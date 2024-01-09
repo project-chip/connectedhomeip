@@ -26,7 +26,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_rvc_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 RvcAppCommandDelegate sRvcAppCommandDelegate;
 } // namespace

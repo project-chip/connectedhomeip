@@ -44,6 +44,15 @@ enum class UDCClientProcessingState : uint8_t
 using PeerAddress = ::chip::Transport::PeerAddress;
 
 /**
+ * Represents information in the TargetAppList of the Identification Declaration message
+ */
+struct TargetAppInfo
+{
+    uint16_t vendorId  = 0;
+    uint16_t productId = 0;
+};
+
+/**
  * Defines the handling state of a UDC Client.
  *
  * Information contained within the state:
@@ -81,6 +90,9 @@ public:
     uint16_t GetProductId() const { return mProductId; }
     void SetProductId(uint16_t value) { mProductId = value; }
 
+    uint16_t GetCdPort() const { return mCdPort; }
+    void SetCdPort(uint16_t port) { mCdPort = port; }
+
     const uint8_t * GetRotatingId() const { return mRotatingId; }
     size_t GetRotatingIdLength() const { return mRotatingIdLen; }
     void SetRotatingId(const uint8_t * rotatingId, size_t rotatingIdLen)
@@ -88,6 +100,37 @@ public:
         size_t maxSize = ArraySize(mRotatingId);
         mRotatingIdLen = (maxSize < rotatingIdLen) ? maxSize : rotatingIdLen;
         memcpy(mRotatingId, rotatingId, mRotatingIdLen);
+    }
+
+    const char * GetPairingInst() const { return mPairingInst; }
+    void SetPairingInst(const char * pairingInst) { Platform::CopyString(mPairingInst, pairingInst); }
+
+    uint16_t GetPairingHint() const { return mPairingHint; }
+    void SetPairingHint(uint16_t pairingHint) { mPairingHint = pairingHint; }
+
+    bool GetTargetAppInfo(uint8_t index, TargetAppInfo & info) const
+    {
+        if (index < mNumTargetAppInfos)
+        {
+            info.vendorId  = mTargetAppInfos[index].vendorId;
+            info.productId = mTargetAppInfos[index].productId;
+            return true;
+        }
+        return false;
+    }
+    size_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
+
+    bool AddTargetAppInfo(TargetAppInfo vid)
+    {
+        if (mNumTargetAppInfos >= sizeof(mTargetAppInfos))
+        {
+            // already at max
+            return false;
+        }
+        mTargetAppInfos[mNumTargetAppInfos].vendorId  = vid.vendorId;
+        mTargetAppInfos[mNumTargetAppInfos].productId = vid.productId;
+        mNumTargetAppInfos++;
+        return true;
     }
 
     UDCClientProcessingState GetUDCClientProcessingState() const { return mUDCClientProcessingState; }
@@ -102,14 +145,42 @@ public:
         return (mUDCClientProcessingState != UDCClientProcessingState::kNotInitialized && mExpirationTime > currentTime);
     }
 
+    void SetNoPasscode(bool newValue) { mNoPasscode = newValue; };
+    bool GetNoPasscode() const { return mNoPasscode; };
+
+    void SetCdUponPasscodeDialog(bool newValue) { mCdUponPasscodeDialog = newValue; };
+    bool GetCdUponPasscodeDialog() const { return mCdUponPasscodeDialog; };
+
+    void SetCommissionerPasscode(bool newValue) { mCommissionerPasscode = newValue; };
+    bool GetCommissionerPasscode() const { return mCommissionerPasscode; };
+
+    void SetCommissionerPasscodeReady(bool newValue) { mCommissionerPasscodeReady = newValue; };
+    bool GetCommissionerPasscodeReady() const { return mCommissionerPasscodeReady; };
+
+    void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
+    bool GetCancelPasscode() const { return mCancelPasscode; };
+
     /**
      *  Reset the connection state to a completely uninitialized status.
      */
     void Reset()
     {
-        mPeerAddress              = PeerAddress::Uninitialized();
-        mExpirationTime           = System::Clock::kZero;
-        mUDCClientProcessingState = UDCClientProcessingState::kNotInitialized;
+        mPeerAddress               = PeerAddress::Uninitialized();
+        mLongDiscriminator         = 0;
+        mVendorId                  = 0;
+        mProductId                 = 0;
+        mRotatingIdLen             = 0;
+        mCdPort                    = 0;
+        mDeviceName[0]             = '\0';
+        mPairingInst[0]            = '\0';
+        mPairingHint               = 0;
+        mNoPasscode                = false;
+        mCdUponPasscodeDialog      = false;
+        mCommissionerPasscode      = false;
+        mCommissionerPasscodeReady = false;
+        mCancelPasscode            = false;
+        mExpirationTime            = System::Clock::kZero;
+        mUDCClientProcessingState  = UDCClientProcessingState::kNotInitialized;
     }
 
 private:
@@ -117,10 +188,24 @@ private:
     char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
     char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
     uint16_t mLongDiscriminator = 0;
-    uint16_t mVendorId;
-    uint16_t mProductId;
+    uint16_t mVendorId          = 0;
+    uint16_t mProductId         = 0;
+    uint16_t mCdPort            = 0;
     uint8_t mRotatingId[chip::Dnssd::kMaxRotatingIdLen];
-    size_t mRotatingIdLen = 0;
+    size_t mRotatingIdLen                                         = 0;
+    char mPairingInst[chip::Dnssd::kMaxPairingInstructionLen + 1] = {};
+    uint16_t mPairingHint                                         = 0;
+
+    constexpr static size_t kMaxTargetAppInfos = 10;
+    uint8_t mNumTargetAppInfos                 = 0; // number of vendor Ids
+    TargetAppInfo mTargetAppInfos[kMaxTargetAppInfos];
+
+    bool mNoPasscode                = false;
+    bool mCdUponPasscodeDialog      = false;
+    bool mCommissionerPasscode      = false;
+    bool mCommissionerPasscodeReady = false;
+    bool mCancelPasscode            = false;
+
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
 };

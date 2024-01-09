@@ -2366,9 +2366,9 @@ static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForBooleanStateConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aEventId) {
     case Events::AlarmsStateChanged::Id: {
         Events::AlarmsStateChanged::DecodableType cppValue;
@@ -2377,7 +2377,7 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
             return nil;
         }
 
-        __auto_type * value = [MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent new];
+        __auto_type * value = [MTRBooleanStateConfigurationClusterAlarmsStateChangedEvent new];
 
         do {
             NSNumber * _Nonnull memberValue;
@@ -2403,7 +2403,13 @@ static id _Nullable DecodeEventPayloadForBooleanSensorConfigurationCluster(Event
             return nil;
         }
 
-        __auto_type * value = [MTRBooleanSensorConfigurationClusterSensorFaultEvent new];
+        __auto_type * value = [MTRBooleanStateConfigurationClusterSensorFaultEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedShort:cppValue.sensorFault.Raw()];
+            value.sensorFault = memberValue;
+        } while (0);
 
         return value;
     }
@@ -2433,6 +2439,15 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
             memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.valveState)];
             value.valveState = memberValue;
         } while (0);
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.valveLevel.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedChar:cppValue.valveLevel.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.valveLevel = memberValue;
+        } while (0);
 
         return value;
     }
@@ -2449,6 +2464,162 @@ static id _Nullable DecodeEventPayloadForValveConfigurationAndControlCluster(Eve
             NSNumber * _Nonnull memberValue;
             memberValue = [NSNumber numberWithUnsignedShort:cppValue.valveFault.Raw()];
             value.valveFault = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForElectricalEnergyMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalEnergyMeasurement;
+    switch (aEventId) {
+    case Events::CumulativeEnergyMeasured::Id: {
+        Events::CumulativeEnergyMeasured::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent new];
+
+        do {
+            MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable memberValue;
+            if (cppValue.energyImported.HasValue()) {
+                memberValue = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+                memberValue.energy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().energy];
+                if (cppValue.energyImported.Value().startTimestamp.HasValue()) {
+                    memberValue.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyImported.Value().startTimestamp.Value()];
+                } else {
+                    memberValue.startTimestamp = nil;
+                }
+                if (cppValue.energyImported.Value().endTimestamp.HasValue()) {
+                    memberValue.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyImported.Value().endTimestamp.Value()];
+                } else {
+                    memberValue.endTimestamp = nil;
+                }
+                if (cppValue.energyImported.Value().startSystime.HasValue()) {
+                    memberValue.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported.Value().startSystime.Value()];
+                } else {
+                    memberValue.startSystime = nil;
+                }
+                if (cppValue.energyImported.Value().endSystime.HasValue()) {
+                    memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported.Value().endSystime.Value()];
+                } else {
+                    memberValue.endSystime = nil;
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.energyImported = memberValue;
+        } while (0);
+        do {
+            MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable memberValue;
+            if (cppValue.energyExported.HasValue()) {
+                memberValue = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+                memberValue.energy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().energy];
+                if (cppValue.energyExported.Value().startTimestamp.HasValue()) {
+                    memberValue.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyExported.Value().startTimestamp.Value()];
+                } else {
+                    memberValue.startTimestamp = nil;
+                }
+                if (cppValue.energyExported.Value().endTimestamp.HasValue()) {
+                    memberValue.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyExported.Value().endTimestamp.Value()];
+                } else {
+                    memberValue.endTimestamp = nil;
+                }
+                if (cppValue.energyExported.Value().startSystime.HasValue()) {
+                    memberValue.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().startSystime.Value()];
+                } else {
+                    memberValue.startSystime = nil;
+                }
+                if (cppValue.energyExported.Value().endSystime.HasValue()) {
+                    memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
+                } else {
+                    memberValue.endSystime = nil;
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.energyExported = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::PeriodicEnergyMeasured::Id: {
+        Events::PeriodicEnergyMeasured::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRElectricalEnergyMeasurementClusterPeriodicEnergyMeasuredEvent new];
+
+        do {
+            MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable memberValue;
+            if (cppValue.energyImported.HasValue()) {
+                memberValue = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+                memberValue.energy = [NSNumber numberWithLongLong:cppValue.energyImported.Value().energy];
+                if (cppValue.energyImported.Value().startTimestamp.HasValue()) {
+                    memberValue.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyImported.Value().startTimestamp.Value()];
+                } else {
+                    memberValue.startTimestamp = nil;
+                }
+                if (cppValue.energyImported.Value().endTimestamp.HasValue()) {
+                    memberValue.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyImported.Value().endTimestamp.Value()];
+                } else {
+                    memberValue.endTimestamp = nil;
+                }
+                if (cppValue.energyImported.Value().startSystime.HasValue()) {
+                    memberValue.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported.Value().startSystime.Value()];
+                } else {
+                    memberValue.startSystime = nil;
+                }
+                if (cppValue.energyImported.Value().endSystime.HasValue()) {
+                    memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyImported.Value().endSystime.Value()];
+                } else {
+                    memberValue.endSystime = nil;
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.energyImported = memberValue;
+        } while (0);
+        do {
+            MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct * _Nullable memberValue;
+            if (cppValue.energyExported.HasValue()) {
+                memberValue = [MTRElectricalEnergyMeasurementClusterEnergyMeasurementStruct new];
+                memberValue.energy = [NSNumber numberWithLongLong:cppValue.energyExported.Value().energy];
+                if (cppValue.energyExported.Value().startTimestamp.HasValue()) {
+                    memberValue.startTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyExported.Value().startTimestamp.Value()];
+                } else {
+                    memberValue.startTimestamp = nil;
+                }
+                if (cppValue.energyExported.Value().endTimestamp.HasValue()) {
+                    memberValue.endTimestamp = [NSNumber numberWithUnsignedInt:cppValue.energyExported.Value().endTimestamp.Value()];
+                } else {
+                    memberValue.endTimestamp = nil;
+                }
+                if (cppValue.energyExported.Value().startSystime.HasValue()) {
+                    memberValue.startSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().startSystime.Value()];
+                } else {
+                    memberValue.startSystime = nil;
+                }
+                if (cppValue.energyExported.Value().endSystime.HasValue()) {
+                    memberValue.endSystime = [NSNumber numberWithUnsignedLongLong:cppValue.energyExported.Value().endSystime.Value()];
+                } else {
+                    memberValue.endSystime = nil;
+                }
+            } else {
+                memberValue = nil;
+            }
+            value.energyExported = memberValue;
         } while (0);
 
         return value;
@@ -2619,6 +2790,78 @@ static id _Nullable DecodeEventPayloadForDemandResponseLoadControlCluster(EventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DeviceEnergyManagement;
+    switch (aEventId) {
+    case Events::PowerAdjustStart::Id: {
+        Events::PowerAdjustStart::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerAdjustStartEvent new];
+
+        return value;
+    }
+    case Events::PowerAdjustEnd::Id: {
+        Events::PowerAdjustEnd::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPowerAdjustEndEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
+            value.cause = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithLongLong:cppValue.energyUse];
+            value.energyUse = memberValue;
+        } while (0);
+
+        return value;
+    }
+    case Events::Paused::Id: {
+        Events::Paused::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterPausedEvent new];
+
+        return value;
+    }
+    case Events::Resumed::Id: {
+        Events::Resumed::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRDeviceEnergyManagementClusterResumedEvent new];
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EnergyEvse;
@@ -2750,8 +2993,12 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
         __auto_type * value = [MTREnergyEVSEClusterFaultEvent new];
 
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.sessionID];
+            NSNumber * _Nullable memberValue;
+            if (cppValue.sessionID.IsNull()) {
+                memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.sessionID.Value()];
+            }
             value.sessionID = memberValue;
         } while (0);
         do {
@@ -2789,6 +3036,18 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
 
         return value;
     }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForEnergyPreferenceCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EnergyPreference;
+    switch (aEventId) {
     default: {
         break;
     }
@@ -3572,6 +3831,55 @@ static id _Nullable DecodeEventPayloadForTargetNavigatorCluster(EventId aEventId
 {
     using namespace Clusters::TargetNavigator;
     switch (aEventId) {
+    case Events::TargetUpdated::Id: {
+        Events::TargetUpdated::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRTargetNavigatorClusterTargetUpdatedEvent new];
+
+        do {
+            NSArray * _Nonnull memberValue;
+            { // Scope for our temporary variables
+                auto * array_0 = [NSMutableArray new];
+                auto iter_0 = cppValue.targetList.begin();
+                while (iter_0.Next()) {
+                    auto & entry_0 = iter_0.GetValue();
+                    MTRTargetNavigatorClusterTargetInfoStruct * newElement_0;
+                    newElement_0 = [MTRTargetNavigatorClusterTargetInfoStruct new];
+                    newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
+                    newElement_0.name = AsString(entry_0.name);
+                    if (newElement_0.name == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    [array_0 addObject:newElement_0];
+                }
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+                memberValue = array_0;
+            }
+            value.targetList = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.currentTarget];
+            value.currentTarget = memberValue;
+        } while (0);
+        do {
+            NSData * _Nonnull memberValue;
+            memberValue = AsData(cppValue.data);
+            value.data = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -3584,6 +3892,73 @@ static id _Nullable DecodeEventPayloadForMediaPlaybackCluster(EventId aEventId, 
 {
     using namespace Clusters::MediaPlayback;
     switch (aEventId) {
+    case Events::StateChanged::Id: {
+        Events::StateChanged::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRMediaPlaybackClusterStateChangedEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.currentState)];
+            value.currentState = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.startTime];
+            value.startTime = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.duration];
+            value.duration = memberValue;
+        } while (0);
+        do {
+            MTRMediaPlaybackClusterPlaybackPositionStruct * _Nonnull memberValue;
+            memberValue = [MTRMediaPlaybackClusterPlaybackPositionStruct new];
+            memberValue.updatedAt = [NSNumber numberWithUnsignedLongLong:cppValue.sampledPosition.updatedAt];
+            if (cppValue.sampledPosition.position.IsNull()) {
+                memberValue.position = nil;
+            } else {
+                memberValue.position = [NSNumber numberWithUnsignedLongLong:cppValue.sampledPosition.position.Value()];
+            }
+            value.sampledPosition = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithFloat:cppValue.playbackSpeed];
+            value.playbackSpeed = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.seekRangeEnd];
+            value.seekRangeEnd = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.seekRangeStart];
+            value.seekRangeStart = memberValue;
+        } while (0);
+        do {
+            NSData * _Nullable memberValue;
+            if (cppValue.data.HasValue()) {
+                memberValue = AsData(cppValue.data.Value());
+            } else {
+                memberValue = nil;
+            }
+            value.data = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithBool:cppValue.audioAdvanceUnmuted];
+            value.audioAdvanceUnmuted = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -3679,6 +4054,62 @@ static id _Nullable DecodeEventPayloadForApplicationBasicCluster(EventId aEventI
 static id _Nullable DecodeEventPayloadForAccountLoginCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AccountLogin;
+    switch (aEventId) {
+    case Events::LoggedOut::Id: {
+        Events::LoggedOut::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRAccountLoginClusterLoggedOutEvent new];
+
+        do {
+            NSNumber * _Nullable memberValue;
+            if (cppValue.node.HasValue()) {
+                memberValue = [NSNumber numberWithUnsignedLongLong:cppValue.node.Value()];
+            } else {
+                memberValue = nil;
+            }
+            value.node = memberValue;
+        } while (0);
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForContentControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ContentControl;
+    switch (aEventId) {
+    case Events::RemainingScreenTimeExpired::Id: {
+        Events::RemainingScreenTimeExpired::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRContentControlClusterRemainingScreenTimeExpiredEvent new];
+
+        return value;
+    }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ContentAppObserver;
     switch (aEventId) {
     default: {
         break;
@@ -3831,6 +4262,28 @@ static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV:
 {
     using namespace Clusters::SampleMei;
     switch (aEventId) {
+    case Events::PingCountEvent::Id: {
+        Events::PingCountEvent::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRSampleMEIClusterPingCountEventEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedInt:cppValue.count];
+            value.count = memberValue;
+        } while (0);
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.fabricIndex];
+            value.fabricIndex = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }
@@ -4023,17 +4476,26 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return DecodeEventPayloadForBooleanSensorConfigurationCluster(aPath.mEventId, aReader, aError);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return DecodeEventPayloadForBooleanStateConfigurationCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return DecodeEventPayloadForValveConfigurationAndControlCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::ElectricalEnergyMeasurement::Id: {
+        return DecodeEventPayloadForElectricalEnergyMeasurementCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::DemandResponseLoadControl::Id: {
         return DecodeEventPayloadForDemandResponseLoadControlCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::DeviceEnergyManagement::Id: {
+        return DecodeEventPayloadForDeviceEnergyManagementCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::EnergyEvse::Id: {
         return DecodeEventPayloadForEnergyEVSECluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::EnergyPreference::Id: {
+        return DecodeEventPayloadForEnergyPreferenceCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);
@@ -4145,6 +4607,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AccountLogin::Id: {
         return DecodeEventPayloadForAccountLoginCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ContentControl::Id: {
+        return DecodeEventPayloadForContentControlCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ContentAppObserver::Id: {
+        return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return DecodeEventPayloadForElectricalMeasurementCluster(aPath.mEventId, aReader, aError);

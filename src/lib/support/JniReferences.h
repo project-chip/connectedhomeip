@@ -82,6 +82,10 @@ public:
 
     CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                           jmethodID * methodId);
+
+    CHIP_ERROR FindMethod(JNIEnv * env, jclass javaClass, const char * methodName, const char * methodSignature,
+                          jmethodID * methodId);
+
     void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);
 
     CHIP_ERROR N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, jsize inArrayLen, jbyteArray & outArray);
@@ -190,12 +194,8 @@ private:
     jobject mClassLoader       = nullptr;
     jmethodID mFindClassMethod = nullptr;
 
-    // These are global refs and therefore safe to persist.
     jclass mHashMapClass   = nullptr;
     jclass mListClass      = nullptr;
     jclass mArrayListClass = nullptr;
-    jclass mOptionalClass  = nullptr;
-
-    bool use_java8_optional = false;
 };
 } // namespace chip

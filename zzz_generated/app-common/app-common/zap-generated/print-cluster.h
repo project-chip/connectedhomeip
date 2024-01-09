@@ -428,11 +428,11 @@
 #define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                     \
-    { chip::app::Clusters::BooleanSensorConfiguration::Id, "Boolean Sensor Configuration" },
+#if defined(ZCL_USING_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_STATE_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER                                                                      \
+    { chip::app::Clusters::BooleanStateConfiguration::Id, "Boolean State Configuration" },
 #else
-#define CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER
+#define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER) ||                                                           \
@@ -443,6 +443,14 @@
 #define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER) ||                                                             \
+    defined(ZCL_USING_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER                                                                    \
+    { chip::app::Clusters::ElectricalEnergyMeasurement::Id, "Electrical Energy Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
     { chip::app::Clusters::DemandResponseLoadControl::Id, "Demand Response Load Control" },
@@ -450,10 +458,23 @@
 #define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                         \
+    { chip::app::Clusters::DeviceEnergyManagement::Id, "Device Energy Management" },
+#else
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_ENERGY_EVSE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER { chip::app::Clusters::EnergyEvse::Id, "Energy EVSE" },
 #else
 #define CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ENERGY_PREFERENCE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_PREFERENCE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER { chip::app::Clusters::EnergyPreference::Id, "Energy Preference" },
+#else
+#define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER
 #endif
 
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
@@ -707,6 +728,18 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
+#if defined(ZCL_USING_CONTENT_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER { chip::app::Clusters::ContentControl::Id, "Content Control" },
+#else
+#define CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CONTENT_APP_OBSERVER_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_APP_OBSERVER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER { chip::app::Clusters::ContentAppObserver::Id, "Content App Observer" },
+#else
+#define CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                           \
     { chip::app::Clusters::ElectricalMeasurement::Id, "Electrical Measurement" },
@@ -796,10 +829,13 @@
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
-    CHIP_PRINTCLUSTER_BOOLEAN_SENSOR_CONFIGURATION_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                      \
+    CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
@@ -837,6 +873,8 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER                                                                                      \

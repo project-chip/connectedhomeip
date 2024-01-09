@@ -537,13 +537,13 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Init
+/** @brief Boolean State Configuration Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBooleanSensorConfigurationClusterInitCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Valve Configuration and Control Cluster Init
  *
@@ -553,6 +553,14 @@ void emberAfBooleanSensorConfigurationClusterInitCallback(chip::EndpointId endpo
  */
 void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Electrical Energy Measurement Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Demand Response Load Control Cluster Init
  *
  * Cluster Init
@@ -561,6 +569,14 @@ void emberAfValveConfigurationAndControlClusterInitCallback(chip::EndpointId end
  */
 void emberAfDemandResponseLoadControlClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Device Energy Management Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Energy EVSE Cluster Init
  *
  * Cluster Init
@@ -568,6 +584,14 @@ void emberAfDemandResponseLoadControlClusterInitCallback(chip::EndpointId endpoi
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Energy Preference Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEnergyPreferenceClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Door Lock Cluster Init
  *
@@ -864,6 +888,22 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content Control Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfContentControlClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content App Observer Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfContentAppObserverClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Electrical Measurement Cluster Init
  *
@@ -5761,42 +5801,42 @@ void emberAfActivatedCarbonFilterMonitoringClusterServerTickCallback(chip::Endpo
 void emberAfActivatedCarbonFilterMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Boolean Sensor Configuration Cluster
+// Boolean State Configuration Cluster
 //
 
-/** @brief Boolean Sensor Configuration Cluster Server Init
+/** @brief Boolean State Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBooleanSensorConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Server Shutdown
+/** @brief Boolean State Configuration Cluster Server Shutdown
  *
  * Server Shutdown
  *
  * @param endpoint    Endpoint that is being shutdown
  */
-void MatterBooleanSensorConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+void MatterBooleanStateConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Client Init
+/** @brief Boolean State Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBooleanSensorConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Server Attribute Changed
+/** @brief Boolean State Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterBooleanSensorConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterBooleanStateConfigurationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Boolean Sensor Configuration Cluster Server Pre Attribute Changed
+/** @brief Boolean State Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -5805,10 +5845,10 @@ void MatterBooleanSensorConfigurationClusterServerAttributeChangedCallback(const
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterBooleanSensorConfigurationClusterServerPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterBooleanStateConfigurationClusterServerPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Boolean Sensor Configuration Cluster Client Pre Attribute Changed
+/** @brief Boolean State Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -5817,24 +5857,24 @@ chip::Protocols::InteractionModel::Status MatterBooleanSensorConfigurationCluste
  * @param size          Attribute size
  * @param value         Attribute value
  */
-chip::Protocols::InteractionModel::Status MatterBooleanSensorConfigurationClusterClientPreAttributeChangedCallback(
+chip::Protocols::InteractionModel::Status MatterBooleanStateConfigurationClusterClientPreAttributeChangedCallback(
     const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Boolean Sensor Configuration Cluster Server Tick
+/** @brief Boolean State Configuration Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBooleanSensorConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Boolean Sensor Configuration Cluster Client Tick
+/** @brief Boolean State Configuration Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBooleanSensorConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfBooleanStateConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Valve Configuration and Control Cluster
@@ -5914,6 +5954,82 @@ void emberAfValveConfigurationAndControlClusterServerTickCallback(chip::Endpoint
 void emberAfValveConfigurationAndControlClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Electrical Energy Measurement Cluster
+//
+
+/** @brief Electrical Energy Measurement Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalEnergyMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalEnergyMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfElectricalEnergyMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterElectricalEnergyMeasurementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Electrical Energy Measurement Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalEnergyMeasurementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Electrical Energy Measurement Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterElectricalEnergyMeasurementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Electrical Energy Measurement Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalEnergyMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Electrical Energy Measurement Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfElectricalEnergyMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Demand Response Load Control Cluster
 //
 
@@ -5988,6 +6104,82 @@ void emberAfDemandResponseLoadControlClusterServerTickCallback(chip::EndpointId 
  * @param endpoint  Endpoint that is being served
  */
 void emberAfDemandResponseLoadControlClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Device Energy Management Cluster
+//
+
+/** @brief Device Energy Management Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDeviceEnergyManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Device Energy Management Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDeviceEnergyManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Device Energy Management Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfDeviceEnergyManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Device Energy Management Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterDeviceEnergyManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Device Energy Management Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDeviceEnergyManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Device Energy Management Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterDeviceEnergyManagementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Device Energy Management Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDeviceEnergyManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Device Energy Management Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfDeviceEnergyManagementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Energy EVSE Cluster
@@ -6066,6 +6258,84 @@ void emberAfEnergyEvseClusterServerTickCallback(chip::EndpointId endpoint);
  * @param endpoint  Endpoint that is being served
  */
 void emberAfEnergyEvseClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Energy Preference Cluster
+//
+
+/** @brief Energy Preference Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEnergyPreferenceClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Energy Preference Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterEnergyPreferenceClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Energy Preference Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfEnergyPreferenceClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Energy Preference Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterEnergyPreferenceClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Energy Preference Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Energy Preference Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterEnergyPreferenceClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Energy Preference Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfEnergyPreferenceClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Energy Preference Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfEnergyPreferenceClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Door Lock Cluster
@@ -8930,6 +9200,160 @@ void emberAfAccountLoginClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfAccountLoginClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
+// Content Control Cluster
+//
+
+/** @brief Content Control Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfContentControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterContentControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Content Control Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfContentControlClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content Control Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterContentControlClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Content Control Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterContentControlClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Content Control Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterContentControlClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                             EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Content Control Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfContentControlClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Content Control Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfContentControlClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Content App Observer Cluster
+//
+
+/** @brief Content App Observer Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfContentAppObserverClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content App Observer Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterContentAppObserverClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/** @brief Content App Observer Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfContentAppObserverClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content App Observer Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterContentAppObserverClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Content App Observer Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterContentAppObserverClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Content App Observer Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterContentAppObserverClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Content App Observer Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfContentAppObserverClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Content App Observer Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfContentAppObserverClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
 // Electrical Measurement Cluster
 //
 
@@ -9759,23 +10183,17 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief Microwave Oven Control Cluster SetCookingParameters Command callback (from client)
+ * @brief Boolean State Configuration Cluster SuppressAlarm Command callback (from client)
  */
-bool emberAfMicrowaveOvenControlClusterSetCookingParametersCallback(
+bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::DecodableType & commandData);
+    const chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData);
 /**
- * @brief Microwave Oven Control Cluster AddMoreTime Command callback (from client)
+ * @brief Boolean State Configuration Cluster EnableDisableAlarm Command callback (from client)
  */
-bool emberAfMicrowaveOvenControlClusterAddMoreTimeCallback(
+bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::DecodableType & commandData);
-/**
- * @brief Boolean Sensor Configuration Cluster SuppressRequest Command callback (from client)
- */
-bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::DecodableType & commandData);
+    const chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData);
 /**
  * @brief Valve Configuration and Control Cluster Open Command callback (from client)
  */
@@ -9788,12 +10206,6 @@ bool emberAfValveConfigurationAndControlClusterOpenCallback(
 bool emberAfValveConfigurationAndControlClusterCloseCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::DecodableType & commandData);
-/**
- * @brief Valve Configuration and Control Cluster SetLevel Command callback (from client)
- */
-bool emberAfValveConfigurationAndControlClusterSetLevelCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::DecodableType & commandData);
 /**
  * @brief Demand Response Load Control Cluster RegisterLoadControlProgramRequest Command callback (from client)
  */
@@ -9825,48 +10237,6 @@ bool emberAfDemandResponseLoadControlClusterRemoveLoadControlEventRequestCallbac
 bool emberAfDemandResponseLoadControlClusterClearLoadControlEventsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster Disable Command callback (from client)
- */
-bool emberAfEnergyEvseClusterDisableCallback(chip::app::CommandHandler * commandObj,
-                                             const chip::app::ConcreteCommandPath & commandPath,
-                                             const chip::app::Clusters::EnergyEvse::Commands::Disable::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster EnableCharging Command callback (from client)
- */
-bool emberAfEnergyEvseClusterEnableChargingCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvse::Commands::EnableCharging::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster EnableDischarging Command callback (from client)
- */
-bool emberAfEnergyEvseClusterEnableDischargingCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvse::Commands::EnableDischarging::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster StartDiagnostics Command callback (from client)
- */
-bool emberAfEnergyEvseClusterStartDiagnosticsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvse::Commands::StartDiagnostics::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster SetTargets Command callback (from client)
- */
-bool emberAfEnergyEvseClusterSetTargetsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvse::Commands::SetTargets::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster GetTargets Command callback (from client)
- */
-bool emberAfEnergyEvseClusterGetTargetsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvse::Commands::GetTargets::DecodableType & commandData);
-/**
- * @brief Energy EVSE Cluster ClearTargets Command callback (from client)
- */
-bool emberAfEnergyEvseClusterClearTargetsCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvse::Commands::ClearTargets::DecodableType & commandData);
 /**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
@@ -10198,6 +10568,24 @@ bool emberAfChannelClusterSkipChannelCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Channel::Commands::SkipChannel::DecodableType & commandData);
 /**
+ * @brief Channel Cluster GetProgramGuide Command callback (from client)
+ */
+bool emberAfChannelClusterGetProgramGuideCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Channel::Commands::GetProgramGuide::DecodableType & commandData);
+/**
+ * @brief Channel Cluster RecordProgram Command callback (from client)
+ */
+bool emberAfChannelClusterRecordProgramCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Channel::Commands::RecordProgram::DecodableType & commandData);
+/**
+ * @brief Channel Cluster CancelRecordProgram Command callback (from client)
+ */
+bool emberAfChannelClusterCancelRecordProgramCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Channel::Commands::CancelRecordProgram::DecodableType & commandData);
+/**
  * @brief Target Navigator Cluster NavigateTarget Command callback (from client)
  */
 bool emberAfTargetNavigatorClusterNavigateTargetCallback(
@@ -10269,6 +10657,24 @@ bool emberAfMediaPlaybackClusterSkipBackwardCallback(
 bool emberAfMediaPlaybackClusterSeekCallback(chip::app::CommandHandler * commandObj,
                                              const chip::app::ConcreteCommandPath & commandPath,
                                              const chip::app::Clusters::MediaPlayback::Commands::Seek::DecodableType & commandData);
+/**
+ * @brief Media Playback Cluster ActivateAudioTrack Command callback (from client)
+ */
+bool emberAfMediaPlaybackClusterActivateAudioTrackCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::ActivateAudioTrack::DecodableType & commandData);
+/**
+ * @brief Media Playback Cluster ActivateTextTrack Command callback (from client)
+ */
+bool emberAfMediaPlaybackClusterActivateTextTrackCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::ActivateTextTrack::DecodableType & commandData);
+/**
+ * @brief Media Playback Cluster DeactivateTextTrack Command callback (from client)
+ */
+bool emberAfMediaPlaybackClusterDeactivateTextTrackCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::MediaPlayback::Commands::DeactivateTextTrack::DecodableType & commandData);
 /**
  * @brief Media Input Cluster SelectInput Command callback (from client)
  */
@@ -10364,6 +10770,72 @@ bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * command
 bool emberAfAccountLoginClusterLogoutCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::AccountLogin::Commands::Logout::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster UpdatePIN Command callback (from client)
+ */
+bool emberAfContentControlClusterUpdatePINCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::UpdatePIN::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster ResetPIN Command callback (from client)
+ */
+bool emberAfContentControlClusterResetPINCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::ResetPIN::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster Enable Command callback (from client)
+ */
+bool emberAfContentControlClusterEnableCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::Enable::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster Disable Command callback (from client)
+ */
+bool emberAfContentControlClusterDisableCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::Disable::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster AddBonusTime Command callback (from client)
+ */
+bool emberAfContentControlClusterAddBonusTimeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::AddBonusTime::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster SetScreenDailyTime Command callback (from client)
+ */
+bool emberAfContentControlClusterSetScreenDailyTimeCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::SetScreenDailyTime::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster BlockUnratedContent Command callback (from client)
+ */
+bool emberAfContentControlClusterBlockUnratedContentCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::BlockUnratedContent::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster UnblockUnratedContent Command callback (from client)
+ */
+bool emberAfContentControlClusterUnblockUnratedContentCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::UnblockUnratedContent::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster SetOnDemandRatingThreshold Command callback (from client)
+ */
+bool emberAfContentControlClusterSetOnDemandRatingThresholdCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::SetOnDemandRatingThreshold::DecodableType & commandData);
+/**
+ * @brief Content Control Cluster SetScheduledContentRatingThreshold Command callback (from client)
+ */
+bool emberAfContentControlClusterSetScheduledContentRatingThresholdCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentControl::Commands::SetScheduledContentRatingThreshold::DecodableType & commandData);
+/**
+ * @brief Content App Observer Cluster ContentAppMessage Command callback (from client)
+ */
+bool emberAfContentAppObserverClusterContentAppMessageCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::DecodableType & commandData);
 /**
  * @brief Electrical Measurement Cluster GetProfileInfoCommand Command callback (from client)
  */
@@ -10508,6 +10980,18 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
 bool emberAfUnitTestingClusterTestEmitTestFabricScopedEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
+/**
+ * @brief Unit Testing Cluster TestBatchHelperRequest Command callback (from client)
+ */
+bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::DecodableType & commandData);
+/**
+ * @brief Unit Testing Cluster TestSecondBatchHelperRequest Command callback (from client)
+ */
+bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::DecodableType & commandData);
 /**
  * @brief Fault Injection Cluster FailAtFault Command callback (from client)
  */

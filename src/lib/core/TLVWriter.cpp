@@ -44,30 +44,56 @@
 #define NO_INLINE __attribute__((noinline))
 #endif // DOXYGEN
 
+// You can enable this block manually to abort on usage of uninitialized writers in
+// your codebase. There are no such usages in the SDK (outside of tests).
+#if 0
+#define ABORT_ON_UNINITIALIZED_IF_ENABLED() VerifyOrDie(IsInitialized() == true)
+#else
+#define ABORT_ON_UNINITIALIZED_IF_ENABLED()                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
+#endif
+
 namespace chip {
 namespace TLV {
 
 using namespace chip::Encoding;
 
+TLVWriter::TLVWriter() :
+    ImplicitProfileId(kProfileIdNotSpecified), AppData(nullptr), mBackingStore(nullptr), mBufStart(nullptr), mWritePoint(nullptr),
+    mRemainingLen(0), mLenWritten(0), mMaxLen(0), mReservedSize(0), mContainerType(kTLVType_NotSpecified), mInitializationCookie(0),
+    mContainerOpen(false), mCloseContainerReserved(true)
+{}
+
 NO_INLINE void TLVWriter::Init(uint8_t * buf, size_t maxLen)
 {
     // TODO: Maybe we can just make mMaxLen, mLenWritten, mRemainingLen size_t instead?
     uint32_t actualMaxLen = maxLen > UINT32_MAX ? UINT32_MAX : static_cast<uint32_t>(maxLen);
+
+    // TODO(#30825): Need to ensure a single init path for this complex data.
+    mInitializationCookie = 0;
     mBackingStore         = nullptr;
-    mBufStart = mWritePoint = buf;
-    mRemainingLen           = actualMaxLen;
-    mLenWritten             = 0;
-    mMaxLen                 = actualMaxLen;
-    mContainerType          = kTLVType_NotSpecified;
-    mReservedSize           = 0;
+    mBufStart             = buf;
+    mWritePoint           = buf;
+    mRemainingLen         = actualMaxLen;
+    mLenWritten           = 0;
+    mMaxLen               = actualMaxLen;
+    mContainerType        = kTLVType_NotSpecified;
+    mReservedSize         = 0;
     SetContainerOpen(false);
     SetCloseContainerReserved(true);
 
-    ImplicitProfileId = kProfileIdNotSpecified;
+    ImplicitProfileId     = kProfileIdNotSpecified;
+    mInitializationCookie = kExpectedInitializationCookie;
 }
 
-CHIP_ERROR TLVWriter::Init(TLVBackingStore & backingStore, uint32_t maxLen)
+CHIP_ERROR TLVWriter::Init(TLVBackingStore & backingStore, uint32_t maxLen /* = UINT32_MAX */)
 {
+    // TODO(#30825): Need to ensure a single init path for this complex data.
+    Init(nullptr, maxLen);
+    mInitializationCookie = 0;
+
     mBackingStore  = &backingStore;
     mBufStart      = nullptr;
     mRemainingLen  = 0;
@@ -75,26 +101,45 @@ CHIP_ERROR TLVWriter::Init(TLVBackingStore & backingStore, uint32_t maxLen)
     if (err != CHIP_NO_ERROR)
         return err;
 
-    mWritePoint    = mBufStart;
-    mLenWritten    = 0;
-    mMaxLen        = maxLen;
-    mContainerType = kTLVType_NotSpecified;
-    mReservedSize  = 0;
-    SetContainerOpen(false);
-    SetCloseContainerReserved(true);
-
-    ImplicitProfileId = kProfileIdNotSpecified;
+    mWritePoint           = mBufStart;
+    mInitializationCookie = kExpectedInitializationCookie;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVWriter::Finalize()
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (IsContainerOpen())
         return CHIP_ERROR_TLV_CONTAINER_OPEN;
     if (mBackingStore != nullptr)
         err = mBackingStore->FinalizeBuffer(*this, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart));
+
+        // TODO(#30825) The following should be safe, but in some cases (without mBackingStore), there are incremental writes that
+        // start failing.
+#if 0
+    if (err == CHIP_NO_ERROR)
+        mInitializationCookie = 0;
+#endif
+
     return err;
+}
+
+CHIP_ERROR TLVWriter::ReserveBuffer(uint32_t aBufferSize)
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRemainingLen >= aBufferSize, CHIP_ERROR_NO_MEMORY);
+
+    if (mBackingStore)
+    {
+        VerifyOrReturnError(mBackingStore->GetNewBufferWillAlwaysFail(), CHIP_ERROR_INCORRECT_STATE);
+    }
+    mReservedSize += aBufferSize;
+    mRemainingLen -= aBufferSize;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVWriter::PutBoolean(Tag tag, bool v)
@@ -463,6 +508,9 @@ CHIP_ERROR TLVWriter::CopyElement(Tag tag, TLVReader & reader)
 
 CHIP_ERROR TLVWriter::OpenContainer(Tag tag, TLVType containerType, TLVWriter & containerWriter)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(TLVTypeIsContainer(containerType), CHIP_ERROR_WRONG_TLV_TYPE);
@@ -483,6 +531,7 @@ CHIP_ERROR TLVWriter::OpenContainer(Tag tag, TLVType containerType, TLVWriter & 
         return err;
     }
 
+    // TODO(#30825): Clean-up this separate init path path.
     containerWriter.mBackingStore  = mBackingStore;
     containerWriter.mBufStart      = mBufStart;
     containerWriter.mWritePoint    = mWritePoint;
@@ -492,7 +541,8 @@ CHIP_ERROR TLVWriter::OpenContainer(Tag tag, TLVType containerType, TLVWriter & 
     containerWriter.mContainerType = containerType;
     containerWriter.SetContainerOpen(false);
     containerWriter.SetCloseContainerReserved(IsCloseContainerReserved());
-    containerWriter.ImplicitProfileId = ImplicitProfileId;
+    containerWriter.ImplicitProfileId     = ImplicitProfileId;
+    containerWriter.mInitializationCookie = kExpectedInitializationCookie;
 
     SetContainerOpen(true);
 
@@ -501,6 +551,10 @@ CHIP_ERROR TLVWriter::OpenContainer(Tag tag, TLVType containerType, TLVWriter & 
 
 CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     if (!TLVTypeIsContainer(containerWriter.mContainerType))
         return CHIP_ERROR_INCORRECT_STATE;
 
@@ -526,6 +580,9 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
 
 CHIP_ERROR TLVWriter::StartContainer(Tag tag, TLVType containerType, TLVType & outerContainerType)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrReturnError(TLVTypeIsContainer(containerType), CHIP_ERROR_WRONG_TLV_TYPE);
@@ -555,6 +612,10 @@ CHIP_ERROR TLVWriter::StartContainer(Tag tag, TLVType containerType, TLVType & o
 
 CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     if (!TLVTypeIsContainer(mContainerType))
         return CHIP_ERROR_INCORRECT_STATE;
 
@@ -585,6 +646,10 @@ CHIP_ERROR TLVWriter::CopyContainer(TLVReader & container)
 
 CHIP_ERROR TLVWriter::CopyContainer(Tag tag, TLVReader & container)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     // NOTE: This function MUST be used with a TVLReader that is reading from a contiguous buffer.
     if (container.mBackingStore != nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -611,6 +676,8 @@ CHIP_ERROR TLVWriter::CopyContainer(Tag tag, TLVReader & container)
 
 CHIP_ERROR TLVWriter::CopyContainer(Tag tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+
     TLVReader reader;
 
     reader.Init(encodedContainer, encodedContainerLen);
@@ -624,6 +691,9 @@ CHIP_ERROR TLVWriter::CopyContainer(Tag tag, const uint8_t * encodedContainer, u
 
 CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_t lenOrVal)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     uint8_t * p;
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
 
@@ -742,6 +812,9 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     if (static_cast<uint64_t>(type) & kTLVTypeSizeMask)
     {
         // We won't be able to recover this type properly!
@@ -767,6 +840,9 @@ CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, Tag tag, const uint8_t 
 
 CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
 {
+    ABORT_ON_UNINITIALIZED_IF_ENABLED();
+
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError((mLenWritten + len) <= mMaxLen, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     while (len > 0)

@@ -83,15 +83,16 @@ limitations under the License.
     <code>0x0033</code>
     <define>GENERAL_DIAGNOSTICS_CLUSTER</define>
     <description>The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
-    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="ARRAY" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
     <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
     <!-- TODO(#30023): Make Uptime conditionally mandatory at rev >= 2 -->
     <attribute side="server" code="0x02" define="UP_TIME" type="int64u" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
     <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="int32u" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
     <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" writable="false" optional="true">BootReason</attribute>
-    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
-    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
+    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
+    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
     <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean" writable="false" optional="false">TestEventTriggersEnabled</attribute>
     <!--
         WARNING !!!!! Attribute 0x0009 (previously AverageWearCount, see #30002/#29285)
@@ -116,8 +117,8 @@ limitations under the License.
 
     <command source="server" code="0x02" name="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
       <description>Response for the TimeSnapshot command.</description>
-      <arg name="SystemTimeUs" type="systime_us" optional="false"/>
-      <arg name="UTCTimeUs" type="epoch_us" isNullable="true" optional="false"/>
+      <arg name="SystemTimeMs" type="systime_ms" optional="false"/>
+      <arg name="PosixTimeMs" type="posix_ms" isNullable="true" optional="false"/>
     </command>
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">

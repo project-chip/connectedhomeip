@@ -28,7 +28,8 @@ AccountLoginManager::AccountLoginManager(const char * setupPin)
     CopyString(mSetupPin, sizeof(mSetupPin), setupPin);
 }
 
-bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin)
+bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, const CharSpan & setupPin,
+                                      const chip::Optional<chip::NodeId> & nodeId)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
     string setupPinString(setupPin.data(), setupPin.size());
@@ -45,7 +46,7 @@ bool AccountLoginManager::HandleLogin(const CharSpan & tempAccountIdentifier, co
     return false;
 }
 
-bool AccountLoginManager::HandleLogout()
+bool AccountLoginManager::HandleLogout(const chip::Optional<chip::NodeId> & nodeId)
 {
     // TODO: Insert your code here to send logout request
     ChipLogProgress(Zcl, "AccountLoginManager::HandleLogout success");

@@ -48,7 +48,13 @@ tests:
                 value: "asdf"
               - name: "SetupPIN"
                 value: "tempPin123"
+              - name: "Node"
+                value: nodeId
 
     - label: "Logout Command"
       command: "Logout"
       timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Node"
+                value: nodeId

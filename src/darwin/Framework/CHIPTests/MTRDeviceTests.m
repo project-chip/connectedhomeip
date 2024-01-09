@@ -80,6 +80,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
+
+@interface MTRDevice (Test)
+- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+@end
 #endif
 
 @interface MTRDeviceTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
@@ -1458,6 +1462,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // can satisfy the test below.
     XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     __block unsigned eventReportsReceived = 0;
+    __block BOOL reportEnded = NO;
+    __block BOOL gotOneNonPrimingEvent = NO;
+    XCTestExpectation * gotNonPrimingEventExpectation = [self expectationWithDescription:@"Received event outside of priming report"];
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
 
@@ -1472,10 +1479,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             } else if (eventTimeType == MTREventTimeTypeTimestampDate) {
                 XCTAssertNotNil(eventDict[MTREventTimestampDateKey]);
             }
+
+            if (!reportEnded) {
+                NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+                XCTAssertTrue(reportIsHistorical.boolValue);
+            } else {
+                if (!gotOneNonPrimingEvent) {
+                    NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+                    XCTAssertFalse(reportIsHistorical.boolValue);
+                    gotOneNonPrimingEvent = YES;
+                    [gotNonPrimingEventExpectation fulfill];
+                }
+            }
         }
     };
     delegate.onReportEnd = ^() {
+        reportEnded = YES;
         [gotReportsExpectation fulfill];
+#ifdef DEBUG
+        [device unitTestInjectEventReport:@[ @{
+            MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
+            MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+            MTREventTimestampDateKey : [NSDate date]
+        } ]];
+#endif
     };
 
     [device setDelegate:delegate queue:queue];
@@ -1506,7 +1533,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
     [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
 
-    [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation ] timeout:60];
+    [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation, gotNonPrimingEventExpectation ] timeout:60];
 
     delegate.onReportEnd = nil;
 
@@ -2776,6 +2803,93 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
+}
+
+- (void)test029_PathsBehavior
+{
+    __auto_type * commandPath1 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(3)];
+    __auto_type * commandPath2 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(4)];
+    __auto_type * commandPath3 = [MTRCommandPath commandPathWithEndpointID:@(2) clusterID:@(2) commandID:@(3)];
+    __auto_type * commandPath4 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(1) commandID:@(3)];
+    __auto_type * commandPath5 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(3)];
+
+    __auto_type * eventPath1 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(3)];
+    __auto_type * eventPath2 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(4)];
+    __auto_type * eventPath3 = [MTREventPath eventPathWithEndpointID:@(2) clusterID:@(2) eventID:@(3)];
+    __auto_type * eventPath4 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(3)];
+    __auto_type * eventPath5 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(3)];
+
+    __auto_type * attributePath1 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)];
+    __auto_type * attributePath2 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(4)];
+    __auto_type * attributePath3 = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(2) attributeID:@(3)];
+    __auto_type * attributePath4 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(3)];
+    __auto_type * attributePath5 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)];
+
+    __auto_type * clusterPath1 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
+    __auto_type * clusterPath2 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)];
+    __auto_type * clusterPath3 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
+    __auto_type * clusterPath4 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
+
+    // Command paths
+    XCTAssertTrue([commandPath1 isEqual:commandPath5]);
+    XCTAssertEqualObjects(commandPath1, commandPath5);
+
+    XCTAssertFalse([commandPath1 isEqual:commandPath2]);
+    XCTAssertNotEqualObjects(commandPath1, commandPath2);
+
+    XCTAssertFalse([commandPath1 isEqual:commandPath3]);
+    XCTAssertNotEqualObjects(commandPath1, commandPath3);
+
+    XCTAssertFalse([commandPath1 isEqual:commandPath4]);
+    XCTAssertNotEqualObjects(commandPath1, commandPath4);
+
+    // Event paths
+    XCTAssertTrue([eventPath1 isEqual:eventPath5]);
+    XCTAssertEqualObjects(eventPath1, eventPath5);
+
+    XCTAssertFalse([eventPath1 isEqual:eventPath2]);
+    XCTAssertNotEqualObjects(eventPath1, eventPath2);
+
+    XCTAssertFalse([eventPath1 isEqual:eventPath3]);
+    XCTAssertNotEqualObjects(eventPath1, eventPath3);
+
+    XCTAssertFalse([eventPath1 isEqual:eventPath4]);
+    XCTAssertNotEqualObjects(eventPath1, eventPath4);
+
+    // Attribute paths
+    XCTAssertTrue([attributePath1 isEqual:attributePath5]);
+    XCTAssertEqualObjects(attributePath1, attributePath5);
+
+    XCTAssertFalse([attributePath1 isEqual:attributePath2]);
+    XCTAssertNotEqualObjects(attributePath1, attributePath2);
+
+    XCTAssertFalse([attributePath1 isEqual:attributePath3]);
+    XCTAssertNotEqualObjects(attributePath1, attributePath3);
+
+    XCTAssertFalse([attributePath1 isEqual:attributePath4]);
+    XCTAssertNotEqualObjects(attributePath1, attributePath4);
+
+    // Clusters
+    XCTAssertTrue([clusterPath1 isEqual:clusterPath4]);
+    XCTAssertEqualObjects(clusterPath1, clusterPath4);
+
+    XCTAssertFalse([clusterPath1 isEqual:clusterPath2]);
+    XCTAssertNotEqualObjects(clusterPath1, clusterPath2);
+
+    XCTAssertFalse([clusterPath1 isEqual:clusterPath3]);
+    XCTAssertNotEqualObjects(clusterPath1, clusterPath3);
+
+    // Mix
+    XCTAssertFalse([commandPath1 isEqual:eventPath1]);
+    XCTAssertFalse([eventPath1 isEqual:commandPath1]);
+
+    XCTAssertFalse([commandPath1 isEqual:attributePath1]);
+    XCTAssertFalse([attributePath1 isEqual:commandPath1]);
+
+    XCTAssertFalse([attributePath1 isEqual:eventPath1]);
+    XCTAssertFalse([eventPath1 isEqual:attributePath1]);
+    XCTAssertFalse([clusterPath1 isEqual:attributePath1]);
+    XCTAssertFalse([clusterPath1 isEqual:eventPath1]);
 }
 
 - (void)test999_TearDown

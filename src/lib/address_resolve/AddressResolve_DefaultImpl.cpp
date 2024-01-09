@@ -195,7 +195,7 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
 {
     VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
+    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_NOT_FOUND);
 
     auto listener = handle.GetListener();
     auto peerId   = handle.GetRequest().GetPeerId();

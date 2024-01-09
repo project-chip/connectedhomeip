@@ -54,6 +54,9 @@ namespace {
 // For WiFi and Thread scan results, each item will cost ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
 constexpr size_t kMaxNetworksInScanResponse = 15;
 
+// The maximum number of Wi-Fi bands a device can support.
+constexpr size_t kMaxWiFiBands = 6;
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 constexpr size_t kPossessionNonceSize = 32;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -269,7 +272,19 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::SupportedWiFiBands::Id:
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_NO_ERROR);
         VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
-        return aEncoder.Encode(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands());
+
+        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+            WiFiBand bandsBuffer[kMaxWiFiBands];
+            Span<WiFiBand> bands(bandsBuffer);
+            ReturnErrorOnFailure(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands(bands));
+
+            for (WiFiBand band : bands)
+            {
+                ReturnErrorOnFailure(encoder.Encode(band));
+            }
+
+            return CHIP_NO_ERROR;
+        });
 
     case Attributes::SupportedThreadFeatures::Id:
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
@@ -830,8 +845,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
-    SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
@@ -942,8 +959,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     WiFiScanResponse scanResponse;
     size_t networksEncoded = 0;
 
-    SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));

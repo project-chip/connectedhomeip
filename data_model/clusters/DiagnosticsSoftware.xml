@@ -72,7 +72,7 @@ Davis, CA 95616, USA
       <field id="0" name="ID" type="uint64">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="empty">
+      <field id="1" name="Name" type="ref_DataTypeString" default="empty">
         <optionalConform/>
         <constraint type="max" value="8"/>
       </field>
@@ -88,7 +88,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ThreadMetrics" type="&lt;&lt;ref_DataTypeList&gt;&gt;[ThreadMetricsStruct]">
+    <attribute id="0x0000" name="ThreadMetrics" type="ref_DataTypeList[ThreadMetricsStruct]">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="max" value="64"/>
@@ -123,11 +123,11 @@ Davis, CA 95616, USA
       <field id="0" name="ID" type="uint64" default="0">
         <mandatoryConform/>
       </field>
-      <field id="1" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;" default="empty">
+      <field id="1" name="Name" type="ref_DataTypeString" default="empty">
         <optionalConform/>
         <constraint type="max" value="8"/>
       </field>
-      <field id="2" name="FaultRecording" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;" default="empty">
+      <field id="2" name="FaultRecording" type="ref_DataTypeOctstr" default="empty">
         <optionalConform/>
         <constraint type="max" value="1024"/>
       </field>

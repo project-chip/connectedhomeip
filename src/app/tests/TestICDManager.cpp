@@ -68,53 +68,51 @@ public:
     void OnICDModeChange() {}
 };
 
-TestICDStateObserver mICDStateObserver;
-static Clock::Internal::MockClock gMockClock;
-static Clock::ClockBase * gRealClock;
-
-class TestContext : public Test::AppContext
+class TestContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context)
+    // Performs shared setup for all tests in the test suite
+    CHIP_ERROR SetUpTestSuite() override
     {
-        if (AppContext::Initialize(context) != SUCCESS)
-            return FAILURE;
-
-        auto * ctx = static_cast<TestContext *>(context);
-        DeviceLayer::SetSystemLayerForTesting(&ctx->GetSystemLayer());
-
-        gRealClock = &SystemClock();
-        Clock::Internal::SetSystemClockForTesting(&gMockClock);
-
-        if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
-        {
-            return FAILURE;
-        }
-        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &(ctx->mKeystore), &(ctx->GetExchangeManager()));
-        ctx->mICDManager.RegisterObserver(&mICDStateObserver);
-        return SUCCESS;
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUpTestSuite());
+        DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
+        mRealClock = &chip::System::SystemClock();
+        System::Clock::Internal::SetSystemClockForTesting(&mMockClock);
+        return CHIP_NO_ERROR;
     }
 
-    static int Finalize(void * context)
+    // Performs shared teardown for all tests in the test suite
+    void TearDownTestSuite() override
     {
-        auto * ctx = static_cast<TestContext *>(context);
-        ctx->mICDManager.Shutdown();
-        app::EventManagement::DestroyEventManagement();
-        System::Clock::Internal::SetSystemClockForTesting(gRealClock);
+        System::Clock::Internal::SetSystemClockForTesting(mRealClock);
         DeviceLayer::SetSystemLayerForTesting(nullptr);
-
-        if (AppContext::Finalize(context) != SUCCESS)
-            return FAILURE;
-
-        return SUCCESS;
+        chip::Test::AppContext::TearDownTestSuite();
     }
 
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override
+    {
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+        mICDManager.Init(&testStorage, &GetFabricTable(), &mKeystore, &GetExchangeManager());
+        mICDManager.RegisterObserver(&mICDStateObserver);
+        return CHIP_NO_ERROR;
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        mICDManager.Shutdown();
+        chip::Test::AppContext::TearDown();
+    }
+
+    System::Clock::Internal::MockClock mMockClock;
     TestSessionKeystoreImpl mKeystore;
     app::ICDManager mICDManager;
     TestPersistentStorageDelegate testStorage;
 
 private:
-    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
+    System::Clock::ClockBase * mRealClock;
+    TestICDStateObserver mICDStateObserver;
 };
 
 } // namespace
@@ -131,9 +129,9 @@ public:
      *
      * @param time_ms: Value in milliseconds.
      */
-    static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint32_t time_ms)
+    static void AdvanceClockAndRunEventLoop(TestContext * ctx, uint64_t time_ms)
     {
-        gMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
+        ctx->mMockClock.AdvanceMonotonic(System::Clock::Timeout(time_ms));
         ctx->GetIOContext().DriveIO();
     }
 
@@ -143,13 +141,13 @@ public:
 
         // After the init we should be in Idle mode
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
         // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
         // Active mode interval expired, ICDManager transitioned to the IdleMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
-        AdvanceClockAndRunEventLoop(ctx, secondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
+        AdvanceClockAndRunEventLoop(ctx, SecondsToMilliseconds(ICDConfigurationData::GetInstance().GetIdleModeDurationSec()) + 1);
         // Idle mode interval expired, ICDManager transitioned to the ActiveMode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
@@ -314,34 +312,37 @@ public:
         // Check ICDManager is still in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT);
     }
+
+    static void TestICDCounter(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx = static_cast<TestContext *>(aContext);
+        uint32_t counter  = ICDConfigurationData::GetInstance().GetICDCounter();
+        ctx->mICDManager.IncrementCounter();
+        uint32_t counter2 = ICDConfigurationData::GetInstance().GetICDCounter();
+        NL_TEST_ASSERT(aSuite, (counter + 1) == counter2);
+    }
 };
 
 } // namespace app
 } // namespace chip
 
 namespace {
-/**
- *   Test Suite. It lists all the test functions.
- */
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("TestICDModeDurations",         TestICDManager::TestICDModeDurations),
-    NL_TEST_DEF("TestKeepActivemodeRequests",   TestICDManager::TestKeepActivemodeRequests),
+static const nlTest sTests[] = {
+    NL_TEST_DEF("TestICDModeDurations", TestICDManager::TestICDModeDurations),
+    NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
-    NL_TEST_SENTINEL()
+    NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
+    NL_TEST_SENTINEL(),
 };
-// clang-format on
 
-// clang-format off
-nlTestSuite cmSuite =
-{
+nlTestSuite cmSuite = {
     "TestICDManager",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
-// clang-format on
 } // namespace
 
 int TestSuiteICDManager()

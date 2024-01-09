@@ -42,9 +42,9 @@ namespace chip {
 namespace app {
 namespace TestGroups {
 
-static const char * kKey1   = "abc/def";
-static const char * kValue1 = "abc/def";
-static const char * kValue2 = "abc/ghi/xyz";
+static const char kKey1[]   = "abc/def";
+static const char kValue1[] = "abc/def";
+static const char kValue2[] = "abc/ghi/xyz";
 static const size_t kSize1  = strlen(kValue1) + 1;
 static const size_t kSize2  = strlen(kValue2) + 1;
 
