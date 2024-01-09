@@ -29,7 +29,7 @@ from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
 TEST_DISCRIMINATOR = 3840
 TEST_SETUPPIN = 20202021
 
-TEST_ENDPOINT_ID = 1
+TEST_ENDPOINT_ID = 0
 
 TEST_SSH_PORT=2222
 
