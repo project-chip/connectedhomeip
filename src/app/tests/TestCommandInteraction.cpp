@@ -214,10 +214,7 @@ public:
 
 class MockCommandSenderUsingExtendedPathCallbacks : public MockCommandSenderCallback
 {
-    bool UsingExtendedPathCallbacks() override
-    {
-        return true;
-    }
+    bool UsingExtendedPathCallbacks() override { return true; }
 } mockCommandSenderExtendedPathDelegate;
 
 class MockCommandHandlerCallback : public CommandHandler::Callback
@@ -1244,7 +1241,8 @@ void TestCommandInteraction::TestCommandSenderExtendedPathUnsupportedCommand(nlT
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderExtendedPathDelegate.onResponseCalledTimes == 1 && mockCommandSenderExtendedPathDelegate.onFinalCalledTimes == 1 &&
+                   mockCommandSenderExtendedPathDelegate.onResponseCalledTimes == 1 &&
+                       mockCommandSenderExtendedPathDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderExtendedPathDelegate.onErrorCalledTimes == 0);
 
     NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
