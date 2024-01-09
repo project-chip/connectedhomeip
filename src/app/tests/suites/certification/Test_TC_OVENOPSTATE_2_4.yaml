@@ -19,7 +19,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Oven Operational State"
+    cluster: "Oven Cavity Operational State"
     endpoint: 1
 
 tests:
