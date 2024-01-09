@@ -67,8 +67,7 @@ OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
 }
 
 CHIP_ERROR
-OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index,
-                                                               OperationalState::MutableCharSpan & operationalPhase)
+OvenCavityOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     return CHIP_ERROR_NOT_FOUND;
 }
