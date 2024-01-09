@@ -216,7 +216,8 @@ function gn_generate() { # [project options]
     } >"${BUILD_DIR}/args.gn"
     "${gn[@]}" -q gen "$BUILD_DIR"
 
-    # Generate args.configured first
+    # Generate args.configured before populating args.gn because process_project_args may fail
+    # and we want to make sure, that args.configured is available as stated above in the info message
     "${gn[@]}" args "$BUILD_DIR" --list >"${BUILD_DIR}/args.configured"
 
     # Use the argument list to drive the mapping of our command line options to GN args
