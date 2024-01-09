@@ -233,6 +233,7 @@ def BuildEfr32Target():
         TargetPart('brd4186a', board=Efr32Board.BRD4186A),
         TargetPart('brd4187a', board=Efr32Board.BRD4187A),
         TargetPart('brd4304a', board=Efr32Board.BRD4304A),
+        TargetPart('brd4338a', board=Efr32Board.BRD4338A),
     ])
 
     # apps
@@ -262,6 +263,7 @@ def BuildEfr32Target():
     target.AppendModifier('rs911x', enable_rs911x=True).OnlyIfRe('-wifi')
     target.AppendModifier('wf200', enable_wf200=True).OnlyIfRe('-wifi')
     target.AppendModifier('wifi_ipv4', enable_wifi_ipv4=True).OnlyIfRe('-wifi')
+    target.AppendModifier('917_soc', enable_917_soc=True).OnlyIfRe('-wifi')
     target.AppendModifier('additional_data_advertising',
                           enable_additional_data_advertising=True)
     target.AppendModifier('use_ot_lib', enable_ot_lib=True).ExceptIfRe(
@@ -269,6 +271,7 @@ def BuildEfr32Target():
     target.AppendModifier('use_ot_coap_lib', enable_ot_coap_lib=True).ExceptIfRe(
         '-(wifi|use_ot_lib)')
     target.AppendModifier('no-version', no_version=True)
+    target.AppendModifier('skip_rps_generation', use_rps_extension=False).OnlyIfRe('-wifi')
 
     return target
 
