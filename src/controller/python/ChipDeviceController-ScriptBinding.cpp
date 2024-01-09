@@ -389,7 +389,8 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
     chip::Transport::PeerAddress addr;
     chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
 
-    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr, ifaceOutput), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr, ifaceOutput),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
 
     // TODO: IP rendezvous should use TCP connection.
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr).SetInterface(ifaceOutput);
@@ -598,7 +599,8 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
     chip::Inet::InterfaceId ifaceOutput;
     chip::Transport::PeerAddress addr;
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
-    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr, ifaceOutput), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr, ifaceOutput),
+                        ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr).SetInterface(ifaceOutput);
     if (port != 0)
     {
