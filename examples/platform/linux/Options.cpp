@@ -148,7 +148,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "rpc-server-port", kArgumentRequired, kOptionRpcServerPort },
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity},
+    { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
 #endif
     {}
 };

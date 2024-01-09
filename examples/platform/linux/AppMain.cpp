@@ -570,7 +570,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     // Set ReadHandler Capacity for Subscriptions
-    chip::app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(LinuxDeviceOptions::GetInstance().subscriptionCapacity);
+    chip::app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity);
     chip::app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
 #endif
 
