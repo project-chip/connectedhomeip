@@ -40,7 +40,7 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 '''
 class TC_IDM_4_2(MatterBaseTest):
     
-    ADMIN_ENDPOINT_ID=0
+    ADMIN_ENDPOINT_ID = 0
 
     async def write_acl(self, ctrl, acl, ep=ADMIN_ENDPOINT_ID):
         result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
@@ -89,11 +89,11 @@ class TC_IDM_4_2(MatterBaseTest):
             keepSubscriptions=False,
             fabricFiltered=True
         )
-        
+
         acl_list = sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
         return acl_list
-    
+
     async def add_ace_to_dut_acl(self, ctrl, ace):
         dut_acl_original = await self.get_dut_acl()
         dut_acl = copy.deepcopy(dut_acl_original)
@@ -151,7 +151,7 @@ class TC_IDM_4_2(MatterBaseTest):
         else:
             # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to 60 minutes
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 * 60
-        
+
         logging.info(f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC} seconds")            
 
         '''
@@ -162,7 +162,8 @@ class TC_IDM_4_2(MatterBaseTest):
         self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = 1
         max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC + 5
-        asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec, "MaxIntervalCeiling must be greater than MinIntervalFloor")
+        asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
+                               "MaxIntervalCeiling must be greater than MinIntervalFloor")
 
         # Subscribe to attribute
         sub_cr1_step1 = await CR1.ReadAttribute(
@@ -185,11 +186,12 @@ class TC_IDM_4_2(MatterBaseTest):
         # Verify MaxInterval is of uint32 type
         sub_cr1_step1_intervals = sub_cr1_step1.GetReportingIntervalsSeconds()
         sub_cr1_step1_min_interval_floor_sec, sub_cr1_step1_max_interval_ceiling_sec = sub_cr1_step1_intervals
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
+        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step1_max_interval_ceiling_sec),
+                            "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
         asserts.assert_less_equal(sub_cr1_step1_max_interval_ceiling_sec, max_interval_ceiling_sec,
-                            "MaxInterval is not less than or equal to MaxIntervalCeiling")
+                                  "MaxInterval is not less than or equal to MaxIntervalCeiling")
 
         sub_cr1_step1.Shutdown()
 
@@ -201,7 +203,8 @@ class TC_IDM_4_2(MatterBaseTest):
         self.print_step(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = 1
         max_interval_ceiling_sec = max(2, SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC - 5)
-        asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec, "MaxIntervalCeiling must be greater than MinIntervalFloor")
+        asserts.assert_greater(max_interval_ceiling_sec, min_interval_floor_sec,
+                               "MaxIntervalCeiling must be greater than MinIntervalFloor")
 
         # Subscribe to attribute
         sub_cr1_step2 = await CR1.ReadAttribute(
@@ -224,11 +227,12 @@ class TC_IDM_4_2(MatterBaseTest):
         # Verify MaxInterval is of uint32 type
         sub_cr1_step2_intervals = sub_cr1_step2.GetReportingIntervalsSeconds()
         sub_cr1_step2_min_interval_floor_sec, sub_cr1_step2_max_interval_ceiling_sec = sub_cr1_step2_intervals
-        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step2_max_interval_ceiling_sec), "MaxInterval is not of uint32 type.")
+        asserts.assert_true(self.is_valid_uint32_value(sub_cr1_step2_max_interval_ceiling_sec),
+                            "MaxInterval is not of uint32 type.")
 
         # Verify MaxInterval is less than or equal to MaxIntervalCeiling
         asserts.assert_less_equal(sub_cr1_step2_max_interval_ceiling_sec, SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC,
-                            "MaxInterval is not less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC")
+                                  "MaxInterval is not less than or equal to SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC")
 
         sub_cr1_step2.Shutdown()
 
@@ -245,7 +249,7 @@ class TC_IDM_4_2(MatterBaseTest):
             authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
             targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=Clusters.BasicInformation.id)],
             subjects=[CR2_nodeid])
-        
+
         self.add_ace_to_dut_acl(CR1, CR2_limited_ace)
 
         # Controller 2 tries to subscribe an attribute from a cluster
