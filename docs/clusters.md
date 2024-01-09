@@ -81,6 +81,7 @@ Generally regenerate using one of:
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
+|        155 |       0x9B | EnergyPreference                                        |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |

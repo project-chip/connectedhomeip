@@ -938,10 +938,6 @@ namespace Close {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Close
 
-namespace SetLevel {
-static constexpr CommandId Id = 0x00000002;
-} // namespace SetLevel
-
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
 
@@ -1744,6 +1740,10 @@ namespace TestListNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000C;
 } // namespace TestListNestedStructListArgumentRequest
 
+namespace TestBatchHelperResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace TestBatchHelperResponse
+
 namespace TestListInt8UReverseRequest {
 static constexpr CommandId Id = 0x0000000D;
 } // namespace TestListInt8UReverseRequest
@@ -1779,6 +1779,14 @@ static constexpr CommandId Id = 0x00000014;
 namespace TestEmitTestFabricScopedEventRequest {
 static constexpr CommandId Id = 0x00000015;
 } // namespace TestEmitTestFabricScopedEventRequest
+
+namespace TestBatchHelperRequest {
+static constexpr CommandId Id = 0x00000016;
+} // namespace TestBatchHelperRequest
+
+namespace TestSecondBatchHelperRequest {
+static constexpr CommandId Id = 0x00000017;
+} // namespace TestSecondBatchHelperRequest
 
 } // namespace Commands
 } // namespace UnitTesting

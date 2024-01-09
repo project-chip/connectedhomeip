@@ -3,6 +3,7 @@ package com.chip.casting.app;
 import android.content.Context;
 import android.widget.LinearLayout;
 import androidx.fragment.app.FragmentActivity;
+import com.R;
 
 public class CastingContext {
   private FragmentActivity fragmentActivity;

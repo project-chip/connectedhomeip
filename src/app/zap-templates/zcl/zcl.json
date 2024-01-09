@@ -46,6 +46,7 @@
         "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
         "energy-evse-cluster.xml",
+        "energy-preference-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
         "fault-injection-cluster.xml",

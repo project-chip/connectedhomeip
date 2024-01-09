@@ -62,11 +62,12 @@ Davis, CA 95616, USA
   <classification hierarchy="derived" baseCluster="Label" role="utility" picsCode="ULABEL" scope="Endpoint"/>
   <dataTypes/>
   <attributes>
-    <attribute id="0x0000" name="LabelList" type="list[LabelStruct Type]" default="empty">
+    <attribute id="0x0000" name="LabelList" type="list" default="empty">
+      <entry type="LabelStruct"/>
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="min" value="4"/>
+      <constraint type="minCount" value="4 per node"/>
     </attribute>
   </attributes>
 </cluster>
