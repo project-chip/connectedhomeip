@@ -83,8 +83,8 @@ tests:
 
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
-          transition to PIXIT.OM.MODE_CHANGE_FAIL"
-      PICS: OTCCM.S.M.CAN_TEST_MODE_FAILURE && OM.S.M.CAN_MANUALLY_CONTROLLED
+          transition to PIXIT.OTCCM.MODE_CHANGE_FAIL"
+      PICS: OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       cluster: "LogCommands"
@@ -97,7 +97,7 @@ tests:
                 value: "y"
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute."
-      PICS: OTCCM.S.A0001 && OM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: OTCCM.S.A0001 && OTCCM.S.M.CAN_MANUALLY_CONTROLLED
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -183,7 +183,7 @@ tests:
 
     - label:
           "Step 11: TH sends a ChangeToMode command to the DUT with NewMode set
-          to PIXIT.OM.MODE_CHANGE_OK"
+          to PIXIT.OTCCM.MODE_CHANGE_OK"
       PICS: OTCCM.S.C00.Rsp
       command: "ChangeToMode"
       arguments:
