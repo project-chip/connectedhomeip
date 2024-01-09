@@ -35,18 +35,18 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
-            TestStep(3, "Verify AlarmsEnabled is supported"),
+            TestStep(3, "Verify SPRS feature is supported"),
             TestStep(4, "Create enabledAlarms and set to 0"),
             TestStep("5a", "Enable VIS alarm in enabledAlarms"),
             TestStep("5b", "Enable AUD alarm in enabledAlarms"),
             TestStep("5c", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
-            TestStep(6, "Send TestEventTrigger with SensorTrigger event"),
-            TestStep("7a", "Read AlarmsActive attribute"),
-            TestStep("7b", "Read AlarmsActive attribute"),
-            TestStep(8, "Verify VIS alarm is active"),
-            TestStep("9a", "Disable VIS alarm in enabledAlarms"),
-            TestStep("9b", "Set AlarmsEnabled attribute to value of enabledAlarms using AlarmsToEnableDisable command"),
-            TestStep(10, "Read AlarmsActive attribute"),
+            TestStep(6, "Send TestEventTrigger with SensorUntrigger event"),
+            TestStep("7a", "Suppress VIS alarm using SuppressAlarm command"),
+            TestStep("7b", "Suppress VIS alarm using SuppressAlarm command"),
+            TestStep(8, "Read AlarmsSuppressed attribute"),
+            TestStep("9a", "Suppress AUD alarm using SuppressAlarm command"),
+            TestStep("9b", "Suppress AUD alarm using SuppressAlarm command"),
+            TestStep(10, "Read AlarmsSuppressed attribute"),
         ]
         return steps
 
