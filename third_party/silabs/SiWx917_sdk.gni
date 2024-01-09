@@ -57,6 +57,10 @@ template("siwx917_sdk") {
       # ble component
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
 
+      # trng component
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/inc",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/inc",
+
       # si91x component
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ahb_interface/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
@@ -337,6 +341,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_common_apis.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/rsi_utils.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/src/sl_si91x_ble.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_trng.c",
 
       # si91x_basic_buffers component
       "${wifi_sdk_root}/components/board/silabs/src/rsi_board.c",

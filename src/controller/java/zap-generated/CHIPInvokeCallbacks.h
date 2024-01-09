@@ -1126,6 +1126,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPUnitTestingClusterTestBatchHelperResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestBatchHelperResponseCallbackType>
+{
+public:
+    CHIPUnitTestingClusterTestBatchHelperResponseCallback(jobject javaCallback);
+
+    ~CHIPUnitTestingClusterTestBatchHelperResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPSampleMeiClusterAddArgumentsResponseCallback
     : public Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>
 {
