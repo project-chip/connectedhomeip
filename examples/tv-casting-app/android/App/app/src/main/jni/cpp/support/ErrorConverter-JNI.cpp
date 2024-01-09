@@ -35,7 +35,7 @@ jobject createJMatterError(CHIP_ERROR inErr)
 
     jmethodID jMatterErrorConstructor = env->GetMethodID(jMatterErrorClass, "<init>", "(JLjava/lang/String;)V");
 
-    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, err.AsInteger(), nullptr);
+    return env->NewObject(jMatterErrorClass, jMatterErrorConstructor, inErr.AsInteger(), nullptr);
 }
 
 }; // namespace support

@@ -180,7 +180,8 @@ void Instance::ReportPhaseListChange()
 
 bool Instance::IsSupportedPhase(uint8_t aPhase)
 {
-    GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
+    char buffer[kMaxPhaseNameLength];
+    MutableCharSpan phase(buffer);
     if (mDelegate->GetOperationalPhaseAtIndex(aPhase, phase) != CHIP_ERROR_NOT_FOUND)
     {
         return true;
@@ -301,20 +302,29 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     break;
 
     case OperationalState::Attributes::PhaseList::Id: {
-        GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-        size_t index                  = 0;
 
-        if (mDelegate->GetOperationalPhaseAtIndex(index, phase) == CHIP_ERROR_NOT_FOUND || phase.IsMissing())
+        char buffer[kMaxPhaseNameLength];
+        MutableCharSpan phase(buffer);
+        size_t index = 0;
+
+        if (mDelegate->GetOperationalPhaseAtIndex(index, phase) == CHIP_ERROR_NOT_FOUND)
         {
             return aEncoder.EncodeNull();
         }
-        return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-            while (this->mDelegate->GetOperationalPhaseAtIndex(index, phase) != CHIP_ERROR_NOT_FOUND)
+
+        return aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
             {
-                ReturnErrorOnFailure(encoder.Encode(phase.mPhaseName));
-                index++;
+                char buffer2[kMaxPhaseNameLength];
+                MutableCharSpan phase2(buffer2);
+                auto err = delegate->GetOperationalPhaseAtIndex(i, phase2);
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(phase2));
             }
-            return CHIP_NO_ERROR;
         });
     }
     break;

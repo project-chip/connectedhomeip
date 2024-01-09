@@ -239,6 +239,9 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType & value);
+
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::DoorLock::Structs::CredentialStruct::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -734,5 +737,7 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & value);

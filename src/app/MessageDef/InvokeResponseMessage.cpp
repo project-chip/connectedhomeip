@@ -112,6 +112,14 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetMoreChunkedMessages(bool * const ap
     return GetSimpleValue(to_underlying(Tag::kMoreChunkedMessages), TLV::kTLVType_Boolean, apMoreChunkedMessages);
 }
 
+CHIP_ERROR InvokeResponseMessage::Builder::InitWithEndBufferReserved(TLV::TLVWriter * const apWriter)
+{
+    ReturnErrorOnFailure(Init(apWriter));
+    ReturnErrorOnFailure(GetWriter()->ReserveBuffer(GetSizeToEndInvokeResponseMessage()));
+    mIsEndBufferReserved = true;
+    return CHIP_NO_ERROR;
+}
+
 InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressResponse(const bool aSuppressResponse)
 {
     if (mError == CHIP_NO_ERROR)
@@ -121,11 +129,18 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressRespons
     return *this;
 }
 
-InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeResponses()
+InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeResponses(const bool aReserveEndBuffer)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mInvokeResponses.Init(mpWriter, to_underlying(Tag::kInvokeResponses));
+        if (aReserveEndBuffer)
+        {
+            mError = mInvokeResponses.InitWithEndBufferReserved(mpWriter, to_underlying(Tag::kInvokeResponses));
+        }
+        else
+        {
+            mError = mInvokeResponses.Init(mpWriter, to_underlying(Tag::kInvokeResponses));
+        }
     }
     return mInvokeResponses;
 }
@@ -142,6 +157,15 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::MoreChunkedMess
 
 CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
 {
+    // If any changes are made to how we end the invoke response message that involves how many
+    // bytes are needed, a corresponding change to GetSizeToEndInvokeResponseMessage indicating
+    // the new size that will be required.
+    ReturnErrorOnFailure(mError);
+    if (mIsEndBufferReserved)
+    {
+        ReturnErrorOnFailure(GetWriter()->UnreserveBuffer(GetSizeToEndInvokeResponseMessage()));
+        mIsEndBufferReserved = false;
+    }
     if (mError == CHIP_NO_ERROR)
     {
         mError = MessageBuilder::EncodeInteractionModelRevision();
@@ -151,6 +175,16 @@ CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
         EndOfContainer();
     }
     return GetError();
+}
+
+uint32_t InvokeResponseMessage::Builder::GetSizeToEndInvokeResponseMessage()
+{
+    // EncodeInteractionModelRevision() encodes a uint8_t with context tag 0xFF. This means 1 control byte,
+    // 1 byte for the tag, 1 byte for the value.
+    uint32_t kEncodeInteractionModelSize = 1 + 1 + 1;
+    uint32_t kEndOfContainerSize         = 1;
+
+    return kEncodeInteractionModelSize + kEndOfContainerSize;
 }
 } // namespace app
 } // namespace chip

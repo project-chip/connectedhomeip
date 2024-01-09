@@ -51,7 +51,7 @@ tests:
                 saveAs: commissionerNodeId
 
     - label:
-          "Step 1: TH sends KeySetWrite command in the GroupKeyManagement
+          "Step 1a: TH sends KeySetWrite command in the GroupKeyManagement
           cluster to DUT using a key that is pre-installed on the TH.
           GroupKeySet fields are as follows: GroupKeySetID: 0x01a3
           GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
@@ -74,11 +74,35 @@ tests:
                         EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
                         EpochStartTime2: 2220002,
                     }
+    - label:
+          "Step 1b: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: GroupKeySetID: 0x01a1
+          GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
+          a0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
+          b1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
+          c2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:a0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "hex:b1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "hex:c2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 2220002,
+                    }
 
     - label:
           "Step 2: TH binds GroupId to GroupKeySet with entries as follows: List
           item 1: GroupId: 0x0103, GroupKeySetId: 0x01a3, List item 2: GroupId:
-          0x0104, GroupKeySetId: 0x01a3, List item 3: GroupId: 0x0105,
+          0x0104, GroupKeySetId: 0x01a4, List item 3: GroupId: 0x0105,
           GroupKeySetId: 0x01a3"
       cluster: "Group Key Management"
       command: "writeAttribute"
@@ -86,9 +110,9 @@ tests:
       arguments:
           value:
               [
+                  { FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 0, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
-                  { FabricIndex: 0, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
-                  { FabricIndex: 0, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
               ]
 
     - label:
@@ -151,7 +175,7 @@ tests:
 
     - label:
           "Step 5: TH sends a AddGroup Command to the Groups cluster on Endpoint
-          PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0104 and
+          PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0101 and
           the GroupName set to an empty string"
       cluster: "Groups"
       endpoint: Groups.Endpoint
@@ -159,7 +183,7 @@ tests:
       arguments:
           values:
               - name: GroupID
-                value: 0x0104
+                value: 0x0101
               - name: GroupName
                 value: ""
       response:
@@ -167,7 +191,7 @@ tests:
 
     - label:
           "Step 6: TH sends a AddGroup Command to the Groups cluster with the
-          GroupID field set to 0x0104 and the GroupName set to an empty string.
+          GroupID field set to 0x0101 and the GroupName set to an empty string.
           The command is sent as a group command using GroupID 0x0103"
       cluster: "Groups"
       groupId: 0x0103
@@ -175,7 +199,7 @@ tests:
       arguments:
           values:
               - name: GroupID
-                value: 0x0104
+                value: 0x0101
               - name: GroupName
                 value: ""
 
@@ -188,26 +212,19 @@ tests:
               - name: "ms"
                 value: 1000
 
-    #Issue : https://github.com/project-chip/connectedhomeip/issues/27982
     - label:
           "Step 7: TH sends a AddGroup Command to the Groups cluster with the
-          GroupID field set to 0x0105 and the GroupName set to an empty string.
-          The command is sent as a group command using GroupID 0x0104"
-      verification: |
-          ./chip-tool groups add-group 261 '' 0xffffffffffff0104 1 --trace_decode 1
-
-          This step does not have any expected outcome as per the spec, Hence no verification logs has been provided.
-
-          Further continuation of this step has been validated using "view group" command in Step 10
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+          GroupID field set to 0x0102 and the GroupName set to an empty string.
+          The command is sent as a group command using GroupID 0x0101"
+      cluster: "Groups"
+      groupId: 0x0101
+      command: "AddGroup"
       arguments:
           values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: GroupID
+                value: 0x0102
+              - name: GroupName
+                value: ""
 
     # multicast if the unicast packet is sent immediately after the multicast one.
     - label: "Wait for AddGroup"
@@ -239,7 +256,7 @@ tests:
 
     - label:
           "Step 9: TH sends a ViewGroup Command to the Groups cluster on
-          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0104 to
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
           confirm that the AddGroup command from step 6 was successful"
       cluster: "Groups"
       endpoint: Groups.Endpoint
@@ -247,43 +264,35 @@ tests:
       arguments:
           values:
               - name: GroupID
-                value: 0x0104
+                value: 0x0101
       response:
           values:
               - name: Status
                 value: 0
               - name: GroupID
-                value: 0x0104
+                value: 0x0101
               - name: GroupName
                 value: ""
 
-    #Issue : https://github.com/project-chip/connectedhomeip/issues/27967
     - label:
           "Step 10: TH sends a ViewGroup Command to the Groups cluster on
-          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0105 to
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0102 to
           confirm that the AddGroup command from step 7 was not successful"
-      verification: |
-          ./chip-tool groups view-group 0x0105 1 0
-
-          Verify DUT sends a ViewGroupResponse with Status is set to NOT_FOUND on TH(chip-tool) Logs:
-
-          [1685009398.600925][39795:39797] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0004 Command=0x0000_0001
-          [1685009398.600932][39795:39797] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0004 Command 0x0000_0001
-          [1685009398.600944][39795:39797] CHIP:TOO: ViewGroupResponse: {
-          [1685009398.600949][39795:39797] CHIP:TOO: status: 139
-          [1685009398.600952][39795:39797] CHIP:TOO: groupID: 261
-          [1685009398.600955][39795:39797] CHIP:TOO: groupName:
-          [1685009398.600957][39795:39797] CHIP:TOO: }
-          [1685009398.600964][39795:39797] CHIP:DMG: ICR moving to [AwaitingDe]
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
       arguments:
           values:
-              - name: "message"
-                value: "Enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: GroupID
+                value: 0x0102
+      response:
+          values:
+              - name: Status
+                value: 139
+              - name: GroupID
+                value: 0x0102
+              - name: GroupName
+                value: ""
 
     - label:
           "Step 11: TH sends a AddGroup Command to the Groups cluster with the
@@ -346,3 +355,14 @@ tests:
           values:
               - name: GroupKeySetID
                 value: 0x01a3
+
+    - label:
+          "Step 16: TH resets the key set by sending the KeySetRemove command to
+          the GroupKeyManagement cluster over CASE with the following fields:
+          GroupKeySetID: 0x01a1"
+      cluster: "Group Key Management"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a1

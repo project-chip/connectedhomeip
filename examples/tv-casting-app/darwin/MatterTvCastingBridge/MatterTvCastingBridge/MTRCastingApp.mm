@@ -20,6 +20,7 @@
 #import "MTRCommissionableDataProvider.h"
 #import "MTRCommonCaseDeviceServerInitParamsProvider.h"
 #import "MTRDeviceAttestationCredentialsProvider.h"
+#import "MTRErrorUtils.h"
 #import "MTRRotatingDeviceIdUniqueIdProvider.h"
 
 #import "core/Types.h"
@@ -36,14 +37,17 @@
 @property matter::casting::support::MTRDeviceAttestationCredentialsProvider * dacProvider;
 @property MTRCommonCaseDeviceServerInitParamsProvider * serverInitParamsProvider;
 
-// queue used to serialize all work performed by the CastingServerBridge
-@property (atomic) dispatch_queue_t chipWorkQueue;
+// queue used when calling the client code on completion blocks from any MatterTvCastingBridge API
+@property dispatch_queue_t _Nonnull clientQueue;
+
+// queue used to perform all work performed by the MatterTvCastingBridge
+@property (atomic) dispatch_queue_t workQueue;
 
 @end
 
 @implementation MTRCastingApp
 
-+ (MTRCastingApp * _Nullable)getSharedInstance
++ (MTRCastingApp *)getSharedInstance
 {
     static MTRCastingApp * instance = nil;
     static dispatch_once_t onceToken;
@@ -53,18 +57,32 @@
     return instance;
 }
 
-- (MatterError * _Nonnull)initializeWithDataSource:(id _Nonnull)dataSource
+- (dispatch_queue_t)getWorkQueue
+{
+    return _workQueue;
+}
+
+- (dispatch_queue_t)getClientQueue
+{
+    return _clientQueue;
+}
+
+- (NSError *)initializeWithDataSource:(id)dataSource
 {
     ChipLogProgress(AppServer, "MTRCastingApp.initializeWithDataSource called");
 
+    // get the clientQueue
+    VerifyOrReturnValue([dataSource clientQueue] != nil, [MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
+    _clientQueue = [dataSource clientQueue];
+
     // Initialize cpp Providers
-    VerifyOrReturnValue(_uniqueIdProvider.Initialize(dataSource) == CHIP_NO_ERROR, MATTER_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(_uniqueIdProvider.Initialize(dataSource) == CHIP_NO_ERROR, [MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
     _commissionableDataProvider = new matter::casting::support::MTRCommissionableDataProvider();
-    VerifyOrReturnValue(_commissionableDataProvider->Initialize(dataSource) == CHIP_NO_ERROR, MATTER_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(_commissionableDataProvider->Initialize(dataSource) == CHIP_NO_ERROR, [MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
     _dacProvider = new matter::casting::support::MTRDeviceAttestationCredentialsProvider();
-    VerifyOrReturnValue(_dacProvider->Initialize(dataSource) == CHIP_NO_ERROR, MATTER_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(_dacProvider->Initialize(dataSource) == CHIP_NO_ERROR, [MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
     _serverInitParamsProvider = new MTRCommonCaseDeviceServerInitParamsProvider();
 
@@ -72,44 +90,82 @@
     VerifyOrReturnValue(_appParameters.Create(&_uniqueIdProvider, _commissionableDataProvider, _dacProvider,
                             GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore()), _serverInitParamsProvider)
             == CHIP_NO_ERROR,
-        MATTER_ERROR_INVALID_ARGUMENT);
+        [MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
     // Initialize cpp CastingApp
     VerifyOrReturnValue(matter::casting::core::CastingApp::GetInstance()->Initialize(_appParameters) == CHIP_NO_ERROR,
-        MATTER_ERROR_INCORRECT_STATE);
+        [MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
 
     // Get and store the CHIP Work queue
-    _chipWorkQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+    _workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
 
-    return MATTER_NO_ERROR;
+    return [MTRErrorUtils NSErrorFromChipError:CHIP_NO_ERROR];
 }
 
-- (MatterError * _Nonnull)start
+- (void)startWithCompletionBlock:(void (^)(NSError *))completion
 {
-    ChipLogProgress(AppServer, "MTRCastingApp.start called");
-    VerifyOrReturnValue(_chipWorkQueue != nil, MATTER_ERROR_INCORRECT_STATE);
+    ChipLogProgress(AppServer, "MTRCastingApp.startWithCompletionBlock called");
+    VerifyOrReturn(_workQueue != nil && _clientQueue != nil, dispatch_async(self->_clientQueue, ^{
+        completion([MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
+    }));
 
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
-
-    dispatch_sync(_chipWorkQueue, ^{
-        err = matter::casting::core::CastingApp::GetInstance()->Start();
+    dispatch_async(_workQueue, ^{
+        __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Start();
+        dispatch_async(self->_clientQueue, ^{
+            completion([MTRErrorUtils NSErrorFromChipError:err]);
+        });
     });
-
-    return err == CHIP_NO_ERROR ? MATTER_NO_ERROR : MATTER_ERROR_INCORRECT_STATE;
+    __block CHIP_ERROR err = chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+    VerifyOrReturn(err == CHIP_NO_ERROR, dispatch_async(self->_clientQueue, ^{
+        completion([MTRErrorUtils NSErrorFromChipError:err]);
+    }));
 }
 
-- (MatterError * _Nonnull)stop
+- (void)stopWithCompletionBlock:(void (^)(NSError *))completion
 {
-    ChipLogProgress(AppServer, "MTRCastingApp.stop called");
-    VerifyOrReturnValue(_chipWorkQueue != nil, MATTER_ERROR_INCORRECT_STATE);
+    ChipLogProgress(AppServer, "MTRCastingApp.stopWithCompletionBlock called");
+    VerifyOrReturn(_workQueue != nil && _clientQueue != nil, dispatch_async(self->_clientQueue, ^{
+        completion([MTRErrorUtils NSErrorFromChipError:CHIP_ERROR_INCORRECT_STATE]);
+    }));
 
-    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    dispatch_async(_workQueue, ^{
+        __block CHIP_ERROR err = matter::casting::core::CastingApp::GetInstance()->Stop();
 
-    dispatch_sync(_chipWorkQueue, ^{
-        err = matter::casting::core::CastingApp::GetInstance()->Stop();
+        dispatch_async(self->_clientQueue, ^{
+            completion([MTRErrorUtils NSErrorFromChipError:err]);
+        });
     });
+}
 
-    return err == CHIP_NO_ERROR ? MATTER_NO_ERROR : MATTER_ERROR_INCORRECT_STATE;
+- (bool)isRunning
+{
+    VerifyOrReturnValue(_workQueue != nil && _clientQueue != nil, false);
+
+    __block bool running = false;
+    dispatch_sync(_workQueue, ^{
+        running = matter::casting::core::CastingApp::GetInstance()->isRunning();
+    });
+    return running;
+}
+
+- (NSError *)ShutdownAllSubscriptions
+{
+    ChipLogProgress(AppServer, "MTRCastingApp.ShutdownAllSubscriptions called");
+    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    dispatch_sync(_workQueue, ^{
+        err = matter::casting::core::CastingApp::GetInstance()->ShutdownAllSubscriptions();
+    });
+    return [MTRErrorUtils NSErrorFromChipError:err];
+}
+
+- (NSError *)ClearCache
+{
+    ChipLogProgress(AppServer, "MTRCastingApp.ClearCache called");
+    __block CHIP_ERROR err = CHIP_NO_ERROR;
+    dispatch_sync(_workQueue, ^{
+        err = matter::casting::core::CastingApp::GetInstance()->ClearCache();
+    });
+    return [MTRErrorUtils NSErrorFromChipError:err];
 }
 
 @end

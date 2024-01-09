@@ -10894,6 +10894,153 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedEnergyPreferenceClusterEnergyBalancesAttributeCallback implements ChipClusters.EnergyPreferenceCluster.EnergyBalancesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.EnergyPreferenceClusterBalanceStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EnergyPreferenceClusterBalanceStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyPreferenceClusterEnergyPrioritiesAttributeCallback implements ChipClusters.EnergyPreferenceCluster.EnergyPrioritiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyPreferenceClusterLowPowerModeSensitivitiesAttributeCallback implements ChipClusters.EnergyPreferenceCluster.LowPowerModeSensitivitiesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.EnergyPreferenceClusterBalanceStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.EnergyPreferenceClusterBalanceStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyPreferenceClusterGeneratedCommandListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyPreferenceClusterAcceptedCommandListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyPreferenceClusterEventListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedEnergyPreferenceClusterAttributeListAttributeCallback implements ChipClusters.EnergyPreferenceCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedDoorLockClusterGetWeekDayScheduleResponseCallback implements ChipClusters.DoorLockCluster.GetWeekDayScheduleResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -15979,11 +16126,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer channelPagingStruct, ArrayList<ChipStructs.ChannelClusterProgramStruct> programList) {
+    public void onSuccess(ChipStructs.ChannelClusterChannelPagingStruct paging, ArrayList<ChipStructs.ChannelClusterProgramStruct> programList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo channelPagingStructResponseValue = new CommandResponseInfo("channelPagingStruct", "Integer");
-      responseValues.put(channelPagingStructResponseValue, channelPagingStruct);
+      // paging: Struct ChannelPagingStruct
+      // Conversion from this type to Java is not properly implemented yet
       // programList: ProgramStruct
       // Conversion from this type to Java is not properly implemented yet
 
@@ -17636,14 +17783,14 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Optional<Integer> status, String data, String encodingHint) {
+    public void onSuccess(Integer status, Optional<String> data, Optional<String> encodingHint) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Optional<Integer>");
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "Optional<String>");
       responseValues.put(dataResponseValue, data);
-      CommandResponseInfo encodingHintResponseValue = new CommandResponseInfo("encodingHint", "String");
+      CommandResponseInfo encodingHintResponseValue = new CommandResponseInfo("encodingHint", "Optional<String>");
       responseValues.put(encodingHintResponseValue, encodingHint);
       callback.onSuccess(responseValues);
     }
@@ -18157,6 +18304,28 @@ public class ClusterInfoMapping {
 
       CommandResponseInfo valueResponseValue = new CommandResponseInfo("value", "Long");
       responseValues.put(valueResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedUnitTestingClusterTestBatchHelperResponseCallback implements ChipClusters.UnitTestingCluster.TestBatchHelperResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] buffer) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo bufferResponseValue = new CommandResponseInfo("buffer", "byte[]");
+      responseValues.put(bufferResponseValue, buffer);
       callback.onSuccess(responseValues);
     }
 
@@ -19570,6 +19739,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.EnergyEvseCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("energyEvse", energyEvseClusterInfo);
 
+    ClusterInfo energyPreferenceClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.EnergyPreferenceCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("energyPreference", energyPreferenceClusterInfo);
+
     ClusterInfo doorLockClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.DoorLockCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("doorLock", doorLockClusterInfo);
@@ -19815,6 +19988,7 @@ public class ClusterInfoMapping {
     destination.get("demandResponseLoadControl").combineCommands(source.get("demandResponseLoadControl"));
     destination.get("deviceEnergyManagement").combineCommands(source.get("deviceEnergyManagement"));
     destination.get("energyEvse").combineCommands(source.get("energyEvse"));
+    destination.get("energyPreference").combineCommands(source.get("energyPreference"));
     destination.get("doorLock").combineCommands(source.get("doorLock"));
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
     destination.get("barrierControl").combineCommands(source.get("barrierControl"));
@@ -23074,6 +23248,10 @@ public class ClusterInfoMapping {
 
     commandMap.put("energyEvse", energyEvseClusterInteractionInfoMap);
 
+    Map<String, InteractionInfo> energyPreferenceClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("energyPreference", energyPreferenceClusterInteractionInfoMap);
+
     Map<String, InteractionInfo> doorLockClusterInteractionInfoMap = new LinkedHashMap<>();
 
     Map<String, CommandParameterInfo> doorLocklockDoorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -26033,6 +26211,66 @@ public class ClusterInfoMapping {
         unitTestingtestEmitTestFabricScopedEventRequestCommandParams
       );
     unitTestingClusterInteractionInfoMap.put("testEmitTestFabricScopedEventRequest", unitTestingtestEmitTestFabricScopedEventRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestBatchHelperRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo unitTestingtestBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo = new CommandParameterInfo("sleepBeforeResponseTimeMs", Integer.class, Integer.class);
+    unitTestingtestBatchHelperRequestCommandParams.put("sleepBeforeResponseTimeMs",unitTestingtestBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestBatchHelperRequestsizeOfResponseBufferCommandParameterInfo = new CommandParameterInfo("sizeOfResponseBuffer", Integer.class, Integer.class);
+    unitTestingtestBatchHelperRequestCommandParams.put("sizeOfResponseBuffer",unitTestingtestBatchHelperRequestsizeOfResponseBufferCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestBatchHelperRequestfillCharacterCommandParameterInfo = new CommandParameterInfo("fillCharacter", Integer.class, Integer.class);
+    unitTestingtestBatchHelperRequestCommandParams.put("fillCharacter",unitTestingtestBatchHelperRequestfillCharacterCommandParameterInfo);
+    InteractionInfo unitTestingtestBatchHelperRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+          .testBatchHelperRequest((ChipClusters.UnitTestingCluster.TestBatchHelperResponseCallback) callback
+           , (Integer)
+             commandArguments.get("sleepBeforeResponseTimeMs")
+
+           , (Integer)
+             commandArguments.get("sizeOfResponseBuffer")
+
+           , (Integer)
+             commandArguments.get("fillCharacter")
+
+            );
+        },
+        () -> new DelegatedUnitTestingClusterTestBatchHelperResponseCallback(),
+        unitTestingtestBatchHelperRequestCommandParams
+      );
+    unitTestingClusterInteractionInfoMap.put("testBatchHelperRequest", unitTestingtestBatchHelperRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestSecondBatchHelperRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo unitTestingtestSecondBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo = new CommandParameterInfo("sleepBeforeResponseTimeMs", Integer.class, Integer.class);
+    unitTestingtestSecondBatchHelperRequestCommandParams.put("sleepBeforeResponseTimeMs",unitTestingtestSecondBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestSecondBatchHelperRequestsizeOfResponseBufferCommandParameterInfo = new CommandParameterInfo("sizeOfResponseBuffer", Integer.class, Integer.class);
+    unitTestingtestSecondBatchHelperRequestCommandParams.put("sizeOfResponseBuffer",unitTestingtestSecondBatchHelperRequestsizeOfResponseBufferCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestSecondBatchHelperRequestfillCharacterCommandParameterInfo = new CommandParameterInfo("fillCharacter", Integer.class, Integer.class);
+    unitTestingtestSecondBatchHelperRequestCommandParams.put("fillCharacter",unitTestingtestSecondBatchHelperRequestfillCharacterCommandParameterInfo);
+    InteractionInfo unitTestingtestSecondBatchHelperRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+          .testSecondBatchHelperRequest((ChipClusters.UnitTestingCluster.TestBatchHelperResponseCallback) callback
+           , (Integer)
+             commandArguments.get("sleepBeforeResponseTimeMs")
+
+           , (Integer)
+             commandArguments.get("sizeOfResponseBuffer")
+
+           , (Integer)
+             commandArguments.get("fillCharacter")
+
+            );
+        },
+        () -> new DelegatedUnitTestingClusterTestBatchHelperResponseCallback(),
+        unitTestingtestSecondBatchHelperRequestCommandParams
+      );
+    unitTestingClusterInteractionInfoMap.put("testSecondBatchHelperRequest", unitTestingtestSecondBatchHelperRequestInteractionInfo);
 
     commandMap.put("unitTesting", unitTestingClusterInteractionInfoMap);
 

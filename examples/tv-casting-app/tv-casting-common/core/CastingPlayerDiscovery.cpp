@@ -40,9 +40,9 @@ CastingPlayerDiscovery * CastingPlayerDiscovery::GetInstance()
     return _castingPlayerDiscovery;
 }
 
-CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint64_t deviceTypeFilter)
+CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint32_t deviceTypeFilter)
 {
-    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StartDiscovery called");
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StartDiscovery() called");
     VerifyOrReturnError(mState == DISCOVERY_READY, CHIP_ERROR_INCORRECT_STATE);
 
     mCommissionableNodeController.RegisterDeviceDiscoveryDelegate(&mDelegate);
@@ -63,9 +63,11 @@ CHIP_ERROR CastingPlayerDiscovery::StartDiscovery(uint64_t deviceTypeFilter)
 
 CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 {
+    ChipLogProgress(Discovery, "CastingPlayerDiscovery::StopDiscovery() called");
     VerifyOrReturnError(mState == DISCOVERY_RUNNING, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mCommissionableNodeController.StopDiscovery());
 
+    mCastingPlayers.clear();
     mState = DISCOVERY_READY;
 
     return CHIP_NO_ERROR;
@@ -73,9 +75,9 @@ CHIP_ERROR CastingPlayerDiscovery::StopDiscovery()
 
 void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
-    ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice called");
+    ChipLogProgress(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice() called");
     VerifyOrReturn(mClientDelegate != nullptr,
-                   ChipLogError(NotSpecified, "CastingPlayerDeviceDiscoveryDelegate, mClientDelegate is a nullptr"));
+                   ChipLogError(Discovery, "DeviceDiscoveryDelegateImpl::OnDiscoveredDevice mClientDelegate is a nullptr"));
 
     // convert nodeData to CastingPlayer
     CastingPlayerAttributes attributes;

@@ -1352,6 +1352,52 @@ public class ClusterWriteMapping {
     );
     writeEnergyEvseInteractionInfo.put("writeApproximateEVEfficiencyAttribute", writeEnergyEvseApproximateEVEfficiencyAttributeInteractionInfo);
     writeAttributeMap.put("energyEvse", writeEnergyEvseInteractionInfo);
+    Map<String, InteractionInfo> writeEnergyPreferenceInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeEnergyPreferenceCurrentEnergyBalanceCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo energyPreferencecurrentEnergyBalanceCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeEnergyPreferenceCurrentEnergyBalanceCommandParams.put(
+        "value",
+        energyPreferencecurrentEnergyBalanceCommandParameterInfo
+    );
+    InteractionInfo writeEnergyPreferenceCurrentEnergyBalanceAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.EnergyPreferenceCluster) cluster).writeCurrentEnergyBalanceAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeEnergyPreferenceCurrentEnergyBalanceCommandParams
+    );
+    writeEnergyPreferenceInteractionInfo.put("writeCurrentEnergyBalanceAttribute", writeEnergyPreferenceCurrentEnergyBalanceAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeEnergyPreferenceCurrentLowPowerModeSensitivityCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo energyPreferencecurrentLowPowerModeSensitivityCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeEnergyPreferenceCurrentLowPowerModeSensitivityCommandParams.put(
+        "value",
+        energyPreferencecurrentLowPowerModeSensitivityCommandParameterInfo
+    );
+    InteractionInfo writeEnergyPreferenceCurrentLowPowerModeSensitivityAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.EnergyPreferenceCluster) cluster).writeCurrentLowPowerModeSensitivityAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeEnergyPreferenceCurrentLowPowerModeSensitivityCommandParams
+    );
+    writeEnergyPreferenceInteractionInfo.put("writeCurrentLowPowerModeSensitivityAttribute", writeEnergyPreferenceCurrentLowPowerModeSensitivityAttributeInteractionInfo);
+    writeAttributeMap.put("energyPreference", writeEnergyPreferenceInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =

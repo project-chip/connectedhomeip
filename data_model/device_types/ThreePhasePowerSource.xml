@@ -61,10 +61,10 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusters>
-    <cluster id="0x000a" name="Time Synchronization" side="client">
+    <cluster id="0x000A" name="Time Synchronization" side="client">
       <optionalConform/>
     </cluster>
-    <cluster id="0x002f" name="Power Source" side="server">
+    <cluster id="0x002F" name="Power Source" side="server">
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0090" name="Electrical Power Measurement" side="server">
@@ -72,6 +72,11 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0091" name="Electrical Energy Measurement" side="server">
       <optionalConform/>
+      <features>
+        <feature code="" name="THRP">
+          <mandatoryConform/>
+        </feature>
+      </features>
     </cluster>
   </clusters>
 </deviceType>

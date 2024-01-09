@@ -73,8 +73,5 @@ Davis, CA 95616, USA
         </feature>
       </features>
     </cluster>
-    <cluster id="0x0047" name="Timer" side="server">
-      <optionalConform/>
-    </cluster>
   </clusters>
 </deviceType>
