@@ -8918,6 +8918,9 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: DRYERCTRL.S.A0001
 
+    - label: "Can the device be controlled manually?"
+      id: DRYERCTRL.S.M.ManuallyControlled
+
     # RVC Clean Mode Cluster
 
     - label: "Does the device implement the RVCCLEANM cluster as a server?"
