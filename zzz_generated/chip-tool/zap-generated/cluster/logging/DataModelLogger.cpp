@@ -5156,6 +5156,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const IcdManagement::Events::OnTransitionToActiveMode::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OvenCavityOperationalState::Events::OperationalError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -17796,6 +17804,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateChange", 1, value);
+        }
+        }
+        break;
+    }
+    case IcdManagement::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case IcdManagement::Events::OnTransitionToActiveMode::Id: {
+            chip::app::Clusters::IcdManagement::Events::OnTransitionToActiveMode::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnTransitionToActiveMode", 1, value);
         }
         }
         break;

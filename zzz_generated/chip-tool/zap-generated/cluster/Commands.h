@@ -4606,6 +4606,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * OnTransitionToActiveMode                                          | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -17629,8 +17630,10 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                            //
+        make_unique<ReadEvent>(Id, "on-transition-to-active-mode", Events::OnTransitionToActiveMode::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                       //
+        make_unique<SubscribeEvent>(Id, "on-transition-to-active-mode", Events::OnTransitionToActiveMode::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);

@@ -267,6 +267,16 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
+namespace IcdManagement {
+namespace Events {
+
+namespace OnTransitionToActiveMode {
+static constexpr EventId Id = 0x00000000;
+} // namespace OnTransitionToActiveMode
+
+} // namespace Events
+} // namespace IcdManagement
+
 namespace OvenCavityOperationalState {
 namespace Events {
 

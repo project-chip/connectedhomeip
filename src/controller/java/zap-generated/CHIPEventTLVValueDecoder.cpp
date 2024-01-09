@@ -2594,6 +2594,33 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::IcdManagement;
         switch (aPath.mEventId)
         {
+        case Events::OnTransitionToActiveMode::Id: {
+            Events::OnTransitionToActiveMode::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass onTransitionToActiveModeStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent",
+                onTransitionToActiveModeStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent");
+                return nullptr;
+            }
+            jmethodID onTransitionToActiveModeStructCtor = env->GetMethodID(onTransitionToActiveModeStructClass, "<init>", "()V");
+            if (onTransitionToActiveModeStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(onTransitionToActiveModeStructClass, onTransitionToActiveModeStructCtor);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

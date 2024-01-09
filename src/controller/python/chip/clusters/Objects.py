@@ -15210,6 +15210,23 @@ class IcdManagement(Cluster):
 
             value: 'uint' = 0
 
+    class Events:
+        @dataclass
+        class OnTransitionToActiveMode(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000046
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
 
 @dataclass
 class Timer(Cluster):

@@ -14466,6 +14466,36 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace OnTransitionToActiveMode {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OnTransitionToActiveMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::OnTransitionToActiveMode::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace OnTransitionToActiveMode
+} // namespace Events
 } // namespace IcdManagement
 namespace Timer {
 
