@@ -617,6 +617,7 @@ exit:
             // a subscription and have a valid value for mMaxInterval which the function
             // relies on.
             //
+            mpCallback.RefreshLiveness(*this);
             err = RefreshLivenessCheckTimer();
         }
     }
