@@ -468,6 +468,7 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
     uint8_t appDataBuffer[kAppDataLength];
     MutableByteSpan appData(appDataBuffer);
     auto * iterator = IterateICDClientInfo();
+    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
     while (iterator->Next(clientInfo))
     {
         CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(

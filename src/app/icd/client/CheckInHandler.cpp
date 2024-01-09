@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP ICD handler which handles unsolicited Check-In messages.
+ *      This file defines objects for a CHIP ICD handler which handles unsolicited check-in messages.
  *
  */
 
