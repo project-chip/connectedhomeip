@@ -21,7 +21,6 @@
 
 import os
 import sys
-import time
 from optparse import OptionParser
 
 from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger

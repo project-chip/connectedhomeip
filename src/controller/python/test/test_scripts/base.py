@@ -1437,7 +1437,6 @@ class BaseTestHelper:
 
     def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
                                                 remote_server_app: str, subscription_capacity: int):
-        remoteDeviceRestarted = False
         updateLock = threading.Lock()
         updateCv = threading.Condition(updateLock)
 
@@ -1474,7 +1473,6 @@ class BaseTestHelper:
                              os.path.join(CHIP_REPO, "out/debug/standalone", self.remote_server_app),
                              self.subscription_capacity))
                     with updateLock:
-                        remoteDeviceRestarted = True
                         updateCv.notifyAll()
 
                 finally:
@@ -1485,11 +1483,10 @@ class BaseTestHelper:
             restartRemoteThread = _restartRemoteDevice(remote_ip, ssh_port, remote_server_app, subscription_capacity)
             restartRemoteThread.start()
             with updateCv:
-                while remoteDeviceRestarted is False:
-                    if not updateCv.wait(8.0):
-                        self.logger.error(
-                            "Failed to restart the remote device")
-                        break
+                if not updateCv.wait(8.0):
+                    self.logger.error(
+                        "Failed to restart the remote device")
+
             # Wait for some time so that the device will be resolving the address of the first controller
             time.sleep(3)
 
