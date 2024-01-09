@@ -32,7 +32,7 @@ Category:
 Functional
 
 Purpose:
-This test case will verify that the response messages returned by 
+This test case will verify that the response messages returned by
 subscription requests are according to specification.
 
 Test Plan:
