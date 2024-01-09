@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <crypto/CHIPCryptoPALPSA.h>
 #include <crypto/SessionKeystore.h>
 
 namespace chip {
@@ -27,11 +28,19 @@ class PSASessionKeystore : public SessionKeystore
 public:
     CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key) override;
     CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) override;
+    CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hkdf128KeyHandle & key) override;
     CHIP_ERROR DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                          Aes128KeyHandle & key) override;
     CHIP_ERROR DeriveSessionKeys(const ByteSpan & secret, const ByteSpan & salt, const ByteSpan & info, Aes128KeyHandle & i2rKey,
                                  Aes128KeyHandle & r2iKey, AttestationChallenge & attestationChallenge) override;
+    CHIP_ERROR DeriveSessionKeys(const Hkdf128KeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info,
+                                 Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge) override;
     void DestroyKey(Symmetric128BitsKeyHandle & key) override;
+
+private:
+    CHIP_ERROR DeriveSessionKeys(PsaKdf & kdf, Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
+                                 AttestationChallenge & attestationChallenge);
 };
 
 } // namespace Crypto

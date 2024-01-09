@@ -602,7 +602,6 @@ using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BY
  *
  * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
  *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
- *       Child classes only need to implement a constructor and delete all the copy operators.
  */
 class Symmetric128BitsKeyHandle
 {
@@ -648,13 +647,6 @@ private:
  */
 class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
 {
-public:
-    Aes128KeyHandle() = default;
-
-    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
-    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
-    void operator=(const Aes128KeyHandle &)  = delete;
-    void operator=(Aes128KeyHandle &&)       = delete;
 };
 
 /**
@@ -662,13 +654,13 @@ public:
  */
 class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
 {
-public:
-    Hmac128KeyHandle() = default;
+};
 
-    Hmac128KeyHandle(const Hmac128KeyHandle &) = delete;
-    Hmac128KeyHandle(Hmac128KeyHandle &&)      = delete;
-    void operator=(const Hmac128KeyHandle &)   = delete;
-    void operator=(Hmac128KeyHandle &&)        = delete;
+/**
+ * @brief Platform-specific HKDF key handle
+ */
+class Hkdf128KeyHandle final : public Symmetric128BitsKeyHandle
+{
 };
 
 /**
@@ -1087,6 +1079,9 @@ public:
                                      unsigned int iteration_count, uint32_t key_length, uint8_t * output);
 };
 
+// TODO: Extract Spake2p to a separate header and replace the forward declaration with #include SessionKeystore.h
+class SessionKeystore;
+
 /**
  * The below class implements the draft 01 version of the Spake2+ protocol as
  * defined in https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html.
@@ -1202,14 +1197,17 @@ public:
     virtual CHIP_ERROR KeyConfirm(const uint8_t * in, size_t in_len);
 
     /**
-     * @brief Return the shared secret.
+     * @brief Return the shared HKDF key.
      *
-     * @param out     The output secret.
-     * @param out_len The output secret length.
+     * Returns the shared key established during the Spake2+ process, which can be used
+     * to derive application-specific keys using HKDF.
+     *
+     * @param keystore The session keystore for managing the HKDF key lifetime.
+     * @param key The output HKDF key.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetKeys(uint8_t * out, size_t * out_len);
+    CHIP_ERROR GetKeys(SessionKeystore & keystore, Hkdf128KeyHandle & key) const;
 
     CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
     CHIP_ERROR WriteMN();

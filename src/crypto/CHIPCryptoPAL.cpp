@@ -21,6 +21,9 @@
  */
 
 #include "CHIPCryptoPAL.h"
+
+#include "SessionKeystore.h"
+
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPEncoding.h>
@@ -498,18 +501,15 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p::GetKeys(uint8_t * out, size_t * out_len)
+CHIP_ERROR Spake2p::GetKeys(SessionKeystore & keystore, Hkdf128KeyHandle & key) const
 {
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
+    VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::KC, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(hash_size / 2 == sizeof(Symmetric128BitsKeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(state == CHIP_SPAKE2P_STATE::KC, error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(*out_len >= hash_size / 2, error = CHIP_ERROR_INVALID_ARGUMENT);
+    Symmetric128BitsKeyByteArray keyMaterial;
+    memcpy(keyMaterial, Ke, hash_size / 2);
 
-    memcpy(out, Ke, hash_size / 2);
-    error = CHIP_NO_ERROR;
-exit:
-    *out_len = hash_size / 2;
-    return error;
+    return keystore.CreateKey(keyMaterial, key);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
