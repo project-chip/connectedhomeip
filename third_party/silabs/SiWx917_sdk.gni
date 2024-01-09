@@ -247,6 +247,7 @@ template("siwx917_sdk") {
     }
     if (!disable_lcd) {
       defines += [
+        "DISPLAY_ENABLED",
         "CONFIG_ENABLE_UART",
         "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
