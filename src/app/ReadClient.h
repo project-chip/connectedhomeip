@@ -90,7 +90,7 @@ public:
          * receives an OnDone call to destroy the object.
          *
          */
-        virtual void RefreshLiveness(const ReadClient& apReadClient) {}
+        virtual void RefreshLiveness(const ReadClient & apReadClient) {}
 
         /**
          * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
