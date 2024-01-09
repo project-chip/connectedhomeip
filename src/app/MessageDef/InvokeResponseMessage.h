@@ -111,9 +111,9 @@ public:
     InvokeResponseMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
-     *  @brief Set True if the set of InvokeResponseIB have to be sent across multiple packets in a single transaction
-     *  @param [in] aMoreChunkedMessages  true if more chunked messages are needed
-     *  @return A reference to *this
+     *  @brief Reserved space in TLVWriter for MoreChunkedMessages
+     *  @return CHIP_NO_ERROR upon successfully reserving space for MoreChunkedMessages
+     *  @return other CHIP error see TLVWriter::ReserveBuffer for more details.
      */
     CHIP_ERROR ReserveSpaceForMoreChunkedMessages();
 
