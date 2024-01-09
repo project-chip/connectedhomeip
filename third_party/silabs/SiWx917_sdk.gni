@@ -247,7 +247,6 @@ template("siwx917_sdk") {
     }
     if (!disable_lcd) {
       defines += [
-        "DISPLAY_ENABLED",
         "CONFIG_ENABLE_UART",
         "SI91X_SYSRTC_COUNT=1",
         "SYSCALLS_WRITE",
@@ -528,6 +527,7 @@ template("siwx917_sdk") {
       ]
     }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
+    public_configs = [ ":${sdk_target_name}_config",
+          "${examples_plat_dir}:siwx917-common-config", ]
   }
 }
