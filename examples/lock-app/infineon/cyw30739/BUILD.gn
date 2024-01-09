@@ -45,11 +45,14 @@ cyw30739_executable("lock_app") {
   output_name = "chip-cyw30739-lock-example.elf"
 
   sources = [
+    "${examples_plat_dir}/LEDWidget.cpp",
+    "${examples_plat_dir}/main.cpp",
+    "${examples_plat_dir}/matter_config.cpp",
     "src/AppShellCommands.cpp",
+    "src/AppTask.cpp",
     "src/ButtonHandler.cpp",
     "src/LockManager.cpp",
     "src/ZclCallbacks.cpp",
-    "src/main.cpp",
   ]
 
   deps = [

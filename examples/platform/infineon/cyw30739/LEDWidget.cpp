@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,56 +17,39 @@
  *    limitations under the License.
  */
 
-#include <LightingManager.h>
-
+#include "LEDWidget.h"
 #include <stdio.h>
 
-using namespace chip;
-
-LightingManager LightingManager::sLight;
 bool usr_LED1_OnOffStatus = false;
 
-/* config LED 1 */
-static wiced_led_config_t chip_lighting_led_config_1 = {
-    .led    = PLATFORM_LED_1,
-    .bright = 50,
-};
-/* config LED 2 */
-static wiced_led_config_t chip_lighting_led_config_2 = {
-    .led    = PLATFORM_LED_2,
-    .bright = 50,
-};
-
-wiced_result_t LightingManager::Init()
+void LEDWidget::Init(wiced_led_config_t * lighting_led_config, uint8_t nums)
 {
     wiced_result_t result;
-    result = wiced_led_manager_init(&chip_lighting_led_config_1);
-    if (result != WICED_SUCCESS)
-        printf("Init LED1 fail (%d)\n", result);
 
-    result = wiced_led_manager_init(&chip_lighting_led_config_2);
-    if (result != WICED_SUCCESS)
-        printf("Init LED2 fail (%d)\n", result);
-
-    return result;
+    for (uint8_t i = 0; i < nums; i++)
+    {
+        result = wiced_led_manager_init(&lighting_led_config[i]);
+        if (result != WICED_SUCCESS)
+            printf("wiced_led_manager_init fail i=%d, (%d)", i, result);
+    }
 }
 
-void LightingManager::Set(bool state, uint8_t pin)
+void LEDWidget::Set(bool state, uint8_t pin)
 {
     DoSetLEDOnOff(state, pin);
 }
 
-void LightingManager::Blink(wiced_led_t led_pin, uint32_t on_period_ms, uint32_t off_period_ms)
+void LEDWidget::Blink(wiced_led_t led_pin, uint32_t on_period_ms, uint32_t off_period_ms)
 {
     wiced_led_manager_blink_led(led_pin, on_period_ms, off_period_ms);
 }
 
-bool LightingManager::IsLightOn(void)
+bool LEDWidget::IsLEDOn(void)
 {
     return usr_LED1_OnOffStatus;
 }
 
-void LightingManager::DoSetLEDOnOff(bool state, uint8_t pin)
+void LEDWidget::DoSetLEDOnOff(bool state, uint8_t pin)
 {
     if (pin == PLATFORM_LED_1)
     {

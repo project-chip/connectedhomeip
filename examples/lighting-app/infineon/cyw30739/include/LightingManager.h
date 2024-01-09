@@ -19,6 +19,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <wiced_led_manager.h>
 
 class LightingManager
 {
@@ -47,7 +48,6 @@ public:
         ACTOR_BUTTON,
     } Actor;
 
-    CHIP_ERROR Init();
     bool IsLightOn();
     bool IsActionInProgress();
     bool InitiateAction(Actor_t aActor, Action_t aAction, uint8_t vallue);
