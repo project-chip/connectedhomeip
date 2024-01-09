@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceAttestationCredentials.h"
+#import "MCDeviceAttestationCredentials.h"
 #import <Foundation/Foundation.h>
 
-@implementation MTRDeviceAttestationCredentials
+@implementation MCDeviceAttestationCredentials
 
 - (instancetype)initWithCertificationDeclaration:(NSData * _Nonnull)certificationDeclaration
                              firmwareInformation:(NSData * _Nonnull)firmwareInformation

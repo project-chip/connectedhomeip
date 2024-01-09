@@ -19,22 +19,22 @@
 import Foundation
 import os.log
 
-class MTRConnectionExampleViewModel: ObservableObject {
+class MCConnectionExampleViewModel: ObservableObject {
     let Log = Logger(subsystem: "com.matter.casting",
-                     category: "MTRConnectionExampleViewModel")
+                     category: "MCConnectionExampleViewModel")
     
-    // VendorId of the MTREndpoint on the MTRCastingPlayer that the MTRCastingApp desires to interact with after connection
+    // VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
     let kDesiredEndpointVendorId: UInt16 = 65521;
     
     @Published var connectionSuccess: Bool?;
 
     @Published var connectionStatus: String?;
 
-    func connect(selectedCastingPlayer: MTRCastingPlayer?) {
-        let desiredEndpointFilter: MTREndpointFilter = MTREndpointFilter()
+    func connect(selectedCastingPlayer: MCCastingPlayer?) {
+        let desiredEndpointFilter: MCEndpointFilter = MCEndpointFilter()
         desiredEndpointFilter.vendorId = kDesiredEndpointVendorId
         selectedCastingPlayer?.verifyOrEstablishConnection(completionBlock: { err in
-            self.Log.error("MTRConnectionExampleViewModel connect() completed with \(err)")
+            self.Log.error("MCConnectionExampleViewModel connect() completed with \(err)")
             if(err == nil)
             {
                 self.connectionSuccess = true

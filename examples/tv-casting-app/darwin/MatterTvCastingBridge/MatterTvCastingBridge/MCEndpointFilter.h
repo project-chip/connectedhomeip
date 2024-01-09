@@ -17,17 +17,17 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef MTREndpointFilter_h
-#define MTREndpointFilter_h
+#ifndef MCEndpointFilter_h
+#define MCEndpointFilter_h
 
 /**
- * @brief Describes a MTREndpoint that the client wants to connect to
+ * @brief Describes a MCEndpoint that the client wants to connect to
  */
-@interface MTREndpointFilter : NSObject
+@interface MCEndpointFilter : NSObject
 // value of 0 means unspecified
 @property (nonatomic) uint16_t vendorId;
 @property (nonatomic) uint16_t productId;
 // std::vector<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> requiredDeviceTypes;
 
 @end
-#endif /* MTREndpointFilter_h */
+#endif /* MCEndpointFilter_h */

@@ -15,45 +15,45 @@
  *    limitations under the License.
  */
 
-#import "MTRDataSource.h"
+#import "MCDataSource.h"
 #import "MatterError.h"
 
-#ifndef MTRCastingApp_h
-#define MTRCastingApp_h
+#ifndef MCCastingApp_h
+#define MCCastingApp_h
 
 /**
- * @brief MTRCastingApp represents an app that can cast content to a Casting Player.
+ * @brief MCCastingApp represents an app that can cast content to a Casting Player.
  */
-@interface MTRCastingApp : NSObject
+@interface MCCastingApp : NSObject
 
 /**
- * Returns a shared instance of the MTRCastingApp
+ * Returns a shared instance of the MCCastingApp
  */
-+ (MTRCastingApp * _Nullable)getSharedInstance;
++ (MCCastingApp * _Nullable)getSharedInstance;
 
 - (dispatch_queue_t _Nullable)getWorkQueue;
 
 - (dispatch_queue_t _Nullable)getClientQueue;
 
 /**
- * @brief Initializes the MTRCastingApp with an MTRDataSource
+ * @brief Initializes the MCCastingApp with an MCDataSource
  *
- * @param dataSource provides all the parameters required to initialize the MTRCastingApp
+ * @param dataSource provides all the parameters required to initialize the MCCastingApp
  */
-- (NSError * _Nullable)initializeWithDataSource:(id<MTRDataSource> _Nonnull)dataSource;
+- (NSError * _Nullable)initializeWithDataSource:(id<MCDataSource> _Nonnull)dataSource;
 
 /**
- * @brief (async) Starts the Matter server that the MTRCastingApp runs on and registers all the necessary delegates
+ * @brief (async) Starts the Matter server that the MCCastingApp runs on and registers all the necessary delegates
  */
 - (void)startWithCompletionBlock:(void (^_Nonnull __strong)(NSError * _Nullable __strong))completion;
 
 /**
- * @brief (async) Stops the Matter server that the MTRCastingApp runs on
+ * @brief (async) Stops the Matter server that the MCCastingApp runs on
  */
 - (void)stopWithCompletionBlock:(void (^_Nonnull __strong)(NSError * _Nullable __strong))completion;
 
 /**
- * @brief true, if MTRCastingApp is running. false otherwise
+ * @brief true, if MCCastingApp is running. false otherwise
  */
 - (bool)isRunning;
 
@@ -69,4 +69,4 @@
 
 @end
 
-#endif /* MTRCastingApp_h */
+#endif /* MCCastingApp_h */

@@ -15,22 +15,22 @@
  *    limitations under the License.
  */
 
-#import "MTRCastingPlayer.h"
+#import "MCCastingPlayer.h"
 
-#import "MTRCastingApp.h"
-#import "MTRErrorUtils.h"
+#import "MCCastingApp.h"
+#import "MCErrorUtils.h"
 
 #import "core/CastingPlayer.h"
 
 #import <Foundation/Foundation.h>
 
-@interface MTRCastingPlayer ()
+@interface MCCastingPlayer ()
 
 @property (nonatomic, readwrite) matter::casting::memory::Strong<matter::casting::core::CastingPlayer> cppCastingPlayer;
 
 @end
 
-@implementation MTRCastingPlayer
+@implementation MCCastingPlayer
 
 static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core::kCommissioningWindowTimeoutSec;
 
@@ -39,17 +39,17 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return kMinCommissioningWindowTimeoutSec;
 }
 
-- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion desiredEndpointFilter:(MTREndpointFilter * _Nullable)desiredEndpointFilter
+- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter
 {
     [self verifyOrEstablishConnectionWithCompletionBlock:completion timeout:kMinCommissioningWindowTimeoutSec desiredEndpointFilter:desiredEndpointFilter];
 }
 
-- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion timeout:(long long)timeout desiredEndpointFilter:(MTREndpointFilter * _Nullable)desiredEndpointFilter
+- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion timeout:(long long)timeout desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter
 {
-    ChipLogProgress(AppServer, "MTRCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock called");
-    VerifyOrReturn([[MTRCastingApp getSharedInstance] isRunning], ChipLogError(AppServer, "MTRCastingApp NOT running"));
+    ChipLogProgress(AppServer, "MCCastingPlayer.verifyOrEstablishConnectionWithCompletionBlock called");
+    VerifyOrReturn([[MCCastingApp getSharedInstance] isRunning], ChipLogError(AppServer, "MCCastingApp NOT running"));
 
-    dispatch_queue_t workQueue = [[MTRCastingApp getSharedInstance] getWorkQueue];
+    dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
         __block matter::casting::core::EndpointFilter cppDesiredEndpointFilter;
         if (desiredEndpointFilter != nil) {
@@ -59,9 +59,9 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
         _cppCastingPlayer->VerifyOrEstablishConnection(
             [completion](CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer) {
-                dispatch_queue_t clientQueue = [[MTRCastingApp getSharedInstance] getClientQueue];
+                dispatch_queue_t clientQueue = [[MCCastingApp getSharedInstance] getClientQueue];
                 dispatch_async(clientQueue, ^{
-                    completion(err == CHIP_NO_ERROR ? nil : [MTRErrorUtils NSErrorFromChipError:err]);
+                    completion(err == CHIP_NO_ERROR ? nil : [MCErrorUtils NSErrorFromChipError:err]);
                 });
             }, timeout, cppDesiredEndpointFilter);
     });
@@ -69,10 +69,10 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
 - (void)disconnect
 {
-    ChipLogProgress(AppServer, "MTRCastingPlayer.disconnect called");
-    VerifyOrReturn([[MTRCastingApp getSharedInstance] isRunning], ChipLogError(AppServer, "MTRCastingApp NOT running"));
+    ChipLogProgress(AppServer, "MCCastingPlayer.disconnect called");
+    VerifyOrReturn([[MCCastingApp getSharedInstance] isRunning], ChipLogError(AppServer, "MCCastingApp NOT running"));
 
-    dispatch_queue_t workQueue = [[MTRCastingApp getSharedInstance] getWorkQueue];
+    dispatch_queue_t workQueue = [[MCCastingApp getSharedInstance] getWorkQueue];
     dispatch_sync(workQueue, ^{
         _cppCastingPlayer->Disconnect();
     });
@@ -129,12 +129,12 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 }
 
 // TODO convert to Obj-C endpoints and return
-/*- (NSArray<MTREndpoint *> * _Nonnull)endpoints
+/*- (NSArray<MCEndpoint *> * _Nonnull)endpoints
 {
     return [NSMutableArray new];
 }*/
 
-- (BOOL)isEqualToMTRCastingPlayer:(MTRCastingPlayer * _Nullable)other
+- (BOOL)isEqualToMCCastingPlayer:(MCCastingPlayer * _Nullable)other
 {
     return [self.identifier isEqualToString:other.identifier];
 }
@@ -149,11 +149,11 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
         return YES;
     }
 
-    if (![other isKindOfClass:[MTRCastingPlayer class]]) {
+    if (![other isKindOfClass:[MCCastingPlayer class]]) {
         return NO;
     }
 
-    return [self isEqualToMTRCastingPlayer:(MTRCastingPlayer *) other];
+    return [self isEqualToMCCastingPlayer:(MCCastingPlayer *) other];
 }
 
 - (NSUInteger)hash

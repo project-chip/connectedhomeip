@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
-#import "MTRCommissionableData.h"
+#import "MCCommissionableData.h"
 #import <Foundation/Foundation.h>
 
-@implementation MTRCommissionableData
+@implementation MCCommissionableData
 
 - (instancetype)initWithPasscode:(uint32_t)passcode
                    discriminator:(uint16_t)discriminator

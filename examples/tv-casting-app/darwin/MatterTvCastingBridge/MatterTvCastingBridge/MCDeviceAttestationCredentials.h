@@ -18,10 +18,10 @@
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 
-#ifndef MTRDeviceAttestationCredentials_h
-#define MTRDeviceAttestationCredentials_h
+#ifndef MCDeviceAttestationCredentials_h
+#define MCDeviceAttestationCredentials_h
 
-@interface MTRDeviceAttestationCredentials : NSObject
+@interface MCDeviceAttestationCredentials : NSObject
 
 @property (nonatomic, strong, readonly) NSData * _Nonnull certificationDeclaration;
 
@@ -31,12 +31,12 @@
 
 @property (nonatomic, strong, readonly) NSData * _Nonnull productAttestationIntermediateCert;
 
-- (MTRDeviceAttestationCredentials * _Nonnull)initWithCertificationDeclaration:(NSData * _Nonnull)certificationDeclaration
-                                                           firmwareInformation:(NSData * _Nonnull)firmwareInformation
-                                                         deviceAttestationCert:(NSData * _Nonnull)deviceAttestationCert
-                                            productAttestationIntermediateCert:
-                                                (NSData * _Nonnull)productAttestationIntermediateCert;
+- (MCDeviceAttestationCredentials * _Nonnull)initWithCertificationDeclaration:(NSData * _Nonnull)certificationDeclaration
+                                                          firmwareInformation:(NSData * _Nonnull)firmwareInformation
+                                                        deviceAttestationCert:(NSData * _Nonnull)deviceAttestationCert
+                                           productAttestationIntermediateCert:
+                                               (NSData * _Nonnull)productAttestationIntermediateCert;
 
 @end
 
-#endif /* MTRDeviceAttestationCredentials_h */
+#endif /* MCDeviceAttestationCredentials_h */

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "MTRCryptoUtils.h"
-#import "MTRErrorUtils.h"
+#import "MCCryptoUtils.h"
+#import "MCErrorUtils.h"
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
@@ -25,7 +25,7 @@
 
 #include <Security/Security.h>
 
-@implementation MTRCryptoUtils
+@implementation MCCryptoUtils
 
 + (MatterError *)ecdsaAsn1SignatureToRawWithFeLengthBytes:(NSUInteger)feLengthBytes asn1Signature:(CFDataRef)asn1Signature outRawSignature:(NSData **)outRawSignature
 {
@@ -44,7 +44,7 @@
     CHIP_ERROR err = chip::Crypto::EcdsaAsn1SignatureToRaw(feLengthBytes, chip::ByteSpan(asn1SignatureByteSpan.data(), asn1SignatureByteSpan.size()), rawSignatureMutableByteSpan);
     if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "chip::Crypto::EcdsaAsn1SignatureToRaw() failed");
-        return [MTRErrorUtils MatterErrorFromChipError:err];
+        return [MCErrorUtils MatterErrorFromChipError:err];
     }
 
     // copy from rawSignatureMutableByteSpan into *outRawSignature

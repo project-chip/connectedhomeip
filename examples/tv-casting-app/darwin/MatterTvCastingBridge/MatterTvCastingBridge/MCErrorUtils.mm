@@ -17,11 +17,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRErrorUtils.h"
+#import "MCErrorUtils.h"
 
 #include <lib/core/CHIPError.h>
 
-@implementation MTRErrorUtils
+@implementation MCErrorUtils
 
 + (MatterError * _Nonnull)MatterErrorFromChipError:(CHIP_ERROR)chipError
 {

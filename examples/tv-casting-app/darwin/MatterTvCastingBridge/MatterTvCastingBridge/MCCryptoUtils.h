@@ -19,10 +19,10 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef MTRCryptoUtils_h
-#define MTRCryptoUtils_h
+#ifndef MCCryptoUtils_h
+#define MCCryptoUtils_h
 
-@interface MTRCryptoUtils : NSObject
+@interface MCCryptoUtils : NSObject
 
 /**
  * @brief Convert an ASN.1 DER signature (per X9.62) as used by TLS libraries to SEC1 raw format
@@ -44,4 +44,4 @@
 
 @end
 
-#endif /* MTRCryptoUtils_h */
+#endif /* MCCryptoUtils_h */

@@ -17,13 +17,13 @@
 
 #include "core/Types.h"
 
-#ifndef MTRCommonCaseDeviceServerInitParamsProvider_h
-#define MTRCommonCaseDeviceServerInitParamsProvider_h
+#ifndef MCCommonCaseDeviceServerInitParamsProvider_h
+#define MCCommonCaseDeviceServerInitParamsProvider_h
 
 /**
  * @brief Provides the ServerInitParams required to start the CastingApp, which in turn starts the Matter server
  */
-class MTRCommonCaseDeviceServerInitParamsProvider : public matter::casting::support::ServerInitParamsProvider
+class MCCommonCaseDeviceServerInitParamsProvider : public matter::casting::support::ServerInitParamsProvider
 {
 private:
     // For this example, we'll use CommonCaseDeviceServerInitParams
@@ -39,4 +39,4 @@ public:
     }
 };
 
-#endif /* MTRCommonCaseDeviceServerInitParamsProvider_h */
+#endif /* MCCommonCaseDeviceServerInitParamsProvider_h */

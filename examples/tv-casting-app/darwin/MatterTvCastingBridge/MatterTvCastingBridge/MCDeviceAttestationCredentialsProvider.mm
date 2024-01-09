@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#import "MTRDeviceAttestationCredentialsProvider.h"
+#import "MCDeviceAttestationCredentialsProvider.h"
 
-#import "MTRDeviceAttestationCredentials.h"
+#import "MCDeviceAttestationCredentials.h"
 
 #include "lib/support/logging/CHIPLogging.h"
 #include <lib/core/CHIPError.h>
@@ -29,19 +29,19 @@ namespace matter {
 namespace casting {
     namespace support {
 
-        CHIP_ERROR MTRDeviceAttestationCredentialsProvider::Initialize(id<MTRDataSource> dataSource)
+        CHIP_ERROR MCDeviceAttestationCredentialsProvider::Initialize(id<MCDataSource> dataSource)
         {
             VerifyOrReturnError(dataSource != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(mDataSource == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
             mDataSource = dataSource;
             mDac = [mDataSource
-                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MTRDeviceAttestationCredentialsProvider.Initialize()"];
+                castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MCDeviceAttestationCredentialsProvider.Initialize()"];
 
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRDeviceAttestationCredentialsProvider::GetCertificationDeclaration(
+        CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetCertificationDeclaration(
             chip::MutableByteSpan & outCertificationDeclaration)
         {
             VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -58,7 +58,7 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRDeviceAttestationCredentialsProvider::GetFirmwareInformation(chip::MutableByteSpan & outFirmwareInformation)
+        CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetFirmwareInformation(chip::MutableByteSpan & outFirmwareInformation)
         {
             VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -73,7 +73,7 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRDeviceAttestationCredentialsProvider::GetDeviceAttestationCert(
+        CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetDeviceAttestationCert(
             chip::MutableByteSpan & outDeviceAttestationCert)
         {
             VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -89,7 +89,7 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRDeviceAttestationCredentialsProvider::GetProductAttestationIntermediateCert(
+        CHIP_ERROR MCDeviceAttestationCredentialsProvider::GetProductAttestationIntermediateCert(
             chip::MutableByteSpan & outProductAttestationIntermediateCert)
         {
             VerifyOrReturnError(mDac != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -106,7 +106,7 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRDeviceAttestationCredentialsProvider::SignWithDeviceAttestationKey(
+        CHIP_ERROR MCDeviceAttestationCredentialsProvider::SignWithDeviceAttestationKey(
             const chip::ByteSpan & messageToSign, chip::MutableByteSpan & outSignatureBuffer)
         {
             VerifyOrReturnError(mDataSource != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -115,7 +115,7 @@ namespace casting {
             __block NSData * signedData = [NSData dataWithBytes:outSignatureBuffer.data() length:outSignatureBuffer.size()];
             __block MatterError * err = nil;
             dispatch_sync(mDataSource.clientQueue, ^{
-                err = [mDataSource castingApp:@"MTRDeviceAttestationCredentialsProvider.SignWithDeviceAttestationKey()"
+                err = [mDataSource castingApp:@"MCDeviceAttestationCredentialsProvider.SignWithDeviceAttestationKey()"
                     didReceiveRequestToSignCertificateRequest:csrData
                                               outRawSignature:&signedData];
             });

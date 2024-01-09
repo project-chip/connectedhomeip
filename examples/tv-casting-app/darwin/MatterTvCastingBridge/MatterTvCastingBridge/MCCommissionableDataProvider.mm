@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#import "MTRCommissionableDataProvider.h"
+#import "MCCommissionableDataProvider.h"
 
-#import "MTRCommissionableData.h"
+#import "MCCommissionableData.h"
 
 #include <cstdint>
 #include <string.h>
@@ -48,14 +48,14 @@ namespace casting {
             return DRBG_get_bytes(spake2pSaltVector.data(), spake2pSaltVector.size());
         }
 
-        CHIP_ERROR MTRCommissionableDataProvider::Initialize(id<MTRDataSource> dataSource)
+        CHIP_ERROR MCCommissionableDataProvider::Initialize(id<MCDataSource> dataSource)
         {
             VerifyOrReturnLogError(dataSource != nil, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnLogError(mDataSource == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
             mDataSource = dataSource;
-            MTRCommissionableData * commissionableData =
-                [mDataSource castingAppDidReceiveRequestForCommissionableData:@"MTRCommissionableDataProvider.Initialize()"];
+            MCCommissionableData * commissionableData =
+                [mDataSource castingAppDidReceiveRequestForCommissionableData:@"MCCommissionableDataProvider.Initialize()"];
 
             VerifyOrReturnLogError(commissionableData.discriminator <= chip::kMaxDiscriminatorValue, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -96,7 +96,7 @@ namespace casting {
             // read salt from paramter if provided or generate one
             std::vector<uint8_t> spake2pSalt(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length);
             if (!havePaseSalt) {
-                ChipLogProgress(Support, "MTRCommissionableDataProvider didn't get a PASE salt, generating one.");
+                ChipLogProgress(Support, "MCCommissionableDataProvider didn't get a PASE salt, generating one.");
                 err = GeneratePaseSalt(spake2pSalt);
                 VerifyOrReturnLogError(err == CHIP_NO_ERROR, err);
             } else {
@@ -162,24 +162,24 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRCommissionableDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+        CHIP_ERROR MCCommissionableDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
         {
             VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
             setupDiscriminator = mDiscriminator;
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRCommissionableDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
+        CHIP_ERROR MCCommissionableDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
         {
-            ChipLogProgress(AppServer, "MTRCommissionableDataProvider::GetSpake2pIterationCount called");
+            ChipLogProgress(AppServer, "MCCommissionableDataProvider::GetSpake2pIterationCount called");
             VerifyOrReturnLogError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
             iterationCount = mPaseIterationCount;
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRCommissionableDataProvider::GetSpake2pSalt(chip::MutableByteSpan & saltBuf)
+        CHIP_ERROR MCCommissionableDataProvider::GetSpake2pSalt(chip::MutableByteSpan & saltBuf)
         {
-            ChipLogProgress(AppServer, "MTRCommissionableDataProvider::GetSpake2pSalt called");
+            ChipLogProgress(AppServer, "MCCommissionableDataProvider::GetSpake2pSalt called");
             VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
 
             VerifyOrReturnError(saltBuf.size() >= kSpake2p_Max_PBKDF_Salt_Length, CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -189,9 +189,9 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRCommissionableDataProvider::GetSpake2pVerifier(chip::MutableByteSpan & verifierBuf, size_t & outVerifierLen)
+        CHIP_ERROR MCCommissionableDataProvider::GetSpake2pVerifier(chip::MutableByteSpan & verifierBuf, size_t & outVerifierLen)
         {
-            ChipLogProgress(AppServer, "MTRCommissionableDataProvider::GetSpake2pVerifier called");
+            ChipLogProgress(AppServer, "MCCommissionableDataProvider::GetSpake2pVerifier called");
             VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
 
             // By now, serialized verifier from Init should be correct size
@@ -205,9 +205,9 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        CHIP_ERROR MTRCommissionableDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
+        CHIP_ERROR MCCommissionableDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
         {
-            ChipLogProgress(AppServer, "MTRCommissionableDataProvider::GetSetupPasscode called");
+            ChipLogProgress(AppServer, "MCCommissionableDataProvider::GetSetupPasscode called");
             VerifyOrReturnError(mFirstUpdated, CHIP_ERROR_INCORRECT_STATE);
 
             // Pretend not implemented if we don't have a passcode value externally set
@@ -216,7 +216,7 @@ namespace casting {
             }
 
             setupPasscode = mSetupPasscode.Value();
-            ChipLogProgress(AppServer, "MTRCommissionableDataProvider::GetSetupPasscode returning value %d", setupPasscode);
+            ChipLogProgress(AppServer, "MCCommissionableDataProvider::GetSetupPasscode returning value %d", setupPasscode);
             return CHIP_NO_ERROR;
         }
 
