@@ -534,7 +534,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     case kDeviceOption_SubscriptionCapacity:
-        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<size_t>(atoi(aValue));
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(atoi(aValue));
         break;
 #endif
     default:
