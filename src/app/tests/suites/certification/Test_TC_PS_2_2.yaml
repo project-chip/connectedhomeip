@@ -110,7 +110,9 @@ tests:
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
-    - label: "Step 5: The Current field of Step 3b has to be the same as the value of Step 4."
+    - label:
+          "Step 5: The Current field of Step 3b has to be the same as the value
+          of Step 4."
       PICS: PS.S.E00 && PS.S.A000a && PS.S.M.ManualWiredFault
       verification: |
 
@@ -279,7 +281,9 @@ tests:
           General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
       disabled: true
 
-    - label: "Step 5: The Current field of Step 13b has to be the same as the value of Step 14."
+    - label:
+          "Step 5: The Current field of Step 13b has to be the same as the value
+          of Step 14."
       PICS: PS.S.E02 && PS.S.A001e && PS.S.M.ManualWiredFault
       verification: |
 

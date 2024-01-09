@@ -123,7 +123,6 @@ tests:
           value: []
           constraints:
               type: list
-
     #Commenting out the step IdentifyQueryResponse (0x00) is not supported by Matter 1.0
     #- label:
     #      "TH reads the optional command(IdentifyQueryResponse) in

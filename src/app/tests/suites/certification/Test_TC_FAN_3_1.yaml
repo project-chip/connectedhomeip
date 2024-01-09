@@ -52,7 +52,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 2b: after a few seconds, TH reads from the DUT the the FanMode attribute"
+    - label:
+          "Step 2b: after a few seconds, TH reads from the DUT the the FanMode
+          attribute"
       PICS: FAN.S.A0000
       command: "readAttribute"
       attribute: "FanMode"
@@ -136,7 +138,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 3.1b: after a few seconds, TH reads from the DUT the the FanMode attribute"
+    - label:
+          "Step 3.1b: after a few seconds, TH reads from the DUT the the FanMode
+          attribute"
       PICS: FAN.S.A0000
       command: "readAttribute"
       attribute: "FanMode"

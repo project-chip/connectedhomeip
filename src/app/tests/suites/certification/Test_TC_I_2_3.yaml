@@ -18,7 +18,6 @@ PICS:
     - I.S
     - I.S.C40.Rsp
 
-
 config:
     nodeId: 0x12344321
     cluster: "Identify"
