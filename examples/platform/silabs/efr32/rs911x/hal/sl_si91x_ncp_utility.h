@@ -51,5 +51,6 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 
 #if SL_SPICTRL_MUX
 sl_status_t spi_board_init(void);
+static bool spi_enabled = false;
 #endif // SL_SPICTRL_MUX
 

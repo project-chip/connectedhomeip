@@ -20,9 +20,6 @@
 
 #include "rsi_wlan_defines.h"
 
-// SLC-FIX
-#include "sl_matter_wifi_config.h"
-
 //! Enable feature
 #define RSI_ENABLE 1
 //! Disable feature

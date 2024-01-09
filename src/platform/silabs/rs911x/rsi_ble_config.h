@@ -26,8 +26,6 @@
 #include <rsi_data_types.h>
 #endif
 
-// SLC-FIX
-#include "sl_matter_wifi_config.h"
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -36,6 +34,12 @@
 #ifndef RSI_FAILURE
 // failure return value
 #define RSI_FAILURE -1
+#endif
+
+#define WIFI_ENABLE_SECURITY_WPA3_TRANSITION 0
+
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_IPV4
+#define CHIP_DEVICE_CONFIG_ENABLE_IPV4 0
 #endif
 
 #define RSI_BLE_CONN_EVENT (0x01)

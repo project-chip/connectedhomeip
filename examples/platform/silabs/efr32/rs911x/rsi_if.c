@@ -54,9 +54,6 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
-// SLC-FIX
-#include "sl_matter_wifi_config.h"
-
 // TODO convert this file to cpp and use CodeUtils.h
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))

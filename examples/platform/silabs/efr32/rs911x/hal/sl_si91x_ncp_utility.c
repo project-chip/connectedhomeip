@@ -45,6 +45,11 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+#if SL_MX25CTRL_MUX
+sl_status_t sl_wfx_host_spiflash_cs_assert(void);
+sl_status_t sl_wfx_host_spiflash_cs_deassert(void);
+#endif
+
 #if SL_BTLCTRL_MUX
 #include "btl_interface.h"
 #endif // SL_BTLCTRL_MUX
@@ -64,8 +69,6 @@ SemaphoreHandle_t spi_sem_sync_hdl;
 #endif // SL_SPICTRL_MUX
 
 #if SL_LCDCTRL_MUX
-
-
 
 /********************************************************
  * @fn   sl_wfx_host_pre_lcd_spi_transfer(void)
