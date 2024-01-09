@@ -82,7 +82,7 @@ public:
          * @return true when callback's expect path specific error to come in OnResponse* callback
          * @return false when callback's expect path specific error to come in OnError callback
          */
-        bool PathSpecificErrorGoesToOnResponseCallbacks()
+        virtual bool ExtendedUsePathCallbacks()
         {
             // Legacy code had path specific errors go to OnError which is why this is set to false.
             return false;
@@ -93,7 +93,7 @@ public:
          * processed. Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
-         *      - Note this only happens if PathSpecificErrorGoesToOnResponseCallbacks() returns true.
+         *      - Note this only happens if ExtendedUsePathCallbacks() returns true.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
@@ -128,7 +128,7 @@ public:
          * OnResponse will be called when a successful response from server has been received and processed. Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
-         *      - Note this only happens if PathSpecificErrorGoesToOnResponseCallbacks() returns true.
+         *      - Note this only happens if ExtendedUsePathCallbacks() returns true.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
@@ -161,7 +161,7 @@ public:
          * - CHIP_ERROR encapsulating a StatusIB: If we got a path-specific
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
-         *      - Note path specific error only come here happens if PathSpecificErrorGoesToOnResponseCallbacks()
+         *      - Note path specific error only come here happens if ExtendedUsePathCallbacks()
          *        returns false.
          *      - There isn't a guaranteeded way to differentiate between a non-path-specific error and a
          *        path-specific error from the OnError callback.

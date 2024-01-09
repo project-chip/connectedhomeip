@@ -66,7 +66,7 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
     mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
 {
     assertChipStackLockedByCurrentThread();
-    mPathSpecificErrorToOnResponseCallback = mpCallback->PathSpecificErrorGoesToOnResponseCallbacks();
+    mPathSpecificErrorToOnResponseCallback = mpCallback->ExtendedUsePathCallbacks();
 }
 
 CommandSender::~CommandSender()
