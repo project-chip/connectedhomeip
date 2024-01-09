@@ -22,7 +22,6 @@ import faulthandler
 import inspect
 import logging
 import os
-import paramiko
 import secrets
 import sys
 import threading
@@ -37,6 +36,7 @@ import chip.discovery
 import chip.FabricAdmin
 import chip.interaction_model as IM
 import chip.native
+import paramiko
 from chip import ChipDeviceCtrl
 from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
