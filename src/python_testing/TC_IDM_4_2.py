@@ -38,8 +38,10 @@ subscription requests are according to specification.
 Test Plan:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#tc-idm-4-2-subscription-response-messages-from-dut-test-cases-dut_server
 '''
+
+
 class TC_IDM_4_2(MatterBaseTest):
-    
+
     ADMIN_ENDPOINT_ID = 0
 
     async def write_acl(self, ctrl, acl, ep=ADMIN_ENDPOINT_ID):
