@@ -7064,7 +7064,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Channel::Commands::ProgramGuideResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("channelPagingStruct", indent + 1, value.channelPagingStruct));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("paging", indent + 1, value.paging));
     ReturnErrorOnFailure(DataModelLogger::LogValue("programList", indent + 1, value.programList));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -7299,6 +7299,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Commands::TestBatchHelperResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("buffer", indent + 1, value.buffer));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -17454,6 +17462,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestFabricScopedEventResponse", 1, value);
+        }
+        case UnitTesting::Commands::TestBatchHelperResponse::Id: {
+            UnitTesting::Commands::TestBatchHelperResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestBatchHelperResponse", 1, value);
         }
         }
         break;

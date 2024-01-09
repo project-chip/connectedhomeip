@@ -409,6 +409,11 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kConfigureTrustedTimeSource:
         if (mNeedIcdRegistration)
         {
+            if (mParams.GetICDCheckInNodeId().HasValue() && mParams.GetICDMonitoredSubject().HasValue() &&
+                mParams.GetICDSymmetricKey().HasValue())
+            {
+                return CommissioningStage::kICDRegistration;
+            }
             return CommissioningStage::kICDGetRegistrationInfo;
         }
         return GetNextCommissioningStageInternal(CommissioningStage::kICDSendStayActive, lastErr);
@@ -759,7 +764,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
 
             if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
             {
-                if (commissioningInfo.isLIT && commissioningInfo.checkInProtocolSupport)
+                if (commissioningInfo.icd.isLIT && commissioningInfo.icd.checkInProtocolSupport)
                 {
                     mNeedIcdRegistration = true;
                     ChipLogDetail(Controller, "AutoCommissioner: ICD supports the check-in protocol.");

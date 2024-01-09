@@ -59,7 +59,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification superset="Boolean Sensor" class="simple" scope="endpoint"/>
+  <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
@@ -73,8 +73,8 @@ Davis, CA 95616, USA
         </event>
       </events>
     </cluster>
-    <cluster id="0x0080" name="Boolean Sensor Configuration" side="server">
-      <mandatoryConform/>
+    <cluster id="0x0080" name="Boolean State Configuration" side="server">
+      <optionalConform/>
     </cluster>
   </clusters>
 </deviceType>

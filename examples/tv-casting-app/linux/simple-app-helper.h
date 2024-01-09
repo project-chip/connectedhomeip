@@ -31,6 +31,15 @@
 const uint64_t kTargetPlayerDeviceType = 35;
 
 /**
+ * @brief Test values used for demo command and attribute read/subscribe calls
+ */
+const char kContentURL[]                          = "https://www.test.com/videoid";
+const char kContentDisplayStr[]                   = "Test video";
+const unsigned short kTimedInvokeCommandTimeoutMs = 5 * 1000;
+const uint16_t kMinIntervalFloorSeconds           = 0;
+const uint16_t kMaxIntervalCeilingSeconds         = 1;
+
+/**
  * @brief Singleton that reacts to CastingPlayer discovery results
  */
 class DiscoveryDelegateImpl : public matter::casting::core::DiscoveryDelegate

@@ -18,8 +18,8 @@
 
 #pragma once
 
+#include "BaseCluster.h"
 #include "CastingPlayer.h"
-#include "Cluster.h"
 #include "Types.h"
 
 #include "lib/support/logging/CHIPLogging.h"
@@ -59,9 +59,6 @@ private:
     EndpointAttributes mAttributes;
     std::map<chip::ClusterId, memory::Strong<BaseCluster>> mClusters;
 
-protected:
-    CastingPlayer * GetCastingPlayer() const { return mCastingPlayer; }
-
 public:
     Endpoint(CastingPlayer * castingPlayer, const EndpointAttributes & attributes)
     {
@@ -74,6 +71,8 @@ public:
     Endpoint()                       = delete;
     Endpoint(Endpoint & other)       = delete;
     void operator=(const Endpoint &) = delete;
+
+    CastingPlayer * GetCastingPlayer() const { return mCastingPlayer; }
 
     /**
      * @brief Compares based on the Id
@@ -113,6 +112,8 @@ public:
         return serverList;
     }
 
+    void RegisterClusters(std::vector<chip::ClusterId> clusters);
+
     /**
      * @brief Registers a cluster of type T against the passed in clusterId
      * for this Endpoint
@@ -121,7 +122,8 @@ public:
     void RegisterCluster(const chip::ClusterId clusterId)
     {
         static_assert(std::is_base_of<BaseCluster, T>::value, "T must be derived from BaseCluster");
-        auto cluster         = std::make_shared<T>(shared_from_this());
+        auto cluster = std::make_shared<T>(shared_from_this());
+        cluster->SetUp();
         mClusters[clusterId] = std::static_pointer_cast<BaseCluster>(cluster);
     }
 
