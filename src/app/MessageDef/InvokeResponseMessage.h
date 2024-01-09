@@ -78,6 +78,12 @@ class Builder : public MessageBuilder
 {
 public:
     /**
+     *  @brief Performs underlying StructBuilder::Init, but reserves memory need in
+     *  EndOfInvokeResponseMessage() with underlying TLVWriter.
+     */
+    CHIP_ERROR InitWithEndBufferReserved(TLV::TLVWriter * const apWriter);
+
+    /**
      *  @brief This is set to 'true' by the subscriber to indicate preservation of previous subscriptions. If omitted, it implies
      * 'false' as a value.
      */
@@ -88,7 +94,7 @@ public:
      *
      *  @return A reference to InvokeResponseIBs::Builder
      */
-    InvokeResponseIBs::Builder & CreateInvokeResponses();
+    InvokeResponseIBs::Builder & CreateInvokeResponses(const bool aReserveEndBuffer = false);
 
     /**
      *  @brief Get reference to InvokeResponseIBs::Builder
@@ -105,14 +111,37 @@ public:
     InvokeResponseMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
+     *  @brief Reserved space in TLVWriter for MoreChunkedMessages
+     *  @return CHIP_NO_ERROR upon successfully reserving space for MoreChunkedMessages
+     *  @return other CHIP error see TLVWriter::ReserveBuffer for more details.
+     */
+    CHIP_ERROR ReserveSpaceForMoreChunkedMessages();
+
+    /**
      *  @brief Mark the end of this InvokeResponseMessage
      *
      *  @return The builder's final status.
      */
     CHIP_ERROR EndOfInvokeResponseMessage();
 
+    /**
+     *  @brief Get number of bytes required in the buffer by MoreChunkedMessages
+     *
+     *  @return Expected number of bytes required in the buffer by MoreChunkedMessages()
+     */
+    uint32_t GetSizeForMoreChunkResponses();
+
+    /**
+     *  @brief Get number of bytes required in the buffer by EndOfInvokeResponseMessage()
+     *
+     *  @return Expected number of bytes required in the buffer by EndOfInvokeResponseMessage()
+     */
+    uint32_t GetSizeToEndInvokeResponseMessage();
+
 private:
     InvokeResponseIBs::Builder mInvokeResponses;
+    bool mIsEndBufferReserved              = false;
+    bool mIsMoreChunkMessageBufferReserved = false;
 };
 } // namespace InvokeResponseMessage
 } // namespace app

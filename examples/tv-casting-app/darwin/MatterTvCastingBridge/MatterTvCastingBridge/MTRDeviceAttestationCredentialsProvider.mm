@@ -34,6 +34,7 @@ namespace casting {
             VerifyOrReturnError(dataSource != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(mDataSource == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+            mDataSource = dataSource;
             mDac = [mDataSource
                 castingAppDidReceiveRequestForDeviceAttestationCredentials:@"MTRDeviceAttestationCredentialsProvider.Initialize()"];
 
@@ -110,12 +111,16 @@ namespace casting {
         {
             VerifyOrReturnError(mDataSource != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-            __block NSData * signedData = nil;
             NSData * csrData = [NSData dataWithBytes:messageToSign.data() length:messageToSign.size()];
+            __block NSData * signedData = [NSData dataWithBytes:outSignatureBuffer.data() length:outSignatureBuffer.size()];
+            __block MatterError * err = nil;
             dispatch_sync(mDataSource.clientQueue, ^{
-                signedData = [mDataSource castingApp:@"MTRDeviceAttestationCredentialsProvider.SignWithDeviceAttestationKey()"
-                    didReceiveRequestToSignCertificateRequest:csrData];
+                err = [mDataSource castingApp:@"MTRDeviceAttestationCredentialsProvider.SignWithDeviceAttestationKey()"
+                    didReceiveRequestToSignCertificateRequest:csrData
+                                              outRawSignature:&signedData];
             });
+
+            VerifyOrReturnValue(MATTER_NO_ERROR == err, CHIP_ERROR(chip::ChipError::SdkPart::kCore, err.code), ChipLogError(AppServer, "castingApp::SignCertificateRequest failed"));
 
             if (signedData != nil && outSignatureBuffer.size() >= signedData.length) {
                 memcpy(outSignatureBuffer.data(), signedData.bytes, signedData.length);

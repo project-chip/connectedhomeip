@@ -7803,8 +7803,12 @@
               Feature:
                   DeadFrontBehavior: DeadFront
 
-- release: "Future"
-  versions: "future"
+- release: "Early 2024"
+  versions:
+      iOS: "17.4"
+      macOS: "14.4"
+      watchOS: "10.4"
+      tvOS: "17.4"
   introduced:
       clusters:
           - RVCRunMode
@@ -8309,6 +8313,12 @@
               - ActivateAudioTrack
               - ActivateTextTrack
               - DeactivateTextTrack
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestBatchHelperResponse
+              - TestBatchHelperRequest
+              - TestSecondBatchHelperRequest
       command fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8524,3 +8534,6 @@
               # as the enum.  The old enum name never had the new value name.
               ContentLaunchStatusEnum:
                   - URLNotAvailable
+
+- release: "Future"
+  versions: "future"

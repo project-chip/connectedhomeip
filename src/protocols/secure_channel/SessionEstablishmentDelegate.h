@@ -52,8 +52,9 @@ public:
      *   called at most once per session establishment and will not be called if
      *   OnSessionEstablished is called.
      *
-     *   This overload of OnSessionEstablishmentError is not called directly.  It's only called from the default
-     *.   implemetation of the two-argument overload.
+     *   This overload of OnSessionEstablishmentError is not called directly.
+     *   It's only called from the default implementation of the two-argument
+     *   overload.
      */
     virtual void OnSessionEstablishmentError(CHIP_ERROR error) {}
 

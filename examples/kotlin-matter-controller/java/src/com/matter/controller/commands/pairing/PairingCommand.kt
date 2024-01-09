@@ -17,6 +17,7 @@
  */
 package com.matter.controller.commands.pairing
 
+import chip.devicecontroller.ICDDeviceInfo
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.IPAddress
 import com.matter.controller.commands.common.MatterCommand
@@ -177,10 +178,15 @@ abstract class PairingCommand(
     logger.log(Level.INFO, "onICDRegistrationInfoRequired")
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+  override fun onICDRegistrationComplete(
+    errorCode: Int,
+    icdNodeId: Long,
+    icdCounter: Long,
+    icdDeviceInfo: ICDDeviceInfo
+  ) {
     logger.log(
       Level.INFO,
-      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter"
+      "onICDRegistrationComplete with errorCode: $errorCode, icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${icdDeviceInfo.symmetricKey.toHex()}"
     )
   }
 
@@ -211,6 +217,9 @@ abstract class PairingCommand(
   fun getOnboardingPayload(): String {
     return onboardingPayload.toString()
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   private fun String.hexToByteArray(): ByteArray {
     return chunked(2).map { byteStr -> byteStr.toUByte(16).toByte() }.toByteArray()
