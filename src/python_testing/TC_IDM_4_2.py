@@ -152,7 +152,8 @@ class TC_IDM_4_2(MatterBaseTest):
             # Defaulting SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to 60 minutes
             SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 * 60
 
-        logging.info(f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC} seconds")            
+        logging.info(
+            f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC} seconds")            
 
         '''
         ##########
