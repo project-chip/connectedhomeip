@@ -138,18 +138,31 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 
 /**
  * @brief    Called when EVSE cluster receives StartDiagnostics command
+ *
+ *  NOTE: Application code needs to call HwDiagnosticsComplete
+ *  once diagnostics have been completed.
  */
 Status EnergyEvseDelegate::StartDiagnostics()
 {
     /* For EVSE manufacturers to customize */
     ChipLogProgress(AppServer, "EnergyEvseDelegate::StartDiagnostics()");
 
-    /* update SupplyState to indicate we are now in Diagnostics mode */
-    // TODO save the value of SupplyState so it can be restored later
-    SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
+    if (mSupplyState == SupplyStateEnum::kDisabledDiagnostics)
+    {
+        ChipLogError(AppServer, "EVSE: Already in diagnostics mode!");
+        return Status::Failure;
+    }
 
-    // TODO Application code would need to put the SupplyState back
-    // once diagnostics have been completed
+    /* update SupplyState to indicate we are now in Diagnostics mode */
+    if (mSupplyStateBeforeDiagnostics != SupplyStateEnum::kUnknownEnumValue)
+    {
+        ChipLogError(AppServer, "EVSE: Something wrong trying to go into diagnostics mode");
+        return Status::Failure;
+    }
+
+    mSupplyStateBeforeDiagnostics = mSupplyState;
+    // Update the SupplyState - this will automatically callback the Application StateChanged callback
+    SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
     return Status::Success;
 }
@@ -410,6 +423,25 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
     return Status::Success;
 }
 
+/**
+ * @brief Called by EVSE Hardware to indicate that it has finished its diagnostics test
+ */
+Status EnergyEvseDelegate::HwDiagnosticsComplete()
+{
+    if (mSupplyState != SupplyStateEnum::kDisabledDiagnostics)
+    {
+        ChipLogError(AppServer, "Incorrect state to be completing diagnostics");
+        return Status::Failure;
+    }
+
+    /* Restore the SupplyState to the saved state before diagnostics were triggered */
+    SetSupplyState(mSupplyStateBeforeDiagnostics);
+
+    /* Set the sentinel back for checking another diagnostics command */
+    mSupplyStateBeforeDiagnostics = SupplyStateEnum::kUnknownEnumValue;
+
+    return Status::Success;
+}
 /* ---------------------------------------------------------------------------
  * Functions below are private helper functions internal to the delegate
  */

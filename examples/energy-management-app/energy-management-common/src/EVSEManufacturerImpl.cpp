@@ -181,6 +181,33 @@ void SetTestEventTrigger_EVChargeDemandClear()
 
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedInDemand);
 }
+void SetTestEventTrigger_EVSEGroundFault()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    dg->HwSetFault(FaultStateEnum::kGroundFault);
+}
+
+void SetTestEventTrigger_EVSEOverTemperatureFault()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    dg->HwSetFault(FaultStateEnum::kOverTemperature);
+}
+
+void SetTestEventTrigger_EVSEFaultClear()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    dg->HwSetFault(FaultStateEnum::kNoError);
+}
+
+void SetTestEventTrigger_EVSEDiagnosticsComplete()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    dg->HwDiagnosticsComplete();
+}
 
 bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
 {
@@ -212,9 +239,24 @@ bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV Charge NoDemand");
         SetTestEventTrigger_EVChargeDemandClear();
         break;
+    case EnergyEvseTrigger::kEVSEGroundFault:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE has a GroundFault fault");
+        SetTestEventTrigger_EVSEGroundFault();
+        break;
+    case EnergyEvseTrigger::kEVSEOverTemperatureFault:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE has a OverTemperature fault");
+        SetTestEventTrigger_EVSEOverTemperatureFault();
+        break;
+    case EnergyEvseTrigger::kEVSEFaultClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE faults have cleared");
+        SetTestEventTrigger_EVSEFaultClear();
+        break;
+    case EnergyEvseTrigger::kEVSEDiagnosticsComplete:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Diagnostics Completed");
+        SetTestEventTrigger_EVSEDiagnosticsComplete();
+        break;
 
     default:
-
         return false;
     }
 

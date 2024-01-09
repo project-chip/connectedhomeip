@@ -32,14 +32,27 @@ namespace chip {
 enum class EnergyEvseTrigger : uint64_t
 {
     // Scenarios
-    kBasicFunctionality = 0x0099000000000000,      // Basic Functionality Test Event       | Simulate installation with
-                                                   // _{A_CIRCUIT_CAPACITY}_=32A and _{A_USER_MAXIMUM_CHARGE_CURRENT}_=32A
-    kBasicFunctionalityClear = 0x0099000000000001, // Basic Functionality Test Event Clear | End simulation of installation
-    kEVPluggedIn             = 0x0099000000000002, // EV Plugged-in Test Event | Simulate plugging
-                                                   // the EV into the EVSE using a cable of 63A capacity
-    kEVPluggedInClear    = 0x0099000000000003,     // EV Plugged-in Test Event Clear | Simulate unplugging the EV
-    kEVChargeDemand      = 0x0099000000000004, // EV Charge Demand Test Event | Simulate the EV presenting charge demand to the EVSE
-    kEVChargeDemandClear = 0x0099000000000005, // EV Charge Demand Test Event Clear | Simulate the EV becoming fully charged
+    // Basic Functionality Test Event       | Simulate installation with _{A_CIRCUIT_CAPACITY}_=32A and
+    // _{A_USER_MAXIMUM_CHARGE_CURRENT}_=32A
+    kBasicFunctionality = 0x0099000000000000,
+    // Basic Functionality Test Event Clear | End simulation of installation
+    kBasicFunctionalityClear = 0x0099000000000001,
+    // EV Plugged-in Test Event | Simulate plugging the EV into the EVSE using a cable of 63A capacity
+    kEVPluggedIn = 0x0099000000000002,
+    // EV Plugged-in Test Event Clear | Simulate unplugging the EV
+    kEVPluggedInClear = 0x0099000000000003,
+    // EV Charge Demand Test Event | Simulate the EV presenting charge demand to the EVSE
+    kEVChargeDemand = 0x0099000000000004,
+    // EV Charge Demand Test Event Clear | Simulate the EV becoming fully charged
+    kEVChargeDemandClear = 0x0099000000000005,
+    // EVSE has a GroundFault fault
+    kEVSEGroundFault = 0x0099000000000010,
+    // EVSE has a OverTemperature fault
+    kEVSEOverTemperatureFault = 0x0099000000000011,
+    // EVSE faults have cleared
+    kEVSEFaultClear = 0x0099000000000012,
+    // EVSE Diagnostics Complete | Simulate diagnostics have been completed and return to normal
+    kEVSEDiagnosticsComplete = 0x0099000000000020,
 };
 
 class EnergyEvseTestEventTriggerDelegate : public TestEventTriggerDelegate

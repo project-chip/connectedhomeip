@@ -148,7 +148,7 @@ public:
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
     Status HwSetVehicleID(const CharSpan & vehID);
-
+    Status HwDiagnosticsComplete();
     Status SendEVConnectedEvent();
     Status SendEVNotDetectedEvent();
     Status SendEnergyTransferStartedEvent();
@@ -227,8 +227,9 @@ private:
     StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
 
     /* Variables to hold State and SupplyState in case a fault is raised */
-    StateEnum mStateBeforeFault             = StateEnum::kUnknownEnumValue;
-    SupplyStateEnum mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
+    StateEnum mStateBeforeFault                   = StateEnum::kUnknownEnumValue;
+    SupplyStateEnum mSupplyStateBeforeFault       = SupplyStateEnum::kUnknownEnumValue;
+    SupplyStateEnum mSupplyStateBeforeDiagnostics = SupplyStateEnum::kUnknownEnumValue;
 
     /* Callback related */
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
