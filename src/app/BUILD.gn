@@ -199,6 +199,13 @@ static_library("app") {
     ]
   }
 
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
+    ]
+  }
+
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
