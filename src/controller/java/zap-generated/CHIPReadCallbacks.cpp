@@ -35448,7 +35448,7 @@ void CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback::CallbackFn(
 }
 
 CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback::
-    CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPDoorLockClusterAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallbackType>(CallbackFn,
                                                                                                                          this),
     keepAlive(keepAlive)
@@ -35467,8 +35467,8 @@ CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback:
     }
 }
 
-CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback::
-    ~CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback()
+CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback::~
+CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -35588,7 +35588,7 @@ void CHIPDoorLockAliroGroupResolvingKeyAttributeCallback::CallbackFn(void * cont
 }
 
 CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::
-    CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback(jobject javaCallback, bool keepAlive) :
+CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPDoorLockClusterAliroSupportedBLEUWBProtocolVersionsAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
@@ -35606,8 +35606,8 @@ CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::
     }
 }
 
-CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::
-    ~CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback()
+CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::~
+CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
