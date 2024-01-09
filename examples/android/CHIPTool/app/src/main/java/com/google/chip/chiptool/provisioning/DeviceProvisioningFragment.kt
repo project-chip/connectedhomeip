@@ -32,6 +32,8 @@ import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.AttestationInfo
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.DeviceAttestationDelegate
+import chip.devicecontroller.ICDDeviceInfo
+import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
@@ -284,7 +286,29 @@ class DeviceProvisioningFragment : Fragment() {
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
     }
+
+    override fun onICDRegistrationInfoRequired() {
+      Log.d(TAG, "onICDRegistrationInfoRequired")
+      deviceController.updateCommissioningICDRegistrationInfo(
+        ICDRegistrationInfo.newBuilder().build()
+      )
+    }
+
+    override fun onICDRegistrationComplete(
+      errorCode: Int,
+      icdNodeId: Long,
+      icdCounter: Long,
+      icdDeviceInfo: ICDDeviceInfo
+    ) {
+      Log.d(
+        TAG,
+        "onICDRegistrationComplete - errorCode: $errorCode, icdNodeId : $icdNodeId, icdCounter : $icdCounter, symmetricKey : ${icdDeviceInfo.symmetricKey.toHex()}"
+      )
+    }
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {

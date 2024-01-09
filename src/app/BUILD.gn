@@ -232,6 +232,13 @@ static_library("app") {
     ]
   }
 
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
+    ]
+  }
+
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",
@@ -250,6 +257,7 @@ static_library("app") {
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",

@@ -82,7 +82,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management.</description>
     
-    <globalAttribute side="server" code="0xFFFD" value="2" />
+    <globalAttribute side="either" code="0xFFFD" value="2" />
 
     <!--Attributes-->
     <attribute code="0x0000" side="server" type="StateEnum" define="STATE" isNullable="true" writable="false" optional="false">State</attribute>
