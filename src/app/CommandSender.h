@@ -89,8 +89,8 @@ public:
         }
 
         /**
-         * OnResponseWithAdditionalData will be called for all path specific responses from the server has been received and processed.
-         * Specifically:
+         * OnResponseWithAdditionalData will be called for all path specific responses from the server has been received and
+         * processed. Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
          *      - Note this only happens if PathSpecificErrorGoesToOnResponseCallbacks() returns true.
