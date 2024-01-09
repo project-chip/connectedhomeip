@@ -8926,7 +8926,7 @@ PICS:
     - label:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: OTCCM.S.C01.Tx
-      
+
     - label: "Can the device be controlled manually?"
       id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
 
