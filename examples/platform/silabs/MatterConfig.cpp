@@ -300,7 +300,7 @@ extern "C" void vApplicationIdleHook(void)
     if (ConnectivityMgr().IsWiFiStationConnected())
     {
         // Let the M4 sleep once commissioning is done and device is in idle state
-        M4_sleep_wakeup();
+        sl_wfx_host_si91x_sleep_wakeup();
     }
 #endif
 }

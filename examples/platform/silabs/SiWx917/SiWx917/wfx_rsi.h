@@ -94,7 +94,7 @@ int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
 int32_t wfx_wifi_rsi_init(void);
 #if SL_ICD_ENABLED
-void M4_sleep_wakeup();
+void sl_wfx_host_si91x_sleep_wakeup();
 int32_t wfx_rsi_power_save();
 #endif /* SL_ICD_ENABLED */
 

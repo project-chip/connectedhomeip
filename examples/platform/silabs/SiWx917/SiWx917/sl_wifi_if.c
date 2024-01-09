@@ -211,7 +211,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 
 #if SIWX_917
 /******************************************************************
- * @fn   M4_sleep_wakeup()
+ * @fn   sl_wfx_host_si91x_sleep_wakeup()
  * @brief
  *       M4 going to sleep
  *
@@ -219,7 +219,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
  * @return
  *        None
  *********************************************************************/
-void M4_sleep_wakeup()
+void sl_wfx_host_si91x_sleep_wakeup()
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
     {
