@@ -24,6 +24,7 @@
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
+#include "sl_board_configuration.h"
 #include "sl_net.h"
 #include "sl_si91x_host_interface.h"
 #include "sl_si91x_types.h"
@@ -40,17 +41,31 @@
 
 #include "ble_config.h"
 
+#if SL_ICD_ENABLED && SIWX_917
+#include "rsi_rom_power_save.h"
+#include "sl_si91x_button_pin_config.h"
+#include "sl_si91x_m4_ps.h"
+
+// TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+#define BUTTON_PRESSED 1
+bool btn0_pressed = false;
+#endif // SL_ICD_ENABLED && SIWX_917
+
 #include "dhcp_client.h"
 #include "sl_wifi.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
-
 #define ADV_SCAN_THRESHOLD -40
 #define ADV_RSSI_TOLERANCE_THRESHOLD 5
 #define ADV_ACTIVE_SCAN_DURATION 15
 #define ADV_PASSIVE_SCAN_DURATION 20
 #define ADV_MULTIPROBE 1
 #define ADV_SCAN_PERIODICITY 10
+
+#ifdef SIWX_917
+#include "sl_si91x_trng.h"
+#define TRNGKEY_SIZE 4
+#endif // SIWX_917
 
 struct wfx_rsi wfx_rsi;
 
@@ -67,8 +82,9 @@ bool hasNotifiedWifiConnectivity = false;
 bool is_wifi_disconnection_event = false;
 
 /* Declare a variable to hold connection time intervals */
-uint32_t retryInterval              = WLAN_MIN_RETRY_TIMER_MS;
-volatile bool scan_results_complete = false;
+uint32_t retryInterval                 = WLAN_MIN_RETRY_TIMER_MS;
+volatile bool scan_results_complete    = false;
+volatile bool bg_scan_results_complete = false;
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
 extern osSemaphoreId_t sl_rs_ble_init_sem;
@@ -188,7 +204,8 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
     wfx_rsi.join_retries = 0;
     retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
-    if (is_wifi_disconnection_event) {
+    if (is_wifi_disconnection_event)
+    {
         is_wifi_disconnection_event = false;
     }
     callback_status = SL_STATUS_OK;
@@ -196,6 +213,44 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
 }
 
 #if SL_ICD_ENABLED
+
+#if SIWX_917
+/******************************************************************
+ * @fn   sl_wfx_host_si91x_sleep_wakeup()
+ * @brief
+ *       M4 going to sleep
+ *
+ * @param[in] None
+ * @return
+ *        None
+ *********************************************************************/
+void sl_wfx_host_si91x_sleep_wakeup()
+{
+    if (wfx_rsi.dev_state & WFX_RSI_ST_SLEEP_READY)
+    {
+        // TODO: should be removed once we are getting the press interrupt for button 0 with sleep
+        if (!RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN) && !btn0_pressed)
+        {
+            sl_button_on_change(SL_BUTTON_BTN0_NUMBER, BUTTON_PRESSED);
+            btn0_pressed = true;
+        }
+        if (RSI_NPSSGPIO_GetPin(SL_BUTTON_BTN0_PIN))
+        {
+#ifdef DISPLAY_ENABLED
+            // if LCD is enabled, power down the lcd before setting the M4 to sleep
+            sl_si91x_hardware_setup();
+#endif
+            btn0_pressed = false;
+            /* Configure RAM Usage and Retention Size */
+            sl_si91x_m4_sleep_wakeup();
+#if SILABS_LOG_ENABLED
+            silabsInitLog();
+#endif
+        }
+    }
+}
+#endif /* SIWX_917 */
+
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -222,7 +277,7 @@ int32_t wfx_rsi_power_save()
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
         return status;
     }
-    SILABS_LOG("Powersave Config Success");
+    wfx_rsi.dev_state |= WFX_RSI_ST_SLEEP_READY;
     return status;
 }
 #endif /* SL_ICD_ENABLED */
@@ -281,7 +336,17 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("wfx_rsi_init failed %x", status);
         return status;
     }
-#endif
+#else // For SoC
+#if SL_ICD_ENABLED
+    uint8_t xtal_enable = 1;
+    status              = sl_si91x_m4_ta_secure_handshake(SL_SI91X_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("Failed to bring m4_ta_secure_handshake: 0x%lx\r\n", status);
+        return status;
+    }
+#endif /* SL_ICD_ENABLED */
+#endif /* SLI_SI91X_MCU_INTERFACE */
 
     sl_wifi_firmware_version_t version = { 0 };
     status                             = sl_wifi_get_firmware_version(&version);
@@ -299,6 +364,25 @@ static sl_status_t wfx_rsi_init(void)
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
+#ifdef SIWX_917
+    const uint32_t trngKey[TRNGKEY_SIZE] = { 0x16157E2B, 0xA6D2AE28, 0x8815F7AB, 0x3C4FCF09 };
+
+    // To check the Entropy of TRNG and verify TRNG functioning.
+    status = sl_si91x_trng_entropy();
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("TRNG Entropy Failed");
+        return status;
+    }
+
+    // Initiate and program the key required for TRNG hardware engine
+    status = sl_si91x_trng_program_key(trngKey, TRNGKEY_SIZE);
+    if (status != SL_STATUS_OK)
+    {
+        SILABS_LOG("TRNG Key Programming Failed");
+        return status;
+    }
+#endif // SIWX_917
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
@@ -363,6 +447,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
         break;
     }
+    wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
     scan_results_complete = true;
     return SL_STATUS_OK;
 }
@@ -371,29 +456,27 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     SL_WIFI_ARGS_CHECK_NULL_POINTER(scan_result);
     int x;
     wfx_wifi_scan_result_t ap;
-    if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
+    for (x = 0; x < (int) scan_result->scan_count; x++)
     {
-        for (x = 0; x < (int) scan_result->scan_count; x++)
+        strcpy(&ap.ssid[0], (char *) &scan_result->scan_info[x].ssid);
+        if (wfx_rsi.scan_ssid)
         {
-            strcpy(&ap.ssid[0], (char *) &scan_result->scan_info[x].ssid);
-            if (wfx_rsi.scan_ssid)
-            {
-                SILABS_LOG("SCAN SSID: %s , ap scan: %s", wfx_rsi.scan_ssid, ap.ssid);
-                if (strcmp(wfx_rsi.scan_ssid, ap.ssid) == CMP_SUCCESS)
-                {
-                    ap.security = scan_result->scan_info[x].security_mode;
-                    ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
-                    memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
-                    (*wfx_rsi.scan_cb)(&ap);
-                }
-            }
-            else
+            SILABS_LOG("SCAN SSID: %s , ap scan: %s", wfx_rsi.scan_ssid, ap.ssid);
+            if (strcmp(wfx_rsi.scan_ssid, ap.ssid) == CMP_SUCCESS)
             {
                 ap.security = scan_result->scan_info[x].security_mode;
                 ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
                 memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
                 (*wfx_rsi.scan_cb)(&ap);
+                break;
             }
+        }
+        else
+        {
+            ap.security = scan_result->scan_info[x].security_mode;
+            ap.rssi     = (-1) * scan_result->scan_info[x].rssi_val;
+            memcpy(&ap.bssid[0], &scan_result->scan_info[x].bssid[0], BSSID_MAX_STR_LEN);
+            (*wfx_rsi.scan_cb)(&ap);
         }
     }
     wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
@@ -408,8 +491,8 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 }
 sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
 {
-    callback_status       = show_scan_results(result);
-    scan_results_complete = true;
+    callback_status          = show_scan_results(result);
+    bg_scan_results_complete = true;
     return SL_STATUS_OK;
 }
 /***************************************************************************************
@@ -500,8 +583,8 @@ static sl_status_t wfx_rsi_do_join(void)
         sl_wifi_set_join_callback(join_callback_handler, NULL);
 
         // Setting the listen interval to 0 which will set it to DTIM interval
-        sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0};
-        status = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
+        sl_wifi_listen_interval_t sleep_interval = { .listen_interval = 0 };
+        status                                   = sl_wifi_set_listen_interval(SL_WIFI_CLIENT_INTERFACE, sleep_interval);
 
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
@@ -707,9 +790,16 @@ void wfx_rsi_task(void * arg)
                 advanced_scan_configuration.trigger_level_change = ADV_RSSI_TOLERANCE_THRESHOLD;
                 advanced_scan_configuration.enable_multi_probe   = ADV_MULTIPROBE;
                 status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
-                /* Terminate with end of scan which is no ap sent back */
-                wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
-                wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
+                if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
+                {
+                    /* Terminate with end of scan which is no ap sent back */
+                    wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
+                    wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
+                }
+                else
+                {
+                    wifi_scan_configuration = default_wifi_scan_configuration;
+                }
                 sl_wifi_set_scan_callback(bg_scan_callback_handler, NULL);
                 scan_results_complete = false;
                 wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
@@ -717,11 +807,11 @@ void wfx_rsi_task(void * arg)
                 if (SL_STATUS_IN_PROGRESS == status)
                 {
                     const uint32_t start = osKernelGetTickCount();
-                    while (!scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
+                    while (!bg_scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
                     {
                         osThreadYield();
                     }
-                    status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
+                    status = bg_scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
                 }
             }
         }
