@@ -69,9 +69,31 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponseWithAdditionalData will be called when a successful response from the server has been received and processed.
+         * @brief Should CommandSender send path specific errors to OnResponse* callbacks.
+         * 
+         * Any callbacks that override this method to return true must support capability of
+         * handling multiple callbacks to OnResponse* callbacks even with non-successful StatusIB
+         * values.
+         *
+         * Clients that want to support batch commands must override this method and return true.
+         * 
+         * Callback SHALL always return a consistent value that does NOT change.
+         * 
+         * @return true when callback's expect path specific error to come in OnResponse* callback
+         * @return false when callback's expect path specific error to come in OnError callback
+         */
+        bool PathSpecificErrorGoesToOnResponseCallbacks()
+        {
+            // Legacy code had path specific errors go to OnError which is why this is set to false.
+            return false;
+        }
+
+        /**
+         * OnResponseWithAdditionalData will be called for all path specific responses from the server has been received and processed.
          * Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
+         *      - Note this only happens if PathSpecificErrorGoesToOnResponseCallbacks() returns true.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
@@ -105,6 +127,8 @@ public:
         /**
          * OnResponse will be called when a successful response from server has been received and processed. Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
+         *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
+         *      - Note this only happens if PathSpecificErrorGoesToOnResponseCallbacks() returns true.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
@@ -134,6 +158,13 @@ public:
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
+         *      - Note path specific error only come here happens if PathSpecificErrorGoesToOnResponseCallbacks()
+         *        returns false.
+         *      - There isn't a guaranteeded way to differentiate between a non-path-specific error and a 
+         *        path-specific error from the OnError callback.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
@@ -454,10 +485,11 @@ private:
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
-    bool mSuppressResponse     = false;
-    bool mTimedRequest         = false;
-    bool mBufferAllocated      = false;
-    bool mBatchCommandsEnabled = false;
+    bool mSuppressResponse                      = false;
+    bool mTimedRequest                          = false;
+    bool mBufferAllocated                       = false;
+    bool mBatchCommandsEnabled                  = false;
+    bool mPathSpecificErrorToOnResponseCallback = false;
 };
 
 } // namespace app

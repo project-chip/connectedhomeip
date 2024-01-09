@@ -66,6 +66,7 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
     mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
 {
     assertChipStackLockedByCurrentThread();
+    mPathSpecificErrorToOnResponseCallback = mpCallback->PathSpecificErrorGoesToOnResponseCallbacks();
 }
 
 CommandSender::~CommandSender()
@@ -384,7 +385,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
         if (mpCallback != nullptr)
         {
-            if (statusIB.IsSuccess())
+            if (statusIB.IsSuccess() || mPathSpecificErrorToOnResponseCallback)
             {
                 mpCallback->OnResponseWithAdditionalData(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
                                                          hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
