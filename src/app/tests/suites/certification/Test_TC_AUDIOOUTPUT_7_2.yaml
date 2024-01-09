@@ -60,7 +60,7 @@ tests:
           "Step 3: TH reads the OutputList attribute from the DUT. Verify that
           the output at the index provided in step 2 has the name CertTest"
       verification: |
-          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):  
+          The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
           ./chip-tool audiooutput read output-list 1 1
           ./chip-tv-casting-app audiooutput read output-list 1 1
 
