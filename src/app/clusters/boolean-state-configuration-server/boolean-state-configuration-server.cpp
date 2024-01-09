@@ -144,13 +144,13 @@ CHIP_ERROR SetAlarmsActive(EndpointId ep, BitMask<BooleanStateConfiguration::Ala
         BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsEnabled;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Get(ep, &alarmsEnabled),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        if (!alarmsEnabled.Has(alarms))
+        if (!alarmsEnabled.HasAll(alarms))
         {
             return CHIP_NO_ERROR;
         }
     }
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarms), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarms), CHIP_IM_GLOBAL_STATUS(Failure));
     emitAlarmsStateChangedEvent(ep);
 
     return CHIP_NO_ERROR;
@@ -181,34 +181,25 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanStateConfiguration::Alar
 {
     CHIP_ERROR attribute_error = CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
 
-    if (!HasFeature(ep, BooleanStateConfiguration::Feature::kAlarmSuppress))
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedCommand);
-    }
+    VerifyOrReturnError(HasFeature(ep, BooleanStateConfiguration::Feature::kAlarmSuppress),
+                        CHIP_IM_GLOBAL_STATUS(UnsupportedCommand));
+    VerifyOrReturnError(HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) ||
+                            HasFeature(ep, BooleanStateConfiguration::Feature::kAudible),
+                        CHIP_IM_GLOBAL_STATUS(UnsupportedCommand));
 
-    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
+    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed, alarmsSupported;
 
-    if (HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) || HasFeature(ep, BooleanStateConfiguration::Feature::kAudible))
-    {
-        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive), attribute_error);
-        if (!alarmsActive.Has(alarm))
-        {
-            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
-        }
-    }
-    else
-    {
-        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
-    }
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSupported::Get(ep, &alarmsSupported), attribute_error);
+    VerifyOrReturnError(alarmsSupported.HasAll(alarm), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive), attribute_error);
+    VerifyOrReturnError(alarmsActive.HasAll(alarm), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
     Delegate * delegate = GetDelegate(ep);
     if (!isDelegateNull(delegate, ep))
     {
         delegate->HandleSuppressAlarm(alarm);
     }
-
-    alarmsActive.Clear(alarm);
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsActive), attribute_error);
 
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &alarmsSuppressed), attribute_error);
     alarmsSuppressed.Set(alarm);
@@ -241,23 +232,19 @@ bool emberAfBooleanStateConfigurationClusterSuppressAlarmCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const BooleanStateConfiguration::Commands::SuppressAlarm::DecodableType & commandData)
 {
-    const auto & alarm = commandData.alarmsToSuppress;
-    CHIP_ERROR err     = BooleanStateConfiguration::SuppressAlarms(commandPath.mEndpointId, alarm);
+    const auto & alarms = commandData.alarmsToSuppress;
+    CHIP_ERROR err      = BooleanStateConfiguration::SuppressAlarms(commandPath.mEndpointId, alarms);
     if (err == CHIP_NO_ERROR)
     {
         commandObj->AddStatus(commandPath, Status::Success);
     }
-    else if (err == CHIP_IM_GLOBAL_STATUS(InvalidInState))
+    else if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute))
     {
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
-    }
-    else if (err == CHIP_IM_GLOBAL_STATUS(UnsupportedCommand))
-    {
-        return false;
+        commandObj->AddStatus(commandPath, Status::Failure);
     }
     else
     {
-        commandObj->AddStatus(commandPath, Status::Failure);
+        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
     }
 
     return true;
@@ -267,6 +254,65 @@ bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const BooleanStateConfiguration::Commands::EnableDisableAlarm::DecodableType & commandData)
 {
+    const auto & alarms     = commandData.alarmsToEnableDisable;
+    const auto & ep         = commandPath.mEndpointId;
+    Optional<Status> status = Optional<Status>::Missing();
+
+    if (!HasFeature(ep, BooleanStateConfiguration::Feature::kVisual) &&
+        !HasFeature(ep, BooleanStateConfiguration::Feature::kAudible))
+    {
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return true;
+    }
+
+    BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed, alarmsSupported, alarmsToDisable;
+    Delegate * delegate = GetDelegate(ep);
+    // uint8_t rawAlarm    = alarms.Raw();
+    // rawAlarm            = ~rawAlarm;
+
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsSupported::Get(ep, &alarmsSupported), status.Emplace(Status::Failure));
+    VerifyOrExit(alarmsSupported.HasAll(alarms), status.Emplace(Status::ConstraintError));
+
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Set(ep, alarms), status.Emplace(Status::Failure));
+
+    ChipLogProgress(Zcl, "alarms %d", alarms.Raw());
+    alarmsToDisable = BitMask<BooleanStateConfiguration::AlarmModeBitmap>(~alarms.Raw());
+    ChipLogProgress(Zcl, "inverted alarms %d", alarmsToDisable.Raw());
+
+    if (!isDelegateNull(delegate, ep))
+    {
+        delegate->HandleEnableDisableAlarms(alarms);
+    }
+
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive), status.Emplace(Status::Failure));
+    if (alarmsActive.HasAny(alarmsToDisable))
+    {
+        alarmsActive.Clear(alarmsToDisable);
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsActive), status.Emplace(Status::Failure));
+    }
+
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &alarmsSuppressed), status.Emplace(Status::Failure));
+    if (alarmsSuppressed.HasAny(alarmsToDisable))
+    {
+        alarmsSuppressed.Clear(alarmsToDisable);
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Set(ep, alarmsSuppressed), status.Emplace(Status::Failure));
+    }
+
+    emitAlarmsStateChangedEvent(ep);
+
+exit:
+    if (status.HasValue())
+    {
+        // BitMask<ValveConfigurationAndControl::ValveFaultBitmap> gFault(
+        //     ValveConfigurationAndControl::ValveFaultBitmap::kGeneralFault);
+        // emitValveFaultEvent(ep, gFault);
+        commandObj->AddStatus(commandPath, status.Value());
+    }
+    else
+    {
+        commandObj->AddStatus(commandPath, Status::Success);
+    }
+
     return true;
 }
 

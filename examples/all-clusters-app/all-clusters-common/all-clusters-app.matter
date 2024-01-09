@@ -3655,7 +3655,7 @@ provisional cluster BooleanStateConfiguration = 128 {
   }
 
   bitmap SensorFaultBitmap : bitmap16 {
-    kGneralFault = 0x1;
+    kGeneralFault = 0x1;
   }
 
   info event AlarmsStateChanged = 0 {
@@ -7367,13 +7367,13 @@ endpoint 1 {
   server cluster BooleanStateConfiguration {
     emits event AlarmsStateChanged;
     emits event SensorFault;
-    ram      attribute currentSensitivityLevel;
-    ram      attribute supportedSensitivityLevels;
-    ram      attribute defaultSensitivityLevel;
+    persist  attribute currentSensitivityLevel default = 2;
+    ram      attribute supportedSensitivityLevels default = 3;
+    ram      attribute defaultSensitivityLevel default = 2;
     ram      attribute alarmsActive;
     ram      attribute alarmsSuppressed;
     ram      attribute alarmsEnabled;
-    ram      attribute alarmsSupported;
+    ram      attribute alarmsSupported default = 0x03;
     ram      attribute sensorFault default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

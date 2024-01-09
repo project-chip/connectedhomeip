@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BitMask.h>
 
 namespace chip {
 namespace app {
@@ -35,6 +36,7 @@ public:
     Delegate(){};
 
     virtual CHIP_ERROR HandleSuppressAlarm(BooleanStateConfiguration::AlarmModeBitmap alarmToSuppress) = 0;
+    virtual CHIP_ERROR HandleEnableDisableAlarms(chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms) = 0;
 
     virtual ~Delegate() = default;
 };
