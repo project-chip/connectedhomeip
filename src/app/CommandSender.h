@@ -59,10 +59,9 @@ public:
         virtual ~Callback() = default;
 
         /**
-         * OnResponse will be called when a successful response from server has been received and processed. Specifically:
+         * OnResponse will be called when a successful response from server has been received and processed.
+         * Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
-         *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
-         *      - Note this only happens if UsingExtendedPathCallbacks() returns true.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
