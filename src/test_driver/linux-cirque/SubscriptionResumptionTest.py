@@ -27,7 +27,9 @@ Steps for this test:
 import logging
 import os
 import sys
+
 from helper.CHIPTestBase import CHIPVirtualHome
+
 logger = logging.getLogger('SubscriptionResumptionTest')
 logger.setLevel(logging.INFO)
 
