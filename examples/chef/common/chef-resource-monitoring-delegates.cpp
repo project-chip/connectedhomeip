@@ -111,9 +111,9 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     VerifyOrDie(gHepaFilterInstance == nullptr && gHepaFilterDelegate == nullptr);
 
     gHepaFilterDelegate = std::make_unique<HepaFilterMonitoringDelegate>();
-    gHepaFilterInstance = std::make_unique<ResourceMonitoring::Instance>(gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id,
-                                                           static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
-                                                           ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+    gHepaFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
+        gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+        ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gHepaFilterInstance->Init();
 }
 
