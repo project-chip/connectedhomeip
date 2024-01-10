@@ -29,12 +29,14 @@ using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::HepaFilterMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
+const chip::BitMask<ResourceMonitoring::Feature> gHepaFilterFeatureMap(
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
                                                 static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
-                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
-constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
-                                                     static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
-                                                     static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList));
+const chip::BitMask<ResourceMonitoring::Feature> gActivatedCarbonFeatureMap(
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
+                                                static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList));
 
 static std::unique_ptr<ActivatedCarbonFilterMonitoringDelegate> gActivatedCarbonFilterDelegate = nullptr;
 static std::unique_ptr<ResourceMonitoring::Instance> gActivatedCarbonFilterInstance            = nullptr;
@@ -102,7 +104,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
     gActivatedCarbonFilterDelegate = std::make_unique<ActivatedCarbonFilterMonitoringDelegate>();
     gActivatedCarbonFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
         gActivatedCarbonFilterDelegate.get(), endpoint, ActivatedCarbonFilterMonitoring::Id,
-        static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+        static_cast<uint32_t>(gActivatedCarbonFeatureMap.Raw()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gActivatedCarbonFilterInstance->Init();
 }
 
@@ -112,7 +114,7 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 
     gHepaFilterDelegate = std::make_unique<HepaFilterMonitoringDelegate>();
     gHepaFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
-        gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
+        gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.Raw()),
         ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gHepaFilterInstance->Init();
 }
