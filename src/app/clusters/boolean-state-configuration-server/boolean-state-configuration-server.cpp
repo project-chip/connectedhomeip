@@ -321,17 +321,13 @@ bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
 
     BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed, alarmsSupported, alarmsToDisable;
     Delegate * delegate = GetDelegate(ep);
-    uint8_t rawAlarm    = alarms.Raw();
-    rawAlarm            = ~rawAlarm;
+    uint8_t rawAlarm    = static_cast<uint8_t>(~alarms.Raw() & 0x03); // 0x03 is the current max bitmap
+    alarmsToDisable     = BitMask<BooleanStateConfiguration::AlarmModeBitmap>(rawAlarm);
 
     VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsSupported::Get(ep, &alarmsSupported), status.Emplace(Status::Failure));
     VerifyOrExit(alarmsSupported.HasAll(alarms), status.Emplace(Status::ConstraintError));
 
     VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Set(ep, alarms), status.Emplace(Status::Failure));
-
-    ChipLogProgress(Zcl, "alarms %d", alarms.Raw());
-    alarmsToDisable = BitMask<BooleanStateConfiguration::AlarmModeBitmap>(rawAlarm);
-    ChipLogProgress(Zcl, "inverted alarms %d", alarmsToDisable.Raw());
 
     if (!isDelegateNull(delegate, ep))
     {
