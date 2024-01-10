@@ -5829,7 +5829,7 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "sceneID": "int",
-                    "transitionTimeMS": "int",
+                    "transitionTime": "int",
                     "sceneName": "str",
                     "extensionFieldSets": "ExtensionFieldSet",
                 },
@@ -5871,7 +5871,7 @@ class ChipClusters:
                 "args": {
                     "groupID": "int",
                     "sceneID": "int",
-                    "transitionTimeMS": "int",
+                    "transitionTime": "int",
                 },
             },
             0x00000006: {

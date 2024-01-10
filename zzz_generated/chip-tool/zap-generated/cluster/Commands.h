@@ -5906,7 +5906,7 @@ public:
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
-        AddArgument("TransitionTimeMS", 0, UINT32_MAX, &mRequest.transitionTimeMS);
+        AddArgument("TransitionTime", 0, UINT32_MAX, &mRequest.transitionTime);
         AddArgument("SceneName", &mRequest.sceneName);
         AddArgument("ExtensionFieldSets", &mComplex_ExtensionFieldSets);
         ClusterCommand::AddArguments();
@@ -6101,7 +6101,7 @@ public:
     {
         AddArgument("GroupID", 0, UINT16_MAX, &mRequest.groupID);
         AddArgument("SceneID", 0, UINT8_MAX, &mRequest.sceneID);
-        AddArgument("TransitionTimeMS", 0, UINT32_MAX, &mRequest.transitionTimeMS);
+        AddArgument("TransitionTime", 0, UINT32_MAX, &mRequest.transitionTime);
         ClusterCommand::AddArguments();
     }
 

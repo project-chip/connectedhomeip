@@ -18312,7 +18312,7 @@ enum class Fields : uint8_t
 {
     kGroupID            = 0,
     kSceneID            = 1,
-    kTransitionTimeMS   = 2,
+    kTransitionTime     = 2,
     kSceneName          = 3,
     kExtensionFieldSets = 4,
 };
@@ -18324,9 +18324,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
 
-    chip::GroupId groupID     = static_cast<chip::GroupId>(0);
-    uint8_t sceneID           = static_cast<uint8_t>(0);
-    uint32_t transitionTimeMS = static_cast<uint32_t>(0);
+    chip::GroupId groupID   = static_cast<chip::GroupId>(0);
+    uint8_t sceneID         = static_cast<uint8_t>(0);
+    uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
     DataModel::List<const Structs::ExtensionFieldSet::Type> extensionFieldSets;
 
@@ -18343,9 +18343,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AddScene::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ScenesManagement::Id; }
 
-    chip::GroupId groupID     = static_cast<chip::GroupId>(0);
-    uint8_t sceneID           = static_cast<uint8_t>(0);
-    uint32_t transitionTimeMS = static_cast<uint32_t>(0);
+    chip::GroupId groupID   = static_cast<chip::GroupId>(0);
+    uint8_t sceneID         = static_cast<uint8_t>(0);
+    uint32_t transitionTime = static_cast<uint32_t>(0);
     chip::CharSpan sceneName;
     DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -18430,7 +18430,7 @@ enum class Fields : uint8_t
     kStatus             = 0,
     kGroupID            = 1,
     kSceneID            = 2,
-    kTransitionTimeMS   = 3,
+    kTransitionTime     = 3,
     kSceneName          = 4,
     kExtensionFieldSets = 5,
 };
@@ -18445,7 +18445,7 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    Optional<uint32_t> transitionTimeMS;
+    Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
     Optional<DataModel::List<const Structs::ExtensionFieldSet::Type>> extensionFieldSets;
 
@@ -18465,7 +18465,7 @@ public:
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    Optional<uint32_t> transitionTimeMS;
+    Optional<uint32_t> transitionTime;
     Optional<chip::CharSpan> sceneName;
     Optional<DataModel::DecodableList<Structs::ExtensionFieldSet::DecodableType>> extensionFieldSets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -18687,9 +18687,9 @@ public:
 namespace RecallScene {
 enum class Fields : uint8_t
 {
-    kGroupID          = 0,
-    kSceneID          = 1,
-    kTransitionTimeMS = 2,
+    kGroupID        = 0,
+    kSceneID        = 1,
+    kTransitionTime = 2,
 };
 
 struct Type
@@ -18701,7 +18701,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    Optional<DataModel::Nullable<uint32_t>> transitionTimeMS;
+    Optional<DataModel::Nullable<uint32_t>> transitionTime;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -18718,7 +18718,7 @@ public:
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     uint8_t sceneID       = static_cast<uint8_t>(0);
-    Optional<DataModel::Nullable<uint32_t>> transitionTimeMS;
+    Optional<DataModel::Nullable<uint32_t>> transitionTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RecallScene

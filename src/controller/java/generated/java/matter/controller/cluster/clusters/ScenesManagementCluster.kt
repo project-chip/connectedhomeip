@@ -49,7 +49,7 @@ class ScenesManagementCluster(
     val status: UByte,
     val groupID: UShort,
     val sceneID: UByte,
-    val transitionTimeMS: UInt?,
+    val transitionTime: UInt?,
     val sceneName: String?,
     val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?
   )
@@ -137,7 +137,7 @@ class ScenesManagementCluster(
   suspend fun addScene(
     groupID: UShort,
     sceneID: UByte,
-    transitionTimeMS: UInt,
+    transitionTime: UInt,
     sceneName: String,
     extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
     timedInvokeTimeout: Duration? = null
@@ -153,8 +153,8 @@ class ScenesManagementCluster(
     val TAG_SCENE_I_D_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
 
-    val TAG_TRANSITION_TIME_M_S_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_M_S_REQ), transitionTimeMS)
+    val TAG_TRANSITION_TIME_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
 
     val TAG_SCENE_NAME_REQ: Int = 3
     tlvWriter.put(ContextSpecificTag(TAG_SCENE_NAME_REQ), sceneName)
@@ -261,8 +261,8 @@ class ScenesManagementCluster(
     val TAG_SCENE_I_D: Int = 2
     var sceneID_decoded: UByte? = null
 
-    val TAG_TRANSITION_TIME_M_S: Int = 3
-    var transitionTimeMS_decoded: UInt? = null
+    val TAG_TRANSITION_TIME: Int = 3
+    var transitionTime_decoded: UInt? = null
 
     val TAG_SCENE_NAME: Int = 4
     var sceneName_decoded: String? = null
@@ -285,8 +285,8 @@ class ScenesManagementCluster(
         sceneID_decoded = tlvReader.getUByte(tag)
       }
 
-      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME_M_S)) {
-        transitionTimeMS_decoded =
+      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
+        transitionTime_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
             null
@@ -354,7 +354,7 @@ class ScenesManagementCluster(
       status_decoded,
       groupID_decoded,
       sceneID_decoded,
-      transitionTimeMS_decoded,
+      transitionTime_decoded,
       sceneName_decoded,
       extensionFieldSets_decoded
     )
@@ -567,7 +567,7 @@ class ScenesManagementCluster(
   suspend fun recallScene(
     groupID: UShort,
     sceneID: UByte,
-    transitionTimeMS: UInt?,
+    transitionTime: UInt?,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
@@ -581,9 +581,9 @@ class ScenesManagementCluster(
     val TAG_SCENE_I_D_REQ: Int = 1
     tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
 
-    val TAG_TRANSITION_TIME_M_S_REQ: Int = 2
-    transitionTimeMS?.let {
-      tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_M_S_REQ), transitionTimeMS)
+    val TAG_TRANSITION_TIME_REQ: Int = 2
+    transitionTime?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
     }
     tlvWriter.endStructure()
 

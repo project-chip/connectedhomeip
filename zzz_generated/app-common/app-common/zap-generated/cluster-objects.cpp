@@ -12605,7 +12605,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTimeMS), transitionTimeMS);
+    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
     encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
     return encoder.Finalize();
@@ -12633,9 +12633,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else if (__context_tag == to_underlying(Fields::kTransitionTimeMS))
+        else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            err = DataModel::Decode(reader, transitionTimeMS);
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
@@ -12743,7 +12743,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kStatus), status);
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTimeMS), transitionTimeMS);
+    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
     encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
     return encoder.Finalize();
@@ -12775,9 +12775,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else if (__context_tag == to_underlying(Fields::kTransitionTimeMS))
+        else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            err = DataModel::Decode(reader, transitionTimeMS);
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
@@ -13040,7 +13040,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kGroupID), groupID);
     encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTimeMS), transitionTimeMS);
+    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
     return encoder.Finalize();
 }
 
@@ -13066,9 +13066,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, sceneID);
         }
-        else if (__context_tag == to_underlying(Fields::kTransitionTimeMS))
+        else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            err = DataModel::Decode(reader, transitionTimeMS);
+            err = DataModel::Decode(reader, transitionTime);
         }
         else
         {

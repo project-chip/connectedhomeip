@@ -8321,16 +8321,6 @@
               - TestBatchHelperRequest
               - TestSecondBatchHelperRequest
       command fields:
-          Scenes:
-              AddScene:
-                  # Targeting Spring 2024 Matter release
-                  - transitionTimeMS
-              ViewSceneResponse:
-                  # Targeting Spring 2024 Matter release
-                  - transitionTimeMS
-              RecallScene:
-                  # Targeting Spring 2024 Matter release
-                  - transitionTimeMS
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
               AddOrUpdateWiFiNetwork:
@@ -8566,17 +8556,6 @@
               - EnhancedAddSceneResponse
               - EnhancedViewScene
               - EnhancedViewSceneResponse
-      command fields:
-          ScenesManagement:
-              AddScene:
-                  # Targeting Spring 2024 Matter release
-                  - transitionTime
-              ViewSceneResponse:
-                  # Targeting Spring 2024 Matter release
-                  - transitionTime
-              RecallScene:
-                  # Targeting Spring 2024 Matter release
-                  - transitionTime
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time

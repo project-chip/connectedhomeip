@@ -61,7 +61,7 @@ limitations under the License.
       </description>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
-      <arg name="TransitionTimeMS" type="int32u"/>
+      <arg name="TransitionTime" type="int32u"/>
       <arg name="SceneName" type="char_string"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true"/>
       <access op="invoke" role="manage"/>
@@ -107,7 +107,7 @@ limitations under the License.
       </description>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
-      <arg name="TransitionTimeMS" type="int32u" optional="true" isNullable="true"/>
+      <arg name="TransitionTime" type="int32u" optional="true" isNullable="true"/>
     </command>
    
     <command source="client" code="0x06" name="GetSceneMembership" response="GetSceneMembershipResponse" isFabricScoped="true" optional="false" cli="chip scenes get">
@@ -144,7 +144,7 @@ limitations under the License.
       <arg name="Status" type="status"/>
       <arg name="GroupID" type="group_id"/>
       <arg name="SceneID" type="int8u"/>
-      <arg name="TransitionTimeMS" type="int32u" optional="true"/>
+      <arg name="TransitionTime" type="int32u" optional="true"/>
       <arg name="SceneName" type="char_string" optional="true"/>
       <arg name="ExtensionFieldSets" type="ExtensionFieldSet" array="true" optional="true"/>
     </command>

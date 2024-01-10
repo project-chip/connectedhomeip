@@ -20416,14 +20416,14 @@ class ScenesManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTimeMS", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sceneName", Tag=3, Type=str),
                         ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=4, Type=typing.List[ScenesManagement.Structs.ExtensionFieldSet]),
                     ])
 
             groupID: 'uint' = 0
             sceneID: 'uint' = 0
-            transitionTimeMS: 'uint' = 0
+            transitionTime: 'uint' = 0
             sceneName: 'str' = ""
             extensionFieldSets: 'typing.List[ScenesManagement.Structs.ExtensionFieldSet]' = field(default_factory=lambda: [])
 
@@ -20479,7 +20479,7 @@ class ScenesManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTimeMS", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=3, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="sceneName", Tag=4, Type=typing.Optional[str]),
                         ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=5, Type=typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]),
                     ])
@@ -20487,7 +20487,7 @@ class ScenesManagement(Cluster):
             status: 'uint' = 0
             groupID: 'uint' = 0
             sceneID: 'uint' = 0
-            transitionTimeMS: 'typing.Optional[uint]' = None
+            transitionTime: 'typing.Optional[uint]' = None
             sceneName: 'typing.Optional[str]' = None
             extensionFieldSets: 'typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]' = None
 
@@ -20614,12 +20614,12 @@ class ScenesManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTimeMS", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
                     ])
 
             groupID: 'uint' = 0
             sceneID: 'uint' = 0
-            transitionTimeMS: 'typing.Union[None, Nullable, uint]' = None
+            transitionTime: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class GetSceneMembership(ClusterCommand):

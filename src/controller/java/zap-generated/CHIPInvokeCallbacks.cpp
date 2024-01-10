@@ -3133,21 +3133,21 @@ void CHIPScenesManagementClusterViewSceneResponseCallback::CallbackFn(
     jint jniSceneID                  = static_cast<jint>(dataResponse.sceneID);
     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(SceneIDClassName.c_str(), SceneIDCtorSignature.c_str(), jniSceneID,
                                                                SceneID);
-    jobject TransitionTimeMS;
-    if (!dataResponse.transitionTimeMS.HasValue())
+    jobject TransitionTime;
+    if (!dataResponse.transitionTime.HasValue())
     {
-        chip::JniReferences::GetInstance().CreateOptional(nullptr, TransitionTimeMS);
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, TransitionTime);
     }
     else
     {
-        jobject TransitionTimeMSInsideOptional;
-        std::string TransitionTimeMSInsideOptionalClassName     = "java/lang/Long";
-        std::string TransitionTimeMSInsideOptionalCtorSignature = "(J)V";
-        jlong jniTransitionTimeMSInsideOptional                 = static_cast<jlong>(dataResponse.transitionTimeMS.Value());
-        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-            TransitionTimeMSInsideOptionalClassName.c_str(), TransitionTimeMSInsideOptionalCtorSignature.c_str(),
-            jniTransitionTimeMSInsideOptional, TransitionTimeMSInsideOptional);
-        chip::JniReferences::GetInstance().CreateOptional(TransitionTimeMSInsideOptional, TransitionTimeMS);
+        jobject TransitionTimeInsideOptional;
+        std::string TransitionTimeInsideOptionalClassName     = "java/lang/Long";
+        std::string TransitionTimeInsideOptionalCtorSignature = "(J)V";
+        jlong jniTransitionTimeInsideOptional                 = static_cast<jlong>(dataResponse.transitionTime.Value());
+        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(TransitionTimeInsideOptionalClassName.c_str(),
+                                                                    TransitionTimeInsideOptionalCtorSignature.c_str(),
+                                                                    jniTransitionTimeInsideOptional, TransitionTimeInsideOptional);
+        chip::JniReferences::GetInstance().CreateOptional(TransitionTimeInsideOptional, TransitionTime);
     }
     jobject SceneName;
     if (!dataResponse.sceneName.HasValue())
@@ -3257,7 +3257,7 @@ void CHIPScenesManagementClusterViewSceneResponseCallback::CallbackFn(
         chip::JniReferences::GetInstance().CreateOptional(ExtensionFieldSetsInsideOptional, ExtensionFieldSets);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID, TransitionTimeMS, SceneName, ExtensionFieldSets);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, SceneID, TransitionTime, SceneName, ExtensionFieldSets);
 }
 CHIPScenesManagementClusterRemoveSceneResponseCallback::CHIPScenesManagementClusterRemoveSceneResponseCallback(
     jobject javaCallback) : Callback::Callback<CHIPScenesManagementClusterRemoveSceneResponseCallbackType>(CallbackFn, this)

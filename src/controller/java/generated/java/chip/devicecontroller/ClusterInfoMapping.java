@@ -9101,7 +9101,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTimeMS, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets) {
+    public void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
@@ -9110,8 +9110,8 @@ public class ClusterInfoMapping {
       responseValues.put(groupIDResponseValue, groupID);
       CommandResponseInfo sceneIDResponseValue = new CommandResponseInfo("sceneID", "Integer");
       responseValues.put(sceneIDResponseValue, sceneID);
-      CommandResponseInfo transitionTimeMSResponseValue = new CommandResponseInfo("transitionTimeMS", "Optional<Long>");
-      responseValues.put(transitionTimeMSResponseValue, transitionTimeMS);
+      CommandResponseInfo transitionTimeResponseValue = new CommandResponseInfo("transitionTime", "Optional<Long>");
+      responseValues.put(transitionTimeResponseValue, transitionTime);
       CommandResponseInfo sceneNameResponseValue = new CommandResponseInfo("sceneName", "Optional<String>");
       responseValues.put(sceneNameResponseValue, sceneName);
       // extensionFieldSets: ExtensionFieldSet
@@ -22806,8 +22806,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo scenesManagementaddScenesceneIDCommandParameterInfo = new CommandParameterInfo("sceneID", Integer.class, Integer.class);
     scenesManagementaddSceneCommandParams.put("sceneID",scenesManagementaddScenesceneIDCommandParameterInfo);
 
-    CommandParameterInfo scenesManagementaddScenetransitionTimeMSCommandParameterInfo = new CommandParameterInfo("transitionTimeMS", Long.class, Long.class);
-    scenesManagementaddSceneCommandParams.put("transitionTimeMS",scenesManagementaddScenetransitionTimeMSCommandParameterInfo);
+    CommandParameterInfo scenesManagementaddScenetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", Long.class, Long.class);
+    scenesManagementaddSceneCommandParams.put("transitionTime",scenesManagementaddScenetransitionTimeCommandParameterInfo);
 
     CommandParameterInfo scenesManagementaddScenesceneNameCommandParameterInfo = new CommandParameterInfo("sceneName", String.class, String.class);
     scenesManagementaddSceneCommandParams.put("sceneName",scenesManagementaddScenesceneNameCommandParameterInfo);
@@ -22823,7 +22823,7 @@ public class ClusterInfoMapping {
              commandArguments.get("sceneID")
 
            , (Long)
-             commandArguments.get("transitionTimeMS")
+             commandArguments.get("transitionTime")
 
            , (String)
              commandArguments.get("sceneName")
@@ -22936,8 +22936,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo scenesManagementrecallScenesceneIDCommandParameterInfo = new CommandParameterInfo("sceneID", Integer.class, Integer.class);
     scenesManagementrecallSceneCommandParams.put("sceneID",scenesManagementrecallScenesceneIDCommandParameterInfo);
 
-    CommandParameterInfo scenesManagementrecallScenetransitionTimeMSCommandParameterInfo = new CommandParameterInfo("transitionTimeMS", Optional.class, Long.class);
-    scenesManagementrecallSceneCommandParams.put("transitionTimeMS",scenesManagementrecallScenetransitionTimeMSCommandParameterInfo);
+    CommandParameterInfo scenesManagementrecallScenetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", Optional.class, Long.class);
+    scenesManagementrecallSceneCommandParams.put("transitionTime",scenesManagementrecallScenetransitionTimeCommandParameterInfo);
     InteractionInfo scenesManagementrecallSceneInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ScenesManagementCluster) cluster)
@@ -22947,7 +22947,7 @@ public class ClusterInfoMapping {
         , (Integer)
         commandArguments.get("sceneID")
         , (Optional<Long>)
-        commandArguments.get("transitionTimeMS")
+        commandArguments.get("transitionTime")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

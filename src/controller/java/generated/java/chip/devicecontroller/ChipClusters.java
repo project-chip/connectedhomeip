@@ -25881,11 +25881,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTimeMS, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet> extensionFieldSets) {
-      addScene(callback, groupID, sceneID, transitionTimeMS, sceneName, extensionFieldSets, 0);
+    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTime, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet> extensionFieldSets) {
+      addScene(callback, groupID, sceneID, transitionTime, sceneName, extensionFieldSets, 0);
     }
 
-    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTimeMS, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet> extensionFieldSets, int timedInvokeTimeoutMs) {
+    public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Long transitionTime, String sceneName, ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet> extensionFieldSets, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -25897,9 +25897,9 @@ public class ChipClusters {
       BaseTLVType sceneIDtlvValue = new UIntType(sceneID);
       elements.add(new StructElement(sceneIDFieldID, sceneIDtlvValue));
 
-      final long transitionTimeMSFieldID = 2L;
-      BaseTLVType transitionTimeMStlvValue = new UIntType(transitionTimeMS);
-      elements.add(new StructElement(transitionTimeMSFieldID, transitionTimeMStlvValue));
+      final long transitionTimeFieldID = 2L;
+      BaseTLVType transitionTimetlvValue = new UIntType(transitionTime);
+      elements.add(new StructElement(transitionTimeFieldID, transitionTimetlvValue));
 
       final long sceneNameFieldID = 3L;
       BaseTLVType sceneNametlvValue = new StringType(sceneName);
@@ -25967,8 +25967,8 @@ public class ChipClusters {
           Integer groupID = null;
           final long sceneIDFieldID = 2L;
           Integer sceneID = null;
-          final long transitionTimeMSFieldID = 3L;
-          Optional<Long> transitionTimeMS = Optional.empty();
+          final long transitionTimeFieldID = 3L;
+          Optional<Long> transitionTime = Optional.empty();
           final long sceneNameFieldID = 4L;
           Optional<String> sceneName = Optional.empty();
           final long extensionFieldSetsFieldID = 5L;
@@ -25989,10 +25989,10 @@ public class ChipClusters {
                 UIntType castingValue = element.value(UIntType.class);
                 sceneID = castingValue.value(Integer.class);
               }
-            } else if (element.contextTagNum() == transitionTimeMSFieldID) {
+            } else if (element.contextTagNum() == transitionTimeFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
-                transitionTimeMS = Optional.of(castingValue.value(Long.class));
+                transitionTime = Optional.of(castingValue.value(Long.class));
               }
             } else if (element.contextTagNum() == sceneNameFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.String) {
@@ -26006,7 +26006,7 @@ public class ChipClusters {
               }
             }
           }
-          callback.onSuccess(status, groupID, sceneID, transitionTimeMS, sceneName, extensionFieldSets);
+          callback.onSuccess(status, groupID, sceneID, transitionTime, sceneName, extensionFieldSets);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
@@ -26143,11 +26143,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void recallScene(DefaultClusterCallback callback, Integer groupID, Integer sceneID, @Nullable Optional<Long> transitionTimeMS) {
-      recallScene(callback, groupID, sceneID, transitionTimeMS, 0);
+    public void recallScene(DefaultClusterCallback callback, Integer groupID, Integer sceneID, @Nullable Optional<Long> transitionTime) {
+      recallScene(callback, groupID, sceneID, transitionTime, 0);
     }
 
-    public void recallScene(DefaultClusterCallback callback, Integer groupID, Integer sceneID, @Nullable Optional<Long> transitionTimeMS, int timedInvokeTimeoutMs) {
+    public void recallScene(DefaultClusterCallback callback, Integer groupID, Integer sceneID, @Nullable Optional<Long> transitionTime, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -26159,9 +26159,9 @@ public class ChipClusters {
       BaseTLVType sceneIDtlvValue = new UIntType(sceneID);
       elements.add(new StructElement(sceneIDFieldID, sceneIDtlvValue));
 
-      final long transitionTimeMSFieldID = 2L;
-      BaseTLVType transitionTimeMStlvValue = transitionTimeMS != null ? transitionTimeMS.<BaseTLVType>map((nonOptionaltransitionTimeMS) -> new UIntType(nonOptionaltransitionTimeMS)).orElse(new EmptyType()) : new NullType();
-      elements.add(new StructElement(transitionTimeMSFieldID, transitionTimeMStlvValue));
+      final long transitionTimeFieldID = 2L;
+      BaseTLVType transitionTimetlvValue = transitionTime != null ? transitionTime.<BaseTLVType>map((nonOptionaltransitionTime) -> new UIntType(nonOptionaltransitionTime)).orElse(new EmptyType()) : new NullType();
+      elements.add(new StructElement(transitionTimeFieldID, transitionTimetlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -26287,7 +26287,7 @@ public class ChipClusters {
     }
 
     public interface ViewSceneResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTimeMS, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets);
+      void onSuccess(Integer status, Integer groupID, Integer sceneID, Optional<Long> transitionTime, Optional<String> sceneName, Optional<ArrayList<ChipStructs.ScenesManagementClusterExtensionFieldSet>> extensionFieldSets);
     }
 
     public interface RemoveSceneResponseCallback extends BaseClusterCallback {

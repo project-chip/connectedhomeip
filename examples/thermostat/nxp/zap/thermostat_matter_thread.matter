@@ -1769,7 +1769,7 @@ provisional cluster ScenesManagement = 98 {
   request struct AddSceneRequest {
     group_id groupID = 0;
     int8u sceneID = 1;
-    int32u transitionTimeMS = 2;
+    int32u transitionTime = 2;
     char_string sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
@@ -1789,7 +1789,7 @@ provisional cluster ScenesManagement = 98 {
     status status = 0;
     group_id groupID = 1;
     int8u sceneID = 2;
-    optional int32u transitionTimeMS = 3;
+    optional int32u transitionTime = 3;
     optional char_string sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
@@ -1828,7 +1828,7 @@ provisional cluster ScenesManagement = 98 {
   request struct RecallSceneRequest {
     group_id groupID = 0;
     int8u sceneID = 1;
-    optional nullable int32u transitionTimeMS = 2;
+    optional nullable int32u transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {

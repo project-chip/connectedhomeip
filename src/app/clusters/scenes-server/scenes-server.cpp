@@ -361,7 +361,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     response.sceneID = req.sceneID;
 
     // Verify the attributes are respecting constraints
-    if (req.transitionTimeMS > scenes::kScenesMaxTransitionTimeMS || req.sceneName.size() > scenes::kSceneNameMaxLength)
+    if (req.transitionTime > scenes::kScenesMaxTransitionTime || req.sceneName.size() > scenes::kSceneNameMaxLength)
     {
         response.status = to_underlying(Protocols::InteractionModel::Status::InvalidCommand);
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
@@ -381,7 +381,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     uint32_t featureMap = 0;
     ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
 
-    SceneData storageData(CharSpan(), req.transitionTimeMS);
+    SceneData storageData(CharSpan(), req.transitionTime);
     if (featureMap & to_underlying(Feature::kSceneNames))
     {
         storageData.SetName(req.sceneName);
@@ -512,7 +512,7 @@ void ViewSceneParse(HandlerContext & ctx, const CommandData & req, GroupDataProv
     }
 
     response.status = to_underlying(Protocols::InteractionModel::Status::Success);
-    response.transitionTimeMS.SetValue(scene.mStorageData.mSceneTransitionTimeMs);
+    response.transitionTime.SetValue(scene.mStorageData.mSceneTransitionTimeMs);
 
     response.sceneName.SetValue(CharSpan(scene.mStorageData.mName, scene.mStorageData.mNameLength));
     Span<Structs::ExtensionFieldSet::Type> responseEFSSpan(responseEFSBuffer, deserializedEFSCount);
@@ -582,7 +582,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
 }
 
 CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & endpointID, const GroupId & groupID,
-                            const SceneId & sceneID, const Optional<DataModel::Nullable<uint32_t>> & transitionTimeMS,
+                            const SceneId & sceneID, const Optional<DataModel::Nullable<uint32_t>> & transitionTime,
                             GroupDataProvider * groupProvider)
 {
     // Make SceneValid false for all fabrics before recalling a scene
@@ -609,12 +609,12 @@ CHIP_ERROR RecallSceneParse(const FabricIndex & fabricIdx, const EndpointId & en
     ReturnErrorOnFailure(sceneTable->GetSceneTableEntry(fabricIdx, scene.mStorageId, scene));
 
     // Check for optional
-    if (transitionTimeMS.HasValue())
+    if (transitionTime.HasValue())
     {
         // Check for nullable
-        if (!transitionTimeMS.Value().IsNull())
+        if (!transitionTime.Value().IsNull())
         {
-            scene.mStorageData.mSceneTransitionTimeMs = transitionTimeMS.Value().Value();
+            scene.mStorageData.mSceneTransitionTimeMs = transitionTime.Value().Value();
         }
     }
 
@@ -744,9 +744,9 @@ void ScenesServer::StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpoint
 }
 void ScenesServer::RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId)
 {
-    Optional<DataModel::Nullable<uint32_t>> transitionTimeMS;
+    Optional<DataModel::Nullable<uint32_t>> transitionTime;
 
-    RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTimeMS, mGroupProvider);
+    RecallSceneParse(aFabricIx, aEndpointId, aGroupId, aSceneId, transitionTime, mGroupProvider);
 }
 
 bool ScenesServer::IsHandlerRegistered(EndpointId aEndpointId, scenes::SceneHandler * handler)
@@ -926,7 +926,7 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 {
     MATTER_TRACE_SCOPE("RecallScene", "Scenes");
     CHIP_ERROR err = RecallSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
-                                      req.sceneID, req.transitionTimeMS, mGroupProvider);
+                                      req.sceneID, req.transitionTime, mGroupProvider);
 
     if (CHIP_NO_ERROR == err)
     {

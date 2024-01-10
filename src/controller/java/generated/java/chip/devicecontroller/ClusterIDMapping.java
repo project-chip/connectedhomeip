@@ -8357,7 +8357,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum AddSceneCommandField {GroupID(0),SceneID(1),TransitionTimeMS(2),SceneName(3),ExtensionFieldSets(4),;
+        }public enum AddSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),SceneName(3),ExtensionFieldSets(4),;
                     private final int id;
                     AddSceneCommandField(int id) {
                         this.id = id;
@@ -8442,7 +8442,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum RecallSceneCommandField {GroupID(0),SceneID(1),TransitionTimeMS(2),;
+                }public enum RecallSceneCommandField {GroupID(0),SceneID(1),TransitionTime(2),;
                     private final int id;
                     RecallSceneCommandField(int id) {
                         this.id = id;

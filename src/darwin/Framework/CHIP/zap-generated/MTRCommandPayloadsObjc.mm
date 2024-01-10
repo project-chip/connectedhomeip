@@ -12953,7 +12953,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneID = @(0);
 
-        _transitionTimeMS = @(0);
+        _transitionTime = @(0);
 
         _sceneName = @"";
 
@@ -12970,7 +12970,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.transitionTimeMS = self.transitionTimeMS;
+    other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -12981,7 +12981,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTimeMS:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTimeMS, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
@@ -13000,7 +13000,7 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.sceneID = self.sceneID.unsignedCharValue;
     }
     {
-        encodableStruct.transitionTimeMS = self.transitionTimeMS.unsignedIntValue;
+        encodableStruct.transitionTime = self.transitionTime.unsignedIntValue;
     }
     {
         encodableStruct.sceneName = AsCharSpan(self.sceneName);
@@ -13278,7 +13278,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneID = @(0);
 
-        _transitionTimeMS = nil;
+        _transitionTime = nil;
 
         _sceneName = nil;
 
@@ -13294,7 +13294,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.status = self.status;
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.transitionTimeMS = self.transitionTimeMS;
+    other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
 
@@ -13303,7 +13303,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTimeMS:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTimeMS, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
@@ -13363,10 +13363,10 @@ NS_ASSUME_NONNULL_BEGIN
         self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
     }
     {
-        if (decodableStruct.transitionTimeMS.HasValue()) {
-            self.transitionTimeMS = [NSNumber numberWithUnsignedInt:decodableStruct.transitionTimeMS.Value()];
+        if (decodableStruct.transitionTime.HasValue()) {
+            self.transitionTime = [NSNumber numberWithUnsignedInt:decodableStruct.transitionTime.Value()];
         } else {
-            self.transitionTimeMS = nil;
+            self.transitionTime = nil;
         }
     }
     {
@@ -13949,7 +13949,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _sceneID = @(0);
 
-        _transitionTimeMS = nil;
+        _transitionTime = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -13962,7 +13962,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupID = self.groupID;
     other.sceneID = self.sceneID;
-    other.transitionTimeMS = self.transitionTimeMS;
+    other.transitionTime = self.transitionTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -13971,7 +13971,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTimeMS:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTimeMS];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
     return descriptionString;
 }
 
@@ -13990,13 +13990,13 @@ NS_ASSUME_NONNULL_BEGIN
         encodableStruct.sceneID = self.sceneID.unsignedCharValue;
     }
     {
-        if (self.transitionTimeMS != nil) {
-            auto & definedValue_0 = encodableStruct.transitionTimeMS.Emplace();
-            if (self.transitionTimeMS == nil) {
+        if (self.transitionTime != nil) {
+            auto & definedValue_0 = encodableStruct.transitionTime.Emplace();
+            if (self.transitionTime == nil) {
                 definedValue_0.SetNull();
             } else {
                 auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                nonNullValue_1 = self.transitionTimeMS.unsignedIntValue;
+                nonNullValue_1 = self.transitionTime.unsignedIntValue;
             }
         }
     }

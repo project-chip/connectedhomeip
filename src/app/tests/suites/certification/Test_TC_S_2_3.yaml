@@ -195,7 +195,7 @@ tests:
 
     - label:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
-          to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
+          to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 0x0001 (1s) and a set of extension fields appropriate to AC1."
       # This step is overwriting Step 2a, we need to add PICS !S.S.C40.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
       PICS: S.S.C00.Rsp && !S.S.C40.Rsp && PICS_SDK_CI_ONLY
@@ -206,7 +206,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTimeMS"
+              - name: "TransitionTime"
                 value: 0x0001
               - name: "SceneName"
                 value: "Scene1"
@@ -235,7 +235,7 @@ tests:
 
     - label:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
-          to G1, the SceneID field set to 0x01, the TransitionTimeMS field set
+          to G1, the SceneID field set to 0x01, the TransitionTime field set
           to G1 and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
@@ -316,7 +316,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTimeMS"
+              - name: "TransitionTime"
                 value: 0x0001
               - name: "ExtensionFieldSets"
                 value:
@@ -349,7 +349,7 @@ tests:
           Status = 0x00
           GroupID = G1
           SceneID = 0x01
-          TransitionTimeMS = 0x0001
+          TransitionTime = 0x0001
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:

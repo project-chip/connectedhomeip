@@ -126,7 +126,7 @@ server cluster MatterScenes = 98 {
   request struct AddSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    INT32U transitionTimeMS = 2;
+    INT32U transitionTime = 2;
     CHAR_STRING sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
@@ -153,7 +153,7 @@ server cluster MatterScenes = 98 {
   request struct RecallSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    optional nullable INT32U transitionTimeMS = 2;
+    optional nullable INT32U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
@@ -170,7 +170,7 @@ server cluster MatterScenes = 98 {
     ENUM8 status = 0;
     group_id groupId = 1;
     INT8U sceneId = 2;
-    optional INT32U transitionTimeMS = 3;
+    optional INT32U transitionTime = 3;
     optional CHAR_STRING sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
   }

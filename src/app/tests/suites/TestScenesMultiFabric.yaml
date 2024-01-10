@@ -335,7 +335,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTimeMS"
+              - name: "TransitionTime"
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
@@ -441,7 +441,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-              - name: "TransitionTimeMS"
+              - name: "TransitionTime"
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
