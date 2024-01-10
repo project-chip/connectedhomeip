@@ -57,13 +57,8 @@ CHIP_ERROR ChefFanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEn
     // Return PercentSetting attribute value for now
     DataModel::Nullable<Percent> percentSetting;
     PercentSetting::Get(mEndpoint, percentSetting);
-    Percent ret = 0;
-    if (!percentSetting.IsNull())
-    {
-        ret = percentSetting.Value();
-    }
 
-    return aEncoder.Encode(ret);
+    return aEncoder.Encode(ercentSetting.ValueOr(0));
 }
 
 CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
@@ -71,13 +66,8 @@ CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEnco
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(mEndpoint, speedSetting);
-    uint8_t ret = 0;
-    if (!speedSetting.IsNull())
-    {
-        ret = speedSetting.Value();
-    }
 
-    return aEncoder.Encode(ret);
+    return aEncoder.Encode(speedSetting.ValueOr(0));
 }
 
 Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWrap, bool aLowestOff)
