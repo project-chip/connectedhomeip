@@ -128,7 +128,7 @@ CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct
 
     switch (mIndex)
     {
-    case 0: {
+    case 0:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
         item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
         break;
@@ -150,8 +150,6 @@ CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct
         break;
     default:
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-        break;
-    }
     }
     mIndex++;
     return CHIP_NO_ERROR;
