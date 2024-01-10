@@ -10754,7 +10754,29 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {} // namespace Events
+namespace Events {
+namespace OnTransitionToActiveMode {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace OnTransitionToActiveMode.
+} // namespace Events
 
 } // namespace IcdManagement
 namespace Timer {
@@ -13929,6 +13951,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, defaultOpenLevel);
     case Attributes::ValveFault::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, valveFault);
+    case Attributes::LevelStep::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, levelStep);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -17707,6 +17731,75 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace UnboltDoor.
+namespace SetAliroReaderConfig {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSigningKey), signingKey);
+    encoder.Encode(to_underlying(Fields::kVerificationKey), verificationKey);
+    encoder.Encode(to_underlying(Fields::kGroupIdentifier), groupIdentifier);
+    encoder.Encode(to_underlying(Fields::kGroupResolvingKey), groupResolvingKey);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSigningKey))
+        {
+            err = DataModel::Decode(reader, signingKey);
+        }
+        else if (__context_tag == to_underlying(Fields::kVerificationKey))
+        {
+            err = DataModel::Decode(reader, verificationKey);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupIdentifier))
+        {
+            err = DataModel::Decode(reader, groupIdentifier);
+        }
+        else if (__context_tag == to_underlying(Fields::kGroupResolvingKey))
+        {
+            err = DataModel::Decode(reader, groupResolvingKey);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace SetAliroReaderConfig.
+namespace ClearAliroReaderConfig {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace ClearAliroReaderConfig.
 } // namespace Commands
 
 namespace Attributes {
@@ -17786,6 +17879,24 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, requirePINforRemoteOperation);
     case Attributes::ExpiringUserTimeout::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, expiringUserTimeout);
+    case Attributes::AliroReaderVerificationKey::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroReaderVerificationKey);
+    case Attributes::AliroReaderGroupIdentifier::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroReaderGroupIdentifier);
+    case Attributes::AliroReaderGroupSubIdentifier::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroReaderGroupSubIdentifier);
+    case Attributes::AliroExpeditedTransactionSupportedProtocolVersions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroExpeditedTransactionSupportedProtocolVersions);
+    case Attributes::AliroGroupResolvingKey::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroGroupResolvingKey);
+    case Attributes::AliroSupportedBLEUWBProtocolVersions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroSupportedBLEUWBProtocolVersions);
+    case Attributes::AliroBLEAdvertisingVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, aliroBLEAdvertisingVersion);
+    case Attributes::NumberOfAliroCredentialIssuerKeysSupported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, numberOfAliroCredentialIssuerKeysSupported);
+    case Attributes::NumberOfAliroEndpointKeysSupported::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, numberOfAliroEndpointKeysSupported);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -28268,6 +28379,8 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::DoorLock::Commands::SetCredential::Id:
         case Clusters::DoorLock::Commands::ClearCredential::Id:
         case Clusters::DoorLock::Commands::UnboltDoor::Id:
+        case Clusters::DoorLock::Commands::SetAliroReaderConfig::Id:
+        case Clusters::DoorLock::Commands::ClearAliroReaderConfig::Id:
             return true;
         default:
             return false;
