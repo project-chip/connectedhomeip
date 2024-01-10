@@ -18,12 +18,12 @@
 
 import SwiftUI
 
-struct MTRConnectionExampleView: View {
-    var selectedCastingPlayer: MTRCastingPlayer?
+struct MCConnectionExampleView: View {
+    var selectedCastingPlayer: MCCastingPlayer?
     
-    @StateObject var viewModel = MTRConnectionExampleViewModel();
+    @StateObject var viewModel = MCConnectionExampleViewModel();
     
-    init(_selectedCastingPlayer: MTRCastingPlayer?) {
+    init(_selectedCastingPlayer: MCCastingPlayer?) {
         self.selectedCastingPlayer = _selectedCastingPlayer
     }
     
@@ -62,8 +62,8 @@ struct MTRConnectionExampleView: View {
     }
 }
 
-struct MTRConnectionExampleView_Previews: PreviewProvider {
+struct MCConnectionExampleView_Previews: PreviewProvider {
     static var previews: some View {
-        MTRConnectionExampleView(_selectedCastingPlayer: nil)
+        MCConnectionExampleView(_selectedCastingPlayer: nil)
     }
 }

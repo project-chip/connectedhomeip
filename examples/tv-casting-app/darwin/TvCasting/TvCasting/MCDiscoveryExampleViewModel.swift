@@ -18,12 +18,12 @@
 import Foundation
 import os.log
 
-class MTRDiscoveryExampleViewModel: ObservableObject {
+class MCDiscoveryExampleViewModel: ObservableObject {
     let Log = Logger(subsystem: "com.matter.casting",
-                     category: "MTRDiscoveryExampleViewModel")
+                     category: "MCDiscoveryExampleViewModel")
     let kTargetPlayerDeviceType: UInt64 = 35
     
-    @Published var displayedCastingPlayers: [MTRCastingPlayer] = []
+    @Published var displayedCastingPlayers: [MCCastingPlayer] = []
     
     @Published var discoveryHasError: Bool = false;
     
@@ -36,9 +36,9 @@ class MTRDiscoveryExampleViewModel: ObservableObject {
         NotificationCenter.default.addObserver(self, selector: #selector(self.didRemoveDiscoveredCastingPlayers), name: NSNotification.Name(REMOVE_CASTING_PLAYER_NOTIFICATION_NAME), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.didUpdateDiscoveredCastingPlayers), name: NSNotification.Name(UPDATE_CASTING_PLAYER_NOTIFICATION_NAME), object: nil)
 
-        if let err:Error = MTRCastingPlayerDiscovery.sharedInstance().start(UInt32(kTargetPlayerDeviceType))
+        if let err:Error = MCCastingPlayerDiscovery.sharedInstance().start(UInt32(kTargetPlayerDeviceType))
         {
-            Log.error("MTRCastingPlayerDiscovery.start failed with \(err)")
+            Log.error("MCCastingPlayerDiscovery.start failed with \(err)")
             self.discoveryHasError = true
         }
         self.discoveryHasError = false
@@ -46,9 +46,9 @@ class MTRDiscoveryExampleViewModel: ObservableObject {
     
     func stopDiscovery() {
         Log.info("stopDiscovery() called")
-        if let err:Error = MTRCastingPlayerDiscovery.sharedInstance().stop()
+        if let err:Error = MCCastingPlayerDiscovery.sharedInstance().stop()
         {
-            Log.error("MTRCastingPlayerDiscovery.stop failed with \(err)")
+            Log.error("MCCastingPlayerDiscovery.stop failed with \(err)")
             self.discoveryHasError = true
         }
         else
@@ -74,12 +74,12 @@ class MTRDiscoveryExampleViewModel: ObservableObject {
     {
         Log.info("didAddDiscoveredCastingPlayers() called")
         guard let userInfo = notification.userInfo,
-            let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
-            self.Log.error("didAddDiscoveredCastingPlayers called with no MTRCastingPlayer")
+            let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+            self.Log.error("didAddDiscoveredCastingPlayers called with no MCCastingPlayer")
             return
         }
         
-        self.Log.info("didAddDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+        self.Log.info("didAddDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
 
         DispatchQueue.main.async
         {
@@ -92,12 +92,12 @@ class MTRDiscoveryExampleViewModel: ObservableObject {
     {
         Log.info("didRemoveDiscoveredCastingPlayers() called")
         guard let userInfo = notification.userInfo,
-            let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
-            self.Log.error("didRemoveDiscoveredCastingPlayers called with no MTRCastingPlayer")
+            let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+            self.Log.error("didRemoveDiscoveredCastingPlayers called with no MCCastingPlayer")
             return
         }
         
-        self.Log.info("didRemoveDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+        self.Log.info("didRemoveDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
         DispatchQueue.main.async
         {
             self.displayedCastingPlayers.removeAll(where: {$0 == castingPlayer})
@@ -109,12 +109,12 @@ class MTRDiscoveryExampleViewModel: ObservableObject {
     {
         Log.info("didUpdateDiscoveredCastingPlayers() called")
         guard let userInfo = notification.userInfo,
-            let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
-            self.Log.error("didUpdateDiscoveredCastingPlayers called with no MTRCastingPlayer")
+            let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+            self.Log.error("didUpdateDiscoveredCastingPlayers called with no MCCastingPlayer")
             return
         }
         
-        self.Log.info("didUpdateDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+        self.Log.info("didUpdateDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
         if let index = displayedCastingPlayers.firstIndex(where: { castingPlayer.identifier() == $0.identifier() })
         {
             DispatchQueue.main.async

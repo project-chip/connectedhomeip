@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRDataSource.h"
+#import "MCDataSource.h"
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -24,17 +24,17 @@
 #import <Foundation/Foundation.h>
 #include <Security/Security.h>
 
-#ifndef MTRDeviceAttestationCredentialsProvider_h
-#define MTRDeviceAttestationCredentialsProvider_h
+#ifndef MCDeviceAttestationCredentialsProvider_h
+#define MCDeviceAttestationCredentialsProvider_h
 
 namespace matter {
 namespace casting {
 namespace support {
 
-class MTRDeviceAttestationCredentialsProvider : public chip::Credentials::DeviceAttestationCredentialsProvider
+class MCDeviceAttestationCredentialsProvider : public chip::Credentials::DeviceAttestationCredentialsProvider
 {
 public:
-    CHIP_ERROR Initialize(id<MTRDataSource> dataSource);
+    CHIP_ERROR Initialize(id<MCDataSource> dataSource);
 
     CHIP_ERROR GetCertificationDeclaration(chip::MutableByteSpan & outCertificationDeclaration) override;
     CHIP_ERROR GetFirmwareInformation(chip::MutableByteSpan & outFirmwareInformation) override;
@@ -44,12 +44,12 @@ public:
                                             chip::MutableByteSpan & outSignatureBuffer) override;
 
 private:
-    id<MTRDataSource> mDataSource          = nullptr;
-    MTRDeviceAttestationCredentials * mDac = nullptr;
+    id<MCDataSource> mDataSource          = nullptr;
+    MCDeviceAttestationCredentials * mDac = nullptr;
 };
 
 }; // namespace support
 }; // namespace casting
 }; // namespace matter
 
-#endif /* MTRDeviceAttestationCredentialsProvider_h */
+#endif /* MCDeviceAttestationCredentialsProvider_h */

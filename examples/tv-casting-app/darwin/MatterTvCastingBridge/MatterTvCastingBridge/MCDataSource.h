@@ -15,14 +15,14 @@
  *    limitations under the License.
  */
 
-#import "MTRCommissionableData.h"
-#import "MTRDeviceAttestationCredentials.h"
+#import "MCCommissionableData.h"
+#import "MCDeviceAttestationCredentials.h"
 #import "MatterError.h"
 
-#ifndef MTRDataSource_h
-#define MTRDataSource_h
+#ifndef MCDataSource_h
+#define MCDataSource_h
 
-@protocol MTRDataSource <NSObject>
+@protocol MCDataSource <NSObject>
 
 /**
  * @brief Queue used when calling the client code on completion blocks from any MatterTvCastingBridge API
@@ -30,20 +30,20 @@
 - (dispatch_queue_t _Nonnull)clientQueue;
 
 /**
- * @brief Provide UniqueId used to generate the RotatingDeviceId advertised during commissioning by the MTRCastingApp
+ * @brief Provide UniqueId used to generate the RotatingDeviceId advertised during commissioning by the MCCastingApp
  * Must be at least 16 bytes (i.e. ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength)
  */
 - (NSData * _Nonnull)castingAppDidReceiveRequestForRotatingDeviceIdUniqueId:(id _Nonnull)sender;
 
 /**
- * @brief Provides MTRCommissionableData (such as setupPasscode, discriminator, etc) used to get the MTRCastingApp commissioned
+ * @brief Provides MCCommissionableData (such as setupPasscode, discriminator, etc) used to get the MCCastingApp commissioned
  */
-- (MTRCommissionableData * _Nonnull)castingAppDidReceiveRequestForCommissionableData:(id _Nonnull)sender;
+- (MCCommissionableData * _Nonnull)castingAppDidReceiveRequestForCommissionableData:(id _Nonnull)sender;
 
 /**
- * @brief Provides MTRDeviceAttestationCredentials of the MTRCastingApp used during commissioning
+ * @brief Provides MCDeviceAttestationCredentials of the MCCastingApp used during commissioning
  */
-- (MTRDeviceAttestationCredentials * _Nonnull)castingAppDidReceiveRequestForDeviceAttestationCredentials:(id _Nonnull)sender;
+- (MCDeviceAttestationCredentials * _Nonnull)castingAppDidReceiveRequestForDeviceAttestationCredentials:(id _Nonnull)sender;
 
 /**
  * @brief Request to signs a message using the device attestation private key
@@ -56,4 +56,4 @@
 
 @end
 
-#endif /* MTRDataSource_h */
+#endif /* MCDataSource_h */

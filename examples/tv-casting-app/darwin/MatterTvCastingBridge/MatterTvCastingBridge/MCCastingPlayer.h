@@ -15,20 +15,20 @@
  *    limitations under the License.
  */
 
-#import "MTREndpointFilter.h"
+#import "MCEndpointFilter.h"
 
 #import <Foundation/Foundation.h>
 
-#ifndef MTRCastingPlayer_h
-#define MTRCastingPlayer_h
+#ifndef MCCastingPlayer_h
+#define MCCastingPlayer_h
 
-@class MTREndpoint;
+@class MCEndpoint;
 
 /**
- * @brief MTRCastingPlayer represents a Matter commissioner that is able to play media to a physical
+ * @brief MCCastingPlayer represents a Matter commissioner that is able to play media to a physical
  * output or to a display screen which is part of the device.
  */
-@interface MTRCastingPlayer : NSObject
+@interface MCCastingPlayer : NSObject
 
 + (NSInteger)kMinCommissioningWindowTimeoutSec;
 
@@ -45,7 +45,7 @@
  * Commissioning, in case the desired Endpoint is not found in the on-device cached information about the CastingPlayer
  * (if any)
  */
-- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion timeout:(long long)timeout desiredEndpointFilter:(MTREndpointFilter * _Nullable)desiredEndpointFilter;
+- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion timeout:(long long)timeout desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter;
 
 /**
  * @brief (async) Verifies that a connection exists with this CastingPlayer, or triggers a new session request. If the
@@ -58,7 +58,7 @@
  * Commissioning, in case the desired Endpoint is not found in the on-device cached information about the CastingPlayer
  * (if any)
  */
-- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion desiredEndpointFilter:(MTREndpointFilter * _Nullable)desiredEndpointFilter;
+- (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter;
 
 /**
  * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
@@ -73,11 +73,11 @@
 - (NSArray * _Nonnull)ipAddresses;
 
 // TODO
-// - (NSArray<MTREndpoint *> * _Nonnull)endpoints;
+// - (NSArray<MCEndpoint *> * _Nonnull)endpoints;
 
 - (nonnull instancetype)init UNAVAILABLE_ATTRIBUTE;
 + (nonnull instancetype)new UNAVAILABLE_ATTRIBUTE;
 
 @end
 
-#endif /* MTRCastingPlayer_h */
+#endif /* MCCastingPlayer_h */

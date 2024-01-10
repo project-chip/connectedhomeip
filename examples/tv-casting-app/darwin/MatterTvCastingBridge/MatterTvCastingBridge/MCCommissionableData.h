@@ -17,10 +17,10 @@
 
 #import <Foundation/Foundation.h>
 
-#ifndef MTRCommissionableData_h
-#define MTRCommissionableData_h
+#ifndef MCCommissionableData_h
+#define MCCommissionableData_h
 
-@interface MTRCommissionableData : NSObject
+@interface MCCommissionableData : NSObject
 
 @property (nonatomic, readonly) uint32_t passcode;
 
@@ -40,4 +40,4 @@
 
 @end
 
-#endif /* MTRCommissionableData_h */
+#endif /* MCCommissionableData_h */

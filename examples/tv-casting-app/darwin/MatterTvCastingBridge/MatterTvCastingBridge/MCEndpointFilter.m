@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "MTREndpointFilter.h"
+#import "MCEndpointFilter.h"
 
-@implementation MTREndpointFilter
+@implementation MCEndpointFilter
 
 @end

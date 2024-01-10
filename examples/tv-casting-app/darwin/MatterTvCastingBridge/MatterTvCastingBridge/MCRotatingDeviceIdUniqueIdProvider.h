@@ -15,25 +15,25 @@
  *    limitations under the License.
  */
 
-#import "MTRDataSource.h"
+#import "MCDataSource.h"
 
 #include "core/Types.h"
 
-#ifndef MTRRotatingDeviceIdUniqueIdProvider_h
-#define MTRRotatingDeviceIdUniqueIdProvider_h
+#ifndef MCRotatingDeviceIdUniqueIdProvider_h
+#define MCRotatingDeviceIdUniqueIdProvider_h
 
 namespace matter {
 namespace casting {
 namespace support {
 
-class MTRRotatingDeviceIdUniqueIdProvider : public matter::casting::support::MutableByteSpanDataProvider
+class MCRotatingDeviceIdUniqueIdProvider : public matter::casting::support::MutableByteSpanDataProvider
 {
 public:
-    CHIP_ERROR Initialize(id<MTRDataSource> dataSource);
+    CHIP_ERROR Initialize(id<MCDataSource> dataSource);
     chip::MutableByteSpan * Get();
 
 private:
-    id<MTRDataSource> mDataSource = nullptr;
+    id<MCDataSource> mDataSource = nullptr;
 
     chip::MutableByteSpan mRotatingDeviceIdUniqueIdSpan;
     uint8_t mRotatingDeviceIdUniqueId[chip::DeviceLayer::ConfigurationManager::kRotatingDeviceIDUniqueIDLength];
@@ -43,4 +43,4 @@ private:
 }; // namespace casting
 }; // namespace matter
 
-#endif /* MTRRotatingDeviceIdUniqueIdProvider_h */
+#endif /* MCRotatingDeviceIdUniqueIdProvider_h */

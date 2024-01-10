@@ -17,14 +17,14 @@
 
 import SwiftUI
 
-extension MTRCastingPlayer : Identifiable {
+extension MCCastingPlayer : Identifiable {
     public var id: String {
         identifier()
     }
 }
 
-struct MTRDiscoveryExampleView: View {
-    @StateObject var viewModel = MTRDiscoveryExampleViewModel()
+struct MCDiscoveryExampleView: View {
+    @StateObject var viewModel = MCDiscoveryExampleViewModel()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -59,7 +59,7 @@ struct MTRDiscoveryExampleView: View {
                 ForEach(viewModel.displayedCastingPlayers) { castingPlayer in
                     NavigationLink(
                         destination: {
-                            MTRConnectionExampleView(_selectedCastingPlayer: castingPlayer)
+                            MCConnectionExampleView(_selectedCastingPlayer: castingPlayer)
                         },
                         label: {
                             Text(castingPlayer.description)
@@ -78,8 +78,8 @@ struct MTRDiscoveryExampleView: View {
     }        
 }
 
-struct MTRDiscoveryExampleView_Previews: PreviewProvider {
+struct MCDiscoveryExampleView_Previews: PreviewProvider {
     static var previews: some View {
-        MTRDiscoveryExampleView()
+        MCDiscoveryExampleView()
     }
 }

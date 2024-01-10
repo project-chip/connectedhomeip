@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "MTRRotatingDeviceIdUniqueIdProvider.h"
+#include "MCRotatingDeviceIdUniqueIdProvider.h"
 
 #include "lib/support/logging/CHIPLogging.h"
 #include <lib/core/CHIPError.h>
@@ -27,7 +27,7 @@ namespace matter {
 namespace casting {
     namespace support {
 
-        CHIP_ERROR MTRRotatingDeviceIdUniqueIdProvider::Initialize(id<MTRDataSource> dataSource)
+        CHIP_ERROR MCRotatingDeviceIdUniqueIdProvider::Initialize(id<MCDataSource> dataSource)
         {
             VerifyOrReturnError(dataSource != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(mDataSource == nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -35,13 +35,13 @@ namespace casting {
             return CHIP_NO_ERROR;
         }
 
-        chip::MutableByteSpan * MTRRotatingDeviceIdUniqueIdProvider::Get()
+        chip::MutableByteSpan * MCRotatingDeviceIdUniqueIdProvider::Get()
         {
-            ChipLogProgress(AppServer, "MTRRotatingDeviceIdUniqueIdProvider.Get() called");
+            ChipLogProgress(AppServer, "MCRotatingDeviceIdUniqueIdProvider.Get() called");
             VerifyOrReturnValue(mDataSource != nil, nullptr, ChipLogError(AppServer, "mDataSource found nil!"));
 
             NSData * uniqueIdData =
-                [mDataSource castingAppDidReceiveRequestForRotatingDeviceIdUniqueId:@"MTRRotatingDeviceIdUniqueIdProvider.Get()"];
+                [mDataSource castingAppDidReceiveRequestForRotatingDeviceIdUniqueId:@"MCRotatingDeviceIdUniqueIdProvider.Get()"];
             if (uniqueIdData != nil) {
                 mRotatingDeviceIdUniqueIdSpan = chip::MutableByteSpan(
                     const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(uniqueIdData.bytes)), uniqueIdData.length);
