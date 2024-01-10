@@ -220,7 +220,7 @@ public:
     {
         IgnoreUnusedVariable(apCommandSender);
         IgnoreUnusedVariable(aData);
-        ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x", aPath.mClusterId,
+        ChipLogDetail(Controller, "Received response for command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x", aPath.mClusterId,
                       aPath.mCommandId, aPath.mEndpointId);
         onResponseCalledTimes++;
     }

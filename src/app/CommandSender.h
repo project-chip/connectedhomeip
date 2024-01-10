@@ -507,12 +507,12 @@ private:
     void OnResponseCallback(const ConcreteCommandPath & aPath, const StatusIB & aStatusIB, TLV::TLVReader * apData,
                             const AdditionalResponseData & aAdditionalResponseData)
     {
+        // mpExtendedCallback and mpCallback are mutually exclusive.
         if (mpExtendedCallback)
         {
             mpExtendedCallback->OnResponse(this, aPath, aStatusIB, apData, aAdditionalResponseData);
         }
-        // mpCallback is a legacy path that is omitted if using extended callbacks
-        if (mpCallback)
+        else if (mpCallback)
         {
             mpCallback->OnResponse(this, aPath, aStatusIB, apData);
         }
@@ -520,13 +520,13 @@ private:
 
     void OnErrorCallback(CHIP_ERROR aError)
     {
+        // mpExtendedCallback and mpCallback are mutually exclusive.
         if (mpExtendedCallback)
         {
             ErrorData errorData = { aError };
             mpExtendedCallback->OnError(this, errorData);
         }
-        // mpCallback is a legacy path that is omitted if using extended callbacks
-        if (mpCallback)
+        else if (mpCallback)
         {
             mpCallback->OnError(this, aError);
         }
@@ -534,12 +534,12 @@ private:
 
     void OnDoneCallback()
     {
+        // mpExtendedCallback and mpCallback are mutually exclusive.
         if (mpExtendedCallback)
         {
             mpExtendedCallback->OnDone(this);
         }
-        // mpCallback is a legacy path that is omitted if using extended callbacks
-        if (mpCallback)
+        else if (mpCallback)
         {
             mpCallback->OnDone(this);
         }
