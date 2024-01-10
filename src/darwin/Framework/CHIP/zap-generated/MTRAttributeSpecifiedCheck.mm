@@ -2904,6 +2904,9 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::ValveFault::Id: {
         return YES;
     }
+    case Attributes::LevelStep::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

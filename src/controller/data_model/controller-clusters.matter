@@ -4104,6 +4104,7 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute optional nullable percent targetLevel = 7;
   attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute optional int8u levelStep = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

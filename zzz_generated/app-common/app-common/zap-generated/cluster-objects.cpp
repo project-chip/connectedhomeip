@@ -13951,6 +13951,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, defaultOpenLevel);
     case Attributes::ValveFault::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, valveFault);
+    case Attributes::LevelStep::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, levelStep);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
