@@ -25,7 +25,10 @@ import sys
 import threading
 import time
 
-import paramiko
+try:
+    import paramiko
+except ImportError:
+    pass
 
 CHIP_REPO = os.path.join(os.path.abspath(
     os.path.dirname(__file__)), "..", "..", "..", "..", "..")

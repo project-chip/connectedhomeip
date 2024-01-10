@@ -15,7 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-'''
+import logging
+import os
+import sys
+
+from helper.CHIPTestBase import CHIPVirtualHome
+
+"""
 Test to verify that the device can still handle new subscription requests when resuming the maximum subscriptions.
 Steps for this test:
     1. Commission the server app to the first fabric and send maximum subscription requests from the controller in
@@ -27,14 +33,7 @@ Steps for this test:
     5. Restart the server app and the server app will start resuming subscriptions.
     6. When the server app is resuming subscriptions, send a new subscription request from the second controller.
     7. Verify that the device can still handle this subscription request.
-'''
-
-
-import logging
-import os
-import sys
-
-from helper.CHIPTestBase import CHIPVirtualHome
+"""
 
 logger = logging.getLogger('SubscriptionResumptionCapacityTest')
 logger.setLevel(logging.INFO)
