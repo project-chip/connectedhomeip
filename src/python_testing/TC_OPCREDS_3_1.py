@@ -19,20 +19,19 @@ import copy
 import logging
 import random
 
+from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
 import chip.discovery as Discovery
-from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.tlv import TLVReader, TLVWriter
-from cryptography import x509
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):
     def FindAndEstablishPase(self, discriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None, ):
-        if dev_ctrl == None:
+        if dev_ctrl is None:
             dev_ctrl = self.default_controller
 
         devices = dev_ctrl.DiscoverCommissionableNodes(
@@ -411,7 +410,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH2_nodeid = self.default_controller.nodeId+2
         TH2 = TH2_fabric_admin.NewController(nodeId=TH2_nodeid)
         TH2_dut_nodeid = self.dut_node_id+2
-        errcode = TH2.CommissionOnNetwork(
+        TH2.CommissionOnNetwork(
             nodeId=TH2_dut_nodeid, setupPinCode=params.setupPinCode,
             filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
 
