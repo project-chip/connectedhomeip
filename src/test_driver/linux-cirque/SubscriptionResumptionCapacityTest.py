@@ -15,6 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+'''
+Test to verify that the device can still handle new subscription requests when resuming the maximum subscriptions.
+Steps for this test:
+    1. Commission the server app to the first fabric and send maximum subscription requests from the controller in
+    the first fabric to establish maximum subscriptions.
+    2. Open the commissioning window to make the server app can be commissioned to the second fabric.
+    3. Shutdown the controller in the first fabric to extend the time of resuming subscriptions. The server app will
+    keep resolving the address of the first controller for a while after rebooting.
+    4. Commission the server app to the second fabric.
+    5. Restart the server app and the server app will start resuming subscriptions.
+    6. When the server app is resuming subscriptions, send a new subscription request from the second controller.
+    7. Verify that the device can still handle this subscription request.
+'''
+
 import logging
 import os
 import sys
@@ -43,7 +57,9 @@ TEST_SUBSCRIPTION_CAPACITY = 3
 
 
 # TODO: If using one Mobile Device, the CHIPEndDevice can still resolve the address for first controller
-# even if it was shutdown.
+# even if it is shutdown by 'devCtrl.Shutdown()'. And the server will fail to estalish the subscriptions
+# immediately, which makes it hard to send the new subscription request from the second controller.
+
 # Use two containers for two controller in two different fabrics.
 DEVICE_CONFIG = {
     'device0': {

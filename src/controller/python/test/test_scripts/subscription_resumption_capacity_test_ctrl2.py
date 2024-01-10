@@ -33,23 +33,6 @@ TEST_ENDPOINT_ID = 0
 TEST_SSH_PORT = 2222
 
 
-def ethernet_commissioning(test: BaseTestHelper, discriminator: int, setup_pin: int, address_override: str, device_nodeid: int):
-    logger.info("Testing discovery")
-    device = test.TestDiscovery(discriminator=discriminator)
-    FailIfNot(device, "Failed to discover any devices.")
-
-    address = device.addresses[0]
-
-    if address_override:
-        address = address_override
-
-    logger.info("Testing commissioning")
-    FailIfNot(test.TestCommissioning(ip=address,
-                                     setuppin=setup_pin,
-                                     nodeid=device_nodeid),
-              "Failed to finish key exchange")
-
-
 def main():
     optParser = OptionParser()
     optParser.add_option(
@@ -137,7 +120,9 @@ def main():
     test = BaseTestHelper(
         nodeid=112244, paaTrustStorePath=options.paaTrustStorePath, testCommissioner=True)
 
-    ethernet_commissioning(test, options.discriminator, options.setuppin, options.deviceAddress, options.nodeid)
+    FailIfNot(
+        test.TestOnNetworkCommissioning(options.discriminator, options.setuppin, options.nodeid, options.deviceAddress),
+        "Failed on on-network commissioing")
 
     FailIfNot(
         test.TestSubscriptionResumptionCapacityStep2(options.nodeid, TEST_ENDPOINT_ID, options.deviceAddress,

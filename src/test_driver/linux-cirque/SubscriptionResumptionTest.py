@@ -15,6 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+'''
+Basic Subscription Resumption Test to validate that the device can resume subscriptions after restarting.
+Steps for this test:
+    1. Subcription an attribute on the controller
+    2. Restart the server app
+    3. Verify that the server app with resume the subscription and send a report to the controller
+'''
+
 import logging
 import os
 import sys
@@ -60,7 +68,6 @@ DEVICE_CONFIG = {
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
 }
-
 
 class TestSubscriptionResumption(CHIPVirtualHome):
     def __init__(self, device_config):
