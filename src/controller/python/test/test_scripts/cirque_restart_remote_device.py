@@ -42,7 +42,7 @@ logger.addHandler(sh)
 
 class restartRemoteDevice(threading.Thread):
     def __init__(self, remote_ip: str, ssh_port: int, user: str, password: str, remote_server_app: str,
-            extra_args: str):
+                 extra_args: str):
         super(restartRemoteDevice, self).__init__()
         self.remote_ip = remote_ip
         self.ssh_port = ssh_port

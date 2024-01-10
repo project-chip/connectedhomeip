@@ -1368,7 +1368,7 @@ class BaseTestHelper:
 
             self.logger.info("Restart remote deivce")
             restartRemoteThread = restartRemoteDevice(
-                    remote_ip, ssh_port, "root", "admin", remote_server_app, "--thread --discriminator 3840")
+                remote_ip, ssh_port, "root", "admin", remote_server_app, "--thread --discriminator 3840")
             restartRemoteThread.start()
             # After device restarts, the attribute will be set dirty so the subscription can receive
             # the update
@@ -1423,6 +1423,7 @@ class BaseTestHelper:
     So we will use two controller containers for this test and divide the test to two steps. The Step1 is executed in
     controller 1 in container 1 while the Step2 is executed in controller 2 in container 2
     '''
+
     def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, subscription_capacity: int):
         try:
             # BasicInformation Cluster, NodeLabel Attribute
@@ -1447,7 +1448,7 @@ class BaseTestHelper:
         return True
 
     def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
-            remote_server_app: str, subscription_capacity: int):
+                                                remote_server_app: str, subscription_capacity: int):
         try:
             self.logger.info("Restart remote deivce")
             extra_agrs = f"--thread --discriminator 3840 --subscription-capacity {subscription_capacity}"

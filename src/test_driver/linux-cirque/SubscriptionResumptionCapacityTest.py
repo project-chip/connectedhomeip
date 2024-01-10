@@ -29,12 +29,11 @@ Steps for this test:
     7. Verify that the device can still handle this subscription request.
 '''
 
+
 import logging
 import os
 import sys
-
 from helper.CHIPTestBase import CHIPVirtualHome
-
 logger = logging.getLogger('SubscriptionResumptionCapacityTest')
 logger.setLevel(logging.INFO)
 

@@ -23,12 +23,11 @@ Steps for this test:
     3. Verify that the server app with resume the subscription and send a report to the controller
 '''
 
+
 import logging
 import os
 import sys
-
 from helper.CHIPTestBase import CHIPVirtualHome
-
 logger = logging.getLogger('SubscriptionResumptionTest')
 logger.setLevel(logging.INFO)
 
@@ -68,6 +67,7 @@ DEVICE_CONFIG = {
         "mount_pairs": [[CHIP_REPO, CHIP_REPO]],
     }
 }
+
 
 class TestSubscriptionResumption(CHIPVirtualHome):
     def __init__(self, device_config):
