@@ -913,15 +913,19 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ActivatedCarbonFilterMonitoring
 
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 namespace Commands {
 
-namespace SuppressRequest {
+namespace SuppressAlarm {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SuppressRequest
+} // namespace SuppressAlarm
+
+namespace EnableDisableAlarm {
+static constexpr CommandId Id = 0x00000001;
+} // namespace EnableDisableAlarm
 
 } // namespace Commands
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 namespace Commands {
@@ -933,10 +937,6 @@ static constexpr CommandId Id = 0x00000000;
 namespace Close {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Close
-
-namespace SetLevel {
-static constexpr CommandId Id = 0x00000002;
-} // namespace SetLevel
 
 } // namespace Commands
 } // namespace ValveConfigurationAndControl
@@ -1141,6 +1141,14 @@ static constexpr CommandId Id = 0x00000026;
 namespace UnboltDoor {
 static constexpr CommandId Id = 0x00000027;
 } // namespace UnboltDoor
+
+namespace SetAliroReaderConfig {
+static constexpr CommandId Id = 0x00000028;
+} // namespace SetAliroReaderConfig
+
+namespace ClearAliroReaderConfig {
+static constexpr CommandId Id = 0x00000029;
+} // namespace ClearAliroReaderConfig
 
 } // namespace Commands
 } // namespace DoorLock
@@ -1740,6 +1748,10 @@ namespace TestListNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000C;
 } // namespace TestListNestedStructListArgumentRequest
 
+namespace TestBatchHelperResponse {
+static constexpr CommandId Id = 0x0000000C;
+} // namespace TestBatchHelperResponse
+
 namespace TestListInt8UReverseRequest {
 static constexpr CommandId Id = 0x0000000D;
 } // namespace TestListInt8UReverseRequest
@@ -1775,6 +1787,14 @@ static constexpr CommandId Id = 0x00000014;
 namespace TestEmitTestFabricScopedEventRequest {
 static constexpr CommandId Id = 0x00000015;
 } // namespace TestEmitTestFabricScopedEventRequest
+
+namespace TestBatchHelperRequest {
+static constexpr CommandId Id = 0x00000016;
+} // namespace TestBatchHelperRequest
+
+namespace TestSecondBatchHelperRequest {
+static constexpr CommandId Id = 0x00000017;
+} // namespace TestSecondBatchHelperRequest
 
 } // namespace Commands
 } // namespace UnitTesting

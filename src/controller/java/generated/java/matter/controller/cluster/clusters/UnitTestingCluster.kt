@@ -20,11 +20,28 @@ package matter.controller.cluster.clusters
 import java.time.Duration
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
+import matter.controller.BooleanSubscriptionState
+import matter.controller.ByteArraySubscriptionState
+import matter.controller.ByteSubscriptionState
+import matter.controller.DoubleSubscriptionState
+import matter.controller.FloatSubscriptionState
+import matter.controller.IntSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
+import matter.controller.LongSubscriptionState
 import matter.controller.MatterController
 import matter.controller.ReadData
 import matter.controller.ReadRequest
+import matter.controller.ShortSubscriptionState
+import matter.controller.StringSubscriptionState
+import matter.controller.SubscribeRequest
+import matter.controller.SubscriptionState
+import matter.controller.UByteSubscriptionState
+import matter.controller.UIntSubscriptionState
+import matter.controller.ULongSubscriptionState
+import matter.controller.UShortSubscriptionState
 import matter.controller.WriteRequest
 import matter.controller.WriteRequests
 import matter.controller.WriteResponse
@@ -102,100 +119,466 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class TestEmitTestFabricScopedEventResponse(val value: ULong)
 
+  class TestBatchHelperResponse(val buffer: ByteArray)
+
   class ListInt8uAttribute(val value: List<UByte>)
+
+  sealed class ListInt8uAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : ListInt8uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : ListInt8uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ListInt8uAttributeSubscriptionState()
+  }
 
   class ListOctetStringAttribute(val value: List<ByteArray>)
 
+  sealed class ListOctetStringAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>) : ListOctetStringAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : ListOctetStringAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ListOctetStringAttributeSubscriptionState()
+  }
+
   class ListStructOctetStringAttribute(val value: List<UnitTestingClusterTestListStructOctet>)
+
+  sealed class ListStructOctetStringAttributeSubscriptionState {
+    data class Success(val value: List<UnitTestingClusterTestListStructOctet>) :
+      ListStructOctetStringAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : ListStructOctetStringAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ListStructOctetStringAttributeSubscriptionState()
+  }
 
   class ListNullablesAndOptionalsStructAttribute(
     val value: List<UnitTestingClusterNullablesAndOptionalsStruct>
   )
 
+  sealed class ListNullablesAndOptionalsStructAttributeSubscriptionState {
+    data class Success(val value: List<UnitTestingClusterNullablesAndOptionalsStruct>) :
+      ListNullablesAndOptionalsStructAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      ListNullablesAndOptionalsStructAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ListNullablesAndOptionalsStructAttributeSubscriptionState()
+  }
+
   class StructAttrAttribute(val value: UnitTestingClusterSimpleStruct)
+
+  sealed class StructAttrAttributeSubscriptionState {
+    data class Success(val value: UnitTestingClusterSimpleStruct) :
+      StructAttrAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : StructAttrAttributeSubscriptionState()
+
+    object SubscriptionEstablished : StructAttrAttributeSubscriptionState()
+  }
 
   class ListLongOctetStringAttribute(val value: List<ByteArray>)
 
+  sealed class ListLongOctetStringAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>) :
+      ListLongOctetStringAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : ListLongOctetStringAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ListLongOctetStringAttributeSubscriptionState()
+  }
+
   class ListFabricScopedAttribute(val value: List<UnitTestingClusterTestFabricScoped>)
+
+  sealed class ListFabricScopedAttributeSubscriptionState {
+    data class Success(val value: List<UnitTestingClusterTestFabricScoped>) :
+      ListFabricScopedAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : ListFabricScopedAttributeSubscriptionState()
+
+    object SubscriptionEstablished : ListFabricScopedAttributeSubscriptionState()
+  }
 
   class NullableBooleanAttribute(val value: Boolean?)
 
+  sealed class NullableBooleanAttributeSubscriptionState {
+    data class Success(val value: Boolean?) : NullableBooleanAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableBooleanAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableBooleanAttributeSubscriptionState()
+  }
+
   class NullableBitmap8Attribute(val value: UByte?)
+
+  sealed class NullableBitmap8AttributeSubscriptionState {
+    data class Success(val value: UByte?) : NullableBitmap8AttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableBitmap8AttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableBitmap8AttributeSubscriptionState()
+  }
 
   class NullableBitmap16Attribute(val value: UShort?)
 
+  sealed class NullableBitmap16AttributeSubscriptionState {
+    data class Success(val value: UShort?) : NullableBitmap16AttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableBitmap16AttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableBitmap16AttributeSubscriptionState()
+  }
+
   class NullableBitmap32Attribute(val value: UInt?)
+
+  sealed class NullableBitmap32AttributeSubscriptionState {
+    data class Success(val value: UInt?) : NullableBitmap32AttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableBitmap32AttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableBitmap32AttributeSubscriptionState()
+  }
 
   class NullableBitmap64Attribute(val value: ULong?)
 
+  sealed class NullableBitmap64AttributeSubscriptionState {
+    data class Success(val value: ULong?) : NullableBitmap64AttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableBitmap64AttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableBitmap64AttributeSubscriptionState()
+  }
+
   class NullableInt8uAttribute(val value: UByte?)
+
+  sealed class NullableInt8uAttributeSubscriptionState {
+    data class Success(val value: UByte?) : NullableInt8uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt8uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt8uAttributeSubscriptionState()
+  }
 
   class NullableInt16uAttribute(val value: UShort?)
 
+  sealed class NullableInt16uAttributeSubscriptionState {
+    data class Success(val value: UShort?) : NullableInt16uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt16uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt16uAttributeSubscriptionState()
+  }
+
   class NullableInt24uAttribute(val value: UInt?)
+
+  sealed class NullableInt24uAttributeSubscriptionState {
+    data class Success(val value: UInt?) : NullableInt24uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt24uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt24uAttributeSubscriptionState()
+  }
 
   class NullableInt32uAttribute(val value: UInt?)
 
+  sealed class NullableInt32uAttributeSubscriptionState {
+    data class Success(val value: UInt?) : NullableInt32uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt32uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt32uAttributeSubscriptionState()
+  }
+
   class NullableInt40uAttribute(val value: ULong?)
+
+  sealed class NullableInt40uAttributeSubscriptionState {
+    data class Success(val value: ULong?) : NullableInt40uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt40uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt40uAttributeSubscriptionState()
+  }
 
   class NullableInt48uAttribute(val value: ULong?)
 
+  sealed class NullableInt48uAttributeSubscriptionState {
+    data class Success(val value: ULong?) : NullableInt48uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt48uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt48uAttributeSubscriptionState()
+  }
+
   class NullableInt56uAttribute(val value: ULong?)
+
+  sealed class NullableInt56uAttributeSubscriptionState {
+    data class Success(val value: ULong?) : NullableInt56uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt56uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt56uAttributeSubscriptionState()
+  }
 
   class NullableInt64uAttribute(val value: ULong?)
 
+  sealed class NullableInt64uAttributeSubscriptionState {
+    data class Success(val value: ULong?) : NullableInt64uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt64uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt64uAttributeSubscriptionState()
+  }
+
   class NullableInt8sAttribute(val value: Byte?)
+
+  sealed class NullableInt8sAttributeSubscriptionState {
+    data class Success(val value: Byte?) : NullableInt8sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt8sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt8sAttributeSubscriptionState()
+  }
 
   class NullableInt16sAttribute(val value: Short?)
 
+  sealed class NullableInt16sAttributeSubscriptionState {
+    data class Success(val value: Short?) : NullableInt16sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt16sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt16sAttributeSubscriptionState()
+  }
+
   class NullableInt24sAttribute(val value: Int?)
+
+  sealed class NullableInt24sAttributeSubscriptionState {
+    data class Success(val value: Int?) : NullableInt24sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt24sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt24sAttributeSubscriptionState()
+  }
 
   class NullableInt32sAttribute(val value: Int?)
 
+  sealed class NullableInt32sAttributeSubscriptionState {
+    data class Success(val value: Int?) : NullableInt32sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt32sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt32sAttributeSubscriptionState()
+  }
+
   class NullableInt40sAttribute(val value: Long?)
+
+  sealed class NullableInt40sAttributeSubscriptionState {
+    data class Success(val value: Long?) : NullableInt40sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt40sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt40sAttributeSubscriptionState()
+  }
 
   class NullableInt48sAttribute(val value: Long?)
 
+  sealed class NullableInt48sAttributeSubscriptionState {
+    data class Success(val value: Long?) : NullableInt48sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt48sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt48sAttributeSubscriptionState()
+  }
+
   class NullableInt56sAttribute(val value: Long?)
+
+  sealed class NullableInt56sAttributeSubscriptionState {
+    data class Success(val value: Long?) : NullableInt56sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt56sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt56sAttributeSubscriptionState()
+  }
 
   class NullableInt64sAttribute(val value: Long?)
 
+  sealed class NullableInt64sAttributeSubscriptionState {
+    data class Success(val value: Long?) : NullableInt64sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableInt64sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableInt64sAttributeSubscriptionState()
+  }
+
   class NullableEnum8Attribute(val value: UByte?)
+
+  sealed class NullableEnum8AttributeSubscriptionState {
+    data class Success(val value: UByte?) : NullableEnum8AttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableEnum8AttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableEnum8AttributeSubscriptionState()
+  }
 
   class NullableEnum16Attribute(val value: UShort?)
 
+  sealed class NullableEnum16AttributeSubscriptionState {
+    data class Success(val value: UShort?) : NullableEnum16AttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableEnum16AttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableEnum16AttributeSubscriptionState()
+  }
+
   class NullableFloatSingleAttribute(val value: Float?)
+
+  sealed class NullableFloatSingleAttributeSubscriptionState {
+    data class Success(val value: Float?) : NullableFloatSingleAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableFloatSingleAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableFloatSingleAttributeSubscriptionState()
+  }
 
   class NullableFloatDoubleAttribute(val value: Double?)
 
+  sealed class NullableFloatDoubleAttributeSubscriptionState {
+    data class Success(val value: Double?) : NullableFloatDoubleAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableFloatDoubleAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableFloatDoubleAttributeSubscriptionState()
+  }
+
   class NullableOctetStringAttribute(val value: ByteArray?)
+
+  sealed class NullableOctetStringAttributeSubscriptionState {
+    data class Success(val value: ByteArray?) : NullableOctetStringAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableOctetStringAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableOctetStringAttributeSubscriptionState()
+  }
 
   class NullableCharStringAttribute(val value: String?)
 
+  sealed class NullableCharStringAttributeSubscriptionState {
+    data class Success(val value: String?) : NullableCharStringAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableCharStringAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableCharStringAttributeSubscriptionState()
+  }
+
   class NullableEnumAttrAttribute(val value: UByte?)
+
+  sealed class NullableEnumAttrAttributeSubscriptionState {
+    data class Success(val value: UByte?) : NullableEnumAttrAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableEnumAttrAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableEnumAttrAttributeSubscriptionState()
+  }
 
   class NullableStructAttribute(val value: UnitTestingClusterSimpleStruct?)
 
+  sealed class NullableStructAttributeSubscriptionState {
+    data class Success(val value: UnitTestingClusterSimpleStruct?) :
+      NullableStructAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : NullableStructAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableStructAttributeSubscriptionState()
+  }
+
   class NullableRangeRestrictedInt8uAttribute(val value: UByte?)
+
+  sealed class NullableRangeRestrictedInt8uAttributeSubscriptionState {
+    data class Success(val value: UByte?) :
+      NullableRangeRestrictedInt8uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      NullableRangeRestrictedInt8uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableRangeRestrictedInt8uAttributeSubscriptionState()
+  }
 
   class NullableRangeRestrictedInt8sAttribute(val value: Byte?)
 
+  sealed class NullableRangeRestrictedInt8sAttributeSubscriptionState {
+    data class Success(val value: Byte?) : NullableRangeRestrictedInt8sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      NullableRangeRestrictedInt8sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableRangeRestrictedInt8sAttributeSubscriptionState()
+  }
+
   class NullableRangeRestrictedInt16uAttribute(val value: UShort?)
+
+  sealed class NullableRangeRestrictedInt16uAttributeSubscriptionState {
+    data class Success(val value: UShort?) :
+      NullableRangeRestrictedInt16uAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      NullableRangeRestrictedInt16uAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableRangeRestrictedInt16uAttributeSubscriptionState()
+  }
 
   class NullableRangeRestrictedInt16sAttribute(val value: Short?)
 
+  sealed class NullableRangeRestrictedInt16sAttributeSubscriptionState {
+    data class Success(val value: Short?) :
+      NullableRangeRestrictedInt16sAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      NullableRangeRestrictedInt16sAttributeSubscriptionState()
+
+    object SubscriptionEstablished : NullableRangeRestrictedInt16sAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
+
+  sealed class GeneratedCommandListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : GeneratedCommandListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : GeneratedCommandListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : GeneratedCommandListAttributeSubscriptionState()
+  }
 
   class AcceptedCommandListAttribute(val value: List<UInt>)
 
+  sealed class AcceptedCommandListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : AcceptedCommandListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
+  }
+
   class EventListAttribute(val value: List<UInt>)
+
+  sealed class EventListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : EventListAttributeSubscriptionState()
+  }
 
   class AttributeListAttribute(val value: List<UInt>)
 
-  suspend fun test(timedInvokeTimeoutMs: Int? = null) {
+  sealed class AttributeListAttributeSubscriptionState {
+    data class Success(val value: List<UInt>) : AttributeListAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AttributeListAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AttributeListAttributeSubscriptionState()
+  }
+
+  suspend fun test(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 0u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -205,17 +588,15 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun testNotHandled(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testNotHandled(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 1u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -225,17 +606,15 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun testSpecific(timedInvokeTimeoutMs: Int? = null): TestSpecificResponse {
+  suspend fun testSpecific(timedInvokeTimeout: Duration? = null): TestSpecificResponse {
     val commandId: UInt = 2u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -245,7 +624,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -262,7 +641,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -276,10 +654,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return TestSpecificResponse(returnValue_decoded)
   }
 
-  suspend fun testUnknownCommand(timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testUnknownCommand(timedInvokeTimeout: Duration? = null) {
     val commandId: UInt = 3u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -289,7 +665,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -299,11 +675,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   suspend fun testAddArguments(
     arg1: UByte,
     arg2: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestAddArgumentsResponse {
     val commandId: UInt = 4u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -319,7 +693,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -336,7 +710,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -352,11 +725,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testSimpleArgumentRequest(
     arg1: Boolean,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestSimpleArgumentResponse {
     val commandId: UInt = 5u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -369,7 +740,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -386,7 +757,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_RETURN_VALUE)) {
         returnValue_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -407,11 +777,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     arg4: List<Boolean>,
     arg5: UByte,
     arg6: Boolean,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestStructArrayArgumentResponse {
     val commandId: UInt = 6u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -455,7 +823,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -535,7 +903,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_ARG6)) {
         arg6_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -578,11 +945,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testStructArgumentRequest(
     arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 7u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -595,7 +960,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -612,7 +977,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -628,11 +992,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNestedStructArgumentRequest(
     arg1: UnitTestingClusterNestedStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 8u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -645,7 +1007,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -662,7 +1024,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -678,11 +1039,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListStructArgumentRequest(
     arg1: List<UnitTestingClusterSimpleStruct>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 9u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -699,7 +1058,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -716,7 +1075,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -732,11 +1090,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListInt8UArgumentRequest(
     arg1: List<UByte>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 10u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -753,7 +1109,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -770,7 +1126,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -786,11 +1141,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNestedStructListArgumentRequest(
     arg1: UnitTestingClusterNestedStructList,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 11u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -803,7 +1156,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -820,7 +1173,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -836,11 +1188,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListNestedStructListArgumentRequest(
     arg1: List<UnitTestingClusterNestedStructList>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): BooleanResponse {
     val commandId: UInt = 12u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -857,7 +1207,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -874,7 +1224,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getBoolean(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -890,11 +1239,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testListInt8UReverseRequest(
     arg1: List<UByte>,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestListInt8UReverseResponse {
     val commandId: UInt = 13u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -911,7 +1258,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -935,7 +1282,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             tlvReader.exitContainer()
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -952,11 +1298,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
   suspend fun testEnumsRequest(
     arg1: UShort,
     arg2: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestEnumsResponse {
     val commandId: UInt = 14u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -972,7 +1316,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -996,7 +1340,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_ARG2)) {
         arg2_decoded = tlvReader.getUByte(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1016,11 +1359,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testNullableOptionalRequest(
     arg1: UByte?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestNullableOptionalResponse {
     val commandId: UInt = 15u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1033,7 +1374,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1106,7 +1447,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1138,11 +1478,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     nullableList: List<UByte>?,
     optionalList: List<UByte>?,
     nullableOptionalList: List<UByte>?,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestComplexNullableOptionalResponse {
     val commandId: UInt = 16u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1220,7 +1558,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1604,7 +1942,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
           }
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1693,11 +2030,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun simpleStructEchoRequest(
     arg1: UnitTestingClusterSimpleStruct,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): SimpleStructResponse {
     val commandId: UInt = 17u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1710,7 +2045,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1727,7 +2062,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = UnitTestingClusterSimpleStruct.fromTlv(tag, tlvReader)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1741,9 +2075,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return SimpleStructResponse(arg1_decoded)
   }
 
-  suspend fun timedInvokeRequest(timedInvokeTimeoutMs: Int) {
+  suspend fun timedInvokeRequest(timedInvokeTimeout: Duration) {
     val commandId: UInt = 18u
-    val timeoutMs: Duration = Duration.ofMillis(timedInvokeTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1753,17 +2086,18 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun testSimpleOptionalArgumentRequest(arg1: Boolean?, timedInvokeTimeoutMs: Int? = null) {
+  suspend fun testSimpleOptionalArgumentRequest(
+    arg1: Boolean?,
+    timedInvokeTimeout: Duration? = null
+  ) {
     val commandId: UInt = 19u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1776,7 +2110,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1787,11 +2121,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     arg1: UByte,
     arg2: UByte,
     arg3: Boolean,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestEmitTestEventResponse {
     val commandId: UInt = 20u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1810,7 +2142,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1827,7 +2159,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getULong(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1843,11 +2174,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun testEmitTestFabricScopedEventRequest(
     arg1: UByte,
-    timedInvokeTimeoutMs: Int? = null
+    timedInvokeTimeout: Duration? = null
   ): TestEmitTestFabricScopedEventResponse {
     val commandId: UInt = 21u
-    val timeoutMs: Duration =
-      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1860,7 +2189,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       InvokeRequest(
         CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
         tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timeoutMs
+        timedRequest = timedInvokeTimeout
       )
 
     val response: InvokeResponse = controller.invoke(request)
@@ -1877,7 +2206,6 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       if (tag == ContextSpecificTag(TAG_VALUE)) {
         value_decoded = tlvReader.getULong(tag)
       } else {
-        // Skip unknown tags
         tlvReader.skipElement()
       }
     }
@@ -1889,6 +2217,122 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     tlvReader.exitContainer()
 
     return TestEmitTestFabricScopedEventResponse(value_decoded)
+  }
+
+  suspend fun testBatchHelperRequest(
+    sleepBeforeResponseTimeMs: UShort,
+    sizeOfResponseBuffer: UShort,
+    fillCharacter: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestBatchHelperResponse {
+    val commandId: UInt = 22u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
+    tlvWriter.put(
+      ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
+      sleepBeforeResponseTimeMs
+    )
+
+    val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SIZE_OF_RESPONSE_BUFFER_REQ), sizeOfResponseBuffer)
+
+    val TAG_FILL_CHARACTER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_FILL_CHARACTER_REQ), fillCharacter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_BUFFER: Int = 0
+    var buffer_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_BUFFER)) {
+        buffer_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (buffer_decoded == null) {
+      throw IllegalStateException("buffer not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestBatchHelperResponse(buffer_decoded)
+  }
+
+  suspend fun testSecondBatchHelperRequest(
+    sleepBeforeResponseTimeMs: UShort,
+    sizeOfResponseBuffer: UShort,
+    fillCharacter: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestBatchHelperResponse {
+    val commandId: UInt = 23u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
+    tlvWriter.put(
+      ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
+      sleepBeforeResponseTimeMs
+    )
+
+    val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SIZE_OF_RESPONSE_BUFFER_REQ), sizeOfResponseBuffer)
+
+    val TAG_FILL_CHARACTER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_FILL_CHARACTER_REQ), fillCharacter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_BUFFER: Int = 0
+    var buffer_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_BUFFER)) {
+        buffer_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (buffer_decoded == null) {
+      throw IllegalStateException("buffer not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestBatchHelperResponse(buffer_decoded)
   }
 
   suspend fun readBooleanAttribute(): Boolean {
@@ -1922,10 +2366,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBooleanAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 0u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -1940,7 +2382,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -1960,6 +2402,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 0u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Boolean attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+          emit(BooleanSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -1995,10 +2487,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2013,7 +2503,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2033,6 +2523,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeBitmap8Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 1u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Bitmap8 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2068,10 +2608,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 2u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2086,7 +2624,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2106,6 +2644,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeBitmap16Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 2u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Bitmap16 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2141,10 +2729,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap32Attribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap32Attribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 3u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2159,7 +2745,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2179,6 +2765,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeBitmap32Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 3u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Bitmap32 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+          emit(UIntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2214,10 +2850,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeBitmap64Attribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeBitmap64Attribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 4u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2232,7 +2866,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2252,6 +2886,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeBitmap64Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 4u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Bitmap64 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2287,10 +2971,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 5u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2305,7 +2987,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2325,6 +3007,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 5u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int8u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2360,10 +3092,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt16uAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 6u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2378,7 +3108,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2398,6 +3128,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt16uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 6u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int16u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2433,10 +3213,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt24uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt24uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 7u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2451,7 +3229,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2471,6 +3249,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt24uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 7u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int24u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+          emit(UIntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2506,10 +3334,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt32uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt32uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 8u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2524,7 +3350,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2544,6 +3370,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt32uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 8u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int32u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+          emit(UIntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2579,10 +3455,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt40uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt40uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 9u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2597,7 +3471,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2617,6 +3491,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt40uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 9u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int40u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2652,10 +3576,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt48uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt48uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 10u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2670,7 +3592,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2690,6 +3612,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt48uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 10u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int48u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2725,10 +3697,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt56uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt56uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 11u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2743,7 +3713,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2763,6 +3733,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt56uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 11u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int56u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2798,10 +3818,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt64uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt64uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 12u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2816,7 +3834,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2836,6 +3854,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt64uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 12u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int64u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2871,10 +3939,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt8sAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 13u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2889,7 +3955,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2909,6 +3975,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt8sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 13u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int8s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Byte = tlvReader.getByte(AnonymousTag)
+
+          emit(ByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -2944,10 +4060,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt16sAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt16sAttribute(value: Short, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 14u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -2962,7 +4076,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -2982,6 +4096,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt16sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 14u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int16s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Short = tlvReader.getShort(AnonymousTag)
+
+          emit(ShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3017,10 +4181,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt24sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt24sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 15u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3035,7 +4197,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3055,6 +4217,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt24sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<IntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 15u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            IntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int24s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Int = tlvReader.getInt(AnonymousTag)
+
+          emit(IntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(IntSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3090,10 +4302,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt32sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt32sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3108,7 +4318,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3128,6 +4338,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt32sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<IntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            IntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int32s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Int = tlvReader.getInt(AnonymousTag)
+
+          emit(IntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(IntSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3163,10 +4423,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt40sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt40sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 17u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3181,7 +4439,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3201,6 +4459,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt40sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<LongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 17u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            LongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int40s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long = tlvReader.getLong(AnonymousTag)
+
+          emit(LongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(LongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3236,10 +4544,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt48sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt48sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 18u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3254,7 +4560,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3274,6 +4580,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt48sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<LongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 18u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            LongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int48s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long = tlvReader.getLong(AnonymousTag)
+
+          emit(LongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(LongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3309,10 +4665,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt56sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt56sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 19u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3327,7 +4681,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3347,6 +4701,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt56sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<LongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 19u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            LongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int56s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long = tlvReader.getLong(AnonymousTag)
+
+          emit(LongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(LongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3382,10 +4786,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeInt64sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeInt64sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 20u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3400,7 +4802,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3420,6 +4822,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeInt64sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<LongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 20u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            LongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Int64s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long = tlvReader.getLong(AnonymousTag)
+
+          emit(LongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(LongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3455,10 +4907,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEnum8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEnum8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 21u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3473,7 +4923,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3493,6 +4943,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeEnum8Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 21u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Enum8 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3528,10 +5028,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEnum16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEnum16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 22u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3546,7 +5044,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3566,6 +5064,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeEnum16Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 22u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Enum16 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3601,10 +5149,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeFloatSingleAttribute(value: Float, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeFloatSingleAttribute(value: Float, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 23u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3619,7 +5165,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3639,6 +5185,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeFloatSingleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<FloatSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 23u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            FloatSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Floatsingle attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Float = tlvReader.getFloat(AnonymousTag)
+
+          emit(FloatSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(FloatSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3674,10 +5270,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeFloatDoubleAttribute(value: Double, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeFloatDoubleAttribute(value: Double, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 24u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3692,7 +5286,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3712,6 +5306,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeFloatDoubleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<DoubleSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 24u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            DoubleSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Floatdouble attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Double = tlvReader.getDouble(AnonymousTag)
+
+          emit(DoubleSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(DoubleSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3747,10 +5391,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeOctetStringAttribute(value: ByteArray, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 25u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -3765,7 +5407,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3785,6 +5427,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ByteArraySubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 25u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ByteArraySubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Octetstring attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray = tlvReader.getByteArray(AnonymousTag)
+
+          emit(ByteArraySubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ByteArraySubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3827,10 +5519,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return ListInt8uAttribute(decodedValue)
   }
 
-  suspend fun writeListInt8uAttribute(value: List<UByte>, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeListInt8uAttribute(value: List<UByte>, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 26u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -3849,7 +5539,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3869,6 +5559,63 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeListInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ListInt8uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 26u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ListInt8uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Listint8u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(ListInt8uAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ListInt8uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -3913,11 +5660,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListOctetStringAttribute(
     value: List<ByteArray>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 27u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -3936,7 +5681,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -3956,6 +5701,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeListOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ListOctetStringAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 27u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ListOctetStringAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Listoctetstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ByteArray> =
+            buildList<ByteArray> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getByteArray(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(ListOctetStringAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ListOctetStringAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4000,11 +5804,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListStructOctetStringAttribute(
     value: List<UnitTestingClusterTestListStructOctet>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 28u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -4023,7 +5825,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4043,6 +5845,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeListStructOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ListStructOctetStringAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 28u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ListStructOctetStringAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Liststructoctetstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UnitTestingClusterTestListStructOctet> =
+            buildList<UnitTestingClusterTestListStructOctet> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(UnitTestingClusterTestListStructOctet.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(ListStructOctetStringAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ListStructOctetStringAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4078,10 +5939,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeLongOctetStringAttribute(value: ByteArray, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLongOctetStringAttribute(value: ByteArray, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 29u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4096,7 +5955,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4116,6 +5975,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeLongOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ByteArraySubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 29u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ByteArraySubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Longoctetstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray = tlvReader.getByteArray(AnonymousTag)
+
+          emit(ByteArraySubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ByteArraySubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4151,10 +6062,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeCharStringAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeCharStringAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 30u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4169,7 +6078,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4189,6 +6098,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeCharStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<StringSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 30u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            StringSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Charstring attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: String = tlvReader.getString(AnonymousTag)
+
+          emit(StringSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(StringSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4224,10 +6183,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeLongCharStringAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeLongCharStringAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 31u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4242,7 +6199,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4262,6 +6219,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeLongCharStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<StringSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 31u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            StringSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Longcharstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: String = tlvReader.getString(AnonymousTag)
+
+          emit(StringSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(StringSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4297,10 +6306,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEpochUsAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEpochUsAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 32u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4315,7 +6322,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4335,6 +6342,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeEpochUsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ULongSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 32u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ULongSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Epochus attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong = tlvReader.getULong(AnonymousTag)
+
+          emit(ULongSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ULongSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4370,10 +6427,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEpochSAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEpochSAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 33u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4388,7 +6443,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4408,6 +6463,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeEpochSAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 33u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Epochs attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+          emit(UIntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4443,10 +6548,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeVendorIdAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeVendorIdAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 34u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4461,7 +6564,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4481,6 +6584,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeVendorIdAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 34u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Vendorid attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4528,11 +6681,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListNullablesAndOptionalsStructAttribute(
     value: List<UnitTestingClusterNullablesAndOptionalsStruct>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 35u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -4551,7 +6702,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4571,6 +6722,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeListNullablesAndOptionalsStructAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ListNullablesAndOptionalsStructAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 35u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ListNullablesAndOptionalsStructAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Listnullablesandoptionalsstruct attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UnitTestingClusterNullablesAndOptionalsStruct> =
+            buildList<UnitTestingClusterNullablesAndOptionalsStruct> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(UnitTestingClusterNullablesAndOptionalsStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(ListNullablesAndOptionalsStructAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ListNullablesAndOptionalsStructAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4606,10 +6816,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeEnumAttrAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeEnumAttrAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 36u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4624,7 +6832,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4644,6 +6852,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeEnumAttrAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 36u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Enumattr attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4682,11 +6940,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeStructAttrAttribute(
     value: UnitTestingClusterSimpleStruct,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 37u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     value.toTlv(AnonymousTag, tlvWriter)
@@ -4701,7 +6957,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4721,6 +6977,57 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeStructAttrAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<StructAttrAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 37u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            StructAttrAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Structattr attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UnitTestingClusterSimpleStruct =
+            UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader)
+
+          emit(StructAttrAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(StructAttrAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4756,10 +7063,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt8uAttribute(
+    value: UByte,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 38u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4774,7 +7082,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4794,6 +7102,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeRangeRestrictedInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 38u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Rangerestrictedint8u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4829,10 +7189,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt8sAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 39u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4847,7 +7205,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4867,6 +7225,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeRangeRestrictedInt8sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 39u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Rangerestrictedint8s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Byte = tlvReader.getByte(AnonymousTag)
+
+          emit(ByteSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4902,10 +7312,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt16uAttribute(
+    value: UShort,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 40u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4920,7 +7331,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -4940,6 +7351,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeRangeRestrictedInt16uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 40u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Rangerestrictedint16u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -4975,10 +7438,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeRangeRestrictedInt16sAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeRangeRestrictedInt16sAttribute(
+    value: Short,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 41u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -4993,7 +7457,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5013,6 +7477,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeRangeRestrictedInt16sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 41u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Rangerestrictedint16s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Short = tlvReader.getShort(AnonymousTag)
+
+          emit(ShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ShortSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5057,11 +7573,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListLongOctetStringAttribute(
     value: List<ByteArray>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 42u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -5080,7 +7594,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5100,6 +7614,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeListLongOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ListLongOctetStringAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 42u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ListLongOctetStringAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Listlongoctetstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ByteArray> =
+            buildList<ByteArray> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getByteArray(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(ListLongOctetStringAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ListLongOctetStringAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5144,11 +7717,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeListFabricScopedAttribute(
     value: List<UnitTestingClusterTestFabricScoped>,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 43u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.startArray(AnonymousTag)
@@ -5167,7 +7738,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5187,6 +7758,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeListFabricScopedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ListFabricScopedAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 43u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ListFabricScopedAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Listfabricscoped attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UnitTestingClusterTestFabricScoped> =
+            buildList<UnitTestingClusterTestFabricScoped> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(UnitTestingClusterTestFabricScoped.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(ListFabricScopedAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ListFabricScopedAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5222,9 +7852,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeTimedWriteBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+  suspend fun writeTimedWriteBooleanAttribute(value: Boolean, timedWriteTimeout: Duration) {
     val ATTRIBUTE_ID: UInt = 48u
-    val timeoutMs: Duration = Duration.ofMillis(timedWriteTimeoutMs.toLong())
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5239,7 +7868,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5259,6 +7888,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeTimedWriteBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 48u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Timedwriteboolean attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+          emit(BooleanSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5294,10 +7975,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeGeneralErrorBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeGeneralErrorBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 49u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5312,7 +7994,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5332,6 +8014,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeGeneralErrorBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 49u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Generalerrorboolean attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+          emit(BooleanSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5367,10 +8101,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeClusterErrorBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeClusterErrorBooleanAttribute(
+    value: Boolean,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 50u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5385,7 +8120,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5405,6 +8140,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeClusterErrorBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 50u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Clustererrorboolean attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+          emit(BooleanSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5445,10 +8232,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeUnsupportedAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeUnsupportedAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 255u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5463,7 +8248,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5483,6 +8268,61 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeUnsupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 255u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Unsupported attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5524,10 +8364,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBooleanAttribute(decodedValue)
   }
 
-  suspend fun writeNullableBooleanAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBooleanAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16384u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5542,7 +8380,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5562,6 +8400,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableBooleanAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableBooleanAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16384u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableBooleanAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableboolean attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableBooleanAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableBooleanAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5603,10 +8499,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap8Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16385u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5621,7 +8515,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5641,6 +8535,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableBitmap8Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableBitmap8AttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16385u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableBitmap8AttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablebitmap8 attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableBitmap8AttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableBitmap8AttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5682,10 +8634,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap16Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16386u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5700,7 +8650,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5720,6 +8670,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableBitmap16Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableBitmap16AttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16386u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableBitmap16AttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablebitmap16 attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableBitmap16AttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableBitmap16AttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5761,10 +8769,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap32Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap32Attribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap32Attribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16387u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5779,7 +8785,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5799,6 +8805,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableBitmap32Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableBitmap32AttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16387u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableBitmap32AttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablebitmap32 attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUInt(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableBitmap32AttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableBitmap32AttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5840,10 +8904,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableBitmap64Attribute(decodedValue)
   }
 
-  suspend fun writeNullableBitmap64Attribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableBitmap64Attribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16388u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5858,7 +8920,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5878,6 +8940,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableBitmap64Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableBitmap64AttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16388u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableBitmap64AttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablebitmap64 attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableBitmap64AttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableBitmap64AttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5919,10 +9039,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt8uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16389u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -5937,7 +9055,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -5957,6 +9075,62 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt8uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16389u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt8uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Nullableint8u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt8uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt8uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -5998,10 +9172,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt16uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt16uAttribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt16uAttribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16390u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6016,7 +9188,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6036,6 +9208,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt16uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt16uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16390u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt16uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint16u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt16uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt16uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6077,10 +9307,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt24uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt24uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt24uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16391u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6095,7 +9323,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6115,6 +9343,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt24uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt24uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16391u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt24uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint24u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUInt(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt24uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt24uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6156,10 +9442,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt32uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt32uAttribute(value: UInt, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt32uAttribute(value: UInt, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16392u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6174,7 +9458,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6194,6 +9478,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt32uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt32uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16392u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt32uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint32u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUInt(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt32uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt32uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6235,10 +9577,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt40uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt40uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt40uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16393u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6253,7 +9593,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6273,6 +9613,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt40uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt40uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16393u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt40uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint40u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt40uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt40uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6314,10 +9712,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt48uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt48uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt48uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16394u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6332,7 +9728,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6352,6 +9748,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt48uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt48uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16394u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt48uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint48u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt48uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt48uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6393,10 +9847,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt56uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt56uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt56uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16395u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6411,7 +9863,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6431,6 +9883,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt56uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt56uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16395u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt56uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint56u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt56uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt56uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6472,10 +9982,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt64uAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt64uAttribute(value: ULong, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt64uAttribute(value: ULong, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16396u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6490,7 +9998,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6510,6 +10018,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt64uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt64uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16396u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt64uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint64u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ULong? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getULong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt64uAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt64uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6551,10 +10117,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt8sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt8sAttribute(value: Byte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt8sAttribute(value: Byte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16397u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6569,7 +10133,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6589,6 +10153,62 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt8sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt8sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16397u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt8sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Nullableint8s attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Byte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt8sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt8sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6630,10 +10250,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt16sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt16sAttribute(value: Short, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt16sAttribute(value: Short, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16398u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6648,7 +10266,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6668,6 +10286,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt16sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt16sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16398u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt16sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint16s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Short? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt16sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt16sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6709,10 +10385,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt24sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt24sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt24sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16399u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6727,7 +10401,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6747,6 +10421,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt24sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt24sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16399u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt24sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint24s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Int? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getInt(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt24sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt24sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6788,10 +10520,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt32sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt32sAttribute(value: Int, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt32sAttribute(value: Int, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16400u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6806,7 +10536,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6826,6 +10556,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt32sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt32sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16400u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt32sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint32s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Int? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getInt(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt32sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt32sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6867,10 +10655,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt40sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt40sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt40sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16401u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6885,7 +10671,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6905,6 +10691,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt40sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt40sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16401u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt40sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint40s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getLong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt40sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt40sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -6946,10 +10790,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt48sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt48sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt48sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16402u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -6964,7 +10806,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -6984,6 +10826,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt48sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt48sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16402u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt48sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint48s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getLong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt48sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt48sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7025,10 +10925,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt56sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt56sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt56sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16403u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7043,7 +10941,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7063,6 +10961,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt56sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt56sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16403u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt56sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint56s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getLong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt56sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt56sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7104,10 +11060,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableInt64sAttribute(decodedValue)
   }
 
-  suspend fun writeNullableInt64sAttribute(value: Long, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableInt64sAttribute(value: Long, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16404u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7122,7 +11076,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7142,6 +11096,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableInt64sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableInt64sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16404u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableInt64sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableint64s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Long? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getLong(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableInt64sAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableInt64sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7183,10 +11195,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableEnum8Attribute(decodedValue)
   }
 
-  suspend fun writeNullableEnum8Attribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableEnum8Attribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16405u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7201,7 +11211,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7221,6 +11231,62 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableEnum8Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableEnum8AttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16405u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableEnum8AttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Nullableenum8 attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableEnum8AttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableEnum8AttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7262,10 +11328,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableEnum16Attribute(decodedValue)
   }
 
-  suspend fun writeNullableEnum16Attribute(value: UShort, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableEnum16Attribute(value: UShort, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16406u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7280,7 +11344,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7300,6 +11364,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableEnum16Attribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableEnum16AttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16406u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableEnum16AttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableenum16 attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableEnum16AttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableEnum16AttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7341,10 +11463,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableFloatSingleAttribute(decodedValue)
   }
 
-  suspend fun writeNullableFloatSingleAttribute(value: Float, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableFloatSingleAttribute(value: Float, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16407u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7359,7 +11479,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7379,6 +11499,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableFloatSingleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableFloatSingleAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16407u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableFloatSingleAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablefloatsingle attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Float? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getFloat(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableFloatSingleAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableFloatSingleAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7420,10 +11598,11 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableFloatDoubleAttribute(decodedValue)
   }
 
-  suspend fun writeNullableFloatDoubleAttribute(value: Double, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableFloatDoubleAttribute(
+    value: Double,
+    timedWriteTimeout: Duration? = null
+  ) {
     val ATTRIBUTE_ID: UInt = 16408u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7438,7 +11617,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7458,6 +11637,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableFloatDoubleAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableFloatDoubleAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16408u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableFloatDoubleAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablefloatdouble attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Double? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getDouble(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableFloatDoubleAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableFloatDoubleAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7501,11 +11738,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableOctetStringAttribute(
     value: ByteArray,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16409u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7520,7 +11755,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7540,6 +11775,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableOctetStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableOctetStringAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16409u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableOctetStringAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableoctetstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getByteArray(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableOctetStringAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableOctetStringAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7581,10 +11874,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableCharStringAttribute(decodedValue)
   }
 
-  suspend fun writeNullableCharStringAttribute(value: String, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableCharStringAttribute(value: String, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16414u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7599,7 +11890,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7619,6 +11910,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableCharStringAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableCharStringAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16414u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableCharStringAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablecharstring attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: String? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getString(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableCharStringAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableCharStringAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7660,10 +12009,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return NullableEnumAttrAttribute(decodedValue)
   }
 
-  suspend fun writeNullableEnumAttrAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeNullableEnumAttrAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16420u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7678,7 +12025,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7698,6 +12045,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableEnumAttrAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableEnumAttrAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16420u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableEnumAttrAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullableenumattr attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableEnumAttrAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableEnumAttrAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7741,11 +12146,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableStructAttribute(
     value: UnitTestingClusterSimpleStruct,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16421u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     value.toTlv(AnonymousTag, tlvWriter)
@@ -7760,7 +12163,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7780,6 +12183,64 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableStructAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableStructAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16421u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableStructAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablestruct attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UnitTestingClusterSimpleStruct? =
+            if (!tlvReader.isNull()) {
+              UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(NullableStructAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableStructAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7823,11 +12284,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt8uAttribute(
     value: UByte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16422u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7842,7 +12301,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7862,6 +12321,66 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableRangeRestrictedInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableRangeRestrictedInt8uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16422u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableRangeRestrictedInt8uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablerangerestrictedint8u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let {
+            emit(NullableRangeRestrictedInt8uAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableRangeRestrictedInt8uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7905,11 +12424,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt8sAttribute(
     value: Byte,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16423u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -7924,7 +12441,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -7944,6 +12461,66 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableRangeRestrictedInt8sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableRangeRestrictedInt8sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16423u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableRangeRestrictedInt8sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablerangerestrictedint8s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Byte? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getByte(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let {
+            emit(NullableRangeRestrictedInt8sAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableRangeRestrictedInt8sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -7989,11 +12566,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt16uAttribute(
     value: UShort,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16424u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -8008,7 +12583,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8028,6 +12603,66 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableRangeRestrictedInt16uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableRangeRestrictedInt16uAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16424u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableRangeRestrictedInt16uAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablerangerestrictedint16u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let {
+            emit(NullableRangeRestrictedInt16uAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableRangeRestrictedInt16uAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -8073,11 +12708,9 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   suspend fun writeNullableRangeRestrictedInt16sAttribute(
     value: Short,
-    timedWriteTimeoutMs: Int? = null
+    timedWriteTimeout: Duration? = null
   ) {
     val ATTRIBUTE_ID: UInt = 16425u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -8092,7 +12725,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8112,6 +12745,66 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeNullableRangeRestrictedInt16sAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<NullableRangeRestrictedInt16sAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16425u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            NullableRangeRestrictedInt16sAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Nullablerangerestrictedint16s attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Short? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let {
+            emit(NullableRangeRestrictedInt16sAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(NullableRangeRestrictedInt16sAttributeSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -8152,10 +12845,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeWriteOnlyInt8uAttribute(value: UByte, timedWriteTimeoutMs: Int? = null) {
+  suspend fun writeWriteOnlyInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 16426u
-    val timeoutMs: Duration =
-      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
     val tlvWriter = TlvWriter()
     tlvWriter.put(AnonymousTag, value)
@@ -8170,7 +12861,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               tlvPayload = tlvWriter.getEncoded()
             )
           ),
-        timedRequest = timeoutMs
+        timedRequest = timedWriteTimeout
       )
 
     val response: WriteResponse = controller.write(writeRequests)
@@ -8190,6 +12881,63 @@ class UnitTestingCluster(private val controller: MatterController, private val e
         }
 
         throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeWriteOnlyInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 16426u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Writeonlyint8u attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
       }
     }
   }
@@ -8232,6 +12980,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return GeneratedCommandListAttribute(decodedValue)
   }
 
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<GeneratedCommandListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65528u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            GeneratedCommandListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Generatedcommandlist attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(GeneratedCommandListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(GeneratedCommandListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     val ATTRIBUTE_ID: UInt = 65529u
 
@@ -8268,6 +13075,65 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       }
 
     return AcceptedCommandListAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AcceptedCommandListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65529u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AcceptedCommandListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Acceptedcommandlist attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(AcceptedCommandListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
@@ -8308,6 +13174,63 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return EventListAttribute(decodedValue)
   }
 
+  suspend fun subscribeEventListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<EventListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65530u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            EventListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(EventListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
     val ATTRIBUTE_ID: UInt = 65531u
 
@@ -8346,6 +13269,63 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return AttributeListAttribute(decodedValue)
   }
 
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AttributeListAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65531u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AttributeListAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Attributelist attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UInt> =
+            buildList<UInt> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUInt(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(AttributeListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AttributeListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readFeatureMapAttribute(): UInt {
     val ATTRIBUTE_ID: UInt = 65532u
 
@@ -8377,6 +13357,56 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
+  suspend fun subscribeFeatureMapAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UIntSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65532u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UIntSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Featuremap attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+          emit(UIntSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UIntSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
   suspend fun readClusterRevisionAttribute(): UShort {
     val ATTRIBUTE_ID: UInt = 65533u
 
@@ -8406,6 +13436,58 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
 
     return decodedValue
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 65533u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Clusterrevision attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+          emit(UShortSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   companion object {

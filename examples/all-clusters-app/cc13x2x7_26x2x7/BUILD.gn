@@ -79,11 +79,14 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/ClusterManager.cpp",
@@ -105,10 +108,15 @@ ti_simplelink_executable("all-clusters-app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
   }
 
+  if (custom_factory_data) {
+    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
+  }
+
   include_dirs = [
     "${project_dir}",
     "${project_dir}/main",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
     "${chip_root}/examples/providers/",
   ]
 

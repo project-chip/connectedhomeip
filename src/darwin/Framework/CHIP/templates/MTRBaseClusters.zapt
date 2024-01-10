@@ -30,14 +30,20 @@ NS_ASSUME_NONNULL_BEGIN
  * {{description}}
  */
 - (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField }}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#if (and (isStrEqual command "KeySetReadAllIndices")
            (isStrEqual cluster "GroupKeyManagement"))}}
 {{availability cluster command=command minimalRelease="Fall 2023"}};
 {{else}}
+{{#if (isInConfigList
+       (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+       "LegacyCommandsWithOnlyOptionalArguments")}}
+{{availability cluster command=command minimalRelease="Early 2024"}};
+{{else}}
 {{availability cluster command=command minimalRelease="First major API revamp"}};
+{{/if}}
 {{/if}}
 {{/unless}}
 {{/if}}
@@ -217,12 +223,17 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
            (isSupported cluster command=command))}}
 - (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField }}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
     {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:completion:")}};
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
+{{! No need for these backwards-compat APIs for commands that never shipped them. }}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
 - (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
     {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithCompletion:")}};
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/if}}

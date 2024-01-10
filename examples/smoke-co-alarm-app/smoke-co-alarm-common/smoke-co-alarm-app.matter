@@ -1208,8 +1208,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
@@ -1746,6 +1746,9 @@ cluster IcdManagement = 70 {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
     fabric_idx fabricIndex = 254;
+  }
+
+  critical event OnTransitionToActiveMode = 0 {
   }
 
   readonly attribute int32u idleModeDuration = 0;

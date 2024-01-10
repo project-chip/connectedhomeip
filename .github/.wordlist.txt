@@ -130,6 +130,7 @@ BarrierControl
 BasicCHIPRegression
 BasicInformation
 baudrate
+BCM
 BD
 BDX
 BDXDownloader
@@ -248,6 +249,7 @@ CKIT
 CLA
 clapre
 CLI
+CLIs
 cloudbuild
 CLRF
 clusterAttrs
@@ -264,6 +266,7 @@ CMS
 CMSIS
 CMVH
 cn
+COAP
 codeaurora
 codebase
 codegen
@@ -298,8 +301,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -655,13 +658,13 @@ iaszone
 ibb
 ICA
 ICD
+ICDs
 iCloud
 ICMP
 IDF
 IDL
 IDLs
 idt
-IDT
 idx
 ifconfig
 ifdef
@@ -793,7 +796,6 @@ LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
 lladdr
-LLADDR
 LocalConfigDisabled
 localedef
 localhost
@@ -914,6 +916,7 @@ namespacing
 nano
 natively
 navpad
+NCP
 ncs
 nding
 NDK
@@ -1021,6 +1024,7 @@ PairDevice
 PAIs
 PAKE
 palletsprojects
+PANID
 pankore
 param
 params
@@ -1157,8 +1161,8 @@ REPL
 repo
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1213,8 +1217,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1227,6 +1231,7 @@ SendNewInputEvent
 sendto
 seqdiag
 SERIALDEVICE
+serialno
 SerialNumber
 ServiceId
 SetDns
@@ -1336,12 +1341,14 @@ systime
 sysv
 TargetNavigator
 TBD
+tbody
 tcl
 TCP
 teardown
 Telink
 TemperatureMeasurement
 templating
+Tera
 testability
 TestArray
 TestCluster
@@ -1470,6 +1477,7 @@ utils
 UUID
 ux
 validator
+vcom
 VCP
 Vectorcall
 VendorID
@@ -1497,6 +1505,7 @@ WantedBy
 watchdogTimeout
 watchOS
 webpage
+wf
 wg
 wget
 whde

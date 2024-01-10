@@ -247,7 +247,6 @@ public:
     static void TestCommandInvalidMessage3(nlTestSuite * apSuite, void * apContext);
     static void TestCommandInvalidMessage4(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerInvalidMessageSync(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
@@ -1079,48 +1078,14 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageSync(nlTestSuite * 
     mockCommandSenderDelegate.ResetCounter();
     app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
 
+    chip::isCommandDispatched = false;
     AddInvalidInvokeRequestData(apSuite, apContext, &commandSender);
     err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
-                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
-    NL_TEST_ASSERT(apSuite, mockCommandSenderDelegate.mError == CHIP_IM_GLOBAL_STATUS(InvalidAction));
-    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
-}
-
-// Command Sender sends malformed invoke request, this command is aysnc command, handler fails to process it and sends status
-// report with invalid action
-void TestCommandInteraction::TestCommandHandlerInvalidMessageAsync(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-
-    mockCommandSenderDelegate.ResetCounter();
-    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
-    asyncCommand = true;
-    AddInvalidInvokeRequestData(apSuite, apContext, &commandSender);
-    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    ctx.DrainAndServiceIO();
-
-    // Error status response has been sent already; it's not waiting for the handle.
-    NL_TEST_ASSERT(apSuite,
-                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
-                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
-    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 1);
-    NL_TEST_ASSERT(apSuite, asyncCommand == false);
-
-    // Decrease CommandHandler refcount. No additional message should be sent since error response already sent.
-    asyncCommandHandle = nullptr;
-
-    ctx.DrainAndServiceIO();
-
+    NL_TEST_ASSERT(apSuite, !chip::isCommandDispatched);
     NL_TEST_ASSERT(apSuite,
                    mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
                        mockCommandSenderDelegate.onErrorCalledTimes == 1);
@@ -1725,7 +1690,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandSenderCommandFailureResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandFailureResponseFlow),
     NL_TEST_DEF("TestCommandSenderAbruptDestruction", chip::app::TestCommandInteraction::TestCommandSenderAbruptDestruction),
     NL_TEST_DEF("TestCommandHandlerInvalidMessageSync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageSync),
-    NL_TEST_DEF("TestCommandHandlerInvalidMessageAsync", chip::app::TestCommandInteraction::TestCommandHandlerInvalidMessageAsync),
     NL_TEST_SENTINEL()
 };
 // clang-format on
