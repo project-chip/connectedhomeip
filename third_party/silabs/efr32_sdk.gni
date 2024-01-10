@@ -652,7 +652,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emlib/src/em_timer.c",
       "${efr32_sdk_root}/platform/peripheral/src/peripheral_sysrtc.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/pa-conversions/pa_conversions_efr32.c",
-   #   "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
+      "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_power_manager_init/sl_rail_util_power_manager_init.c",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti/sl_rail_util_pti.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/crypto_ecp.c",
       "${efr32_sdk_root}/platform/security/sl_component/sl_mbedtls_support/src/error.c",
