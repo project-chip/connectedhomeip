@@ -26,7 +26,6 @@
 #include "sl_status.h"
 #include "spi_multiplex.h"
 
-
 #if defined(CHIP_9117)
 #include "sl_board_configuration_SiWx917.h"
 #else
