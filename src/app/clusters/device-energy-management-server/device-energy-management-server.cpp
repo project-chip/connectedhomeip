@@ -336,7 +336,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     /* earliestStartTime is optional based on the StartTimeAdjust (STA) feature AND is nullable */
     if (!(forecast.earliestStartTime.HasValue()) || !(forecast.latestEndTime.HasValue()))
     {
-        /* These should not be NULL since this command requires STA feature and these are mandatory for that */
+        /* These should have values, since this command requires STA feature and these are mandatory for that */
         ChipLogError(Zcl, "DEM: EarliestStartTime / LatestEndTime do not have values");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
