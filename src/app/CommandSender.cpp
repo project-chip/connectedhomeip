@@ -68,10 +68,11 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
     assertChipStackLockedByCurrentThread();
 }
 
-CommandSender::CommandSender(ExtendedCallback * apExtendedCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
-                             bool aSuppressResponse) :
+CommandSender::CommandSender(ExtendedCallback * apExtendedCallback, Messaging::ExchangeManager * apExchangeMgr,
+                             bool aIsTimedRequest, bool aSuppressResponse) :
     mExchangeCtx(*this),
-    mpExtendedCallback(apExtendedCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
+    mpExtendedCallback(apExtendedCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
+    mTimedRequest(aIsTimedRequest)
 {
     assertChipStackLockedByCurrentThread();
     mUsingExtendedCallbacks = true;

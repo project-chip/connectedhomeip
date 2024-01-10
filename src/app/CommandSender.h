@@ -146,7 +146,6 @@ public:
         CHIP_ERROR mChipError;
     };
 
-
     /**
      * @brief asdf
      *
@@ -193,9 +192,8 @@ public:
          * @param[in] aAdditionalResponseData
          *                            Additional response data that comes within the InvokeResponseMessage.
          */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                                const StatusIB & aStatusIB, TLV::TLVReader * apData,
-                                const AdditionalResponseData & aAdditionalResponseData)
+        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
+                                TLV::TLVReader * apData, const AdditionalResponseData & aAdditionalResponseData)
         {}
 
         /**
@@ -295,7 +293,9 @@ public:
     CommandSender(ExtendedCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false) : CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse) {}
+                  bool aSuppressResponse = false) :
+        CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
+    {}
     ~CommandSender();
 
     /**
@@ -520,8 +520,7 @@ private:
 
     CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
 
-    void OnResponseCallback(const ConcreteCommandPath & aPath,
-                            const StatusIB & aStatusIB, TLV::TLVReader * apData,
+    void OnResponseCallback(const ConcreteCommandPath & aPath, const StatusIB & aStatusIB, TLV::TLVReader * apData,
                             const AdditionalResponseData & aAdditionalResponseData)
     {
         if (mUsingExtendedCallbacks)
@@ -544,7 +543,7 @@ private:
         {
             if (mpExtendedCallback)
             {
-                ErrorData errorData = {aError};
+                ErrorData errorData = { aError };
                 mpExtendedCallback->OnError(this, errorData);
             }
             return;

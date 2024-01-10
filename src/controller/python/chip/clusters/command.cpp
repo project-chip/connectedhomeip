@@ -82,9 +82,8 @@ public:
         mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
     {}
 
-    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                    const app::StatusIB & aStatus, TLV::TLVReader * aData,
-                    const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
+                    TLV::TLVReader * aData, const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
@@ -99,7 +98,7 @@ public:
             err = writer.CopyContainer(TLV::AnonymousTag(), *aData);
             if (err != CHIP_NO_ERROR)
             {
-                CommandSender::ErrorData errorData = {err};
+                CommandSender::ErrorData errorData = { err };
                 this->OnError(apCommandSender, errorData);
                 return;
             }
@@ -110,14 +109,14 @@ public:
         // for more information on why see https://github.com/project-chip/connectedhomeip/issues/30991.
         if (!mIsBatchedCommands && !aStatus.IsSuccess())
         {
-            CommandSender::ErrorData errorData = {aStatus.ToChipError()};
+            CommandSender::ErrorData errorData = { aStatus.ToChipError() };
             this->OnError(apCommandSender, errorData);
             return;
         }
 
         if (err != CHIP_NO_ERROR)
         {
-            CommandSender::ErrorData errorData = {err};
+            CommandSender::ErrorData errorData = { err };
             this->OnError(apCommandSender, errorData);
             return;
         }
@@ -127,7 +126,7 @@ public:
         err                         = GetIndexFromCommandRef(commandRef, index);
         if (err != CHIP_NO_ERROR && mIsBatchedCommands)
         {
-            CommandSender::ErrorData errorData = {err};
+            CommandSender::ErrorData errorData = { err };
             this->OnError(apCommandSender, errorData);
             return;
         }
