@@ -149,7 +149,7 @@ public:
 
     /**
      * @brief asdf
-     * 
+     *
      * The two major differences between ExtendedCallback and Callback are:
      * 1. Path-specific errors go to OnResponse instead of OnError
      *       - Note: Non-path-specific errors still go to OnError.
