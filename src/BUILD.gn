@@ -38,6 +38,11 @@ config("includes") {
     "${root_gen_dir}/include",
   ]
 
+  if (chip_device_platform == "external" &&
+      chip_external_platform_include_dir != "") {
+    include_dirs += [ "${chip_external_platform_include_dir}" ]
+  }
+
   # TODO: generated file dependency should be a lib NOT an include
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 

@@ -93,26 +93,26 @@ Davis, CA 95616, USA
   </features>
   <dataTypes>
     <enum name="DelayedAllOffEffectVariantEnum">
-      <item value="0" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
+      <item value="0x00" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
         <mandatoryConform/>
       </item>
-      <item value="1" name="NoFade" summary="No fade">
+      <item value="0x01" name="NoFade" summary="No fade">
         <mandatoryConform/>
       </item>
-      <item value="2" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
+      <item value="0x02" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="DyingLightEffectVariantEnum">
-      <item value="0" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
+      <item value="0x00" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="EffectIdentifierEnum">
-      <item value="0" name="DelayedAllOff" summary="Delayed All Off">
+      <item value="0x00" name="DelayedAllOff" summary="Delayed All Off">
         <mandatoryConform/>
       </item>
-      <item value="1" name="DyingLight" summary="Dying Light">
+      <item value="0x01" name="DyingLight" summary="Dying Light">
         <mandatoryConform/>
       </item>
     </enum>

@@ -57,7 +57,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    javaCallbackRef = cppCallback->javaCallbackRef;
     VerifyOrReturn(javaCallbackRef != nullptr, ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
     jmethodID javaMethod;
@@ -83,7 +83,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context), maybeDestroy);
 
         // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        javaCallbackRef = cppCallback->javaCallbackRef;
         VerifyOrReturn(javaCallbackRef != nullptr, ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
 
         jmethodID javaMethod;

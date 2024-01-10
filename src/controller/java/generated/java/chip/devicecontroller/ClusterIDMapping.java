@@ -6060,7 +6060,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            OnTransitionToActiveMode(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -8934,6 +8935,7 @@ public class ClusterIDMapping {
             TargetLevel(7L),
             DefaultOpenLevel(8L),
             ValveFault(9L),
+            LevelStep(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9894,6 +9896,15 @@ public class ClusterIDMapping {
             SendPINOverTheAir(50L),
             RequirePINforRemoteOperation(51L),
             ExpiringUserTimeout(53L),
+            AliroReaderVerificationKey(128L),
+            AliroReaderGroupIdentifier(129L),
+            AliroReaderGroupSubIdentifier(130L),
+            AliroExpeditedTransactionSupportedProtocolVersions(131L),
+            AliroGroupResolvingKey(132L),
+            AliroSupportedBLEUWBProtocolVersions(133L),
+            AliroBLEAdvertisingVersion(134L),
+            NumberOfAliroCredentialIssuerKeysSupported(135L),
+            NumberOfAliroEndpointKeysSupported(136L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9963,7 +9974,9 @@ public class ClusterIDMapping {
             SetCredential(34L),
             GetCredentialStatus(36L),
             ClearCredential(38L),
-            UnboltDoor(39L),;
+            UnboltDoor(39L),
+            SetAliroReaderConfig(40L),
+            ClearAliroReaderConfig(41L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10298,6 +10311,23 @@ public class ClusterIDMapping {
                     }
                     public static UnboltDoorCommandField value(int id) throws NoSuchFieldError {
                         for (UnboltDoorCommandField field : UnboltDoorCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetAliroReaderConfigCommandField {SigningKey(0),VerificationKey(1),GroupIdentifier(2),GroupResolvingKey(3),;
+                    private final int id;
+                    SetAliroReaderConfigCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetAliroReaderConfigCommandField value(int id) throws NoSuchFieldError {
+                        for (SetAliroReaderConfigCommandField field : SetAliroReaderConfigCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -16053,7 +16083,9 @@ public class ClusterIDMapping {
             TimedInvokeRequest(18L),
             TestSimpleOptionalArgumentRequest(19L),
             TestEmitTestEventRequest(20L),
-            TestEmitTestFabricScopedEventRequest(21L),;
+            TestEmitTestFabricScopedEventRequest(21L),
+            TestBatchHelperRequest(22L),
+            TestSecondBatchHelperRequest(23L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -16354,6 +16386,40 @@ public class ClusterIDMapping {
                     }
                     public static TestEmitTestFabricScopedEventRequestCommandField value(int id) throws NoSuchFieldError {
                         for (TestEmitTestFabricScopedEventRequestCommandField field : TestEmitTestFabricScopedEventRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestBatchHelperRequestCommandField {SleepBeforeResponseTimeMs(0),SizeOfResponseBuffer(1),FillCharacter(2),;
+                    private final int id;
+                    TestBatchHelperRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestBatchHelperRequestCommandField field : TestBatchHelperRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestSecondBatchHelperRequestCommandField {SleepBeforeResponseTimeMs(0),SizeOfResponseBuffer(1),FillCharacter(2),;
+                    private final int id;
+                    TestSecondBatchHelperRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestSecondBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestSecondBatchHelperRequestCommandField field : TestSecondBatchHelperRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

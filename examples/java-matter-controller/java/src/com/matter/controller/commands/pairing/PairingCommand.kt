@@ -18,6 +18,7 @@
 package com.matter.controller.commands.pairing
 
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ICDDeviceInfo
 import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import com.matter.controller.commands.common.CredentialsIssuer
@@ -185,10 +186,15 @@ abstract class PairingCommand(
       .updateCommissioningICDRegistrationInfo(ICDRegistrationInfo.newBuilder().build())
   }
 
-  override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
+  override fun onICDRegistrationComplete(
+    errorCode: Int,
+    icdNodeId: Long,
+    icdCounter: Long,
+    icdDeviceInfo: ICDDeviceInfo
+  ) {
     logger.log(
       Level.INFO,
-      "onICDRegistrationComplete with icdNodeId: $icdNodeId, icdCounter: $icdCounter"
+      "onICDRegistrationComplete with errorCode: $errorCode, icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${icdDeviceInfo.symmetricKey.toHex()}"
     )
   }
 
@@ -243,6 +249,9 @@ abstract class PairingCommand(
   fun getUseOnlyOnNetworkDiscovery(): Boolean {
     return useOnlyOnNetworkDiscovery.get()
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   companion object {
     private val logger = Logger.getLogger(PairingCommand::class.java.name)
