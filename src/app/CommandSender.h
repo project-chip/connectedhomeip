@@ -199,7 +199,7 @@ public:
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
-         * 
+         *
          * NOTE: Path specific error do NOT come to OnError, but instead go to OnResponse.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
