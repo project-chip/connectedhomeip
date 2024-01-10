@@ -43,7 +43,6 @@
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
-
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
