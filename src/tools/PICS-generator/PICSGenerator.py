@@ -28,8 +28,10 @@ from rich.console import Console
 # Add the path to python_testing folder, in order to be able to import from matter_testing_support
 sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
+from spec_parsing_support import build_xml_clusters  # noqa: E402
 
 console = None
+xml_clusters = None
 
 
 def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, attributePicsList, acceptedCommandPicsList, generatedCommandPicsList, outputPathStr):
@@ -40,17 +42,22 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     print(f"Handling PICS for {clusterName}")
 
     # Map clusters to common XML template if needed
-    otaProviderCluster = "OTA Software Update Provider Cluster"
-    otaRequestorCluster = "OTA Software Update Requestor Cluster"
-    onOffCluster = "On/Off Cluster"
-    groupKeyManagementCluster = "Group Key Management Cluster"
-    nodeOperationalCredentialsCluster = "Node Operational Credentials Cluster"
-    basicInformationCluster = "Basic Information Cluster"
-    networkCommissioningCluster = "Network Commissioning Cluster"
-    diagnosticLogsCluster = "Diagnostic Logs Cluster"
-    thermostatUserInterfaceConfigurationCluster = "Thermostat User Interface Configuration Cluster"
-    wakeOnLANCluster = "Wake On LAN Cluster"
-    lowPowerCluster = "Low Power Cluster"
+    # basicInformationCluster = "Basic Information Cluster"
+    # networkCommissioningCluster = "Network Commissioning Cluster"
+
+    accessControlCluster = "AccessControl"
+    diagnosticLogsCluster = "Diagnostic Logs"
+    groupKeyManagementCluster = "GroupKeyManagement"
+    lowPowerCluster = "Low Power"
+    onOffCluster = "On/Off"
+    operationalCredentialsCluster = "Operational Credentials"
+    otaProviderCluster = "OTA Software Update Provider"
+    otaRequestorCluster = "OTA Software Update Requestor"
+    thermostatUserInterfaceConfigurationCluster = "Thermostat User Interface Configuration"
+    wakeOnLANCluster = "Wake on LAN"
+
+    if accessControlCluster in clusterName:
+        clusterName = "Access Control"
 
     if otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
         clusterName = "OTA Software Update"
@@ -70,8 +77,11 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     elif wakeOnLANCluster == clusterName or lowPowerCluster == clusterName:
         clusterName = "Media Cluster"
 
-    elif nodeOperationalCredentialsCluster == clusterName or basicInformationCluster == clusterName or networkCommissioningCluster == clusterName:
-        clusterName = clusterName.replace("Cluster", "").strip()
+    elif operationalCredentialsCluster == clusterName:
+        clusterName = "Node Operational Credentials"
+
+    # elif basicInformationCluster == clusterName or networkCommissioningCluster == clusterName:
+    #     clusterName = clusterName.replace("Cluster", "").strip()
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
@@ -276,18 +286,16 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
                 console.print(f"[red]Cluster class not found for ({clusterID}) not found! ❌")
                 continue
 
-            # Does the clusterInfoDict contain the found cluster ID?
-            if clusterID not in clusterInfoDict:
-                console.print(f"[red]Cluster ID ({clusterID}) not in list! ❌")
+            # Does the the DM XML contain the found cluster ID?
+            try:
+                clusterName = xml_clusters[server].name
+                clusterPICS = f"{xml_clusters[server].pics}{serverTag}"
+
+            except KeyError:
+                console.print(f"[red]Cluster ({clusterID}) not found in DM XML! ❌")
                 continue
 
-            clusterName = clusterInfoDict[clusterID]['Name']
-            clusterPICS = f"{clusterInfoDict[clusterID]['PICS_Code']}{serverTag}"
-
             console.print(f"{clusterName} - {clusterPICS}")
-
-            # Print PICS for specific server from dict
-            # console.print(clusterInfoDict[f"0x{server:04x}"])
 
             # Read feature map
             featureMapResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.FeatureMap)])
@@ -357,8 +365,14 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
         for client in clientList:
             clusterID = f"0x{client:04x}"
-            clusterName = clusterInfoDict[clusterID]['Name']
-            clusterPICS = f"{clusterInfoDict[clusterID]['PICS_Code']}{clientTag}"
+
+            try:
+                clusterName = xml_clusters[client].name
+                clusterPICS = f"{xml_clusters[client].pics}{clientTag}"
+
+            except KeyError:
+                console.print(f"[red]Cluster ({clusterID}) not found in DM XML! ❌")
+                continue
 
             console.print(f"{clusterName} - {clusterPICS}")
 
@@ -375,13 +389,9 @@ def cleanDirectory(pathToClean):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--cluster-data', required=True)
 parser.add_argument('--pics-template', required=True)
 parser.add_argument('--pics-output', required=True)
 args, unknown = parser.parse_known_args()
-
-basePath = os.path.dirname(__file__)
-clusterInfoInputPathStr = args.cluster_data
 
 xmlTemplatePathStr = args.pics_template
 if not xmlTemplatePathStr.endswith('/'):
@@ -410,31 +420,6 @@ generatedCommandListAttributeId = "0xFFF8"
 # Endpoint define
 rootNodeEndpointID = 0
 
-# Load cluster info
-inputJson = {}
-clusterInfoDict = {}
-
-print("Generating cluster data dict from JSON input")
-
-with open(clusterInfoInputPathStr, 'rb') as clusterInfoInputFile:
-    clusterInfoJson = json.load(clusterInfoInputFile)
-
-    for cluster in clusterInfoJson:
-        clusterData = clusterInfoJson[f"{cluster}"]["Data created by Script"]
-
-        try:
-            # Check if cluster id is a value hex value
-            clusterIdValid = int(clusterData["Id"].lower(), 16)
-
-            # Add cluster data to dict
-            clusterInfoDict[clusterData["Id"].lower()] = {
-                "Name": clusterData["Cluster Name"],
-                "PICS_Code": clusterData["PICS Code"],
-            }
-
-        except ValueError:
-            print(f"Ignore ClusterID: {clusterData['Id']} - {clusterData['Cluster Name']}")
-
 # Load PICS XML templates
 print("Capture list of PICS XML templates")
 xmlFileList = os.listdir(xmlTemplatePathStr)
@@ -458,6 +443,9 @@ class DeviceMappingTest(MatterBaseTest):
         # Create console to print
         global console
         console = Console()
+
+        global xml_clusters
+        xml_clusters, problems = build_xml_clusters()
 
         # Run device mapping function
         await DeviceMapping(self.default_controller, self.dut_node_id, outputPathStr)
