@@ -24,13 +24,13 @@ import sys
 from types import SimpleNamespace
 
 import cryptography.x509
-from bitarray import bitarray
-from bitarray.util import ba2int
 from esp_secure_cert.tlv_format import generate_partition_ds, generate_partition_no_ds, tlv_priv_key_t, tlv_priv_key_type_t
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
+sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'src', 'setup_payload', 'python'))
+from generate_setup_payload import CommissioningFlow, SetupPayload  # noqa: E402 isort:skip
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
@@ -47,11 +47,11 @@ INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444, 55555555,
 
 TOOLS = {}
 
-
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
 NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
 ESP_SECURE_CERT_PARTITION_BIN = 'esp_secure_cert_partititon.bin'
+ONBOARDING_DATA_FILE = 'onboarding_codes.csv'
 
 FACTORY_DATA = {
     # CommissionableDataProvider
@@ -480,6 +480,12 @@ def get_args():
                         help='Do not generate the factory partition binary')
     parser.add_argument('--output_dir', type=str, default='bin', help='Created image output file path')
 
+    parser.add_argument('-cf', '--commissioning-flow', type=any_base_int, default=0,
+                        help='Device commissioning flow, 0:Standard, 1:User-Intent, 2:Custom. \
+                                          Default is 0.', choices=[0, 1, 2])
+    parser.add_argument('-dm', '--discovery-mode', type=any_base_int, default=1,
+                        help='Commissionable device discovery networking technology. \
+                                         0:WiFi-SoftAP, 1:BLE, 2:On-network. Default is BLE.', choices=[0, 1, 2])
     parser.set_defaults(generate_bin=True)
 
     return parser.parse_args()
@@ -511,11 +517,33 @@ def set_up_out_dirs(args):
     os.makedirs(args.output_dir, exist_ok=True)
 
 
+def generate_onboarding_data(args):
+    if (args.vendor_id and args.product_id):
+        payloads = SetupPayload(args.discriminator, args.passcode, args.discovery_mode, CommissioningFlow(args.commissioning_flow),
+                                args.vendor_id, args.product_id)
+    else:
+        payloads = SetupPayload(args.discriminator, args.passcode, args.discovery_mode, CommissioningFlow(args.commissioning_flow))
+
+    chip_qrcode = payloads.generate_qrcode()
+    chip_manualcode = payloads.generate_manualcode()
+
+    logging.info('Generated QR code: ' + chip_qrcode)
+    logging.info('Generated manual code: ' + chip_manualcode)
+
+    csv_data = 'qrcode,manualcode\n'
+    csv_data += chip_qrcode + ',' + chip_manualcode + '\n'
+
+    with open(os.path.join(args.output_dir, ONBOARDING_DATA_FILE), 'w') as f:
+        f.write(csv_data)
+
+
 def main():
     args = get_args()
     set_up_out_dirs(args)
     set_up_factory_data(args)
     generate_factory_partiton_binary(args)
+    if (args.discriminator and args.passcode):
+        generate_onboarding_data(args)
 
 
 if __name__ == "__main__":
