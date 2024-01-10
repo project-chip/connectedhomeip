@@ -130,6 +130,7 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${efr32_sdk_root}",
+      #TODO: Added this as include files because of spi_multiplexing.h file. we will remove it after the cleanup.
       "${examples_plat_dir}",
       "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
