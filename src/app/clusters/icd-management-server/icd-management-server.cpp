@@ -23,6 +23,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/EventLogging.h>
+#include <app/icd/ICDManager.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/server/Server.h>
@@ -218,9 +220,7 @@ CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & c
  * ICD Management Implementation
  */
 
-PersistentStorageDelegate * ICDManagementServer::mStorage           = nullptr;
-Crypto::SymmetricKeystore * ICDManagementServer::mSymmetricKeystore = nullptr;
-ICDConfigurationData * ICDManagementServer::mICDConfigurationData   = nullptr;
+ICDManagementServer ICDManagementServer::sICDManagementServer;
 
 Status ICDManagementServer::RegisterClient(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                            const Commands::RegisterClient::DecodableType & commandData, uint32_t & icdCounter)
@@ -354,6 +354,20 @@ void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::Symm
     mICDConfigurationData = &icdConfigurationData;
 }
 
+void ICDManagementServer::OnEnterActiveMode()
+{
+    ChipLogProgress(Zcl, "ICDManagementServer: OnTransitionToActiveMode");
+
+    // Record OnTransitionToActiveMode event
+    EventNumber eventNumber;
+    Events::OnTransitionToActiveMode::Type event;
+
+    if (CHIP_NO_ERROR != LogEvent(event, kRootEndpointId, eventNumber))
+    {
+        ChipLogError(Zcl, "ICDManagementServer: Failed to record OnTransitionToActiveMode event");
+    }
+}
+
 /**********************************************************
  * Callbacks Implementation
  *********************************************************/
@@ -366,9 +380,8 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
                                                        const Commands::RegisterClient::DecodableType & commandData)
 {
     uint32_t icdCounter = 0;
-
-    ICDManagementServer server;
-    InteractionModel::Status status = server.RegisterClient(commandObj, commandPath, commandData, icdCounter);
+    InteractionModel::Status status =
+        ICDManagementServer::GetInstance().RegisterClient(commandObj, commandPath, commandData, icdCounter);
 
     if (InteractionModel::Status::Success == status)
     {
@@ -390,8 +403,7 @@ bool emberAfIcdManagementClusterRegisterClientCallback(CommandHandler * commandO
 bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                          const Commands::UnregisterClient::DecodableType & commandData)
 {
-    ICDManagementServer server;
-    InteractionModel::Status status = server.UnregisterClient(commandObj, commandPath, commandData);
+    InteractionModel::Status status = ICDManagementServer::GetInstance().UnregisterClient(commandObj, commandPath, commandData);
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -403,8 +415,7 @@ bool emberAfIcdManagementClusterUnregisterClientCallback(CommandHandler * comman
 bool emberAfIcdManagementClusterStayActiveRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                           const Commands::StayActiveRequest::DecodableType & commandData)
 {
-    ICDManagementServer server;
-    InteractionModel::Status status = server.StayActiveRequest(commandObj->GetAccessingFabricIndex());
+    InteractionModel::Status status = ICDManagementServer::GetInstance().StayActiveRequest(commandObj->GetAccessingFabricIndex());
 
     commandObj->AddStatus(commandPath, status);
     return true;
@@ -426,5 +437,8 @@ void MatterIcdManagementPluginServerInitCallback()
     registerAttributeAccessOverride(&gAttribute);
 
     // Configure ICD Management
-    ICDManagementServer::Init(storage, symmetricKeystore, icdConfigurationData);
+    ICDManagementServer::GetInstance().Init(storage, symmetricKeystore, icdConfigurationData);
+
+    // Register ICD Management Server with ICD Manager
+    Server::GetInstance().GetICDManager().RegisterObserver(&ICDManagementServer::GetInstance());
 }

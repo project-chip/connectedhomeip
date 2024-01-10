@@ -301,8 +301,10 @@ template("chip_data_model") {
         deps += [
           "${chip_root}/src/app/icd:configuration-data",
           "${chip_root}/src/app/icd:icd_config",
+          "${chip_root}/src/app/icd:manager",
           "${chip_root}/src/app/icd:monitoring-table",
           "${chip_root}/src/app/icd:notifier",
+          "${chip_root}/src/app/icd:observer",
         ]
       } else if (cluster == "resource-monitoring-server") {
         sources += [

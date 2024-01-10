@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/icd/ICDConfigurationData.h>
 #include <app/icd/ICDMonitoringTable.h>
+#include <app/icd/ICDStateObserver.h>
 #include <app/util/basic-types.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -31,13 +32,13 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-class ICDManagementServer
+class ICDManagementServer : public chip::app::ICDStateObserver
 {
 public:
-    ICDManagementServer() = default;
+    static ICDManagementServer & GetInstance() { return sICDManagementServer; };
 
-    static void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
-                     chip::ICDConfigurationData & ICDConfigurationData);
+    void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
+              chip::ICDConfigurationData & ICDConfigurationData);
 
     /**
      * @brief Function that executes the business logic of the RegisterClient Command
@@ -55,14 +56,26 @@ public:
 
     Status StayActiveRequest(chip::FabricIndex fabricIndex);
 
+    /**
+     * @brief Called when the ICD goes from Idle to Active mode
+     *        Triggers the onTransitionToActiveMode event
+     */
+    void OnEnterActiveMode();
+
+    void OnTransitionToIdle(){ /* Do Nothing */ };
+    void OnICDModeChange(){ /* Do Nothing*/ };
+
 private:
     /**
      * @brief Triggers table update events to notify subscribers that an entry was added or removed
      *        from the ICDMonitoringTable.
      */
     void TriggerICDMTableUpdatedEvent();
+    ICDManagementServer() = default;
 
-    static chip::PersistentStorageDelegate * mStorage;
-    static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
-    static chip::ICDConfigurationData * mICDConfigurationData;
+    static ICDManagementServer sICDManagementServer;
+
+    chip::PersistentStorageDelegate * mStorage;
+    chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
+    chip::ICDConfigurationData * mICDConfigurationData;
 };
