@@ -1961,8 +1961,9 @@ namespace MicrowaveOvenControl {
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kPowerAsANumber = 0x1,
-    kPowerInWatts   = 0x2,
+    kPowerAsNumber     = 0x1,
+    kPowerInWatts      = 0x2,
+    kPowerNumberLimits = 0x4,
 };
 } // namespace MicrowaveOvenControl
 

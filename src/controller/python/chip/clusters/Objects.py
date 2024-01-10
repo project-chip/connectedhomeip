@@ -19898,8 +19898,9 @@ class MicrowaveOvenControl(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kPowerAsANumber = 0x1
+            kPowerAsNumber = 0x1
             kPowerInWatts = 0x2
+            kPowerNumberLimits = 0x4
 
     class Commands:
         @dataclass

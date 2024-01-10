@@ -35,9 +35,9 @@ namespace Clusters {
 /**
  * set default value for the optional attributes
  */
-constexpr uint8_t kDefaultMinPower     = 10u;
-constexpr uint8_t kDefaultMaxPower     = 100u;
-constexpr uint8_t kDefaultPowerStep    = 10u;
+constexpr uint8_t kMinPower            = 20u;
+constexpr uint8_t kMaxPower            = 110u;
+constexpr uint8_t kPowerStep           = 10u;
 constexpr uint32_t kMaxCookTime        = 86400u;
 constexpr uint8_t kDefaultPowerSetting = 100u;
 
@@ -64,7 +64,7 @@ public:
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         mOperationalStateInstance(this, aClustersEndpoint),
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, MicrowaveOvenControl::Feature::kPowerInWatts,
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, kFeature,
                                       mOperationalStateInstance, mMicrowaveOvenModeInstance)
     {}
 
@@ -78,7 +78,7 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                           bool startAfterSetting, MicrowaveOvenControl::Feature feature,
+                                                                           bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
                                                                            Optional<uint8_t> powerSetting, 
                                                                            Optional<uint8_t> wattSettingIndex) override;
 
@@ -105,17 +105,17 @@ public:
     /**
      * Get the value of MinPower.
      */
-    uint8_t GetMinPower() const override { return kDefaultMinPower; }
+    uint8_t GetMinPower() const override { return kMinPower; }
 
     /**
      * Get the value of MaxPower.
      */
-    uint8_t GetMaxPower() const override { return kDefaultMaxPower; }
+    uint8_t GetMaxPower() const override { return kMaxPower; }
 
     /**
      * Get the value of PowerStep.
      */
-    uint8_t GetPowerStep() const override { return kDefaultPowerStep; }
+    uint8_t GetPowerStep() const override { return kPowerStep; }
 
     /**
      * Get the value of MaxCookTime.
@@ -238,6 +238,8 @@ private:
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
     // MicrowaveOvenControl variables
+    BitMask<MicrowaveOvenControl::Feature> kFeature = to_underlying(MicrowaveOvenControl::Feature::kPowerAsNumber) + 
+                                                      to_underlying(MicrowaveOvenControl::Feature::kPowerNumberLimits);
     uint8_t mPowerSetting        = kDefaultPowerSetting;
     uint8_t mSelectedWattIndex   = 0;
     uint16_t mWattRatting        = 0;

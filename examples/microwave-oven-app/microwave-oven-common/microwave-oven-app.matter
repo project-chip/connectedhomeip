@@ -1034,8 +1034,9 @@ provisional cluster MicrowaveOvenControl = 95 {
   revision 1; // NOTE: Default/not specifically set
 
   bitmap Feature : bitmap32 {
-    kPowerAsANumber = 0x1;
+    kPowerAsNumber = 0x1;
     kPowerInWatts = 0x2;
+    kPowerNumberLimits = 0x4;
   }
 
   readonly attribute elapsed_s cookTime = 0;
@@ -1412,9 +1413,6 @@ endpoint 1 {
     callback attribute minPower;
     callback attribute maxPower;
     callback attribute powerStep;
-    callback attribute supportedWatts;
-    callback attribute selectedWattIndex;
-    callback attribute wattRating;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

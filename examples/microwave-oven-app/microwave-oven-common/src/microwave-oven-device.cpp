@@ -53,7 +53,7 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
  */
 Protocols::InteractionModel::Status
 ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                            bool startAfterSetting, MicrowaveOvenControl::Feature feature,
+                                                            bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
                                                             Optional<uint8_t> powerSetting, 
                                                             Optional<uint8_t> wattSettingIndex)
 {
@@ -69,13 +69,13 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
     mMicrowaveOvenControlInstance.SetCookTime(cookTime);
 
     // set powerSetting if power is in number
-    if (feature == MicrowaveOvenControl::Feature::kPowerAsANumber && powerSetting.HasValue())
+    if (feature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) && powerSetting.HasValue())
     {
         mPowerSetting = powerSetting.Value();
     }
 
     // set wattRatting and selectedWattIndex if power is in watt
-    if(feature == MicrowaveOvenControl::Feature::kPowerInWatts && wattSettingIndex.HasValue())
+    if(feature.Has(MicrowaveOvenControl::Feature::kPowerInWatts) && wattSettingIndex.HasValue())
     {
         mSelectedWattIndex = wattSettingIndex.Value();
         mWattRatting       = mWattSettingList[mSelectedWattIndex];

@@ -16894,8 +16894,9 @@ typedef NS_OPTIONS(uint32_t, MTRMicrowaveOvenModeFeature) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRMicrowaveOvenControlFeature) {
-    MTRMicrowaveOvenControlFeaturePowerAsANumber MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRMicrowaveOvenControlFeaturePowerAsNumber MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRMicrowaveOvenControlFeaturePowerInWatts MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRMicrowaveOvenControlFeaturePowerNumberLimits MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROperationalStateErrorState) {

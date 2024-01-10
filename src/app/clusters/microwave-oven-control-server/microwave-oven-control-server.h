@@ -31,8 +31,11 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-constexpr uint32_t kDefaultCookTime = 30u;
-constexpr uint32_t kMinCookTime     = 1u;
+constexpr uint32_t kDefaultCookTime  = 30u;
+constexpr uint32_t kMinCookTime      = 1u;
+constexpr uint8_t  kDefaultMinPower  = 10u;
+constexpr uint8_t  kDefaultMaxPower  = 100u;
+constexpr uint8_t  kDefaultPowerStep = 10u;
 
 class Delegate;
 
@@ -51,7 +54,7 @@ public:
      * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
      * Caller must ensure those 2 instances are live and initialized before initializing MicorwaveOvenControl instance.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<MicrowaveOvenControl::Feature> aFeature,
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId, BitMask<MicrowaveOvenControl::Feature> & aFeature,
              Clusters::OperationalState::Instance & aOpStateInstance, Clusters::ModeBase::Instance & aMicrowaveOvenModeInstance);
 
     ~Instance() override;
@@ -85,7 +88,7 @@ private:
     Delegate * mDelegate;
     EndpointId mEndpointId;
     ClusterId mClusterId;
-    BitMask<MicrowaveOvenControl::Feature> mFeature;
+    BitMask<MicrowaveOvenControl::Feature> & mFeature;
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
@@ -140,11 +143,12 @@ public:
      *   @param  powerSetting: the input power setting value. 
      *   @param  wattSettingIndex: the input watts setting index.
      *   Note: powerSetting and wattSettingIndex must be mutually exclusive, depends on the feature value.
+     *   Caller should check if the feature has included the corresponding feature value at the application level.
      *   If using power as number, wattSettingIndex will be set to NullOptional.
      *   If using power in watts, powerSetting will be set to NullOptional.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                   bool startAfterSetting, MicrowaveOvenControl::Feature feature,
+                                                                                   bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
                                                                                    Optional<uint8_t> powerSetting, 
                                                                                    Optional<uint8_t> wattSettingIndex) = 0;
 
