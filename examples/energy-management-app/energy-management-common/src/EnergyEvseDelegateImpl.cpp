@@ -153,14 +153,6 @@ Status EnergyEvseDelegate::StartDiagnostics()
         return Status::Failure;
     }
 
-    /* update SupplyState to indicate we are now in Diagnostics mode */
-    if (mSupplyStateBeforeDiagnostics != SupplyStateEnum::kUnknownEnumValue)
-    {
-        ChipLogError(AppServer, "EVSE: Something wrong trying to go into diagnostics mode");
-        return Status::Failure;
-    }
-
-    mSupplyStateBeforeDiagnostics = mSupplyState;
     // Update the SupplyState - this will automatically callback the Application StateChanged callback
     SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
 
@@ -434,11 +426,9 @@ Status EnergyEvseDelegate::HwDiagnosticsComplete()
         return Status::Failure;
     }
 
-    /* Restore the SupplyState to the saved state before diagnostics were triggered */
-    SetSupplyState(mSupplyStateBeforeDiagnostics);
-
-    /* Set the sentinel back for checking another diagnostics command */
-    mSupplyStateBeforeDiagnostics = SupplyStateEnum::kUnknownEnumValue;
+    /* Restore the SupplyState to Disabled (per spec) - client will need to
+     * re-enable charging or discharging to get out of this state */
+    SetSupplyState(SupplyStateEnum::kDisabled);
 
     return Status::Success;
 }

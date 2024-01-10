@@ -227,9 +227,8 @@ private:
     StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
 
     /* Variables to hold State and SupplyState in case a fault is raised */
-    StateEnum mStateBeforeFault                   = StateEnum::kUnknownEnumValue;
-    SupplyStateEnum mSupplyStateBeforeFault       = SupplyStateEnum::kUnknownEnumValue;
-    SupplyStateEnum mSupplyStateBeforeDiagnostics = SupplyStateEnum::kUnknownEnumValue;
+    StateEnum mStateBeforeFault             = StateEnum::kUnknownEnumValue;
+    SupplyStateEnum mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
 
     /* Callback related */
     EVSECallbackWrapper mCallbacks = { .handler = nullptr, .arg = 0 }; /* Wrapper to allow callbacks to be registered */
