@@ -281,7 +281,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
         return aEncoder.EncodeList([this](const auto & encoder) {
             uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands();
-            static_assert(chip::to_underlying(WiFiBandEnum::kUnknownEnumValue) <= std::numeric_limits<uint32_t>::digits, "Expected WiFiBandEnum::kUnknownEnumValue to fit in uint32_t's number of bits");
+            static_assert(chip::to_underlying(WiFiBandEnum::kUnknownEnumValue) <= std::numeric_limits<uint32_t>::digits,
+                          "Expected WiFiBandEnum::kUnknownEnumValue to fit in uint32_t's number of bits");
 
             // Extract every band from the bitmap of supported bands, starting positionally on the right.
             for (uint32_t band_bit_pos = 0; band_bit_pos < chip::to_underlying(WiFiBandEnum::kUnknownEnumValue); ++band_bit_pos)
@@ -321,7 +322,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         ReturnErrorOnFailure(aDecoder.Decode(value));
         return mpBaseDriver->SetEnabled(value);
     default:
-        return  CHIP_IM_GLOBAL_STATUS(InvalidAction);
+        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
     }
 }
 

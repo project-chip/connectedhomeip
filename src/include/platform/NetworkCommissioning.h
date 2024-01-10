@@ -133,11 +133,11 @@ using ThreadScanResponseIterator = Iterator<ThreadScanResponse>;
 using Status                     = app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum;
 using WiFiBandEnum               = app::Clusters::NetworkCommissioning::WiFiBandEnum;
 // For backwards compatibility with pre-rename enum values.
-using WiFiBand                   = WiFiBandEnum;
-using WiFiSecurityBitmap         = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+using WiFiBand           = WiFiBandEnum;
+using WiFiSecurityBitmap = app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
 // For backwards compatibility with pre-rename bitmap values.
-using WiFiSecurity               = WiFiSecurityBitmap;
-using ThreadCapabilities         = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
+using WiFiSecurity       = WiFiSecurityBitmap;
+using ThreadCapabilities = app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap;
 
 // BaseDriver and WirelessDriver are the common interfaces for a network driver, platform drivers should not implement this
 // directly, instead, users are expected to implement WiFiDriver, ThreadDriver and EthernetDriver.
