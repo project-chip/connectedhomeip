@@ -58,6 +58,7 @@ protected:
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override;
 
     // TODO : Follow up to check if this really needs to be a pure virtual function in Exchange delegate
+    // https://github.com/project-chip/connectedhomeip/issues/31322
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return CheckInExchangeDispatch::Instance(); }
