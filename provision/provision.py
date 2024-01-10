@@ -1,8 +1,15 @@
 #! /usr/bin/python3
+import os
+import sys
+
+if "STUDIO_PYTHONPATH" in os.environ.keys():
+    [sys.path.append(aPath) for aPath in os.environ["STUDIO_PYTHONPATH"].split(os.pathsep)]
+
 from modules.arguments import *
 from modules.connection import *
 from modules.commander import *
 from modules.commands import *
+from modules.exporter import *
 from modules.util import *
 from modules.signing_server import *
 from ecdsa.curves import NIST256p
@@ -10,49 +17,57 @@ import subprocess
 import base64
 import hashlib
 import struct
-import os
-import sys
+import shutil
 
+
+def toOsPath(path):
+    if path == "" or path == None:
+        return ""
+    return os.path.abspath(os.path.normpath(path))
+
+
+def copyFile(src, dest):
+    shutil.copy(src, dest)
 
 class Paths:
 
     kDefaultToolPath = '../out/tools/chip-cert'
 
     def __init__(self, info, args):
-        self.stop = os.path.normpath(os.path.dirname(__file__))
-        self.root = self.stop + '/..'
-        self.debug = self.root + '/out/debug'
-        self.temp = self.stop + '/temp'
-        self.out_default = "{}/paa_cert.pem".format(self.stop)
-        self.att_certs = args.attest.paa_cert or "{}/certs.p12".format(self.temp)
-        self.paa_cert_pem = args.attest.paa_cert or "{}/paa_cert.pem".format(self.temp)
-        self.paa_cert_der = "{}/paa_cert.der".format(self.temp)
-        self.paa_key_pem = args.attest.paa_key or "{}/paa_key.pem".format(self.temp)
-        self.paa_key_der = "{}/paa_key.der".format(self.temp)
-        self.pai_cert_pem = "{}/pai_cert.pem".format(self.temp)
-        self.pai_cert_der = "{}/pai_cert.der".format(self.temp)
-        self.pai_key_pem = "{}/pai_key.pem".format(self.temp)
-        self.pai_key_der = "{}/pai_key.der".format(self.temp)
-        self.dac_cert_pem = "{}/dac_cert.pem".format(self.temp)
-        self.dac_cert_der = "{}/dac_cert.der".format(self.temp)
-        self.dac_key_pem = "{}/dac_key.pem".format(self.temp)
-        self.dac_key_der = "{}/dac_key.der".format(self.temp)
-        self.cert_tool = os.path.normpath(Paths.kDefaultToolPath)
-        self.config = "{}/config/latest.json".format(self.stop)
-        self.cd = "{}/cd.der".format(self.temp)
-        self.csr_pem = self.temp + '/csr.pem'
-        self.gen_fw = "{}/images/{}.s37".format(self.stop, info.family)
-        self.template = "{}/silabs_creds.tmpl".format(self.stop)
-        self.header = "{}/silabs_creds.h".format(self.temp)
-        execute(["mkdir", "-p", self.temp ])
+        base = toOsPath(os.path.normpath(os.path.dirname(__file__)))
+        self.root = toOsPath(base + '/..')
+        self.debug = toOsPath(self.root + '/out/debug')
+        self.temp = toOsPath(args.temp or (base + '/temp'))
+        self.support = toOsPath("{}/support".format(base))
+        self.out_default = toOsPath("{}/paa_cert.pem".format(base))
+        self.att_certs = toOsPath(args.attest.paa_cert or "{}/certs.p12".format(self.temp))
+        self.paa_cert_pem = toOsPath(args.attest.paa_cert or "{}/paa_cert.pem".format(self.temp))
+        self.paa_cert_der = toOsPath("{}/paa_cert.der".format(self.temp))
+        self.paa_key_pem = toOsPath(args.attest.paa_key or "{}/paa_key.pem".format(self.temp))
+        self.paa_key_der = toOsPath("{}/paa_key.der".format(self.temp))
+        self.pai_cert_pem = toOsPath("{}/pai_cert.pem".format(self.temp))
+        self.pai_cert_der = toOsPath("{}/pai_cert.der".format(self.temp))
+        self.pai_key_pem = toOsPath("{}/pai_key.pem".format(self.temp))
+        self.pai_key_der = toOsPath("{}/pai_key.der".format(self.temp))
+        self.dac_cert_pem = toOsPath("{}/dac_cert.pem".format(self.temp))
+        self.dac_cert_der = toOsPath("{}/dac_cert.der".format(self.temp))
+        self.dac_key_pem = toOsPath("{}/dac_key.pem".format(self.temp))
+        self.dac_key_der = toOsPath("{}/dac_key.der".format(self.temp))
+        self.cert_tool = toOsPath(os.path.normpath(Paths.kDefaultToolPath))
+        self.config = toOsPath("{}/config/latest.json".format(base))
+        self.cd = toOsPath("{}/cd.der".format(self.temp))
+        self.csr_pem = toOsPath(self.temp + '/csr.pem')
+        self.gen_fw = toOsPath("{}/images/{}".format(base, info.image))
+        self.template = toOsPath("{}/silabs_creds.tmpl".format(base))
+        self.header = toOsPath("{}/silabs_creds.h".format(self.temp))
+        if not os.path.isdir(self.temp):
+            os.makedirs(self.temp)
+        # execute(["mkdir", "-p", self.temp ])
 
 
 def generateSPAKE2pVerifier(args, paths):
     print("\n◆ SPAKE2+ Verifier")
-    try:
-        salt = base64.b64decode(args.spake2p.salt)
-    except:
-        fail("Invalid SPAKE2+ salt (base64): {}".format(args.spake2p.salt))
+    salt = base64.b64decode(args.spake2p.salt)
     salt_length = len(salt)
     if salt_length < Spake2pArguments.kSaltMin:
         fail("Invalid SPAKE2+ salt length: {} < {}".format(salt_length, Spake2pArguments.kSaltMin))
@@ -64,23 +79,43 @@ def generateSPAKE2pVerifier(args, paths):
     w1 = int.from_bytes(ws[WS_LENGTH:], byteorder='big') % NIST256p.order
     L = NIST256p.generator * w1
     verifier = w0.to_bytes(NIST256p.baselen, byteorder='big') + L.to_bytes('uncompressed')
-    args.spake2p.verifier = base64.b64encode(verifier).decode('ascii')
+    args.spake2p.verifier = base64.b64encode(verifier).decode('utf-8')
     print("  ∙ pass: {}\n  ∙ salt: {}\n  ∙ iter: {}\n  ▪︎ {}"
         .format(args.spake2p.passcode, args.spake2p.salt, args.spake2p.iterations, args.spake2p.verifier))
-
 
 def collectCerts(args, paths):
     # CD
     if args.attest.cd and os.path.exists(args.attest.cd) and (not os.path.exists(paths.cd) or not os.path.samefile(args.attest.cd, paths.cd)):
-        execute(['cp', args.attest.cd, paths.cd])
+        copyFile(args.attest.cd, paths.cd)
+
     # PKCS#12
-    if args.attest.pkcs12 and os.path.exists(args.attest.pkcs12) and (not os.path.exists(paths.att_certs) or not os.path.samefile(args.attest.pkcs12, paths.att_certs)):
-        execute(['cp', args.attest.pkcs12, paths.att_certs])
-    # PAI
-    x509Copy('cert', args.attest.pai_cert, paths.temp, 'pai_cert')
-    # DAC
-    x509Copy('cert', args.attest.dac_cert, paths.temp, 'dac_cert')
-    x509Copy('key', args.attest.dac_key, paths.temp, 'dac_key')
+    if args.attest.pkcs12 is not None:
+        copyFile(args.attest.pkcs12, paths.att_certs)
+
+        # Extract key from PKCS#12
+        password_arg = "pass:{}".format(args.attest.key_pass)
+        ps = subprocess.Popen(('openssl', 'pkcs12', '-nodes', '-nocerts', '-in', args.attest.pkcs12, '-passin', password_arg), stdout=subprocess.PIPE)
+        subprocess.check_output(('openssl', 'ec', '-outform', 'der', '-out', paths.dac_key_der), stdin=ps.stdout)
+
+        # Extract certificates from PKCS#12
+        out = execute([ 'openssl', 'pkcs12', '-nodes', '-nokeys', '-in', args.attest.pkcs12, '-passin', password_arg ], True, True)
+
+        # Parse certificates
+        certs = parsePKCSCerts(out.decode("utf-8"))
+        with open(paths.dac_cert_pem, 'w') as f:
+            f.write(certs[0])
+        with open(paths.pai_cert_pem, 'w') as f:
+            f.write(certs[1])
+
+        # Convert to DER
+        x509Copy('cert', paths.pai_cert_pem, paths.temp, 'pai_cert')
+        x509Copy('cert', paths.dac_cert_pem, paths.temp, 'dac_cert')
+    else:
+        # PAI
+        x509Copy('cert', args.attest.pai_cert, paths.temp, 'pai_cert')
+        # DAC
+        x509Copy('cert', args.attest.dac_cert, paths.temp, 'dac_cert')
+        x509Copy('key', args.attest.dac_key, paths.temp, 'dac_key')
 
 
 def generateCerts(args, paths):
@@ -138,9 +173,9 @@ def x509Copy(type, in_path, out_dir, out_name):
         return False
     (in_dir, in_base) = os.path.split(in_path)
     (in_root, in_ext) = os.path.splitext(in_base)
-    out_path = "{}/{}{}".format(out_dir, out_name, in_ext)
-    if not os.path.samefile(in_path, out_path):
-        execute(['cp', in_path, out_path])
+    out_path = toOsPath("{}/{}{}".format(out_dir, out_name, in_ext))
+    if (not os.path.exists(out_path)) or (os.path.exists(in_path) and os.path.exists(out_path) and not os.path.samefile(in_path, out_path)):
+        copyFile(in_path, out_path)
     return x509Translate(type, out_path)
 
 
@@ -193,26 +228,6 @@ def generateAttestation(conn, args, paths):
 
 def importAttestation(conn, args, paths):
     print("\n◆ Credentials: Import\n")
-    if args.attest.pkcs12 is not None:
-        # Extract key from PKCS#12
-        password_arg = "pass:{}".format(args.attest.key_pass)
-        ps = subprocess.Popen(('openssl', 'pkcs12', '-nodes', '-nocerts', '-in', args.attest.pkcs12, '-passin', password_arg), stdout=subprocess.PIPE)
-        subprocess.check_output(('openssl', 'ec', '-outform', 'der', '-out', paths.dac_key_der), stdin=ps.stdout)
-
-        # Extract certificates from PKCS#12
-        out = execute([ 'openssl', 'pkcs12', '-nodes', '-nokeys', '-in', args.attest.pkcs12, '-passin', password_arg ], True, True)
-
-        # Parse certificates
-        certs = parsePKCSCerts(out.decode("utf-8"))
-        with open(paths.dac_cert_pem, 'w') as f:
-            f.write(certs[0])
-        with open(paths.pai_cert_pem, 'w') as f:
-            f.write(certs[1])
-
-        # Convert to DER
-        x509Copy('cert', paths.pai_cert_pem, paths.temp, 'pai_cert')
-        x509Copy('cert', paths.dac_cert_pem, paths.temp, 'dac_cert')
-
     step = ImportCommand(ImportCommand.KEY, args.attest.key_id, paths.dac_key_der)
     (key_id, key_offset, key_size) = step.execute(conn)
     return key_id
@@ -255,24 +270,34 @@ def main(argv):
     cmmd = Commander(args.conn)
     info = cmmd.info()
     paths = Paths(info, args)
+    if args.part_number is None:
+        args.part_number = info.part
     print("\n◆ Device Info:\n{}".format(info))
 
-    print("\n◆ Prepare")
+    # Flash Production Firmware
+    print("\n◆ Writing firmware\n")
+    cmmd.flash(args.gen_fw or paths.gen_fw)
+
+    print("\n◆ Preparing credentials")
     # Collect/Generate certificates
     if (args.spake2p.verifier is None):
         generateSPAKE2pVerifier(args, paths)
+
     # Generate/Import Attestation Credentials
     collectCerts(args, paths)
     if args.generate:
         generateCerts(args, paths)
     # Export configuration to JSON
     args.write(paths.config)
-    if args.stop:
+    # Export configuration to binary
+    if args.binary:
+        e = Exporter()
+        e.export(args, paths)
+    if args.stop or args.binary:
         exit()
 
-    print("\n◆ Loading Generator Firmware")
-    cmmd.flash(args.gen_fw or paths.gen_fw)
-    conn = Connection(args, info.part)
+    print("\n◆ Connecting to device")
+    conn = Connection(args, paths, info.part)
     conn.open(args.conn)
 
     # Initialize device

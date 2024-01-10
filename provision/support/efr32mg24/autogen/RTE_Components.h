@@ -12,6 +12,18 @@
 
 /* components are auto-generated here */
 
+#define RTE_RTOS_FreeRTOS_CORE
+
+#define RTE_RTOS_FreeRTOS_CONFIG_RTOS2
+
+#define RTE_RTOS_FreeRTOS_COROUTINE
+
+#define RTE_RTOS_FreeRTOS_EVENTGROUPS
+
+#define RTE_RTOS_FreeRTOS_TIMERS
+
+#define RTE_RTOS_FreeRTOS_HEAP_4
+
 
 #endif /* RTE_COMPONENTS_H */
 

@@ -243,6 +243,23 @@ python3 ./provision.py -v 0x1049 -p 0x8005 \
     -d 0xf01 -j 440266330 -pf /git/matter/core/out/lighting-app/BRD4187C/chip-efr32-lighting-example.s37
 ```
 
+## Self-Provisioning
+
+Silicon Labs' Matter examples include the same provisioning engine used by the GFW. This allows applications to be flashed once but provisioned multiple times. There are two ways to put the application in provisioning mode:
+* Factory-reset by pressing both BTN0 and BTN1 for six seconds
+* Write 1 to the NVM3 key 0x87228. This is useful in boards with less than two buttons, and can be accomplished using Simplicity Commander:
+```
+commander nvm3 read -o ./temp/nvm3.s37
+commander nvm3 set ./temp/nvm3.s37 --object 0x87228:01 --outfile ./temp/nvm3+.s37
+commander flash ./temp/nvm3+.s37
+```
+Once in provisioning mode, the example firmware can be used as GFW, for instance:
+```
+python3 provision.py -c config/develop.json -gf ../out/light/BRD4187C/matter-silabs-lighting-example.s37
+```
+If the device was factory-reset, it becomes ready for commissioning right after self-provisioning.
+
+
 ## Validation
 
 If the certificate injection is successful, the commissioning process should

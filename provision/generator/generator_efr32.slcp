@@ -14,30 +14,52 @@ filter:
     value: ["Beginner"]
 source:
   - path: app.cpp
-  - path: commands.cpp
-  - path: config.cpp
-  - path: credentials_efr32.cpp
-  - path: encoding.cpp
   - path: main.cpp
   - path: nvm3.c
-  - path: platform_efr32.c
 include:
   - path: .
     file_list:
     - path: app.h
-    - path: commands.h
-    - path: config.h
-    - path: credentials.h
-    - path: encoding.h
-    - path: platform.h
   - path: ../../examples/
     file_list:
-    - path: lib/support/Base64.h
+    - path: platform/silabs/provision/ProvisionManager.cpp
+    - path: platform/silabs/provision/ProvisionManager.h
+    - path: platform/silabs/provision/ProvisionChannel.h
+    - path: platform/silabs/provision/RttStreamChannel.cpp
+    - path: platform/silabs/provision/RttStreamChannel.h
+    - path: platform/silabs/provision/ProvisionCommands.cpp
+    - path: platform/silabs/provision/ProvisionCommands.h
+    - path: platform/silabs/provision/ProvisionEncoder.cpp
+    - path: platform/silabs/provision/ProvisionEncoder.h
+    - path: platform/silabs/provision/ProvisionStorage.cpp
+    - path: platform/silabs/provision/ProvisionStorage.h
+    - path: platform/silabs/provision/ProvisionStorageDefault.cpp
+    - path: platform/silabs/provision/ProvisionStorageDefault.h
+    - path: platform/silabs/provision/AttestationKey.h
+    - path: platform/silabs/provision/AttestationKeyPSA.cpp
+    - path: platform/silabs/provision/AttestationKeyPSA.h
+  - path: ../../examples/platform/silabs/
   - path: ../../src/
     file_list:
+    - path: lib/support/Base64.h
+    - path: lib/support/Base64.cpp
+    - path: lib/support/logging/CHIPLogging.h
+    - path: lib/support/logging/TextOnlyLogging.cpp
     - path: platform/silabs/SilabsConfig.h
+    - path: platform/silabs/SilabsConfig.cpp
+    - path: platform/silabs/Logging.cpp
+    - path: crypto/CHIPCryptoPALPSA.cpp
+    - path: setup_payload/Base38Encode.h
+    - path: setup_payload/Base38Encode.cpp
+  - path: ../../src/include/
+  - path: ../../zzz_generated/app-common/
+  - path: ../../third_party/nlassert/repo/include/
+  - path: ../../third_party/nlio/repo/include/
 component:
+  - id: freertos
   - id: sl_system
+  - id: device_init
+  - id: sleeptimer
   - id: cpp_support
   - id: iostream_rtt
   - id: psa_its

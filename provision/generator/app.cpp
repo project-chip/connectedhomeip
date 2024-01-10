@@ -15,73 +15,22 @@
  *
  ******************************************************************************/
 
-#include "assert.h"
-#include "commands.h"
-#include "encoding.h"
-#include "credentials.h"
-#include "platform.h"
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
 
+#include <em_msc.h>
+#include <psa/crypto.h>
 
-#define BUFFER_SIZE          2048
+#include <provision/ProvisionManager.h>
+#include <provision/ProvisionStorageDefault.h>
+#include <provision/RttStreamChannel.h>
 
-static uint8_t _buffer[BUFFER_SIZE] = { 0 };
-
-
-static VoidCommand _void_command;
-static InitCommand _init_command;
-static CsrCommand _csr_command;
-static ImportCommand _import_command;
-static SetupCommand _setup_command;
-
-
-Command & select_command(uint8_t id)
-{
-    switch(id)
-    {
-    case kCommand_Init:
-        return _init_command;
-    case kCommand_CSR:
-        return _csr_command;
-    case kCommand_Import:
-        return _import_command;
-    case kCommand_Setup:
-        return _setup_command;
-    default:
-        return _void_command;
-    }
-}
-
-void execute_command(uint8_t id, Encoder & input)
-{
-    Command &cmd = select_command(id);
-    int err = cmd.decode(input);
-    if(!err)
-    {
-        err = cmd.execute();
-    }
-
-    Encoder output(_buffer, sizeof(_buffer));
-    output.addUint8(id);
-    output.addInt32(err);
-    if(! err)
-    {
-        cmd.encode(output);
-    }
-
-    platform_write(output.data(), output.offset());
-}
-
-void reject_command(uint8_t id, int err)
-{
-    Encoder out(_buffer, sizeof(_buffer));
-    out.addUint8(id);
-    out.addInt32(err);
-    platform_write(out.data(), out.offset());
-}
+using namespace chip::DeviceLayer::Silabs;
+Provision::RttStreamChannel sProvisionChannel;
+Provision::DefaultStorage sProvisionStore;
+Provision::Manager sProvisionManager(sProvisionStore, sProvisionChannel);
 
 /*******************************************************************************
  * Initialize application.
@@ -89,6 +38,11 @@ void reject_command(uint8_t id, int err)
 
 void app_init(void)
 {
+#ifndef SIWX_917
+    MSC_Init();
+    psa_crypto_init();
+#endif
+    sProvisionManager.Start();
 }
 
 /*******************************************************************************
@@ -97,19 +51,4 @@ void app_init(void)
 
 void app_process_action(void)
 {
-    uint8_t command_id = kCommand_None;
-    size_t in_size = 0;
-    int status = 0;
-
-    // Read input
-    status = platform_read((void *)_buffer, sizeof(_buffer), &in_size);
-    ASSERT((0 == status) && (in_size > 0), return, "RX error");
-
-    // Decode header
-    Encoder input(_buffer, in_size);
-    int err = input.getUint8(command_id);
-    ASSERT(!err, reject_command(command_id, err); return, "Decode error");
-
-    // Execute command
-    execute_command(command_id, input);
 }

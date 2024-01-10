@@ -98,24 +98,6 @@ source_set("siwx917-matter-shell") {
   }
 }
 
-config("attestation-credentials-config") {
-  include_dirs = [ "${chip_root}" ]
-}
-
-source_set("siwx917-attestation-credentials") {
-  sources = [
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.cpp",
-    "${silabs_common_plat_dir}/SilabsDeviceAttestationCreds.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/credentials",
-    "${chip_root}/src/platform:platform_base",
-  ]
-
-  public_configs = [ ":attestation-credentials-config" ]
-}
-
 source_set("silabs-factory-data-provider") {
   sources = [
     "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
@@ -266,11 +248,11 @@ source_set("siwx917-common") {
     ]
   }
 
-  # Attestation Credentials
-  deps += [ ":siwx917-attestation-credentials" ]
+  # Provisionned data and credentials
+  public_deps += [ "${silabs_common_plat_dir}/provision:provision-siwx917" ]
 
   # Factory Data Provider
-  if (use_efr32_factory_data_provider) {
+  if (use_efr32_factory_data_provider && !use_provision_channel) {
     public_deps += [ ":silabs-factory-data-provider" ]
   }
 

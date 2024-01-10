@@ -1,5 +1,6 @@
 from .util import *
 from .encoding import *
+from .util import *
 
 class Command(object):
     NONE = 0
@@ -8,7 +9,7 @@ class Command(object):
     IMPORT = 3
     SETUP = 4
     SPAKE2p = 10
-    STRINGS = [ 'None', 'INIT', 'CSR', 'IMPORT', 'SETUP' ]
+    STRINGS = [ 'None', 'Init', 'CSR', 'Import', 'Setup' ]
 
     def __init__(self, cid):
         self.id = cid
@@ -23,7 +24,7 @@ class Command(object):
         enc.addUint8(self.id)
         self.encode(enc)
         cmd = enc.serialize()
-        # print("◦ {}".format(cmd.hex()))
+        print("▵ {} send({})".format(self.name, len(cmd)))
         return cmd
 
     def encode(self, enc):
@@ -39,16 +40,22 @@ class Command(object):
         # Receive
         resp = serial.receive()
         serial.stop()
+        print("▴ {} response({})".format(self.name, len(resp)))
         # Decode
-        enc = Encoder(resp)
-        rid = enc.getUint8()
-        err = enc.getInt32()
-        # print("✧ cmd:{}/{}, err:{}".format(self.id, rid, err))
+        try:
+            enc = Encoder(resp)
+            rid = enc.getUint8()
+            err = enc.getInt32()
+        except:
+            fail("Invalid header({}): {}".format(len(resp), bytearray(resp).hex()))
         if rid != self.id:
             fail("Unexpected response {} to command {}".format(rid, self.id))
         if err:
             fail("Command {} failed with error {}".format(self.name, hex(err)))
-        return self.decode(enc, err)
+        try:
+            return self.decode(enc, err)
+        except:
+            fail("Invalid response")
 
 class InitCommand(Command):
 
@@ -105,9 +112,9 @@ class ImportCommand(Command):
         self.name = ImportCommand.STRINGS[fid]
 
     def read(self, path):
-        file = open(path, "rb")
-        contents = bytearray(file.read())
-        file.close()
+        contents = bytearray()
+        with open(path, 'rb') as f:
+            contents = bytearray(f.read())
         return contents
 
     def encode(self, enc):
@@ -130,83 +137,47 @@ class SetupCommand(Command):
         super().__init__(Command.SETUP)
 
         # Vendor
-
         self.vendor_id = args.vendor_id
-        if args.vendor_name:
-            self.vendor_name = bytes(args.vendor_name, 'utf-8')
-        else:
-            self.vendor_name = None
-
+        self.vendor_name = args.vendor_name
         # Product
         self.product_id = args.product_id
-        if args.product_name is None:
-            self.product_name = None
-        else:
-            self.product_name = bytes(args.product_name, 'utf-8')
-
-        if args.product_label is None:
-            self.product_label = None
-        else:
-            self.product_label = bytes(args.product_label, 'utf-8')
-
-        if args.product_url is None:
-            self.product_url = None
-        else:
-            self.product_url = bytes(args.product_url, 'utf-8')
-
-        if args.part_number is None:
-            self.part_number = None
-        else:
-            self.part_number = bytes(args.part_number, 'utf-8')
-
-        if args.hw_version is None:
-            self.hw_version = None
-        else:
-            self.hw_version = args.hw_version
-
-        if args.hw_version_str is None:
-            self.hw_version_str = None
-        else:
-            self.hw_version_str = bytes(args.hw_version_str, 'utf-8')
-
-        if args.manufacturing_date is None:
-            self.manufacturing_date = None
-        else:
-            self.manufacturing_date = bytes(args.manufacturing_date, 'utf-8')
-
+        self.product_name = args.product_name
+        self.product_label = args.product_label
+        self.product_url = args.product_url
+        # Hardware
+        self.part_number = args.part_number
+        self.hw_version = args.hw_version
+        self.hw_version_str = args.hw_version_str
+        self.manufacturing_date = args.manufacturing_date
         # Commissioning
-        if args.unique_id is None:
-            self.unique_id = None
-        else:
-            self.unique_id = bytearray.fromhex(args.unique_id)
+        self.unique_id = args.unique_id
         self.commissioning_flow = args.commissioning_flow
         self.rendezvous_flags = args.rendezvous_flags
-        self.discriminator = args.discriminator or 0
-
+        self.discriminator = args.discriminator
         # SPAKE2+
-        self.spake2p_verifier = bytes(args.spake2p.verifier, 'utf-8')
-        self.spake2p_iterations = args.spake2p.iterations.to_bytes(4, 'little')
-        self.spake2p_salt = bytes(args.spake2p.salt, 'utf-8')
+        self.spake2p_verifier = args.spake2p.verifier
+        self.spake2p_iterations = args.spake2p.iterations
+        self.spake2p_salt = args.spake2p.salt
         self.passcode = args.spake2p.passcode
 
     def encode(self, enc):
         enc.addUint32(self.vendor_id)
-        enc.addArray(self.vendor_name)
+        enc.addString(self.vendor_name)
         enc.addUint32(self.product_id)
-        enc.addArray(self.product_name)
-        enc.addArray(self.product_label)
-        enc.addArray(self.product_url)
-        enc.addArray(self.part_number)
+        enc.addString(self.product_name)
+        enc.addString(self.product_label)
+        enc.addString(self.product_url)
+        enc.addString(self.part_number)
         enc.addUint16(self.hw_version)
-        enc.addArray(self.hw_version_str)
-        enc.addArray(self.manufacturing_date)
+        enc.addString(self.hw_version_str)
+        enc.addString(self.manufacturing_date)
         enc.addArray(self.unique_id)
         enc.addUint32(self.commissioning_flow)
         enc.addUint32(self.rendezvous_flags)
         enc.addUint16(self.discriminator)
-        enc.addArray(self.spake2p_verifier)
-        enc.addArray(self.spake2p_iterations)
-        enc.addArray(self.spake2p_salt)
+        enc.addString(self.spake2p_verifier)
+        enc.addUint32(self.spake2p_iterations)
+        enc.addString(self.spake2p_salt)
         enc.addUint32(self.passcode)
 
     def decode(self, enc, err):

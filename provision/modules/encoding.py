@@ -78,8 +78,10 @@ class Encoder(object):
 
 
     def addString(self, x):
-        a = x.encode('utf-8')
-        return self.addArray(a)
+        if x is None:
+            return self.addArray(x)
+        else:
+            return self.addArray(x.encode('utf-8'))
 
     def getString(self):
         a = self.getArray()
@@ -91,5 +93,3 @@ class Encoder(object):
     @staticmethod
     def hex(arr):
         return str(len(arr)) + ':' + ' '.join(format(x, '02x') for x in arr)
-        
-    

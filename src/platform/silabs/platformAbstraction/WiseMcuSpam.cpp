@@ -16,6 +16,7 @@
  */
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <sl_si91x_button_pin_config.h>
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -41,6 +42,10 @@ void soc_pll_config(void);
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
+namespace {
+    uint8_t sButtonStates[SL_SI91x_BUTTON_COUNT] = { 0 };
+
+}
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 SilabsPlatform::SilabsButtonCb SilabsPlatform::mButtonCallback = nullptr;
@@ -106,8 +111,17 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction)
         return;
     }
 
+    if(btn < SL_SI91x_BUTTON_COUNT)
+    {
+        sButtonStates[btn] = btnAction;
+    }
     Silabs::GetPlatform().mButtonCallback(btn, btnAction);
 }
+}
+
+uint8_t SilabsPlatform::GetButtonState(uint8_t button)
+{
+    return (button < SL_SI91x_BUTTON_COUNT) ? sButtonStates[button] : 0;
 }
 
 } // namespace Silabs

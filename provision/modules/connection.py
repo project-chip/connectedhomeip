@@ -7,13 +7,14 @@ import pylink
 class Connection:
     DEFAULT_PORT = 19020
 
-    def __init__(self, args, part_number):
+    def __init__(self, args, paths, part_number):
 
         if args.conn.lib_path is None:
             self.link = pylink.JLink()
         else:
             self.link=pylink.JLink(lib=pylink.library.Library(dllpath=args.conn.lib_path))
         self.part_number = part_number
+        self.support_dir = paths.support
 
     def open(self, conn):
         if conn.serial_num:
@@ -28,6 +29,7 @@ class Connection:
             print("\n▪︎ Open DEFAULT connection to {}".format(self.part_number))
             self.link.open()
 
+        self.link.exec_command("JLinkDevicesXMLPath {}/".format(self.support_dir))
         self.link.set_tif(interface=pylink.JLinkInterfaces.SWD)
         self.link.connect(chip_name=self.part_number, speed="auto", verbose=True)
 

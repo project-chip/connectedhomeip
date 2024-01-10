@@ -54,10 +54,12 @@
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
-#include "SilabsDeviceDataProvider.h"
 #include "SilabsTestEventTriggerDelegate.h"
 #include <app/InteractionModelEngine.h>
 #include <app/TimerDelegates.h>
+#if !PROVISION_CHANNEL_ENABLED
+#include <SilabsDeviceDataProvider.h> // nogncheck
+#endif
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
@@ -75,10 +77,9 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
+#include <provision/ProvisionManager.h>
 
 #include "FreeRTOSConfig.h"
 #include "event_groups.h"
@@ -167,7 +168,7 @@ void application_start(void * unused)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Credentials::Silabs::GetSilabsDacProvider());
+    SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     SILABS_LOG("Starting App Task");
@@ -183,8 +184,16 @@ void SilabsMatterConfig::AppInit()
 {
     GetPlatform().Init();
 
-    xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
-    SILABS_LOG("Starting scheduler");
+    if(Provision::Manager::GetInstance().ProvisionRequired())
+    {
+        Provision::Manager::GetInstance().Start();
+    }
+    else
+    {
+        xTaskCreate(application_start, "main_task", MAIN_TASK_STACK_SIZE, NULL, MAIN_TASK_PRIORITY, &main_Task);
+        SILABS_LOG("Starting scheduler");
+    }
+    
     GetPlatform().StartScheduler();
 
     // Should never get here.
@@ -254,8 +263,13 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
+#if PROVISION_CHANNEL_ENABLED
+    SetDeviceInstanceInfoProvider(&Silabs::Provision::Manager::GetInstance().GetStorage());
+    SetCommissionableDataProvider(&Silabs::Provision::Manager::GetInstance().GetStorage());
+#else
     SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
     SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+#endif
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 

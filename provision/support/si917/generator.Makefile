@@ -158,7 +158,11 @@ endif
 
 $(OUTPUT_DIR)/$(PROJECTNAME).out: $(OBJS) $(LIB_FILES)
 	@echo 'Linking $(OUTPUT_DIR)/$(PROJECTNAME).out'
+ifeq ($(UNAME_S),Darwin)
 	@echo $(OBJS) > $(OUTPUT_DIR)/linker_objs
+else
+	$(file > $(OUTPUT_DIR)/linker_objs,$(OBJS))
+endif
 	$(ECHO)$(LD) $(LD_FLAGS) @$(OUTPUT_DIR)/linker_objs $(LIBS) -o $(OUTPUT_DIR)/$(PROJECTNAME).out
 	$(ECHO)$(OBJCOPY) $(OUTPUT_DIR)/$(PROJECTNAME).out -O binary $(OUTPUT_DIR)/$(PROJECTNAME).bin
 	$(ECHO)$(OBJCOPY) $(OUTPUT_DIR)/$(PROJECTNAME).out -O ihex $(OUTPUT_DIR)/$(PROJECTNAME).hex

@@ -1,9 +1,13 @@
 #CRC Codes for initially generated config files -- do not modify!
+FreeRTOSConfig.h=-1074791178
 SEGGER_RTT_Conf.h=-1668074135
 app_properties_config.h=-77184399
 emlib_core_debug_config.h=171843933
 nvm3_default_config.h=-1865878923
 psa_crypto_config.h=-1777265300
+sl_device_init_dcdc_config.h=467347643
+sl_device_init_emu_config.h=1238190016
 sl_mbedtls_config.h=-1940460892
 sl_mbedtls_device_config.h=-1083250924
 sl_memory_config.h=-995392215
+sl_sleeptimer_config.h=847044378

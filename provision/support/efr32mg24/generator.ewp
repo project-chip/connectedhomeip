@@ -223,6 +223,7 @@
                     <name>CCDefines</name>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
+                    <state>configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS=2</state>
                     <state>SL_COMPONENT_CATALOG_PRESENT=1</state>
                     <state>MBEDTLS_CONFIG_FILE=&lt;sl_mbedtls_config.h&gt;</state>
                     <state>MBEDTLS_PSA_CRYPTO_CONFIG_FILE=&lt;psa_crypto_config.h&gt;</state>
@@ -356,26 +357,38 @@
                     <state>$PROJ_DIR$\autogen</state>
                     <state>$PROJ_DIR$\..\..\generator</state>
                     <state>$PROJ_DIR$\..\..\..\examples</state>
+                    <state>$PROJ_DIR$\..\..\..\examples\platform\silabs</state>
                     <state>$PROJ_DIR$\..\..\..\src</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\Device\SiliconLabs\EFR32MG24\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\CMSIS\Core\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\emdrv\common\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\emlib\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\common\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\service\iostream\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_mbedtls_support\config</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_mbedtls_support\config\preset</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_mbedtls_support\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\third_party\mbedtls\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\third_party\mbedtls\library</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\emdrv\nvm3\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_psa_driver\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\se_manager\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\se_manager\src</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\third_party\segger\systemview\SEGGER</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\silicon_labs\silabs_core\memory_manager</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\common\toolchain\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\service\system\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\src\include</state>
+                    <state>$PROJ_DIR$\..\..\..\zzz_generated\app-common</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\nlassert\repo\include</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\nlio\repo\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\Device\SiliconLabs\EFR32MG24\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\CMSIS\Core\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\CMSIS\RTOS2\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\device_init\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\emdrv\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\emlib\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\freertos\cmsis\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\freertos\kernel\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\freertos\kernel\portable\IAR\ARM_CM33_NTZ\non_secure</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\iostream\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_mbedtls_support\config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_mbedtls_support\config\preset</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_mbedtls_support\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\mbedtls\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\mbedtls\library</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\emdrv\nvm3\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\peripheral\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_psa_driver\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\se_manager\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\se_manager\src</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\segger\systemview\SEGGER</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\silicon_labs\silabs_core\memory_manager</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\common\toolchain\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\system\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\sleeptimer\inc</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -551,6 +564,7 @@
                     <name>ADefines</name>
                     <state>EFR32MG24A010F1024IM48=1</state>
                     <state>SL_APP_PROPERTIES=1</state>
+                    <state>configNUM_SDK_THREAD_LOCAL_STORAGE_POINTERS=2</state>
                     <state>SL_COMPONENT_CATALOG_PRESENT=1</state>
                     <state>MBEDTLS_CONFIG_FILE=&lt;sl_mbedtls_config.h&gt;</state>
                     <state>MBEDTLS_PSA_CRYPTO_CONFIG_FILE=&lt;psa_crypto_config.h&gt;</state>
@@ -651,26 +665,38 @@
                     <state>$PROJ_DIR$\autogen</state>
                     <state>$PROJ_DIR$\..\..\generator</state>
                     <state>$PROJ_DIR$\..\..\..\examples</state>
+                    <state>$PROJ_DIR$\..\..\..\examples\platform\silabs</state>
                     <state>$PROJ_DIR$\..\..\..\src</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\Device\SiliconLabs\EFR32MG24\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\CMSIS\Core\Include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\emdrv\common\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\emlib\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\common\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\service\iostream\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_mbedtls_support\config</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_mbedtls_support\config\preset</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_mbedtls_support\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\third_party\mbedtls\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\third_party\mbedtls\library</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\emdrv\nvm3\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\sl_psa_driver\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\se_manager\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\security\sl_component\se_manager\src</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\third_party\segger\systemview\SEGGER</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\util\silicon_labs\silabs_core\memory_manager</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\common\toolchain\inc</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\git\gsdk\platform\service\system\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\src\include</state>
+                    <state>$PROJ_DIR$\..\..\..\zzz_generated\app-common</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\nlassert\repo\include</state>
+                    <state>$PROJ_DIR$\..\..\..\third_party\nlio\repo\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\Device\SiliconLabs\EFR32MG24\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\CMSIS\Core\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\CMSIS\RTOS2\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\device_init\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\emdrv\common\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\emlib\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\freertos\cmsis\Include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\freertos\kernel\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\freertos\kernel\portable\IAR\ARM_CM33_NTZ\non_secure</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\iostream\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_mbedtls_support\config</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_mbedtls_support\config\preset</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_mbedtls_support\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\mbedtls\include</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\mbedtls\library</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\emdrv\nvm3\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\peripheral\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\sl_psa_driver\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\se_manager\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\security\sl_component\se_manager\src</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\third_party\segger\systemview\SEGGER</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\util\silicon_labs\silabs_core\memory_manager</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\common\toolchain\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\system\inc</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\gsdk\platform\service\sleeptimer\inc</state>
                 </option>
                 <option>
                     <name>AExtraOptionsCheckV2</name>

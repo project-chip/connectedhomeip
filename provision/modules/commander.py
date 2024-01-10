@@ -4,9 +4,9 @@ from .util import *
 
 # SoC configuration
 socs = {
-  'mg12': { 'ram_addr': 0x20000000, 'stacksize': 0x1000, 'flash_addr': 0x0000000 },
-  'mg24': { 'ram_addr': 0x20000000, 'stacksize': 0x1000, 'flash_addr': 0x8000000 },
-  'Si917': { 'ram_addr': 0xC, 'stacksize': 0x4FC00 },
+  'mg12': { 'ram_addr': 0x20000000, 'stacksize': 0x1000, 'flash_addr': 0x0000000, 'image': 'efr32mg12.s37' },
+  'mg24': { 'ram_addr': 0x20000000, 'stacksize': 0x1000, 'flash_addr': 0x8000000, 'image': 'efr32mg24.s37' },
+  'si917': { 'ram_addr': 0x400, 'stacksize': 0x4FC00, 'flash_addr': 0x8202000, 'image': 'si917.rps' },
 }
 
 
@@ -26,12 +26,16 @@ class DeviceInfo:
             soc = socs['mg12']
         elif "efr32mg24" in self.part:
             soc = socs['mg24']
+        elif "mgm24" in self.part:
+            soc = socs['mg24']
+        elif "si917" in self.part:
+            soc = socs['si917']
         else:
             raise Exception('Invalid MCU')
         self.ram_addr = soc['ram_addr']
         self.stacksize = soc['stacksize']
         self.flash_addr = soc['flash_addr']
-
+        self.image = soc['image']
 
     def parseSize(self, text):
         parts = text.split()
@@ -72,4 +76,5 @@ class Commander:
         return DeviceInfo(res)
 
     def flash(self, image_path):
-        return self.execute(['flash' , image_path], False, True)
+        self.execute(['flash' , image_path], False, True)
+        self.execute(['device', 'reset'], False, True)

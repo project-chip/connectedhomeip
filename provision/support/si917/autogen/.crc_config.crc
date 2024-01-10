@@ -1,9 +1,8 @@
 #CRC Codes for initially generated config files -- do not modify!
-SEGGER_RTT_Conf.h=-1668074135
-emlib_core_debug_config.h=171843933
-nvm3_default_config.h=1109545002
-psa_crypto_config.h=-422190221
-sl_device_init_dcdc_config.h=-1223674373
-sl_device_init_emu_config.h=1414330218
-sl_mbedtls_config.h=-1710232477
-sl_memory_config.h=-995392215
+FreeRTOSConfig.h=-1583439459
+RTE_Device_917.h=-719277934
+SEGGER_RTT_Conf.h=784924437
+emlib_core_debug_config.h=1524820012
+sl_board_configuration.h=-447436877
+sl_board_control.h=-188041674
+sl_net_default_values.h=1503430588

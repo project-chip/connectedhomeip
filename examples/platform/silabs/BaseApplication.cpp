@@ -24,8 +24,9 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
-
 #include <app/server/Server.h>
+
+#define APP_ACTION_BUTTON   1
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -34,7 +35,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include "SilabsDeviceDataProvider.h"
+#include <SilabsDeviceDataProvider.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
 #include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
@@ -45,6 +46,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <provision/ProvisionManager.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
@@ -746,6 +748,11 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
 void BaseApplication::ScheduleFactoryReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {
+        // Press both buttons to request provisioning
+        if(GetPlatform().GetButtonState(APP_ACTION_BUTTON))
+        {
+            Provision::Manager::GetInstance().RequestProvision();
+        }
         PlatformMgr().HandleServerShuttingDown();
         ConfigurationMgr().InitiateFactoryReset();
     });
@@ -761,13 +768,19 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 
 void BaseApplication::OutputQrCode(bool refreshLCD)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     (void) refreshLCD; // could be unused
 
     // Create buffer for the Qr code setup payload that can fit max size and null terminator.
     char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan setupPayload(setupPayloadBuffer);
 
-    if (Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(setupPayload) == CHIP_NO_ERROR)
+#if PROVISION_CHANNEL_ENABLED
+    err = Provision::Manager::GetInstance().GetStorage().GetSetupPayload(setupPayload);
+#else
+    err = Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(setupPayload);
+#endif
+    if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
 #ifdef QR_CODE_ENABLED

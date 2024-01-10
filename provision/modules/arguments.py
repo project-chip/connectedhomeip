@@ -2,6 +2,7 @@ from .util import *
 import json
 import os
 import argparse
+import base64
 from datetime import datetime
 
 
@@ -67,8 +68,9 @@ class BaseArguments:
 
 
 class Config:
-    pass
-
+    def __init__(self):
+        self.stop = False
+        self.binary = False
 
 class Arguments(BaseArguments):
     VERSION = "1.0"
@@ -88,11 +90,14 @@ class Arguments(BaseArguments):
         super().__init__()
         self.version = Arguments.VERSION
         self.conn = None
+        self.temp = None
+        self.binary = None
         self.generate = None
         self.stop = None
         self.csr = None
         self.gen_fw = None
         self.prod_fw = None
+        self.serial_number = None
         self.vendor_id = None
         self.vendor_name = None
         self.product_id = None
@@ -112,6 +117,8 @@ class Arguments(BaseArguments):
 
     def configure(self, parser):
         super().configure(parser)
+        parser.add_argument('-t', '--temp', type=str, help='[string] Temporary folder.')
+        parser.add_argument('-b', '--binary', type=str, help='[string] Binary export.')
         parser.add_argument('-j', '--jlink', type=str, help='[string] J-Link connection.')
         parser.add_argument('-l', '--pylink_lib', type=str, help='[string] Path to the PyLink library.')
         parser.add_argument('-g', '--generate', action='store_true', help='[boolean] Generate certificates.', default=None)
@@ -119,6 +126,7 @@ class Arguments(BaseArguments):
         parser.add_argument('-r', '--csr', action='store_true', help='[boolean] Generate Certificate Signing Request', default=None)
         parser.add_argument('-gf', '--gen_fw', type=str, help='[string] Path to the Generator Firmware image')
         parser.add_argument('-pf', '--prod_fw', type=str, help='[string] Path to the Production Firmware image')
+        parser.add_argument('-S',  '--serial_number', type=str, help='[string] SerialNumber')
         parser.add_argument('-v',  '--vendor_id', type=parseInt, help='[int] vendor ID')
         parser.add_argument('-V',  '--vendor_name', type=str, help='[string] vendor name')
         parser.add_argument('-p',  '--product_id', type=parseInt, help='[int] Product ID')
@@ -154,6 +162,8 @@ class Arguments(BaseArguments):
 
     def decode(self, d, args):
         c = Config()
+        c.temp = decode(d, 'temp', args.temp)
+        c.binary = decode(d, 'binary', args.binary)
         c.jlink = decode(d, 'jlink', args.jlink)
         c.pylink_lib = decode(d, 'pylink_lib', args.pylink_lib)
         c.generate = decode(d, 'generate', args.generate)
@@ -161,6 +171,7 @@ class Arguments(BaseArguments):
         c.csr = decode(d, 'csr', args.csr)
         c.gen_fw = decode(d, 'gen_fw', args.gen_fw)
         c.prod_fw = decode(d, 'prod_fw', args.prod_fw)
+        c.serial_number = decode(d, 'serial_number', args.serial_number)
         c.vendor_id = decode(d, 'vendor_id', args.vendor_id)
         c.vendor_name = decode(d, 'vendor_name', args.vendor_name)
         c.product_id = decode(d, 'product_id', args.product_id)
@@ -191,11 +202,10 @@ class Arguments(BaseArguments):
         c.common_name = decode(attest, 'common_name', args.common_name)
         # SPAKE2+
         spake = decode(d, 'spake2p', None, {})
-        c.spake2p_verifier = decode(spake, 'verifier', args.spake2p_verifier)
+        c.spake2p_iterations = decode(spake, 'iterations', args.spake2p_iterations)
         c.spake2p_passcode = decode(spake, 'passcode', args.spake2p_passcode)
         c.spake2p_salt = decode(spake, 'salt', args.spake2p_salt)
-        c.spake2p_iterations = decode(spake, 'iterations', args.spake2p_iterations)
-
+        c.spake2p_verifier = decode(spake, 'verifier', args.spake2p_verifier)
         return c
 
 
@@ -203,11 +213,12 @@ class Arguments(BaseArguments):
         d = {}
         encode(d, 'jlink', self.conn.encode())
         encode(d, 'pylink_lib', self.conn.lib_path)
+        encode(d, 'temp', self.temp)
         encode(d, 'generate', self.generate)
-        encode(d, 'stop', self.stop)
         encode(d, 'csr', self.csr)
         encode(d, 'gen_fw', self.gen_fw)
         encode(d, 'prod_fw', self.prod_fw)
+        encode(d, 'serial_number', self.serial_number)
         encode(d, 'vendor_id', self.vendor_id)
         encode(d, 'vendor_name', self.vendor_name)
         encode(d, 'product_id', self.product_id)
@@ -217,7 +228,9 @@ class Arguments(BaseArguments):
         encode(d, 'part_number', self.part_number)
         encode(d, 'hw_version', self.hw_version)
         encode(d, 'hw_version_str', self.hw_version_str)
-        encode(d, 'unique_id', self.unique_id)
+        encode(d, 'manufacturing_date', self.manufacturing_date)
+        if self.unique_id is not None:
+            encode(d, 'unique_id', self.unique_id.hex())
         encode(d, 'commissioning_flow', self.commissioning_flow)
         encode(d, 'rendezvous_flags', self.rendezvous_flags)
         encode(d, 'discriminator', self.discriminator)
@@ -238,10 +251,10 @@ class Arguments(BaseArguments):
         d["attestation"] = attest
         # SPAKE2+
         spake = {}
-        encode(spake, 'verifier', self.spake2p.verifier)
-        encode(spake, 'passcode', self.spake2p.passcode)
-        encode(spake, 'salt', self.spake2p.salt)
         encode(spake, 'iterations', self.spake2p.iterations)
+        encode(spake, 'passcode', self.spake2p.passcode)
+        encode(spake, 'verifier', self.spake2p.verifier)
+        encode(spake, 'salt', self.spake2p.salt)
         d["spake2p"] = spake
         return d
 
@@ -252,46 +265,64 @@ class Arguments(BaseArguments):
         self.conn = ConnectionArguments()
         self.conn.decode(args)
 
+        self.temp = args.temp
+        self.binary = args.binary
         self.generate = args.generate
         self.stop = args.stop
         self.csr = args.csr
 
         self.gen_fw = args.gen_fw
         self.prod_fw = args.prod_fw
+        if args.serial_number is None:
+            self.serial_number = None
+        else:
+            self.serial_number = args.serial_number
 
         if args.vendor_id is None:
             fail("Missing Vendor ID (--vendor_id)")
         self.vendor_id = args.vendor_id
 
-        if args.vendor_name:
+        if args.vendor_name is None:
+            self.vendor_name = None
+        else:
             assert (len(args.vendor_name) <= Arguments.kMaxVendorNameLength), "Vendor name exceeds the size limit"
-        self.vendor_name = args.vendor_name
+            self.vendor_name = args.vendor_name
 
         if args.product_id is None:
             fail("Missing Product ID (--product_id)")
         self.product_id = args.product_id
 
-        if args.product_name:
+        if args.product_name is None:
+            self.product_name = None
+        else:
             assert (len(args.product_name) <= Arguments.kMaxProductNameLength), "Product name exceeds the size limit"
-        self.product_name = args.product_name
+            self.product_name = args.product_name
 
-        if args.product_label:
+        if args.product_label is None:
+            self.product_label = None
+        else:
             assert (len(args.product_label) <= Arguments.kMaxProductLabelLength), "Product Label exceeds the size limit"
-        self.product_label = args.product_label
+            self.product_label = args.product_label
 
-        if args.product_url:
+        if args.product_url is None:
+            self.product_url = None
+        else:
             assert (len(args.product_url) <= Arguments.kMaxProductUrlLenght), "Product URL exceeds the size limit"
-        self.product_url = args.product_url
+            self.product_url = args.product_url
 
-        if args.part_number:
+        if args.part_number is None:
+            self.part_number = None
+        else:
             assert (len(args.part_number) <= Arguments.kMaxPartNumberLength), "Part number exceeds the size limit"
-        self.part_number = args.part_number
+            self.part_number = args.part_number
 
         self.hw_version = args.hw_version or 0
 
-        if args.hw_version_str:
+        if args.hw_version_str is None:
+            args.hw_version_str = None
+        else:
+            self.hw_version_str = args.hw_version_str
             assert (len(args.hw_version_str) <= Arguments.kMaxHardwareVersionStringLength), "Hardware version string exceeds the size limit"
-        self.hw_version_str = args.hw_version_str
 
         if args.manufacturing_date:
             try:
@@ -303,9 +334,11 @@ class Arguments(BaseArguments):
         else:
             self.manufacturing_date = datetime.now().strftime('%Y-%m-%d')
 
-        if args.unique_id:
+        if args.unique_id is None:
+            self.unique_id = None
+        else:
             assert (len(bytearray.fromhex(args.unique_id)) == Arguments.kUniqueIDLength), "Provide a 16 bytes rotating id"
-        self.unique_id = args.unique_id
+            self.unique_id = bytearray.fromhex(args.unique_id)
 
         if args.commissioning_flow is None:
             self.commissioning_flow = Arguments.kDefaultCommissioningFlow
@@ -321,7 +354,7 @@ class Arguments(BaseArguments):
 
         if args.discriminator is not None:
             assert (int(args.discriminator) < 0xffff), "Invalid discriminator > 0xffff"
-        self.discriminator = args.discriminator
+        self.discriminator = args.discriminator or 0
 
         # Attestation Files
         self.attest = AttestationArguments()
@@ -491,14 +524,13 @@ class Spake2pArguments:
     def validate(self, args):
         # Passcode
         self.passcode = args.spake2p_passcode or Spake2pArguments.kPasscodeDefault
-        if not self.passcode:
-            fail("SPAKE2+ passcode required (--spake2p_passcode)")
         if(self.passcode in Spake2pArguments.INVALID_PASSCODES):
             fail("The provided passcode is invalid")
         # Salt
-        self.salt = args.spake2p_salt or Spake2pArguments.kSaltDefault
-        if not self.salt:
-            fail("SPAKE2+ salt required (--spake2p_salt)")
+        try:
+            self.salt = args.spake2p_salt or Spake2pArguments.kSaltDefault
+        except:
+            fail("Invalid SPAKE2+ salt (base64): {}".format(args.spake2p.salt))
         # Iterations
         self.iterations = args.spake2p_iterations or Spake2pArguments.kIterationsDefault
         if not self.iterations:
