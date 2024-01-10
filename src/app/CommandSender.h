@@ -68,9 +68,6 @@ public:
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
          *
-         * It is advised that subclasses should only override this or `OnResponseWithAdditionalData`. But, it shouldn't actually
-         * matter if both are overridden, just that `OnResponse` will never be called by CommandSender directly.
-         *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
          * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
