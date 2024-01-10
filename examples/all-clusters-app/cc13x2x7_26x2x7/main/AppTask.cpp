@@ -230,6 +230,19 @@ int AppTask::Init()
             ;
     }
 
+    // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+#ifdef CC13XX_26XX_FACTORY_DATA
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
@@ -258,9 +271,6 @@ int AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     ConfigurationMgr().LogDeviceConfig();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);

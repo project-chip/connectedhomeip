@@ -3324,6 +3324,33 @@ static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
     case Attributes::ExpiringUserTimeout::Id: {
         return YES;
     }
+    case Attributes::AliroReaderVerificationKey::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderGroupIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderGroupSubIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+        return YES;
+    }
+    case Attributes::AliroGroupResolvingKey::Id: {
+        return YES;
+    }
+    case Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
+        return YES;
+    }
+    case Attributes::AliroBLEAdvertisingVersion::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfAliroEndpointKeysSupported::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

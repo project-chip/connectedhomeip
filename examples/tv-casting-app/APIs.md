@@ -137,7 +137,7 @@ client's lifecycle:
     `func castingAppDidReceiveRequestForRotatingDeviceIdUniqueId` in a class,
     `MTRAppParametersDataSource`, that implements the `MTRDataSource`:
 
-    ```objectivec
+    ```swift
     class MTRAppParametersDataSource : NSObject, MTRDataSource
     {
         func castingAppDidReceiveRequestForRotatingDeviceIdUniqueId(_ sender: Any) -> Data {
@@ -199,7 +199,7 @@ client's lifecycle:
     `MTRAppParametersDataSource` class defined above, that can provide the
     required values to the `MTRCastingApp`.
 
-    ```objectivec
+    ```swift
     func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MTRCommissionableData {
         // dummy values for demonstration only
         return MTRCommissionableData(
@@ -276,7 +276,7 @@ client's lifecycle:
     `MTRDeviceAttestationCredentials` and sign messages for the Casting Client,
     respectively.
 
-    ```objectivec
+    ```swift
     // dummy DAC values for demonstration only
     let kDevelopmentDAC_Cert_FFF1_8001: Data = Data(base64Encoded: "MIIB..<snipped>..CXE1M=")!;
     let kDevelopmentDAC_PrivateKey_FFF1_8001: Data = Data(base64Encoded: "qrYA<snipped>tE+/8=")!;
@@ -292,21 +292,38 @@ client's lifecycle:
             productAttestationIntermediateCert: KPAI_FFF1_8000_Cert_Array)
     }
 
-    func castingApp(_ sender: Any, didReceiveRequestToSignCertificateRequest csrData: Data) -> Data {
-        var privateKey = Data()
-        privateKey.append(kDevelopmentDAC_PublicKey_FFF1_8001);
-        privateKey.append(kDevelopmentDAC_PrivateKey_FFF1_8001);
+    func castingApp(_ sender: Any, didReceiveRequestToSignCertificateRequest csrData: Data, outRawSignature: AutoreleasingUnsafeMutablePointer<NSData>) -> MatterError {
+        Log.info("castingApp didReceiveRequestToSignCertificateRequest")
 
-        let privateKeyRef: SecKey = SecKeyCreateWithData(privateKey as NSData,
+        // get the private SecKey
+        var privateKeyData = Data()
+        privateKeyData.append(kDevelopmentDAC_PublicKey_FFF1_8001);
+        privateKeyData.append(kDevelopmentDAC_PrivateKey_FFF1_8001);
+        let privateSecKey: SecKey = SecKeyCreateWithData(privateKeyData as NSData,
                                     [
                                         kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
                                         kSecAttrKeyClass: kSecAttrKeyClassPrivate,
                                         kSecAttrKeySizeInBits: 256
                                     ] as NSDictionary, nil)!
 
-        let _:Unmanaged<SecKey> = Unmanaged<SecKey>.passRetained(privateKeyRef);
+        // sign csrData to get asn1SignatureData
+        var error: Unmanaged<CFError>?
+        let asn1SignatureData: CFData? = SecKeyCreateSignature(privateSecKey, .ecdsaSignatureMessageX962SHA256, csrData as CFData, &error)
+        if(error != nil)
+        {
+            Log.error("Failed to sign message. Error: \(String(describing: error))")
+            return MATTER_ERROR_INVALID_ARGUMENT
+        }
+        else if (asn1SignatureData == nil)
+        {
+            Log.error("Failed to sign message. asn1SignatureData is nil")
+            return MATTER_ERROR_INVALID_ARGUMENT
+        }
 
-        // use SecKey above to sign csrData and return resulting value
+        // convert ASN.1 DER signature to SEC1 raw format
+        return MTRCryptoUtils.ecdsaAsn1SignatureToRaw(withFeLengthBytes: 32,
+                                                    asn1Signature: asn1SignatureData!,
+                                                         outRawSignature: &outRawSignature.pointee)
     }
     ```
 
@@ -319,6 +336,7 @@ On Linux, create an `AppParameters` object using the
 `RotatingDeviceIdUniqueIdProvider`, `LinuxCommissionableDataProvider`,
 `CommonCaseDeviceServerInitParamsProvider`, `ExampleDACProvider` and
 `DefaultDACVerifier`, and call `CastingApp::GetInstance()->Initialize` with it.
+Then, call `Start` on the `CastingApp`.
 
 ```c
 LinuxCommissionableDataProvider gCommissionableDataProvider;
@@ -357,7 +375,8 @@ int main(int argc, char * argv[]) {
 On Android, create an `AppParameters` object using the
 `rotatingDeviceIdUniqueIdProvider`, `commissioningDataProvider`, `dacProvider`
 and `DataProvider<ConfigurationManager>`, and call
-`CastingApp.getInstance().initialize` with it.
+`CastingApp.getInstance().initialize` with it. Then, call `start` on the
+`CastingApp`
 
 ```java
 public static MatterError initAndStart(Context applicationContext) {
@@ -396,7 +415,7 @@ public static MatterError initAndStart(Context applicationContext) {
 On iOS, call `MTRCastingApp.initialize` with an object of the
 `MTRAppParametersDataSource`.
 
-```objectivec
+```swift
 func initialize() -> MatterError {
     if let castingApp = MTRCastingApp.getSharedInstance() {
         return castingApp.initialize(with: MTRAppParametersDataSource())
@@ -406,9 +425,73 @@ func initialize() -> MatterError {
 }
 ```
 
+After initialization, on iOS, call `start` and `stop` on the `MTRCastingApp`
+shared instance when the App sends the
+`UIApplication.didBecomeActiveNotification` and
+`UIApplication.willResignActiveNotification`
+
+```objectivec
+struct TvCastingApp: App {
+    let Log = Logger(subsystem: "com.matter.casting", category: "TvCastingApp")
+    @State
+    var firstAppActivation: Bool = true
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .onAppear(perform: {
+                    let err: Error? = MTRInitializationExample().initialize()
+                    if err != nil
+                    {
+                        self.Log.error("MTRCastingApp initialization failed \(err)")
+                        return
+                    }
+                })
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification")
+                    if let castingApp = MTRCastingApp.getSharedInstance()
+                    {
+                        castingApp.start(completionBlock: { (err : Error?) -> () in
+                            if err != nil
+                            {
+                                self.Log.error("MTRCastingApp start failed \(err)")
+                            }
+                        })
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification")
+                    if let castingApp = MTRCastingApp.getSharedInstance()
+                    {
+                        castingApp.stop(completionBlock: { (err : Error?) -> () in
+                            if err != nil
+                            {
+                                self.Log.error("MTRCastingApp stop failed \(err)")
+                            }
+                        })
+                    }
+                }
+            }   // WindowGroup
+    }   // body
+}   // App
+```
+
+Note about on-device cache: The Casting App maintains an on-device cache
+containing information about the Casting Players it has connected with so far.
+This cached information allows the Casting App to connect with Casting Players
+(that it had previously connected with) faster and using fewer resources, by
+potentially skipping the longer commissioning process and instead, simply
+re-establishing the CASE session. This cache can be cleared by calling the
+`ClearCache` API on the `CastingApp`, say when the user signs out of the app.
+See API and its documentation for [Linux](tv-casting-common/core/CastingApp.h),
+Android and
+[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MTRCastingApp.h).
+
 ### Discover Casting Players
 
-_{Complete Discovery examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Discovery examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/DiscoveryExampleFragment.java)
+| [iOS](darwin/TvCasting/TvCasting/MTRDiscoveryExampleViewModel.swift)}_
 
 The Casting Client discovers `CastingPlayers` using Matter Commissioner
 discovery over DNS-SD by listening for `CastingPlayer` events as they are
@@ -439,6 +522,111 @@ public:
 };
 ```
 
+On Android, implement the `CastingPlayerDiscovery.CastingPlayerChangeListener`.
+
+```java
+private static final CastingPlayerDiscovery.CastingPlayerChangeListener castingPlayerChangeListener =
+    new CastingPlayerDiscovery.CastingPlayerChangeListener() {
+        private final String TAG = CastingPlayerDiscovery.CastingPlayerChangeListener.class.getSimpleName();
+
+        @Override
+        public void onAdded(CastingPlayer castingPlayer) {
+            Log.i(TAG, "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
+            // Display CastingPlayer info on the screen
+            new Handler(Looper.getMainLooper()).post(() -> {
+                arrayAdapter.add(castingPlayer);
+            });
+        }
+
+        @Override
+        public void onChanged(CastingPlayer castingPlayer) {
+            Log.i(TAG, "onChanged() Discovered changes to CastingPlayer with deviceId: " + castingPlayer.getDeviceId());
+            // Update the CastingPlayer on the screen
+            new Handler(Looper.getMainLooper()).post(() -> {
+                final Optional<CastingPlayer> playerInList = castingPlayerList.stream().filter(node -> castingPlayer.equals(node)).findFirst();
+                if (playerInList.isPresent()) {
+                    Log.d(TAG, "onChanged() Updating existing CastingPlayer entry " + playerInList.get().getDeviceId() + " in castingPlayerList list");
+                    arrayAdapter.remove(playerInList.get());
+                }
+                arrayAdapter.add(castingPlayer);
+            });
+        }
+
+        @Override
+        public void onRemoved(CastingPlayer castingPlayer) {
+            Log.i(TAG, "onRemoved() Removed CastingPlayer with deviceId: " + castingPlayer.getDeviceId());
+            // Remove CastingPlayer from the screen
+            new Handler(Looper.getMainLooper()).post(() -> {
+                final Optional<CastingPlayer> playerInList = castingPlayerList.stream().filter(node -> castingPlayer.equals(node)).findFirst();
+                if (playerInList.isPresent()) {
+                    Log.d(TAG, "onRemoved() Removing existing CastingPlayer entry " + playerInList.get().getDeviceId() + " in castingPlayerList list");
+                    arrayAdapter.remove(playerInList.get());
+                }
+            });
+        }
+};
+```
+
+On iOS, implement a `func addDiscoveredCastingPlayers`,
+`func removeDiscoveredCastingPlayers` and `func updateDiscoveredCastingPlayers`
+which listen to notifications as Casting Players are added, removed, or updated.
+
+```swift
+@objc
+func didAddDiscoveredCastingPlayers(notification: Notification)
+{
+    Log.info("didAddDiscoveredCastingPlayers() called")
+    guard let userInfo = notification.userInfo,
+        let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
+        self.Log.error("didAddDiscoveredCastingPlayers called with no MTRCastingPlayer")
+        return
+    }
+
+    self.Log.info("didAddDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+    DispatchQueue.main.async
+    {
+        self.displayedCastingPlayers.append(castingPlayer)
+    }
+}
+
+@objc
+func didRemoveDiscoveredCastingPlayers(notification: Notification)
+{
+    Log.info("didRemoveDiscoveredCastingPlayers() called")
+    guard let userInfo = notification.userInfo,
+        let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
+        self.Log.error("didRemoveDiscoveredCastingPlayers called with no MTRCastingPlayer")
+        return
+    }
+
+    self.Log.info("didRemoveDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+    DispatchQueue.main.async
+    {
+        self.displayedCastingPlayers.removeAll(where: {$0 == castingPlayer})
+    }
+}
+
+@objc
+func didUpdateDiscoveredCastingPlayers(notification: Notification)
+{
+    Log.info("didUpdateDiscoveredCastingPlayers() called")
+    guard let userInfo = notification.userInfo,
+        let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
+        self.Log.error("didUpdateDiscoveredCastingPlayers called with no MTRCastingPlayer")
+        return
+    }
+
+    self.Log.info("didUpdateDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+    if let index = displayedCastingPlayers.firstIndex(where: { castingPlayer.identifier() == $0.identifier() })
+    {
+        DispatchQueue.main.async
+        {
+            self.displayedCastingPlayers[index] = castingPlayer
+        }
+    }
+}
+```
+
 Finally, register these listeners and start discovery.
 
 On Linux, register an instance of the `DiscoveryDelegateImpl` with
@@ -462,9 +650,50 @@ chip::DeviceLayer::PlatformMgr().RunEventLoop();
 ...
 ```
 
+On Android, add the implemented `castingPlayerChangeListener` as a listener to
+the singleton instance of `MatterCastingPlayerDiscovery` to listen to changes in
+the discovered Casting Players and call `startDiscovery`.
+
+```java
+MatterError err = MatterCastingPlayerDiscovery.getInstance().addCastingPlayerChangeListener(castingPlayerChangeListener);
+if (err.hasError()) {
+    Log.e(TAG, "startDiscovery() addCastingPlayerChangeListener() called, err Add: " + err);
+    return false;
+}
+
+// Start discovery
+Log.i(TAG, "startDiscovery() calling CastingPlayerDiscovery.startDiscovery()");
+err = MatterCastingPlayerDiscovery.getInstance().startDiscovery(DISCOVERY_TARGET_DEVICE_TYPE);
+if (err.hasError()) {
+    Log.e(TAG, "Error in startDiscovery(): " + err);
+    return false;
+}
+```
+
+On iOS, register the listeners by calling `addObserver` on the
+`NotificationCenter` with the appropriate selector, and then call start on the
+`sharedInstance` of `MTRCastingPlayerDiscovery`.
+
+```swift
+func startDiscovery() {
+    NotificationCenter.default.addObserver(self, selector: #selector(self.didAddDiscoveredCastingPlayers), name: NSNotification.Name.didAddCastingPlayers, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.didRemoveDiscoveredCastingPlayers), name: NSNotification.Name.didRemoveCastingPlayers, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.didUpdateDiscoveredCastingPlayers), name: NSNotification.Name.didUpdateCastingPlayers, object: nil)
+
+    MTRCastingPlayerDiscovery.sharedInstance().start()
+    ...
+}
+```
+
+Note: You will need to connect with a Casting Player as described below to see
+the list of Endpoints that they support. Refer to the
+[Connection](#connect-to-a-casting-player) section for details on how to
+discover available endpoints supported by a Casting Player.
+
 ### Connect to a Casting Player
 
-_{Complete Connection examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Connection examples: [Linux](linux/simple-app-helper.cpp) |
+[iOS](darwin/TvCasting/TvCasting/MTRConnectionExampleViewModel.swift)}_
 
 Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
@@ -509,6 +738,37 @@ targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
                                                     matter::casting::core::kCommissioningWindowTimeoutSec,
                                                     desiredEndpointFilter);
 ...
+```
+
+On iOS, the Casting Client may call `verifyOrEstablishConnection` on the
+`MTRCastingPlayer` object it wants to connect to and handle any `NSErrors` that
+may happen in the process.
+
+```swift
+// VendorId of the MTREndpoint on the MTRCastingPlayer that the MTRCastingApp desires to interact with after connection
+let kDesiredEndpointVendorId: UInt16 = 65521;
+
+@Published var connectionSuccess: Bool?;
+
+@Published var connectionStatus: String?;
+
+func connect(selectedCastingPlayer: MTRCastingPlayer?) {
+    let desiredEndpointFilter: MTREndpointFilter = MTREndpointFilter()
+    desiredEndpointFilter.vendorId = kDesiredEndpointVendorId
+    selectedCastingPlayer?.verifyOrEstablishConnection(completionBlock: { err in
+        self.Log.error("MTRConnectionExampleViewModel connect() completed with \(err)")
+        if(err == nil)
+        {
+            self.connectionSuccess = true
+            self.connectionStatus = "Connected!"
+        }
+        else
+        {
+            self.connectionSuccess = false
+            self.connectionStatus = "Connection failed with \(String(describing: err))"
+        }
+    }, desiredEndpointFilter: desiredEndpointFilter)
+}
 ```
 
 ### Select an Endpoint on the Casting Player
@@ -705,3 +965,8 @@ void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter
         kMinIntervalFloorSeconds, kMaxIntervalCeilingSeconds);
 }
 ```
+
+The Casting client can Shutdown all running Subscriptions by calling the
+`ShutdownAllSubscriptions` API on the `CastingApp`. See API and its
+documentation for [Linux](tv-casting-common/core/CastingApp.h), Android and
+[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MTRCastingApp.h).

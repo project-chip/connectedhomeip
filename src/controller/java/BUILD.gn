@@ -447,6 +447,8 @@ android_library("java") {
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
+    "src/chip/devicecontroller/ICDClientInfo.java",
+    "src/chip/devicecontroller/ICDDeviceInfo.java",
     "src/chip/devicecontroller/ICDRegistrationInfo.java",
     "src/chip/devicecontroller/InvokeCallback.java",
     "src/chip/devicecontroller/InvokeCallbackJni.java",

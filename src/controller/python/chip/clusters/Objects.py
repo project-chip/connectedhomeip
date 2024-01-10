@@ -15210,6 +15210,23 @@ class IcdManagement(Cluster):
 
             value: 'uint' = 0
 
+    class Events:
+        @dataclass
+        class OnTransitionToActiveMode(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000046
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
 
 @dataclass
 class Timer(Cluster):
@@ -25079,6 +25096,15 @@ class DoorLock(Cluster):
                 ClusterObjectFieldDescriptor(Label="sendPINOverTheAir", Tag=0x00000032, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="requirePINforRemoteOperation", Tag=0x00000033, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="expiringUserTimeout", Tag=0x00000035, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="aliroReaderVerificationKey", Tag=0x00000080, Type=typing.Union[None, Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="aliroReaderGroupIdentifier", Tag=0x00000081, Type=typing.Union[None, Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="aliroReaderGroupSubIdentifier", Tag=0x00000082, Type=typing.Optional[bytes]),
+                ClusterObjectFieldDescriptor(Label="aliroExpeditedTransactionSupportedProtocolVersions", Tag=0x00000083, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="aliroGroupResolvingKey", Tag=0x00000084, Type=typing.Union[None, Nullable, bytes]),
+                ClusterObjectFieldDescriptor(Label="aliroSupportedBLEUWBProtocolVersions", Tag=0x00000085, Type=typing.Optional[typing.List[bytes]]),
+                ClusterObjectFieldDescriptor(Label="aliroBLEAdvertisingVersion", Tag=0x00000086, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfAliroCredentialIssuerKeysSupported", Tag=0x00000087, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="numberOfAliroEndpointKeysSupported", Tag=0x00000088, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -25123,6 +25149,15 @@ class DoorLock(Cluster):
     sendPINOverTheAir: 'typing.Optional[bool]' = None
     requirePINforRemoteOperation: 'typing.Optional[bool]' = None
     expiringUserTimeout: 'typing.Optional[uint]' = None
+    aliroReaderVerificationKey: 'typing.Union[None, Nullable, bytes]' = None
+    aliroReaderGroupIdentifier: 'typing.Union[None, Nullable, bytes]' = None
+    aliroReaderGroupSubIdentifier: 'typing.Optional[bytes]' = None
+    aliroExpeditedTransactionSupportedProtocolVersions: 'typing.Optional[typing.List[bytes]]' = None
+    aliroGroupResolvingKey: 'typing.Union[None, Nullable, bytes]' = None
+    aliroSupportedBLEUWBProtocolVersions: 'typing.Optional[typing.List[bytes]]' = None
+    aliroBLEAdvertisingVersion: 'typing.Optional[uint]' = None
+    numberOfAliroCredentialIssuerKeysSupported: 'typing.Optional[uint]' = None
+    numberOfAliroEndpointKeysSupported: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -25163,11 +25198,14 @@ class DoorLock(Cluster):
             kFingerprint = 0x03
             kFingerVein = 0x04
             kFace = 0x05
+            kAliroCredentialIssuerKey = 0x06
+            kAliroEvictableEndpointKey = 0x07
+            kAliroNonEvictableEndpointKey = 0x08
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 6,
+            kUnknownEnumValue = 9,
 
         class DataOperationTypeEnum(MatterIntEnum):
             kAdd = 0x00
@@ -25319,11 +25357,14 @@ class DoorLock(Cluster):
             kFingerprint = 0x08
             kFingerVein = 0x09
             kFace = 0x0A
+            kAliroCredentialIssuerKey = 0x0B
+            kAliroEvictableEndpointKey = 0x0C
+            kAliroNonEvictableEndpointKey = 0x0D
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 11,
+            kUnknownEnumValue = 14,
 
         class LockOperationTypeEnum(MatterIntEnum):
             kLock = 0x00
@@ -25372,11 +25413,12 @@ class DoorLock(Cluster):
             kRemote = 0x07
             kRfid = 0x08
             kBiometric = 0x09
+            kAliro = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 11,
 
         class UserStatusEnum(MatterIntEnum):
             kAvailable = 0x00
@@ -25531,6 +25573,8 @@ class DoorLock(Cluster):
             kYearDayAccessSchedules = 0x400
             kHolidaySchedules = 0x800
             kUnbolt = 0x1000
+            kAliroProvisioning = 0x2000
+            kAliroBLEUWB = 0x4000
 
     class Structs:
         @dataclass
@@ -26094,6 +26138,49 @@ class DoorLock(Cluster):
                 return True
 
             PINCode: 'typing.Optional[bytes]' = None
+
+        @dataclass
+        class SetAliroReaderConfig(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000028
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="signingKey", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="verificationKey", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="groupIdentifier", Tag=2, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="groupResolvingKey", Tag=3, Type=typing.Optional[bytes]),
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            signingKey: 'bytes' = b""
+            verificationKey: 'bytes' = b""
+            groupIdentifier: 'bytes' = b""
+            groupResolvingKey: 'typing.Optional[bytes]' = None
+
+        @dataclass
+        class ClearAliroReaderConfig(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000101
+            command_id: typing.ClassVar[int] = 0x00000029
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
     class Attributes:
         @dataclass
@@ -26665,6 +26752,150 @@ class DoorLock(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000035
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class AliroReaderVerificationKey(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000080
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bytes])
+
+            value: 'typing.Union[None, Nullable, bytes]' = None
+
+        @dataclass
+        class AliroReaderGroupIdentifier(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000081
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bytes])
+
+            value: 'typing.Union[None, Nullable, bytes]' = None
+
+        @dataclass
+        class AliroReaderGroupSubIdentifier(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000082
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bytes])
+
+            value: 'typing.Optional[bytes]' = None
+
+        @dataclass
+        class AliroExpeditedTransactionSupportedProtocolVersions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000083
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[bytes]])
+
+            value: 'typing.Optional[typing.List[bytes]]' = None
+
+        @dataclass
+        class AliroGroupResolvingKey(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000084
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, bytes])
+
+            value: 'typing.Union[None, Nullable, bytes]' = None
+
+        @dataclass
+        class AliroSupportedBLEUWBProtocolVersions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000085
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[bytes]])
+
+            value: 'typing.Optional[typing.List[bytes]]' = None
+
+        @dataclass
+        class AliroBLEAdvertisingVersion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000086
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class NumberOfAliroCredentialIssuerKeysSupported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000087
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class NumberOfAliroEndpointKeysSupported(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000101
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000088
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -45542,6 +45773,22 @@ class UnitTesting(Cluster):
             arg1: 'typing.List[UnitTesting.Structs.NestedStructList]' = field(default_factory=lambda: [])
 
         @dataclass
+        class TestBatchHelperResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x0000000C
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="buffer", Tag=0, Type=bytes),
+                    ])
+
+            buffer: 'bytes' = b""
+
+        @dataclass
         class TestListInt8UReverseRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0xFFF1FC05
             command_id: typing.ClassVar[int] = 0x0000000D
@@ -45713,6 +45960,46 @@ class UnitTesting(Cluster):
                     ])
 
             arg1: 'uint' = 0
+
+        @dataclass
+        class TestBatchHelperRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x00000016
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'TestBatchHelperResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sleepBeforeResponseTimeMs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sizeOfResponseBuffer", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fillCharacter", Tag=2, Type=uint),
+                    ])
+
+            sleepBeforeResponseTimeMs: 'uint' = 0
+            sizeOfResponseBuffer: 'uint' = 0
+            fillCharacter: 'uint' = 0
+
+        @dataclass
+        class TestSecondBatchHelperRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0x00000017
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'TestBatchHelperResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sleepBeforeResponseTimeMs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sizeOfResponseBuffer", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fillCharacter", Tag=2, Type=uint),
+                    ])
+
+            sleepBeforeResponseTimeMs: 'uint' = 0
+            sizeOfResponseBuffer: 'uint' = 0
+            fillCharacter: 'uint' = 0
 
     class Attributes:
         @dataclass

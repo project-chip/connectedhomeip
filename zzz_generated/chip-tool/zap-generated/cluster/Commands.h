@@ -4606,6 +4606,7 @@ private:
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * OnTransitionToActiveMode                                          | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -7508,6 +7509,8 @@ private:
 | * GetCredentialStatus                                               |   0x24 |
 | * ClearCredential                                                   |   0x26 |
 | * UnboltDoor                                                        |   0x27 |
+| * SetAliroReaderConfig                                              |   0x28 |
+| * ClearAliroReaderConfig                                            |   0x29 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
@@ -7546,6 +7549,15 @@ private:
 | * SendPINOverTheAir                                                 | 0x0032 |
 | * RequirePINforRemoteOperation                                      | 0x0033 |
 | * ExpiringUserTimeout                                               | 0x0035 |
+| * AliroReaderVerificationKey                                        | 0x0080 |
+| * AliroReaderGroupIdentifier                                        | 0x0081 |
+| * AliroReaderGroupSubIdentifier                                     | 0x0082 |
+| * AliroExpeditedTransactionSupportedProtocolVersions                | 0x0083 |
+| * AliroGroupResolvingKey                                            | 0x0084 |
+| * AliroSupportedBLEUWBProtocolVersions                              | 0x0085 |
+| * AliroBLEAdvertisingVersion                                        | 0x0086 |
+| * NumberOfAliroCredentialIssuerKeysSupported                        | 0x0087 |
+| * NumberOfAliroEndpointKeysSupported                                | 0x0088 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -8307,6 +8319,84 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnboltDoor::Type mRequest;
+};
+
+/*
+ * Command SetAliroReaderConfig
+ */
+class DoorLockSetAliroReaderConfig : public ClusterCommand
+{
+public:
+    DoorLockSetAliroReaderConfig(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-aliro-reader-config", credsIssuerConfig)
+    {
+        AddArgument("SigningKey", &mRequest.signingKey);
+        AddArgument("VerificationKey", &mRequest.verificationKey);
+        AddArgument("GroupIdentifier", &mRequest.groupIdentifier);
+        AddArgument("GroupResolvingKey", &mRequest.groupResolvingKey);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::Type mRequest;
+};
+
+/*
+ * Command ClearAliroReaderConfig
+ */
+class DoorLockClearAliroReaderConfig : public ClusterCommand
+{
+public:
+    DoorLockClearAliroReaderConfig(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("clear-aliro-reader-config", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DoorLock::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -12795,6 +12885,8 @@ private:
 | * TestSimpleOptionalArgumentRequest                                 |   0x13 |
 | * TestEmitTestEventRequest                                          |   0x14 |
 | * TestEmitTestFabricScopedEventRequest                              |   0x15 |
+| * TestBatchHelperRequest                                            |   0x16 |
+| * TestSecondBatchHelperRequest                                      |   0x17 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -13773,6 +13865,86 @@ public:
 
 private:
     chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Type mRequest;
+};
+
+/*
+ * Command TestBatchHelperRequest
+ */
+class UnitTestingTestBatchHelperRequest : public ClusterCommand
+{
+public:
+    UnitTestingTestBatchHelperRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-batch-helper-request", credsIssuerConfig)
+    {
+        AddArgument("SleepBeforeResponseTimeMs", 0, UINT16_MAX, &mRequest.sleepBeforeResponseTimeMs);
+        AddArgument("SizeOfResponseBuffer", 0, UINT16_MAX, &mRequest.sizeOfResponseBuffer);
+        AddArgument("FillCharacter", 0, UINT8_MAX, &mRequest.fillCharacter);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Type mRequest;
+};
+
+/*
+ * Command TestSecondBatchHelperRequest
+ */
+class UnitTestingTestSecondBatchHelperRequest : public ClusterCommand
+{
+public:
+    UnitTestingTestSecondBatchHelperRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("test-second-batch-helper-request", credsIssuerConfig)
+    {
+        AddArgument("SleepBeforeResponseTimeMs", 0, UINT16_MAX, &mRequest.sleepBeforeResponseTimeMs);
+        AddArgument("SizeOfResponseBuffer", 0, UINT16_MAX, &mRequest.sizeOfResponseBuffer);
+        AddArgument("FillCharacter", 0, UINT8_MAX, &mRequest.fillCharacter);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::UnitTesting::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -17547,8 +17719,10 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
         //
         // Events
         //
-        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
-        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),                                                                            //
+        make_unique<ReadEvent>(Id, "on-transition-to-active-mode", Events::OnTransitionToActiveMode::Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig),                                                                       //
+        make_unique<SubscribeEvent>(Id, "on-transition-to-active-mode", Events::OnTransitionToActiveMode::Id, credsIssuerConfig), //
     };
 
     commands.RegisterCluster(clusterName, clusterCommands);
@@ -19976,26 +20150,28 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),           //
-        make_unique<DoorLockLockDoor>(credsIssuerConfig),             //
-        make_unique<DoorLockUnlockDoor>(credsIssuerConfig),           //
-        make_unique<DoorLockUnlockWithTimeout>(credsIssuerConfig),    //
-        make_unique<DoorLockSetWeekDaySchedule>(credsIssuerConfig),   //
-        make_unique<DoorLockGetWeekDaySchedule>(credsIssuerConfig),   //
-        make_unique<DoorLockClearWeekDaySchedule>(credsIssuerConfig), //
-        make_unique<DoorLockSetYearDaySchedule>(credsIssuerConfig),   //
-        make_unique<DoorLockGetYearDaySchedule>(credsIssuerConfig),   //
-        make_unique<DoorLockClearYearDaySchedule>(credsIssuerConfig), //
-        make_unique<DoorLockSetHolidaySchedule>(credsIssuerConfig),   //
-        make_unique<DoorLockGetHolidaySchedule>(credsIssuerConfig),   //
-        make_unique<DoorLockClearHolidaySchedule>(credsIssuerConfig), //
-        make_unique<DoorLockSetUser>(credsIssuerConfig),              //
-        make_unique<DoorLockGetUser>(credsIssuerConfig),              //
-        make_unique<DoorLockClearUser>(credsIssuerConfig),            //
-        make_unique<DoorLockSetCredential>(credsIssuerConfig),        //
-        make_unique<DoorLockGetCredentialStatus>(credsIssuerConfig),  //
-        make_unique<DoorLockClearCredential>(credsIssuerConfig),      //
-        make_unique<DoorLockUnboltDoor>(credsIssuerConfig),           //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),             //
+        make_unique<DoorLockLockDoor>(credsIssuerConfig),               //
+        make_unique<DoorLockUnlockDoor>(credsIssuerConfig),             //
+        make_unique<DoorLockUnlockWithTimeout>(credsIssuerConfig),      //
+        make_unique<DoorLockSetWeekDaySchedule>(credsIssuerConfig),     //
+        make_unique<DoorLockGetWeekDaySchedule>(credsIssuerConfig),     //
+        make_unique<DoorLockClearWeekDaySchedule>(credsIssuerConfig),   //
+        make_unique<DoorLockSetYearDaySchedule>(credsIssuerConfig),     //
+        make_unique<DoorLockGetYearDaySchedule>(credsIssuerConfig),     //
+        make_unique<DoorLockClearYearDaySchedule>(credsIssuerConfig),   //
+        make_unique<DoorLockSetHolidaySchedule>(credsIssuerConfig),     //
+        make_unique<DoorLockGetHolidaySchedule>(credsIssuerConfig),     //
+        make_unique<DoorLockClearHolidaySchedule>(credsIssuerConfig),   //
+        make_unique<DoorLockSetUser>(credsIssuerConfig),                //
+        make_unique<DoorLockGetUser>(credsIssuerConfig),                //
+        make_unique<DoorLockClearUser>(credsIssuerConfig),              //
+        make_unique<DoorLockSetCredential>(credsIssuerConfig),          //
+        make_unique<DoorLockGetCredentialStatus>(credsIssuerConfig),    //
+        make_unique<DoorLockClearCredential>(credsIssuerConfig),        //
+        make_unique<DoorLockUnboltDoor>(credsIssuerConfig),             //
+        make_unique<DoorLockSetAliroReaderConfig>(credsIssuerConfig),   //
+        make_unique<DoorLockClearAliroReaderConfig>(credsIssuerConfig), //
         //
         // Attributes
         //
@@ -20045,8 +20221,25 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                    credsIssuerConfig),                                                                //
         make_unique<ReadAttribute>(Id, "send-pinover-the-air", Attributes::SendPINOverTheAir::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
-                                   credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig),   //
+                                   credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "aliro-reader-verification-key", Attributes::AliroReaderVerificationKey::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "aliro-reader-group-identifier", Attributes::AliroReaderGroupIdentifier::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "aliro-reader-group-sub-identifier", Attributes::AliroReaderGroupSubIdentifier::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "aliro-expedited-transaction-supported-protocol-versions",
+                                   Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "aliro-group-resolving-key", Attributes::AliroGroupResolvingKey::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "aliro-supported-bleuwbprotocol-versions",
+                                   Attributes::AliroSupportedBLEUWBProtocolVersions::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "aliro-bleadvertising-version", Attributes::AliroBLEAdvertisingVersion::Id,
+                                   credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "number-of-aliro-credential-issuer-keys-supported",
+                                   Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "number-of-aliro-endpoint-keys-supported",
+                                   Attributes::NumberOfAliroEndpointKeysSupported::Id, credsIssuerConfig),                 //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -20138,6 +20331,34 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                           WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "expiring-user-timeout", 0, UINT16_MAX, Attributes::ExpiringUserTimeout::Id,
                                               WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
+            Id, "aliro-reader-verification-key", Attributes::AliroReaderVerificationKey::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
+            Id, "aliro-reader-group-identifier", Attributes::AliroReaderGroupIdentifier::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::ByteSpan>>(Id, "aliro-reader-group-sub-identifier",
+                                                    Attributes::AliroReaderGroupSubIdentifier::Id, WriteCommandType::kForceWrite,
+                                                    credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
+            Id, "aliro-expedited-transaction-supported-protocol-versions",
+            Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::ByteSpan>>>(
+            Id, "aliro-group-resolving-key", Attributes::AliroGroupResolvingKey::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
+            Id, "aliro-supported-bleuwbprotocol-versions", Attributes::AliroSupportedBLEUWBProtocolVersions::Id,
+            WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "aliro-bleadvertising-version", 0, UINT8_MAX,
+                                             Attributes::AliroBLEAdvertisingVersion::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "number-of-aliro-credential-issuer-keys-supported", 0, UINT16_MAX,
+                                              Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "number-of-aliro-endpoint-keys-supported", 0, UINT16_MAX,
+                                              Attributes::NumberOfAliroEndpointKeysSupported::Id, WriteCommandType::kForceWrite,
+                                              credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -20203,8 +20424,26 @@ void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * cre
                                         credsIssuerConfig),                                                                //
         make_unique<SubscribeAttribute>(Id, "send-pinover-the-air", Attributes::SendPINOverTheAir::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "require-pinfor-remote-operation", Attributes::RequirePINforRemoteOperation::Id,
-                                        credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig),   //
+                                        credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "expiring-user-timeout", Attributes::ExpiringUserTimeout::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-reader-verification-key", Attributes::AliroReaderVerificationKey::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-reader-group-identifier", Attributes::AliroReaderGroupIdentifier::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-reader-group-sub-identifier", Attributes::AliroReaderGroupSubIdentifier::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-expedited-transaction-supported-protocol-versions",
+                                        Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-group-resolving-key", Attributes::AliroGroupResolvingKey::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-supported-bleuwbprotocol-versions",
+                                        Attributes::AliroSupportedBLEUWBProtocolVersions::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "aliro-bleadvertising-version", Attributes::AliroBLEAdvertisingVersion::Id,
+                                        credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "number-of-aliro-credential-issuer-keys-supported",
+                                        Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "number-of-aliro-endpoint-keys-supported",
+                                        Attributes::NumberOfAliroEndpointKeysSupported::Id, credsIssuerConfig),                 //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -24899,6 +25138,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<UnitTestingTestSimpleOptionalArgumentRequest>(credsIssuerConfig),       //
         make_unique<UnitTestingTestEmitTestEventRequest>(credsIssuerConfig),                //
         make_unique<UnitTestingTestEmitTestFabricScopedEventRequest>(credsIssuerConfig),    //
+        make_unique<UnitTestingTestBatchHelperRequest>(credsIssuerConfig),                  //
+        make_unique<UnitTestingTestSecondBatchHelperRequest>(credsIssuerConfig),            //
         //
         // Attributes
         //
