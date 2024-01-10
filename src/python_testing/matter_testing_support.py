@@ -355,7 +355,10 @@ def cluster_id_str(id):
         s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
     else:
         s = "Unknown cluster"
-    return f'{id_str(id)} {s}'
+    try:
+        return f'{id_str(id)} {s}'
+    except TypeError:
+        return 'HERE IS THE PROBLEM'
 
 
 @dataclass
@@ -715,7 +718,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -725,17 +728,29 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Error reading {}:{}".format(str(cluster), str(attribute))
-        asserts.assert_true(attr_ret is not None, err_msg)
-        asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+        read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
-        asserts.assert_true(type_matches(attr_ret, desired_type),
-                            'Returned attribute {} is wrong type expected {}, got {}'.format(attribute, desired_type, type(attr_ret)))
+        type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
+        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        type_ok = type_matches(attr_ret, desired_type)
+        if assert_on_error:
+            asserts.assert_true(read_ok, read_err_msg)
+            asserts.assert_true(type_ok, type_err_msg)
+        else:
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+                                             attribute_id=attribute.attribute_id)
+            if not read_ok:
+                self.record_error(test_name=test_name, location=location, problem=read_err_msg)
+                return None
+            elif not type_ok:
+                self.record_error(test_name=test_name, location=location, problem=type_err_msg)
+                return None
         return attr_ret
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
+            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -746,10 +761,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-        asserts.assert_true(attr_ret is not None, err_msg)
-        asserts.assert_true(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
-        asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
-        asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        error_type_ok = attr_ret is not None and isinstance(
+            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+        if assert_on_error:
+            asserts.assert_true(error_type_ok, err_msg)
+            asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        elif not error_type_ok or attr_ret.Reason.status != error:
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+                                             attribute_id=attribute.attribute_id)
+            self.record_error(test_name=test_name, location=location, problem=err_msg)
+            return None
+
         return attr_ret
 
     async def send_single_cmd(
