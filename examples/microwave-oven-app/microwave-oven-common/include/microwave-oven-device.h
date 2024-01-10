@@ -64,8 +64,8 @@ public:
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         mOperationalStateInstance(this, aClustersEndpoint),
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, kFeature,
-                                      mOperationalStateInstance, mMicrowaveOvenModeInstance)
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, kFeature, mOperationalStateInstance,
+                                      mMicrowaveOvenModeInstance)
     {}
 
     /**
@@ -78,7 +78,8 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                           bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
+                                                                           bool startAfterSetting,
+                                                                           BitMask<MicrowaveOvenControl::Feature> feature,
                                                                            Optional<uint8_t> powerSetting,
                                                                            Optional<uint8_t> wattSettingIndex) override;
 
@@ -243,11 +244,11 @@ private:
 
     // MicrowaveOvenControl variables
     BitMask<MicrowaveOvenControl::Feature> kFeature = to_underlying(MicrowaveOvenControl::Feature::kPowerAsNumber) +
-                                                      to_underlying(MicrowaveOvenControl::Feature::kPowerNumberLimits);
+        to_underlying(MicrowaveOvenControl::Feature::kPowerNumberLimits);
 
-    uint8_t mPowerSetting        = kDefaultPowerSetting;
-    uint8_t mSelectedWattIndex   = 0;
-    uint16_t mWattRatting        = 0;
+    uint8_t mPowerSetting              = kDefaultPowerSetting;
+    uint8_t mSelectedWattIndex         = 0;
+    uint16_t mWattRatting              = 0;
     const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 
     // MicrowaveOvenMode types

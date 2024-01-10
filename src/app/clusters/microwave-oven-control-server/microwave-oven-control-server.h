@@ -31,11 +31,11 @@ namespace app {
 namespace Clusters {
 namespace MicrowaveOvenControl {
 
-constexpr uint32_t kDefaultCookTime  = 30u;
-constexpr uint32_t kMinCookTime      = 1u;
-constexpr uint8_t  kDefaultMinPower  = 10u;
-constexpr uint8_t  kDefaultMaxPower  = 100u;
-constexpr uint8_t  kDefaultPowerStep = 10u;
+constexpr uint32_t kDefaultCookTime = 30u;
+constexpr uint32_t kMinCookTime     = 1u;
+constexpr uint8_t kDefaultMinPower  = 10u;
+constexpr uint8_t kDefaultMaxPower  = 100u;
+constexpr uint8_t kDefaultPowerStep = 10u;
 
 class Delegate;
 
@@ -148,7 +148,8 @@ public:
      *   If using power in watts, powerSetting will be set to NullOptional.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                                   bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
+                                                                                   bool startAfterSetting,
+                                                                                   BitMask<MicrowaveOvenControl::Feature> feature,
                                                                                    Optional<uint8_t> powerSetting,
                                                                                    Optional<uint8_t> wattSettingIndex) = 0;
 
