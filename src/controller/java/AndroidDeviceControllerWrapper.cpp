@@ -967,7 +967,10 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
 
     UtfString jUserActiveModeTriggerInstruction(env, mUserActiveModeTriggerInstruction);
 
-    icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()), jUserActiveModeTriggerInstruction.jniValue(), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()));
+    icdDeviceInfoObj = env->NewObject(
+        icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
+        jUserActiveModeTriggerInstruction.jniValue(), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()));
 
     env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), icdDeviceInfoObj);
 }
