@@ -33,7 +33,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-
 #if defined(SL_CATLOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif

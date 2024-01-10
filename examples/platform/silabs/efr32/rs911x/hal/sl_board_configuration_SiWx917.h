@@ -38,7 +38,10 @@ typedef struct
 } sl_pin_t;
 
 #define PIN(port_id, pin_id)                                                                                                       \
-    (sl_pin_t) { .port = gpioPort##port_id, .pin = pin_id }
+    (sl_pin_t)                                                                                                                     \
+    {                                                                                                                              \
+        .port = gpioPort##port_id, .pin = pin_id                                                                                   \
+    }
 
 #define SLEEP_CONFIRM_PIN PIN(D, 2)
 #define WAKE_INDICATOR_PIN PIN(A, 5)

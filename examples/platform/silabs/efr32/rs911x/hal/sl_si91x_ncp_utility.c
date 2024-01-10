@@ -36,7 +36,6 @@
 #include "spidrv.h"
 #include "task.h"
 
-
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
 #include "sl_status.h"

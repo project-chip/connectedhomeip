@@ -130,6 +130,7 @@ template("efr32_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
       "${efr32_sdk_root}",
+
       #TODO: Added this as include files because of spi_multiplexing.h file. we will remove it after the cleanup.
       "${examples_plat_dir}",
       "${efr32_sdk_root}/util/plugin/security_manager/",
@@ -207,14 +208,13 @@ template("efr32_sdk") {
     ]
 
     if (silabs_family == "efr32mg24") {
-    _include_dirs += [
-      "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include",
-      ]
+      _include_dirs +=
+          [ "${efr32_sdk_root}/platform/Device/SiliconLabs/EFR32MG24/Include" ]
     }
 
     if (use_SiWx917) {
       _include_dirs += [
-         # si91x component
+        # si91x component
         "${wifi_sdk_root}/components/si91x/memory",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/rom_driver/inc",
@@ -255,7 +255,9 @@ template("efr32_sdk") {
       if (use_rs9116) {
         _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
       } else {
-        _include_dirs += [ "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc" ]
+        _include_dirs += [
+          "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
+        ]
       }
     }
 
