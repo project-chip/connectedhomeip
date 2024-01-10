@@ -79,7 +79,7 @@ public:
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                            bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
-                                                                           Optional<uint8_t> powerSetting, 
+                                                                           Optional<uint8_t> powerSetting,
                                                                            Optional<uint8_t> wattSettingIndex) override;
 
     /**
@@ -242,9 +242,9 @@ private:
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
     // MicrowaveOvenControl variables
-    BitMask<MicrowaveOvenControl::Feature> kFeature = to_underlying(MicrowaveOvenControl::Feature::kPowerAsNumber) + 
+    BitMask<MicrowaveOvenControl::Feature> kFeature = to_underlying(MicrowaveOvenControl::Feature::kPowerAsNumber) +
                                                       to_underlying(MicrowaveOvenControl::Feature::kPowerNumberLimits);
-                                                      
+
     uint8_t mPowerSetting        = kDefaultPowerSetting;
     uint8_t mSelectedWattIndex   = 0;
     uint16_t mWattRatting        = 0;

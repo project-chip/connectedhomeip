@@ -344,7 +344,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         VerifyOrExit(IsPowerSettingInRange(reqPowerSetting, minPower, maxPower),
                      status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookPower, cookPower value is out of range"));
-        
+
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqStartAfterSetting,
                                                                mFeature,MakeOptional(reqPowerSetting), NullOptional);
     }
@@ -361,7 +361,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         VerifyOrExit((reqWattSettingIndex <= (mSupportedPowerLevels - 1)) && mSupportedPowerLevels > 0,
                      status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattIndex, wattIndex is out of range"));
-        
+
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqStartAfterSetting,
                                                                mFeature, NullOptional, MakeOptional(reqWattSettingIndex));

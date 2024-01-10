@@ -54,7 +54,7 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 Protocols::InteractionModel::Status
 ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                             bool startAfterSetting, BitMask<MicrowaveOvenControl::Feature> feature,
-                                                            Optional<uint8_t> powerSetting, 
+                                                            Optional<uint8_t> powerSetting,
                                                             Optional<uint8_t> wattSettingIndex)
 {
     // placeholder implementation
