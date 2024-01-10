@@ -66,10 +66,15 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
     mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
 {
     assertChipStackLockedByCurrentThread();
-    if (mpCallback != nullptr)
-    {
-        mUsingExtendedPathCallbacks = mpCallback->UsingExtendedPathCallbacks();
-    }
+}
+
+CommandSender::CommandSender(ExtendedCallback * apExtendedCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
+                             bool aSuppressResponse) :
+    mExchangeCtx(*this),
+    mpExtendedCallback(apExtendedCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
+{
+    assertChipStackLockedByCurrentThread();
+    mUsingExtendedCallbacks = true;
 }
 
 CommandSender::~CommandSender()
@@ -233,12 +238,9 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     }
 
 exit:
-    if (mpCallback != nullptr)
+    if (err != CHIP_NO_ERROR)
     {
-        if (err != CHIP_NO_ERROR)
-        {
-            mpCallback->OnError(this, err);
-        }
+        OnErrorCallback(err);
     }
 
     if (sendStatusResponse)
@@ -299,7 +301,7 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
 
     if (mpCallback != nullptr)
     {
-        mpCallback->OnError(this, CHIP_ERROR_TIMEOUT);
+        OnErrorCallback(CHIP_ERROR_TIMEOUT);
     }
 
     Close();
@@ -311,10 +313,7 @@ void CommandSender::Close()
     mTimedRequest     = false;
     MoveToState(State::AwaitingDestruction);
 
-    if (mpCallback)
-    {
-        mpCallback->OnDone(this);
-    }
+    OnDoneCallback();
 }
 
 CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse)
@@ -386,17 +385,15 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         }
         ReturnErrorOnFailure(err);
 
-        if (mpCallback != nullptr)
+        // TODO add comment here about why different path taken for mUsingExtendedCallbacks.
+        if (statusIB.IsSuccess() || mUsingExtendedCallbacks)
         {
-            if (statusIB.IsSuccess() || mUsingExtendedPathCallbacks)
-            {
-                mpCallback->OnResponseWithAdditionalData(this, ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
-                                                         hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
-            }
-            else
-            {
-                mpCallback->OnError(this, statusIB.ToChipError());
-            }
+            OnResponseCallback(ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
+                               hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
+        }
+        else
+        {
+            OnErrorCallback(statusIB.ToChipError());
         }
     }
     return CHIP_NO_ERROR;
