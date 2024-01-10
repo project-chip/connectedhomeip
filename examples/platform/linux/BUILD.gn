@@ -65,8 +65,8 @@ source_set("app-main") {
   ]
 
   public_deps = [
-    ":smco-test-event-trigger",
     ":boolean-state-configuration-test-event-trigger",
+    ":smco-test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:force_stdio",
   ]
@@ -101,8 +101,10 @@ source_set("app-main") {
     ]
   }
 
-  defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
-               "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}" ]
+  defines += [
+    "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
+  ]
 
   public_configs = [ ":app-main-config" ]
 }
