@@ -80,6 +80,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerDelegate.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
@@ -551,6 +554,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
     };
     otherDelegate = &smokeCOTestEventTriggerDelegate;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+    static BooleanStateConfigurationTestEventTriggerDelegate booleanStateConfigurationTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &booleanStateConfigurationTestEventTriggerDelegate;
 #endif
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SampleTestEventTriggerDelegate testEventTriggerDelegate;
