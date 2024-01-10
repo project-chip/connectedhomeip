@@ -25,15 +25,15 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_VCC_4_3(MatterBaseTest):
-    async def read_vcc_attribute_expect_success(self, endpoint, attribute):
+class TC_VALCC_4_3(MatterBaseTest):
+    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_VCC_4_3(self) -> str:
-        return "[TC-VCC-4.3] AutoCloseTime functionality with DUT as Server"
+    def desc_TC_VALCC_4_3(self) -> str:
+        return "[TC-VALCC-4.3] AutoCloseTime functionality with DUT as Server"
 
-    def steps_TC_VCC_4_3(self) -> list[TestStep]:
+    def steps_TC_VALCC_4_3(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
@@ -51,14 +51,14 @@ class TC_VCC_4_3(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VCC_4_3(self) -> list[str]:
+    def pics_TC_VALCC_4_3(self) -> list[str]:
         pics = [
-            "VCC.S",
+            "VALCC.S",
         ]
         return pics
 
     @async_test_body
-    async def test_TC_VCC_4_3(self):
+    async def test_TC_VALCC_4_3(self):
 
         endpoint = self.user_params.get("endpoint", 1)
 
@@ -66,7 +66,7 @@ class TC_VCC_4_3(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step(2)
-        feature_map = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_ts_feature_supported = feature_map & Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync
 
@@ -90,7 +90,7 @@ class TC_VCC_4_3(MatterBaseTest):
 
         self.step(5)
         if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
             asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
             asserts.assert_greater_equal(auto_close_time_dut, (utcTime + 55000000),
@@ -111,7 +111,7 @@ class TC_VCC_4_3(MatterBaseTest):
 
         self.step(7)
         if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
             print(auto_close_time_dut)
 
@@ -123,7 +123,7 @@ class TC_VCC_4_3(MatterBaseTest):
         defaultOpenDuration = 0
 
         if is_ts_feature_supported:
-            defaultOpenDuration = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+            defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
 
             print(auto_close_time_dut)
 
@@ -151,7 +151,7 @@ class TC_VCC_4_3(MatterBaseTest):
 
         self.step(11)
         if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
             asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
             asserts.assert_greater_equal(auto_close_time_dut, (utcTime + ((defaultOpenDuration - 5) * 1000000)),
@@ -173,7 +173,7 @@ class TC_VCC_4_3(MatterBaseTest):
 
         self.step(13)
         if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
             asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
         else:

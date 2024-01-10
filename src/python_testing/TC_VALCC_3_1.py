@@ -24,15 +24,15 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_VCC_3_1(MatterBaseTest):
-    async def read_vcc_attribute_expect_success(self, endpoint, attribute):
+class TC_VALCC_3_1(MatterBaseTest):
+    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_VCC_3_1(self) -> str:
-        return "[TC-VCC-3.1] Basic state functionality with DUT as Server"
+    def desc_TC_VALCC_3_1(self) -> str:
+        return "[TC-VALCC-3.1] Basic state functionality with DUT as Server"
 
-    def steps_TC_VCC_3_1(self) -> list[TestStep]:
+    def steps_TC_VALCC_3_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send Open command"),
@@ -44,14 +44,14 @@ class TC_VCC_3_1(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VCC_3_1(self) -> list[str]:
+    def pics_TC_VALCC_3_1(self) -> list[str]:
         pics = [
-            "VCC.S",
+            "VALCC.S",
         ]
         return pics
 
     @async_test_body
-    async def test_TC_VCC_3_1(self):
+    async def test_TC_VALCC_3_1(self):
 
         endpoint = self.user_params.get("endpoint", 1)
 
@@ -66,20 +66,20 @@ class TC_VCC_3_1(MatterBaseTest):
             pass
 
         self.step(3)
-        target_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
         asserts.assert_true(target_state_dut is not NullValue, "TargetState is null")
         asserts.assert_equal(target_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kOpen,
                              "TargetState is not the expected value")
 
         self.step(4)
-        current_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
         asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         while current_state_dut is Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kTransitioning:
             time.sleep(1)
 
-            current_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+            current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         asserts.assert_equal(current_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kOpen,
@@ -93,20 +93,20 @@ class TC_VCC_3_1(MatterBaseTest):
             pass
 
         self.step(6)
-        target_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        target_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
         asserts.assert_true(target_state_dut is not NullValue, "TargetState is null")
         asserts.assert_equal(target_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kClosed,
                              "TargetState is not the expected value")
 
         self.step(7)
-        current_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+        current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
         asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         while current_state_dut is Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kTransitioning:
             time.sleep(1)
 
-            current_state_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+            current_state_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
             asserts.assert_true(current_state_dut is not NullValue, "CurrentState is null")
 
         asserts.assert_equal(current_state_dut, Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kClosed,

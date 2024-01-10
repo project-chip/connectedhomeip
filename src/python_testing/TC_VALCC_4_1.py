@@ -25,15 +25,15 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_VCC_4_1(MatterBaseTest):
-    async def read_vcc_attribute_expect_success(self, endpoint, attribute):
+class TC_VALCC_4_1(MatterBaseTest):
+    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_VCC_4_1(self) -> str:
-        return "[TC-VCC-4.1] Duration functionality with DUT as Server"
+    def desc_TC_VALCC_4_1(self) -> str:
+        return "[TC-VALCC-4.1] Duration functionality with DUT as Server"
 
-    def steps_TC_VCC_4_1(self) -> list[TestStep]:
+    def steps_TC_VALCC_4_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Send Open command with duration set to 60"),
@@ -47,14 +47,14 @@ class TC_VCC_4_1(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VCC_4_1(self) -> list[str]:
+    def pics_TC_VALCC_4_1(self) -> list[str]:
         pics = [
-            "VCC.S",
+            "VALCC.S",
         ]
         return pics
 
     @async_test_body
-    async def test_TC_VCC_4_1(self):
+    async def test_TC_VALCC_4_1(self):
 
         endpoint = self.user_params.get("endpoint", 1)
 
@@ -69,12 +69,12 @@ class TC_VCC_4_1(MatterBaseTest):
             pass
 
         self.step(3)
-        open_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
         asserts.assert_true(open_duration_dut is not NullValue, "OpenDuration is null")
         asserts.assert_equal(open_duration_dut, 60, "OpenDuration is not the expected value")
 
         self.step(4)
-        remaining_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is not NullValue, "RemainingDuration is null")
         asserts.assert_greater_equal(remaining_duration_dut, 55, "RemainingDuration is not in the expected range")
         asserts.assert_less_equal(remaining_duration_dut, 60, "RemainingDuration is not in the expected range")
@@ -83,7 +83,7 @@ class TC_VCC_4_1(MatterBaseTest):
         time.sleep(5)
 
         self.step(6)
-        remaining_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is not NullValue, "RemainingDuration is null")
         asserts.assert_greater_equal(remaining_duration_dut, 50, "RemainingDuration is not in the expected range")
         asserts.assert_less_equal(remaining_duration_dut, 55, "RemainingDuration is not in the expected range")
@@ -96,11 +96,11 @@ class TC_VCC_4_1(MatterBaseTest):
             pass
 
         self.step(8)
-        open_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        open_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
         asserts.assert_true(open_duration_dut is NullValue, "OpenDuration is not null")
 
         self.step(9)
-        remaining_duration_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
+        remaining_duration_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.RemainingDuration)
         asserts.assert_true(remaining_duration_dut is NullValue, "RemainingDuration is not null")
 
 

@@ -25,15 +25,15 @@ from matter_testing_support import MatterBaseTest, TestStep, async_test_body, de
 from mobly import asserts
 
 
-class TC_VCC_3_2(MatterBaseTest):
-    async def read_vcc_attribute_expect_success(self, endpoint, attribute):
+class TC_VALCC_3_2(MatterBaseTest):
+    async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    def desc_TC_VCC_3_2(self) -> str:
-        return "[TC-VCC-3.2] Basic level functionality with DUT as Server"
+    def desc_TC_VALCC_3_2(self) -> str:
+        return "[TC-VALCC-3.2] Basic level functionality with DUT as Server"
 
-    def steps_TC_VCC_3_2(self) -> list[TestStep]:
+    def steps_TC_VALCC_3_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
@@ -46,14 +46,14 @@ class TC_VCC_3_2(MatterBaseTest):
         ]
         return steps
 
-    def pics_TC_VCC_3_2(self) -> list[str]:
+    def pics_TC_VALCC_3_2(self) -> list[str]:
         pics = [
-            "VCC.S",
+            "VALCC.S",
         ]
         return pics
 
     @async_test_body
-    async def test_TC_VCC_3_2(self):
+    async def test_TC_VALCC_3_2(self):
 
         endpoint = self.user_params.get("endpoint", 1)
 
@@ -61,7 +61,7 @@ class TC_VCC_3_2(MatterBaseTest):
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
         self.step(2)
-        feature_map = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_lvl_feature_supported = feature_map & Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kLevel
 
@@ -77,7 +77,7 @@ class TC_VCC_3_2(MatterBaseTest):
 
         self.step(4)
         if is_lvl_feature_supported:
-            target_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
+            target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
 
             asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
             asserts.assert_equal(target_level_dut, 100, "TargetLevel is not the expected value")
@@ -86,13 +86,13 @@ class TC_VCC_3_2(MatterBaseTest):
 
         self.step(5)
         if is_lvl_feature_supported:
-            current_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
+            current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
             asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
             while current_level_dut != 100:
                 time.sleep(1)
 
-                current_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
+                current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
                 asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
             asserts.assert_equal(current_level_dut, 100, "CurrentLevel is not the expected value")
@@ -111,7 +111,7 @@ class TC_VCC_3_2(MatterBaseTest):
 
         self.step(7)
         if is_lvl_feature_supported:
-            target_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
+            target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
 
             asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
             asserts.assert_equal(target_level_dut, 0, "TargetLevel is not the expected value")
@@ -120,13 +120,13 @@ class TC_VCC_3_2(MatterBaseTest):
 
         self.step(8)
         if is_lvl_feature_supported:
-            current_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
+            current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
             asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
             while current_level_dut is Clusters.Objects.ValveConfigurationAndControl.Enums.ValveStateEnum.kTransitioning:
                 time.sleep(1)
 
-                current_level_dut = await self.read_vcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
+                current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
                 asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
             asserts.assert_equal(current_level_dut, 0, "CurrentLevel is not the expected value")
