@@ -22,6 +22,9 @@ from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+sensorTrigger = 0x0080_0000_0000_0000
+sensorUntrigger = 0x0080_0000_0000_0001
+
 
 class TC_BOOLCFG_4_3(MatterBaseTest):
     async def read_boolcfg_attribute_expect_success(self, endpoint, attribute):
@@ -72,7 +75,12 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
     @async_test_body
     async def test_TC_BOOLCFG_4_3(self):
 
+        asserts.assert_true('PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
+                            "PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
+                            "the --int-arg flag as PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY:<key>")
+
         endpoint = self.user_params.get("endpoint", 1)
+        enableKey = self.matter_test_config.global_test_params['PIXIT.BOOLCFG.TEST_EVENT_TRIGGER_KEY'].to_bytes(16, byteorder='big')
 
         self.step(1)
         attributes = Clusters.BooleanStateConfiguration.Attributes
@@ -158,10 +166,17 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
+        test = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsEnabled)
+        print(enabledAlarms)
+        print(test)
+
         self.step(6)
         if is_vis_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorTrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -174,8 +189,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(8)
         if is_vis_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorUntrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -198,8 +216,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(12)
         if is_vis_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorTrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -212,8 +233,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(14)
         if is_vis_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorUntrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -232,8 +256,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(16)
         if is_aud_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorTrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -246,8 +273,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(18)
         if is_aud_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorUntrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -270,8 +300,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(22)
         if is_aud_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorTrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
@@ -284,8 +317,11 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
 
         self.step(24)
         if is_aud_feature_supported:
-            # Test event trigger!
-            logging.info("WIP Test Event Trigger")
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=enableKey, eventTrigger=sensorUntrigger), endpoint=0)
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                pass
         else:
             logging.info("Test step skipped")
 
