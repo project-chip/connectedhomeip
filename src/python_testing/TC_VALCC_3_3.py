@@ -85,7 +85,7 @@ class TC_VALCC_3_3(MatterBaseTest):
             target_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetLevel)
 
             asserts.assert_true(target_level_dut is not NullValue, "TargetLevel is null")
-            asserts.assert_equal(target_level_dut, 100, "TargetLevel is not the expected value")
+            asserts.assert_equal(target_level_dut, defaultOpenLevel, "TargetLevel is not the expected value")
         else:
             logging.info("Test step skipped")
 
@@ -94,13 +94,13 @@ class TC_VALCC_3_3(MatterBaseTest):
             current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
             asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
-            while current_level_dut != 100:
+            while current_level_dut != defaultOpenLevel:
                 time.sleep(1)
 
                 current_level_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentLevel)
                 asserts.assert_true(current_level_dut is not NullValue, "CurrentLevel is null")
 
-            asserts.assert_equal(current_level_dut, 100, "CurrentLevel is not the expected value")
+            asserts.assert_equal(current_level_dut, defaultOpenLevel, "CurrentLevel is not the expected value")
         else:
             logging.info("Test step skipped")
 
