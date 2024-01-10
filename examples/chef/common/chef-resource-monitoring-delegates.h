@@ -25,8 +25,6 @@ namespace app {
 namespace Clusters {
 
 namespace ActivatedCarbonFilterMonitoring {
-/// This is an application level Delegate to handle ActivatedCarbonfilterMonitoringDelegate commands according to the specific
-/// business logic.
 class ActivatedCarbonFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
