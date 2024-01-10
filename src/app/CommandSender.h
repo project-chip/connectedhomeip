@@ -83,20 +83,17 @@ public:
         {}
 
         /**
-         * OnError will be called when an error occur *after* a successful call to SendCommandRequest(). The following
+         * OnError will be called when an error occurs *after* a successful call to SendCommandRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific or path-specific
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
-         * - CHIP_ERROR encapsulating a StatusIB: If we got a path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
-         *      - Note because CommandSender using `CommandSender::Callback` only support sending
-         *        single InvokeRequest, only one path specific error will ever be sent to OnError
-         *        callback
+         *      - Note CommandSender's using `CommandSender::Callback` only supports sending
+         *        single InvokeRequest. As a result, only one path-specific error is expected
+         *        to ever be sent to OnError callback.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
@@ -141,6 +138,16 @@ public:
     // to allow for future extendability.
     struct ErrorData
     {
+        /** 
+         * The following errors will be delivered through chipError
+         *
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
+         *   status response from the server.  In that case,
+         *   StatusIB::InitFromChipError can be used to extract the status.
+         * - CHIP_ERROR*: All other cases.
+         */
         CHIP_ERROR chipError;
     };
 
@@ -187,15 +194,7 @@ public:
         {}
 
         /**
-         * OnError will be called when an error occur *after* a successful call to SendCommandRequest(). The following
-         * errors will be delivered through this call in the aError field:
-         *
-         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
-         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
-         * - CHIP_ERROR*: All other cases.
+         * OnError will be called when an error occurs *after* a successful call to SendCommandRequest().
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
