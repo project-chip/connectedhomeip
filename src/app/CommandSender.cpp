@@ -430,7 +430,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
     bool usingExtendedCallbacks = mpExtendedCallback != nullptr;
-    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendedCallbacks);
+    bool canAddAnotherCommand   = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendedCallbacks);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 

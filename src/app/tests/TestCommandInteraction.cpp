@@ -215,9 +215,8 @@ public:
 class MockCommandSenderExtendedCallback : public CommandSender::ExtendedCallback
 {
 public:
-    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
-                    const StatusIB & aStatus, TLV::TLVReader * aData,
-                    const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatus,
+                    TLV::TLVReader * aData, const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
     {
         IgnoreUnusedVariable(apCommandSender);
         IgnoreUnusedVariable(aData);
@@ -1291,14 +1290,14 @@ void TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommand
 
     // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
     // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
-    commandSender.mBatchCommandsEnabled = true;
+    commandSender.mBatchCommandsEnabled    = true;
     commandSender.mRemoteMaxPathsPerInvoke = 2;
 
     auto commandPathParams = MakeTestCommandPath();
-    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    err                    = commandSender.PrepareCommand(commandPathParams, commandParameters);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     chip::TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
-    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    err                           = writer->PutBoolean(chip::TLV::ContextTag(1), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandSender.FinishCommand(commandParameters);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1322,14 +1321,14 @@ void TestCommandInteraction::TestCommandSenderExtendedCallbackBuildingBatchComma
 
     // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
     // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
-    commandSender.mBatchCommandsEnabled = true;
+    commandSender.mBatchCommandsEnabled    = true;
     commandSender.mRemoteMaxPathsPerInvoke = 2;
 
     auto commandPathParams = MakeTestCommandPath();
-    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    err                    = commandSender.PrepareCommand(commandPathParams, commandParameters);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     chip::TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
-    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    err                           = writer->PutBoolean(chip::TLV::ContextTag(1), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandSender.FinishCommand(commandParameters);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1338,7 +1337,7 @@ void TestCommandInteraction::TestCommandSenderExtendedCallbackBuildingBatchComma
     err = commandSender.PrepareCommand(commandPathParams, commandParameters);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     writer = commandSender.GetCommandDataIBTLVWriter();
-    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    err    = writer->PutBoolean(chip::TLV::ContextTag(1), true);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandSender.FinishCommand(commandParameters);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
