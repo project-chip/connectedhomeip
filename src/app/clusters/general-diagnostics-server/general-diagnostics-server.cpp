@@ -17,9 +17,11 @@
 
 #include "general-diagnostics-server.h"
 
-#ifdef TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
-#include "app/clusters/time-synchronization-server/time-synchronization-server.h"
-#endif // TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+// Need the `nogncheck` because it's inter-cluster dependency and this
+// breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
+#include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 
 #include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -398,13 +400,26 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
 
     System::Clock::Microseconds64 posix_time_us{ 0 };
 
-#ifdef TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     bool time_is_synced = false;
     using Clusters::TimeSynchronization::GranularityEnum;
     GranularityEnum granularity = Clusters::TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity();
-    time_is_synced              = (granularity == GranularityEnum::kSecondsGranularity) ||
-        (granularity == GranularityEnum::kMillisecondsGranularity) || (granularity == GranularityEnum::kMicrosecondsGranularity);
+    switch (granularity)
+    {
+        case GranularityEnum::kUnknownEnumValue:
+        case GranularityEnum::kNoTimeGranularity:
+            time_is_synced = false;
+            break;
+        case GranularityEnum::kMinutesGranularity:
+            // Minute granularity is not deemed good enough for TimeSnapshot to report PosixTimeMs, by spec.
+            time_is_synced = false;
+            break;
+        case GranularityEnum::kSecondsGranularity:
+        case GranularityEnum::kMillisecondsGranularity:
+        case GranularityEnum::kMicrosecondsGranularity:
+            time_is_synced = true;
+            break;
+    }
 
     if (time_is_synced)
     {
@@ -416,7 +431,6 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
         }
     }
 #endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-#endif // TIME_SYNCHRONIZATION_CLUSTER_INCLUDED
 
     System::Clock::Milliseconds64 system_time_ms =
         std::chrono::duration_cast<System::Clock::Milliseconds64>(Server::GetInstance().TimeSinceInit());
