@@ -138,7 +138,7 @@ public:
     // to allow for future extendability.
     struct ErrorData
     {
-        /** 
+        /**
          * The following errors will be delivered through chipError
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
