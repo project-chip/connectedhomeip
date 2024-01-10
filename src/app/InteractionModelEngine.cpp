@@ -995,6 +995,21 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
     }
 }
 
+void InteractionModelEngine::OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType)
+{
+    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    {
+        auto pNextItem = pListItem->GetNextClient();
+        // It is possible that pListItem is destroyed by the app in OnPeerTypeChange.
+        // Get the next item before invoking `OnPeerTypeChange`.
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        {
+            pListItem->OnPeerTypeChange(aType);
+        }
+        pListItem = pNextItem;
+    }
+}
+
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
     apReadClient->SetNextClient(mpActiveReadClientList);

@@ -292,6 +292,11 @@ public:
         Subscribe,
     };
 
+    enum class PeerType : uint8_t {
+        kNormal,
+        kLITICD,
+    };
+
     /**
      *
      *  Constructor.
@@ -349,6 +354,16 @@ public:
      * call this function when a check-in message is received.
      */
     void OnActiveModeNotification();
+
+    /**
+     *  Used to notify whether a peer becomes LIT ICD or vice versa.
+     *
+     *  When the app knows that the peer becoms LIT ICD, it is expected to call this method with PeerType::kLITICD and when
+     * the peer is nolonger a LIT ICD, it is expected to call this method with PeerType::kNormal.
+     *
+     *  Users should call InteractionModelEngine::OnPeerTypeChange instead of this function.  
+     */
+    void OnPeerTypeChange(PeerType aType);
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 

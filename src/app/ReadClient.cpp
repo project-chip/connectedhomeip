@@ -451,6 +451,19 @@ void ReadClient::OnActiveModeNotification()
     TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
 }
 
+void ReadClient::OnPeerTypeChange(PeerType aType)
+{
+    VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+
+    mIsPeerLIT = (aType == PeerType::kLITICD);
+
+    // If the peer is nolonger LIT, try to wake up the subscription and do resubsribe when necessary.
+    if (!mIsPeerLIT)
+    {
+        OnActiveModeNotification();
+    }
+}
+
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {

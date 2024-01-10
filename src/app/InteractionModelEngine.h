@@ -248,6 +248,14 @@ public:
     void OnActiveModeNotification(ScopedNodeId aPeer);
 
     /**
+     *  Used to notify whether a peer becomes LIT ICD or vice versa.
+     *
+     *  When the app knows that the peer becoms LIT ICD, it is expected to call this method with PeerType::kLITICD and when
+     * the peer is nolonger a LIT ICD, it is expected to call this method with PeerType::kNormal.
+     */
+    void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
+
+    /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
      */
