@@ -147,12 +147,30 @@ InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeRespons
 
 InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::MoreChunkedMessages(const bool aMoreChunkedMessages)
 {
+    // If any changes are made to how we encoded MoreChunkedMessage that involves how many
+    // bytes are needed, a corresponding change to GetSizeForMoreChunkResponses indicating
+    // the new size that will be required.
+
     // skip if error has already been set
-    if (mError == CHIP_NO_ERROR)
+    SuccessOrExit(mError);
+
+    if (mIsMoreChunkMessageBufferReserved)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kMoreChunkedMessages), aMoreChunkedMessages);
+        mError = GetWriter()->UnreserveBuffer(GetSizeForMoreChunkResponses());
+        SuccessOrExit(mError);
+        mIsMoreChunkMessageBufferReserved = false;
     }
+
+    mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kMoreChunkedMessages), aMoreChunkedMessages);
+exit:
     return *this;
+}
+
+CHIP_ERROR InvokeResponseMessage::Builder::ReserveSpaceForMoreChunkedMessages()
+{
+    ReturnErrorOnFailure(GetWriter()->ReserveBuffer(GetSizeForMoreChunkResponses()));
+    mIsMoreChunkMessageBufferReserved = true;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
@@ -175,6 +193,15 @@ CHIP_ERROR InvokeResponseMessage::Builder::EndOfInvokeResponseMessage()
         EndOfContainer();
     }
     return GetError();
+}
+
+uint32_t InvokeResponseMessage::Builder::GetSizeForMoreChunkResponses()
+{
+    // MoreChunkedMessages() encodes a uint8_t with context tag 0x02. This means 1 control byte,
+    // 1 byte for the tag. For booleans the value is encoded in control byte.
+    uint32_t kEncodeMoreChunkedMessages = 1 + 1;
+
+    return kEncodeMoreChunkedMessages;
 }
 
 uint32_t InvokeResponseMessage::Builder::GetSizeToEndInvokeResponseMessage()

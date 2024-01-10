@@ -2297,6 +2297,34 @@ public static class BooleanStateClusterStateChangeEvent {
     return output.toString();
   }
 }
+public static class IcdManagementClusterOnTransitionToActiveModeEvent {
+
+  public IcdManagementClusterOnTransitionToActiveModeEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static IcdManagementClusterOnTransitionToActiveModeEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new IcdManagementClusterOnTransitionToActiveModeEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("IcdManagementClusterOnTransitionToActiveModeEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OvenCavityOperationalStateClusterOperationalErrorEvent {
   public ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState;
   private static final long ERROR_STATE_ID = 0L;
