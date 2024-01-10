@@ -1405,7 +1405,7 @@ class BaseTestHelper:
     requests when resuming the maximum subscriptions. The steps for this test are:
     1. Commission the server app to the first fabric and send maximum subscription requests from the controller in
     the first fabric to establish maximum subscriptions.
-    2. Open the commissioning window to make the server app can be commissioned to the second fabric
+    2. Open the commissioning window to make the server app can be commissioned to the second fabric.
     3. Shutdown the controller in the first fabric to extend the time of resuming subscriptions. The server app will
     keep resolving the address of the first controller for a while after rebooting.
     4. Commission the server app to the second fabric.
@@ -1417,7 +1417,7 @@ class BaseTestHelper:
 
     BaseTestHelper provides two controllers. However, if using the two controller (devCtrl and devCtrl2) in one
     MobileDevice to execute this Cirque test, the CHIPEndDevice can still resolve the address for first controller
-    even if the first controller is shutdown by 'self.devCtrl.Shutdown()'. And the server will fail to estalish the
+    even if the first controller is shutdown by 'self.devCtrl.Shutdown()'. And the server will fail to establish the
     subscriptions immediately, which makes it hard to send the new subscription request from the second controller
     at the time of server app resuming maximum subscriptions.
     So we will use two controller containers for this test and divide the test to two steps. The Step1 is executed in
