@@ -281,8 +281,6 @@ source_set("efr32-common") {
   }
 
   if (chip_enable_wifi) {
-
-
     if (use_rs9116) {
       sources += rs911x_src_plat
 
