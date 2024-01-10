@@ -212,6 +212,40 @@ public:
     CHIP_ERROR mError         = CHIP_NO_ERROR;
 } mockCommandSenderDelegate;
 
+class MockCommandSenderExtendedCallback : public CommandSender::ExtendedCallback
+{
+public:
+    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath,
+                    const StatusIB & aStatus, TLV::TLVReader * aData,
+                    const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    {
+        IgnoreUnusedVariable(apCommandSender);
+        IgnoreUnusedVariable(aData);
+        ChipLogDetail(Controller, "Received Cluster Command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x", aPath.mClusterId,
+                      aPath.mCommandId, aPath.mEndpointId);
+        onResponseCalledTimes++;
+    }
+    void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
+    {
+        ChipLogError(Controller, "OnError happens with %" CHIP_ERROR_FORMAT, aErrorData.chipError.Format());
+        mError = aErrorData.chipError;
+        onErrorCalledTimes++;
+    }
+    void OnDone(CommandSender * apCommandSender) override { onFinalCalledTimes++; }
+
+    void ResetCounter()
+    {
+        onResponseCalledTimes = 0;
+        onErrorCalledTimes    = 0;
+        onFinalCalledTimes    = 0;
+    }
+
+    int onResponseCalledTimes = 0;
+    int onErrorCalledTimes    = 0;
+    int onFinalCalledTimes    = 0;
+    CHIP_ERROR mError         = CHIP_NO_ERROR;
+} mockCommandSenderExtendedDelegate;
+
 class MockCommandHandlerCallback : public CommandHandler::Callback
 {
 public:
@@ -261,6 +295,10 @@ public:
     static void TestCommandHandlerReleaseWithExchangeClosed(nlTestSuite * apSuite, void * apContext);
 #endif
 
+    static void TestCommandSenderLegacyCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderExtendedCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderLegacyCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderExtendedCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandSuccessResponseFlow(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandAsyncSuccessResponseFlow(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandFailureResponseFlow(nlTestSuite * apSuite, void * apContext);
@@ -1196,6 +1234,119 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
     }
 }
 
+void TestCommandInteraction::TestCommandSenderLegacyCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+
+    AddInvokeRequestData(apSuite, apContext, &commandSender, kTestNonExistCommandId);
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderDelegate.onResponseCalledTimes == 0 && mockCommandSenderDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderDelegate.onErrorCalledTimes == 1);
+
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+// Because UnsupportedCommand is a path specific error we will expect it to come via on response when using Extended Path.
+void TestCommandInteraction::TestCommandSenderExtendedCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager());
+
+    AddInvokeRequestData(apSuite, apContext, &commandSender, kTestNonExistCommandId);
+    err = commandSender.SendCommandRequest(ctx.GetSessionBobToAlice());
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite,
+                   mockCommandSenderExtendedDelegate.onResponseCalledTimes == 1 &&
+                       mockCommandSenderExtendedDelegate.onFinalCalledTimes == 1 &&
+                       mockCommandSenderExtendedDelegate.onErrorCalledTimes == 0);
+
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    mockCommandSenderDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &ctx.GetExchangeManager());
+    app::CommandSender::AdditionalCommandParameters commandParameters;
+    commandParameters.SetStartOrEndDataStruct(true);
+
+    // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
+    // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
+    commandSender.mBatchCommandsEnabled = true;
+    commandSender.mRemoteMaxPathsPerInvoke = 2;
+
+    auto commandPathParams = MakeTestCommandPath();
+    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    chip::TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
+    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = commandSender.FinishCommand(commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Preparing second command.
+    commandParameters.commandRef.ClearValue();
+    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestCommandInteraction::TestCommandSenderExtendedCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    app::CommandSender commandSender(&mockCommandSenderExtendedDelegate, &ctx.GetExchangeManager());
+    app::CommandSender::AdditionalCommandParameters commandParameters;
+    commandParameters.SetStartOrEndDataStruct(true);
+
+    // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
+    // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
+    commandSender.mBatchCommandsEnabled = true;
+    commandSender.mRemoteMaxPathsPerInvoke = 2;
+
+    auto commandPathParams = MakeTestCommandPath();
+    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    chip::TLV::TLVWriter * writer = commandSender.GetCommandDataIBTLVWriter();
+    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = commandSender.FinishCommand(commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // Preparing second command.
+    commandParameters.commandRef.ClearValue();
+    err = commandSender.PrepareCommand(commandPathParams, commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    writer = commandSender.GetCommandDataIBTLVWriter();
+    err = writer->PutBoolean(chip::TLV::ContextTag(1), true);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    err = commandSender.FinishCommand(commandParameters);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, GetNumActiveHandlerObjects() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -1683,7 +1834,10 @@ const nlTest sTests[] =
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     NL_TEST_DEF("TestCommandHandlerReleaseWithExchangeClosed", chip::app::TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed),
 #endif
-
+    NL_TEST_DEF("TestCommandSenderLegacyCallbackUnsupportedCommand", chip::app::TestCommandInteraction::TestCommandSenderLegacyCallbackUnsupportedCommand),
+    NL_TEST_DEF("TestCommandSenderExtendedCallbackUnsupportedCommand", chip::app::TestCommandInteraction::TestCommandSenderExtendedCallbackUnsupportedCommand),
+    NL_TEST_DEF("TestCommandSenderLegacyCallbackBuildingBatchCommandFails", chip::app::TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommandFails),
+    NL_TEST_DEF("TestCommandSenderExtendedCallbackBuildingBatchCommandFails", chip::app::TestCommandInteraction::TestCommandSenderExtendedCallbackBuildingBatchCommandFails),
     NL_TEST_DEF("TestCommandSenderCommandSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandAsyncSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandSpecificResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSpecificResponseFlow),

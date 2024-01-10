@@ -53,6 +53,9 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
+    /**
+     * @brief Legacy callbacks for CommandSender
+     */
     class Callback
     {
     public:
@@ -91,10 +94,9 @@ public:
          * - CHIP_ERROR encapsulating a StatusIB: If we got a path-specific
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
-         *      - Note path specific error only come here happens if UsingExtendedPathCallbacks()
-         *        returns false.
-         *      - There isn't a guaranteeded way to differentiate between a non-path-specific error and a
-         *        path-specific error from the OnError callback.
+         *      - Note because CommandSender using `CommandSender::Callback` only support sending
+         *        single InvokeRequest, only one path specific error will ever be sent to OnError
+         *        callback
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
@@ -129,7 +131,7 @@ public:
     // to allow for future extendability.
     struct AdditionalResponseData
     {
-        Optional<uint16_t> mCommandRef;
+        Optional<uint16_t> commandRef;
     };
 
     // CommandSender::ExtendedCallback::OnError is public SDK API, so we cannot break source
@@ -139,11 +141,11 @@ public:
     // to allow for future extendability.
     struct ErrorData
     {
-        CHIP_ERROR mChipError;
+        CHIP_ERROR chipError;
     };
 
     /**
-     * @brief asdf
+     * @brief Callback that is extendable for future features, starting with batch commands
      *
      * The two major differences between ExtendedCallback and Callback are:
      * 1. Path-specific errors go to OnResponse instead of OnError
@@ -160,24 +162,16 @@ public:
         virtual ~ExtendedCallback() = default;
 
         /**
-         * OnResponseWithAdditionalData will be called for all path specific responses from the server has been received and
-         * processed. Specifically:
+         * OnResponse will be called for all path specific responses from the server that has been received
+         * and processed. Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
-         *      - Note this only happens if UsingExtendedPathCallbacks() returns true.
+         *      - These kinds of errors are referred to as path-specific errors.
          *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
          *    that contains the data payload (callee will still need to open and process the container).
          *
-         * This OnResponseWithAdditionalData is similar to OnResponse mentioned below, except it contains an additional parameter
-         * `AdditionalResponseData`. This was added in Matter 1.3 to not break backward compatibility, but is extendable in the
-         * future to provide additional response data by only making changes to `AdditionalResponseData`, and not all the potential
-         * callees.
-         *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy the object.
-         *
-         * It is advised that subclass should only override this or `OnResponse`. But, it shouldn't actually matter if both are
-         * overridden, just that `OnResponse` will never be called by CommandSender directly.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aPath           The command path field in invoke command response.
@@ -201,22 +195,17 @@ public:
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
-         * - CHIP_ERROR encapsulating a StatusIB: If we got a path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
-         *      - Note path specific error only come here happens if UsingExtendedPathCallbacks()
-         *        returns false.
-         *      - There isn't a guaranteeded way to differentiate between a non-path-specific error and a
-         *        path-specific error from the OnError callback.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
+         * 
+         * NOTE: Path specific error do NOT come to OnError, but instead go to OnResponse.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aError          A system error code that conveys the overall error code.
+         * @param[in] aErrorData      A error data regarding error that occurred.
          */
-        virtual void OnError(const CommandSender * apCommandSender, ErrorData aErrorData) {}
+        virtual void OnError(const CommandSender * apCommandSender, const ErrorData & aErrorData) {}
 
         /**
          * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
@@ -243,13 +232,13 @@ public:
     {
         ConfigParameters & SetRemoteMaxPathsPerInvoke(uint16_t aRemoteMaxPathsPerInvoke)
         {
-            mRemoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
+            remoteMaxPathsPerInvoke = aRemoteMaxPathsPerInvoke;
             return *this;
         }
 
-        // If mRemoteMaxPathsPerInvoke is 1, this will allow the CommandSender client to contain only one command and
+        // If remoteMaxPathsPerInvoke is 1, this will allow the CommandSender client to contain only one command and
         // doesn't enforce other batch commands requirements.
-        uint16_t mRemoteMaxPathsPerInvoke = 1;
+        uint16_t remoteMaxPathsPerInvoke = 1;
     };
 
     // PrepareCommand and FinishCommand are public SDK APIs, so we cannot break source
@@ -264,17 +253,17 @@ public:
 
         AdditionalCommandParameters & SetStartOrEndDataStruct(bool aStartOrEndDataStruct)
         {
-            mStartOrEndDataStruct = aStartOrEndDataStruct;
+            startOrEndDataStruct = aStartOrEndDataStruct;
             return *this;
         }
 
         // From the perspective of `PrepareCommand`, this is an out parameter. This value will be
         // set by `PrepareCommand` and is expected to be unchanged by caller until it is provided
         // to `FinishCommand`.
-        Optional<uint16_t> mCommandRef;
+        Optional<uint16_t> commandRef;
         // For both `PrepareCommand` and `FinishCommand` this is an in parameter. It must have
         // the same value when calling `PrepareCommand` and `FinishCommand` for a given command.
-        bool mStartOrEndDataStruct = false;
+        bool startOrEndDataStruct = false;
     };
 
     /*
@@ -368,8 +357,8 @@ public:
                               const Optional<uint16_t> & aTimedInvokeTimeoutMs, AdditionalCommandParameters & aOptionalArgs)
     {
         VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
-        // AddRequestDataInternal encodes the data and requires mStartOrEndDataStruct to be false.
-        VerifyOrReturnError(aOptionalArgs.mStartOrEndDataStruct == false, CHIP_ERROR_INVALID_ARGUMENT);
+        // AddRequestDataInternal encodes the data and requires startOrEndDataStruct to be false.
+        VerifyOrReturnError(aOptionalArgs.startOrEndDataStruct == false, CHIP_ERROR_INVALID_ARGUMENT);
 
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs, aOptionalArgs);
     }
@@ -519,14 +508,11 @@ private:
     void OnResponseCallback(const ConcreteCommandPath & aPath, const StatusIB & aStatusIB, TLV::TLVReader * apData,
                             const AdditionalResponseData & aAdditionalResponseData)
     {
-        if (mUsingExtendedCallbacks)
+        if (mpExtendedCallback)
         {
-            if (mpExtendedCallback)
-            {
-                mpExtendedCallback->OnResponse(this, aPath, aStatusIB, apData, aAdditionalResponseData);
-            }
-            return;
+            mpExtendedCallback->OnResponse(this, aPath, aStatusIB, apData, aAdditionalResponseData);
         }
+        // mpCallback is a legacy path that is omitted if using extended callbacks
         if (mpCallback)
         {
             mpCallback->OnResponse(this, aPath, aStatusIB, apData);
@@ -535,15 +521,12 @@ private:
 
     void OnErrorCallback(CHIP_ERROR aError)
     {
-        if (mUsingExtendedCallbacks)
+        if (mpExtendedCallback)
         {
-            if (mpExtendedCallback)
-            {
-                ErrorData errorData = { aError };
-                mpExtendedCallback->OnError(this, errorData);
-            }
-            return;
+            ErrorData errorData = { aError };
+            mpExtendedCallback->OnError(this, errorData);
         }
+        // mpCallback is a legacy path that is omitted if using extended callbacks
         if (mpCallback)
         {
             mpCallback->OnError(this, aError);
@@ -552,14 +535,11 @@ private:
 
     void OnDoneCallback()
     {
-        if (mUsingExtendedCallbacks)
+        if (mpExtendedCallback)
         {
-            if (mpExtendedCallback)
-            {
-                mpExtendedCallback->OnDone(this);
-            }
-            return;
+            mpExtendedCallback->OnDone(this);
         }
+        // mpCallback is a legacy path that is omitted if using extended callbacks
         if (mpCallback)
         {
             mpCallback->OnDone(this);
@@ -585,11 +565,10 @@ private:
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
-    bool mSuppressResponse       = false;
-    bool mTimedRequest           = false;
-    bool mBufferAllocated        = false;
-    bool mBatchCommandsEnabled   = false;
-    bool mUsingExtendedCallbacks = false;
+    bool mSuppressResponse     = false;
+    bool mTimedRequest         = false;
+    bool mBufferAllocated      = false;
+    bool mBatchCommandsEnabled = false;
 };
 
 } // namespace app

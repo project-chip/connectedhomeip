@@ -75,7 +75,6 @@ CommandSender::CommandSender(ExtendedCallback * apExtendedCallback, Messaging::E
     mTimedRequest(aIsTimedRequest)
 {
     assertChipStackLockedByCurrentThread();
-    mUsingExtendedCallbacks = true;
 }
 
 CommandSender::~CommandSender()
@@ -87,6 +86,12 @@ CHIP_ERROR CommandSender::AllocateBuffer()
 {
     if (!mBufferAllocated)
     {
+        // We are making sure that both callbacks are not set. This should never happen as the constructors
+        // are strongly typed and only one should ever be set, but explicit check is here to ensure that is
+        // always the case.
+        bool bothCallbacksAreSet = mpExtendedCallback != nullptr && mpCallback != nullptr;
+        VerifyOrDie(!bothCallbacksAreSet);
+
         mCommandMessageWriter.Reset();
 
         System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
@@ -300,10 +305,9 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
     ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(apExchangeContext));
 
-    if (mpCallback != nullptr)
-    {
-        OnErrorCallback(CHIP_ERROR_TIMEOUT);
-    }
+    // TODO(#30453) When timeout occurs for batch commands what should be done? Should all individual
+    // commands have a path specific error of timeout, or do we give or NoCommandResponse.
+    OnErrorCallback(CHIP_ERROR_TIMEOUT);
 
     Close();
 }
@@ -345,7 +349,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
-            ReturnErrorOnFailure(GetRef(commandStatus, additionalResponseData.mCommandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandStatus, additionalResponseData.commandRef, commandRefExpected));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -357,7 +361,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
-            ReturnErrorOnFailure(GetRef(commandData, additionalResponseData.mCommandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandData, additionalResponseData.commandRef, commandRefExpected));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -387,9 +391,10 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         ReturnErrorOnFailure(err);
 
         // When using ExtendedCallbacks, we are adhearing to a different API contract where path
-        // specific error are send to the OnResponse callback. For more information on the history
+        // specific error are sent to the OnResponse callback. For more information on the history
         // of this issue please see https://github.com/project-chip/connectedhomeip/issues/30991
-        if (statusIB.IsSuccess() || mUsingExtendedCallbacks)
+        bool usingExtendedCallbacks = mpExtendedCallback != nullptr;
+        if (statusIB.IsSuccess() || usingExtendedCallbacks)
         {
             OnResponseCallback(ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
                                hasDataResponse ? &commandDataReader : nullptr, additionalResponseData);
@@ -406,13 +411,13 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
 {
 #if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mRemoteMaxPathsPerInvoke = aConfigParams.mRemoteMaxPathsPerInvoke;
-    mBatchCommandsEnabled    = (aConfigParams.mRemoteMaxPathsPerInvoke > 1);
+    mRemoteMaxPathsPerInvoke = aConfigParams.remoteMaxPathsPerInvoke;
+    mBatchCommandsEnabled    = (aConfigParams.remoteMaxPathsPerInvoke > 1);
     return CHIP_NO_ERROR;
 #else
-    VerifyOrReturnError(aConfigParams.mRemoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     return CHIP_NO_ERROR;
 #endif
 }
@@ -424,14 +429,15 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
-    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled);
+    bool usingExtendedCallbacks = mpExtendedCallback != nullptr;
+    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendedCallbacks);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
-    VerifyOrReturnError(!aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     if (mBatchCommandsEnabled)
     {
-        aOptionalArgs.mCommandRef.SetValue(mFinishedCommandCount);
+        aOptionalArgs.commandRef.SetValue(mFinishedCommandCount);
     }
 
     InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
@@ -441,7 +447,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     ReturnErrorOnFailure(invokeRequest.GetError());
     ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
-    if (aOptionalArgs.mStartOrEndDataStruct)
+    if (aOptionalArgs.startOrEndDataStruct)
     {
         ReturnErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
@@ -459,20 +465,20 @@ CHIP_ERROR CommandSender::FinishCommand(const AdditionalCommandParameters & aOpt
 
     CommandDataIB::Builder & commandData = mInvokeRequestBuilder.GetInvokeRequests().GetCommandData();
 
-    if (aOptionalArgs.mStartOrEndDataStruct)
+    if (aOptionalArgs.startOrEndDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
     }
 
     if (mBatchCommandsEnabled)
     {
-        // If error below occurs, aOptionalArgs.mCommandRef was modified since PerpareCommand was called.
-        VerifyOrReturnError(aOptionalArgs.mCommandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        // If error below occurs, aOptionalArgs.commandRef was modified since PerpareCommand was called.
+        VerifyOrReturnError(aOptionalArgs.commandRef.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if (aOptionalArgs.mCommandRef.HasValue())
+    if (aOptionalArgs.commandRef.HasValue())
     {
-        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.mCommandRef.Value()));
+        ReturnErrorOnFailure(commandData.Ref(aOptionalArgs.commandRef.Value()));
     }
 
     ReturnErrorOnFailure(commandData.EndOfCommandDataIB());

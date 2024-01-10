@@ -121,9 +121,9 @@ public:
             return;
         }
 
-        chip::CommandRef commandRef = aAdditionalResponseData.mCommandRef.ValueOr(0);
+        chip::CommandRef commandRef = aAdditionalResponseData.commandRef.ValueOr(0);
         size_t index                = 0;
-        err                         = GetIndexFromCommandRef(commandRef, index);
+        err                         = GetIndexFrocommandRef(commandRef, index);
         if (err != CHIP_NO_ERROR && mIsBatchedCommands)
         {
             CommandSender::ErrorData errorData = { err };
@@ -137,9 +137,9 @@ public:
             size);
     }
 
-    void OnError(const CommandSender * apCommandSender, CommandSender::ErrorData aErrorData) override
+    void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
     {
-        CHIP_ERROR protocolError = aErrorData.mChipError;
+        CHIP_ERROR protocolError = aErrorData.chipError;
         StatusIB status(protocolError);
         gOnCommandSenderErrorCallback(mAppContext, to_underlying(status.mStatus),
                                       status.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus),
@@ -157,31 +157,31 @@ public:
         delete this;
     };
 
-    CHIP_ERROR GetIndexFromCommandRef(uint16_t aCommandRef, size_t & aIndex)
+    CHIP_ERROR GetIndexFrocommandRef(uint16_t aCommandRef, size_t & aIndex)
     {
-        auto search = mCommandRefToIndex.find(aCommandRef);
-        if (search == mCommandRefToIndex.end())
+        auto search = commandRefToIndex.find(aCommandRef);
+        if (search == commandRefToIndex.end())
         {
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
-        aIndex = mCommandRefToIndex[aCommandRef];
+        aIndex = commandRefToIndex[aCommandRef];
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR AddCommandRefToIndexLookup(uint16_t aCommandRef, size_t aIndex)
     {
-        auto search = mCommandRefToIndex.find(aCommandRef);
-        if (search != mCommandRefToIndex.end())
+        auto search = commandRefToIndex.find(aCommandRef);
+        if (search != commandRefToIndex.end())
         {
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
-        mCommandRefToIndex[aCommandRef] = aIndex;
+        commandRefToIndex[aCommandRef] = aIndex;
         return CHIP_NO_ERROR;
     }
 
 private:
     PyObject mAppContext = nullptr;
-    std::unordered_map<uint16_t, size_t> mCommandRefToIndex;
+    std::unordered_map<uint16_t, size_t> commandRefToIndex;
     bool mIsBatchedCommands;
 };
 
@@ -306,8 +306,8 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 
             // CommandSender provides us with the CommandReference for this associated command. In order to match responses
             // we have to add CommandRef to index lookup.
-            VerifyOrExit(additionalParams.mCommandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
-            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.mCommandRef.Value(), i));
+            VerifyOrExit(additionalParams.commandRef.HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i));
         }
     }
 
