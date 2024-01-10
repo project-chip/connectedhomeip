@@ -37,10 +37,11 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 Delegate * GetDefaultDelegate(EndpointId endpoint);
 
 CHIP_ERROR SetAlarmsActive(EndpointId ep, chip::BitMask<AlarmModeBitmap> alarms);
+CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep);
 CHIP_ERROR ClearAllAlarms(EndpointId ep);
 CHIP_ERROR SuppressAlarms(EndpointId ep, chip::BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarms);
 CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level);
-CHIP_ERROR EmitSensorFault(EndpointId ep);
+CHIP_ERROR EmitSensorFault(EndpointId ep, chip::BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault);
 
 inline bool HasFeature(EndpointId ep, Feature feature)
 {
