@@ -244,6 +244,7 @@ private:
     // MicrowaveOvenControl variables
     BitMask<MicrowaveOvenControl::Feature> kFeature = to_underlying(MicrowaveOvenControl::Feature::kPowerAsNumber) + 
                                                       to_underlying(MicrowaveOvenControl::Feature::kPowerNumberLimits);
+                                                      
     uint8_t mPowerSetting        = kDefaultPowerSetting;
     uint8_t mSelectedWattIndex   = 0;
     uint16_t mWattRatting        = 0;
