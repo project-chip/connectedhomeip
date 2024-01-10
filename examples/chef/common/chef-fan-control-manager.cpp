@@ -58,7 +58,7 @@ CHIP_ERROR ChefFanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEn
     DataModel::Nullable<Percent> percentSetting;
     PercentSetting::Get(mEndpoint, percentSetting);
 
-    return aEncoder.Encode(ercentSetting.ValueOr(0));
+    return aEncoder.Encode(percentSetting.ValueOr(0));
 }
 
 CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
