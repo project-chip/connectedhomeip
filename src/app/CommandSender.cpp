@@ -386,7 +386,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         }
         ReturnErrorOnFailure(err);
 
-        // TODO add comment here about why different path taken for mUsingExtendedCallbacks.
+        // When using ExtendedCallbacks, we are adhearing to a different API contract where path
+        // specific error are send to the OnResponse callback. For more information on the history
+        // of this issue please see https://github.com/project-chip/connectedhomeip/issues/30991
         if (statusIB.IsSuccess() || mUsingExtendedCallbacks)
         {
             OnResponseCallback(ConcreteCommandPath(endpointId, clusterId, commandId), statusIB,
