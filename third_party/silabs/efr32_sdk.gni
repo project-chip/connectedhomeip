@@ -213,13 +213,15 @@ template("efr32_sdk") {
 
     if (use_SiWx917) {
       _include_dirs += [
+         # si91x component
         "${wifi_sdk_root}/components/si91x/memory",
-        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/rom_driver/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/inc",
         "${wifi_sdk_root}/components/common/inc",
         "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
+        "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
@@ -234,6 +236,8 @@ template("efr32_sdk") {
 
         # network_manager component
         "${wifi_sdk_root}/components/service/network_manager/inc",
+
+        "${wifi_sdk_root}/components/protocol/wifi/si91x",
       ]
     }
     if (use_rs9116 || use_SiWx917) {

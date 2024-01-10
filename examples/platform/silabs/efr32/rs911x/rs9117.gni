@@ -15,29 +15,6 @@ rs9117_inc_plat = [
   "${examples_plat_dir}/rs911x",
   "${examples_plat_dir}/rs911x/hal",
   "${wifi_sdk_root}/components/si91x/ble/inc",
-
-   # si91x component
-  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ble/inc",
-  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/inc",
-  "${wifi_sdk_root}/components/common/inc",
-  "${wifi_sdk_root}/components/si91x/memory",
-  "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/inc",
-
-  # wifi component
-  "${wifi_sdk_root}/components/protocol/wifi/inc",
-
-  # si91x_support component
-  "${wifi_sdk_root}/components/si91x_support/inc",
-
-  # wifi_resources component
-  "${wifi_sdk_root}/resources/certificates",
-  "${wifi_sdk_root}/resources/defaults",
-  "${wifi_sdk_root}/resources/other",
-
-  # network_manager component
-  "${wifi_sdk_root}/components/service/network_manager/inc",
-
-  "${wifi_sdk_root}/components/protocol/wifi/si91x",
 ]
 
 rs911x_cflags = [ "-Wno-empty-body" ]
