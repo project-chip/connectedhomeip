@@ -276,20 +276,13 @@ void NrfWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
     }
 }
 
-CHIP_ERROR NrfWiFiDriver::GetSupportedWiFiBands(Span<WiFiBand> & bands)
+uint32_t NrfWiFiDriver::GetSupportedWiFiBands()
 {
-    static constexpr WiFiBand kBands[] = {
-        WiFiBand::k2g4,
+    uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
 #ifndef CONFIG_BOARD_NRF7001
-        WiFiBand::k5g,
+    bands |= static_cast<uint32_t>(1UL << WiFiBandEnum::k5g);
 #endif
-    };
-
-    VerifyOrReturnError(ArraySize(kBands) <= bands.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(bands.data(), kBands, sizeof(kBands));
-    bands.reduce_size(ArraySize(kBands));
-
-    return CHIP_NO_ERROR;
+    return bands;
 }
 
 } // namespace NetworkCommissioning
