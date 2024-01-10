@@ -63,6 +63,60 @@ bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
     }
     return false;
 }
+
+class BooleanStateConfigAttrAccess : public AttributeAccessInterface
+{
+public:
+    BooleanStateConfigAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BooleanStateConfiguration::Id) {}
+
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR WriteCurrentSensitivityLevel(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+};
+
+BooleanStateConfigAttrAccess gAttrAccess;
+
+CHIP_ERROR BooleanStateConfigAttrAccess::WriteCurrentSensitivityLevel(const ConcreteDataAttributePath & aPath,
+                                                                      AttributeValueDecoder & aDecoder)
+{
+    uint8_t curSenLevel, supportedSensLevel;
+    ReturnErrorOnFailure(aDecoder.Decode(curSenLevel));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
+                        CHIP_IM_GLOBAL_STATUS(Failure));
+
+    VerifyOrReturnError(curSenLevel < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentSensitivityLevel::Set(aPath.mEndpointId, curSenLevel),
+                        CHIP_IM_GLOBAL_STATUS(Failure));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BooleanStateConfigAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BooleanStateConfigAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    if (aPath.mClusterId != BooleanStateConfiguration::Id)
+    {
+        return CHIP_ERROR_INVALID_PATH_LIST;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case CurrentSensitivityLevel::Id: {
+        return WriteCurrentSensitivityLevel(aPath, aDecoder);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
 } // namespace
 
 static bool emitAlarmsStateChangedEvent(EndpointId ep)
@@ -316,4 +370,7 @@ exit:
     return true;
 }
 
-void MatterBooleanStateConfigurationPluginServerInitCallback() {}
+void MatterBooleanStateConfigurationPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
+}
