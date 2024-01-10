@@ -408,18 +408,30 @@ class AttributeCache:
             instead of a cluster object value, a ValueDecodeFailure shall be present.
         '''
 
-        tlvCache = self.attributeTLVCache
-        attributeCache = self.attributeCache
+        def handle_cluster_view(endpointId, clusterId, clusterType):
+            try:
+                decodedData = clusterType.FromDict(
+                    data=clusterType.descriptor.TagDictToLabelDict([], self.attributeTLVCache[endpointId][clusterId]))
+                decodedData.SetDataVersion(self.versionList.get(endpointId, {}).get(clusterId))
+                return decodedData
+            except Exception as ex:
+                return ValueDecodeFailure(self.attributeTLVCache[endpointId][clusterId], ex)
+
+        def handle_attribute_view(endpointId, clusterId, attributeId, attributeType):
+            value = self.attributeTLVCache[endpointId][clusterId][attributeId]
+            if isinstance(value, ValueDecodeFailure):
+                return value
+            try:
+                return attributeType.FromTagDictOrRawValue(value)
+            except Exception as ex:
+                return ValueDecodeFailure(value, ex)
 
         for attributePath in changedPathSet:
-            endpointId = attributePath.EndpointId
+            endpointId, clusterId, attributeId = attributePath.EndpointId, attributePath.ClusterId, attributePath.AttributeId
 
-            if endpointId not in attributeCache:
-                attributeCache[endpointId] = {}
-
-            endpointCache = attributeCache[endpointId]
-
-            clusterId = attributePath.ClusterId
+            if endpointId not in self.attributeCache:
+                self.attributeCache[endpointId] = {}
+            endpointCache = self.attributeCache[endpointId]
 
             if clusterId not in _ClusterIndex:
                 #
@@ -430,30 +442,13 @@ class AttributeCache:
 
             clusterType = _ClusterIndex[clusterId]
 
-            if clusterType not in endpointCache:
-                endpointCache[clusterType] = {}
-
-            clusterCache = endpointCache[clusterType]
-            clusterDataVersion = self.versionList.get(
-                endpointId, {}).get(clusterId, None)
-
             if self.returnClusterObject:
-                try:
-                    # Since the TLV data is already organized by attribute tags, we can trivially convert to a cluster object representation.
-                    endpointCache[clusterType] = clusterType.FromDict(
-                        data=clusterType.descriptor.TagDictToLabelDict([], tlvCache[endpointId][clusterId]))
-                    endpointCache[clusterType].SetDataVersion(
-                        clusterDataVersion)
-                except Exception as ex:
-                    decodedValue = ValueDecodeFailure(
-                        tlvCache[endpointId][clusterId], ex)
-                    endpointCache[clusterType] = decodedValue
+                endpointCache[clusterType] = handle_cluster_view(endpointId, clusterId, clusterType)
             else:
-                clusterCache[DataVersion] = clusterDataVersion
-
-                attributeId = attributePath.AttributeId
-
-                value = tlvCache[endpointId][clusterId][attributeId]
+                if clusterType not in endpointCache:
+                    endpointCache[clusterType] = {}
+                clusterCache = endpointCache[clusterType]
+                clusterCache[DataVersion] = self.versionList.get(endpointId, {}).get(clusterId)
 
                 if (clusterId, attributeId) not in _AttributeIndex:
                     #
@@ -463,20 +458,7 @@ class AttributeCache:
                     continue
 
                 attributeType = _AttributeIndex[(clusterId, attributeId)][0]
-
-                if attributeType not in clusterCache:
-                    clusterCache[attributeType] = {}
-
-                if isinstance(value, ValueDecodeFailure):
-                    clusterCache[attributeType] = value
-                else:
-                    try:
-                        decodedValue = attributeType.FromTagDictOrRawValue(
-                            tlvCache[endpointId][clusterId][attributeId])
-                    except Exception as ex:
-                        decodedValue = ValueDecodeFailure(value, ex)
-
-                    clusterCache[attributeType] = decodedValue
+                clusterCache[attributeType] = handle_attribute_view(endpointId, clusterId, attributeId, attributeType)
 
 
 class SubscriptionTransaction:
@@ -692,11 +674,7 @@ class AsyncReadTransaction:
 
     def handleAttributeData(self, path: AttributePathWithListIndex, dataVersion: int, status: int, data: bytes):
         try:
-            imStatus = status
-            try:
-                imStatus = chip.interaction_model.Status(status)
-            except chip.exceptions.ChipStackException:
-                pass
+            imStatus = chip.interaction_model.Status(status)
 
             if (imStatus != chip.interaction_model.Status.Success):
                 attributeValue = ValueDecodeFailure(
@@ -849,8 +827,8 @@ class AsyncWriteTransaction:
         try:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except chip.exceptions.ChipStackException:
-            self._resultData.append(AttributeWriteResult(Path=path, Status=status))
+        except ValueError as ex:
+            logging.exception(ex)
 
     def handleError(self, chipError: PyChipError):
         self._resultError = chipError

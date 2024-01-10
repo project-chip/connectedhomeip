@@ -171,6 +171,13 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
     chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
+    *errInfoOnFailure = wrapper->mICDClientStorage.Init(wrapperStorage, &wrapper->mSessionKeystore);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "ICD Client Storage failure");
+        return nullptr;
+    }
+
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
 
@@ -358,6 +365,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
+    wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -449,6 +458,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Contro
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    mDeviceIsICD = false;
 
     VerifyOrReturnError(icdRegistrationInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -637,6 +648,16 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
+
+    if (error != CHIP_NO_ERROR && mDeviceIsICD)
+    {
+        CHIP_ERROR deleteEntryError = mICDClientStorage.DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
+        if (deleteEntryError != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
+        }
+    }
+
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
@@ -889,14 +910,61 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
 void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter)
 {
     chip::DeviceLayer::StackUnlock unlock;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::ICDClientInfo clientInfo;
+    clientInfo.peer_node         = ScopedNodeId(icdNodeId, Controller()->GetFabricIndex());
+    clientInfo.monitored_subject = mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value();
+    clientInfo.start_icd_counter = icdCounter;
+
+    ByteSpan symmetricKey = mAutoCommissioner.GetCommissioningParameters().GetICDSymmetricKey().Value();
+
+    err = mICDClientStorage.SetKey(clientInfo, symmetricKey);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(icdNodeId));
+    }
+    else
+    {
+        mICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(icdNodeId),
+                     err.AsString());
+    }
+
+    mDeviceIsICD = true;
+
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onICDRegistrationCompleteMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete", "(JJ)V",
-                                                             &onICDRegistrationCompleteMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+    jclass icdDeviceInfoClass         = nullptr;
+    jmethodID icdDeviceInfoStructCtor = nullptr;
+    jobject icdDeviceInfoObj          = nullptr;
+    jbyteArray jSymmetricKey          = nullptr;
+    CHIP_ERROR methodErr =
+        JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
+                                                "(IJJLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
-    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jlong>(icdNodeId),
-                        static_cast<jlong>(icdCounter));
+    methodErr = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
+
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([B)V");
+    VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
+
+    methodErr =
+        JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<jint>(symmetricKey.size()), jSymmetricKey);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, methodErr.Format()));
+
+    icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey);
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()),
+                        static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
