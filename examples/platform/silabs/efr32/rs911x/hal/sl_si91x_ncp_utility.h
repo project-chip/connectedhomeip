@@ -22,10 +22,10 @@
  * That can be extended to other families as well.
  */
 
-
-#include "spi_multiplex.h"
 #include "silabs_utils.h"
 #include "sl_status.h"
+#include "spi_multiplex.h"
+
 
 #if defined(CHIP_9117)
 #include "sl_board_configuration_SiWx917.h"
@@ -38,8 +38,9 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 #elif defined(EFR32MG24)
 #include "em_eusart.h"
-#include "sl_spidrv_instances.h"
 #include "sl_spidrv_eusart_exp_config.h"
+#include "sl_spidrv_instances.h"
+
 #define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
 #else // EFR32MG12 || EFR32MG24
 #error "Unknown platform"
@@ -53,4 +54,3 @@ extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 sl_status_t spi_board_init(void);
 static bool spi_enabled = false;
 #endif // SL_SPICTRL_MUX
-

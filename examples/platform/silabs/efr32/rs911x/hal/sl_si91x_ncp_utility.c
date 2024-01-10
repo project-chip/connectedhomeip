@@ -23,9 +23,6 @@
 #include <string.h>
 
 #include "FreeRTOS.h"
-#include "event_groups.h"
-#include "semphr.h"
-#include "task.h"
 #include "dmadrv.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -33,8 +30,12 @@
 #include "em_device.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
+#include "event_groups.h"
 #include "gpiointerrupt.h"
+#include "semphr.h"
 #include "spidrv.h"
+#include "task.h"
+
 
 #include "sl_device_init_clocks.h"
 #include "sl_device_init_hfxo.h"
@@ -117,8 +118,6 @@ sl_status_t sl_wfx_host_post_lcd_spi_transfer(void)
 }
 #endif // SL_LCDCTRL_MUX
 
-
-
 #if SL_SPICTRL_MUX
 
 void SPIDRV_SetBaudrate(uint32_t baudrate)
@@ -140,7 +139,8 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
  * @return
  *        None
  **********************************************************/
-sl_status_t spi_board_init() {
+sl_status_t spi_board_init()
+{
 #if SL_SPICTRL_MUX
     if (spi_sem_sync_hdl == NULL)
     {
@@ -221,7 +221,7 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
     }
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
-int32_t status = BOOTLOADER_OK;
+    int32_t status = BOOTLOADER_OK;
 #if defined(CHIP_9117)
     LDMA_Init_t ldma_init = LDMA_INIT_DEFAULT;
     LDMA_Init(&ldma_init);
@@ -265,7 +265,6 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
     return SL_STATUS_OK;
 }
 #endif // SL_BTLCTRL_MUX
-
 
 #if SL_MX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)

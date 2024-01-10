@@ -173,7 +173,7 @@ void sl_wfx_host_reset_chip(void)
 
 void gpio_interrupt(uint8_t interrupt_number)
 {
-  UNUSED_PARAMETER(interrupt_number);
+    UNUSED_PARAMETER(interrupt_number);
 }
 
 /*****************************************************************
