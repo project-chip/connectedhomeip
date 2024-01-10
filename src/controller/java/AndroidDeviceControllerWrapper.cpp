@@ -713,6 +713,10 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
                                                              &onReadCommissioningInfoMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
 
+    // For ICD
+    mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
+    CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
+
     env->CallVoidMethod(mJavaObjectRef, onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
                         static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
                         static_cast<jint>(info.network.thread.endpoint));
@@ -946,14 +950,14 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     jbyteArray jSymmetricKey          = nullptr;
     CHIP_ERROR methodErr =
         JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
-                                                "(IJJLchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
+                                                "(ILchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
     methodErr = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
 
-    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([B)V");
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJ)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
     methodErr =
@@ -961,10 +965,11 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     VerifyOrReturn(methodErr == CHIP_NO_ERROR,
                    ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, methodErr.Format()));
 
-    icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey);
+    UtfString jUserActiveModeTriggerInstruction(env, mUserActiveModeTriggerInstruction);
 
-    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()),
-                        static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), icdDeviceInfoObj);
+    icdDeviceInfoObj = env->NewObject(icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()), jUserActiveModeTriggerInstruction.jniValue(), static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter), static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()));
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

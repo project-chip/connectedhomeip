@@ -17,16 +17,112 @@
  */
 package chip.devicecontroller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /** Class for holding ICD Device information. */
 public class ICDDeviceInfo {
-  private byte[] symmetricKey;
+    /** List of methods to trigger the ICD to switch to Active mode. */
+    public enum UserActiveModeTriggerBitmap {
+        PowerCycle(0),
+        SettingsMenu(1),
+        CustomInstruction(2),
+        DeviceManual(3),
+        ActuateSensor(4),
+        ActuateSensorSeconds(5),
+        ActuateSensorTimes(6),
+        ActuateSensorLightsBlink(7),
+        ResetButton(8),
+        ResetButtonLightsBlink(9),
+        ResetButtonSeconds(10),
+        ResetButtonTimes(11),
+        SetupButton(12),
+        SetupButtonSeconds(13),
+        SetupButtonLightsBlink(14),
+        SetupButtonTimes(15),
+        AppDefinedButton(16);
 
-  public ICDDeviceInfo(byte[] symmetricKey) {
-    this.symmetricKey = symmetricKey;
-  }
+        private final int bitIndex;
 
-  /** Returns the 16 bytes ICD symmetric key. */
-  public byte[] getSymmetricKey() {
-    return symmetricKey;
-  }
+        UserActiveModeTriggerBitmap(int bitIndex) {
+            this.bitIndex = bitIndex;
+        }
+
+        public int getBitIndex() {
+            return bitIndex;
+        }
+    }
+
+    private final byte[] symmetricKey;
+    private final Set<UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
+    private final String userActiveModeTriggerInstruction;
+    private final long icdNodeId;
+    private final long icdCounter;
+    private final long monitoredSubject;
+
+    ICDDeviceInfo(byte[] symmetricKey, Set<UserActiveModeTriggerBitmap> userActiveModeTriggerHint, String userActiveModeTriggerInstruction, long icdNodeId, long icdCounter, long monitoredSubject) {
+        this.symmetricKey = symmetricKey;
+        this.userActiveModeTriggerHint = userActiveModeTriggerHint;
+        this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
+        this.icdNodeId = icdNodeId;
+        this.icdCounter = icdCounter;
+        this.monitoredSubject = monitoredSubject;
+    }
+
+    ICDDeviceInfo(byte[] symmetricKey, int userActiveModeTriggerHintRaw, String userActiveModeTriggerInstruction, long icdNodeId, long icdCounter, long monitoredSubject) {
+        this.symmetricKey = symmetricKey;
+        this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
+        this.icdNodeId = icdNodeId;
+        this.icdCounter = icdCounter;
+        this.monitoredSubject = monitoredSubject;
+
+        this.userActiveModeTriggerHint = new HashSet<>();
+        for (UserActiveModeTriggerBitmap mode: UserActiveModeTriggerBitmap.values()) {
+            int bitmask = 1 << mode.getBitIndex();
+            if ((userActiveModeTriggerHintRaw & bitmask) != 0) {
+                userActiveModeTriggerHint.add(mode);
+            }
+        }
+    }
+
+    /** Returns the 16 bytes ICD symmetric key. */
+    public byte[] getSymmetricKey() {
+        return symmetricKey;
+    }
+
+    /** Returns the Set of UserActiveModeTriggerHint. */
+    public Set<UserActiveModeTriggerBitmap> getUserActiveModeTriggerHint() {
+        return userActiveModeTriggerHint;
+    }
+
+    /** Returns the UserActiveModeTriggerInstruction. */
+    public String getUserActiveModeTriggerInstruction() {
+        return userActiveModeTriggerInstruction;
+    }
+
+    /** Returns the ICD Node Id. */
+    public long getIcdNodeId() {
+        return icdNodeId;
+    }
+
+    /** Returns the ICD Counter. */
+    public long getIcdCounter() {
+        return icdCounter;
+    }
+
+    /** Returns the Monitored Subject. */
+    public long getMonitoredSubject() {
+        return monitoredSubject;
+    }
+
+    @Override
+    public String toString() {
+        return "ICDDeviceInfo : {" +
+                "\n\tuserActiveModeTriggerHint : " + userActiveModeTriggerHint +
+                "\n\tuserActiveModeTriggerInstruction : " + userActiveModeTriggerInstruction +
+                "\n\ticdNodeId : " + icdNodeId +
+                "\n\ticdCounter : " + icdCounter +
+                "\n\tmonitoredSubject : " + monitoredSubject +
+                "\n}";
+    }
 }

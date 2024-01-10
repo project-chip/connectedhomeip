@@ -294,15 +294,10 @@ class DeviceProvisioningFragment : Fragment() {
       )
     }
 
-    override fun onICDRegistrationComplete(
-      errorCode: Int,
-      icdNodeId: Long,
-      icdCounter: Long,
-      icdDeviceInfo: ICDDeviceInfo
-    ) {
+    override fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo) {
       Log.d(
         TAG,
-        "onICDRegistrationComplete - errorCode: $errorCode, icdNodeId : $icdNodeId, icdCounter : $icdCounter, symmetricKey : ${icdDeviceInfo.symmetricKey.toHex()}"
+        "onICDRegistrationComplete - errorCode: $errorCode, symmetricKey : ${icdDeviceInfo.symmetricKey.toHex()}, icdDeviceInfo : $icdDeviceInfo"
       )
     }
   }
