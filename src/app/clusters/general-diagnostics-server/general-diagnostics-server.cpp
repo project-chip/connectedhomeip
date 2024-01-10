@@ -21,7 +21,7 @@
 // Need the `nogncheck` because it's inter-cluster dependency and this
 // breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
 #include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
-#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+#endif                                                                            // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 
 #include "app/server/Server.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -406,19 +406,19 @@ bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * comma
     GranularityEnum granularity = Clusters::TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity();
     switch (granularity)
     {
-        case GranularityEnum::kUnknownEnumValue:
-        case GranularityEnum::kNoTimeGranularity:
-            time_is_synced = false;
-            break;
-        case GranularityEnum::kMinutesGranularity:
-            // Minute granularity is not deemed good enough for TimeSnapshot to report PosixTimeMs, by spec.
-            time_is_synced = false;
-            break;
-        case GranularityEnum::kSecondsGranularity:
-        case GranularityEnum::kMillisecondsGranularity:
-        case GranularityEnum::kMicrosecondsGranularity:
-            time_is_synced = true;
-            break;
+    case GranularityEnum::kUnknownEnumValue:
+    case GranularityEnum::kNoTimeGranularity:
+        time_is_synced = false;
+        break;
+    case GranularityEnum::kMinutesGranularity:
+        // Minute granularity is not deemed good enough for TimeSnapshot to report PosixTimeMs, by spec.
+        time_is_synced = false;
+        break;
+    case GranularityEnum::kSecondsGranularity:
+    case GranularityEnum::kMillisecondsGranularity:
+    case GranularityEnum::kMicrosecondsGranularity:
+        time_is_synced = true;
+        break;
     }
 
     if (time_is_synced)
