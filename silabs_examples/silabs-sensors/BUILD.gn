@@ -42,6 +42,7 @@ if (wifi_soc) {
   examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 }
 
+import("${silabs_project_dir}/data_model/args.gni")
 import("${examples_common_plat_dir}/args.gni")
 
 declare_args() {
@@ -111,7 +112,21 @@ if (wifi_soc) {
 }
 
 silabs_executable("sensors_app") {
-  output_name = "matter-silabs-sensors-example.out"
+  sensorType = "sensor"
+  if (is_occupancy_sensor)
+  {
+    sensorType = "occupancy-sensor"
+  }
+  else if (is_temperature_sensor) 
+  {
+    sensorType = "temperature-sensor"
+  }
+  else if (is_contact_sensor)
+  {
+    sensorType = "contact-sensor"
+  }
+
+  output_name = "matter-silabs-${sensorType}-example.out"
   include_dirs = [ "include" ]
   defines = []
 

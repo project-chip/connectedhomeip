@@ -15,14 +15,9 @@
 import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/platform/device.gni")
+import("args.gni")
 
-declare_args() {
-  is_occupancy_sensor = false
 
-  is_temperature_sensor = false
-
-  is_contact_sensor = false
-}
 
 if (!is_occupancy_sensor && !is_temperature_sensor && !is_contact_sensor) {
   # Default app will be the occupancy sensor
