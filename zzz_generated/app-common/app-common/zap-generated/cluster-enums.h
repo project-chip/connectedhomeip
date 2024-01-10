@@ -2603,17 +2603,20 @@ enum class CredentialRuleEnum : uint8_t
 // Enum for CredentialTypeEnum
 enum class CredentialTypeEnum : uint8_t
 {
-    kProgrammingPIN = 0x00,
-    kPin            = 0x01,
-    kRfid           = 0x02,
-    kFingerprint    = 0x03,
-    kFingerVein     = 0x04,
-    kFace           = 0x05,
+    kProgrammingPIN               = 0x00,
+    kPin                          = 0x01,
+    kRfid                         = 0x02,
+    kFingerprint                  = 0x03,
+    kFingerVein                   = 0x04,
+    kFace                         = 0x05,
+    kAliroCredentialIssuerKey     = 0x06,
+    kAliroEvictableEndpointKey    = 0x07,
+    kAliroNonEvictableEndpointKey = 0x08,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
+    kUnknownEnumValue = 9,
 };
 
 // Enum for DataOperationTypeEnum
@@ -2787,22 +2790,25 @@ enum class DoorStateEnum : uint8_t
 // Enum for LockDataTypeEnum
 enum class LockDataTypeEnum : uint8_t
 {
-    kUnspecified     = 0x00,
-    kProgrammingCode = 0x01,
-    kUserIndex       = 0x02,
-    kWeekDaySchedule = 0x03,
-    kYearDaySchedule = 0x04,
-    kHolidaySchedule = 0x05,
-    kPin             = 0x06,
-    kRfid            = 0x07,
-    kFingerprint     = 0x08,
-    kFingerVein      = 0x09,
-    kFace            = 0x0A,
+    kUnspecified                  = 0x00,
+    kProgrammingCode              = 0x01,
+    kUserIndex                    = 0x02,
+    kWeekDaySchedule              = 0x03,
+    kYearDaySchedule              = 0x04,
+    kHolidaySchedule              = 0x05,
+    kPin                          = 0x06,
+    kRfid                         = 0x07,
+    kFingerprint                  = 0x08,
+    kFingerVein                   = 0x09,
+    kFace                         = 0x0A,
+    kAliroCredentialIssuerKey     = 0x0B,
+    kAliroEvictableEndpointKey    = 0x0C,
+    kAliroNonEvictableEndpointKey = 0x0D,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 11,
+    kUnknownEnumValue = 14,
 };
 
 // Enum for LockOperationTypeEnum
@@ -2863,11 +2869,12 @@ enum class OperationSourceEnum : uint8_t
     kRemote            = 0x07,
     kRfid              = 0x08,
     kBiometric         = 0x09,
+    kAliro             = 0x0A,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 10,
+    kUnknownEnumValue = 11,
 };
 
 // Enum for UserStatusEnum
@@ -3072,6 +3079,8 @@ enum class Feature : uint32_t
     kYearDayAccessSchedules      = 0x400,
     kHolidaySchedules            = 0x800,
     kUnbolt                      = 0x1000,
+    kAliroProvisioning           = 0x2000,
+    kAliroBLEUWB                 = 0x4000,
 };
 } // namespace DoorLock
 

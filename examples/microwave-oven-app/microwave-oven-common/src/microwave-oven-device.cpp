@@ -125,15 +125,13 @@ CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalStateAtIndex(size_t index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index,
-                                                                  OperationalState::GenericOperationalPhase & operationalPhase)
+CHIP_ERROR ExampleMicrowaveOvenDevice::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
-    if (index > mOperationalPhaseList.size() - 1)
+    if (index >= mOperationalPhaseList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalPhase = mOperationalPhaseList[index];
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void ExampleMicrowaveOvenDevice::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)

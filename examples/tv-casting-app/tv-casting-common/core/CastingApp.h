@@ -55,13 +55,15 @@ public:
     /**
      * @brief Starts the Matter server that the CastingApp runs on and registers all the necessary delegates
      * CastingApp.
+     * If the CastingApp was previously connected to a CastingPlayer and then Stopped by calling the Stop()
+     * API, it will re-connect to the CastingPlayer.
      *
      * @return CHIP_ERROR - CHIP_NO_ERROR if Matter server started successfully, specific error code otherwise.
      */
     CHIP_ERROR Start();
 
     /**
-     * @brief Stops the Matter server that the CastingApp runs on
+     * @brief Stops the Matter server that the CastingApp runs on.
      *
      * @return CHIP_ERROR - CHIP_NO_ERROR if Matter server stopped successfully, specific error code otherwise.
      */
@@ -76,6 +78,11 @@ public:
      * @brief Tears down all active subscriptions.
      */
     CHIP_ERROR ShutdownAllSubscriptions();
+
+    /**
+     * @brief Clears app cache that contains the information about CastingPlayers previously connected to
+     */
+    CHIP_ERROR ClearCache();
 
 private:
     CastingApp();
