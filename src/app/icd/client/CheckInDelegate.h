@@ -19,7 +19,6 @@
 #pragma once
 
 #include <app/icd/client/ICDClientInfo.h>
-#include <app/icd/client/ICDRefreshKeyInfo.h>
 
 namespace chip {
 namespace app {
@@ -40,42 +39,6 @@ public:
                                node that sent the check-in message.
      */
     virtual void OnCheckInComplete(const ICDClientInfo & clientInfo) = 0;
-
-    /**
-     * @brief Callback used to let the application know that a key refresh is
-     * needed to avoid counter rollover problems.
-     *
-     * The implementer of this function should generate a new key and store it in a map with peer nodeID as the key and
-     * ICDRefreshKeyInfo as the value.
-     *
-     * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-                               node that sent the check-in message. The callee can use the clientInfo to determine the type of key
-                               to generate.
-     * @param[out] keyData - pointer to the keyData buffer of size keyDataLength. The implementer of this callback should generate a
-                             new key of size keyLength and copy it to the keyData buffer
-     * @param[in] keyLength - length of the new key to be generated
-     */
-    virtual void OnRefreshKeyGenerate(const ICDClientInfo & clientInfo, uint8_t * keyData, uint8_t keyLength) = 0;
-
-    /**
-     * @brief Callback used to retrieve the refresh key information from the application after establishing a new secure session for
-     * re-registration. The application should be able to store the corresponding ICDRefreshKeyInfo for every peer node. The
-     * application can determine the best way to do this. Please refer to ICDRefreshKeyInfo.h for details.
-     *
-     * @param[in] nodeId - node ID of the peer with whom the client needs to re-register with a new key to avoid rollover problems.
-     * @param[out] refreshKeyInfo - stored refreshKeyInfo for the corresponding nodeId from the ICDRefreshKeyMap
-     */
-    virtual CHIP_ERROR OnRefreshKeyRetrieve(const ScopedNodeId & nodeId, ICDRefreshKeyInfo & refreshKeyInfo) = 0;
-
-    /**
- * @brief Callback used to let the application know that the re-registration with the new key was successful and provides the
- * updated ICDClientInfo
- *
- * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-                           node that sent the check-in message. This will have the new key used for registration and the updated icd
-                           counter.
- */
-    virtual void OnRegistrationComplete(const ICDClientInfo & clientInfo) = 0;
 };
 
 } // namespace app

@@ -18,10 +18,8 @@
 
 #pragma once
 
-#include "ICDRefreshKeyInfo.h"
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
-#include <unordered_map> //TODO: update check_includes_config.py
 
 namespace chip {
 namespace app {
@@ -35,23 +33,9 @@ public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
-    void OnRefreshKeyGenerate(const ICDClientInfo & clientInfo, uint8_t * keyData, uint8_t keyLength) override;
-    CHIP_ERROR OnRefreshKeyRetrieve(const ScopedNodeId & nodeId, ICDRefreshKeyInfo & refreshKeyInfo) override;
-    void OnRegistrationComplete(const ICDClientInfo & clientInfo) override;
-    // Hash function for the map : {NodeId, ICDRefreshKeyInfo}
-    struct HashFunction
-    {
-        size_t operator()(const ScopedNodeId & peer) const
-        {
-            size_t nodeIdHash    = std::hash<uint64_t>()(peer.GetNodeId());
-            size_t fabricIdxHash = std::hash<uint64_t>()(peer.GetFabricIndex()) << 1;
-            return nodeIdHash ^ fabricIdxHash;
-        }
-    };
 
 private:
     ICDClientStorage * mpStorage = nullptr;
-    unordered_map<ScopedNodeId, ICDRefreshKeyInfo, HashFunction> icdRefreshKeyMap;
 };
 
 } // namespace app

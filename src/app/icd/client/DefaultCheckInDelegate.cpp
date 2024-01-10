@@ -40,24 +40,5 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
 }
 
-void DefaultCheckInDelegate::OnRefreshKeyGenerate(const ICDClientInfo & clientInfo, uint8_t * keyData, uint8_t keyLength)
-{
-    chip::Crypto::DRBG_get_bytes(keyData, keyLength);
-    ICDRefreshKeyInfo refreshKeyInfo;
-    refreshKeyInfo.clientInfo = clientInfo;
-    memcpy(&refreshKeyInfo.newKey, keyData, keyLength);
-    icdRefreshKeyMap.insert(make_pair(clientInfo.peer_node, refreshKeyInfo));
-}
-
-CHIP_ERROR DefaultCheckInDelegate::OnRefreshKeyRetrieve(const ScopedNodeId & nodeId, ICDRefreshKeyInfo & refreshKeyInfo)
-{
-    // Todo : Check if CHIP_ERROR_KEY_NOT_FOUND can be used here
-    VerifyOrReturnError(icdRefreshKeyMap.find(nodeId) != icdRefreshKeyMap.end(), CHIP_ERROR_KEY_NOT_FOUND);
-    refreshKeyInfo = icdRefreshKeyMap.at(nodeId);
-    return CHIP_NO_ERROR;
-}
-
-void DefaultCheckInDelegate::OnRegistrationComplete(const ICDClientInfo & clientInfo) {}
-
 } // namespace app
 } // namespace chip
