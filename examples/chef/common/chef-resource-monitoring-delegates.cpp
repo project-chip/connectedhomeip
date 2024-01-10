@@ -36,11 +36,11 @@ constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(Resou
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
-static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
-static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
+static std::unique_ptr<ActivatedCarbonFilterMonitoringDelegate> gActivatedCarbonFilterDelegate = nullptr;
+static std::unique_ptr<ResourceMonitoring::Instance> gActivatedCarbonFilterInstance            = nullptr;
 
-static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
-static ResourceMonitoring::Instance * gHepaFilterInstance = nullptr;
+static std::unique_ptr<HepaFilterMonitoringDelegate> gHepaFilterDelegate = nullptr;
+static std::unique_ptr<ResourceMonitoring::Instance> gHepaFilterInstance = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -66,16 +66,8 @@ Status ActivatedCarbonFilterMonitoringDelegate::PostResetCondition()
 
 void ActivatedCarbonFilterMonitoring::Shutdown()
 {
-    if (gActivatedCarbonFilterInstance != nullptr)
-    {
-        delete gActivatedCarbonFilterInstance;
-        gActivatedCarbonFilterInstance = nullptr;
-    }
-    if (gActivatedCarbonFilterDelegate != nullptr)
-    {
-        delete gActivatedCarbonFilterDelegate;
-        gActivatedCarbonFilterDelegate = nullptr;
-    }
+    gActivatedCarbonFilterInstance = nullptr;
+    gActivatedCarbonFilterDelegate = nullptr;
 }
 
 //-- Hepa Filter Monitoring delegate methods
@@ -100,24 +92,16 @@ Status HepaFilterMonitoringDelegate::PostResetCondition()
 
 void HepaFilterMonitoring::Shutdown()
 {
-    if (gHepaFilterInstance != nullptr)
-    {
-        delete gHepaFilterInstance;
-        gHepaFilterInstance = nullptr;
-    }
-    if (gHepaFilterDelegate != nullptr)
-    {
-        delete gHepaFilterDelegate;
-        gHepaFilterDelegate = nullptr;
-    }
+    gHepaFilterInstance = nullptr;
+    gHepaFilterDelegate = nullptr;
 }
 
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
-    gActivatedCarbonFilterDelegate = new ActivatedCarbonFilterMonitoringDelegate;
-    gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
-        gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
+    gActivatedCarbonFilterDelegate = std::make_unique<ActivatedCarbonFilterMonitoringDelegate>();
+    gActivatedCarbonFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
+        gActivatedCarbonFilterDelegate.get(), endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gActivatedCarbonFilterInstance->Init();
 }
@@ -126,8 +110,8 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gHepaFilterInstance == nullptr && gHepaFilterDelegate == nullptr);
 
-    gHepaFilterDelegate = new HepaFilterMonitoringDelegate;
-    gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
+    gHepaFilterDelegate = std::make_unique<HepaFilterMonitoringDelegate>();
+    gHepaFilterInstance = std::make_unique<ResourceMonitoring::Instance>(gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            ResourceMonitoring::DegradationDirectionEnum::kDown, true);
     gHepaFilterInstance->Init();

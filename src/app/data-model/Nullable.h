@@ -49,6 +49,10 @@ struct Nullable : protected Optional<T>
     // Optional.
     using Optional<T>::Value;
 
+    // Pull in APIs that make sense on Nullable with the same names as on
+    // Optional.
+    using Optional<T>::ValueOr;
+
     // Some consumers need an easy way to determine our underlying type.
     using UnderlyingType = T;
 

@@ -93,7 +93,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     DataModel::Nullable<uint8_t> speedSetting;
     SpeedSetting::Get(mEndpoint, speedSetting);
 
-    uint8_t newSpeedSetting = speedSetting.IsNull() ? 0 : speedSetting.Value();
+    uint8_t newSpeedSetting = speedSetting.ValueOr(0);
 
     if (aDirection == StepDirectionEnum::kIncrease)
     {
