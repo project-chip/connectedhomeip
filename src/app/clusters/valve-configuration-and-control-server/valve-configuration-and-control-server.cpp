@@ -109,7 +109,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     return (epIdx >= kValveConfigurationAndControlDelegateTableSize ? nullptr : gDelegateTable[epIdx]);
 }
 
-bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+bool isDelegateNull(Delegate * delegate)
 {
     if (delegate == nullptr)
     {
@@ -230,7 +230,7 @@ void startRemainingDurationTick(EndpointId ep)
     DataModel::Nullable<uint32_t> rDuration = item->remainingDuration;
     VerifyOrReturn(!rDuration.IsNull());
     Delegate * delegate = GetDelegate(item->endpoint);
-    VerifyOrReturn(delegate != nullptr);
+    VerifyOrReturn(!isDelegateNull(delegate));
 
     delegate->HandleRemainingDurationTick(rDuration.Value());
     if (rDuration.Value() > 0)
@@ -290,7 +290,7 @@ CHIP_ERROR CloseValve(EndpointId ep)
     (void) DeviceLayer::SystemLayer().CancelTimer(onValveConfigurationAndControlTick, item);
 
     emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
-    if (!isDelegateNull(delegate, ep))
+    if (!isDelegateNull(delegate))
     {
         delegate->HandleCloseValve();
     }
@@ -343,7 +343,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
 
     // start movement towards target
     emitValveStateChangedEvent(ep, ValveConfigurationAndControl::ValveStateEnum::kTransitioning);
-    if (!isDelegateNull(delegate, ep))
+    if (!isDelegateNull(delegate))
     {
         DataModel::Nullable<Percent> cLevel = delegate->HandleOpenValve(level);
         if (HasFeature(ep, ValveConfigurationAndControl::Feature::kLevel))
