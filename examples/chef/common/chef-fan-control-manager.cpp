@@ -49,7 +49,7 @@ private:
     CHIP_ERROR ReadSpeedCurrent(AttributeValueEncoder & aEncoder);
 };
 
-static ChefFanControlManager * mFanControlManager = nullptr;
+static std::unique_ptr<ChefFanControlManager> mFanControlManager;
 
 CHIP_ERROR ChefFanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
@@ -169,8 +169,8 @@ CHIP_ERROR ChefFanControlManager::Read(const ConcreteReadAttributePath & aPath, 
 
 void emberAfFanControlClusterInitCallback(EndpointId endpoint)
 {
-    VerifyOrDie(mFanControlManager == nullptr);
-    mFanControlManager = new ChefFanControlManager(endpoint);
-    registerAttributeAccessOverride(mFanControlManager);
-    FanControl::SetDefaultDelegate(endpoint, mFanControlManager);
+    VerifyOrDie(!mFanControlManager);
+    mFanControlManager = std::make_unique<ChefFanControlManager>(endpoint);
+    registerAttributeAccessOverride(mFanControlManager.get());
+    FanControl::SetDefaultDelegate(endpoint, mFanControlManager.get());
 }
