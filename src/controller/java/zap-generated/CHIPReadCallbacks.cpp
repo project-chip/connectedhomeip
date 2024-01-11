@@ -39325,9 +39325,12 @@ void CHIPThermostatPresetTypesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterPresetTypeStruct");
             return;
         }
-        jmethodID presetTypeStructStructCtor_1 = env->GetMethodID(presetTypeStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (presetTypeStructStructCtor_1 == nullptr)
+
+        jmethodID presetTypeStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, presetTypeStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                            &presetTypeStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || presetTypeStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterPresetTypeStruct constructor");
             return;
@@ -39431,9 +39434,12 @@ void CHIPThermostatScheduleTypesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterScheduleTypeStruct");
             return;
         }
-        jmethodID scheduleTypeStructStructCtor_1 = env->GetMethodID(scheduleTypeStructStructClass_1, "<init>",
-                                                                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (scheduleTypeStructStructCtor_1 == nullptr)
+
+        jmethodID scheduleTypeStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, scheduleTypeStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                            &scheduleTypeStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || scheduleTypeStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterScheduleTypeStruct constructor");
             return;
@@ -39805,10 +39811,13 @@ void CHIPThermostatPresetsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterPresetStruct");
             return;
         }
-        jmethodID presetStructStructCtor_1 = env->GetMethodID(
-            presetStructStructClass_1, "<init>",
-            "([BLjava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Boolean;)V");
-        if (presetStructStructCtor_1 == nullptr)
+
+        jmethodID presetStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, presetStructStructClass_1, "<init>",
+            "([BLjava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Boolean;)V",
+            &presetStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || presetStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterPresetStruct constructor");
             return;
@@ -40034,11 +40043,13 @@ void CHIPThermostatSchedulesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterScheduleTransitionStruct");
                 return;
             }
-            jmethodID scheduleTransitionStructStructCtor_3 =
-                env->GetMethodID(scheduleTransitionStructStructClass_3, "<init>",
-                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                                 "Optional;Ljava/util/Optional;)V");
-            if (scheduleTransitionStructStructCtor_3 == nullptr)
+
+            jmethodID scheduleTransitionStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, scheduleTransitionStructStructClass_3, "<init>",
+                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/"
+                                                                "util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                                &scheduleTransitionStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || scheduleTransitionStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterScheduleTransitionStruct constructor");
                 return;
@@ -40081,10 +40092,13 @@ void CHIPThermostatSchedulesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThermostatClusterScheduleStruct");
             return;
         }
-        jmethodID scheduleStructStructCtor_1 = env->GetMethodID(
-            scheduleStructStructClass_1, "<init>",
-            "([BLjava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;)V");
-        if (scheduleStructStructCtor_1 == nullptr)
+
+        jmethodID scheduleStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, scheduleStructStructClass_1, "<init>",
+            "([BLjava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;)V",
+            &scheduleStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || scheduleStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ThermostatClusterScheduleStruct constructor");
             return;
