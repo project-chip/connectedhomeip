@@ -36,15 +36,16 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     mMicrowaveOvenModeInstance.Init();
     mMicrowaveOvenControlInstance.Init();
 
-    // set default value for attribute SelectedWattIndex and WattRatting
+    // set default value for attribute SelectedWattIndex and WattRating
     if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
-    {
+    {  
+        static_assert(ArraySize(mWattSettingList) != 0, "Watt setting list is empty!");   
         mSelectedWattIndex = ArraySize(mWattSettingList) - 1;
-        mWattRatting       = mWattSettingList[mSelectedWattIndex];
+        mWattRating       = mWattSettingList[mSelectedWattIndex];
     }
     else
     {
-        mWattRatting = kExampleWatt5;
+        mWattRating = kExampleWatt5;
     }
 }
 
@@ -53,7 +54,6 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
  */
 Protocols::InteractionModel::Status
 ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime, bool startAfterSetting,
-                                                               BitMask<MicrowaveOvenControl::Feature> feature,
                                                                Optional<uint8_t> powerSetting, Optional<uint8_t> wattSettingIndex)
 {
     // placeholder implementation
@@ -68,16 +68,16 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
     mMicrowaveOvenControlInstance.SetCookTime(cookTime);
 
     // set powerSetting if power is in number
-    if (feature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) && powerSetting.HasValue())
+    if (powerSetting.HasValue())
     {
         mPowerSetting = powerSetting.Value();
     }
 
-    // set wattRatting and selectedWattIndex if power is in watt
-    if (feature.Has(MicrowaveOvenControl::Feature::kPowerInWatts) && wattSettingIndex.HasValue())
+    // set wattRating and selectedWattIndex if power is in watt
+    if (wattSettingIndex.HasValue())
     {
         mSelectedWattIndex = wattSettingIndex.Value();
-        mWattRatting       = mWattSettingList[mSelectedWattIndex];
+        mWattRating       = mWattSettingList[mSelectedWattIndex];
     }
 
     if (startAfterSetting)

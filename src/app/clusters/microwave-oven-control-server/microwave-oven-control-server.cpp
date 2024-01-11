@@ -211,12 +211,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
         {
             aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
-                uint16_t wattRatting;
+                uint16_t wattRating;
                 uint8_t index  = 0;
                 CHIP_ERROR err = CHIP_NO_ERROR;
-                while ((err = delegate->GetWattSettingByIndex(index, wattRatting)) == CHIP_NO_ERROR)
+                while ((err = delegate->GetWattSettingByIndex(index, wattRating)) == CHIP_NO_ERROR)
                 {
-                    ReturnErrorOnFailure(encoder.Encode(wattRatting));
+                    ReturnErrorOnFailure(encoder.Encode(wattRating));
                     index++;
                 }
                 if (err == CHIP_ERROR_NOT_FOUND)
@@ -347,7 +347,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         VerifyOrExit(IsPowerSettingInRange(reqPowerSetting, minPower, maxPower), status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookPower, cookPower value is out of range"));
 
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqStartAfterSetting, mFeature,
+        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqStartAfterSetting,
                                                                MakeOptional(reqPowerSetting), NullOptional);
     }
     else // power in watts
@@ -364,7 +364,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
                      status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattIndex, wattIndex is out of range"));
 
-        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqStartAfterSetting, mFeature,
+        status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTime, reqStartAfterSetting,
                                                                NullOptional, MakeOptional(reqWattSettingIndex));
     }
 

@@ -79,7 +79,6 @@ public:
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                            bool startAfterSetting,
-                                                                           BitMask<MicrowaveOvenControl::Feature> feature,
                                                                            Optional<uint8_t> powerSetting,
                                                                            Optional<uint8_t> wattSettingIndex) override;
 
@@ -131,7 +130,7 @@ public:
     /**
      * Get the value of WattRating.
      */
-    uint16_t GetCurrentWattRating() const override { return mWattRatting; };
+    uint16_t GetCurrentWattRating() const override { return mWattRating; };
 
     // delegates from OperationalState cluster
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
@@ -248,7 +247,7 @@ private:
 
     uint8_t mPowerSetting              = kDefaultPowerSetting;
     uint8_t mSelectedWattIndex         = 0;
-    uint16_t mWattRatting              = 0;
+    uint16_t mWattRating              = 0;
     const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 
     // MicrowaveOvenMode types

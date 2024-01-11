@@ -49,6 +49,7 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aClusterId The ID of the Microwave Oven Control cluster to be instantiated.
+     * @param aFeature The bitmask value that identifies which features are supported by this instance.
      * @param aOpStateInstance The reference of Operational State Instance.
      * @param aMicrowaveOvenModeInstance The reference of Microwave Oven Mode Instance.
      * Note: a MicrowaveOvenControl instance must relies on an Operational State instance and a Microwave Oven Mode instance.
@@ -136,20 +137,17 @@ public:
     /**
      *   @brief Handle Command Callback in application: SetCookingParameters.
      *   @return Returns the Interaction Model status code which was user determined in the business logic.
-     *   @param  cookMode: the user defined modes which from the Microwave Oven Mode application level.
+     *   @param  cookMode: the input cook mode value. Callee needs to define the cooking mode value in the Microwave Oven Mode instance.
      *   @param  cookTime: the input cook time value.
-     *   @param  startAfterSetting: the flag to indicate if start for the operation after handling the command.
-     *   @param  feature: featureMap bits value of Microwave Oven Control.
+     *   @param  startAfterSetting: if true, the cooking operation will start after handling the command.
      *   @param  powerSetting: the input power setting value.
      *   @param  wattSettingIndex: the input watts setting index.
-     *   Note: powerSetting and wattSettingIndex must be mutually exclusive, depends on the feature value.
-     *   Caller should check if the feature has included the corresponding feature value at the application level.
+     *   Note: powerSetting and wattSettingIndex must be mutually exclusive.
      *   If using power as number, wattSettingIndex will be set to NullOptional.
      *   If using power in watts, powerSetting will be set to NullOptional.
      */
     virtual Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
                                                                                    bool startAfterSetting,
-                                                                                   BitMask<MicrowaveOvenControl::Feature> feature,
                                                                                    Optional<uint8_t> powerSetting,
                                                                                    Optional<uint8_t> wattSettingIndex) = 0;
 
