@@ -758,6 +758,7 @@ public:
 
 CHIP_ERROR FabricTable::NotifyFabricUpdated(FabricIndex fabricIndex)
 {
+    MATTER_TRACE_SCOPE("NotifyFabricUpdated","Fabric");
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
@@ -772,6 +773,8 @@ CHIP_ERROR FabricTable::NotifyFabricUpdated(FabricIndex fabricIndex)
 
 CHIP_ERROR FabricTable::NotifyFabricCommitted(FabricIndex fabricIndex)
 {
+    MATTER_TRACE_SCOPE("NotifyFabricCommitted","Fabric");
+
     FabricTable::Delegate * delegate = mDelegateListRoot;
     while (delegate)
     {
@@ -1620,6 +1623,7 @@ CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
 CHIP_ERROR FabricTable::FindExistingFabricByNocChaining(FabricIndex pendingFabricIndex, const ByteSpan & noc,
                                                         FabricIndex & outMatchingFabricIndex) const
 {
+    MATTER_TRACE_SCOPE("FindExistingFabricByNocChaining","Fabric");
     // Check whether we already have a matching fabric from a cert chain perspective.
     // To do so we have to extract the FabricID from the NOC and the root public key from the RCAC.
     // We assume the RCAC is currently readable from OperationalCertificateStore, whether pending
@@ -1737,6 +1741,7 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
                                                   Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                                   AdvertiseIdentity advertiseIdentity)
 {
+    MATTER_TRACE_SCOPE("UpdatePendingFabricCommon","Fabric");
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 

@@ -1804,7 +1804,7 @@ exit:
 bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToSaturation::DecodableType & commandData)
 {
-    MATTER_TRACE_SCOPE("moveToSaturatio", "ColorControl");
+    MATTER_TRACE_SCOPE("moveToSaturation", "ColorControl");
     // limit checking: saturation is 0..254.  Spec dictates we ignore
     // this and report a malformed packet.
     if (commandData.saturation > MAX_SATURATION_VALUE)
