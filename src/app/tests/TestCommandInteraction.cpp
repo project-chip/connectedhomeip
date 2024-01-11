@@ -1286,10 +1286,10 @@ void TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommand
     app::CommandSender::AdditionalCommandParameters commandParameters;
     commandParameters.SetStartOrEndDataStruct(true);
 
-    // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
-    // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
-    commandSender.mBatchCommandsEnabled    = true;
-    commandSender.mRemoteMaxPathsPerInvoke = 2;
+    CommandSender::ConfigParameters config;
+    config.SetRemoteMaxPathsPerInvoke(2);
+    err = commandSender.SetCommandSenderConfig(config);
+    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     auto commandPathParams = MakeTestCommandPath();
     err                    = commandSender.PrepareCommand(commandPathParams, commandParameters);
@@ -1317,10 +1317,10 @@ void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCom
     app::CommandSender::AdditionalCommandParameters commandParameters;
     commandParameters.SetStartOrEndDataStruct(true);
 
-    // TODO(#30453): Once CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED is removed we will need
-    // to call SetCommandSenderConfig with remoteMaxPathsPerInvoke set to 2.
-    commandSender.mBatchCommandsEnabled    = true;
-    commandSender.mRemoteMaxPathsPerInvoke = 2;
+    CommandSender::ConfigParameters config;
+    config.SetRemoteMaxPathsPerInvoke(2);
+    err = commandSender.SetCommandSenderConfig(config);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     auto commandPathParams = MakeTestCommandPath();
     err                    = commandSender.PrepareCommand(commandPathParams, commandParameters);

@@ -304,7 +304,7 @@ public:
      * @return CHIP_ERROR_INVALID_ARGUMENT
      *                      Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-     *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
+     *                      CommandSender has not been provided callbacks expected for supporting batck commands.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 

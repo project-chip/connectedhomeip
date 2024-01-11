@@ -412,17 +412,19 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
 CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters & aConfigParams)
 {
-#if CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
     VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
+    bool requiresBatchCommands = aConfigParams.remoteMaxPathsPerInvoke > 1;
+    if (requiresBatchCommands)
+    {
+        bool usingExtendableCallbacks = mpExtendableCallback != nullptr;
+        VerifyOrReturnError(usingExtendableCallbacks, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    }
+
     mRemoteMaxPathsPerInvoke = aConfigParams.remoteMaxPathsPerInvoke;
-    mBatchCommandsEnabled    = (aConfigParams.remoteMaxPathsPerInvoke > 1);
+    mBatchCommandsEnabled    = requiresBatchCommands;
     return CHIP_NO_ERROR;
-#else
-    VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    return CHIP_NO_ERROR;
-#endif
 }
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs)
@@ -432,8 +434,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
-    bool usingExtendableCallbacks = mpExtendableCallback != nullptr;
-    bool canAddAnotherCommand     = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendableCallbacks);
+    bool canAddAnotherCommand     = (mState == State::AddedCommand && mBatchCommandsEnabled);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
