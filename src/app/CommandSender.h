@@ -552,7 +552,7 @@ private:
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback                      = nullptr;
-    ExtendableCallback * mpExtendableCallback      = nullptr;
+    ExtendableCallback * mpExtendableCallback  = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it

@@ -397,9 +397,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         if (statusIB.IsSuccess() || usingExtendableCallbacks)
         {
             const ConcreteCommandPath concretePath = ConcreteCommandPath(endpointId, clusterId, commandId);
-            responseData.path = &concretePath;
-            responseData.statusIB = &statusIB;
-            responseData.data = hasDataResponse ? &commandDataReader : nullptr;
+            responseData.path                      = &concretePath;
+            responseData.statusIB                  = &statusIB;
+            responseData.data                      = hasDataResponse ? &commandDataReader : nullptr;
             OnResponseCallback(responseData);
         }
         else
@@ -433,7 +433,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
     bool usingExtendableCallbacks = mpExtendableCallback != nullptr;
-    bool canAddAnotherCommand   = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendableCallbacks);
+    bool canAddAnotherCommand     = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendableCallbacks);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
