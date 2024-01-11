@@ -26,6 +26,7 @@ from pprint import pprint
 from typing import Any, Optional
 
 import chip.clusters.ClusterObjects
+import chip.clusters as Clusters
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
 from mobly import asserts
@@ -97,12 +98,13 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
-    async def setup_class_helper(self):
+    async def setup_class_helper(self, default_device_composition_path: str = None, limited_wildcard: bool = False):
         dev_ctrl = self.default_controller
         self.problems = []
 
         do_test_over_pase = self.user_params.get("use_pase_only", True)
-        dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
+        dump_device_composition_path: Optional[str] = self.user_params.get(
+            "dump_device_composition_path", default_device_composition_path)
 
         if do_test_over_pase:
             info = self.get_setup_payload_info()
@@ -129,6 +131,25 @@ class BasicCompositionTests:
 
         wildcard_read = (await dev_ctrl.Read(node_id, [()]))
         endpoints_tlv = wildcard_read.tlvAttributes
+        attributes = wildcard_read.attributes
+        if limited_wildcard:
+            for endpoint_id, endpoint in endpoints_tlv.items():
+                for cluster_id, cluster in endpoint.items():
+                    if cluster_id == Clusters.Descriptor.id:
+                        continue
+                    # Save only the global attributes
+                    endpoints_tlv[endpoint_id][cluster_id] = {k: v for k, v in cluster.items() if k >= 0xF000 and k <= 0xFFFE}
+                for cluster_class, cluster_data in attributes[endpoint_id].items():
+                    if cluster_class.id == Clusters.Descriptor.id:
+                        continue
+
+                    def global_attr(k) -> bool:
+                        try:
+                            return k.attribute_id > 0xF000 and k.attribute_id < 0xFFFE
+                        except AttributeError:
+                            return False
+                    attributes[endpoint_id][cluster_class] = {k: v for k,
+                                                              v in cluster_data.items() if global_attr(k)}
 
         node_dump_dict = {endpoint_id: MatterTlvToJson(endpoints_tlv[endpoint_id]) for endpoint_id in endpoints_tlv}
         logging.debug(f"Raw TLV contents of Node: {json.dumps(node_dump_dict, indent=2)}")
