@@ -121,52 +121,7 @@ void EndpointListLoader::Complete()
             EndpointAttributes endpointAttributes = mEndpointAttributesList[i];
             std::shared_ptr<Endpoint> endpoint =
                 std::make_shared<Endpoint>(CastingPlayer::GetTargetCastingPlayer(), endpointAttributes);
-            for (chip::ClusterId clusterId : mEndpointServerLists[i])
-            {
-                switch (clusterId)
-                {
-                case chip::app::Clusters::ApplicationBasic::Id:
-                    endpoint->RegisterCluster<clusters::application_basic::ApplicationBasicCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::ApplicationLauncher::Id:
-                    endpoint->RegisterCluster<clusters::application_launcher::ApplicationLauncherCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::ContentLauncher::Id:
-                    endpoint->RegisterCluster<clusters::content_launcher::ContentLauncherCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::KeypadInput::Id:
-                    endpoint->RegisterCluster<clusters::keypad_input::KeypadInputCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::LevelControl::Id:
-                    endpoint->RegisterCluster<clusters::level_control::LevelControlCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::OnOff::Id:
-                    endpoint->RegisterCluster<clusters::on_off::OnOffCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::MediaPlayback::Id:
-                    endpoint->RegisterCluster<clusters::media_playback::MediaPlaybackCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::TargetNavigator::Id:
-                    endpoint->RegisterCluster<clusters::target_navigator::TargetNavigatorCluster>(clusterId);
-                    break;
-
-                case chip::app::Clusters::WakeOnLan::Id:
-                    endpoint->RegisterCluster<clusters::wake_on_lan::WakeOnLanCluster>(clusterId);
-                    break;
-
-                default:
-                    ChipLogProgress(AppServer, "Skipping registration of clusterId %d for endpointId %d", clusterId,
-                                    endpointAttributes.mId);
-                    break;
-                }
-            }
+            endpoint->RegisterClusters(mEndpointServerLists[i]);
             CastingPlayer::GetTargetCastingPlayer()->RegisterEndpoint(endpoint);
         }
 
@@ -181,8 +136,14 @@ void EndpointListLoader::Complete()
         mSessionHandle       = nullptr;
         mNewEndpointsToLoad  = 0;
 
-        // done loading endpoints, callback client OnCompleted
-        support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
+        // done loading endpoints, store TargetCastingPlayer
+        CHIP_ERROR err = support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CastingStore::AddOrUpdate() failed. Err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+
+        // callback client OnCompleted
         VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
         CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
     }

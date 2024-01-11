@@ -32,6 +32,7 @@ import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.AttestationInfo
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.DeviceAttestationDelegate
+import chip.devicecontroller.ICDDeviceInfo
 import chip.devicecontroller.ICDRegistrationInfo
 import chip.devicecontroller.NetworkCredentials
 import com.google.chip.chiptool.ChipClient
@@ -293,10 +294,27 @@ class DeviceProvisioningFragment : Fragment() {
       )
     }
 
-    override fun onICDRegistrationComplete(icdNodeId: Long, icdCounter: Long) {
-      Log.d(TAG, "onICDRegistrationComplete - icdNodeId : $icdNodeId, icdCounter : $icdCounter")
+    override fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo) {
+      Log.d(
+        TAG,
+        "onICDRegistrationComplete - errorCode: $errorCode, symmetricKey : ${icdDeviceInfo.symmetricKey.toHex()}, icdDeviceInfo : $icdDeviceInfo"
+      )
+      requireActivity().runOnUiThread {
+        Toast.makeText(
+            requireActivity(),
+            getString(
+              R.string.icd_registration_completed,
+              icdDeviceInfo.userActiveModeTriggerHint.toString()
+            ),
+            Toast.LENGTH_LONG
+          )
+          .show()
+      }
     }
   }
+
+  private fun ByteArray.toHex(): String =
+    joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }
 
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {
