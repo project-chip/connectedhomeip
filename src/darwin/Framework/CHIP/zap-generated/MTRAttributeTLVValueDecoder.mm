@@ -7627,6 +7627,17 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
         value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
         return value;
     }
+    case Attributes::LevelStep::Id: {
+        using TypeInfo = Attributes::LevelStep::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue];
+        return value;
+    }
     default: {
         break;
     }

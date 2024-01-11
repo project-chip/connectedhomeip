@@ -69,6 +69,7 @@ limitations under the License.
     <attribute side="server" code="0x0007" define="TARGET_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">TargetLevel</attribute>
     <attribute side="server" code="0x0008" define="DEFAULT_OPEN_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" default="100" optional="true">DefaultOpenLevel</attribute>
     <attribute side="server" code="0x0009" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
+    <attribute side="server" code="0x000A" define="LEVEL_STEP" type="int8u" min="1" max="50" isNullable="false" writable="false" optional="true">LevelStep</attribute>
 
     <command source="client" code="0x00" name="Open" optional="false">
       <description>This command is used to set the valve to its open position.</description>

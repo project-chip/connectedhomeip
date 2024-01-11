@@ -8935,6 +8935,7 @@ public class ClusterIDMapping {
             TargetLevel(7L),
             DefaultOpenLevel(8L),
             ValveFault(9L),
+            LevelStep(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
