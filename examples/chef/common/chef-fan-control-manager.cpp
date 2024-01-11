@@ -55,7 +55,9 @@ CHIP_ERROR ChefFanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEn
 {
     // Return PercentSetting attribute value for now
     DataModel::Nullable<Percent> percentSetting;
-    PercentSetting::Get(mEndpoint, percentSetting);
+    EmberAfStatus status = PercentSetting::Get(mEndpoint, percentSetting);
+
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, CHIP_ERROR_READ_FAILED);
 
     return aEncoder.Encode(percentSetting.ValueOr(0));
 }
@@ -64,7 +66,9 @@ CHIP_ERROR ChefFanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEnco
 {
     // Return SpeedCurrent attribute value for now
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    EmberAfStatus status = SpeedSetting::Get(mEndpoint, speedSetting);
+
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, CHIP_ERROR_READ_FAILED);
 
     return aEncoder.Encode(speedSetting.ValueOr(0));
 }
@@ -76,13 +80,18 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
 
     VerifyOrReturnError(aDirection != StepDirectionEnum::kUnknownEnumValue, Status::InvalidCommand);
 
+    EmberAfStatus status;
+
     uint8_t speedMax;
-    SpeedMax::Get(mEndpoint, &speedMax);
+    status = SpeedMax::Get(mEndpoint, &speedMax);
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
     DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+    status = SpeedSetting::Get(mEndpoint, speedSetting);
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
     uint8_t newSpeedSetting = speedSetting.ValueOr(0);
+    const uint8_t kLowest = aLowestOff ? 0 : 1;
 
     if (aDirection == StepDirectionEnum::kIncrease)
     {
@@ -98,7 +107,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         {
             if (aWrap)
             {
-                newSpeedSetting = aLowestOff ? 0 : 1;
+                newSpeedSetting = kLowest;
             }
         }
     }
@@ -106,7 +115,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     {
         if (speedSetting.IsNull())
         {
-            newSpeedSetting = aLowestOff ? 0 : 1;
+            newSpeedSetting = kLowest;
         }
         else if ((speedSetting.Value() > 1) && (speedSetting.Value() <= speedMax))
         {
@@ -116,7 +125,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         {
             if (aLowestOff)
             {
-                newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
+                newSpeedSetting = 0;
             }
             else if (aWrap)
             {
