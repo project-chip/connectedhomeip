@@ -33,10 +33,10 @@ struct TvCastingApp: App {
                     {
                         self.Log.info("CHIP_CASTING_SIMPLIFIED = 1")
                         
-                        let err: Error? = MTRInitializationExample().initialize()
+                        let err: Error? = MCInitializationExample().initialize()
                         if err != nil
                         {
-                            self.Log.error("MTRCastingApp initialization failed \(err)")
+                            self.Log.error("MCCastingApp initialization failed \(err)")
                             return
                         }
                     }
@@ -72,12 +72,12 @@ struct TvCastingApp: App {
                     self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification")
                     if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
                     {
-                        if let castingApp = MTRCastingApp.getSharedInstance()
+                        if let castingApp = MCCastingApp.getSharedInstance()
                         {
                             castingApp.stop(completionBlock: { (err : Error?) -> () in
                                 if err != nil
                                 {
-                                    self.Log.error("MTRCastingApp stop failed \(err)")
+                                    self.Log.error("MCCastingApp stop failed \(err)")
                                 }
                             })
                         }
@@ -91,12 +91,12 @@ struct TvCastingApp: App {
                     self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification")
                     if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
                     {
-                        if let castingApp = MTRCastingApp.getSharedInstance()
+                        if let castingApp = MCCastingApp.getSharedInstance()
                         {
                             castingApp.start(completionBlock: { (err : Error?) -> () in
                                 if err != nil
                                 {
-                                    self.Log.error("MTRCastingApp start failed \(err)")
+                                    self.Log.error("MCCastingApp start failed \(err)")
                                 }
                             })
                         }
