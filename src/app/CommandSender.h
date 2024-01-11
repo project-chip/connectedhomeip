@@ -226,7 +226,6 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-
     // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
     // for it. By having parameters to that API use this struct instead of individual
     // function arguments, we centralize required changes to one file when adding new
