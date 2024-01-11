@@ -30,12 +30,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init()
     ConvertDacKey();
 #endif
 
-    for (uint8_t i = 1; i < FactoryDataProvider::kNumberOfIds; i++)
-    {
-        sum += maxLengths[i];
-    }
-
-    if(sum > kFactoryDataSize)
+    if (sum > kFactoryDataSize)
     {
         ChipLogError(DeviceLayer,
             "Max size of factory data: %lu is bigger than reserved factory data size: %lu",
