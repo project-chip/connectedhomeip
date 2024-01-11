@@ -38,8 +38,8 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 
     // set default value for attribute SelectedWattIndex and WattRating
     if (mMicrowaveOvenControlInstance.HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
-    {  
-        static_assert(ArraySize(mWattSettingList) != 0, "Watt setting list is empty!");   
+    {
+        static_assert(ArraySize(mWattSettingList) != 0, "Watt setting list is empty!");
         mSelectedWattIndex = ArraySize(mWattSettingList) - 1;
         mWattRating       = mWattSettingList[mSelectedWattIndex];
     }
