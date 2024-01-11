@@ -53,6 +53,9 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
+    // TODO(#30453) Reorder CommandSender::Callback and CommandSender::ExtendableCallback. To keep follow up
+    // review simple, this was not done initially, and is expected to be completed within day of PR
+    // introducing CommandSender::ExtendableCallback getting merged.
     /**
      * @brief Legacy callbacks for CommandSender
      */
