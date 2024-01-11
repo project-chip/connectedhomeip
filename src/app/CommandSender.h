@@ -91,9 +91,9 @@ public:
          * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific or path-specific
          *   status response from the server.  In that case,
          *   StatusIB::InitFromChipError can be used to extract the status.
-         *      - Note CommandSender's using `CommandSender::Callback` only supports sending
-         *        single InvokeRequest. As a result, only one path-specific error is expected
-         *        to ever be sent to OnError callback.
+         *      - Note: a CommandSender using `CommandSender::Callback` only supports sending
+         *        a single InvokeRequest. As a result, only one path-specific error is expected
+         *        to ever be sent to the OnError callback.
          * - CHIP_ERROR*: All other cases.
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
@@ -105,7 +105,7 @@ public:
         virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
 
         /**
-         * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
+         * OnDone will be called when CommandSender has finished all work and it is safe to destroy and free the
          * allocated CommandSender object.
          *
          * This function will:
@@ -148,7 +148,7 @@ public:
          *   StatusIB::InitFromChipError can be used to extract the status.
          * - CHIP_ERROR*: All other cases.
          */
-        CHIP_ERROR chipError;
+        CHIP_ERROR error;
     };
 
     /**
@@ -161,15 +161,15 @@ public:
      *    as functionality expands, a parameter whose type is defined in this header is used
      *    as the argument to the callbacks
      *
-     * To support batch commands client needs to be using ExtendedCallback
+     * To support batch commands client must use ExtendedCallback.
      */
-    class ExtendedCallback
+    class ExtendableCallback
     {
     public:
         virtual ~ExtendedCallback() = default;
 
         /**
-         * OnResponse will be called for all path specific responses from the server that has been received
+         * OnResponse will be called for all path specific responses from the server that have been received
          * and processed. Specifically:
          *  - When a status code is received and it is IM::Success, aData will be nullptr.
          *  - When a status code is received and it is IM and/or cluster error, aData will be nullptr.
@@ -194,12 +194,12 @@ public:
         {}
 
         /**
-         * OnError will be called when an error occurs *after* a successful call to SendCommandRequest().
+         * OnError will be called when a non-path-specific error occurs *after* a successful call to SendCommandRequest().
          *
          * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
          * receives an OnDone call to destroy and free the object.
          *
-         * NOTE: Path specific error do NOT come to OnError, but instead go to OnResponse.
+         * NOTE: Path specific errors do NOT come to OnError, but instead go to OnResponse.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
          * @param[in] aErrorData      A error data regarding error that occurred.

@@ -390,8 +390,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         }
         ReturnErrorOnFailure(err);
 
-        // When using ExtendedCallbacks, we are adhearing to a different API contract where path
-        // specific error are sent to the OnResponse callback. For more information on the history
+        // When using ExtendedCallbacks, we are adhering to a different API contract where path
+        // specific errors are sent to the OnResponse callback. For more information on the history
         // of this issue please see https://github.com/project-chip/connectedhomeip/issues/30991
         bool usingExtendedCallbacks = mpExtendedCallback != nullptr;
         if (statusIB.IsSuccess() || usingExtendedCallbacks)
