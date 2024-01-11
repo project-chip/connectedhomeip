@@ -29,14 +29,12 @@ using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::HepaFilterMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
-const chip::BitMask<ResourceMonitoring::Feature>
-    gHepaFilterFeatureMap(ResourceMonitoring::Feature::kCondition,
-                          ResourceMonitoring::Feature::kWarning,
-                          ResourceMonitoring::Feature::kReplacementProductList);
-const chip::BitMask<ResourceMonitoring::Feature>
-    gActivatedCarbonFeatureMap(ResourceMonitoring::Feature::kCondition,
-                               ResourceMonitoring::Feature::kWarning,
-                               ResourceMonitoring::Feature::kReplacementProductList);
+const chip::BitMask<ResourceMonitoring::Feature> gHepaFilterFeatureMap(ResourceMonitoring::Feature::kCondition,
+                                                                       ResourceMonitoring::Feature::kWarning,
+                                                                       ResourceMonitoring::Feature::kReplacementProductList);
+const chip::BitMask<ResourceMonitoring::Feature> gActivatedCarbonFeatureMap(ResourceMonitoring::Feature::kCondition,
+                                                                            ResourceMonitoring::Feature::kWarning,
+                                                                            ResourceMonitoring::Feature::kReplacementProductList);
 
 static std::unique_ptr<ActivatedCarbonFilterMonitoringDelegate> gActivatedCarbonFilterDelegate;
 static std::unique_ptr<ResourceMonitoring::Instance> gActivatedCarbonFilterInstance;

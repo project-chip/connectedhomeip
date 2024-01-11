@@ -91,7 +91,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
     uint8_t newSpeedSetting = speedSetting.ValueOr(0);
-    const uint8_t kLowest = aLowestOff ? 0 : 1;
+    const uint8_t kLowest   = aLowestOff ? 0 : 1;
 
     if (aDirection == StepDirectionEnum::kIncrease)
     {
