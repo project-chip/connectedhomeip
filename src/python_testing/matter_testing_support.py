@@ -862,20 +862,27 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def pics_guard(self, pics_condition: bool):
         if not pics_condition:
-            try:
-                steps = self.get_test_steps()
-                num = steps[self.current_step_index].test_plan_number
-            except KeyError:
-                num = self.current_step_index
+            self.mark_step_skipped
 
-            if self.runner_hook:
-                # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
-                # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
-                #       as a string? Does it get used by the TH?
-                self.runner_hook.step_skipped(name=str(num), expression="")
-            else:
-                logging.info(f'**** Skipping: {num}')
-            self.step_skipped = True
+    def mark_current_step_skipped(self):
+        try:
+            steps = self.get_test_steps()
+            num = steps[self.current_step_index].test_plan_number
+        except KeyError:
+            num = self.current_step_index
+
+        if self.runner_hook:
+            # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
+            # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
+            #       as a string? Does it get used by the TH?
+            self.runner_hook.step_skipped(name=str(num), expression="")
+        else:
+            logging.info(f'**** Skipping: {num}')
+        self.step_skipped = True
+
+    def skip_step(self, step):
+        self.step(step)
+        self.mark_current_step_skipped()
 
     def step(self, step: typing.Union[int, str]):
         test_name = sys._getframe().f_back.f_code.co_name
