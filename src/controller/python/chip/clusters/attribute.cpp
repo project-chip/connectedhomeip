@@ -259,10 +259,12 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
+                                               chip::python::PyWriteAttributeData * writeAttributesData,
+                                               size_t attributeDataLength);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
-                                                    chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
+                                                    chip::python::PyWriteAttributeData * writeAttributesData,
+                                                    size_t attributeDataLength);
 }
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
