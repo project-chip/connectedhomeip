@@ -84,6 +84,15 @@ public:
         virtual ~Callback() = default;
 
         /**
+         * Used to notify a (maybe empty) report data is received from peer and the subscription and the peer is alive.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         */
+        virtual void NotifySubscriptionStillActive(const ReadClient & apReadClient) {}
+
+        /**
          * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
          *
          * This object MUST continue to exist after this call is completed. The application shall wait until it
