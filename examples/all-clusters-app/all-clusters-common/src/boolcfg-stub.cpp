@@ -27,7 +27,6 @@ using namespace chip::DeviceLayer;
 bool HandleBooleanStateConfigurationTestEventTrigger(uint64_t eventTrigger)
 {
     BooleanStateConfigurationTrigger trigger = static_cast<BooleanStateConfigurationTrigger>(eventTrigger);
-    BitMask<AlarmModeBitmap> alarmsEnabled;
 
     switch (trigger)
     {
