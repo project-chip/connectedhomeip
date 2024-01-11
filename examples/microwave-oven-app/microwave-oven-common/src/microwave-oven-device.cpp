@@ -41,7 +41,7 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
     {
         static_assert(ArraySize(mWattSettingList) != 0, "Watt setting list is empty!");
         mSelectedWattIndex = ArraySize(mWattSettingList) - 1;
-        mWattRating       = mWattSettingList[mSelectedWattIndex];
+        mWattRating        = mWattSettingList[mSelectedWattIndex];
     }
     else
     {
@@ -77,7 +77,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
     if (wattSettingIndex.HasValue())
     {
         mSelectedWattIndex = wattSettingIndex.Value();
-        mWattRating       = mWattSettingList[mSelectedWattIndex];
+        mWattRating        = mWattSettingList[mSelectedWattIndex];
     }
 
     if (startAfterSetting)

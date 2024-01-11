@@ -137,7 +137,8 @@ public:
     /**
      *   @brief Handle Command Callback in application: SetCookingParameters.
      *   @return Returns the Interaction Model status code which was user determined in the business logic.
-     *   @param  cookMode: the input cook mode value. Callee needs to define the cooking mode value in the Microwave Oven Mode instance.
+     *   @param  cookMode: the input cook mode value. Callee needs to define the cooking mode value in the Microwave Oven Mode
+     * instance.
      *   @param  cookTime: the input cook time value.
      *   @param  startAfterSetting: if true, the cooking operation will start after handling the command.
      *   @param  powerSetting: the input power setting value.

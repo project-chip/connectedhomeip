@@ -78,8 +78,7 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTime,
-                                                                           bool startAfterSetting,
-                                                                           Optional<uint8_t> powerSetting,
+                                                                           bool startAfterSetting, Optional<uint8_t> powerSetting,
                                                                            Optional<uint8_t> wattSettingIndex) override;
 
     /**
@@ -247,7 +246,7 @@ private:
 
     uint8_t mPowerSetting              = kDefaultPowerSetting;
     uint8_t mSelectedWattIndex         = 0;
-    uint16_t mWattRating              = 0;
+    uint16_t mWattRating               = 0;
     const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 
     // MicrowaveOvenMode types
