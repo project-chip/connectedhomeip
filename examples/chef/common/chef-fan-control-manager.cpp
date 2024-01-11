@@ -37,7 +37,6 @@ namespace {
 class ChefFanControlManager : public AttributeAccessInterface, public Delegate
 {
 public:
-    // Register for the FanControl cluster on all endpoints.
     ChefFanControlManager(EndpointId aEndpointId) :
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), FanControl::Id), Delegate(aEndpointId)
     {}
