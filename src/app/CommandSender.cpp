@@ -397,9 +397,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         if (statusIB.IsSuccess() || usingExtendableCallbacks)
         {
             const ConcreteCommandPath concretePath = ConcreteCommandPath(endpointId, clusterId, commandId);
-            ResponseData responseData = { concretePath, statusIB };
-            responseData.data         = hasDataResponse ? &commandDataReader : nullptr;
-            responseData.commandRef   = commandRef;
+            ResponseData responseData              = { concretePath, statusIB };
+            responseData.data                      = hasDataResponse ? &commandDataReader : nullptr;
+            responseData.commandRef                = commandRef;
             OnResponseCallback(responseData);
         }
         else
