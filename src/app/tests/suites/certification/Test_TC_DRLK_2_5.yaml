@@ -19,7 +19,6 @@ name:
 
 PICS:
     - DRLK.S
-    - DRLK.S.F08
 
 config:
     nodeId: 0x12344321

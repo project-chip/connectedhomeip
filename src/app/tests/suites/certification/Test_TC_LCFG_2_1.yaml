@@ -37,9 +37,7 @@ config:
         defaultValue: "es-ES"
 
 tests:
-    - label:
-          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -48,7 +46,7 @@ tests:
                 value: nodeId
 
     - label: "Step 1a: TH reads SupportedLocales attribute from DUT"
-      PICS: LCFG.S.A0000
+      PICS: LCFG.S.A0001
       command: "readAttribute"
       attribute: "SupportedLocales"
       response:
@@ -81,7 +79,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 3: TH reads SupportedLocales attribute from DUT"
-      PICS: LCFG.S.A0000
+      PICS: LCFG.S.A0001
       command: "readAttribute"
       attribute: "SupportedLocales"
       response:

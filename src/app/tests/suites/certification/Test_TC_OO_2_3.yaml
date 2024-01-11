@@ -24,8 +24,12 @@ config:
     timeout: 400
     endpoint: 1
 
+    PIXIT.OO.MaxCommunicationTurnaround:
+        type: int16u
+        defaultValue: 10
+
 tests:
-    - label: "1: Commission DUT to TH"
+    - label: "1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -94,6 +98,7 @@ tests:
           value: 0
 
     - label: "4a: TH sends OnWithRecallGlobalScene command to DUT"
+      command: "OnWithRecallGlobalScene"
       PICS: OO.S.C41.Rsp
 
     - label: "Wait 1000ms"
@@ -299,14 +304,15 @@ tests:
       response:
           value: 1
 
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404396743
     - label: "9b: Immediately TH reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
     - label: "9b: TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -386,7 +392,7 @@ tests:
     - label:
           "10d: After 10s, TH sends OnWithTimedOff command to DUT with
           1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
-          3)OffTime: 0x012c (30s) "
+          3)OffTime: 0x012c (30s)"
       command: "OnWithTimedOff"
       PICS: OO.S.C42.Rsp
       arguments:
@@ -405,14 +411,15 @@ tests:
       response:
           value: 1
 
+    #Refer comment: https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404397738
     - label: "10e: Immediately TH reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
     - label: "10e: Immediately TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -455,14 +462,15 @@ tests:
       response:
           value: 0
 
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404400479
     - label: "11b: Immediately TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C40.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -473,7 +481,7 @@ tests:
                 value: 10000
 
     - label:
-          "12a:After 10s, TH sends OnWithTimedOff command to DUT with
+          "12a: After 10s, TH sends OnWithTimedOff command to DUT with
           1)OnOffControl: 0x01 (AcceptOnlyWhenOn 1) 2)OnTime: 0x012c (30s)
           3)OffTime: 0x012c (30s)"
       command: "OnWithTimedOff"
@@ -501,14 +509,15 @@ tests:
       response:
           value: 0
 
-    - label: "12b:Immediately TH reads OffWaitTime attribute from DUT"
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404406872
+    - label: "12b: Immediately TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 170
-              maxValue: 230
+              minValue: 185 - ( 7 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 215
 
     - label: "Wait 10000ms"
       cluster: "DelayCommands"
@@ -578,7 +587,7 @@ tests:
       command: "Off"
       PICS: OO.S.C00.Rsp
 
-    - label: "14c:Immediately TH reads OnOff attribute from DUT"
+    - label: "14c: Immediately TH reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
       PICS: OO.S.A0000 && OO.S.C00.Rsp
@@ -592,14 +601,15 @@ tests:
       response:
           value: 0
 
-    - label: "14c:Immediately TH reads OffWaitTime attribute from DUT"
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404423488
+    - label: "14c: Immediately TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
     - label: "Wait 30000ms"
       cluster: "DelayCommands"
@@ -708,16 +718,17 @@ tests:
       response:
           value: 1
 
-    - label: "17c:Immediately TH reads OnTime attribute from DUT"
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404424832
+    - label: "17c: Immediately TH reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
-    - label: "17c:Immediately TH reads OffWaitTime attribute from DUT"
+    - label: "17c:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C42.Rsp
@@ -783,16 +794,17 @@ tests:
       response:
           value: 1
 
-    - label: "18b:Immediately TH reads OnTime attribute from DUT"
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404425845
+    - label: "18b: Immediately TH reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
-    - label: "18b:Immediately TH reads OffWaitTime attribute from DUT"
+    - label: "18b:Reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C42.Rsp
@@ -851,14 +863,15 @@ tests:
       response:
           value: 1
 
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404428940
     - label: "19c: TH reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 170
-              maxValue: 230
+              minValue: 185 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 215
 
     - label: "19c: TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
@@ -885,14 +898,15 @@ tests:
       response:
           value: 0
 
-    - label: "20b:Immediately TH reads OffWaitTime attribute from DUT"
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404430203
+    - label: "20b: Immediately TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
     - label:
           "21a:TH sends OnWithTimedOff command to DUT with 1)OnOffControl: 0x00
@@ -930,34 +944,35 @@ tests:
       response:
           value: 0
 
-    - label: "21b:TH reads  OffWaitTime attribute from DUT"
+    #Refer comment https://github.com/project-chip/connectedhomeip/pull/30636#discussion_r1404431785
+    - label: "21b: TH reads  OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && PICS_SKIP_SAMPLE_APP && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 170
-              maxValue: 230
+              minValue: 185 - ( 7 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 215
 
     - label: "22a:TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       command: "On"
 
-    - label: "22b:Immediately TH reads OnOff attribute from DUT"
+    - label: "22b: Immediately TH reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
       PICS: OO.S.A0000 && OO.S.C01.Rsp
       response:
           value: 1
 
-    - label: "22b:Immediately TH reads OnTime attribute from DUT"
+    - label: "22b: Immediately TH reads OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C01.Rsp
       response:
           value: 0
 
-    - label: "22b:Immediately TH reads OffWaitTime attribute from DUT"
+    - label: "22b: Immediately TH reads OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C01.Rsp
@@ -998,21 +1013,21 @@ tests:
       response:
           value: 0
 
-    - label: "23c:Immediately TH reads  OnTime attribute from DUT"
+    - label: "23c: Immediately TH reads  OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C00.Rsp
       response:
           value: 0
 
-    - label: "23c:Immediately TH reads  OffWaitTime attribute from DUT"
+    - label: "23c: Immediately TH reads  OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C00.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 3 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
     - label: "Wait 40000ms"
       cluster: "DelayCommands"
@@ -1022,7 +1037,7 @@ tests:
               - name: "ms"
                 value: 40000
 
-    - label: "23d:After 40s, TH reads OnOff attribute from DUT"
+    - label: "23d: After 40s, TH reads OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
       PICS: OO.S.A0000 && OO.S.C00.Rsp
@@ -1036,7 +1051,7 @@ tests:
       response:
           value: 0
 
-    - label: "23d:TH reads  OffWaitTime attribute from DUT"
+    - label: "23d: TH reads  OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C00.Rsp
@@ -1057,23 +1072,23 @@ tests:
               - name: "OffWaitTime"
                 value: 300
 
-    - label: "24b:Immediately TH reads  OnOff attribute from DUT"
+    - label: "24b: Immediately TH reads  OnOff attribute from DUT"
       command: "readAttribute"
       attribute: "OnOff"
       PICS: OO.S.A0000 && OO.S.C42.Rsp
       response:
           value: 1
 
-    - label: "24b:Immediately TH reads  OnTime attribute from DUT"
+    - label: "24b: Immediately TH reads  OnTime attribute from DUT"
       command: "readAttribute"
       attribute: "OnTime"
       PICS: OO.S.A4001 && OO.S.C42.Rsp
       response:
           constraints:
-              minValue: 255
-              maxValue: 345
+              minValue: 300 - ( 2 * PIXIT.OO.MaxCommunicationTurnaround )
+              maxValue: 300
 
-    - label: "24b:Immediately TH reads  OffWaitTime attribute from DUT"
+    - label: "24b: Immediately TH reads  OffWaitTime attribute from DUT"
       command: "readAttribute"
       attribute: "OffWaitTime"
       PICS: OO.S.A4002 && OO.S.C42.Rsp

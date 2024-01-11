@@ -81,9 +81,7 @@ tests:
               - name: "DebugText"
                 value: ""
 
-    - label:
-          "Step 2: TH reads Networks attribute from the DUT and saves the number
-          of entries as 'NumNetworks' "
+    - label: "Step 2: TH reads Networks attribute from the DUT "
       PICS: CNET.S.A0001
       command: "readAttribute"
       attribute: "Networks"
@@ -203,7 +201,6 @@ tests:
     - label:
           "Step 10: TH reads Breadcrumb attribute from the General Commissioning
           cluster of the DUT"
-      PICS: CNET.S.C04.Rsp
       cluster: "General Commissioning"
       command: "readAttribute"
       attribute: "Breadcrumb"
@@ -280,7 +277,6 @@ tests:
                 value: 0
 
     - label: "Step 15: TH sends the CommissioningComplete command to the DUT"
-      PICS: CNET.S.C04.Rsp
       cluster: "General Commissioning"
       command: "CommissioningComplete"
       response:

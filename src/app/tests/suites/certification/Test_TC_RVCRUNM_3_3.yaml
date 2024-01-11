@@ -18,10 +18,7 @@ name:
     Server
 
 PICS:
-    - RVCRUNM.S.A0002
-    - RVCRUNM.S.A0003
-    - RVCRUNM.S.F00
-    - OO.S.A4003
+    - RVCRUNM.S
 
 config:
     nodeId: 0x12344321
