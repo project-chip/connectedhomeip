@@ -58,7 +58,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     return (ep >= kBooleanStateConfigurationDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
-bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+bool isDelegateNull(Delegate * delegate)
 {
     if (delegate == nullptr)
     {
@@ -320,7 +320,7 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanStateConfiguration::Alar
     VerifyOrReturnError(alarmsActive.HasAll(alarm), CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
     Delegate * delegate = GetDelegate(ep);
-    if (!isDelegateNull(delegate, ep))
+    if (!isDelegateNull(delegate))
     {
         delegate->HandleSuppressAlarm(alarm);
     }
@@ -398,7 +398,7 @@ bool emberAfBooleanStateConfigurationClusterEnableDisableAlarmCallback(
 
     VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Set(ep, alarms), status.Emplace(Status::Failure));
 
-    if (!isDelegateNull(delegate, ep))
+    if (!isDelegateNull(delegate))
     {
         delegate->HandleEnableDisableAlarms(alarms);
     }
