@@ -6035,6 +6035,7 @@ public class ClusterIDMapping {
             ClientsSupportedPerFabric(5L),
             UserActiveModeTriggerHint(6L),
             UserActiveModeTriggerInstruction(7L),
+            OperatingMode(8L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

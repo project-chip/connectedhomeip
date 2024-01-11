@@ -4598,6 +4598,7 @@ private:
 | * ClientsSupportedPerFabric                                         | 0x0005 |
 | * UserActiveModeTriggerHint                                         | 0x0006 |
 | * UserActiveModeTriggerInstruction                                  | 0x0007 |
+| * OperatingMode                                                     | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -17659,6 +17660,7 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "user-active-mode-trigger-instruction", Attributes::UserActiveModeTriggerInstruction::Id,
                                    credsIssuerConfig),                                                                     //
+        make_unique<ReadAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -17686,6 +17688,8 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "user-active-mode-trigger-instruction",
                                                     Attributes::UserActiveModeTriggerInstruction::Id, WriteCommandType::kForceWrite,
                                                     credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::IcdManagement::OperatingModeEnum>>(
+            Id, "operating-mode", 0, UINT8_MAX, Attributes::OperatingMode::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -17711,6 +17715,7 @@ void registerClusterIcdManagement(Commands & commands, CredentialIssuerCommands 
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "user-active-mode-trigger-instruction",
                                         Attributes::UserActiveModeTriggerInstruction::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "operating-mode", Attributes::OperatingMode::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //

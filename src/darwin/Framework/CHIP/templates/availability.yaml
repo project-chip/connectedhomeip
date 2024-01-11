@@ -8550,6 +8550,8 @@
               - AliroBLEAdvertisingVersion
               - NumberOfAliroCredentialIssuerKeysSupported
               - NumberOfAliroEndpointKeysSupported
+          ICDManagement:
+              - OperatingMode
       commands:
           DoorLock:
               # Aliro is not ready yet.

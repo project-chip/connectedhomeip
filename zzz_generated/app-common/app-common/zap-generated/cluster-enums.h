@@ -1472,6 +1472,18 @@ namespace BooleanState {} // namespace BooleanState
 
 namespace IcdManagement {
 
+// Enum for OperatingModeEnum
+enum class OperatingModeEnum : uint8_t
+{
+    kSITOperatingMode = 0x00,
+    kLITOperatingMode = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
