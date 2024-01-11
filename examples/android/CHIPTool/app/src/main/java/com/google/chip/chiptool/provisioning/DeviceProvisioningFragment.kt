@@ -299,6 +299,17 @@ class DeviceProvisioningFragment : Fragment() {
         TAG,
         "onICDRegistrationComplete - errorCode: $errorCode, symmetricKey : ${icdDeviceInfo.symmetricKey.toHex()}, icdDeviceInfo : $icdDeviceInfo"
       )
+      requireActivity().runOnUiThread {
+        Toast.makeText(
+            requireActivity(),
+            getString(
+              R.string.icd_registration_completed,
+              icdDeviceInfo.userActiveModeTriggerHint.toString()
+            ),
+            Toast.LENGTH_LONG
+          )
+          .show()
+      }
     }
   }
 

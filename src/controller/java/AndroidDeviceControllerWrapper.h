@@ -48,7 +48,7 @@
 #include "OTAProviderDelegateBridge.h"
 #endif
 
-constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen = 128;
+constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen = 128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.

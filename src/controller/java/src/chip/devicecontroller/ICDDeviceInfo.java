@@ -59,6 +59,8 @@ public class ICDDeviceInfo {
   private final long icdNodeId;
   private final long icdCounter;
   private final long monitoredSubject;
+  private final long fabricId;
+  private final long fabricIndex;
 
   ICDDeviceInfo(
       byte[] symmetricKey,
@@ -66,13 +68,17 @@ public class ICDDeviceInfo {
       String userActiveModeTriggerInstruction,
       long icdNodeId,
       long icdCounter,
-      long monitoredSubject) {
+      long monitoredSubject,
+      long fabricId,
+      long fabricIndex) {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerHint = userActiveModeTriggerHint;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
     this.icdNodeId = icdNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
+    this.fabricId = fabricId;
+    this.fabricIndex = fabricIndex;
   }
 
   ICDDeviceInfo(
@@ -81,12 +87,16 @@ public class ICDDeviceInfo {
       String userActiveModeTriggerInstruction,
       long icdNodeId,
       long icdCounter,
-      long monitoredSubject) {
+      long monitoredSubject,
+      long fabricId,
+      long fabricIndex) {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
     this.icdNodeId = icdNodeId;
     this.icdCounter = icdCounter;
     this.monitoredSubject = monitoredSubject;
+    this.fabricId = fabricId;
+    this.fabricIndex = fabricIndex;
 
     this.userActiveModeTriggerHint = new HashSet<>();
     for (UserActiveModeTriggerBitmap mode : UserActiveModeTriggerBitmap.values()) {
@@ -127,6 +137,16 @@ public class ICDDeviceInfo {
     return monitoredSubject;
   }
 
+  /** Returns the Fabric Id */
+  public long getFabricId() {
+    return fabricId;
+  }
+
+  /** Returns the Fabric Index */
+  public long getFabricIndex() {
+    return fabricIndex;
+  }
+
   @Override
   public String toString() {
     return "ICDDeviceInfo : {"
@@ -140,6 +160,10 @@ public class ICDDeviceInfo {
         + icdCounter
         + "\n\tmonitoredSubject : "
         + monitoredSubject
+        + "\n\tfabricId : "
+        + fabricId
+        + "\n\tfabricIndex : "
+        + fabricIndex
         + "\n}";
   }
 }
