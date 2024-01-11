@@ -83,6 +83,14 @@ Davis, CA 95616, USA
       </field>
       <access fabricScoped="true"/>
     </struct>
+    <enum name="OperatingModeEnum">
+      <item value="0" name="SITOperatingMode" summary="ICD is operating as a Short Idle Time ICD.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="LITOperatingMode" summary="ICD is operating as a Long Idle Time ICD.">
+        <mandatoryConform/>
+      </item>
+    </enum>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="IdleModeDuration" type="uint32" default="1">
@@ -124,6 +132,13 @@ Davis, CA 95616, USA
         <feature name="CIP"/>
       </mandatoryConform>
       <constraint type="min" value="1"/>
+    </attribute>
+    <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="LITS"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>
