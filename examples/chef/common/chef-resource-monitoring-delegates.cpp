@@ -100,7 +100,7 @@ void HepaFilterMonitoring::Shutdown()
 
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
-    VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
+    VerifyOrDie(!gActivatedCarbonFilterInstance && !gActivatedCarbonFilterDelegate);
     gActivatedCarbonFilterDelegate = std::make_unique<ActivatedCarbonFilterMonitoringDelegate>();
     gActivatedCarbonFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
         gActivatedCarbonFilterDelegate.get(), endpoint, ActivatedCarbonFilterMonitoring::Id,
@@ -110,7 +110,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
-    VerifyOrDie(gHepaFilterInstance == nullptr && gHepaFilterDelegate == nullptr);
+    VerifyOrDie(!gHepaFilterInstance && !gHepaFilterDelegate);
 
     gHepaFilterDelegate = std::make_unique<HepaFilterMonitoringDelegate>();
     gHepaFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
