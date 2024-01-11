@@ -259,10 +259,10 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               chip::python::PyWriteAttributeData * writeAttributesData, size_t length);
+                                               chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
-                                                    chip::python::PyWriteAttributeData * writeAttributesData, size_t length);
+                                                    chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength);
 }
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
@@ -338,7 +338,7 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               python::PyWriteAttributeData * writeAttributesData, size_t length)
+                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -355,7 +355,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
 
-    for (size_t i = 0; i < length; i++)
+    for (size_t i = 0; i < attributeDataLength; i++)
     {
         void * path   = writeAttributesData[i].mAttributePath;
         void * tlv    = writeAttributesData[i].mTlvData;
@@ -397,7 +397,7 @@ exit:
 
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT, python::PyWriteAttributeData * writeAttributesData,
-                                                    size_t length)
+                                                    size_t attributeDataLength)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -413,7 +413,7 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), nullptr /* callback */, Optional<uint16_t>::Missing());
 
-    for (size_t i = 0; i < length; i++)
+    for (size_t i = 0; i < attributeDataLength; i++)
     {
         void * path   = writeAttributesData[i].mAttributePath;
         void * tlv    = writeAttributesData[i].mTlvData;
