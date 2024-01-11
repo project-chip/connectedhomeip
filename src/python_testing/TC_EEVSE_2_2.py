@@ -16,15 +16,12 @@
 
 
 import logging
-import queue
 import time
 from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback

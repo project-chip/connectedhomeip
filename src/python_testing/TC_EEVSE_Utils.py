@@ -22,7 +22,6 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
