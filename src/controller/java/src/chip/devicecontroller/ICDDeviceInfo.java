@@ -60,7 +60,7 @@ public class ICDDeviceInfo {
   private final long icdCounter;
   private final long monitoredSubject;
   private final long fabricId;
-  private final long fabricIndex;
+  private final int fabricIndex;
 
   ICDDeviceInfo(
       byte[] symmetricKey,
@@ -70,7 +70,7 @@ public class ICDDeviceInfo {
       long icdCounter,
       long monitoredSubject,
       long fabricId,
-      long fabricIndex) {
+      int fabricIndex) {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerHint = userActiveModeTriggerHint;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
@@ -89,7 +89,7 @@ public class ICDDeviceInfo {
       long icdCounter,
       long monitoredSubject,
       long fabricId,
-      long fabricIndex) {
+      int fabricIndex) {
     this.symmetricKey = symmetricKey;
     this.userActiveModeTriggerInstruction = userActiveModeTriggerInstruction;
     this.icdNodeId = icdNodeId;
@@ -143,7 +143,7 @@ public class ICDDeviceInfo {
   }
 
   /** Returns the Fabric Index */
-  public long getFabricIndex() {
+  public int getFabricIndex() {
     return fabricIndex;
   }
 

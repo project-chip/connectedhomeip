@@ -959,7 +959,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
     methodErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
     VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
 
-    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJJJ)V");
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJJI)V");
     VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
 
     methodErr =
@@ -973,7 +973,7 @@ void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdN
         icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
         jUserActiveModeTriggerInstruction, static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
         static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
-        static_cast<jlong>(Controller()->GetFabricId()), static_cast<jlong>(Controller()->GetFabricIndex()));
+        static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
 
     env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), icdDeviceInfoObj);
 }
