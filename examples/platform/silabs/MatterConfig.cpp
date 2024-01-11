@@ -296,5 +296,11 @@ CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 // ================================================================================
 extern "C" void vApplicationIdleHook(void)
 {
-    // FreeRTOS Idle callback
+#if SIWX_917 && CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (ConnectivityMgr().IsWiFiStationConnected())
+    {
+        // Let the M4 sleep once commissioning is done and device is in idle state
+        sl_wfx_host_si91x_sleep_wakeup();
+    }
+#endif
 }
