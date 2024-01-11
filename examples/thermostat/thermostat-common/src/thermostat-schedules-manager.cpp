@@ -83,6 +83,7 @@ static EmberAfStatus onEditCommit(ThermostatMatterScheduleManager * mgr)
     gsEditingPresetsEmptyIndex = 0;
 
     // TODO: update thermostat attributes for new presets.
+    
     // TODO: do the validation and commit for schedules.
 
 exit:
