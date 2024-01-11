@@ -102,9 +102,10 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
 {
     VerifyOrDie(!gActivatedCarbonFilterInstance && !gActivatedCarbonFilterDelegate);
     gActivatedCarbonFilterDelegate = std::make_unique<ActivatedCarbonFilterMonitoringDelegate>();
+    bool bResetConditionCommandSupported = true; // The ResetCondition command is supported by the ResourceMonitor cluster
     gActivatedCarbonFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
         gActivatedCarbonFilterDelegate.get(), endpoint, ActivatedCarbonFilterMonitoring::Id,
-        static_cast<uint32_t>(gActivatedCarbonFeatureMap.Raw()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+        static_cast<uint32_t>(gActivatedCarbonFeatureMap.Raw()), ResourceMonitoring::DegradationDirectionEnum::kDown, bResetConditionCommandSupported);
     gActivatedCarbonFilterInstance->Init();
 }
 
@@ -113,9 +114,10 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     VerifyOrDie(!gHepaFilterInstance && !gHepaFilterDelegate);
 
     gHepaFilterDelegate = std::make_unique<HepaFilterMonitoringDelegate>();
+    bool bResetConditionCommandSupported = true; // The ResetCondition command is supported by the ResourceMonitor cluster
     gHepaFilterInstance = std::make_unique<ResourceMonitoring::Instance>(
         gHepaFilterDelegate.get(), endpoint, HepaFilterMonitoring::Id, static_cast<uint32_t>(gHepaFilterFeatureMap.Raw()),
-        ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+        ResourceMonitoring::DegradationDirectionEnum::kDown, bResetConditionCommandSupported);
     gHepaFilterInstance->Init();
 }
 
