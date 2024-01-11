@@ -568,6 +568,13 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Set ReadHandler Capacity for Subscriptions
+    chip::app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity);
+    chip::app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+#endif
+
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
     // noise.
