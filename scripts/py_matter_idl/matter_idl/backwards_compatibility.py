@@ -17,7 +17,7 @@ import enum
 import logging
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
-from matter_idl.matter_idl_types import Attribute, ApiMaturity, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
+from matter_idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
 
 
 class Compatibility(enum.Enum):
