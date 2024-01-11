@@ -294,18 +294,22 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_NO_ERROR;
         });
 #endif
-        break;
-
     case Attributes::SupportedThreadFeatures::Id:
-        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
-        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+#if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+#else
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures());
-
+#endif
+        break;
     case Attributes::ThreadVersion::Id:
-        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
-        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
+#if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+#else
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetThreadVersion());
-
+#endif
+        break;
     default:
         return CHIP_NO_ERROR;
     }
