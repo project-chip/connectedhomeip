@@ -181,6 +181,7 @@ def BuildHostTarget():
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('with-ui', imgui_ui=True)
+    target.AppendModifier('evse-test-event', enable_test_event_triggers=['EVSE']).OnlyIfRe('-energy-management')
 
     return target
 
