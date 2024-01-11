@@ -243,8 +243,7 @@ qpg_make_build("qpg_thermostat_factorydata") {
   make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake/libFactoryData_thermostaticRadiatorValve_static_pake.a" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_thermostaticRadiatorValve_static_pake",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FactoryData_thermostaticRadiatorValve_static_pake",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
         "/${qpg_sdk_lib_dir}/FactoryData_thermostaticRadiatorValve_static_pake",
   ]
@@ -316,8 +315,7 @@ qpg_make_build("qpg_thermostat_firmwaredata") {
   make_output = [ "${target_gen_dir}/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve/libFirmwareData_thermostaticRadiatorValve.a" ]
   make_args = [
     "-f",
-    rebase_path(qpg_sdk_root, root_build_dir) +
-        "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_thermostaticRadiatorValve",
+    rebase_path(qpg_sdk_root, root_build_dir) + "/Libraries/Qorvo/FactoryData/Makefile.FirmwareData_thermostaticRadiatorValve",
     "WORKDIR=" + rebase_path(target_gen_dir, root_build_dir) +
         "/${qpg_sdk_lib_dir}/FirmwareData_thermostaticRadiatorValve",
   ]

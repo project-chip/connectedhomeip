@@ -61,8 +61,8 @@ qpg_executable("thermostat") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/thermostat/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/thermostat/qpg/zap/",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
