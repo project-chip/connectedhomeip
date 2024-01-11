@@ -147,9 +147,9 @@ Status EnergyEvseDelegate::StartDiagnostics()
     /* For EVSE manufacturers to customize */
     ChipLogProgress(AppServer, "EnergyEvseDelegate::StartDiagnostics()");
 
-    if (mSupplyState == SupplyStateEnum::kDisabledDiagnostics)
+    if (mSupplyState != SupplyStateEnum::kDisabled)
     {
-        ChipLogError(AppServer, "EVSE: Already in diagnostics mode!");
+        ChipLogError(AppServer, "EVSE: cannot be put into diagnostics mode if it is not Disabled!");
         return Status::Failure;
     }
 

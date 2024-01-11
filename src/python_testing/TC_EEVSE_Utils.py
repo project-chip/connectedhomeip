@@ -32,9 +32,9 @@ class EventChangeCallback:
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
 
-    async def start(self, dev_ctrl, nodeid):
+    async def start(self, dev_ctrl, nodeid, endpoint: int = 1):
         self._subscription = await dev_ctrl.ReadEvent(nodeid,
-                                                      events=[(1, self._expected_cluster, 1)], reportInterval=(1, 5),
+                                                      events=[(endpoint, self._expected_cluster, 1)], reportInterval=(1, 5),
                                                       fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
 
@@ -62,41 +62,41 @@ class EEVSEBaseTestHelper:
         cluster = Clusters.Objects.EnergyEvse
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
 
-    async def check_evse_attribute(self, attribute, expected_value):
-        value = await self.read_evse_attribute_expect_success(endpoint=1, attribute=attribute)
+    async def check_evse_attribute(self, attribute, expected_value, endpoint: int = 1):
+        value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
     async def get_supported_energy_evse_attributes(self, endpoint):
         return await self.read_evse_attribute_expect_success(endpoint, "AttributeList")
 
-    async def send_enable_charge_command(self, endpoint: int = 0, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
+    async def send_enable_charge_command(self, endpoint: int = 1, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                          min_charge: int = None, max_charge: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
                 chargingEnabledUntil=charge_until,
                 minimumChargeCurrent=min_charge,
                 maximumChargeCurrent=max_charge),
-                endpoint=1,
+                endpoint=endpoint,
                 timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_disable_command(self, endpoint: int = 0, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
+    async def send_disable_command(self, endpoint: int = 1, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.Disable(),
-                                       endpoint=1,
+                                       endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_start_diagnostics_command(self, endpoint: int = 0, timedRequestTimeoutMs: int = 3000,
+    async def send_start_diagnostics_command(self, endpoint: int = 1, timedRequestTimeoutMs: int = 3000,
                                              expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.StartDiagnostics(),
-                                       endpoint=1,
+                                       endpoint=endpoint,
                                        timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
