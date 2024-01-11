@@ -475,7 +475,7 @@ void AppTask::UpdateLEDs(void)
     }
     else
     {
-        // not commisioned yet
+        // not commissioned yet
         qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
     }
 }

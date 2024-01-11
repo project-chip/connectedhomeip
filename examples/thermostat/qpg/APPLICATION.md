@@ -2,7 +2,7 @@
 
 ## Thermostat
 
-A klight switch example application showing the use of
+A thermostat example application showing the use of
 [Matter](https://github.com/project-chip/connectedhomeip) on the Qorvo QPG6105
 can be found in this folder.
 

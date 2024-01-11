@@ -204,7 +204,7 @@ int16_t ThermostaticRadiatorValveManager::GetLocalTemperature()
     return (int16_t) temp;
 }
 
-/* Update the status of thermostaticRadiatorValve according to the exising attributes configuration and temperature */
+/* Update the status of thermostaticRadiatorValve according to the existing attributes configuration and temperature */
 void ThermostaticRadiatorValveManager::UpdateThermostaticRadiatorValveStatus(void)
 {
 

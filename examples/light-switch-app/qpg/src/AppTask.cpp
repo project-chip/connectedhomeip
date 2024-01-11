@@ -293,7 +293,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
     case APP_FUNCTION2_SWITCH: {
         if (!btnPressed)
         {
-            ChipLogProgress(NotSpecified, "Switch inital press");
+            ChipLogProgress(NotSpecified, "Switch initial press");
             SwitchMgr().GenericSwitchInitialPress();
         }
         else
@@ -526,7 +526,7 @@ void AppTask::UpdateLEDs(void)
     }
     else
     {
-        // not commisioned yet
+        // not commissioned yet
         qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
     }
 }
