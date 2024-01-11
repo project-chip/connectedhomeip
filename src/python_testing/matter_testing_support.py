@@ -862,12 +862,15 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def pics_guard(self, pics_condition: bool):
         if not pics_condition:
-            self.mark_step_skipped
+            self.mark_current_step_skipped()
 
     def mark_current_step_skipped(self):
         try:
-            steps = self.get_test_steps()
-            num = steps[self.current_step_index].test_plan_number
+            steps = self.get_test_steps(self.current_test_info.name)
+            if self.current_step_index == 0:
+                asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
+            print(self.current_step_index-1)
+            num = steps[self.current_step_index-1].test_plan_number
         except KeyError:
             num = self.current_step_index
 
@@ -885,7 +888,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.mark_current_step_skipped()
 
     def step(self, step: typing.Union[int, str]):
-        test_name = sys._getframe().f_back.f_code.co_name
+        test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
         # TODO: this might be annoying during dev. Remove? Flag?
