@@ -41,7 +41,6 @@ void Shutdown();
 } // namespace ActivatedCarbonFilterMonitoring
 
 namespace HepaFilterMonitoring {
-/// This is an application level Delegate to handle HepaFilterMonitoringDelegate commands according to the specific business logic.
 class HepaFilterMonitoringDelegate : public ResourceMonitoring::Delegate
 {
 private:
