@@ -40,6 +40,7 @@ from chip import ChipDeviceCtrl
 from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
 from chip.utils import CommissioningBuildingBlocks
+from cirque_restart_remote_device import restartRemoteDevice
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -334,6 +335,21 @@ class BaseTestHelper:
                 "Failed to finish commissioning device {}".format(setupPayload))
             return False
         self.logger.info("Commissioning finished.")
+        return True
+
+    def TestOnNetworkCommissioning(self, discriminator: int, setuppin: int, nodeid: int, ip_override: str = None):
+        self.logger.info("Testing discovery")
+        device = self.TestDiscovery(discriminator=discriminator)
+        if not device:
+            self.logger.info("Failed to discover any devices.")
+            return False
+        address = device.addresses[0]
+        if ip_override:
+            address = ip_override
+        self.logger.info("Testing commissioning")
+        if not self.TestCommissioning(address, setuppin, nodeid):
+            self.logger.info("Failed to finish commissioning")
+            return False
         return True
 
     def TestUsedTestCommissioner(self):
@@ -1316,3 +1332,148 @@ class BaseTestHelper:
             status = ex.status
 
         return status == IM.Status.UnsupportedAccess
+
+    def TestSubscriptionResumption(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int, remote_server_app: str):
+        '''
+        This test validates that the device can resume the subscriptions after restarting.
+        It is executed in Linux Cirque tests and the steps of this test are:
+        1. Subscription the NodeLable attribute on BasicInformation cluster with the controller
+        2. Restart the remote server app
+        3. Validate that the controller can receive a report from the remote server app
+        '''
+        desiredPath = None
+        receivedUpdate = False
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
+
+        def OnValueReport(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
+            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            if path.Path != desiredPath:
+                return
+
+            data = transaction.GetAttribute(path)
+            logger.info(
+                f"Received report from server: path: {path.Path}, value: {data}")
+            with updateLock:
+                receivedUpdate = True
+                updateCv.notify_all()
+
+        try:
+            desiredPath = Clusters.Attribute.AttributePath(
+                EndpointId=0, ClusterId=0x28, AttributeId=5)
+            # BasicInformation Cluster, NodeLabel Attribute
+            subscription = self.devCtrl.ZCLSubscribeAttribute(
+                "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+            subscription.SetAttributeUpdateCallback(OnValueReport)
+
+            self.logger.info("Restart remote deivce")
+            restartRemoteThread = restartRemoteDevice(
+                remote_ip, ssh_port, "root", "admin", remote_server_app, "--thread --discriminator 3840")
+            restartRemoteThread.start()
+            # After device restarts, the attribute will be set dirty so the subscription can receive
+            # the update
+            with updateCv:
+                while receivedUpdate is False:
+                    if not updateCv.wait(10.0):
+                        self.logger.error(
+                            "Failed to receive subscription resumption report")
+                        break
+
+            restartRemoteThread.join(10.0)
+
+            #
+            # Clean-up by shutting down the sub. Otherwise, we're going to get callbacks through
+            # OnValueChange on what will soon become an invalid execution context above.
+            #
+            subscription.Shutdown()
+
+            if restartRemoteThread.is_alive():
+                # Thread join timed out
+                self.logger.error("Failed to join change thread")
+                return False
+
+            return receivedUpdate
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True
+
+    '''
+    The SubscriptionResumptionCapacity Cirque Test is to verify that the device can still handle new subscription
+    requests when resuming the maximum subscriptions. The steps for this test are:
+    1. Commission the server app to the first fabric and send maximum subscription requests from the controller in
+    the first fabric to establish maximum subscriptions.
+    2. Open the commissioning window to make the server app can be commissioned to the second fabric.
+    3. Shutdown the controller in the first fabric to extend the time of resuming subscriptions. The server app will
+    keep resolving the address of the first controller for a while after rebooting.
+    4. Commission the server app to the second fabric.
+    5. Restart the server app and the server app will start resuming subscriptions. Since the first controller is
+    shutdown, the server app will keep resolving the address of the first controller for a while and the subscription
+    resumption will not fail so quickly.
+    6. When the server app is resuming subscriptions, send a new subscription request from the second controller.
+    Verify that the device can still handle this subscription.
+
+    BaseTestHelper provides two controllers. However, if using the two controller (devCtrl and devCtrl2) in one
+    MobileDevice to execute this Cirque test, the CHIPEndDevice can still resolve the address for first controller
+    even if the first controller is shutdown by 'self.devCtrl.Shutdown()'. And the server will fail to establish the
+    subscriptions immediately, which makes it hard to send the new subscription request from the second controller
+    at the time of server app resuming maximum subscriptions.
+    So we will use two controller containers for this test and divide the test to two steps. The Step1 is executed in
+    controller 1 in container 1 while the Step2 is executed in controller 2 in container 2
+    '''
+
+    def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, subscription_capacity: int):
+        try:
+            # BasicInformation Cluster, NodeLabel Attribute
+            for i in range(subscription_capacity):
+                self.devCtrl.ZCLSubscribeAttribute(
+                    "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+
+            logger.info("Send OpenBasicCommissioningWindow command on fist controller")
+            asyncio.run(
+                self.devCtrl.SendCommand(
+                    nodeid,
+                    0,
+                    Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180),
+                    timedRequestTimeoutMs=10000
+                ))
+            return True
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True
+
+    def TestSubscriptionResumptionCapacityStep2(self, nodeid: int, endpoint: int, remote_ip: str, ssh_port: int,
+                                                remote_server_app: str, subscription_capacity: int):
+        try:
+            self.logger.info("Restart remote deivce")
+            extra_agrs = f"--thread --discriminator 3840 --subscription-capacity {subscription_capacity}"
+            restartRemoteThread = restartRemoteDevice(remote_ip, ssh_port, "root", "admin", remote_server_app, extra_agrs)
+            restartRemoteThread.start()
+
+            # Wait for some time so that the device will be resolving the address of the first controller after restarting
+            time.sleep(8)
+            restartRemoteThread.join(10.0)
+
+            self.logger.info("Send a new subscription request from the second controller")
+            # Close previous session so that the second controller will res-establish the session with the remote device
+            self.devCtrl.CloseSession(nodeid)
+            self.devCtrl.ZCLSubscribeAttribute(
+                "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
+
+            if restartRemoteThread.is_alive():
+                # Thread join timed out
+                self.logger.error("Failed to join change thread")
+                return False
+
+            return True
+
+        except Exception as ex:
+            self.logger.exception(f"Failed to finish API test: {ex}")
+            return False
+
+        return True

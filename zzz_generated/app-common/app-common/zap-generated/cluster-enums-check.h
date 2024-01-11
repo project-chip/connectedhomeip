@@ -1828,9 +1828,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::CredentialTyp
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(9);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DataOperationTypeEnum val)
@@ -2017,9 +2020,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(11);
+        return static_cast<EnumType>(14);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)
@@ -2082,9 +2088,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSour
     case EnumType::kRemote:
     case EnumType::kRfid:
     case EnumType::kBiometric:
+    case EnumType::kAliro:
         return val;
     default:
-        return static_cast<EnumType>(10);
+        return static_cast<EnumType>(11);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserStatusEnum val)

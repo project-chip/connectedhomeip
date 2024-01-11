@@ -767,10 +767,13 @@ void CHIPScenesFabricSceneInfoAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ScenesClusterSceneInfoStruct");
             return;
         }
-        jmethodID sceneInfoStructStructCtor_1 = env->GetMethodID(sceneInfoStructStructClass_1, "<init>",
-                                                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
-                                                                 "lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (sceneInfoStructStructCtor_1 == nullptr)
+
+        jmethodID sceneInfoStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, sceneInfoStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+            &sceneInfoStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || sceneInfoStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterSceneInfoStruct constructor");
             return;
@@ -3045,9 +3048,11 @@ void CHIPDescriptorDeviceTypeListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterDeviceTypeStruct");
             return;
         }
-        jmethodID deviceTypeStructStructCtor_1 =
-            env->GetMethodID(deviceTypeStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V");
-        if (deviceTypeStructStructCtor_1 == nullptr)
+
+        jmethodID deviceTypeStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, deviceTypeStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;)V", &deviceTypeStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || deviceTypeStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterDeviceTypeStruct constructor");
             return;
@@ -3386,10 +3391,12 @@ void CHIPDescriptorTagListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$DescriptorClusterSemanticTagStruct");
             return;
         }
-        jmethodID semanticTagStructStructCtor_1 =
-            env->GetMethodID(semanticTagStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V");
-        if (semanticTagStructStructCtor_1 == nullptr)
+
+        jmethodID semanticTagStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, semanticTagStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V", &semanticTagStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || semanticTagStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$DescriptorClusterSemanticTagStruct constructor");
             return;
@@ -3825,10 +3832,13 @@ void CHIPBindingBindingAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$BindingClusterTargetStruct");
             return;
         }
-        jmethodID targetStructStructCtor_1 = env->GetMethodID(
-            targetStructStructClass_1, "<init>",
-            "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V");
-        if (targetStructStructCtor_1 == nullptr)
+
+        jmethodID targetStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, targetStructStructClass_1, "<init>",
+            "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
+            &targetStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || targetStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$BindingClusterTargetStruct constructor");
             return;
@@ -4287,9 +4297,12 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlTargetStruct");
                     return;
                 }
-                jmethodID accessControlTargetStructStructCtor_4 = env->GetMethodID(
-                    accessControlTargetStructStructClass_4, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V");
-                if (accessControlTargetStructStructCtor_4 == nullptr)
+
+                jmethodID accessControlTargetStructStructCtor_4;
+                err = chip::JniReferences::GetInstance().FindMethod(env, accessControlTargetStructStructClass_4, "<init>",
+                                                                    "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;)V",
+                                                                    &accessControlTargetStructStructCtor_4);
+                if (err != CHIP_NO_ERROR || accessControlTargetStructStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlTargetStruct constructor");
                     return;
@@ -4317,10 +4330,13 @@ void CHIPAccessControlAclAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlEntryStruct");
             return;
         }
-        jmethodID accessControlEntryStructStructCtor_1 = env->GetMethodID(
-            accessControlEntryStructStructClass_1, "<init>",
-            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
-        if (accessControlEntryStructStructCtor_1 == nullptr)
+
+        jmethodID accessControlEntryStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, accessControlEntryStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V",
+            &accessControlEntryStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || accessControlEntryStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlEntryStruct constructor");
             return;
@@ -4418,9 +4434,11 @@ void CHIPAccessControlExtensionAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$AccessControlClusterAccessControlExtensionStruct");
             return;
         }
-        jmethodID accessControlExtensionStructStructCtor_1 =
-            env->GetMethodID(accessControlExtensionStructStructClass_1, "<init>", "([BLjava/lang/Integer;)V");
-        if (accessControlExtensionStructStructCtor_1 == nullptr)
+
+        jmethodID accessControlExtensionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, accessControlExtensionStructStructClass_1, "<init>",
+                                                            "([BLjava/lang/Integer;)V", &accessControlExtensionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || accessControlExtensionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$AccessControlClusterAccessControlExtensionStruct constructor");
             return;
@@ -4824,10 +4842,13 @@ void CHIPActionsActionListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ActionsClusterActionStruct");
             return;
         }
-        jmethodID actionStructStructCtor_1 = env->GetMethodID(
-            actionStructStructClass_1, "<init>",
-            "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (actionStructStructCtor_1 == nullptr)
+
+        jmethodID actionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, actionStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+            &actionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || actionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ActionsClusterActionStruct constructor");
             return;
@@ -4941,10 +4962,12 @@ void CHIPActionsEndpointListsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ActionsClusterEndpointListStruct");
             return;
         }
-        jmethodID endpointListStructStructCtor_1 =
-            env->GetMethodID(endpointListStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (endpointListStructStructCtor_1 == nullptr)
+
+        jmethodID endpointListStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, endpointListStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V", &endpointListStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || endpointListStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ActionsClusterEndpointListStruct constructor");
             return;
@@ -5911,9 +5934,12 @@ void CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback::Callbac
             ChipLogError(Zcl, "Could not find class ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation");
             return;
         }
-        jmethodID providerLocationStructCtor_1 =
-            env->GetMethodID(providerLocationStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (providerLocationStructCtor_1 == nullptr)
+
+        jmethodID providerLocationStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, providerLocationStructClass_1, "<init>",
+                                                            "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                            &providerLocationStructCtor_1);
+        if (err != CHIP_NO_ERROR || providerLocationStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation constructor");
             return;
@@ -9175,9 +9201,12 @@ void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$NetworkCommissioningClusterNetworkInfoStruct");
             return;
         }
-        jmethodID networkInfoStructStructCtor_1 = env->GetMethodID(
-            networkInfoStructStructClass_1, "<init>", "([BLjava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;)V");
-        if (networkInfoStructStructCtor_1 == nullptr)
+
+        jmethodID networkInfoStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, networkInfoStructStructClass_1, "<init>",
+                                                            "([BLjava/lang/Boolean;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                            &networkInfoStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || networkInfoStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$NetworkCommissioningClusterNetworkInfoStruct constructor");
             return;
@@ -10191,11 +10220,14 @@ void CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$GeneralDiagnosticsClusterNetworkInterface");
             return;
         }
-        jmethodID networkInterfaceStructCtor_1 =
-            env->GetMethodID(networkInterfaceStructClass_1, "<init>",
-                             "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/util/"
-                             "ArrayList;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
-        if (networkInterfaceStructCtor_1 == nullptr)
+
+        jmethodID networkInterfaceStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, networkInterfaceStructClass_1, "<init>",
+            "(Ljava/lang/String;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;[BLjava/util/ArrayList;Ljava/util/"
+            "ArrayList;Ljava/lang/Integer;)V",
+            &networkInterfaceStructCtor_1);
+        if (err != CHIP_NO_ERROR || networkInterfaceStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$GeneralDiagnosticsClusterNetworkInterface constructor");
             return;
@@ -10857,10 +10889,13 @@ void CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$SoftwareDiagnosticsClusterThreadMetricsStruct");
             return;
         }
-        jmethodID threadMetricsStructStructCtor_1 =
-            env->GetMethodID(threadMetricsStructStructClass_1, "<init>",
-                             "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-        if (threadMetricsStructStructCtor_1 == nullptr)
+
+        jmethodID threadMetricsStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, threadMetricsStructStructClass_1, "<init>",
+            "(Ljava/lang/Long;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+            &threadMetricsStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || threadMetricsStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$SoftwareDiagnosticsClusterThreadMetricsStruct constructor");
             return;
@@ -11747,12 +11782,15 @@ void CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct");
             return;
         }
-        jmethodID neighborTableStructStructCtor_1 =
-            env->GetMethodID(neighborTableStructStructClass_1, "<init>",
-                             "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/"
-                             "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/"
-                             "Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-        if (neighborTableStructStructCtor_1 == nullptr)
+
+        jmethodID neighborTableStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, neighborTableStructStructClass_1, "<init>",
+            "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/"
+            "Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;Ljava/lang/"
+            "Boolean;Ljava/lang/Boolean;)V",
+            &neighborTableStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || neighborTableStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct constructor");
             return;
@@ -11911,11 +11949,14 @@ void CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct");
             return;
         }
-        jmethodID routeTableStructStructCtor_1 =
-            env->GetMethodID(routeTableStructStructClass_1, "<init>",
-                             "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
-                             "lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V");
-        if (routeTableStructStructCtor_1 == nullptr)
+
+        jmethodID routeTableStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, routeTableStructStructClass_1, "<init>",
+            "(Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
+            "lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Boolean;)V",
+            &routeTableStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || routeTableStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct constructor");
             return;
@@ -14797,9 +14838,12 @@ void CHIPTimeSynchronizationTimeZoneAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$TimeSynchronizationClusterTimeZoneStruct");
             return;
         }
-        jmethodID timeZoneStructStructCtor_1 =
-            env->GetMethodID(timeZoneStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;Ljava/util/Optional;)V");
-        if (timeZoneStructStructCtor_1 == nullptr)
+
+        jmethodID timeZoneStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, timeZoneStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Long;Ljava/lang/Long;Ljava/util/Optional;)V",
+                                                            &timeZoneStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || timeZoneStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$TimeSynchronizationClusterTimeZoneStruct constructor");
             return;
@@ -14912,9 +14956,12 @@ void CHIPTimeSynchronizationDSTOffsetAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$TimeSynchronizationClusterDSTOffsetStruct");
             return;
         }
-        jmethodID DSTOffsetStructStructCtor_1 =
-            env->GetMethodID(DSTOffsetStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-        if (DSTOffsetStructStructCtor_1 == nullptr)
+
+        jmethodID DSTOffsetStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, DSTOffsetStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V",
+                                                            &DSTOffsetStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || DSTOffsetStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$TimeSynchronizationClusterDSTOffsetStruct constructor");
             return;
@@ -16375,8 +16422,11 @@ void CHIPOperationalCredentialsNOCsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterNOCStruct");
             return;
         }
-        jmethodID NOCStructStructCtor_1 = env->GetMethodID(NOCStructStructClass_1, "<init>", "([B[BLjava/lang/Integer;)V");
-        if (NOCStructStructCtor_1 == nullptr)
+
+        jmethodID NOCStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, NOCStructStructClass_1, "<init>", "([B[BLjava/lang/Integer;)V",
+                                                            &NOCStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || NOCStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterNOCStruct constructor");
             return;
@@ -16497,10 +16547,13 @@ void CHIPOperationalCredentialsFabricsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$OperationalCredentialsClusterFabricDescriptorStruct");
             return;
         }
-        jmethodID fabricDescriptorStructStructCtor_1 =
-            env->GetMethodID(fabricDescriptorStructStructClass_1, "<init>",
-                             "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V");
-        if (fabricDescriptorStructStructCtor_1 == nullptr)
+
+        jmethodID fabricDescriptorStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, fabricDescriptorStructStructClass_1, "<init>",
+            "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V",
+            &fabricDescriptorStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || fabricDescriptorStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OperationalCredentialsClusterFabricDescriptorStruct constructor");
             return;
@@ -16967,9 +17020,12 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct");
             return;
         }
-        jmethodID groupKeyMapStructStructCtor_1 = env->GetMethodID(groupKeyMapStructStructClass_1, "<init>",
-                                                                   "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (groupKeyMapStructStructCtor_1 == nullptr)
+
+        jmethodID groupKeyMapStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, groupKeyMapStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                            &groupKeyMapStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || groupKeyMapStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct constructor");
             return;
@@ -17095,10 +17151,12 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct");
             return;
         }
-        jmethodID groupInfoMapStructStructCtor_1 =
-            env->GetMethodID(groupInfoMapStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/lang/Integer;)V");
-        if (groupInfoMapStructStructCtor_1 == nullptr)
+
+        jmethodID groupInfoMapStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, groupInfoMapStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/lang/Integer;)V", &groupInfoMapStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || groupInfoMapStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct constructor");
             return;
@@ -17472,9 +17530,11 @@ void CHIPFixedLabelLabelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$FixedLabelClusterLabelStruct");
             return;
         }
-        jmethodID labelStructStructCtor_1 =
-            env->GetMethodID(labelStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
-        if (labelStructStructCtor_1 == nullptr)
+
+        jmethodID labelStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, labelStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/String;)V", &labelStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || labelStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$FixedLabelClusterLabelStruct constructor");
             return;
@@ -17842,9 +17902,11 @@ void CHIPUserLabelLabelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$UserLabelClusterLabelStruct");
             return;
         }
-        jmethodID labelStructStructCtor_1 =
-            env->GetMethodID(labelStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/lang/String;)V");
-        if (labelStructStructCtor_1 == nullptr)
+
+        jmethodID labelStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, labelStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/String;)V", &labelStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || labelStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$UserLabelClusterLabelStruct constructor");
             return;
@@ -19371,9 +19433,12 @@ void CHIPIcdManagementRegisteredClientsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$IcdManagementClusterMonitoringRegistrationStruct");
             return;
         }
-        jmethodID monitoringRegistrationStructStructCtor_1 = env->GetMethodID(
-            monitoringRegistrationStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V");
-        if (monitoringRegistrationStructStructCtor_1 == nullptr)
+
+        jmethodID monitoringRegistrationStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, monitoringRegistrationStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V",
+                                                            &monitoringRegistrationStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || monitoringRegistrationStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$IcdManagementClusterMonitoringRegistrationStruct constructor");
             return;
@@ -20258,9 +20323,12 @@ void CHIPOvenCavityOperationalStateOperationalStateListAttributeCallback::Callba
             ChipLogError(Zcl, "Could not find class ChipStructs$OvenCavityOperationalStateClusterOperationalStateStruct");
             return;
         }
-        jmethodID operationalStateStructStructCtor_1 =
-            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-        if (operationalStateStructStructCtor_1 == nullptr)
+
+        jmethodID operationalStateStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, operationalStateStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/util/Optional;)V",
+                                                            &operationalStateStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || operationalStateStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OvenCavityOperationalStateClusterOperationalStateStruct constructor");
             return;
@@ -20672,9 +20740,12 @@ void CHIPOvenModeSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$OvenModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$OvenModeClusterModeTagStruct constructor");
                 return;
@@ -20693,9 +20764,12 @@ void CHIPOvenModeSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$OvenModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OvenModeClusterModeOptionStruct constructor");
             return;
@@ -21714,9 +21788,12 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterSemanticTagStruct");
                 return;
             }
-            jmethodID semanticTagStructStructCtor_3 =
-                env->GetMethodID(semanticTagStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-            if (semanticTagStructStructCtor_3 == nullptr)
+
+            jmethodID semanticTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, semanticTagStructStructClass_3, "<init>",
+                                                                "(Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                &semanticTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || semanticTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$ModeSelectClusterSemanticTagStruct constructor");
                 return;
@@ -21735,9 +21812,12 @@ void CHIPModeSelectSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ModeSelectClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ModeSelectClusterModeOptionStruct constructor");
             return;
@@ -22274,9 +22354,12 @@ void CHIPLaundryWasherModeSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherModeClusterModeTagStruct constructor");
                 return;
@@ -22295,9 +22378,12 @@ void CHIPLaundryWasherModeSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$LaundryWasherModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$LaundryWasherModeClusterModeOptionStruct constructor");
             return;
@@ -22845,9 +22931,12 @@ void CHIPRefrigeratorAndTemperatureControlledCabinetModeSupportedModesAttributeC
                     Zcl, "Could not find class ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(
                     Zcl,
@@ -22870,9 +22959,12 @@ void CHIPRefrigeratorAndTemperatureControlledCabinetModeSupportedModesAttributeC
                          "Could not find class ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(
                 Zcl,
@@ -23938,9 +24030,12 @@ void CHIPRvcRunModeSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$RvcRunModeClusterModeTagStruct constructor");
                 return;
@@ -23959,9 +24054,12 @@ void CHIPRvcRunModeSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$RvcRunModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$RvcRunModeClusterModeOptionStruct constructor");
             return;
@@ -24431,9 +24529,12 @@ void CHIPRvcCleanModeSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanModeClusterModeTagStruct constructor");
                 return;
@@ -24452,9 +24553,12 @@ void CHIPRvcCleanModeSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$RvcCleanModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$RvcCleanModeClusterModeOptionStruct constructor");
             return;
@@ -25569,9 +25673,12 @@ void CHIPDishwasherModeSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$DishwasherModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$DishwasherModeClusterModeTagStruct constructor");
                 return;
@@ -25590,9 +25697,12 @@ void CHIPDishwasherModeSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$DishwasherModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$DishwasherModeClusterModeOptionStruct constructor");
             return;
@@ -26986,9 +27096,12 @@ void CHIPMicrowaveOvenModeSupportedModesAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$MicrowaveOvenModeClusterModeTagStruct");
                 return;
             }
-            jmethodID modeTagStructStructCtor_3 =
-                env->GetMethodID(modeTagStructStructClass_3, "<init>", "(Ljava/util/Optional;Ljava/lang/Integer;)V");
-            if (modeTagStructStructCtor_3 == nullptr)
+
+            jmethodID modeTagStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(env, modeTagStructStructClass_3, "<init>",
+                                                                "(Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &modeTagStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || modeTagStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$MicrowaveOvenModeClusterModeTagStruct constructor");
                 return;
@@ -27007,9 +27120,12 @@ void CHIPMicrowaveOvenModeSupportedModesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$MicrowaveOvenModeClusterModeOptionStruct");
             return;
         }
-        jmethodID modeOptionStructStructCtor_1 = env->GetMethodID(modeOptionStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V");
-        if (modeOptionStructStructCtor_1 == nullptr)
+
+        jmethodID modeOptionStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, modeOptionStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;)V",
+                                                            &modeOptionStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || modeOptionStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$MicrowaveOvenModeClusterModeOptionStruct constructor");
             return;
@@ -27897,9 +28013,12 @@ void CHIPOperationalStateOperationalStateListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$OperationalStateClusterOperationalStateStruct");
             return;
         }
-        jmethodID operationalStateStructStructCtor_1 =
-            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-        if (operationalStateStructStructCtor_1 == nullptr)
+
+        jmethodID operationalStateStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, operationalStateStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/util/Optional;)V",
+                                                            &operationalStateStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || operationalStateStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$OperationalStateClusterOperationalStateStruct constructor");
             return;
@@ -28502,9 +28621,12 @@ void CHIPRvcOperationalStateOperationalStateListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$RvcOperationalStateClusterOperationalStateStruct");
             return;
         }
-        jmethodID operationalStateStructStructCtor_1 =
-            env->GetMethodID(operationalStateStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-        if (operationalStateStructStructCtor_1 == nullptr)
+
+        jmethodID operationalStateStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, operationalStateStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/util/Optional;)V",
+                                                            &operationalStateStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || operationalStateStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$RvcOperationalStateClusterOperationalStateStruct constructor");
             return;
@@ -28956,9 +29078,12 @@ void CHIPHepaFilterMonitoringReplacementProductListAttributeCallback::CallbackFn
             ChipLogError(Zcl, "Could not find class ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct");
             return;
         }
-        jmethodID replacementProductStructStructCtor_1 =
-            env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (replacementProductStructStructCtor_1 == nullptr)
+
+        jmethodID replacementProductStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, replacementProductStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                            &replacementProductStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || replacementProductStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct constructor");
             return;
@@ -29414,9 +29539,12 @@ void CHIPActivatedCarbonFilterMonitoringReplacementProductListAttributeCallback:
             ChipLogError(Zcl, "Could not find class ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct");
             return;
         }
-        jmethodID replacementProductStructStructCtor_1 =
-            env->GetMethodID(replacementProductStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (replacementProductStructStructCtor_1 == nullptr)
+
+        jmethodID replacementProductStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, replacementProductStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                            &replacementProductStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || replacementProductStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl,
                          "Could not find ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct constructor");
@@ -31261,10 +31389,13 @@ void CHIPDemandResponseLoadControlLoadControlProgramsAttributeCallback::Callback
             ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlProgramStruct");
             return;
         }
-        jmethodID loadControlProgramStructStructCtor_1 =
-            env->GetMethodID(loadControlProgramStructStructClass_1, "<init>",
-                             "([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-        if (loadControlProgramStructStructCtor_1 == nullptr)
+
+        jmethodID loadControlProgramStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, loadControlProgramStructStructClass_1, "<init>",
+            "([BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+            &loadControlProgramStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || loadControlProgramStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlProgramStruct constructor");
             return;
@@ -31576,10 +31707,13 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct");
                     return;
                 }
-                jmethodID temperatureControlStructStructCtor_5 =
-                    env->GetMethodID(temperatureControlStructStructClass_5, "<init>",
-                                     "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-                if (temperatureControlStructStructCtor_5 == nullptr)
+
+                jmethodID temperatureControlStructStructCtor_5;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, temperatureControlStructStructClass_5, "<init>",
+                    "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                    &temperatureControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || temperatureControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(Zcl,
                                  "Could not find ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct constructor");
@@ -31623,9 +31757,12 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct");
                     return;
                 }
-                jmethodID averageLoadControlStructStructCtor_5 =
-                    env->GetMethodID(averageLoadControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (averageLoadControlStructStructCtor_5 == nullptr)
+
+                jmethodID averageLoadControlStructStructCtor_5;
+                err =
+                    chip::JniReferences::GetInstance().FindMethod(env, averageLoadControlStructStructClass_5, "<init>",
+                                                                  "(Ljava/lang/Integer;)V", &averageLoadControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || averageLoadControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(Zcl,
                                  "Could not find ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct constructor");
@@ -31666,9 +31803,11 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct");
                     return;
                 }
-                jmethodID dutyCycleControlStructStructCtor_5 =
-                    env->GetMethodID(dutyCycleControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (dutyCycleControlStructStructCtor_5 == nullptr)
+
+                jmethodID dutyCycleControlStructStructCtor_5;
+                err = chip::JniReferences::GetInstance().FindMethod(env, dutyCycleControlStructStructClass_5, "<init>",
+                                                                    "(Ljava/lang/Integer;)V", &dutyCycleControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || dutyCycleControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(Zcl,
                                  "Could not find ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct constructor");
@@ -31709,9 +31848,12 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct");
                     return;
                 }
-                jmethodID powerSavingsControlStructStructCtor_5 =
-                    env->GetMethodID(powerSavingsControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (powerSavingsControlStructStructCtor_5 == nullptr)
+
+                jmethodID powerSavingsControlStructStructCtor_5;
+                err =
+                    chip::JniReferences::GetInstance().FindMethod(env, powerSavingsControlStructStructClass_5, "<init>",
+                                                                  "(Ljava/lang/Integer;)V", &powerSavingsControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || powerSavingsControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(
                         Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct constructor");
@@ -31753,9 +31895,12 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
                                  "Could not find class ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct");
                     return;
                 }
-                jmethodID heatingSourceControlStructStructCtor_5 =
-                    env->GetMethodID(heatingSourceControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (heatingSourceControlStructStructCtor_5 == nullptr)
+
+                jmethodID heatingSourceControlStructStructCtor_5;
+                err = chip::JniReferences::GetInstance().FindMethod(env, heatingSourceControlStructStructClass_5, "<init>",
+                                                                    "(Ljava/lang/Integer;)V",
+                                                                    &heatingSourceControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || heatingSourceControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(
                         Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct constructor");
@@ -31779,11 +31924,14 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
                              "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct");
                 return;
             }
-            jmethodID loadControlEventTransitionStructStructCtor_3 =
-                env->GetMethodID(loadControlEventTransitionStructStructClass_3, "<init>",
-                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                                 "Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-            if (loadControlEventTransitionStructStructCtor_3 == nullptr)
+
+            jmethodID loadControlEventTransitionStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, loadControlEventTransitionStructStructClass_3, "<init>",
+                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                "Optional;Ljava/util/Optional;)V",
+                &loadControlEventTransitionStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || loadControlEventTransitionStructStructCtor_3 == nullptr)
             {
                 ChipLogError(
                     Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct constructor");
@@ -31806,11 +31954,13 @@ void CHIPDemandResponseLoadControlEventsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct");
             return;
         }
-        jmethodID loadControlEventStructStructCtor_1 =
-            env->GetMethodID(loadControlEventStructStructClass_1, "<init>",
-                             "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;Ljava/lang/Integer;Ljava/lang/Long;Ljava/"
-                             "util/ArrayList;)V");
-        if (loadControlEventStructStructCtor_1 == nullptr)
+
+        jmethodID loadControlEventStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, loadControlEventStructStructClass_1, "<init>",
+                                                            "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;Ljava/"
+                                                            "lang/Integer;Ljava/lang/Long;Ljava/util/ArrayList;)V",
+                                                            &loadControlEventStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || loadControlEventStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct constructor");
             return;
@@ -32123,10 +32273,13 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct");
                     return;
                 }
-                jmethodID temperatureControlStructStructCtor_5 =
-                    env->GetMethodID(temperatureControlStructStructClass_5, "<init>",
-                                     "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-                if (temperatureControlStructStructCtor_5 == nullptr)
+
+                jmethodID temperatureControlStructStructCtor_5;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, temperatureControlStructStructClass_5, "<init>",
+                    "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                    &temperatureControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || temperatureControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(Zcl,
                                  "Could not find ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct constructor");
@@ -32170,9 +32323,12 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct");
                     return;
                 }
-                jmethodID averageLoadControlStructStructCtor_5 =
-                    env->GetMethodID(averageLoadControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (averageLoadControlStructStructCtor_5 == nullptr)
+
+                jmethodID averageLoadControlStructStructCtor_5;
+                err =
+                    chip::JniReferences::GetInstance().FindMethod(env, averageLoadControlStructStructClass_5, "<init>",
+                                                                  "(Ljava/lang/Integer;)V", &averageLoadControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || averageLoadControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(Zcl,
                                  "Could not find ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct constructor");
@@ -32213,9 +32369,11 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct");
                     return;
                 }
-                jmethodID dutyCycleControlStructStructCtor_5 =
-                    env->GetMethodID(dutyCycleControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (dutyCycleControlStructStructCtor_5 == nullptr)
+
+                jmethodID dutyCycleControlStructStructCtor_5;
+                err = chip::JniReferences::GetInstance().FindMethod(env, dutyCycleControlStructStructClass_5, "<init>",
+                                                                    "(Ljava/lang/Integer;)V", &dutyCycleControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || dutyCycleControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(Zcl,
                                  "Could not find ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct constructor");
@@ -32256,9 +32414,12 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct");
                     return;
                 }
-                jmethodID powerSavingsControlStructStructCtor_5 =
-                    env->GetMethodID(powerSavingsControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (powerSavingsControlStructStructCtor_5 == nullptr)
+
+                jmethodID powerSavingsControlStructStructCtor_5;
+                err =
+                    chip::JniReferences::GetInstance().FindMethod(env, powerSavingsControlStructStructClass_5, "<init>",
+                                                                  "(Ljava/lang/Integer;)V", &powerSavingsControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || powerSavingsControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(
                         Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct constructor");
@@ -32300,9 +32461,12 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
                                  "Could not find class ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct");
                     return;
                 }
-                jmethodID heatingSourceControlStructStructCtor_5 =
-                    env->GetMethodID(heatingSourceControlStructStructClass_5, "<init>", "(Ljava/lang/Integer;)V");
-                if (heatingSourceControlStructStructCtor_5 == nullptr)
+
+                jmethodID heatingSourceControlStructStructCtor_5;
+                err = chip::JniReferences::GetInstance().FindMethod(env, heatingSourceControlStructStructClass_5, "<init>",
+                                                                    "(Ljava/lang/Integer;)V",
+                                                                    &heatingSourceControlStructStructCtor_5);
+                if (err != CHIP_NO_ERROR || heatingSourceControlStructStructCtor_5 == nullptr)
                 {
                     ChipLogError(
                         Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct constructor");
@@ -32326,11 +32490,14 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
                              "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct");
                 return;
             }
-            jmethodID loadControlEventTransitionStructStructCtor_3 =
-                env->GetMethodID(loadControlEventTransitionStructStructClass_3, "<init>",
-                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                                 "Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-            if (loadControlEventTransitionStructStructCtor_3 == nullptr)
+
+            jmethodID loadControlEventTransitionStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, loadControlEventTransitionStructStructClass_3, "<init>",
+                "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
+                "Optional;Ljava/util/Optional;)V",
+                &loadControlEventTransitionStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || loadControlEventTransitionStructStructCtor_3 == nullptr)
             {
                 ChipLogError(
                     Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct constructor");
@@ -32353,11 +32520,13 @@ void CHIPDemandResponseLoadControlActiveEventsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct");
             return;
         }
-        jmethodID loadControlEventStructStructCtor_1 =
-            env->GetMethodID(loadControlEventStructStructClass_1, "<init>",
-                             "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;Ljava/lang/Integer;Ljava/lang/Long;Ljava/"
-                             "util/ArrayList;)V");
-        if (loadControlEventStructStructCtor_1 == nullptr)
+
+        jmethodID loadControlEventStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, loadControlEventStructStructClass_1, "<init>",
+                                                            "([B[BLjava/lang/Integer;Ljava/lang/Long;Ljava/util/Optional;Ljava/"
+                                                            "lang/Integer;Ljava/lang/Long;Ljava/util/ArrayList;)V",
+                                                            &loadControlEventStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || loadControlEventStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct constructor");
             return;
@@ -32771,9 +32940,12 @@ void CHIPDeviceEnergyManagementPowerAdjustmentCapabilityAttributeCallback::Callb
                 ChipLogError(Zcl, "Could not find class ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct");
                 return;
             }
-            jmethodID powerAdjustStructStructCtor_2 = env->GetMethodID(
-                powerAdjustStructStructClass_2, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V");
-            if (powerAdjustStructStructCtor_2 == nullptr)
+
+            jmethodID powerAdjustStructStructCtor_2;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, powerAdjustStructStructClass_2, "<init>",
+                "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Long;)V", &powerAdjustStructStructCtor_2);
+            if (err != CHIP_NO_ERROR || powerAdjustStructStructCtor_2 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct constructor");
                 return;
@@ -34446,9 +34618,11 @@ void CHIPEnergyPreferenceEnergyBalancesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$EnergyPreferenceClusterBalanceStruct");
             return;
         }
-        jmethodID balanceStructStructCtor_1 =
-            env->GetMethodID(balanceStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-        if (balanceStructStructCtor_1 == nullptr)
+
+        jmethodID balanceStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, balanceStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V", &balanceStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || balanceStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$EnergyPreferenceClusterBalanceStruct constructor");
             return;
@@ -34622,9 +34796,11 @@ void CHIPEnergyPreferenceLowPowerModeSensitivitiesAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$EnergyPreferenceClusterBalanceStruct");
             return;
         }
-        jmethodID balanceStructStructCtor_1 =
-            env->GetMethodID(balanceStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
-        if (balanceStructStructCtor_1 == nullptr)
+
+        jmethodID balanceStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, balanceStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V", &balanceStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || balanceStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$EnergyPreferenceClusterBalanceStruct constructor");
             return;
@@ -35054,6 +35230,352 @@ void CHIPDoorLockDoorStateAttributeCallback::CallbackFn(
     }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPDoorLockAliroReaderVerificationKeyAttributeCallback::CHIPDoorLockAliroReaderVerificationKeyAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPDoorLockClusterAliroReaderVerificationKeyAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockAliroReaderVerificationKeyAttributeCallback::~CHIPDoorLockAliroReaderVerificationKeyAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPDoorLockAliroReaderVerificationKeyAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPDoorLockAliroReaderVerificationKeyAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDoorLockAliroReaderVerificationKeyAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
+        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
+                                reinterpret_cast<const jbyte *>(value.Value().data()));
+        javaValue = javaValueByteArray;
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback::CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPDoorLockClusterAliroReaderGroupIdentifierAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback::~CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDoorLockAliroReaderGroupIdentifierAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
+        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
+                                reinterpret_cast<const jbyte *>(value.Value().data()));
+        javaValue = javaValueByteArray;
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback::
+    CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPDoorLockClusterAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallbackType>(CallbackFn,
+                                                                                                                         this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback::
+    ~CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback, decltype(&maybeDestroy)>
+        cppCallback(reinterpret_cast<CHIPDoorLockAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback *>(context),
+                    maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+        env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.data()));
+        newElement_0 = newElement_0ByteArray;
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPDoorLockAliroGroupResolvingKeyAttributeCallback::CHIPDoorLockAliroGroupResolvingKeyAttributeCallback(jobject javaCallback,
+                                                                                                         bool keepAlive) :
+    chip::Callback::Callback<CHIPDoorLockClusterAliroGroupResolvingKeyAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockAliroGroupResolvingKeyAttributeCallback::~CHIPDoorLockAliroGroupResolvingKeyAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPDoorLockAliroGroupResolvingKeyAttributeCallback::CallbackFn(void * context,
+                                                                     const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPDoorLockAliroGroupResolvingKeyAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDoorLockAliroGroupResolvingKeyAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "([B)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+    if (value.IsNull())
+    {
+        javaValue = nullptr;
+    }
+    else
+    {
+        jbyteArray javaValueByteArray = env->NewByteArray(static_cast<jsize>(value.Value().size()));
+        env->SetByteArrayRegion(javaValueByteArray, 0, static_cast<jsize>(value.Value().size()),
+                                reinterpret_cast<const jbyte *>(value.Value().data()));
+        javaValue = javaValueByteArray;
+    }
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+}
+
+CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::
+    CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPDoorLockClusterAliroSupportedBLEUWBProtocolVersionsAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::
+    ~CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPDoorLockAliroSupportedBLEUWBProtocolVersionsAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jbyteArray newElement_0ByteArray = env->NewByteArray(static_cast<jsize>(entry_0.size()));
+        env->SetByteArrayRegion(newElement_0ByteArray, 0, static_cast<jsize>(entry_0.size()),
+                                reinterpret_cast<const jbyte *>(entry_0.data()));
+        newElement_0 = newElement_0ByteArray;
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
 CHIPDoorLockGeneratedCommandListAttributeCallback::CHIPDoorLockGeneratedCommandListAttributeCallback(jobject javaCallback,
@@ -52185,11 +52707,14 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfoStruct");
             return;
         }
-        jmethodID channelInfoStructStructCtor_1 =
-            env->GetMethodID(channelInfoStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/"
-                             "Optional;Ljava/util/Optional;Ljava/util/Optional;)V");
-        if (channelInfoStructStructCtor_1 == nullptr)
+
+        jmethodID channelInfoStructStructCtor_1;
+        err =
+            chip::JniReferences::GetInstance().FindMethod(env, channelInfoStructStructClass_1, "<init>",
+                                                          "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/"
+                                                          "Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                          &channelInfoStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || channelInfoStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfoStruct constructor");
             return;
@@ -52566,9 +53091,12 @@ void CHIPTargetNavigatorTargetListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$TargetNavigatorClusterTargetInfoStruct");
             return;
         }
-        jmethodID targetInfoStructStructCtor_1 =
-            env->GetMethodID(targetInfoStructStructClass_1, "<init>", "(Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (targetInfoStructStructCtor_1 == nullptr)
+
+        jmethodID targetInfoStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, targetInfoStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                            &targetInfoStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || targetInfoStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$TargetNavigatorClusterTargetInfoStruct constructor");
             return;
@@ -53243,9 +53771,12 @@ void CHIPMediaPlaybackAvailableAudioTracksAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
                     return;
                 }
-                jmethodID trackAttributesStructStructCtor_4 =
-                    env->GetMethodID(trackAttributesStructStructClass_4, "<init>", "(Ljava/lang/String;Ljava/util/Optional;)V");
-                if (trackAttributesStructStructCtor_4 == nullptr)
+
+                jmethodID trackAttributesStructStructCtor_4;
+                err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_4, "<init>",
+                                                                    "(Ljava/lang/String;Ljava/util/Optional;)V",
+                                                                    &trackAttributesStructStructCtor_4);
+                if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
                     return;
@@ -53264,10 +53795,13 @@ void CHIPMediaPlaybackAvailableAudioTracksAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackStruct");
                 return;
             }
-            jmethodID trackStructStructCtor_2 = env->GetMethodID(
-                trackStructStructClass_2, "<init>",
-                "(Ljava/lang/String;Lchip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct;)V");
-            if (trackStructStructCtor_2 == nullptr)
+
+            jmethodID trackStructStructCtor_2;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, trackStructStructClass_2, "<init>",
+                "(Ljava/lang/String;Lchip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct;)V",
+                &trackStructStructCtor_2);
+            if (err != CHIP_NO_ERROR || trackStructStructCtor_2 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackStruct constructor");
                 return;
@@ -53394,9 +53928,12 @@ void CHIPMediaPlaybackAvailableTextTracksAttributeCallback::CallbackFn(
                     ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackAttributesStruct");
                     return;
                 }
-                jmethodID trackAttributesStructStructCtor_4 =
-                    env->GetMethodID(trackAttributesStructStructClass_4, "<init>", "(Ljava/lang/String;Ljava/util/Optional;)V");
-                if (trackAttributesStructStructCtor_4 == nullptr)
+
+                jmethodID trackAttributesStructStructCtor_4;
+                err = chip::JniReferences::GetInstance().FindMethod(env, trackAttributesStructStructClass_4, "<init>",
+                                                                    "(Ljava/lang/String;Ljava/util/Optional;)V",
+                                                                    &trackAttributesStructStructCtor_4);
+                if (err != CHIP_NO_ERROR || trackAttributesStructStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackAttributesStruct constructor");
                     return;
@@ -53415,10 +53952,13 @@ void CHIPMediaPlaybackAvailableTextTracksAttributeCallback::CallbackFn(
                 ChipLogError(Zcl, "Could not find class ChipStructs$MediaPlaybackClusterTrackStruct");
                 return;
             }
-            jmethodID trackStructStructCtor_2 = env->GetMethodID(
-                trackStructStructClass_2, "<init>",
-                "(Ljava/lang/String;Lchip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct;)V");
-            if (trackStructStructCtor_2 == nullptr)
+
+            jmethodID trackStructStructCtor_2;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, trackStructStructClass_2, "<init>",
+                "(Ljava/lang/String;Lchip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct;)V",
+                &trackStructStructCtor_2);
+            if (err != CHIP_NO_ERROR || trackStructStructCtor_2 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$MediaPlaybackClusterTrackStruct constructor");
                 return;
@@ -53805,10 +54345,12 @@ void CHIPMediaInputInputListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$MediaInputClusterInputInfoStruct");
             return;
         }
-        jmethodID inputInfoStructStructCtor_1 =
-            env->GetMethodID(inputInfoStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V");
-        if (inputInfoStructStructCtor_1 == nullptr)
+
+        jmethodID inputInfoStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, inputInfoStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;)V", &inputInfoStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || inputInfoStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$MediaInputClusterInputInfoStruct constructor");
             return;
@@ -55106,9 +55648,12 @@ void CHIPAudioOutputOutputListAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$AudioOutputClusterOutputInfoStruct");
             return;
         }
-        jmethodID outputInfoStructStructCtor_1 = env->GetMethodID(outputInfoStructStructClass_1, "<init>",
-                                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
-        if (outputInfoStructStructCtor_1 == nullptr)
+
+        jmethodID outputInfoStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, outputInfoStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V",
+                                                            &outputInfoStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || outputInfoStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$AudioOutputClusterOutputInfoStruct constructor");
             return;
@@ -56491,9 +57036,12 @@ void CHIPContentControlOnDemandRatingsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ContentControlClusterRatingNameStruct");
             return;
         }
-        jmethodID ratingNameStructStructCtor_1 =
-            env->GetMethodID(ratingNameStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/util/Optional;)V");
-        if (ratingNameStructStructCtor_1 == nullptr)
+
+        jmethodID ratingNameStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, ratingNameStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/util/Optional;)V",
+                                                            &ratingNameStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || ratingNameStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ContentControlClusterRatingNameStruct constructor");
             return;
@@ -56593,9 +57141,12 @@ void CHIPContentControlScheduledContentRatingsAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$ContentControlClusterRatingNameStruct");
             return;
         }
-        jmethodID ratingNameStructStructCtor_1 =
-            env->GetMethodID(ratingNameStructStructClass_1, "<init>", "(Ljava/lang/String;Ljava/util/Optional;)V");
-        if (ratingNameStructStructCtor_1 == nullptr)
+
+        jmethodID ratingNameStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, ratingNameStructStructClass_1, "<init>",
+                                                            "(Ljava/lang/String;Ljava/util/Optional;)V",
+                                                            &ratingNameStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || ratingNameStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$ContentControlClusterRatingNameStruct constructor");
             return;
@@ -57691,9 +58242,11 @@ void CHIPUnitTestingListStructOctetStringAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterTestListStructOctet");
             return;
         }
-        jmethodID testListStructOctetStructCtor_1 =
-            env->GetMethodID(testListStructOctetStructClass_1, "<init>", "(Ljava/lang/Long;[B)V");
-        if (testListStructOctetStructCtor_1 == nullptr)
+
+        jmethodID testListStructOctetStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, testListStructOctetStructClass_1, "<init>",
+                                                            "(Ljava/lang/Long;[B)V", &testListStructOctetStructCtor_1);
+        if (err != CHIP_NO_ERROR || testListStructOctetStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterTestListStructOctet constructor");
             return;
@@ -57938,11 +58491,14 @@ void CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                 ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
                 return;
             }
-            jmethodID simpleStructStructCtor_3 =
-                env->GetMethodID(simpleStructStructClass_3, "<init>",
-                                 "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
-                                 "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
-            if (simpleStructStructCtor_3 == nullptr)
+
+            jmethodID simpleStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, simpleStructStructClass_3, "<init>",
+                "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/"
+                "Float;Ljava/lang/Double;)V",
+                &simpleStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || simpleStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
                 return;
@@ -58028,11 +58584,14 @@ void CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                 ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
                 return;
             }
-            jmethodID simpleStructStructCtor_3 =
-                env->GetMethodID(simpleStructStructClass_3, "<init>",
-                                 "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
-                                 "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
-            if (simpleStructStructCtor_3 == nullptr)
+
+            jmethodID simpleStructStructCtor_3;
+            err = chip::JniReferences::GetInstance().FindMethod(
+                env, simpleStructStructClass_3, "<init>",
+                "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/"
+                "Float;Ljava/lang/Double;)V",
+                &simpleStructStructCtor_3);
+            if (err != CHIP_NO_ERROR || simpleStructStructCtor_3 == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
                 return;
@@ -58134,11 +58693,14 @@ void CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CallbackFn
                     ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
                     return;
                 }
-                jmethodID simpleStructStructCtor_4 =
-                    env->GetMethodID(simpleStructStructClass_4, "<init>",
-                                     "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
-                                     "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
-                if (simpleStructStructCtor_4 == nullptr)
+
+                jmethodID simpleStructStructCtor_4;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, simpleStructStructClass_4, "<init>",
+                    "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/Integer;Ljava/lang/"
+                    "Float;Ljava/lang/Double;)V",
+                    &simpleStructStructCtor_4);
+                if (err != CHIP_NO_ERROR || simpleStructStructCtor_4 == nullptr)
                 {
                     ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
                     return;
@@ -58242,12 +58804,15 @@ void CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback::CallbackFn
             ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterNullablesAndOptionalsStruct");
             return;
         }
-        jmethodID nullablesAndOptionalsStructStructCtor_1 =
-            env->GetMethodID(nullablesAndOptionalsStructStructClass_1, "<init>",
-                             "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/"
-                             "Optional;Ljava/util/Optional;Lchip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;Ljava/"
-                             "util/Optional;Ljava/util/Optional;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/util/Optional;)V");
-        if (nullablesAndOptionalsStructStructCtor_1 == nullptr)
+
+        jmethodID nullablesAndOptionalsStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, nullablesAndOptionalsStructStructClass_1, "<init>",
+            "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;Ljava/lang/String;Ljava/util/Optional;Ljava/util/"
+            "Optional;Lchip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;Ljava/util/Optional;Ljava/util/"
+            "Optional;Ljava/util/ArrayList;Ljava/util/Optional;Ljava/util/Optional;)V",
+            &nullablesAndOptionalsStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || nullablesAndOptionalsStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterNullablesAndOptionalsStruct constructor");
             return;
@@ -58529,11 +59094,13 @@ void CHIPUnitTestingListFabricScopedAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterSimpleStruct");
             return;
         }
-        jmethodID simpleStructStructCtor_2 =
-            env->GetMethodID(simpleStructStructClass_2, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/lang/String;Ljava/lang/"
-                             "Integer;Ljava/lang/Float;Ljava/lang/Double;)V");
-        if (simpleStructStructCtor_2 == nullptr)
+
+        jmethodID simpleStructStructCtor_2;
+        err = chip::JniReferences::GetInstance().FindMethod(env, simpleStructStructClass_2, "<init>",
+                                                            "(Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/Integer;[BLjava/"
+                                                            "lang/String;Ljava/lang/Integer;Ljava/lang/Float;Ljava/lang/Double;)V",
+                                                            &simpleStructStructCtor_2);
+        if (err != CHIP_NO_ERROR || simpleStructStructCtor_2 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterSimpleStruct constructor");
             return;
@@ -58575,11 +59142,14 @@ void CHIPUnitTestingListFabricScopedAttributeCallback::CallbackFn(
             ChipLogError(Zcl, "Could not find class ChipStructs$UnitTestingClusterTestFabricScoped");
             return;
         }
-        jmethodID testFabricScopedStructCtor_1 = env->GetMethodID(
-            testFabricScopedStructClass_1, "<init>",
+
+        jmethodID testFabricScopedStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(
+            env, testFabricScopedStructClass_1, "<init>",
             "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/Integer;Ljava/util/Optional;Ljava/lang/String;Lchip/"
-            "devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V");
-        if (testFabricScopedStructCtor_1 == nullptr)
+            "devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct;Ljava/util/ArrayList;Ljava/lang/Integer;)V",
+            &testFabricScopedStructCtor_1);
+        if (err != CHIP_NO_ERROR || testFabricScopedStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$UnitTestingClusterTestFabricScoped constructor");
             return;

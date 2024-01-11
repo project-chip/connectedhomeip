@@ -793,6 +793,10 @@ typedef void (*EnergyPreferenceEventListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*EnergyPreferenceAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DoorLockAliroExpeditedTransactionSupportedProtocolVersionsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+typedef void (*DoorLockAliroSupportedBLEUWBProtocolVersionsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
