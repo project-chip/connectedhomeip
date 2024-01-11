@@ -27,8 +27,7 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
-from TC_EEVSE_Utils import EventChangeCallback, EEVSEBaseTestHelper
+from TC_EEVSE_Utils import EEVSEBaseTestHelper, EventChangeCallback
 
 logger = logging.getLogger(__name__)
 
