@@ -114,7 +114,7 @@ public:
     /**
      * @brief Initializes the key derivation operation.
      */
-    CHIP_ERROR Init(const Hkdf128KeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info);
+    CHIP_ERROR Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info);
 
     /**
      * @brief Derives raw key material from the operation.

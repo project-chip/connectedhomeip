@@ -90,7 +90,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CryptoContext::InitFromSecret(Crypto::SessionKeystore & keystore, const Crypto::Hkdf128KeyHandle & hkdfKey,
+CHIP_ERROR CryptoContext::InitFromSecret(Crypto::SessionKeystore & keystore, const Crypto::HkdfKeyHandle & hkdfKey,
                                          const ByteSpan & salt, SessionInfoType infoType, SessionRole role)
 {
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);

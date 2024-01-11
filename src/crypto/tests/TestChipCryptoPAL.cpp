@@ -128,9 +128,9 @@ public:
 
 // Verify that two HKDF keys are equal by checking if they generate the same attestation challenge.
 // Note that the keys cannot be compared directly because they are given as key handles.
-void AssertKeysEqual(nlTestSuite * inSuite, SessionKeystore & keystore, Hkdf128KeyHandle & left, const Hkdf128KeyHandle & right)
+void AssertKeysEqual(nlTestSuite * inSuite, SessionKeystore & keystore, HkdfKeyHandle & left, const HkdfKeyHandle & right)
 {
-    auto generateChallenge = [&](const Hkdf128KeyHandle & key, AttestationChallenge & challenge) -> void {
+    auto generateChallenge = [&](const HkdfKeyHandle & key, AttestationChallenge & challenge) -> void {
         constexpr uint8_t kTestSalt[] = { 'T', 'E', 'S', 'T', 'S', 'A', 'L', 'T' };
         constexpr uint8_t kTestInfo[] = { 'T', 'E', 'S', 'T', 'I', 'N', 'F', 'O' };
 
@@ -1965,23 +1965,19 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         // Import HKDF key from the test vector to the keystore
-        Symmetric128BitsKeyByteArray vectorKeMaterial;
-        Hkdf128KeyHandle vectorKe;
-
-        NL_TEST_ASSERT(inSuite, sizeof(vectorKeMaterial) == vector->Ke_len);
-        memcpy(vectorKeMaterial, vector->Ke, vector->Ke_len);
-        error = keystore.CreateKey(vectorKeMaterial, vectorKe);
+        HkdfKeyHandle vectorKe;
+        error = keystore.CreateKey(ByteSpan(vector->Ke, vector->Ke_len), vectorKe);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         // Verify that both sides generated the same HKDF key as in the test vector
         // Since the HKDF keys may not be availabe in the raw form, do not compare them directly,
         // but rather check if the same attestation challenge is derived from
-        Hkdf128KeyHandle PKe;
+        HkdfKeyHandle PKe;
         error = Prover.GetKeys(keystore, PKe);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         AssertKeysEqual(inSuite, keystore, PKe, vectorKe);
 
-        Hkdf128KeyHandle VKe;
+        HkdfKeyHandle VKe;
         error = Verifier.GetKeys(keystore, VKe);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
         AssertKeysEqual(inSuite, keystore, VKe, vectorKe);

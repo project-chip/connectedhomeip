@@ -287,7 +287,7 @@ CHIP_ERROR PsaKdf::Init(const ByteSpan & secret, const ByteSpan & salt, const By
     return InitOperation(mSecretKeyId, salt, info);
 }
 
-CHIP_ERROR PsaKdf::Init(const Hkdf128KeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info)
+CHIP_ERROR PsaKdf::Init(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info)
 {
     return InitOperation(hkdfKey.As<psa_key_id_t>(), salt, info);
 }

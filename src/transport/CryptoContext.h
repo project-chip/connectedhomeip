@@ -106,7 +106,7 @@ public:
      * @param role               Role of the new session (initiator or responder)
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(Crypto::SessionKeystore & keystore, const Crypto::Hkdf128KeyHandle & hkdfKey, const ByteSpan & salt,
+    CHIP_ERROR InitFromSecret(Crypto::SessionKeystore & keystore, const Crypto::HkdfKeyHandle & hkdfKey, const ByteSpan & salt,
                               SessionInfoType infoType, SessionRole role);
 
     /** @brief Build a Nonce buffer using given parameters for encrypt or decrypt. */

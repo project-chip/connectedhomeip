@@ -19,10 +19,21 @@
 
 #include <lib/support/BufferReader.h>
 
+#include <cstdint>
+
 namespace chip {
 namespace Crypto {
 
-using HKDF_sha_crypto = HKDF_sha;
+// The underlying representation of the HKDF key handle
+struct RawHkdfKeyHandle
+{
+    ByteSpan Span() const { return ByteSpan(data, size); }
+
+    static constexpr size_t kMaxDataSize = std::min(CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE - 1, UINT8_MAX);
+
+    uint8_t data[kMaxDataSize];
+    uint8_t size;
+};
 
 CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Aes128KeyHandle & key)
 {
@@ -36,16 +47,21 @@ CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR RawKeySessionKeystore::CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hkdf128KeyHandle & key)
+CHIP_ERROR RawKeySessionKeystore::CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key)
 {
-    memcpy(key.AsMutable<Symmetric128BitsKeyByteArray>(), keyMaterial, sizeof(Symmetric128BitsKeyByteArray));
+    RawHkdfKeyHandle & rawKey = key.AsMutable<RawHkdfKeyHandle>();
+
+    VerifyOrReturnError(keyMaterial.size() <= sizeof(rawKey.data), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(rawKey.data, keyMaterial.data(), keyMaterial.size());
+    rawKey.size = static_cast<uint8_t>(keyMaterial.size());
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR RawKeySessionKeystore::DeriveKey(const P256ECDHDerivedSecret & secret, const ByteSpan & salt, const ByteSpan & info,
                                             Aes128KeyHandle & key)
 {
-    HKDF_sha_crypto hkdf;
+    HKDF_sha hkdf;
 
     return hkdf.HKDF_SHA256(secret.ConstBytes(), secret.Length(), salt.data(), salt.size(), info.data(), info.size(),
                             key.AsMutable<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray));
@@ -55,7 +71,7 @@ CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const ByteSpan & secret, con
                                                     Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                     AttestationChallenge & attestationChallenge)
 {
-    HKDF_sha_crypto hkdf;
+    HKDF_sha hkdf;
     uint8_t keyMaterial[2 * sizeof(Symmetric128BitsKeyByteArray) + AttestationChallenge::Capacity()];
 
     ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info.data(), info.size(),
@@ -69,17 +85,24 @@ CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const ByteSpan & secret, con
         .StatusCode();
 }
 
-CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const Hkdf128KeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info,
+CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info,
                                                     Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                                     AttestationChallenge & attestationChallenge)
 {
-    return DeriveSessionKeys(ByteSpan(hkdfKey.As<Symmetric128BitsKeyByteArray>()), salt, info, i2rKey, r2iKey,
-                             attestationChallenge);
+    return DeriveSessionKeys(hkdfKey.As<RawHkdfKeyHandle>().Span(), salt, info, i2rKey, r2iKey, attestationChallenge);
 }
 
 void RawKeySessionKeystore::DestroyKey(Symmetric128BitsKeyHandle & key)
 {
     ClearSecretData(key.AsMutable<Symmetric128BitsKeyByteArray>());
+}
+
+void RawKeySessionKeystore::DestroyKey(HkdfKeyHandle & key)
+{
+    RawHkdfKeyHandle & rawKey = key.AsMutable<RawHkdfKeyHandle>();
+
+    ClearSecretData(rawKey.data);
+    rawKey.size = 0;
 }
 
 } // namespace Crypto

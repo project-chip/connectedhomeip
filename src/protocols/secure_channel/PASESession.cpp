@@ -263,7 +263,7 @@ CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session) const
     VerifyOrReturnError(mPairingComplete, CHIP_ERROR_INCORRECT_STATE);
 
     SessionKeystore & keystore = *mSessionManager->GetSessionKeystore();
-    AutoReleaseSymmetricKey<Hkdf128KeyHandle> hkdfKey(keystore);
+    AutoReleaseSymmetricKey<HkdfKeyHandle> hkdfKey(keystore);
 
     ReturnErrorOnFailure(mSpake2p.GetKeys(keystore, hkdfKey.KeyHandle()));
     ReturnErrorOnFailure(session.InitFromSecret(keystore, hkdfKey.KeyHandle(), ByteSpan{} /* salt */,

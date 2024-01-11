@@ -501,15 +501,11 @@ CHIP_ERROR Spake2p::KeyConfirm(const uint8_t * in, size_t in_len)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Spake2p::GetKeys(SessionKeystore & keystore, Hkdf128KeyHandle & key) const
+CHIP_ERROR Spake2p::GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const
 {
     VerifyOrReturnError(state == CHIP_SPAKE2P_STATE::KC, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(hash_size / 2 == sizeof(Symmetric128BitsKeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
 
-    Symmetric128BitsKeyByteArray keyMaterial;
-    memcpy(keyMaterial, Ke, hash_size / 2);
-
-    return keystore.CreateKey(keyMaterial, key);
+    return keystore.CreateKey(ByteSpan(Ke, hash_size / 2), key);
 }
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()

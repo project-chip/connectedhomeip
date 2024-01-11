@@ -590,26 +590,24 @@ protected:
     bool mInitialized = false;
 };
 
-using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
-
 /**
- * @brief Platform-specific Symmetric key handle
+ * @brief Platform-specific symmetric key handle
  *
  * The class represents a key used by the Matter stack either in the form of raw key material or key
  * reference, depending on the platform. To achieve that, it contains an opaque context that can be
- * cast to a concrete representation used by the given platform. Note that currently Matter uses
- * 128-bit symmetric keys only.
+ * cast to a concrete representation used by the given platform.
  *
- * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
- *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
+ * @note SymmetricKeyHandle is an abstract class to force child classes for each key handle type.
+ *       SymmetricKeyHandle class implements all the necessary components for handles.
  */
-class Symmetric128BitsKeyHandle
+template <size_t ContextSize>
+class SymmetricKeyHandle
 {
 public:
-    Symmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle &) = delete;
-    Symmetric128BitsKeyHandle(Symmetric128BitsKeyHandle &&)      = delete;
-    void operator=(const Symmetric128BitsKeyHandle &)            = delete;
-    void operator=(Symmetric128BitsKeyHandle &&)                 = delete;
+    SymmetricKeyHandle(const SymmetricKeyHandle &) = delete;
+    SymmetricKeyHandle(SymmetricKeyHandle &&)      = delete;
+    void operator=(const SymmetricKeyHandle &)     = delete;
+    void operator=(SymmetricKeyHandle &&)          = delete;
 
     /**
      * @brief Get internal context cast to the desired key representation
@@ -630,27 +628,34 @@ public:
     }
 
 protected:
-    Symmetric128BitsKeyHandle() = default;
-    ~Symmetric128BitsKeyHandle() { ClearSecretData(mContext.mOpaque); }
+    SymmetricKeyHandle() = default;
+    ~SymmetricKeyHandle() { ClearSecretData(mContext.mOpaque); }
 
 private:
-    static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
-
     struct alignas(uintptr_t) OpaqueContext
     {
-        uint8_t mOpaque[kContextSize] = {};
+        uint8_t mOpaque[ContextSize] = {};
     } mContext;
 };
 
+using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+
 /**
- * @brief Platform-specific AES key handle
+ * @brief Platform-specific 128-bit symmetric key handle
+ */
+class Symmetric128BitsKeyHandle : public SymmetricKeyHandle<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>
+{
+};
+
+/**
+ * @brief Platform-specific 128-bit AES key handle
  */
 class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
 {
 };
 
 /**
- * @brief Platform-specific HMAC key handle
+ * @brief Platform-specific 128-bit HMAC key handle
  */
 class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
 {
@@ -659,7 +664,7 @@ class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
 /**
  * @brief Platform-specific HKDF key handle
  */
-class Hkdf128KeyHandle final : public Symmetric128BitsKeyHandle
+class HkdfKeyHandle final : public SymmetricKeyHandle<CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE>
 {
 };
 
@@ -1207,7 +1212,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR GetKeys(SessionKeystore & keystore, Hkdf128KeyHandle & key) const;
+    CHIP_ERROR GetKeys(SessionKeystore & keystore, HkdfKeyHandle & key) const;
 
     CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
     CHIP_ERROR WriteMN();

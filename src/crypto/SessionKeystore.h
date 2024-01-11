@@ -68,7 +68,7 @@ public:
     virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hmac128KeyHandle & key) = 0;
 
     /**
-     * @brief Import raw key material and return a key handle for a 128-bit key that can be used to do HKDF.
+     * @brief Import raw key material and return a key handle for an HKDF key.
      *
      * @note This method should only be used when using the raw key material in the Matter stack
      * cannot be avoided. Ideally, crypto interfaces should allow platforms to perform all the
@@ -77,7 +77,7 @@ public:
      * If the method returns no error, the application is responsible for destroying the handle
      * using the DestroyKey() method when the key is no longer needed.
      */
-    virtual CHIP_ERROR CreateKey(const Symmetric128BitsKeyByteArray & keyMaterial, Hkdf128KeyHandle & key) = 0;
+    virtual CHIP_ERROR CreateKey(const ByteSpan & keyMaterial, HkdfKeyHandle & key) = 0;
 
     /**
      * @brief Destroy key.
@@ -86,6 +86,14 @@ public:
      * As a result of calling this method, the handle is put in the uninitialized state.
      */
     virtual void DestroyKey(Symmetric128BitsKeyHandle & key) = 0;
+
+    /**
+     * @brief Destroy key.
+     *
+     * The method can take an uninitialized handle in which case it is a no-op.
+     * As a result of calling this method, the handle is put in the uninitialized state.
+     */
+    virtual void DestroyKey(HkdfKeyHandle & key) = 0;
 
     /****************************
      * SessionKeyDerivation APIs
@@ -126,7 +134,7 @@ public:
      * using DestroyKey() method when the keys are no longer needed. On failure, the method must
      * release all handles that it allocated so far.
      */
-    virtual CHIP_ERROR DeriveSessionKeys(const Hkdf128KeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info,
+    virtual CHIP_ERROR DeriveSessionKeys(const HkdfKeyHandle & hkdfKey, const ByteSpan & salt, const ByteSpan & info,
                                          Aes128KeyHandle & i2rKey, Aes128KeyHandle & r2iKey,
                                          AttestationChallenge & attestationChallenge) = 0;
 };
