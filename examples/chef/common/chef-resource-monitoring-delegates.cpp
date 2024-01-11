@@ -38,11 +38,11 @@ const chip::BitMask<ResourceMonitoring::Feature>
                                static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
                                static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList));
 
-static std::unique_ptr<ActivatedCarbonFilterMonitoringDelegate> gActivatedCarbonFilterDelegate = nullptr;
-static std::unique_ptr<ResourceMonitoring::Instance> gActivatedCarbonFilterInstance            = nullptr;
+static std::unique_ptr<ActivatedCarbonFilterMonitoringDelegate> gActivatedCarbonFilterDelegate;
+static std::unique_ptr<ResourceMonitoring::Instance> gActivatedCarbonFilterInstance;
 
-static std::unique_ptr<HepaFilterMonitoringDelegate> gHepaFilterDelegate = nullptr;
-static std::unique_ptr<ResourceMonitoring::Instance> gHepaFilterInstance = nullptr;
+static std::unique_ptr<HepaFilterMonitoringDelegate> gHepaFilterDelegate;
+static std::unique_ptr<ResourceMonitoring::Instance> gHepaFilterInstance;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -68,8 +68,8 @@ Status ActivatedCarbonFilterMonitoringDelegate::PostResetCondition()
 
 void ActivatedCarbonFilterMonitoring::Shutdown()
 {
-    gActivatedCarbonFilterInstance = nullptr;
-    gActivatedCarbonFilterDelegate = nullptr;
+    gActivatedCarbonFilterInstance.reset();
+    gActivatedCarbonFilterDelegate.reset();
 }
 
 //-- Hepa Filter Monitoring delegate methods
@@ -94,8 +94,8 @@ Status HepaFilterMonitoringDelegate::PostResetCondition()
 
 void HepaFilterMonitoring::Shutdown()
 {
-    gHepaFilterInstance = nullptr;
-    gHepaFilterDelegate = nullptr;
+    gHepaFilterInstance.reset();
+    gHepaFilterDelegate.reset();
 }
 
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
