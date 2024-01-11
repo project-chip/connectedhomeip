@@ -8537,3 +8537,42 @@
 
 - release: "Future"
   versions: "future"
+  provisional:
+      attributes:
+          DoorLock:
+              # Aliro is not ready yet.
+              - AliroReaderVerificationKey
+              - AliroReaderGroupIdentifier
+              - AliroReaderGroupSubIdentifier
+              - AliroExpeditedTransactionSupportedProtocolVersions
+              - AliroGroupResolvingKey
+              - AliroSupportedBLEUWBProtocolVersions
+              - AliroBLEAdvertisingVersion
+              - NumberOfAliroCredentialIssuerKeysSupported
+              - NumberOfAliroEndpointKeysSupported
+      commands:
+          DoorLock:
+              # Aliro is not ready yet.
+              - SetAliroReaderConfig
+              - ClearAliroReaderConfig
+      enum values:
+          DoorLock:
+              CredentialTypeEnum:
+                  # Aliro is not ready yet.
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              LockDataTypeEnum:
+                  # Aliro is not ready yet.
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              OperationSourceEnum:
+                  # Aliro is not ready yet.
+                  - Aliro
+      bitmap values:
+          DoorLock:
+              Feature:
+                  # Aliro is not ready yet.
+                  - AliroProvisioning
+                  - AliroBLEUWB
