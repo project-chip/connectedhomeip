@@ -121,17 +121,27 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-    // CommandSender::ExtendedCallback::OnResponse is public SDK API, so we cannot break
+    // CommandSender::ExtendableCallback::OnResponse is public SDK API, so we cannot break
     // source compatibility for it. To allow for additional values to be added at a future
     // time without constantly changing the function's declaration parameter list, we are
-    // defining the struct AdditionalResponseData and adding that to the parameter list
-    // to allow for future extendability.
-    struct AdditionalResponseData
+    // defining the struct ResponseData and adding that to the parameter list to allow for
+    // future extendability.
+    struct ResponseData
     {
+        // The command path field in invoke command response.
+        const ConcreteCommandPath * path;
+        // The status of the command. It can be any success status, including possibly a cluster-specific one.
+        // If `data` is not null, statusIB will always be a generic SUCCESS status with no-cluster specific
+        // information.
+        const StatusIB * statusIB;
+        // The command data, will be nullptr if the server returns a StatusIB.
+        TLV::TLVReader * data;
+        // Reference for the command. This should be associated with the reference value sent out in the initial
+        // invoke request.
         Optional<uint16_t> commandRef;
     };
 
-    // CommandSender::ExtendedCallback::OnError is public SDK API, so we cannot break source
+    // CommandSender::ExtendableCallback::OnError is public SDK API, so we cannot break source
     // compatibility for it. To allow for additional values to be added at a future time
     // without constantly changing the function's declaration parameter list, we are
     // defining the struct ErrorData and adding that to the parameter list
@@ -139,7 +149,7 @@ public:
     struct ErrorData
     {
         /**
-         * The following errors will be delivered through chipError
+         * The following errors will be delivered through `error`
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
@@ -154,19 +164,19 @@ public:
     /**
      * @brief Callback that is extendable for future features, starting with batch commands
      *
-     * The two major differences between ExtendedCallback and Callback are:
+     * The two major differences between ExtendableCallback and Callback are:
      * 1. Path-specific errors go to OnResponse instead of OnError
      *       - Note: Non-path-specific errors still go to OnError.
      * 2. Instead of having new parameters at the end of the arguments list, with defaults,
      *    as functionality expands, a parameter whose type is defined in this header is used
      *    as the argument to the callbacks
      *
-     * To support batch commands client must use ExtendedCallback.
+     * To support batch commands client must use ExtendableCallback.
      */
     class ExtendableCallback
     {
     public:
-        virtual ~ExtendedCallback() = default;
+        virtual ~ExtendableCallback() = default;
 
         /**
          * OnResponse will be called for all path specific responses from the server that have been received
@@ -181,17 +191,10 @@ public:
          * receives an OnDone call to destroy the object.
          *
          * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aPath           The command path field in invoke command response.
-         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
-         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
-         *                            be a generic SUCCESS status with no-cluster specific information.
-         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
-         * @param[in] aAdditionalResponseData
-         *                            Additional response data that comes within the InvokeResponseMessage.
+         * @param[in] aResponseData   Information pertaining to the response.
          */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
-                                TLV::TLVReader * apData, const AdditionalResponseData & aAdditionalResponseData)
-        {}
+        ;
+        virtual void OnResponse(CommandSender * commandSender, const ResponseData & aResponseData) {}
 
         /**
          * OnError will be called when a non-path-specific error occurs *after* a successful call to SendCommandRequest().
@@ -274,7 +277,7 @@ public:
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
-    CommandSender(ExtendedCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false) :
@@ -504,27 +507,26 @@ private:
 
     CHIP_ERROR SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout);
 
-    void OnResponseCallback(const ConcreteCommandPath & aPath, const StatusIB & aStatusIB, TLV::TLVReader * apData,
-                            const AdditionalResponseData & aAdditionalResponseData)
+    void OnResponseCallback(const ResponseData & aResponseData)
     {
-        // mpExtendedCallback and mpCallback are mutually exclusive.
-        if (mpExtendedCallback)
+        // mpExtendableCallback and mpCallback are mutually exclusive.
+        if (mpExtendableCallback)
         {
-            mpExtendedCallback->OnResponse(this, aPath, aStatusIB, apData, aAdditionalResponseData);
+            mpExtendableCallback->OnResponse(this, aResponseData);
         }
         else if (mpCallback)
         {
-            mpCallback->OnResponse(this, aPath, aStatusIB, apData);
+            mpCallback->OnResponse(this, *aResponseData.path, *aResponseData.statusIB, aResponseData.data);
         }
     }
 
     void OnErrorCallback(CHIP_ERROR aError)
     {
-        // mpExtendedCallback and mpCallback are mutually exclusive.
-        if (mpExtendedCallback)
+        // mpExtendableCallback and mpCallback are mutually exclusive.
+        if (mpExtendableCallback)
         {
             ErrorData errorData = { aError };
-            mpExtendedCallback->OnError(this, errorData);
+            mpExtendableCallback->OnError(this, errorData);
         }
         else if (mpCallback)
         {
@@ -534,10 +536,10 @@ private:
 
     void OnDoneCallback()
     {
-        // mpExtendedCallback and mpCallback are mutually exclusive.
-        if (mpExtendedCallback)
+        // mpExtendableCallback and mpCallback are mutually exclusive.
+        if (mpExtendableCallback)
         {
-            mpExtendedCallback->OnDone(this);
+            mpExtendableCallback->OnDone(this);
         }
         else if (mpCallback)
         {
@@ -547,7 +549,7 @@ private:
 
     Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback                      = nullptr;
-    ExtendedCallback * mpExtendedCallback      = nullptr;
+    ExtendableCallback * mpExtendableCallback      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it

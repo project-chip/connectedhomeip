@@ -212,22 +212,21 @@ public:
     CHIP_ERROR mError         = CHIP_NO_ERROR;
 } mockCommandSenderDelegate;
 
-class MockCommandSenderExtendedCallback : public CommandSender::ExtendedCallback
+class MockCommandSenderExtendableCallback : public CommandSender::ExtendableCallback
 {
 public:
-    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatus,
-                    TLV::TLVReader * aData, const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
     {
         IgnoreUnusedVariable(apCommandSender);
-        IgnoreUnusedVariable(aData);
+        const ConcreteCommandPath & path = *aResponseData.path;
         ChipLogDetail(Controller, "Received response for command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x",
-                      aPath.mClusterId, aPath.mCommandId, aPath.mEndpointId);
+                      path.mClusterId, path.mCommandId, path.mEndpointId);
         onResponseCalledTimes++;
     }
     void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
     {
-        ChipLogError(Controller, "OnError happens with %" CHIP_ERROR_FORMAT, aErrorData.chipError.Format());
-        mError = aErrorData.chipError;
+        ChipLogError(Controller, "OnError happens with %" CHIP_ERROR_FORMAT, aErrorData.error.Format());
+        mError = aErrorData.error;
         onErrorCalledTimes++;
     }
     void OnDone(CommandSender * apCommandSender) override { onFinalCalledTimes++; }
@@ -295,9 +294,9 @@ public:
 #endif
 
     static void TestCommandSenderLegacyCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandSenderExtendedCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderExtendableCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderLegacyCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandSenderExtendedCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandSenderExtendableCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandSuccessResponseFlow(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandAsyncSuccessResponseFlow(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderCommandFailureResponseFlow(nlTestSuite * apSuite, void * apContext);
@@ -1256,7 +1255,7 @@ void TestCommandInteraction::TestCommandSenderLegacyCallbackUnsupportedCommand(n
 }
 
 // Because UnsupportedCommand is a path specific error we will expect it to come via on response when using Extended Path.
-void TestCommandInteraction::TestCommandSenderExtendedCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandSenderExtendableCallbackUnsupportedCommand(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1310,7 +1309,7 @@ void TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommand
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-void TestCommandInteraction::TestCommandSenderExtendedCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCommandFails(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -1834,9 +1833,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerReleaseWithExchangeClosed", chip::app::TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed),
 #endif
     NL_TEST_DEF("TestCommandSenderLegacyCallbackUnsupportedCommand", chip::app::TestCommandInteraction::TestCommandSenderLegacyCallbackUnsupportedCommand),
-    NL_TEST_DEF("TestCommandSenderExtendedCallbackUnsupportedCommand", chip::app::TestCommandInteraction::TestCommandSenderExtendedCallbackUnsupportedCommand),
+    NL_TEST_DEF("TestCommandSenderExtendableCallbackUnsupportedCommand", chip::app::TestCommandInteraction::TestCommandSenderExtendableCallbackUnsupportedCommand),
     NL_TEST_DEF("TestCommandSenderLegacyCallbackBuildingBatchCommandFails", chip::app::TestCommandInteraction::TestCommandSenderLegacyCallbackBuildingBatchCommandFails),
-    NL_TEST_DEF("TestCommandSenderExtendedCallbackBuildingBatchCommandFails", chip::app::TestCommandInteraction::TestCommandSenderExtendedCallbackBuildingBatchCommandFails),
+    NL_TEST_DEF("TestCommandSenderExtendableCallbackBuildingBatchCommandFails", chip::app::TestCommandInteraction::TestCommandSenderExtendableCallbackBuildingBatchCommandFails),
     NL_TEST_DEF("TestCommandSenderCommandSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandAsyncSuccessResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandAsyncSuccessResponseFlow),
     NL_TEST_DEF("TestCommandSenderCommandSpecificResponseFlow", chip::app::TestCommandInteraction::TestCommandSenderCommandSpecificResponseFlow),

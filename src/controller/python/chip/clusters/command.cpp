@@ -75,27 +75,26 @@ struct __attribute__((packed)) CommandPath
     chip::CommandId commandId;
 };
 
-class CommandSenderCallback : public CommandSender::ExtendedCallback
+class CommandSenderCallback : public CommandSender::ExtendableCallback
 {
 public:
     CommandSenderCallback(PyObject appContext, bool isBatchedCommands) :
         mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
     {}
 
-    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                    TLV::TLVReader * aData, const CommandSender::AdditionalResponseData & aAdditionalResponseData) override
+    void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
         uint32_t size = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
-        if (aData != nullptr)
+        if (aResponseData.data != nullptr)
         {
             // Python need to read from full TLV data the TLVReader may contain some unclean states.
             TLV::TLVWriter writer;
             writer.Init(buffer);
-            err = writer.CopyContainer(TLV::AnonymousTag(), *aData);
+            err = writer.CopyContainer(TLV::AnonymousTag(), *aResponseData.data);
             if (err != CHIP_NO_ERROR)
             {
                 CommandSender::ErrorData errorData = { err };
@@ -105,11 +104,13 @@ public:
             size = writer.GetLengthWritten();
         }
 
+        const app::StatusIB & statusIB = *aResponseData.statusIB;
+
         // For legacy specific reasons when we are not processing a batch command we simply forward this to the OnError callback
         // for more information on why see https://github.com/project-chip/connectedhomeip/issues/30991.
-        if (!mIsBatchedCommands && !aStatus.IsSuccess())
+        if (!mIsBatchedCommands && !statusIB.IsSuccess())
         {
-            CommandSender::ErrorData errorData = { aStatus.ToChipError() };
+            CommandSender::ErrorData errorData = { statusIB.ToChipError() };
             this->OnError(apCommandSender, errorData);
             return;
         }
@@ -121,7 +122,7 @@ public:
             return;
         }
 
-        chip::CommandRef commandRef = aAdditionalResponseData.commandRef.ValueOr(0);
+        chip::CommandRef commandRef = aResponseData.commandRef.ValueOr(0);
         size_t index                = 0;
         err                         = GetIndexFrocommandRef(commandRef, index);
         if (err != CHIP_NO_ERROR && mIsBatchedCommands)
@@ -131,15 +132,17 @@ public:
             return;
         }
 
+        const ConcreteCommandPath & path = *aResponseData.path;
+
         gOnCommandSenderResponseCallback(
-            mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId, index, to_underlying(aStatus.mStatus),
-            aStatus.mClusterStatus.HasValue() ? aStatus.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus, buffer,
+            mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, index, to_underlying(statusIB.mStatus),
+            statusIB.mClusterStatus.HasValue() ? statusIB.mClusterStatus.Value() : chip::python::kUndefinedClusterStatus, buffer,
             size);
     }
 
     void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override
     {
-        CHIP_ERROR protocolError = aErrorData.chipError;
+        CHIP_ERROR protocolError = aErrorData.error;
         StatusIB status(protocolError);
         gOnCommandSenderErrorCallback(mAppContext, to_underlying(status.mStatus),
                                       status.mClusterStatus.ValueOr(chip::python::kUndefinedClusterStatus),
