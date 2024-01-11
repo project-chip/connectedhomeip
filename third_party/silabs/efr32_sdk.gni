@@ -354,9 +354,6 @@ template("efr32_sdk") {
           "CHIP_917",
           "SLI_SI917=1",
           "SL_WFX_CONFIG_SCAN=1",
-          "SL_POWER_MANAGER_LOWEST_EM_ALLOWED=1",
-          "SL_POWER_MANAGER_CONFIG_VOLTAGE_SCALING_FAST_WAKEUP=1",
-          "SL_PSA_KEY_USER_SLOT_COUNT=21",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
         ]
@@ -365,8 +362,6 @@ template("efr32_sdk") {
           "SL_HEAP_SIZE=24576",
           "WF200_WIFI=1",
           "SL_WIFI=1",
-          "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1",
-          "WIFI_ENABLE_SECURITY_WPA3_TRANSITION=1",
           "SL_WFX_USE_SPI",
           "SL_WFX_DEBUG_MASK=0x0003",
         ]
