@@ -218,9 +218,8 @@ public:
     void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
     {
         IgnoreUnusedVariable(apCommandSender);
-        const ConcreteCommandPath & path = *aResponseData.path;
         ChipLogDetail(Controller, "Received response for command: Cluster=%" PRIx32 " Command=%" PRIx32 " Endpoint=%x",
-                      path.mClusterId, path.mCommandId, path.mEndpointId);
+                      aResponseData.path.mClusterId, aResponseData.path.mCommandId, aResponseData.path.mEndpointId);
         onResponseCalledTimes++;
     }
     void OnError(const CommandSender * apCommandSender, const CommandSender::ErrorData & aErrorData) override

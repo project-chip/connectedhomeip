@@ -334,7 +334,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         bool commandRefExpected = (mFinishedCommandCount > 1);
         bool hasDataResponse    = false;
         TLV::TLVReader commandDataReader;
-        ResponseData responseData;
+        Optional<uint16_t> commandRef;
 
         CommandStatusIB::Parser commandStatus;
         err = aInvokeResponse.GetStatus(&commandStatus);
@@ -349,7 +349,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             StatusIB::Parser status;
             commandStatus.GetErrorStatus(&status);
             ReturnErrorOnFailure(status.DecodeStatusIB(statusIB));
-            ReturnErrorOnFailure(GetRef(commandStatus, responseData.commandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandStatus, commandRef, commandRefExpected));
         }
         else if (CHIP_END_OF_TLV == err)
         {
@@ -361,7 +361,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             ReturnErrorOnFailure(commandPath.GetClusterId(&clusterId));
             ReturnErrorOnFailure(commandPath.GetCommandId(&commandId));
             commandData.GetFields(&commandDataReader);
-            ReturnErrorOnFailure(GetRef(commandData, responseData.commandRef, commandRefExpected));
+            ReturnErrorOnFailure(GetRef(commandData, commandRef, commandRefExpected));
             err             = CHIP_NO_ERROR;
             hasDataResponse = true;
         }
@@ -397,9 +397,9 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         if (statusIB.IsSuccess() || usingExtendableCallbacks)
         {
             const ConcreteCommandPath concretePath = ConcreteCommandPath(endpointId, clusterId, commandId);
-            responseData.path                      = &concretePath;
-            responseData.statusIB                  = &statusIB;
-            responseData.data                      = hasDataResponse ? &commandDataReader : nullptr;
+            ResponseData responseData = { concretePath, statusIB };
+            responseData.data         = hasDataResponse ? &commandDataReader : nullptr;
+            responseData.commandRef   = commandRef;
             OnResponseCallback(responseData);
         }
         else

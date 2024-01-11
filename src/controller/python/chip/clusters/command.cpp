@@ -104,7 +104,7 @@ public:
             size = writer.GetLengthWritten();
         }
 
-        const app::StatusIB & statusIB = *aResponseData.statusIB;
+        const app::StatusIB & statusIB = aResponseData.statusIB;
 
         // For legacy specific reasons when we are not processing a batch command we simply forward this to the OnError callback
         // for more information on why see https://github.com/project-chip/connectedhomeip/issues/30991.
@@ -132,7 +132,7 @@ public:
             return;
         }
 
-        const ConcreteCommandPath & path = *aResponseData.path;
+        const ConcreteCommandPath & path = aResponseData.path;
 
         gOnCommandSenderResponseCallback(
             mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, index, to_underlying(statusIB.mStatus),

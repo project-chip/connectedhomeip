@@ -132,11 +132,11 @@ public:
     struct ResponseData
     {
         // The command path field in invoke command response.
-        const ConcreteCommandPath * path;
+        const ConcreteCommandPath & path;
         // The status of the command. It can be any success status, including possibly a cluster-specific one.
         // If `data` is not null, statusIB will always be a generic SUCCESS status with no-cluster specific
         // information.
-        const StatusIB * statusIB;
+        const StatusIB & statusIB;
         // The command data, will be nullptr if the server returns a StatusIB.
         TLV::TLVReader * data;
         // Reference for the command. This should be associated with the reference value sent out in the initial
@@ -519,7 +519,7 @@ private:
         }
         else if (mpCallback)
         {
-            mpCallback->OnResponse(this, *aResponseData.path, *aResponseData.statusIB, aResponseData.data);
+            mpCallback->OnResponse(this, aResponseData.path, aResponseData.statusIB, aResponseData.data);
         }
     }
 
