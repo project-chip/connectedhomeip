@@ -11698,7 +11698,7 @@
               "side": "server",
               "type": "int8u",
               "included": 1,
-              "storageOption": "NVM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
@@ -11778,7 +11778,7 @@
               "side": "server",
               "type": "AlarmModeBitmap",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -22946,4 +22946,3 @@
   ],
   "log": []
 }
-

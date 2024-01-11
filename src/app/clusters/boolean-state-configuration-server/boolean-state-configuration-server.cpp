@@ -26,6 +26,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/SafeAttributePersistenceProvider.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPError.h>
@@ -44,6 +45,8 @@ static constexpr size_t kBooleanStateConfigurationDelegateTableSize =
 
 static_assert(kBooleanStateConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
               "BooleanStateConfiguration Delegate table size error");
+
+static CHIP_ERROR StoreCurrentSensitivityLevel(EndpointId ep, uint8_t level);
 
 namespace {
 Delegate * gDelegateTable[kBooleanStateConfigurationDelegateTableSize] = { nullptr };
@@ -74,6 +77,7 @@ public:
 
 private:
     CHIP_ERROR WriteCurrentSensitivityLevel(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadCurrentSensitivityLevel(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder);
 };
 
 BooleanStateConfigAttrAccess gAttrAccess;
@@ -81,20 +85,57 @@ BooleanStateConfigAttrAccess gAttrAccess;
 CHIP_ERROR BooleanStateConfigAttrAccess::WriteCurrentSensitivityLevel(const ConcreteDataAttributePath & aPath,
                                                                       AttributeValueDecoder & aDecoder)
 {
-    uint8_t curSenLevel, supportedSensLevel;
+    uint8_t curSenLevel;
     ReturnErrorOnFailure(aDecoder.Decode(curSenLevel));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
-                        CHIP_IM_GLOBAL_STATUS(Failure));
+    // VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
+    //                     CHIP_IM_GLOBAL_STATUS(Failure));
 
-    VerifyOrReturnError(curSenLevel < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentSensitivityLevel::Set(aPath.mEndpointId, curSenLevel),
-                        CHIP_IM_GLOBAL_STATUS(Failure));
+    // VerifyOrReturnError(curSenLevel < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    // ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+    //     ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, CurrentSensitivityLevel::Id), curSenLevel));
+
+    return StoreCurrentSensitivityLevel(aPath.mEndpointId, curSenLevel);
+}
+
+CHIP_ERROR BooleanStateConfigAttrAccess::ReadCurrentSensitivityLevel(const ConcreteReadAttributePath & aPath,
+                                                                     AttributeValueEncoder & aEncoder)
+{
+    uint8_t senLevel;
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, CurrentSensitivityLevel::Id), senLevel);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        uint8_t supportedSensLevel;
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
+                            CHIP_IM_GLOBAL_STATUS(Failure));
+        senLevel = supportedSensLevel - 1;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    ReturnErrorOnFailure(aEncoder.Encode(senLevel));
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BooleanStateConfigAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    if (aPath.mClusterId != BooleanStateConfiguration::Id)
+    {
+        return CHIP_ERROR_INVALID_PATH_LIST;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case CurrentSensitivityLevel::Id: {
+        return ReadCurrentSensitivityLevel(aPath, aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -169,6 +210,19 @@ static CHIP_ERROR emitSensorFaultEvent(EndpointId ep, BitMask<BooleanStateConfig
     }
 
     ChipLogProgress(Zcl, "Emit SensorFault event [ep=%d]", ep);
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR StoreCurrentSensitivityLevel(EndpointId ep, uint8_t level)
+{
+    uint8_t supportedSensLevel;
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(ep, &supportedSensLevel),
+                        CHIP_IM_GLOBAL_STATUS(Failure));
+
+    VerifyOrReturnError(level < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(ep, BooleanStateConfiguration::Id, CurrentSensitivityLevel::Id), level));
+
     return CHIP_NO_ERROR;
 }
 
@@ -282,9 +336,7 @@ CHIP_ERROR SuppressAlarms(EndpointId ep, BitMask<BooleanStateConfiguration::Alar
 
 CHIP_ERROR SetCurrentSensitivityLevel(EndpointId ep, uint8_t level)
 {
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == CurrentSensitivityLevel::Set(ep, level),
-                        CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-    return CHIP_NO_ERROR;
+    return StoreCurrentSensitivityLevel(ep, level);
 }
 
 CHIP_ERROR EmitSensorFault(EndpointId ep, BitMask<BooleanStateConfiguration::SensorFaultBitmap> fault)

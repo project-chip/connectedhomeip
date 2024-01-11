@@ -557,7 +557,8 @@
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
             "PeriodicEnergyExported"
-        ]
+        ],
+        "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

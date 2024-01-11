@@ -7420,12 +7420,12 @@ endpoint 1 {
   server cluster BooleanStateConfiguration {
     emits event AlarmsStateChanged;
     emits event SensorFault;
-    persist  attribute currentSensitivityLevel default = 2;
+    callback attribute currentSensitivityLevel;
     ram      attribute supportedSensitivityLevels default = 3;
     ram      attribute defaultSensitivityLevel default = 2;
     ram      attribute alarmsActive;
     ram      attribute alarmsSuppressed;
-    ram      attribute alarmsEnabled;
+    persist  attribute alarmsEnabled;
     ram      attribute alarmsSupported default = 0x03;
     ram      attribute sensorFault default = 0;
     callback attribute generatedCommandList;
