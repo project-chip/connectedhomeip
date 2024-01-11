@@ -108,7 +108,7 @@ CHIP_ERROR BooleanStateConfigAttrAccess::ReadCurrentSensitivityLevel(const Concr
         uint8_t supportedSensLevel;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
                             CHIP_IM_GLOBAL_STATUS(Failure));
-        senLevel = supportedSensLevel - 1;
+        senLevel = static_cast<uint8_t>(supportedSensLevel - 1);
     }
     else if (err != CHIP_NO_ERROR)
     {
