@@ -272,7 +272,7 @@ const char * sDeviceOptionHelp =
 #endif
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     "  --subscription-capacity\n"
-    "       Max subscriptions number for the device to manage\n"
+    "       Max number of subscriptions the device will allow\n"
 #endif
     "\n";
 
