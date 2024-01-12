@@ -198,14 +198,18 @@ private:
     constexpr static uint32_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
         NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
 
+    constexpr static uint32_t kIPv6ManagementEvents = NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
+
     // Event handling
     static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
+    static void IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
     static void ScanResultHandler(Platform::UniquePtr<uint8_t> data);
     static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data);
     static void ConnectHandler(Platform::UniquePtr<uint8_t> data);
     static void DisconnectHandler(Platform::UniquePtr<uint8_t> data);
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
+    static void IPv6AddressChangeHandler(const void * data);
 
     // Connection Recovery feature
     // This feature allows re-scanning and re-connecting the connection to the known network after
@@ -226,6 +230,7 @@ private:
     wifi_iface_state mWiFiState;
     wifi_iface_state mCachedWiFiState;
     net_mgmt_event_callback mWiFiMgmtClbk{};
+    net_mgmt_event_callback mIPv6MgmtClbk{};
     ScanResultCallback mScanResultCallback{ nullptr };
     ScanDoneCallback mScanDoneCallback{ nullptr };
     WiFiNetwork mWantedNetwork{};

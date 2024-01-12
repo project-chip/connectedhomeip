@@ -136,12 +136,13 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
                               { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
 
-const Map<uint32_t, WiFiManager::NetEventHandler, 5>
-    WiFiManager::sEventHandlerMap({ { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
-                                    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
-                                    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
-                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
-                                    { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler } });
+const Map<uint32_t, WiFiManager::NetEventHandler, 5> WiFiManager::sEventHandlerMap({
+    { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
+    { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
+    { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
+    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
+    { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler },
+});
 
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
@@ -154,14 +155,24 @@ void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mg
     }
 }
 
+void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
+{
+    if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL)) && cb->info)
+    {
+        IPv6AddressChangeHandler(cb->info);
+    }
+}
+
 CHIP_ERROR WiFiManager::Init()
 {
     mNetIf = InetUtils::GetWiFiInterface();
     VerifyOrReturnError(mNetIf != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
 
-
     net_mgmt_init_event_callback(&mWiFiMgmtClbk, WifiMgmtEventHandler, kWifiManagementEvents);
+    net_mgmt_init_event_callback(&mIPv6MgmtClbk, IPv6MgmtEventHandler, kIPv6ManagementEvents);
+
     net_mgmt_add_event_callback(&mWiFiMgmtClbk);
+    net_mgmt_add_event_callback(&mIPv6MgmtClbk);
 
     ChipLogDetail(DeviceLayer, "WiFiManager has been initialized");
 
@@ -467,6 +478,25 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t>)
         Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
         Instance().PostConnectivityStatusChange(kConnectivity_Lost);
     });
+}
+
+void WiFiManager::IPv6AddressChangeHandler(const void * data)
+{
+    const in6_addr * addr = reinterpret_cast<const in6_addr *>(data);
+
+    // Filter out link-local addresses that are not routable outside of a local network.
+    if (!net_ipv6_is_ll_addr(addr))
+    {
+        // This is needed to send mDNS queries containing updated IPv6 addresses.
+        ChipDeviceEvent event;
+        event.Type = DeviceEventType::kDnssdRestartNeeded;
+
+        CHIP_ERROR error = PlatformMgr().PostEvent(&event);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Cannot post event: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+    }
 }
 
 WiFiManager::StationStatus WiFiManager::GetStationStatus() const
