@@ -24,7 +24,7 @@ class TC_ACL_2_2(MatterBaseTest):
     def desc_TC_ACL_2_2(self) -> str:
         return "[TC-ACL-2.2] Cluster endpoint"
 
-    def steps_TC_ACE_2_2(self) -> list[TestStep]:
+    def steps_TC_ACL_2_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"),
@@ -33,7 +33,7 @@ class TC_ACL_2_2(MatterBaseTest):
         return steps
 
     @async_test_body
-    async def test_TC_ACE_2_2(self):
+    async def test_TC_ACL_2_2(self):
         self.step(1)
         self.step(2)
         data = await self.default_controller.ReadAttribute(nodeid=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])

@@ -2560,7 +2560,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Cluster Laundry Washer Controls
- *    This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine.
+ *    This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.
  */
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTRClusterLaundryWasherControls : MTRGenericCluster
