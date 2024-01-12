@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger
 import matter.tlv.ContextSpecificTag
 import matter.tlv.IntValue
 import matter.tlv.TlvReader
-import matter.tlv.UnsignedIntValue
 import matter.tlv.Utf8StringValue
 
 /**
@@ -95,33 +94,30 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       if (reader.isEndOfTlv()) {
         break
       }
-      val info = OptionalQRCodeInfoExtension()
 
       // update tag
       val tag = element.tag
       if (tag is ContextSpecificTag) {
-        info.tag = tag.tagNumber
-      }
-
-      // update values
-      val value = element.value
-      if (value is IntValue) {
-        info.int32 = value.value.toInt()
-        info.type = OptionalQRCodeInfoType.TYPE_INT32
-      }
-      if (value is UnsignedIntValue) {
-        info.uint32 = value.value.toUInt()
-        info.type = OptionalQRCodeInfoType.TYPE_UINT32
-      }
-      if (value is Utf8StringValue) {
-        info.data = value.value
-        info.type = OptionalQRCodeInfoType.TYPE_STRING
-      }
-
-      if (info.tag < 0x80) {
-        payload.addOptionalExtensionData(info)
-      } else {
-        payload.addOptionalVendorData(info)
+        if (tag.tagNumber < 0x80) {
+          // add serial number
+          if (tag.tagNumber == kSerialNumberTag) {
+            val value = element.value
+            if (value is IntValue) {
+              payload.addSerialNumber(value.value.toInt())
+            }
+            if (value is Utf8StringValue) {
+              payload.addSerialNumber(value.value)
+            }
+          }
+        } else {
+          // add extension values
+          val value = element.value
+          if (value is IntValue) {
+            payload.addOptionalVendorData(tag.tagNumber, value.value.toInt())
+          } else if (value is Utf8StringValue) {
+            payload.addOptionalVendorData(tag.tagNumber, value.value)
+          }
+        }
       }
     }
   }

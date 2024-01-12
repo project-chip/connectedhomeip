@@ -409,7 +409,7 @@ class OnboardingPayload(
    *
    * @param info Optional QR code info object to add
    */
-  fun addOptionalVendorData(info: OptionalQRCodeInfo) {
+  private fun addOptionalVendorData(info: OptionalQRCodeInfo) {
     if (isVendorTag(info.tag)) {
       optionalVendorData[info.tag] = info
       return
@@ -452,7 +452,7 @@ class OnboardingPayload(
    *
    * @param info Optional QR code info object to add
    */
-  fun addOptionalExtensionData(info: OptionalQRCodeInfoExtension) {
+  private fun addOptionalExtensionData(info: OptionalQRCodeInfoExtension) {
     if (isCommonTag(info.tag)) {
       optionalExtensionData[info.tag] = info
       return
