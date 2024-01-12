@@ -1,3 +1,19 @@
+#
+#    Copyright (c) 2021 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
 import ctypes
 import enum
 import glob
@@ -8,7 +24,10 @@ import typing
 import chip.exceptions
 import construct
 
-NATIVE_LIBRARY_BASE_NAME = "_ChipDeviceCtrl.so"
+
+class Library(enum.Enum):
+    CONTROLLER = "_ChipDeviceCtrl.so"
+    SERVER = "_ChipServer.so"
 
 
 def _AllDirsToRoot(dir):
@@ -119,7 +138,19 @@ class PyChipError(ctypes.Structure):
         return not self == other
 
 
-def FindNativeLibraryPath() -> str:
+PostAttributeChangeCallback = ctypes.CFUNCTYPE(
+    None,
+    # py_object,
+    ctypes.c_uint16,
+    ctypes.c_uint16,
+    ctypes.c_uint16,
+    ctypes.c_uint8,
+    ctypes.c_uint16,
+    ctypes.c_char_p,
+)
+
+
+def FindNativeLibraryPath(library: Library) -> str:
     """Find the native CHIP dll/so path."""
 
     scriptDir = os.path.dirname(os.path.abspath(__file__))
@@ -129,7 +160,7 @@ def FindNativeLibraryPath() -> str:
     # modules.
     dmDLLPath = os.path.join(
         os.path.dirname(scriptDir),  # file should be inside 'chip'
-        NATIVE_LIBRARY_BASE_NAME)
+        library.value)
     if os.path.exists(dmDLLPath):
         return dmDLLPath
 
@@ -143,7 +174,7 @@ def FindNativeLibraryPath() -> str:
         "build",
         buildMachineGlob,
         "src/controller/python/.libs",
-        NATIVE_LIBRARY_BASE_NAME,
+        library.value,
     )
     for dir in _AllDirsToRoot(scriptDir):
         dmDLLPathGlob = os.path.join(dir, relDMDLLPathGlob)
@@ -152,8 +183,7 @@ def FindNativeLibraryPath() -> str:
                 return dmDLLPath
 
     raise Exception(
-        "Unable to locate Chip Device Manager DLL (%s); expected location: %s" %
-        (NATIVE_LIBRARY_BASE_NAME, scriptDir))
+        f"Unable to locate CHIP DLL ({library.value}); expected location: {scriptDir}")
 
 
 class NativeLibraryHandleMethodArguments:
@@ -168,22 +198,30 @@ class NativeLibraryHandleMethodArguments:
         method.argtype = argumentTypes
 
 
-_nativeLibraryHandle: ctypes.CDLL = None
+_nativeLibraryHandle: ctypes.CDLL = {}
 
 
-def _GetLibraryHandle(shouldInit: bool) -> ctypes.CDLL:
+def _GetLibraryHandle(lib: Library, shouldInit: bool) -> ctypes.CDLL:
     """Get a memoized handle to the chip native code dll."""
 
     global _nativeLibraryHandle
-    if _nativeLibraryHandle is None:
-        if shouldInit:
-            raise Exception("Common stack has not been initialized!")
-        _nativeLibraryHandle = ctypes.CDLL(FindNativeLibraryPath())
-        setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
-        setter.Set("pychip_CommonStackInit", PyChipError, [ctypes.c_char_p])
-        setter.Set("pychip_FormatError", None, [ctypes.POINTER(PyChipError), ctypes.c_char_p, ctypes.c_uint32])
+    if lib not in _nativeLibraryHandle:
 
-    return _nativeLibraryHandle
+        if shouldInit and lib == Library.CONTROLLER:
+            raise Exception("Common stack has not been initialized!")
+
+        _nativeLibraryHandle[lib] = ctypes.CDLL(FindNativeLibraryPath(lib))
+        setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle[lib])
+
+        if lib == Library.CONTROLLER:
+            setter.Set("pychip_CommonStackInit", PyChipError, [ctypes.c_char_p])
+            setter.Set("pychip_FormatError", None,
+                       [ctypes.POINTER(PyChipError), ctypes.c_char_p, ctypes.c_uint32])
+        elif lib == Library.SERVER:
+            setter.Set("pychip_server_native_init", PyChipError, [])
+            setter.Set("pychip_server_set_callbacks", None, [PostAttributeChangeCallback])
+
+    return _nativeLibraryHandle[lib]
 
 
 def Init(bluetoothAdapter: int = None):
@@ -194,12 +232,13 @@ def Init(bluetoothAdapter: int = None):
     params.BluetoothAdapterId = bluetoothAdapter if bluetoothAdapter is not None else 0
     params = CommonStackParams.build(params)
 
-    _GetLibraryHandle(False).pychip_CommonStackInit(ctypes.c_char_p(params))
+    handle = _GetLibraryHandle(Library.CONTROLLER, False)
+    handle.pychip_CommonStackInit(ctypes.c_char_p(params))
 
 
 class HandleFlags(enum.Flag):
     REQUIRE_INITIALIZATION = enum.auto()
 
 
-def GetLibraryHandle(flags=HandleFlags.REQUIRE_INITIALIZATION):
-    return _GetLibraryHandle(HandleFlags.REQUIRE_INITIALIZATION in flags)
+def GetLibraryHandle(lib: Library = Library.CONTROLLER, flags=HandleFlags.REQUIRE_INITIALIZATION):
+    return _GetLibraryHandle(lib, HandleFlags.REQUIRE_INITIALIZATION in flags)

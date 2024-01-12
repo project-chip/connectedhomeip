@@ -447,8 +447,8 @@ class ChipStack(object):
 
     def _loadLib(self):
         if self._ChipStackLib is None:
-            self._ChipStackLib = chip.native.GetLibraryHandle()
-            self._chipDLLPath = chip.native.FindNativeLibraryPath()
+            self._ChipStackLib = chip.native.GetLibraryHandle(chip.native.Library.CONTROLLER)
+            self._chipDLLPath = chip.native.FindNativeLibraryPath(chip.native.Library.CONTROLLER)
 
             self._ChipStackLib.pychip_DeviceController_StackInit.argtypes = [c_void_p, c_bool]
             self._ChipStackLib.pychip_DeviceController_StackInit.restype = PyChipError
