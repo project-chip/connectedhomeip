@@ -17,7 +17,7 @@
  */
 
 #include <static-supported-temperature-levels.h>
-#include <zap-generated/gen_config.h>
+#include <app/util/config.h>
 
 using namespace std;
 using namespace chip;
