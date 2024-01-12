@@ -1,7 +1,6 @@
-/*
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
+/**
+ *
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,19 +15,19 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#import <Foundation/Foundation.h>
 
-// Logging
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef MTREndpointFilter_h
+#define MTREndpointFilter_h
 
-int cc13x2_26x2LogInit(void);
-void cc13x2_26x2Log(const char * aFormat, ...);
-#define PLAT_LOG(...) cc13x2_26x2Log(__VA_ARGS__);
+/**
+ * @brief Describes a MTREndpoint that the client wants to connect to
+ */
+@interface MTREndpointFilter : NSObject
+// value of 0 means unspecified
+@property (nonatomic) uint16_t vendorId;
+@property (nonatomic) uint16_t productId;
+// std::vector<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> requiredDeviceTypes;
 
-#ifdef __cplusplus
-}
-#endif
-#endif // APP_CONFIG_H
+@end
+#endif /* MTREndpointFilter_h */
