@@ -119,7 +119,7 @@ private:
     {
         Idle,                ///< Default state that the object starts out in, where no commands have been dispatched
         AwaitingResponse,    ///< Awaiting response from requester, after sending response.
-        AllCommandsSent, 
+        AllCommandsSent,
     };
 
     void MoveToState(const State aTargetState);

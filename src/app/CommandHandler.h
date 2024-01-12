@@ -549,7 +549,7 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
-    // Dispatches responses sent by 
+    // Dispatches responses sent by
     CommandHandlerDispatcher mDispatcher;
 
     State mState = State::Idle;
