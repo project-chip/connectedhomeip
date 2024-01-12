@@ -107,7 +107,7 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
 {
     uint8_t iv[16];
     uint8_t key[kOTAEncryptionKeyLength];
-    uint8_t dataOut[16] = {0};
+    uint8_t dataOut[16] = { 0 };
     uint32_t u32IVCount;
     uint32_t Offset = 0;
     uint8_t data;
@@ -119,15 +119,15 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
     u32IVCount = (((uint32_t) iv[12]) << 24) | (((uint32_t) iv[13]) << 16) | (((uint32_t) iv[14]) << 8) | (iv[15]);
     u32IVCount += (mIVOffset >> 4);
 
-    iv[12] = (uint8_t)((u32IVCount >> 24) &  0xff);
-    iv[13] = (uint8_t)((u32IVCount >> 16) &  0xff);
-    iv[14] = (uint8_t)((u32IVCount >> 8) &  0xff);
-    iv[15] = (uint8_t)(u32IVCount &  0xff);
+    iv[12] = (uint8_t) ((u32IVCount >> 24) & 0xff);
+    iv[13] = (uint8_t) ((u32IVCount >> 16) & 0xff);
+    iv[14] = (uint8_t) ((u32IVCount >> 8) & 0xff);
+    iv[15] = (uint8_t) (u32IVCount & 0xff);
 
-    if (Encoding::HexToBytes(OTA_ENCRYPTION_KEY, strlen(OTA_ENCRYPTION_KEY),
-                             key,kOTAEncryptionKeyLength) != kOTAEncryptionKeyLength)
+    if (Encoding::HexToBytes(OTA_ENCRYPTION_KEY, strlen(OTA_ENCRYPTION_KEY), key, kOTAEncryptionKeyLength) !=
+        kOTAEncryptionKeyLength)
     {
-        //Failed to convert the OTAEncryptionKey string to octstr type value
+        // Failed to convert the OTAEncryptionKey string to octstr type value
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 

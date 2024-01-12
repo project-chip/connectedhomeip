@@ -73,7 +73,7 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 
 CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error           = CHIP_NO_ERROR;
     FactoryProvider * provider = nullptr;
 
     ReturnErrorOnFailure(Read());

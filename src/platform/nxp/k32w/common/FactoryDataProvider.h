@@ -107,7 +107,7 @@ public:
     virtual CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) = 0;
     CHIP_ERROR Validate();
 
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
 
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;

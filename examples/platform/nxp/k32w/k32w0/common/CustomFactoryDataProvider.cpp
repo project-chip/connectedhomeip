@@ -27,7 +27,7 @@ static constexpr size_t kMaxLengthCustomId3 = 100;
 CustomFactoryDataProvider::CustomFactoryDataProvider()
 {
     // Custom ids should be from a range that does not overlap with the standard factory data range.
-    static_assert((uint16_t)CustomFactoryIds::kCustomId1 >= (uint16_t)FactoryDataProvider::FactoryDataId::kMaxId);
+    static_assert((uint16_t) CustomFactoryIds::kCustomId1 >= (uint16_t) FactoryDataProvider::FactoryDataId::kMaxId);
 }
 
 CHIP_ERROR CustomFactoryDataProvider::ParseFunctionExample()
