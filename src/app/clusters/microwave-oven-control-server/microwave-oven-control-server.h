@@ -156,7 +156,7 @@ public:
      *   @param index The index of the watt setting to be returned. It is assumed that watt setting are indexable from 0 and with no
      * gaps.
      *   @param wattSetting A reference to receive the watt setting on success.
-     *   @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully, 
+     *   @return Returns a CHIP_NO_ERROR if there was no error and the label was returned successfully,
      *   CHIP_ERROR_NOT_FOUND if the index in beyond the list of available labels.
      */
     virtual CHIP_ERROR GetWattSettingByIndex(uint8_t index, uint16_t & wattSetting) = 0;

@@ -47,8 +47,8 @@ public:
     explicit ExampleMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
         mOperationalStateInstance(this, aClustersEndpoint),
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
-        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id, 
-                BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,MicrowaveOvenControl::Feature::kPowerNumberLimits), 
+        mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
+                BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,MicrowaveOvenControl::Feature::kPowerNumberLimits),
                 mOperationalStateInstance, mMicrowaveOvenModeInstance)
     {}
 
@@ -247,7 +247,7 @@ private:
     uint8_t mPowerSettingNum           = kDefaultPowerSettingNum;
     uint8_t mSelectedWattIndex         = 0;
     uint16_t mWattRating               = 0;
-    
+
     const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 
     // MicrowaveOvenMode types
