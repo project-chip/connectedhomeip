@@ -64,7 +64,6 @@ private:
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder);
 
     PersistentStorageDelegate * mStorage           = nullptr;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
@@ -95,9 +94,6 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     case IcdManagement::Attributes::ClientsSupportedPerFabric::Id:
         return ReadClientsSupportedPerFabric(aPath.mEndpointId, aEncoder);
-
-    case IcdManagement::Attributes::OperatingMode::Id:
-        return ReadOperatingMode(aPath.mEndpointId, aEncoder);
     }
 
     return CHIP_NO_ERROR;
@@ -159,11 +155,6 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadICDCounter(EndpointId endpoint, Att
 CHIP_ERROR IcdManagementAttributeAccess::ReadClientsSupportedPerFabric(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
     return encoder.Encode(mICDConfigurationData->GetClientsSupportedPerFabric());
-}
-
-CHIP_ERROR IcdManagementAttributeAccess::ReadOperatingMode(EndpointId endpoint, AttributeValueEncoder & encoder)
-{
-    return encoder.Encode(mICDConfigurationData->GetICDMode());
 }
 
 /**
