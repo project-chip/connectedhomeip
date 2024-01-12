@@ -44,7 +44,8 @@ class TC_VALCC_2_1(MatterBaseTest):
             TestStep(9, "Read CurrentLevel attribute, if supported"),
             TestStep(10, "Read TargetLevel attribute, if supported"),
             TestStep(11, "Read DefaultOpenLevel attribute, if supported"),
-            TestStep(12, "Read ValveFault attribute, if supported")
+            TestStep(12, "Read ValveFault attribute, if supported"),
+            TestStep(13, "Read LevelStep attribute, if supported")
         ]
         return steps
 
@@ -159,6 +160,15 @@ class TC_VALCC_2_1(MatterBaseTest):
             valve_fault_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.ValveFault)
 
             asserts.assert_less_equal(valve_fault_dut, 0b00000111, "ValveFault is not in valid range")
+        else:
+            logging.info("Test step skipped")
+
+        self.step(13)
+        if attributes.LevelStep.attribute_id in attribute_list:
+            level_step_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.LevelStep)
+
+            asserts.assert_less_equal(level_step_dut, 50, "LevelStep attribute is out of range")
+            asserts.assert_greater_equal(level_step_dut, 1, "LevelStep attribute is out of range")
         else:
             logging.info("Test step skipped")
 
