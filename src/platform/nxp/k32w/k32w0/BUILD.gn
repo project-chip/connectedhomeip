@@ -56,11 +56,11 @@ static_library("k32w0") {
   ]
 
   public = [
+    "${chip_root}/src/app/reporting/reporting.h",
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
-    "${chip_root}/src/app/reporting/reporting.h"
   ]
 
   if (chip_with_factory_data == 1) {
