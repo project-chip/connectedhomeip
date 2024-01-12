@@ -35,7 +35,7 @@ constexpr uint32_t kDefaultCookTimeSec = 30u;
 constexpr uint32_t kMinCookTimeSec     = 1u;
 constexpr uint8_t kDefaultMinPowerNum  = 10u;
 constexpr uint8_t kDefaultMaxPowerNum  = 100u;
-constexpr uint8_t kDefaultPowerStepNum    = 10u;
+constexpr uint8_t kDefaultPowerStepNum = 10u;
 
 class Delegate;
 
@@ -85,7 +85,7 @@ private:
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
-    uint32_t mCookTimeSec         = kDefaultCookTimeSec;
+    uint32_t mCookTimeSec        = kDefaultCookTimeSec;
     uint8_t mSupportedWattLevels = 0;
 
     /**

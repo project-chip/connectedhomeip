@@ -32,7 +32,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-
 class ExampleMicrowaveOvenDevice : public MicrowaveOvenControl::Delegate,
                                    public ModeBase::Delegate,
                                    public OperationalState::Delegate
@@ -48,8 +47,9 @@ public:
         mOperationalStateInstance(this, aClustersEndpoint),
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
-                BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,MicrowaveOvenControl::Feature::kPowerNumberLimits),
-                mOperationalStateInstance, mMicrowaveOvenModeInstance)
+                                      BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
+                                                                             MicrowaveOvenControl::Feature::kPowerNumberLimits),
+                                      mOperationalStateInstance, mMicrowaveOvenModeInstance)
     {}
 
     /**
@@ -62,7 +62,8 @@ public:
      * handle command for microwave oven control: set cooking parameters
      */
     Protocols::InteractionModel::Status HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec,
-                                                                           bool startAfterSetting, Optional<uint8_t> powerSettingNum,
+                                                                           bool startAfterSetting,
+                                                                           Optional<uint8_t> powerSettingNum,
                                                                            Optional<uint8_t> wattSettingIndex) override;
 
     /**
@@ -219,13 +220,12 @@ public:
     CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
 
 private:
-
     // define delegates and instances for Microwave Oven device
     OperationalState::Instance mOperationalStateInstance;
     ModeBase::Instance mMicrowaveOvenModeInstance;
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
 
-    //set default value for the optional attributes
+    // set default value for the optional attributes
     static constexpr uint8_t kMinPowerNum            = 20u;
     static constexpr uint8_t kMaxPowerNum            = 110u;
     static constexpr uint8_t kPowerStepNum           = 10u;
@@ -233,20 +233,20 @@ private:
     static constexpr uint8_t kDefaultPowerSettingNum = 100u;
 
     // define the mode value
-    static constexpr uint8_t kModeNormal          = 0u;
-    static constexpr uint8_t kModeDefrost         = 1u;
+    static constexpr uint8_t kModeNormal  = 0u;
+    static constexpr uint8_t kModeDefrost = 1u;
 
     // define the example watts
-    static constexpr uint16_t kExampleWatt1       = 100u;
-    static constexpr uint16_t kExampleWatt2       = 300u;
-    static constexpr uint16_t kExampleWatt3       = 500u;
-    static constexpr uint16_t kExampleWatt4       = 800u;
-    static constexpr uint16_t kExampleWatt5       = 1000u;
+    static constexpr uint16_t kExampleWatt1 = 100u;
+    static constexpr uint16_t kExampleWatt2 = 300u;
+    static constexpr uint16_t kExampleWatt3 = 500u;
+    static constexpr uint16_t kExampleWatt4 = 800u;
+    static constexpr uint16_t kExampleWatt5 = 1000u;
 
     // MicrowaveOvenControl variables
-    uint8_t mPowerSettingNum           = kDefaultPowerSettingNum;
-    uint8_t mSelectedWattIndex         = 0;
-    uint16_t mWattRating               = 0;
+    uint8_t mPowerSettingNum   = kDefaultPowerSettingNum;
+    uint8_t mSelectedWattIndex = 0;
+    uint16_t mWattRating       = 0;
 
     const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
 

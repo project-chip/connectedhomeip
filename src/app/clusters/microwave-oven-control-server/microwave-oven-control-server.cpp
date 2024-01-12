@@ -65,10 +65,11 @@ CHIP_ERROR Instance::Init()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     // Check if the feature bits are not include both PowerAsNumber and PowerInWatts
-    if ((!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) && !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)))
+    if ((!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) &&
+         !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)))
     {
-        ChipLogError(
-            Zcl, "Microwave Oven Control: feature bits error, feature must supports one of PowerInWatts and PowerAsNumber");
+        ChipLogError(Zcl,
+                     "Microwave Oven Control: feature bits error, feature must supports one of PowerInWatts and PowerAsNumber");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     // Check if the feature bits are include both PowerAsNumber and PowerInWatts
@@ -157,10 +158,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
         {
             ReturnErrorOnFailure(aEncoder.Encode(
-                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits)
-                            ? mDelegate->GetMinPowerNum()
-                            : kDefaultMinPowerNum
-            ));
+                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMinPowerNum() : kDefaultMinPowerNum));
         }
         else
         {
@@ -173,10 +171,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
         {
             ReturnErrorOnFailure(aEncoder.Encode(
-                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits)
-                            ? mDelegate->GetMaxPowerNum()
-                            : kDefaultMaxPowerNum
-            ));
+                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMaxPowerNum() : kDefaultMaxPowerNum));
         }
         else
         {
@@ -188,11 +183,9 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case MicrowaveOvenControl::Attributes::PowerStep::Id:
         if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
         {
-            ReturnErrorOnFailure(aEncoder.Encode(
-                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits)
-                            ? mDelegate->GetPowerStepNum()
-                            : kDefaultPowerStepNum
-            ));
+            ReturnErrorOnFailure(aEncoder.Encode(HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits)
+                                                     ? mDelegate->GetPowerStepNum()
+                                                     : kDefaultPowerStepNum));
         }
         else
         {
@@ -315,7 +308,6 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     VerifyOrExit(IsCookTimeSecondsInRange(reqCookTimeSec, mDelegate->GetMaxCookTimeSec()), status = Status::ConstraintError;
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
-
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
     {
         // if using power as number, check if the param is invalid and set PowerSetting number.
@@ -353,11 +345,12 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
         // count of supported watt levels must greater than 0
-        VerifyOrExit(mSupportedWattLevels > 0, ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
+        VerifyOrExit(
+            mSupportedWattLevels > 0,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
 
         reqWattSettingIndex = wattSettingIndex.ValueOr(mSupportedWattLevels - 1);
-        VerifyOrExit(reqWattSettingIndex <= (mSupportedWattLevels - 1),
-                     status = Status::ConstraintError;
+        VerifyOrExit(reqWattSettingIndex <= (mSupportedWattLevels - 1), status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,
@@ -383,7 +376,7 @@ void Instance::HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTi
                  ChipLogError(Zcl, "Microwave Oven Control: Failed to set cookTime, cookTime value is out of range"));
 
     finalCookTimeSec = GetCookTimeSec() + req.timeToAdd;
-    status = mDelegate->HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
+    status           = mDelegate->HandleModifyCookTimeSecondsCallback(finalCookTimeSec);
 
 exit:
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
