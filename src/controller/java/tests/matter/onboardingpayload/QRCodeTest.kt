@@ -348,56 +348,55 @@ class QRCodeTest {
 
     val parser = OnboardingPayloadParser()
     assertThat(
-      parser.getQrCodeFromPayload(
-        OnboardingPayload(
-          discriminator = 0xF00,
-          setupPinCode = 20202021,
-          version = 0,
-          vendorId = 0x235A,
-          productId = 0x4E4B,
-          commissioningFlow = CommissioningFlow.STANDARD.value,
-          discoveryCapabilities = mutableSetOf(DiscoveryCapability.BLE),
+        parser.getQrCodeFromPayload(
+          OnboardingPayload(
+            discriminator = 0xF00,
+            setupPinCode = 20202021,
+            version = 0,
+            vendorId = 0x235A,
+            productId = 0x4E4B,
+            commissioningFlow = CommissioningFlow.STANDARD.value,
+            discoveryCapabilities = mutableSetOf(DiscoveryCapability.BLE),
+          )
         )
       )
-    )
       .isEqualTo("MT:W0GU2OTB00KA0648G00")
   }
 
   /*
-  * Test QRCode with optional data
-  *
-  * matches iOS test
-  * https://github.com/project-chip/connectedhomeip/blob/927962863180270091c1694d4b1ce2e9ea16b8b5/src/darwin/Framework/CHIPTests/MTRSetupPayloadParserTests.m#L155
-  */
+   * Test QRCode with optional data
+   *
+   * matches iOS test
+   * https://github.com/project-chip/connectedhomeip/blob/927962863180270091c1694d4b1ce2e9ea16b8b5/src/darwin/Framework/CHIPTests/MTRSetupPayloadParserTests.m#L155
+   */
   @Test
   fun testQRCodeWithOptionalData() {
-    val payload = OnboardingPayload(
-      discriminator = 128,
-      setupPinCode = 2048,
-      version = 0,
-      vendorId = 12,
-      productId = 1,
-      commissioningFlow = CommissioningFlow.STANDARD.value,
-      discoveryCapabilities = mutableSetOf(DiscoveryCapability.SOFT_AP),
-    )
-    val parsedQrCode = OnboardingPayloadParser().parseQrCode(
-      "MT:M5L90MP500K64J0A33P0SET70" +
-          ".QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
-    )
+    val payload =
+      OnboardingPayload(
+        discriminator = 128,
+        setupPinCode = 2048,
+        version = 0,
+        vendorId = 12,
+        productId = 1,
+        commissioningFlow = CommissioningFlow.STANDARD.value,
+        discoveryCapabilities = mutableSetOf(DiscoveryCapability.SOFT_AP),
+      )
+    val parsedQrCode =
+      OnboardingPayloadParser()
+        .parseQrCode("MT:M5L90MP500K64J0A33P0SET70" + ".QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0")
     assertThat(parsedQrCode).isEqualTo(payload)
 
     var optionalQRCodeInfo = OptionalQRCodeInfoExtension()
-    //Test 1st optional field
+    // Test 1st optional field
     optionalQRCodeInfo.tag = 0
     optionalQRCodeInfo.type = OptionalQRCodeInfoType.TYPE_STRING
     optionalQRCodeInfo.data = "123456789"
 
     assertThat(parsedQrCode.getAllOptionalExtensionData()[0]).isEqualTo(optionalQRCodeInfo)
-    //verify we can grab just the serial number as well
+    // verify we can grab just the serial number as well
     assertThat(parsedQrCode.getSerialNumber()).isEqualTo("123456789")
 
-
-    //Test 2nd optional field
+    // Test 2nd optional field
     optionalQRCodeInfo = OptionalQRCodeInfoExtension()
     optionalQRCodeInfo.tag = 130
     optionalQRCodeInfo.type = OptionalQRCodeInfoType.TYPE_STRING
@@ -405,7 +404,7 @@ class QRCodeTest {
 
     assertThat(parsedQrCode.getAllOptionalVendorData()[0]).isEqualTo(optionalQRCodeInfo)
 
-    //Test 3rd optional field
+    // Test 3rd optional field
     optionalQRCodeInfo = OptionalQRCodeInfoExtension()
     optionalQRCodeInfo.tag = 131
     optionalQRCodeInfo.type = OptionalQRCodeInfoType.TYPE_INT32
@@ -413,7 +412,6 @@ class QRCodeTest {
 
     assertThat(parsedQrCode.getAllOptionalVendorData()[1]).isEqualTo(optionalQRCodeInfo)
   }
-
 
   companion object {
     const val kDefaultPayloadQRCode: String = "MT:M5L90MP500K64J00000"
