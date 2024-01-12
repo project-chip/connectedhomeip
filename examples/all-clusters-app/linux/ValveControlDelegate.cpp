@@ -33,6 +33,12 @@ DataModel::Nullable<chip::Percent> ValveControlDelegate::HandleOpenValve(DataMod
     sLevel                     = level.IsNull() ? 100 : level.Value();
     sLastOpenDuration          = 0;
     ChipLogProgress(NotSpecified, "Valve openinig from level: %d to %d", currentLevel, sLevel);
+
+    // In this demo application, the trasition is considered instant,
+    // so current level is set to the requested level and current state is set to kOpen.
+    currentLevel = sLevel;
+    Attributes::CurrentState::Set(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kOpen);
+
     return DataModel::Nullable<chip::Percent>(currentLevel);
 }
 
