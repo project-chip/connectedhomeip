@@ -54,7 +54,7 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            DoorLock, ElectricalMeasurement,  EnergyEvse, EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
            FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics, GroupKeyManagement, Groups,
            HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement, KeypadInput,
-           LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl, 
+           LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl,
            MicrowaveOvenMode, ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement,
            OccupancySensing, OnOff, OnOffSwitchConfiguration, OperationalCredentials, OperationalState,
            OtaSoftwareUpdateProvider, OtaSoftwareUpdateRequestor, OvenCavityOperationalState, OvenMode,
