@@ -297,7 +297,9 @@ static_library("support") {
   }
 }
 
-source_set("test_utils") {
+static_library("test_utils") {
+  output_name = "libTestUtils"
+  output_dir = "${root_out_dir}/lib"
   deps = [ "${chip_root}/src/platform" ]
 
   sources = [
@@ -306,7 +308,7 @@ source_set("test_utils") {
   ]
 }
 
-static_library("testing") {
+static_library("testing_nlunit") {
   output_name = "libSupportTesting"
   output_dir = "${root_out_dir}/lib"
 
@@ -318,7 +320,6 @@ static_library("testing") {
 
   public_deps = [
     ":support",
-    ":test_utils",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
     "${nlassert_root}:nlassert",
