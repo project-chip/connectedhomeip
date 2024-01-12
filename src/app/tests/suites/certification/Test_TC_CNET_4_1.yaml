@@ -207,7 +207,6 @@ tests:
                 value: enter 'y' after successfull Commission"
               - name: "expectedValue"
                 value: "y"
-
     # - label: "Step 14: TH reads the SupportedWiFiBands attribute from the DUT"
     #   PICS: CNET.S.A0008
     #   command: "readAttribute"
