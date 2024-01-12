@@ -62,7 +62,17 @@ public:
         mEnableKey(enableKey), mOtherDelegate(otherDelegate)
     {}
 
+    /**
+     * This function expects the enableKey ByteSpan to be valid forever.
+     * Typically this feature is only enabled in certification testing
+     * and uses a static secret key in the device for testing (e.g. in factory data)
+     */
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
+
+    /** This function must return True if the eventTrigger is recognised and handled
+     *  It must return False to allow a higher level TestEvent handler to check other
+     *  clusters that may handle it.
+     */
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 private:
