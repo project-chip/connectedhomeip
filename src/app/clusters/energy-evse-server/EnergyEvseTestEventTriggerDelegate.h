@@ -58,14 +58,17 @@ enum class EnergyEvseTrigger : uint64_t
 class EnergyEvseTestEventTriggerDelegate : public TestEventTriggerDelegate
 {
 public:
+    /**
+     * This class expects the enableKey ByteSpan to be valid forever.
+     * Typically this feature is only enabled in certification testing
+     * and uses a static secret key in the device for testing (e.g. in factory data)
+     */
     explicit EnergyEvseTestEventTriggerDelegate(const ByteSpan & enableKey, TestEventTriggerDelegate * otherDelegate) :
         mEnableKey(enableKey), mOtherDelegate(otherDelegate)
     {}
 
-    /**
-     * This function expects the enableKey ByteSpan to be valid forever.
-     * Typically this feature is only enabled in certification testing
-     * and uses a static secret key in the device for testing (e.g. in factory data)
+    /* This function returns True if the enableKey received in the TestEventTrigger command
+     * matches the value passed into the constructor.
      */
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
 

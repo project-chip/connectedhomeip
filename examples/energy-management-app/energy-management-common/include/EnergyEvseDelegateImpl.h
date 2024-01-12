@@ -137,11 +137,19 @@ public:
     Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
 
     /**
-     * @brief   This is used to start a check on if the Enabled timer needs to be started
+     * @brief    Decides if a timer is needed based on EVSE state and sets a callback if needed
      *
-     * It should be called after the EVSE is initialised and the persisted attributes
-     * have been loaded, and time has been synchronised. If time isn't sync'd
-     * yet it will call itself back periodically (if required).
+     * In order to ensure the EVSE restarts charging (if enabled) after power loss
+     * this should be called after the EVSE is initialised
+     * (e.g. HwSetMaxHardwareCurrentLimit and HwSetCircuitCapacity have been called)
+     * and the persisted attributes have been loaded, and time has been synchronised.
+     *
+     * If time isn't sync'd yet it will call itself back periodically (if required)
+     * until time is sync'd.
+     *
+     * It is also called when a EnableCharging or EnableDischarging command
+     * is recv'd to schedule when the EVSE should be automatically disabled based
+     * on ChargingEnabledUntil / DischargingEnabledUntil expiring.
      */
     Status ScheduleCheckOnEnabledTimeout();
 

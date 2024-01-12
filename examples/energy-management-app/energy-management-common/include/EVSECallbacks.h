@@ -30,31 +30,37 @@ using namespace chip::app::Clusters::EnergyEvse;
  * This is not specific to the EnergyEVSE cluster, but includes DeviceEnergyManagement
  * and potential future clusters.
  */
-enum EVSECallbackType
+
+enum class EVSECallbackType : uint8_t
 {
     /*
      * The State has changed (e.g. from Disabled to Charging, or vice-versa)
      */
     StateChanged,
     /*
-     * ChargeCurrent has changed
+     * ChargeCurrent has changed (e.g. maxChargingCurrent so requires an
+       update to advertise a different charging current to the EV)
      */
     ChargeCurrentChanged,
     /*
      * Charging Preferences have changed
+     * The daily charging target time, SoC / Added Energy schedules have changed
+     * and may require the local optimiser to re-run.
      */
     ChargingPreferencesChanged,
     /*
-     * Energy Meter Reading requested
+     * Energy Meter Reading requested from the hardware, e.g. so that the session
+     * information can be updated.
      */
     EnergyMeterReadingRequested,
     /*
-     * DeviceEnergyManagement has changed
+     * The associated DeviceEnergyManagement cluster has changed. This may mean
+     * that the start time, or power profile or power levels have been adjusted
      */
     DeviceEnergyManagementChanged,
 };
 
-enum ChargingDischargingType
+enum class ChargingDischargingType : uint8_t
 {
     kCharging,
     kDischarging
