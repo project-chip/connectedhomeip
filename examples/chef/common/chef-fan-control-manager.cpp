@@ -86,63 +86,31 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
     status = SpeedMax::Get(mEndpoint, &speedMax);
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
+    uint8_t speedCurrent;
+    status = SpeedCurrent::Get(mEndpoint, &speedCurrent);
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
+
     DataModel::Nullable<uint8_t> speedSetting;
     status = SpeedSetting::Get(mEndpoint, speedSetting);
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, Status::InvalidCommand);
 
-    uint8_t newSpeedSetting    = speedSetting.ValueOr(0);
+    uint8_t newSpeedSetting;
+    uint8_t speedValue = speedSetting.ValueOr(speedCurrent);
     const uint8_t kLowestSpeed = aLowestOff ? 0 : 1;
 
     if (aDirection == StepDirectionEnum::kIncrease)
     {
-        if (speedSetting.IsNull())
-        {
-            newSpeedSetting = 1;
-        }
-        else if (speedSetting.Value() < speedMax)
-        {
-            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() + 1);
-        }
-        else if (speedSetting.Value() == speedMax)
-        {
-            if (aWrap)
-            {
-                newSpeedSetting = kLowestSpeed;
-            }
-        }
+        newSpeedSetting = std::invoke([&]() -> uint8_t {
+            VerifyOrReturnValue(speedValue < speedMax, (aWrap ? kLowestSpeed : speedMax));
+            return static_cast<uint8_t>(speedValue + 1);
+        });
     }
     else if (aDirection == StepDirectionEnum::kDecrease)
     {
-        if (speedSetting.IsNull())
-        {
-            newSpeedSetting = kLowestSpeed;
-        }
-        else if (speedSetting.Value() > 1)
-        {
-            newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
-        }
-        else if (speedSetting.Value() == 1)
-        {
-            if (aLowestOff)
-            {
-                newSpeedSetting = 0;
-            }
-            else if (aWrap)
-            {
-                newSpeedSetting = speedMax;
-            }
-        }
-        else if (speedSetting.Value() == 0)
-        {
-            if (aWrap)
-            {
-                newSpeedSetting = speedMax;
-            }
-            else if (!aLowestOff)
-            {
-                newSpeedSetting = 1;
-            }
-        }
+        newSpeedSetting = std::invoke([&]() -> uint8_t {
+            VerifyOrReturnValue(speedValue > kLowestSpeed, aWrap ? speedMax : kLowestSpeed);
+            return static_cast<uint8_t>(speedValue - 1);
+        });
     }
 
     return ToInteractionModelStatus(SpeedSetting::Set(mEndpoint, newSpeedSetting));
