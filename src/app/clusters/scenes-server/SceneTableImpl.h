@@ -26,7 +26,6 @@
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
 
-
 namespace chip {
 namespace scenes {
 

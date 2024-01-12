@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include <static-supported-temperature-levels.h>
 #include <app/util/config.h>
+#include <static-supported-temperature-levels.h>
 
 using namespace std;
 using namespace chip;
