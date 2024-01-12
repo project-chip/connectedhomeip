@@ -684,6 +684,12 @@ static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
     case Commands::UnboltDoor::Id: {
         return YES;
     }
+    case Commands::SetAliroReaderConfig::Id: {
+        return YES;
+    }
+    case Commands::ClearAliroReaderConfig::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
