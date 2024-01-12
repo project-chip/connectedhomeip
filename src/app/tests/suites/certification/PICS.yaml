@@ -8890,24 +8890,7 @@ PICS:
 
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
-
-    #  Laundry DRYER Mode Cluster
-
-    - label: "Does the device implement the Dryer cluster as a server?"
-      id: DRYERCTRL.S
-
-    #- label: "Does the DUT support testing the failed ChangeToMode command?"
-    #  id: DRYERCTRL.S.M.CAN_TEST_MODE_FAILURE
-
-    #- label:
-    #      "Id of mode the device will fail to transition to, given its current
-    #      state"
-    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_FAIL
-
-    #- label:
-    #      "Id of mode the device will successfully transition to, given its
-    #      current state"
-    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_OK
+   
     #
     # server / features
     #
@@ -8915,8 +8898,8 @@ PICS:
           "Does the device support depending on an On/Off cluster implemented on
           the same endpoint?"
       id: OTCCM.S.F00
-      id: DRYERCTRL.S.F00
-
+      
+    #
     # server / attributes
     #
     - label: "Does the device implement the SupportedModes attribute?"
@@ -8946,13 +8929,6 @@ PICS:
 
     - label: "Can the device be controlled manually?"
       id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
-      id: DRYERCTRL.S.A0000
-
-    - label: "Does the device implement the CurrentMode attribute?"
-      id: DRYERCTRL.S.A0001
-
-    - label: "Can the device be controlled manually?"
-      id: DRYERCTRL.S.M.ManuallyControlled
 
     # RVC Clean Mode Cluster
 
