@@ -116,8 +116,8 @@ class OnboardingPayload(
   var setupPinCode: Long = 0
 ) {
   var optionalQRCodeInfo: HashMap<Int, OptionalQRCodeInfo> = HashMap()
-  val optionalVendorData: HashMap<Int, OptionalQRCodeInfo> = HashMap()
-  val optionalExtensionData: HashMap<Int, OptionalQRCodeInfoExtension> = HashMap()
+  private val optionalVendorData: HashMap<Int, OptionalQRCodeInfo> = HashMap()
+  private val optionalExtensionData: HashMap<Int, OptionalQRCodeInfoExtension> = HashMap()
 
   constructor(
     version: Int,
