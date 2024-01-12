@@ -186,15 +186,10 @@ abstract class PairingCommand(
       .updateCommissioningICDRegistrationInfo(ICDRegistrationInfo.newBuilder().build())
   }
 
-  override fun onICDRegistrationComplete(
-    errorCode: Int,
-    icdNodeId: Long,
-    icdCounter: Long,
-    icdDeviceInfo: ICDDeviceInfo
-  ) {
+  override fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo) {
     logger.log(
       Level.INFO,
-      "onICDRegistrationComplete with errorCode: $errorCode, icdNodeId: $icdNodeId, icdCounter: $icdCounter, symmetricKey: ${icdDeviceInfo.symmetricKey.toHex()}"
+      "onICDRegistrationComplete with errorCode: $errorCode, symmetricKey: ${icdDeviceInfo.symmetricKey.toHex()}, icdDeviceInfo: $icdDeviceInfo"
     )
   }
 

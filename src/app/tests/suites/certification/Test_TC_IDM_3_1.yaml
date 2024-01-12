@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [DUT Client]
+name: 3.3.1. [TC-IDM-3.1] Write Request Action from DUT to TH. [DUT as Client]
 
 PICS:
     - MCORE.IDM.C.WriteRequest
@@ -31,7 +31,7 @@ tests:
 
     - label:
           "Step 1: DUT sends the WriteRequestMessage to the TH to modify one
-          attribute data"
+          attribute data +"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
@@ -78,7 +78,7 @@ tests:
 
     - label:
           "Step 3: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type bool."
+          attribute of data type bool. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bool
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -119,7 +119,7 @@ tests:
 
     - label:
           "Step 4: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type string."
+          attribute of data type string. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_String
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -161,7 +161,7 @@ tests:
 
     - label:
           "Step 5: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type unsigned integer."
+          attribute of data type unsigned integer. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_UnsignedInteger
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -201,7 +201,7 @@ tests:
 
     - label:
           "Step 6: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type signed integer."
+          attribute of data type signed integer. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_SignedInteger
       verification: |
           DUT implementation required to verify write an attribute of data type signed integer.
@@ -211,7 +211,7 @@ tests:
 
     - label:
           "Step 7: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type floating point."
+          attribute of data type floating point. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_FloatingPoint
       verification: |
           DUT implementation required to verify write an attribute of data type float
@@ -221,7 +221,7 @@ tests:
 
     - label:
           "Step 8: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type Octet String."
+          attribute of data type Octet String. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_OctetString
       verification: |
           DUT implementation required to verify write an attribute of data type Octet String
@@ -231,7 +231,7 @@ tests:
 
     - label:
           "Step 9: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type Struct."
+          attribute of data type Struct. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Struct
       verification: |
           DUT implementation required to verify write an attribute ofdata type Struct
@@ -241,7 +241,7 @@ tests:
 
     - label:
           "Step 10: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type List."
+          attribute of data type List. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_List
       verification: |
           DUT implementation required to verify write an attribute of  data type List
@@ -251,7 +251,7 @@ tests:
 
     - label:
           "Step 11: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type enum."
+          attribute of data type enum. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Enum
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -293,7 +293,7 @@ tests:
 
     - label:
           "Step 12: DUT sends the WriteRequestMessage to the TH to write an
-          attribute of data type bitmap."
+          attribute of data type bitmap. +"
       PICS: MCORE.IDM.C.WriteRequest.Attribute.DataType_Bitmap
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
@@ -392,7 +392,7 @@ tests:
           the attribute values and the dataversions of the clusters. DUT sends a
           WriteRequestMessage to the DUT to both the clusters with the
           appropriate dataversions(received in the previous step) to modify the
-          value of an attribute"
+          value of an attribute +"
       verification: |
           Out of Scope
       disabled: true

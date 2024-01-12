@@ -1146,6 +1146,14 @@ namespace UnboltDoor {
 static constexpr CommandId Id = 0x00000027;
 } // namespace UnboltDoor
 
+namespace SetAliroReaderConfig {
+static constexpr CommandId Id = 0x00000028;
+} // namespace SetAliroReaderConfig
+
+namespace ClearAliroReaderConfig {
+static constexpr CommandId Id = 0x00000029;
+} // namespace ClearAliroReaderConfig
+
 } // namespace Commands
 } // namespace DoorLock
 

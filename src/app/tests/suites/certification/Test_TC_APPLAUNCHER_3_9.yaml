@@ -39,7 +39,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: TH sends HideApp command to DUT"
+    - label:
+          "Step 1a: TH sends a HideApp command to DUT to Hide a running and
+          Active application"
       PICS: APPLAUNCHER.S.C02.Rsp
       command: "HideApp"
       arguments:
@@ -51,7 +53,7 @@ tests:
                         ApplicationID: applicationId,
                     }
 
-    - label: "Step 2: Reads the Status attribute"
+    - label: "Step 1b: TH reads the Status attribute"
       endpoint: ApplicationBasic.Endpoint
       cluster: "Application Basic"
       command: "readAttribute"
