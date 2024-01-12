@@ -6,16 +6,16 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CHIP_ERROR CommandHandlerDispatcher::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                                         System::PacketBufferHandle && aPayload)
+CHIP_ERROR CommandHandlerDispatcher::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
+                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
     bool sendStatusResponseWithInvalidAction = false;
 
     if (mState == State::AwaitingResponse && aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         CHIP_ERROR statusError = CHIP_NO_ERROR;
-        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
+        err                    = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
         VerifyOrExit(err == CHIP_NO_ERROR, sendStatusResponseWithInvalidAction = true);
         statusError = err;
         VerifyOrExit(err == CHIP_NO_ERROR, sendStatusResponseWithInvalidAction = true);
@@ -53,7 +53,8 @@ exit:
 
 void CommandHandlerDispatcher::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    ChipLogDetail(DataManagement, "CommandHandlerDispatcher: Timed out waiting for response from requester mState=[%10.10s]", GetStateStr());
+    ChipLogDetail(DataManagement, "CommandHandlerDispatcher: Timed out waiting for response from requester mState=[%10.10s]",
+                  GetStateStr());
     mpCommandHandler->Close();
 }
 
@@ -78,8 +79,8 @@ CHIP_ERROR CommandHandlerDispatcher::SendCommandResponse()
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
 
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandResponsePayload), sendFlag));
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse,
+                                                   std::move(commandResponsePayload), sendFlag));
     if (moreToSend)
     {
         MoveToState(State::AwaitingResponse);
@@ -87,7 +88,9 @@ CHIP_ERROR CommandHandlerDispatcher::SendCommandResponse()
         {
             mExchangeCtx->SetDelegate(this);
         }
-    } else {
+    }
+    else
+    {
         MoveToState(State::AllCommandsSent);
     }
     return CHIP_NO_ERROR;

@@ -30,8 +30,8 @@
 
 #pragma once
 
-#include "CommandPathRegistry.h"
 #include "CommandHandlerDispatcher.h"
+#include "CommandPathRegistry.h"
 
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
@@ -395,10 +395,7 @@ public:
      * execution.
      *
      */
-    void FlushAcksRightAwayOnSlowCommand()
-    {
-        mDispatcher.FlushAcksRightNow();
-    }
+    void FlushAcksRightAwayOnSlowCommand() { mDispatcher.FlushAcksRightNow(); }
 
     /**
      * GetSubjectDescriptor() may only be called during synchronous command

@@ -306,7 +306,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     if (CHIP_END_OF_TLV == err)
     {
         moreChunkedMessages = false;
-        err = CHIP_NO_ERROR;
+        err                 = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
 

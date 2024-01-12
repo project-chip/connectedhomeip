@@ -55,10 +55,7 @@ public:
         return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
     }
 
-    bool ValidateExchangeHasSessionHandle()
-    {
-        return mExchangeCtx && mExchangeCtx->HasSessionHandle();
-    }
+    bool ValidateExchangeHasSessionHandle() { return mExchangeCtx && mExchangeCtx->HasSessionHandle(); }
 
     FabricIndex GetAccessingFabricIndex() const
     {
@@ -66,15 +63,9 @@ public:
         return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
     }
 
-    void SetExchangeContext(Messaging::ExchangeContext * ec)
-    {
-        mExchangeCtx.Grab(ec);
-    }
+    void SetExchangeContext(Messaging::ExchangeContext * ec) { mExchangeCtx.Grab(ec); }
 
-    void WillSendMessage()
-    {
-        mExchangeCtx->WillSendMessage();
-    }
+    void WillSendMessage() { mExchangeCtx->WillSendMessage(); }
 
     bool IsGroupExchangeContext()
     {
@@ -82,10 +73,7 @@ public:
         return mExchangeCtx->IsGroupExchangeContext();
     }
 
-    bool HasExchangeContext()
-    {
-        return mExchangeCtx.Get() != nullptr;
-    }
+    bool HasExchangeContext() { return mExchangeCtx.Get() != nullptr; }
 
     GroupId GetGroupId()
     {
@@ -101,10 +89,7 @@ public:
         StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
     }
 
-    bool AwaitingResponse()
-    {
-        return mState == State::AwaitingResponse;
-    }
+    bool AwaitingResponse() { return mState == State::AwaitingResponse; }
 
     void AddPacketToSend(System::PacketBufferHandle && aPacket)
     {
@@ -117,8 +102,8 @@ private:
 
     enum class State : uint8_t
     {
-        Idle,                ///< Default state that the object starts out in, where no commands have been dispatched
-        AwaitingResponse,    ///< Awaiting response from requester, after sending response.
+        Idle,             ///< Default state that the object starts out in, where no commands have been dispatched
+        AwaitingResponse, ///< Awaiting response from requester, after sending response.
         AllCommandsSent,
     };
 

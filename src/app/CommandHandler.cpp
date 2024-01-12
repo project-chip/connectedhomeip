@@ -72,11 +72,11 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
         // Sending an InvokeResponse to a InvokeResponse is going to be removed from spec soon.
         // It was never implemented in the SDK, and there are no commands responses that expect a
         // command response. This means we will never recieve an InvokeResponse Message in response
-	    // to an InvokeResponse Message that we are sending out. This means that the only response
-	    // we are expecting to receive in responses to an InvokeResponse Message that we are
-	    // sending-out is a status when we are chunking multiple responses. As a result, to satisfy the
-	    // condition that we don't set SuppressResponse to true while also setting
-	    // MoreChunkedMessages to true, we are hardcoding the value to false here.
+        // to an InvokeResponse Message that we are sending out. This means that the only response
+        // we are expecting to receive in responses to an InvokeResponse Message that we are
+        // sending-out is a status when we are chunking multiple responses. As a result, to satisfy the
+        // condition that we don't set SuppressResponse to true while also setting
+        // MoreChunkedMessages to true, we are hardcoding the value to false here.
         mInvokeResponseBuilder.SuppressResponse(/* aSuppressResponse = */ false);
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
 
@@ -256,7 +256,6 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(invokeRequestMessage.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
     return Status::Success;
 }
-
 
 void CommandHandler::Close()
 {
