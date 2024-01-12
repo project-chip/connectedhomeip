@@ -8890,7 +8890,7 @@ PICS:
 
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
-   
+
     #
     # server / features
     #
@@ -8898,7 +8898,7 @@ PICS:
           "Does the device support depending on an On/Off cluster implemented on
           the same endpoint?"
       id: OTCCM.S.F00
-      
+
     #
     # server / attributes
     #
