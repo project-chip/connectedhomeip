@@ -345,41 +345,71 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
     switch (newState)
     {
     case StateEnum::kNotPluggedIn:
-        if (mHwState == StateEnum::kPluggedInNoDemand || mHwState == StateEnum::kPluggedInDemand)
+        switch (mHwState)
         {
+        case StateEnum::kNotPluggedIn:
+            // No change
+            break;
+        case StateEnum::kPluggedInNoDemand:
+        case StateEnum::kPluggedInDemand:
             /* EVSE has been unplugged now */
             mHwState = newState;
             HandleStateMachineEvent(EVSEStateMachineEvent::EVNotDetectedEvent);
+            break;
+
+        default:
+            // invalid value for mHwState
+            ChipLogError(AppServer, "HwSetState newstate(kNotPluggedIn) - Invalid value for mHwState");
+            mHwState = newState; // set it to the new state
+            break;
         }
         break;
 
     case StateEnum::kPluggedInNoDemand:
-        if (mHwState == StateEnum::kNotPluggedIn)
+        switch (mHwState)
         {
+        case StateEnum::kNotPluggedIn:
             /* EV was unplugged, now is plugged in */
             mHwState = newState;
             HandleStateMachineEvent(EVSEStateMachineEvent::EVPluggedInEvent);
-        }
-        else if (mHwState == StateEnum::kPluggedInDemand)
-        {
+            break;
+        case StateEnum::kPluggedInNoDemand:
+            // No change
+            break;
+        case StateEnum::kPluggedInDemand:
             /* EV was plugged in and wanted demand, now doesn't want demand */
             mHwState = newState;
             HandleStateMachineEvent(EVSEStateMachineEvent::EVNoDemandEvent);
+            break;
+        default:
+            // invalid value for mHwState
+            ChipLogError(AppServer, "HwSetState newstate(kNotPluggedIn) - Invalid value for mHwState");
+            mHwState = newState; // set it to the new state
+            break;
         }
         break;
     case StateEnum::kPluggedInDemand:
-        if (mHwState == StateEnum::kNotPluggedIn)
+        switch (mHwState)
         {
+        case StateEnum::kNotPluggedIn:
             /* EV was unplugged, now is plugged in and wants demand */
             mHwState = newState;
             HandleStateMachineEvent(EVSEStateMachineEvent::EVPluggedInEvent);
             HandleStateMachineEvent(EVSEStateMachineEvent::EVDemandEvent);
-        }
-        else if (mHwState == StateEnum::kPluggedInNoDemand)
-        {
+            break;
+        case StateEnum::kPluggedInNoDemand:
             /* EV was plugged in and didn't want demand, now does want demand */
             mHwState = newState;
             HandleStateMachineEvent(EVSEStateMachineEvent::EVDemandEvent);
+            break;
+        case StateEnum::kPluggedInDemand:
+            // No change
+            break;
+        default:
+            // invalid value for mHwState
+            ChipLogError(AppServer, "HwSetState newstate(kNotPluggedIn) - Invalid value for mHwState");
+            mHwState = newState; // set it to the new state
+            break;
         }
         break;
 
