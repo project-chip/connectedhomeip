@@ -29,7 +29,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
 
     # This just tests that the current spec can be parsed without failures
     def test_spec_device_parsing(self):
-        problems, device_types = build_xml_device_types()
+        device_types, problems = build_xml_device_types()
         self.problems += problems
         for id, d in device_types.items():
             print(str(d))
