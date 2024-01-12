@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
