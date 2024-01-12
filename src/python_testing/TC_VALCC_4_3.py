@@ -112,8 +112,6 @@ class TC_VALCC_4_3(MatterBaseTest):
         if is_ts_feature_supported:
             auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
-            print(auto_close_time_dut)
-
             asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
         else:
             logging.info("Test step skipped")
@@ -123,8 +121,6 @@ class TC_VALCC_4_3(MatterBaseTest):
 
         if is_ts_feature_supported:
             defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
-
-            print(auto_close_time_dut)
 
             asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
         else:
