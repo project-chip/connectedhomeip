@@ -36,14 +36,15 @@ class TC_VALCC_4_3(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
-            TestStep(3, "Read UTCTime attribute from TimeSync cluster"),
-            TestStep(4, "Send Open command with duration set to 60"),
+            TestStep(3, "Send Open command with duration set to 60"),
+            TestStep(4, "Read UTCTime attribute from TimeSync cluster"),
             TestStep(5, "Read AutoCloseTime attribute"),
             TestStep(6, "Send Close command"),
             TestStep(7, "Read AutoCloseTime attribute"),
-            TestStep(8, "Read DefaultOpenDuration attribute"),
-            TestStep(9, "Read UTCTime attribute from TimeSync cluster"),
-            TestStep(10, "Send Open command"),
+            TestStep("8a", "Read DefaultOpenDuration attribute"),
+            TestStep("8b", "Write DefaultOpenDuration attribute"),
+            TestStep(9, "Send Open command"),
+            TestStep(10, "Read UTCTime attribute from TimeSync cluster"),
             TestStep(11, "Read AutoCloseTime attribute"),
             TestStep(12, "Send Close command"),
             TestStep(13, "Read AutoCloseTime attribute"),
@@ -71,19 +72,21 @@ class TC_VALCC_4_3(MatterBaseTest):
 
         self.step(3)
         if is_ts_feature_supported:
-            utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
-
-            asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
-        else:
-            logging.info("Test step skipped")
-
-        self.step(4)
-        if is_ts_feature_supported:
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(openDuration=60), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
+        else:
+            logging.info("Test step skipped")
+
+        self.step(4)
+        if is_ts_feature_supported:
+            utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+
+            print(f"TS utcTime - {utcTime}")
+
+            asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
         else:
             logging.info("Test step skipped")
 
@@ -116,7 +119,7 @@ class TC_VALCC_4_3(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        self.step(8)
+        self.step("8a")
         defaultOpenDuration = 0
 
         if is_ts_feature_supported:
@@ -126,10 +129,19 @@ class TC_VALCC_4_3(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
+        self.step("8b")
+        if defaultOpenDuration is NullValue:
+            defaultOpenDuration = 60
+
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
+            asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
+        else:
+            logging.info("Test step skipped")
+
         self.step(9)
         if is_ts_feature_supported:
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(openDuration=60), endpoint=endpoint)
+                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
                 pass
