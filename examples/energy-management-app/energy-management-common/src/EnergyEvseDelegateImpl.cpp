@@ -185,7 +185,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         if (delta > 0)
         {
             /* The timer hasn't expired yet - set a timer to check in the future */
-            ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %d seconds", delta);
+            ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %ld seconds", static_cast<long int>(delta));
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
         }
         else
