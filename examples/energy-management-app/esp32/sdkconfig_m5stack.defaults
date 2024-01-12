@@ -1,0 +1,71 @@
+#
+#    Copyright (c) 2021-2023 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#    Description:
+#      Some useful defaults for the demo app configuration.
+#
+CONFIG_IDF_TARGET="esp32"
+CONFIG_IDF_TARGET_ESP32=y
+CONFIG_DEVICE_TYPE_M5STACK=y
+
+# Default to 921600 baud when flashing and monitoring device
+CONFIG_ESPTOOLPY_BAUD_921600B=y
+CONFIG_ESPTOOLPY_BAUD=921600
+CONFIG_ESPTOOLPY_COMPRESSED=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD_115200B=y
+CONFIG_ESPTOOLPY_MONITOR_BAUD=115200
+
+#enable BT
+CONFIG_BT_ENABLED=y
+CONFIG_BT_NIMBLE_ENABLED=y
+
+#disable BT connection reattempt
+CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
+
+#enable lwip ipv6 autoconfig
+CONFIG_LWIP_IPV6_AUTOCONFIG=y
+
+#enable debug shell
+CONFIG_ENABLE_CHIP_SHELL=y
+
+# Use a custom partition table
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+#enable lwIP route hooks
+CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
+CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+
+# Main task needs a bit more stack than the default
+# default is 3584, bump this up to 5k.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=5120
+
+# Serial Flasher config
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# Disable softap support by default
+CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+# This example uses the older version of RMT driver to work with both
+# idf-v4.4.3 and idf-v5.0, so suppressing the warnings by setting below option
+CONFIG_RMT_SUPPRESS_DEPRECATE_WARN=y
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Optimize IRAM
+CONFIG_FREERTOS_PLACE_FUNCTIONS_INTO_FLASH=y
+

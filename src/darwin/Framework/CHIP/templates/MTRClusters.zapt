@@ -25,14 +25,20 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "commandDecl"}}
 {{#if (isSupported cluster command=command)}}
 - (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#if (and (isStrEqual command "KeySetReadAllIndices")
            (isStrEqual cluster "GroupKeyManagement"))}}
 {{availability cluster command=command minimalRelease="Fall 2023"}};
 {{else}}
+{{#if (isInConfigList
+       (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+       "LegacyCommandsWithOnlyOptionalArguments")}}
+{{availability cluster command=command minimalRelease="Early 2024"}};
+{{else}}
 {{availability cluster command=command minimalRelease="First major API revamp"}};
+{{/if}}
 {{/if}}
 {{/unless}}
 {{/if}}
@@ -113,11 +119,16 @@ NS_ASSUME_NONNULL_BEGIN
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
            (isSupported cluster command=command))}}
 - (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:expectedValues:expectedValueInterval:completion:")}};
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
+{{! No need for these backwards-compat APIs for commands that never shipped them. }}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
 - (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithExpectedValues:expectedValueInterval:completion:")}};
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/if}}

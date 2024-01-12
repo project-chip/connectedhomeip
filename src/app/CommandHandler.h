@@ -209,12 +209,13 @@ public:
 
     /**
      * Checks that all CommandDataIB within InvokeRequests satisfy the spec's general
-     * constraints for CommandDataIB.
+     * constraints for CommandDataIB. Additionally checks that InvokeRequestMessage is
+     * properly formatted.
      *
      * This also builds a registry that to ensure that all commands can be responded
      * to with the data required as per spec.
      */
-    CHIP_ERROR ValidateInvokeRequestsAndBuildRegistry(TLV::TLVReader & invokeRequestsReader);
+    CHIP_ERROR ValidateInvokeRequestMessageAndBuildRegistry(InvokeRequestMessage::Parser & invokeRequestMessage);
 
     /**
      * Adds the given command status and returns any failures in adding statuses (e.g. out

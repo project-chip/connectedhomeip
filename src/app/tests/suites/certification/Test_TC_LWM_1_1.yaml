@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -40,7 +42,7 @@ tests:
               type: int16u
 
     - label:
-          "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
+          "Step 3:TH reads from the DUT the FeatureMap attribute., bit 0: SHALL
           be 1 if and only if LWM.S.F00(DEPONOFF)"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -78,7 +80,8 @@ tests:
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: Read the optional attribute(StartUpMode) in AttributeList"
+          "Step 4b: TH reads the optional attribute(StartUpMode) in
+          AttributeList"
       PICS: LWM.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -88,7 +91,7 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4c: Read the Feature dependent attribute(DEPONOFF) in
+          "Step 4c: TH reads the Feature dependent attribute(DEPONOFF) in
           AttributeList"
       PICS: LWM.S.F00
       command: "readAttribute"

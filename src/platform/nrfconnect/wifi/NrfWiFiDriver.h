@@ -86,6 +86,7 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+    CHIP_ERROR GetSupportedWiFiBands(Span<WiFiBand> & bands) override;
 
     static NrfWiFiDriver & Instance()
     {
