@@ -51,12 +51,16 @@ public:
 
     /**
      * Get the list of supported operational phases.
-     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
+     * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
+     *
+     * If CHIP_ERROR_NOT_FOUND is returned for index 0, that indicates that the PhaseList attribute is null
+     * (there are no phases defined at all).
+     *
      * @param index The index of the phase, with 0 representing the first phase.
-     * @param operationalPhase  The GenericOperationalPhase is filled.
+     * @param operationalPhase  The MutableCharSpan is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
 
     // command callback
     /**
@@ -103,13 +107,7 @@ private:
     };
 
     app::DataModel::List<const GenericOperationalState> mOperationalStateList = Span<const GenericOperationalState>(rvcOpStateList);
-
-    const GenericOperationalPhase opPhaseList[1] = {
-        // Phase List is null
-        GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-    };
-
-    Span<const GenericOperationalPhase> mOperationalPhaseList = Span<const GenericOperationalPhase>(opPhaseList);
+    const Span<const CharSpan> mOperationalPhaseList;
 };
 
 OperationalState::Instance* GetInstance();
