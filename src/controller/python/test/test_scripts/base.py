@@ -29,7 +29,6 @@ import sys
 import threading
 import time
 from dataclasses import dataclass
-from ecdsa import NIST256p
 from typing import Any
 
 import chip.CertificateAuthority
@@ -44,6 +43,7 @@ from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
 from chip.utils import CommissioningBuildingBlocks
 from cirque_restart_remote_device import restartRemoteDevice
+from ecdsa import NIST256p
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
