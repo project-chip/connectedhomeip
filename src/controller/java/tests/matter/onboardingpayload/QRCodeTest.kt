@@ -19,26 +19,6 @@
 package matter.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
-import matter.onboardingpayload.CommissioningFlow
-import matter.onboardingpayload.DiscoveryCapability
-import matter.onboardingpayload.OnboardingPayload
-import matter.onboardingpayload.OnboardingPayloadParser
-import matter.onboardingpayload.OptionalQRCodeInfo
-import matter.onboardingpayload.OptionalQRCodeInfoExtension
-import matter.onboardingpayload.OptionalQRCodeInfoType
-import matter.onboardingpayload.QRCodeOnboardingPayloadGenerator
-import matter.onboardingpayload.QRCodeOnboardingPayloadParser
-import matter.onboardingpayload.base38Decode
-import matter.onboardingpayload.kCommissioningFlowFieldLengthInBits
-import matter.onboardingpayload.kPaddingFieldLengthInBits
-import matter.onboardingpayload.kPayloadDiscriminatorFieldLengthInBits
-import matter.onboardingpayload.kProductIDFieldLengthInBits
-import matter.onboardingpayload.kQRCodePrefix
-import matter.onboardingpayload.kRendezvousInfoFieldLengthInBits
-import matter.onboardingpayload.kSetupPINCodeFieldLengthInBits
-import matter.onboardingpayload.kTotalPayloadDataSizeInBits
-import matter.onboardingpayload.kVendorIDFieldLengthInBits
-import matter.onboardingpayload.kVersionFieldLengthInBits
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
