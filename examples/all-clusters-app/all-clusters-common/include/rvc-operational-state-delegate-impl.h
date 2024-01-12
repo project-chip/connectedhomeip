@@ -44,15 +44,9 @@ private:
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
     };
 
-    const OperationalState::GenericOperationalPhase rvcOpPhaseList[1] = {
-        // Phase List is null
-        OperationalState::GenericOperationalPhase(DataModel::Nullable<CharSpan>()),
-    };
-
     Span<const OperationalState::GenericOperationalState> mOperationalStateList =
         Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
-    Span<const OperationalState::GenericOperationalPhase> mOperationalPhaseList =
-        Span<const OperationalState::GenericOperationalPhase>(rvcOpPhaseList);
+    Span<const CharSpan> mOperationalPhaseList;
 
 public:
     RvcOperationalStateDelegate() {}
@@ -81,7 +75,7 @@ public:
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, OperationalState::GenericOperationalPhase & operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
 
     // command callback
     /**
