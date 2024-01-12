@@ -120,7 +120,6 @@ RvcOperationalState::Instance * RvcOperationalState::GetRvcOperationalStateInsta
     return gRvcOperationalStateInstance;
 }
 
-
 void RvcOperationalState::Shutdown()
 {
     if (gRvcOperationalStateInstance != nullptr)
