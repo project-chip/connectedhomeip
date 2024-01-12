@@ -31,12 +31,6 @@ logger = logging.getLogger(__name__)
 
 class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
-    async def write_user_max_charge(self, endpoint, user_max_charge):
-        result = await self.default_controller.WriteAttribute(self.dut_node_id,
-                                                              [(endpoint,
-                                                               Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent(user_max_charge))])
-        asserts.assert_equal(result[0].Status, Status.Success, "UserMaximumChargeCurrent write failed")
-
     def desc_TC_EEVSE_2_2(self) -> str:
         """Returns a description of this test"""
         return "5.1.3. [TC-EEVSE-2.2] Primary functionality with DUT as Server"
@@ -106,7 +100,9 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
         events_callback = EventChangeCallback(Clusters.EnergyEvse)
-        await events_callback.start(self.default_controller, self.dut_node_id)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    self.matter_test_config.endpoint)
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
@@ -135,7 +131,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4b")
         # Save Session ID for later and check it against the value in the event
-        session_id = await self.read_evse_attribute_expect_success(endpoint=1, attribute="SessionID")
+        session_id = await self.read_evse_attribute_expect_success(attribute="SessionID")
         self.validate_ev_connected_event(event_data, session_id)
 
         self.step("5")
@@ -167,7 +163,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
 
         self.step("6e")
-        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute="CircuitCapacity")
+        circuit_capacity = await self.read_evse_attribute_expect_success(attribute="CircuitCapacity")
         expected_max_charge = min(max_charge_current, circuit_capacity)
         await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
 
@@ -192,7 +188,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         min_charge_current = 6000
         max_charge_current = 12000
 
-        await self.send_enable_charge_command(endpoint=1, charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
+        await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
         event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("8a")
@@ -208,7 +204,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
 
         self.step("8e")
-        circuit_capacity = await self.read_evse_attribute_expect_success(endpoint=1, attribute="CircuitCapacity")
+        circuit_capacity = await self.read_evse_attribute_expect_success(attribute="CircuitCapacity")
         expected_max_charge = min(max_charge_current, circuit_capacity)
         await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
 
@@ -217,7 +213,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         # This will only work if the optional UserMaximumChargeCurrent attribute is supported
-        supported_attributes = await self.get_supported_energy_evse_attributes(endpoint=1)
+        supported_attributes = await self.get_supported_energy_evse_attributes()
         if Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent.attribute_id in supported_attributes:
             logging.info("UserMaximumChargeCurrent is supported...")
             user_max_charge_current = 6000
@@ -243,7 +239,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("11")
         await self.send_test_event_trigger_charge_demand()
         # Check we get EnergyTransferStarted again
-        await self.send_enable_charge_command(endpoint=1, charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
+        await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
         event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
         self.validate_energy_transfer_started_event(event_data, session_id, expected_state, expected_max_charge)
 
@@ -275,7 +271,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("SessionID", session_id)
 
         self.step("13d")
-        session_duration = await self.read_evse_attribute_expect_success(endpoint=1, attribute="SessionDuration")
+        session_duration = await self.read_evse_attribute_expect_success(attribute="SessionDuration")
         asserts.assert_greater_equal(session_duration, charging_duration,
                                      f"Unexpected 'SessionDuration' value - expected >= {charging_duration}, was {session_duration}")
 

@@ -69,7 +69,9 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
         events_callback = EventChangeCallback(Clusters.EnergyEvse)
-        await events_callback.start(self.default_controller, self.dut_node_id)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    self.matter_test_config.endpoint)
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
@@ -90,7 +92,7 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
         charge_until = NullValue
         min_charge_current = 6000
         max_charge_current = 60000
-        await self.send_enable_charge_command(endpoint=1, charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
+        await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
 
         self.step("4a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kNotPluggedIn)

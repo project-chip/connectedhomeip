@@ -32,9 +32,9 @@ class EventChangeCallback:
         self._q = queue.Queue()
         self._expected_cluster = expected_cluster
 
-    async def start(self, dev_ctrl, nodeid, endpoint: int = 1):
-        self._subscription = await dev_ctrl.ReadEvent(nodeid,
-                                                      events=[(endpoint, self._expected_cluster, 1)], reportInterval=(1, 5),
+    async def start(self, dev_ctrl, node_id: int, endpoint: int):
+        self._subscription = await dev_ctrl.ReadEvent(node_id,
+                                                      events=[(endpoint, self._expected_cluster, True)], reportInterval=(1, 5),
                                                       fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
 
@@ -57,20 +57,28 @@ class EventChangeCallback:
 
 class EEVSEBaseTestHelper:
 
-    async def read_evse_attribute_expect_success(self, endpoint, attribute):
+    async def read_evse_attribute_expect_success(self, endpoint: int = None, attribute: str = ""):
         full_attr = getattr(Clusters.EnergyEvse.Attributes, attribute)
         cluster = Clusters.Objects.EnergyEvse
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=full_attr)
 
-    async def check_evse_attribute(self, attribute, expected_value, endpoint: int = 1):
+    async def check_evse_attribute(self, attribute, expected_value, endpoint: int = None):
         value = await self.read_evse_attribute_expect_success(endpoint=endpoint, attribute=attribute)
         asserts.assert_equal(value, expected_value,
                              f"Unexpected '{attribute}' value - expected {expected_value}, was {value}")
 
-    async def get_supported_energy_evse_attributes(self, endpoint):
+    async def get_supported_energy_evse_attributes(self, endpoint: int = None):
         return await self.read_evse_attribute_expect_success(endpoint, "AttributeList")
 
-    async def send_enable_charge_command(self, endpoint: int = 1, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
+    async def write_user_max_charge(self, endpoint: int = None, user_max_charge: int = 0):
+        if endpoint is None:
+            endpoint = self.matter_test_config.endpoint
+        result = await self.default_controller.WriteAttribute(self.dut_node_id,
+                                                              [(endpoint,
+                                                               Clusters.EnergyEvse.Attributes.UserMaximumChargeCurrent(user_max_charge))])
+        asserts.assert_equal(result[0].Status, Status.Success, "UserMaximumChargeCurrent write failed")
+
+    async def send_enable_charge_command(self, endpoint: int = None, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                          min_charge: int = None, max_charge: int = None, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
@@ -83,7 +91,7 @@ class EEVSEBaseTestHelper:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_disable_command(self, endpoint: int = 1, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
+    async def send_disable_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.Disable(),
                                        endpoint=endpoint,
@@ -92,7 +100,7 @@ class EEVSEBaseTestHelper:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_start_diagnostics_command(self, endpoint: int = 1, timedRequestTimeoutMs: int = 3000,
+    async def send_start_diagnostics_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000,
                                              expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.StartDiagnostics(),
@@ -102,8 +110,18 @@ class EEVSEBaseTestHelper:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    async def send_test_event_triggers(self, enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000000):
+    async def send_test_event_triggers(self, enableKey: bytes = None, eventTrigger=0x0099000000000000):
+        # get the test event enable key or assume the default
+        # This can be passed in on command line using
+        #    --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+        if enableKey is None:
+            if 'enableKey' not in self.matter_test_config.global_test_params:
+                enableKey = bytes([b for b in range(16)])
+            else:
+                enableKey = self.matter_test_config.global_test_params['enableKey']
+
         try:
+            # GeneralDiagnosics cluster is meant to be on Endpoint 0 (Root)
             await self.send_single_cmd(endpoint=0,
                                        cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
                                            enableKey,
@@ -116,6 +134,7 @@ class EEVSEBaseTestHelper:
     async def check_test_event_triggers_enabled(self):
         full_attr = Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
         cluster = Clusters.Objects.GeneralDiagnostics
+        # GeneralDiagnosics cluster is meant to be on Endpoint 0 (Root)
         test_event_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=cluster, attribute=full_attr)
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 

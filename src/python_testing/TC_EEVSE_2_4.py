@@ -75,7 +75,9 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
         events_callback = EventChangeCallback(Clusters.EnergyEvse)
-        await events_callback.start(self.default_controller, self.dut_node_id)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    self.matter_test_config.endpoint)
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
@@ -104,14 +106,14 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("4b")
         # Save Session ID for later and check it against the value in the event
-        session_id = await self.read_evse_attribute_expect_success(endpoint=1, attribute="SessionID")
+        session_id = await self.read_evse_attribute_expect_success(attribute="SessionID")
         self.validate_ev_connected_event(event_data, session_id)
 
         self.step("5")
         charge_until = NullValue
         min_charge_current = 6000
         max_charge_current = 60000
-        await self.send_enable_charge_command(endpoint=1, charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
+        await self.send_enable_charge_command(charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
 
         self.step("6")
         await self.send_test_event_trigger_charge_demand()
