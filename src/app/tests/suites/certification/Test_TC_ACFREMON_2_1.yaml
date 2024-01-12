@@ -55,7 +55,7 @@ tests:
               maxValue: 1
 
     - label: "Step 4a: TH reads from the DUT the ChangeIndication attribute."
-      PICS: " ACFREMON.S.A0002 && !ACFREMON.S.F01 "
+      PICS: ACFREMON.S.A0002 && !ACFREMON.S.F01
       command: "readAttribute"
       attribute: "ChangeIndication"
       response:
