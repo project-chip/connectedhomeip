@@ -2449,7 +2449,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -2880,6 +2880,9 @@ cluster IcdManagement = 70 {
     fabric_idx fabricIndex = 254;
   }
 
+  critical event OnTransitionToActiveMode = 0 {
+  }
+
   readonly attribute int32u idleModeDuration = 0;
   readonly attribute int32u activeModeDuration = 1;
   readonly attribute int16u activeModeThreshold = 2;
@@ -2925,7 +2928,7 @@ cluster IcdManagement = 70 {
 
 /** This cluster supports creating a simple timer functionality. */
 provisional cluster Timer = 71 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum TimerStatusEnum : enum8 {
     kRunning = 0;
@@ -3095,7 +3098,7 @@ provisional cluster OvenMode = 73 {
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
 cluster LaundryDryerControls = 74 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum DrynessLevelEnum : enum8 {
     kLow = 0;
@@ -3254,9 +3257,9 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+/** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum NumberOfRinsesEnum : enum8 {
     kNone = 0;
@@ -3761,7 +3764,7 @@ provisional cluster MicrowaveOvenControl = 95 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;
@@ -3827,7 +3830,7 @@ cluster OperationalState = 96 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kFailedToFindChargingDock = 64;
@@ -3997,14 +4000,8 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 }
 
 /** This cluster is used to configure a boolean sensor. */
-provisional cluster BooleanSensorConfiguration = 128 {
+provisional cluster BooleanStateConfiguration = 128 {
   revision 1;
-
-  enum SensitivityEnum : enum8 {
-    kHigh = 0;
-    kStandard = 1;
-    kLow = 2;
-  }
 
   bitmap AlarmModeBitmap : bitmap8 {
     kVisual = 0x1;
@@ -4018,18 +4015,27 @@ provisional cluster BooleanSensorConfiguration = 128 {
     kSensitivityLevel = 0x8;
   }
 
+  bitmap SensorFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+  }
+
   info event AlarmsStateChanged = 0 {
     AlarmModeBitmap alarmsActive = 0;
     optional AlarmModeBitmap alarmsSuppressed = 1;
   }
 
   info event SensorFault = 1 {
+    SensorFaultBitmap sensorFault = 0;
   }
 
-  attribute optional SensitivityEnum sensitivityLevel = 0;
-  readonly attribute optional AlarmModeBitmap alarmsActive = 1;
-  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 2;
-  attribute optional AlarmModeBitmap alarmsEnabled = 3;
+  attribute optional int8u currentSensitivityLevel = 0;
+  readonly attribute optional int8u supportedSensitivityLevels = 1;
+  readonly attribute optional int8u defaultSensitivityLevel = 2;
+  readonly attribute optional AlarmModeBitmap alarmsActive = 3;
+  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 4;
+  readonly attribute optional AlarmModeBitmap alarmsEnabled = 5;
+  readonly attribute optional AlarmModeBitmap alarmsSupported = 6;
+  readonly attribute optional SensorFaultBitmap sensorFault = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4037,21 +4043,32 @@ provisional cluster BooleanSensorConfiguration = 128 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct SuppressRequestRequest {
+  request struct SuppressAlarmRequest {
     AlarmModeBitmap alarmsToSuppress = 0;
   }
 
-  /** This command is used to suppress the specified alarm. */
-  command SuppressRequest(SuppressRequestRequest): DefaultSuccess = 0;
+  request struct EnableDisableAlarmRequest {
+    AlarmModeBitmap alarmsToEnableDisable = 0;
+  }
+
+  /** This command is used to suppress the specified alarm mode. */
+  command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
+  /** This command is used to enable or disable the specified alarm mode. */
+  command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
 }
 
 /** This cluster is used to configure a valve. */
 provisional cluster ValveConfigurationAndControl = 129 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kFailureDueToFault = 2;
+  }
+
   enum ValveStateEnum : enum8 {
-    kOpen = 0;
-    kClosed = 1;
+    kClosed = 0;
+    kOpen = 1;
+    kTransitioning = 2;
   }
 
   bitmap Feature : bitmap32 {
@@ -4063,26 +4080,31 @@ provisional cluster ValveConfigurationAndControl = 129 {
     kGeneralFault = 0x1;
     kBlocked = 0x2;
     kLeaking = 0x4;
+    kNotConnected = 0x8;
+    kShortCircuit = 0x10;
+    kCurrentExceeded = 0x20;
   }
 
   info event ValveStateChanged = 0 {
     ValveStateEnum valveState = 0;
+    optional percent valveLevel = 1;
   }
 
   info event ValveFault = 1 {
     ValveFaultBitmap valveFault = 0;
   }
 
-  attribute access(write: manage) nullable elapsed_s openDuration = 0;
-  readonly attribute optional nullable epoch_us autoCloseTime = 1;
-  readonly attribute optional nullable elapsed_s remainingDuration = 2;
-  readonly attribute nullable ValveStateEnum currentState = 3;
-  readonly attribute nullable ValveStateEnum targetState = 4;
-  attribute access(write: manage) optional ValveStateEnum startUpState = 5;
+  readonly attribute nullable elapsed_s openDuration = 0;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
+  readonly attribute optional nullable epoch_us autoCloseTime = 2;
+  readonly attribute nullable elapsed_s remainingDuration = 3;
+  readonly attribute nullable ValveStateEnum currentState = 4;
+  readonly attribute nullable ValveStateEnum targetState = 5;
   readonly attribute optional nullable percent currentLevel = 6;
   readonly attribute optional nullable percent targetLevel = 7;
-  attribute access(write: manage) optional nullable percent openLevel = 8;
+  attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute optional int8u levelStep = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4091,20 +4113,14 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OpenRequest {
-    optional elapsed_s openDuration = 0;
+    optional nullable elapsed_s openDuration = 0;
+    optional percent targetLevel = 1;
   }
 
-  request struct SetLevelRequest {
-    percent level = 0;
-    optional elapsed_s openDuration = 1;
-  }
-
-  /** This command is used to set the valve to its fully open position. */
+  /** This command is used to set the valve to its open position. */
   command Open(OpenRequest): DefaultSuccess = 0;
-  /** This command is used to set the valve to its fully closed position. */
+  /** This command is used to set the valve to its closed position. */
   command Close(): DefaultSuccess = 1;
-  /** This command is used to set the valve to a specific level. */
-  command SetLevel(SetLevelRequest): DefaultSuccess = 2;
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
@@ -4384,7 +4400,7 @@ provisional cluster DemandResponseLoadControl = 150 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
@@ -4451,13 +4467,13 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s minPauseDuration = 6;
     elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
-    optional int64s nominalPower = 9;
-    optional int64s minPower = 10;
-    optional int64s maxPower = 11;
-    optional int64s nominalEnergy = 12;
+    optional power_mw nominalPower = 9;
+    optional power_mw minPower = 10;
+    optional power_mw maxPower = 11;
+    optional energy_mwh nominalEnergy = 12;
     optional CostStruct costs[] = 13;
-    optional int64s minPowerAdjustment = 14;
-    optional int64s maxPowerAdjustment = 15;
+    optional power_mw minPowerAdjustment = 14;
+    optional power_mw maxPowerAdjustment = 15;
     optional elapsed_s minDurationAdjustment = 16;
     optional elapsed_s maxDurationAdjustment = 17;
   }
@@ -4476,21 +4492,21 @@ provisional cluster DeviceEnergyManagement = 152 {
   struct ConstraintsStruct {
     epoch_s startTime = 0;
     elapsed_s duration = 1;
-    optional int64s nominalPower = 2;
-    optional int64s maximumEnergy = 3;
+    optional power_mw nominalPower = 2;
+    optional energy_mwh maximumEnergy = 3;
     optional int8s loadControl = 4;
   }
 
   struct PowerAdjustStruct {
-    int64s minPower = 0;
-    int64s maxPower = 1;
+    power_mw minPower = 0;
+    power_mw maxPower = 1;
     elapsed_s minDuration = 2;
     elapsed_s maxDuration = 3;
   }
 
   struct SlotAdjustmentStruct {
     int8u slotIndex = 0;
-    int64s nominalPower = 1;
+    power_mw nominalPower = 1;
     elapsed_s duration = 2;
   }
 
@@ -4500,7 +4516,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   info event PowerAdjustEnd = 1 {
     CauseEnum cause = 0;
     elapsed_s duration = 1;
-    int64s energyUse = 2;
+    energy_mwh energyUse = 2;
   }
 
   info event Paused = 2 {
@@ -4512,8 +4528,8 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute ESATypeEnum ESAType = 0;
   readonly attribute boolean ESACanGenerate = 1;
   readonly attribute ESAStateEnum ESAState = 2;
-  readonly attribute int64s absMinPower = 3;
-  readonly attribute int64s absMaxPower = 4;
+  readonly attribute power_mw absMinPower = 3;
+  readonly attribute power_mw absMaxPower = 4;
   readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -4524,7 +4540,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct PowerAdjustRequestRequest {
-    int64s power = 0;
+    power_mw power = 0;
     elapsed_s duration = 1;
   }
 
@@ -4563,7 +4579,7 @@ provisional cluster DeviceEnergyManagement = 152 {
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 provisional cluster EnergyEvse = 153 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum EnergyTransferStoppedReasonEnum : enum8 {
     kEVStopped = 0;
@@ -4742,6 +4758,40 @@ provisional cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
+/** This cluster provides an interface to specify preferences for how devices should consume energy. */
+cluster EnergyPreference = 155 {
+  revision 1; // NOTE: Default/not specifically set
+
+  enum EnergyPriorityEnum : enum8 {
+    kComfort = 0;
+    kSpeed = 1;
+    kEfficiency = 2;
+    kWaterConsumption = 3;
+  }
+
+  bitmap Feature : bitmap32 {
+    kEnergyBalance = 0x1;
+    kLowPowerModeSensitivity = 0x2;
+  }
+
+  struct BalanceStruct {
+    percent step = 0;
+    optional char_string<64> label = 1;
+  }
+
+  readonly attribute optional BalanceStruct energyBalances[] = 0;
+  attribute optional int8u currentEnergyBalance = 1;
+  readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
+  readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
+  attribute optional int8u currentLowPowerModeSensitivity = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** An interface to a generic way to secure a door */
 cluster DoorLock = 257 {
   revision 7;
@@ -4770,6 +4820,9 @@ cluster DoorLock = 257 {
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
+    kAliroCredentialIssuerKey = 6;
+    kAliroEvictableEndpointKey = 7;
+    kAliroNonEvictableEndpointKey = 8;
   }
 
   enum DataOperationTypeEnum : enum8 {
@@ -4882,6 +4935,9 @@ cluster DoorLock = 257 {
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
+    kAliroCredentialIssuerKey = 11;
+    kAliroEvictableEndpointKey = 12;
+    kAliroNonEvictableEndpointKey = 13;
   }
 
   enum LockOperationTypeEnum : enum8 {
@@ -4919,6 +4975,7 @@ cluster DoorLock = 257 {
     kRemote = 7;
     kRFID = 8;
     kBiometric = 9;
+    kAliro = 10;
   }
 
   enum UserStatusEnum : enum8 {
@@ -5079,6 +5136,8 @@ cluster DoorLock = 257 {
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
     kUnbolt = 0x1000;
+    kAliroProvisioning = 0x2000;
+    kAliroBLEUWB = 0x4000;
   }
 
   struct CredentialStruct {
@@ -5159,6 +5218,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
+  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5324,6 +5392,13 @@ cluster DoorLock = 257 {
     optional octet_string PINCode = 0;
   }
 
+  request struct SetAliroReaderConfigRequest {
+    octet_string<32> signingKey = 0;
+    octet_string<65> verificationKey = 1;
+    octet_string<16> groupIdentifier = 2;
+    optional octet_string<16> groupResolvingKey = 3;
+  }
+
   /** This command causes the lock device to lock the door. */
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   /** This command causes the lock device to unlock the door. */
@@ -5362,6 +5437,10 @@ cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   /** This command causes the lock device to unlock the door without pulling the latch. */
   timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
+  /** This command communicates an Aliro Reader configuration to the lock. */
+  timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
+  /** This command clears an existing Aliro Reader configuration for the lock. */
+  timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -7267,7 +7346,7 @@ cluster Channel = 1284 {
   }
 
   response struct ProgramGuideResponse = 5 {
-    int16s channelPagingStruct = 0;
+    ChannelPagingStruct paging = 0;
     ProgramStruct programList[] = 1;
   }
 
@@ -8136,9 +8215,9 @@ cluster ContentAppObserver = 1296 {
   }
 
   response struct ContentAppMessageResponse = 1 {
-    optional StatusEnum status = 0;
-    char_string data = 1;
-    char_string encodingHint = 2;
+    StatusEnum status = 0;
+    optional char_string data = 1;
+    optional char_string encodingHint = 2;
   }
 
   /** Upon receipt, the data field MAY be parsed and interpreted. Message encoding is specific to the Content App. A Content App MAY when possible read attributes from the Basic Information Cluster on the Observer and use this to determine the Message encoding. */
@@ -8647,6 +8726,10 @@ internal cluster UnitTesting = 4294048773 {
     NestedStructList arg1[] = 0;
   }
 
+  response struct TestBatchHelperResponse = 12 {
+    octet_string<800> buffer = 0;
+  }
+
   request struct TestListInt8UReverseRequestRequest {
     int8u arg1[] = 0;
   }
@@ -8691,6 +8774,18 @@ internal cluster UnitTesting = 4294048773 {
 
   request struct TestEmitTestFabricScopedEventRequestRequest {
     int8u arg1 = 0;
+  }
+
+  request struct TestBatchHelperRequestRequest {
+    int16u sleepBeforeResponseTimeMs = 0;
+    int16u sizeOfResponseBuffer = 1;
+    int8u fillCharacter = 2;
+  }
+
+  request struct TestSecondBatchHelperRequestRequest {
+    int16u sleepBeforeResponseTimeMs = 0;
+    int16u sizeOfResponseBuffer = 1;
+    int8u fillCharacter = 2;
   }
 
   /** Simple command without any parameters and without a specific response */
@@ -8758,6 +8853,10 @@ internal cluster UnitTesting = 4294048773 {
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
   /** Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response. */
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
+  /** Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
+  command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
+  /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
+  command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */

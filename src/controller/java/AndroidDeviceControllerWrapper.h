@@ -24,6 +24,7 @@
 
 #include <jni.h>
 
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <controller/CHIPDeviceController.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
@@ -47,6 +48,8 @@
 #include "OTAProviderDelegateBridge.h"
 #endif
 
+constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen =
+    128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -88,6 +91,11 @@ public:
     CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
 
     /**
+     * Convert ICD Registration Infomations from Java, and apply them to the commissioning parameters object.
+     */
+    CHIP_ERROR ApplyICDRegistrationInfo(chip::Controller::CommissioningParameters & params, jobject icdRegistrationInfo);
+
+    /**
      * Update the CommissioningParameters used by the active device commissioner
      */
     CHIP_ERROR UpdateCommissioningParameters(const chip::Controller::CommissioningParameters & params);
@@ -103,6 +111,8 @@ public:
     void OnScanNetworksSuccess(
         const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse) override;
     void OnScanNetworksFailure(CHIP_ERROR error) override;
+    void OnICDRegistrationInfoRequired() override;
+    void OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter) override;
 
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
@@ -198,6 +208,8 @@ public:
 
     CHIP_ERROR FinishOTAProvider();
 
+    chip::app::DefaultICDClientStorage * getICDClientStorage() { return &mICDClientStorage; }
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
@@ -209,6 +221,8 @@ private:
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
     // TODO: This may need to be injected as a SessionKeystore*
     chip::Crypto::RawKeySessionKeystore mSessionKeystore;
+
+    chip::app::DefaultICDClientStorage mICDClientStorage;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
@@ -242,6 +256,11 @@ private:
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER
     OTAProviderDelegateBridge * mOtaProviderBridge = nullptr;
 #endif
+    bool mDeviceIsICD = false;
+    uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    char mUserActiveModeTriggerInstructionBuffer[kUserActiveModeTriggerInstructionBufferLen];
+    chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
+    chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

@@ -17,6 +17,7 @@
  */
 package matter.controller
 
+import chip.devicecontroller.ICDDeviceInfo
 import java.io.Closeable
 
 /** Controller interface for interacting with a CHIP device. */
@@ -57,6 +58,15 @@ interface MatterController : Closeable, InteractionClient {
 
     /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
     fun onOpCSRGenerationComplete(csr: ByteArray)
+
+    /**
+     * Notifies when the ICD registration information (ICD symmetric key, check-in node ID and
+     * monitored subject) is required.
+     */
+    fun onICDRegistrationInfoRequired()
+
+    /** Notifies when the registration flow for the ICD completes. */
+    fun onICDRegistrationComplete(errorCode: Int, icdDeviceInfo: ICDDeviceInfo)
   }
 
   /**

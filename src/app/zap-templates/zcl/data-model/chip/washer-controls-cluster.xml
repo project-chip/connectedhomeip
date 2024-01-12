@@ -38,9 +38,9 @@ limitations under the License.
     <define>LAUNDRY_WASHER_CONTROLS_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <description>This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine.</description>
+    <description>This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.</description>
 
-    <globalAttribute side="server" code="0xFFFD" value="1" />
+    <globalAttribute side="either" code="0xFFFD" value="1" />
 
     <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="array" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
     <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="int8u"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>

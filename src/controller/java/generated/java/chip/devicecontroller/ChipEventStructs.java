@@ -449,6 +449,34 @@ public static class BasicInformationClusterStartUpEvent {
     return output.toString();
   }
 }
+public static class BasicInformationClusterShutDownEvent {
+
+  public BasicInformationClusterShutDownEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static BasicInformationClusterShutDownEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new BasicInformationClusterShutDownEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BasicInformationClusterShutDownEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class BasicInformationClusterLeaveEvent {
   public Integer fabricIndex;
   private static final long FABRIC_INDEX_ID = 0L;
@@ -1532,6 +1560,34 @@ public static class WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
     return output.toString();
   }
 }
+public static class TimeSynchronizationClusterDSTTableEmptyEvent {
+
+  public TimeSynchronizationClusterDSTTableEmptyEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static TimeSynchronizationClusterDSTTableEmptyEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new TimeSynchronizationClusterDSTTableEmptyEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TimeSynchronizationClusterDSTTableEmptyEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TimeSynchronizationClusterDSTStatusEvent {
   public Boolean DSTOffsetActive;
   private static final long D_S_T_OFFSET_ACTIVE_ID = 0L;
@@ -1639,6 +1695,62 @@ public static class TimeSynchronizationClusterTimeZoneStatusEvent {
     return output.toString();
   }
 }
+public static class TimeSynchronizationClusterTimeFailureEvent {
+
+  public TimeSynchronizationClusterTimeFailureEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static TimeSynchronizationClusterTimeFailureEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new TimeSynchronizationClusterTimeFailureEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TimeSynchronizationClusterTimeFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class TimeSynchronizationClusterMissingTrustedTimeSourceEvent {
+
+  public TimeSynchronizationClusterMissingTrustedTimeSourceEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static TimeSynchronizationClusterMissingTrustedTimeSourceEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new TimeSynchronizationClusterMissingTrustedTimeSourceEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("TimeSynchronizationClusterMissingTrustedTimeSourceEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class BridgedDeviceBasicInformationClusterStartUpEvent {
   public Long softwareVersion;
   private static final long SOFTWARE_VERSION_ID = 0L;
@@ -1681,6 +1793,62 @@ public static class BridgedDeviceBasicInformationClusterStartUpEvent {
     output.append("\tsoftwareVersion: ");
     output.append(softwareVersion);
     output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class BridgedDeviceBasicInformationClusterShutDownEvent {
+
+  public BridgedDeviceBasicInformationClusterShutDownEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static BridgedDeviceBasicInformationClusterShutDownEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new BridgedDeviceBasicInformationClusterShutDownEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicInformationClusterShutDownEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class BridgedDeviceBasicInformationClusterLeaveEvent {
+
+  public BridgedDeviceBasicInformationClusterLeaveEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static BridgedDeviceBasicInformationClusterLeaveEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new BridgedDeviceBasicInformationClusterLeaveEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BridgedDeviceBasicInformationClusterLeaveEvent {\n");
     output.append("}\n");
     return output.toString();
   }
@@ -2129,6 +2297,34 @@ public static class BooleanStateClusterStateChangeEvent {
     return output.toString();
   }
 }
+public static class IcdManagementClusterOnTransitionToActiveModeEvent {
+
+  public IcdManagementClusterOnTransitionToActiveModeEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static IcdManagementClusterOnTransitionToActiveModeEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new IcdManagementClusterOnTransitionToActiveModeEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("IcdManagementClusterOnTransitionToActiveModeEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class OvenCavityOperationalStateClusterOperationalErrorEvent {
   public ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState;
   private static final long ERROR_STATE_ID = 0L;
@@ -2480,6 +2676,146 @@ public static class SmokeCoAlarmClusterLowBatteryEvent {
     return output.toString();
   }
 }
+public static class SmokeCoAlarmClusterHardwareFaultEvent {
+
+  public SmokeCoAlarmClusterHardwareFaultEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static SmokeCoAlarmClusterHardwareFaultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new SmokeCoAlarmClusterHardwareFaultEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SmokeCoAlarmClusterHardwareFaultEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SmokeCoAlarmClusterEndOfServiceEvent {
+
+  public SmokeCoAlarmClusterEndOfServiceEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static SmokeCoAlarmClusterEndOfServiceEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new SmokeCoAlarmClusterEndOfServiceEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SmokeCoAlarmClusterEndOfServiceEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SmokeCoAlarmClusterSelfTestCompleteEvent {
+
+  public SmokeCoAlarmClusterSelfTestCompleteEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static SmokeCoAlarmClusterSelfTestCompleteEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new SmokeCoAlarmClusterSelfTestCompleteEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SmokeCoAlarmClusterSelfTestCompleteEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SmokeCoAlarmClusterAlarmMutedEvent {
+
+  public SmokeCoAlarmClusterAlarmMutedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static SmokeCoAlarmClusterAlarmMutedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new SmokeCoAlarmClusterAlarmMutedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SmokeCoAlarmClusterAlarmMutedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SmokeCoAlarmClusterMuteEndedEvent {
+
+  public SmokeCoAlarmClusterMuteEndedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static SmokeCoAlarmClusterMuteEndedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new SmokeCoAlarmClusterMuteEndedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SmokeCoAlarmClusterMuteEndedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class SmokeCoAlarmClusterInterconnectSmokeAlarmEvent {
   public Integer alarmSeverityLevel;
   private static final long ALARM_SEVERITY_LEVEL_ID = 0L;
@@ -2568,6 +2904,34 @@ public static class SmokeCoAlarmClusterInterconnectCOAlarmEvent {
     output.append("\talarmSeverityLevel: ");
     output.append(alarmSeverityLevel);
     output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class SmokeCoAlarmClusterAllClearEvent {
+
+  public SmokeCoAlarmClusterAllClearEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static SmokeCoAlarmClusterAllClearEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new SmokeCoAlarmClusterAllClearEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("SmokeCoAlarmClusterAllClearEvent {\n");
     output.append("}\n");
     return output.toString();
   }
@@ -2907,13 +3271,13 @@ public static class RvcOperationalStateClusterOperationCompletionEvent {
     return output.toString();
   }
 }
-public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+public static class BooleanStateConfigurationClusterAlarmsStateChangedEvent {
   public Integer alarmsActive;
   public Optional<Integer> alarmsSuppressed;
   private static final long ALARMS_ACTIVE_ID = 0L;
   private static final long ALARMS_SUPPRESSED_ID = 1L;
 
-  public BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+  public BooleanStateConfigurationClusterAlarmsStateChangedEvent(
     Integer alarmsActive,
     Optional<Integer> alarmsSuppressed
   ) {
@@ -2929,7 +3293,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
     return new StructType(values);
   }
 
-  public static BooleanSensorConfigurationClusterAlarmsStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
+  public static BooleanStateConfigurationClusterAlarmsStateChangedEvent decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
@@ -2948,7 +3312,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
         }
       }
     }
-    return new BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+    return new BooleanStateConfigurationClusterAlarmsStateChangedEvent(
       alarmsActive,
       alarmsSuppressed
     );
@@ -2957,7 +3321,7 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n");
+    output.append("BooleanStateConfigurationClusterAlarmsStateChangedEvent {\n");
     output.append("\talarmsActive: ");
     output.append(alarmsActive);
     output.append("\n");
@@ -2968,19 +3332,70 @@ public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
     return output.toString();
   }
 }
+public static class BooleanStateConfigurationClusterSensorFaultEvent {
+  public Integer sensorFault;
+  private static final long SENSOR_FAULT_ID = 0L;
+
+  public BooleanStateConfigurationClusterSensorFaultEvent(
+    Integer sensorFault
+  ) {
+    this.sensorFault = sensorFault;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SENSOR_FAULT_ID, new UIntType(sensorFault)));
+
+    return new StructType(values);
+  }
+
+  public static BooleanStateConfigurationClusterSensorFaultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sensorFault = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SENSOR_FAULT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sensorFault = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new BooleanStateConfigurationClusterSensorFaultEvent(
+      sensorFault
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BooleanStateConfigurationClusterSensorFaultEvent {\n");
+    output.append("\tsensorFault: ");
+    output.append(sensorFault);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
   public Integer valveState;
+  public Optional<Integer> valveLevel;
   private static final long VALVE_STATE_ID = 0L;
+  private static final long VALVE_LEVEL_ID = 1L;
 
   public ValveConfigurationAndControlClusterValveStateChangedEvent(
-    Integer valveState
+    Integer valveState,
+    Optional<Integer> valveLevel
   ) {
     this.valveState = valveState;
+    this.valveLevel = valveLevel;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(VALVE_STATE_ID, new UIntType(valveState)));
+    values.add(new StructElement(VALVE_LEVEL_ID, valveLevel.<BaseTLVType>map((nonOptionalvalveLevel) -> new UIntType(nonOptionalvalveLevel)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -2990,16 +3405,23 @@ public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
       return null;
     }
     Integer valveState = null;
+    Optional<Integer> valveLevel = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == VALVE_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
           valveState = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == VALVE_LEVEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          valveLevel = Optional.of(castingValue.value(Integer.class));
+        }
       }
     }
     return new ValveConfigurationAndControlClusterValveStateChangedEvent(
-      valveState
+      valveState,
+      valveLevel
     );
   }
 
@@ -3009,6 +3431,9 @@ public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
     output.append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n");
     output.append("\tvalveState: ");
     output.append(valveState);
+    output.append("\n");
+    output.append("\tvalveLevel: ");
+    output.append(valveLevel);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -3363,6 +3788,34 @@ public static class DemandResponseLoadControlClusterLoadControlEventStatusChange
     return output.toString();
   }
 }
+public static class DeviceEnergyManagementClusterPowerAdjustStartEvent {
+
+  public DeviceEnergyManagementClusterPowerAdjustStartEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPowerAdjustStartEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new DeviceEnergyManagementClusterPowerAdjustStartEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPowerAdjustStartEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterPowerAdjustEndEvent {
   public Integer cause;
   public Long duration;
@@ -3435,6 +3888,62 @@ public static class DeviceEnergyManagementClusterPowerAdjustEndEvent {
     output.append("\tenergyUse: ");
     output.append(energyUse);
     output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterPausedEvent {
+
+  public DeviceEnergyManagementClusterPausedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterPausedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new DeviceEnergyManagementClusterPausedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterPausedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class DeviceEnergyManagementClusterResumedEvent {
+
+  public DeviceEnergyManagementClusterResumedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static DeviceEnergyManagementClusterResumedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new DeviceEnergyManagementClusterResumedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("DeviceEnergyManagementClusterResumedEvent {\n");
     output.append("}\n");
     return output.toString();
   }
@@ -4380,6 +4889,482 @@ public static class DoorLockClusterLockUserChangeEvent {
     return output.toString();
   }
 }
+public static class PumpConfigurationAndControlClusterSupplyVoltageLowEvent {
+
+  public PumpConfigurationAndControlClusterSupplyVoltageLowEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterSupplyVoltageLowEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterSupplyVoltageLowEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSupplyVoltageLowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterSupplyVoltageHighEvent {
+
+  public PumpConfigurationAndControlClusterSupplyVoltageHighEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterSupplyVoltageHighEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterSupplyVoltageHighEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSupplyVoltageHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterPowerMissingPhaseEvent {
+
+  public PumpConfigurationAndControlClusterPowerMissingPhaseEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterPowerMissingPhaseEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterPowerMissingPhaseEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterPowerMissingPhaseEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterSystemPressureLowEvent {
+
+  public PumpConfigurationAndControlClusterSystemPressureLowEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterSystemPressureLowEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterSystemPressureLowEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSystemPressureLowEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterSystemPressureHighEvent {
+
+  public PumpConfigurationAndControlClusterSystemPressureHighEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterSystemPressureHighEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterSystemPressureHighEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSystemPressureHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterDryRunningEvent {
+
+  public PumpConfigurationAndControlClusterDryRunningEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterDryRunningEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterDryRunningEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterDryRunningEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterMotorTemperatureHighEvent {
+
+  public PumpConfigurationAndControlClusterMotorTemperatureHighEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterMotorTemperatureHighEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterMotorTemperatureHighEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterMotorTemperatureHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent {
+
+  public PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterPumpMotorFatalFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterElectronicTemperatureHighEvent {
+
+  public PumpConfigurationAndControlClusterElectronicTemperatureHighEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterElectronicTemperatureHighEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterElectronicTemperatureHighEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterElectronicTemperatureHighEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterPumpBlockedEvent {
+
+  public PumpConfigurationAndControlClusterPumpBlockedEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterPumpBlockedEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterPumpBlockedEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterPumpBlockedEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterSensorFailureEvent {
+
+  public PumpConfigurationAndControlClusterSensorFailureEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterSensorFailureEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterSensorFailureEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterSensorFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent {
+
+  public PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterElectronicNonFatalFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterElectronicFatalFailureEvent {
+
+  public PumpConfigurationAndControlClusterElectronicFatalFailureEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterElectronicFatalFailureEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterElectronicFatalFailureEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterElectronicFatalFailureEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterGeneralFaultEvent {
+
+  public PumpConfigurationAndControlClusterGeneralFaultEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterGeneralFaultEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterGeneralFaultEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterGeneralFaultEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterLeakageEvent {
+
+  public PumpConfigurationAndControlClusterLeakageEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterLeakageEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterLeakageEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterLeakageEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterAirDetectionEvent {
+
+  public PumpConfigurationAndControlClusterAirDetectionEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterAirDetectionEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterAirDetectionEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterAirDetectionEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class PumpConfigurationAndControlClusterTurbineOperationEvent {
+
+  public PumpConfigurationAndControlClusterTurbineOperationEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static PumpConfigurationAndControlClusterTurbineOperationEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new PumpConfigurationAndControlClusterTurbineOperationEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("PumpConfigurationAndControlClusterTurbineOperationEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class TargetNavigatorClusterTargetUpdatedEvent {
   public ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct> targetList;
   public Integer currentTarget;
@@ -4664,6 +5649,34 @@ public static class AccountLoginClusterLoggedOutEvent {
     output.append("\tnode: ");
     output.append(node);
     output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ContentControlClusterRemainingScreenTimeExpiredEvent {
+
+  public ContentControlClusterRemainingScreenTimeExpiredEvent(
+  ) {
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+
+    return new StructType(values);
+  }
+
+  public static ContentControlClusterRemainingScreenTimeExpiredEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    return new ContentControlClusterRemainingScreenTimeExpiredEvent(
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ContentControlClusterRemainingScreenTimeExpiredEvent {\n");
     output.append("}\n");
     return output.toString();
   }

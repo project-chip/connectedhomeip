@@ -139,7 +139,10 @@
         _vendorID = @(0); // Not available.
         _productID = @(0); // Not available.
         _commissioningFlow = MTRCommissioningFlowStandard;
-        _discoveryCapabilities = MTRDiscoveryCapabilitiesUnknown;
+        // We are using a long discriminator, so have to have a known
+        // discoveryCapabilities to be a valid payload.  Just default to "try
+        // all discovery methods".
+        _discoveryCapabilities = MTRDiscoveryCapabilitiesAllMask;
         _hasShortDiscriminator = NO;
         _discriminator = discriminator;
         _setupPasscode = setupPasscode;
