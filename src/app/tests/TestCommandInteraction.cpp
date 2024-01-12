@@ -571,7 +571,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
 
-    err = commandHandler.SendCommandResponse();
+    err = commandHandler.InitiateSendingCommandResponses();
 
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
@@ -600,8 +600,10 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
     ctx.DrainAndServiceIO();
 
     GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData);
-    err = commandSender.ProcessInvokeResponse(std::move(buf));
+    bool moreChunkedMessages = false;
+    err = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext)
@@ -624,7 +626,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     err = commandHandler.FinishCommand();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = commandHandler.SendCommandResponse();
+    err = commandHandler.InitiateSendingCommandResponses();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     commandHandler.Close();
@@ -641,15 +643,16 @@ void TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg(nlTestSuite
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData);
-    err = commandSender.ProcessInvokeResponse(std::move(buf));
+    bool moreChunkedMessages = false;
+    err = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 }
 
 void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    System::PacketBufferHandle commandPacket;
     chip::app::ConcreteCommandPath requestCommandPath(kTestEndpointId, kTestClusterId, kTestCommandIdWithData);
     CommandHandlerWithOutstandingCommand commandHandler(&mockCommandHandlerDelegate, requestCommandPath,
                                                         /* aRef = */ NullOptional);
@@ -659,19 +662,11 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     commandHandler.mExchangeCtx.Grab(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
-    err = commandHandler.Finalize(commandPacket);
+    err = commandHandler.Finalize();
+    // TODO it seems like this test name expects InitiateSendingCommandResponses to be called
+    // and not Finalize.
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
-
-    //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
     // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
     // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
@@ -722,24 +717,16 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, /* aRef = */ NullOptional);
-    System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
 
     commandHandler.AddResponse(requestCommandPath, Fields());
-    err = commandHandler.Finalize(commandPacket);
+    // TODO it seems with exchange test expected InitiateSendingCommandResponses to be called
+    // and not just Finalize.
+    err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -757,24 +744,16 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
-    System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
     commandHandler.mExchangeCtx.Grab(exchange);
 
     commandHandler.AddResponse(requestCommandPath, BadFields());
-    err = commandHandler.Finalize(commandPacket);
+    // TODO it seems with exchange test expected InitiateSendingCommandResponses to be called
+    // and not just Finalize.
+    err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -1136,7 +1115,6 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
-    System::PacketBufferHandle commandPacket;
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
@@ -1145,17 +1123,10 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = commandHandler.AddResponseData(requestCommandPath, BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
-    err = commandHandler.Finalize(commandPacket);
+    // TODO it seems with exchange test expected InitiateSendingCommandResponses to be called
+    // and not just Finalize.
+    err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-#if CHIP_CONFIG_IM_PRETTY_PRINT
-    chip::System::PacketBufferTLVReader reader;
-    InvokeResponseMessage::Parser invokeResponseMessageParser;
-    reader.Init(std::move(commandPacket));
-    err = invokeResponseMessageParser.Init(reader);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    invokeResponseMessageParser.PrettyPrint();
-#endif
 
     //
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an

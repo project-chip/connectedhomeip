@@ -64,7 +64,18 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
 
-        mInvokeResponseBuilder.SuppressResponse(mSuppressResponse);
+        if (mReserveSpaceForMoreChunkMessages)
+        {
+            ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
+        }
+
+        // Sending a response command to a response command is going to be removed from spec soon.
+        // It was never implemented in the SDK, and there are no commands responses that expect a
+        // command response. This means we will never recieve an InvokeResponseMessage in response
+        // to an InvokeResponseMessage that we are sending out. As a result, to satisfy the
+        // condition that we don't set suppressResponse to true while also setting
+        // MoreChunkedMessages to true we are hardcoding the value to false here.
+        mInvokeResponseBuilder.SuppressResponse(/* aSuppressResponse = */ false);
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
 
         mInvokeResponseBuilder.CreateInvokeResponses(/* aReserveEndBuffer = */ true);
@@ -90,7 +101,7 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     // TODO: This is broken!  If something under here returns error, we will try
-    // to SendCommandResponse(), and then our caller will try to send a status
+    // to InitiateSendingCommandResponses(), and then our caller will try to send a status
     // response too.  Figure out at what point it's our responsibility to
     // handler errors vs our caller's.
     Handle workHandle(this);
@@ -206,6 +217,12 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     TLV::TLVReader invokeRequestsReader;
     invokeRequests.GetReader(&invokeRequestsReader);
 
+    size_t commandCount     = 0;
+    VerifyOrReturnError(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR, Status::InvalidAction);
+    if (commandCount > 1) {
+        mReserveSpaceForMoreChunkMessages = true;
+    }
+
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), Status::InvalidAction);
@@ -239,9 +256,38 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                              System::PacketBufferHandle && aPayload)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mState == State::AwaitingResponse && aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse)) {
+        ReturnErrorOnFailure(StatusResponse::ProcessStatusResponse(std::move(aPayload), err));
+        SuccessOrExit(err);
+        ReturnErrorOnFailure(SendCommandResponse());
+        // Next check is not looking for error, but if we are not expecting any more responses we want to call Close.
+        VerifyOrExit(mState == State::AwaitingResponse, err = CHIP_NO_ERROR);
+        return CHIP_NO_ERROR;
+    }
     ChipLogDetail(DataManagement, "CommandHandler: Unexpected message type %d", aPayloadHeader.GetMessageType());
     StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    if (mState == State::AwaitingResponse)
+    {
+        // We were waiting on a response and we got something we did not expect, so we will no longer continue sending
+        // messages, nor do we expect to get any more responses. As a result we are simply fulfilling our
+        // responsibility to call Close() by calling ExitNow().
+        ExitNow();
+    }
+    return err;
+exit:
+    Close();
+    return err;
+}
+
+void CommandHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
+{
+    // TODO Verify or die might be a little harsh here.
+    VerifyOrDieWithMsg(mState == State::AwaitingResponse, DataManagement, "Got response timeout while in incorrect state [%10.10s]", GetStateStr());
+    ChipLogDetail(DataManagement, "CommandHandler: Timed out waiting for response from requester to send more responses");
+    Close();
 }
 
 void CommandHandler::Close()
@@ -284,7 +330,7 @@ void CommandHandler::DecrementHoldOff()
         }
         else if (!IsGroupRequest())
         {
-            CHIP_ERROR err = SendCommandResponse();
+            CHIP_ERROR err = InitiateSendingCommandResponses();
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
@@ -292,25 +338,49 @@ void CommandHandler::DecrementHoldOff()
         }
     }
 
+    if (mState == State::AwaitingResponse)
+    {
+        // If we are AwaitingResponse from command that was successfully sent out, the responsibility to call Close()
+        // is now expected to be completed by the ExchangeDelegate callbacks of CommandHandler. In order to get those
+        // callbacks we have to set ourselves as the delegate and return.
+        mExchangeCtx->SetDelegate(this);
+        return;
+    }
     Close();
 }
 
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
-    System::PacketBufferHandle commandPacket;
+    System::PacketBufferHandle packet = mChunks.PopHead();
 
+    bool moreToSend = !mChunks.IsNull();
+    Messaging::SendFlags sendFlag = Messaging::SendMessageFlags::kNone;
+    if (moreToSend) {
+        sendFlag = Messaging::SendMessageFlags::kExpectResponse;
+    }
+
+    // If this is the first response we are sending, and we are waiting on response to send out another
+    // InvokeResponseMessages we setup the response timer.
+    if (mState == State::AddedCommand && moreToSend) {
+        mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+    }
+
+    ReturnErrorOnFailure(mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(packet), sendFlag));
+    MoveToState(State::CommandSent);
+    if (moreToSend) {
+        MoveToState(State::AwaitingResponse);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandHandler::InitiateSendingCommandResponses()
+{
     VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(Finalize(commandPacket));
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
-    // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
-    // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
-
-    MoveToState(State::CommandSent);
-
+    ReturnErrorOnFailure(Finalize());
+    ReturnErrorOnFailure(SendCommandResponse());
     return CHIP_NO_ERROR;
 }
 
@@ -759,12 +829,21 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
-CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
+CHIP_ERROR CommandHandler::Finalize(bool aHasMoreChunks)
 {
+    System::PacketBufferHandle packet;
+
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    if (aHasMoreChunks)
+    {
+        mInvokeResponseBuilder.MoreChunkedMessages(aHasMoreChunks);
+        // TODO check there are no errors With ?GetError()?
+    }
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
-    return mCommandMessageWriter.Finalize(&commandPacket);
+    ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
+    mChunks.AddToEnd(std::move(packet));
+    return CHIP_NO_ERROR;
 }
 
 const char * CommandHandler::GetStateStr() const
@@ -786,6 +865,9 @@ const char * CommandHandler::GetStateStr() const
 
     case State::CommandSent:
         return "CommandSent";
+
+    case State::AwaitingResponse:
+        return "AwaitingResponse";
 
     case State::AwaitingDestruction:
         return "AwaitingDestruction";

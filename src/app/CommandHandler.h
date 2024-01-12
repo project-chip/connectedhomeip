@@ -421,13 +421,7 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
 
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
-    {
-        //
-        // We're not expecting responses to any messages we send out on this EC.
-        //
-        VerifyOrDie(false);
-    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     enum class State : uint8_t
     {
@@ -436,6 +430,7 @@ private:
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
         CommandSent,         ///< The command has been sent successfully.
+        AwaitingResponse,    ///< Awaiting response from requester, after sending response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
@@ -480,7 +475,7 @@ private:
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
-    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+    CHIP_ERROR Finalize(bool aHasMoreChunks = false);
 
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -500,7 +495,10 @@ private:
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    CHIP_ERROR InitiateSendingCommandResponses();
+
     CHIP_ERROR SendCommandResponse();
+
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
@@ -559,13 +557,17 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
+    // A list of InvokeResponseMessages to be sent out by CommandHandler.
+    System::PacketBufferHandle mChunks;
+
     State mState = State::Idle;
     State mBackupState;
-    bool mSuppressResponse   = false;
-    bool mTimedRequest       = false;
-    bool mSentStatusResponse = false;
-    bool mGroupRequest       = false;
-    bool mBufferAllocated    = false;
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
+    bool mSentStatusResponse               = false;
+    bool mGroupRequest                     = false;
+    bool mBufferAllocated                  = false;
+    bool mReserveSpaceForMoreChunkMessages = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any
     // time.

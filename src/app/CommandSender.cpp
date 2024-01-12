@@ -186,7 +186,7 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 
     ReturnErrorOnFailure(
         mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
-    MoveToState(State::CommandSent);
+    MoveToState(State::AwaitingResponse);
 
     return CHIP_NO_ERROR;
 }
@@ -196,13 +196,14 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::CommandSent)
+    if (mState == State::AwaitingResponse)
     {
         MoveToState(State::ResponseReceived);
     }
 
     CHIP_ERROR err          = CHIP_NO_ERROR;
     bool sendStatusResponse = false;
+    bool moreChunkedMessages = false;
     VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
     sendStatusResponse = true;
 
@@ -227,9 +228,12 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 
     if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandResponse))
     {
-        err = ProcessInvokeResponse(std::move(aPayload));
+        err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
-        sendStatusResponse = false;
+        if (!moreChunkedMessages)
+        {
+            sendStatusResponse = false;
+        }
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
@@ -251,10 +255,18 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        bool expectingResponse = false;
+        Protocols::InteractionModel::Status status = Status::InvalidAction;
+        if (moreChunkedMessages && err == CHIP_NO_ERROR)
+        {
+            expectingResponse = true;
+            status = Status::Success;
+            MoveToState(State::AwaitingResponse);
+        }
+        StatusResponse::Send(status, apExchangeContext, expectingResponse);
     }
 
-    if (mState != State::CommandSent)
+    if (mState != State::AwaitingResponse)
     {
         Close();
     }
@@ -263,7 +275,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload)
+CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -289,6 +301,16 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
         InvokeResponseIB::Parser invokeResponse;
         ReturnErrorOnFailure(invokeResponse.Init(invokeResponsesReader));
         ReturnErrorOnFailure(ProcessInvokeResponseIB(invokeResponse));
+    }
+
+    // No need to check error from GetMoreChunkedMessages if the call fails. `moreChunkedMessages` is already set
+    // to the default to use when MoreChunkedMessages is not provided in InvokeResponseMessage.
+    invokeResponseMessage.GetMoreChunkedMessages(&moreChunkedMessages);
+    if (suppressResponse && moreChunkedMessages)
+    {
+        ChipLogError(DataManagement, "Spec violation! InvokeResponse has suppressResponse=true, and moreChunkedMessages=true");
+        // TODO Is there a better error. This seems close but not quite what we want.
+        return CHIP_ERROR_INVALID_TLV_ELEMENT;
     }
 
     // if we have exhausted this container
@@ -543,8 +565,8 @@ const char * CommandSender::GetStateStr() const
     case State::AwaitingTimedStatus:
         return "AwaitingTimedStatus";
 
-    case State::CommandSent:
-        return "CommandSent";
+    case State::AwaitingResponse:
+        return "AwaitingResponse";
 
     case State::ResponseReceived:
         return "ResponseReceived";
