@@ -176,24 +176,24 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("7")
         # Sleep for the charging duration plus a couple of seconds to check it has stopped
         time.sleep(charging_duration + 2)
-        # TODO check EnergyTransferredStoped (EvseStopped)
-        # event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
-        # expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
-        # self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)
+        # check EnergyTransferredStoped (EvseStopped)
+        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
+        self.validate_energy_transfer_stopped_event(event_data, session_id, expected_state, expected_reason)
 
         self.step("7a")
-#        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInDemand)
+        await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInDemand)
 
         self.step("7b")
-#        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabled)
+        await self.check_evse_attribute("SupplyState", Clusters.EnergyEvse.Enums.SupplyStateEnum.kDisabled)
 
         self.step("8")
         charge_until = NullValue
         min_charge_current = 6000
         max_charge_current = 12000
-        # TODO reinstate this check
+
         await self.send_enable_charge_command(endpoint=1, charge_until=charge_until, min_charge=min_charge_current, max_charge=max_charge_current)
-        # event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
+        event_data = events_callback.WaitForEventReport(Clusters.EnergyEvse.Events.EnergyTransferStarted)
 
         self.step("8a")
         await self.check_evse_attribute("State", Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging)
@@ -213,8 +213,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("MaximumChargeCurrent", expected_max_charge)
 
         # from step 8 above - validate event
-        # TODO reinstate this check
-        # self.validate_energy_transfer_started_event(event_data, session_id, expected_state, expected_max_charge)
+        self.validate_energy_transfer_started_event(event_data, session_id, expected_state, expected_max_charge)
 
         self.step("9")
         # This will only work if the optional UserMaximumChargeCurrent attribute is supported

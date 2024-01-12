@@ -136,6 +136,15 @@ public:
      */
     Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
 
+    /**
+     * @brief   This is used to start a check on if the Enabled timer needs to be started
+     *
+     * It should be called after the EVSE is initialised and the persisted attributes
+     * have been loaded, and time has been synchronised. If time isn't sync'd
+     * yet it will call itself back periodically (if required).
+     */
+    Status ScheduleCheckOnEnabledTimeout();
+
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
     Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
@@ -214,10 +223,11 @@ public:
 
 private:
     /* Constants */
-    static constexpr int DEFAULT_MIN_CHARGE_CURRENT          = 6000;                  /* 6A */
-    static constexpr int DEFAULT_USER_MAXIMUM_CHARGE_CURRENT = kMaximumChargeCurrent; /* 80A */
-    static constexpr int DEFAULT_RANDOMIZATION_DELAY_WINDOW  = 600;                   /* 600s */
-    static constexpr int kMaxVehicleIDBufSize                = 32;
+    static constexpr int DEFAULT_MIN_CHARGE_CURRENT                         = 6000;                  /* 6A */
+    static constexpr int DEFAULT_USER_MAXIMUM_CHARGE_CURRENT                = kMaximumChargeCurrent; /* 80A */
+    static constexpr int DEFAULT_RANDOMIZATION_DELAY_WINDOW                 = 600;                   /* 600s */
+    static constexpr int kMaxVehicleIDBufSize                               = 32;
+    static constexpr int PERIODIC_CHECK_INTERVAL_REAL_TIME_CLOCK_NOT_SYNCED = 30;
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
@@ -253,6 +263,14 @@ private:
      * @brief Helper function to work out the charge limit based on conditions and settings
      */
     Status ComputeMaxChargeCurrentLimit();
+
+    /**
+     * @brief This checks if the charging or discharging needs to be disabled
+     *
+     * @params pointer to SystemLayer
+     * @params pointer to EnergyEvseDelegate
+     */
+    static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
 
     /* Attributes */
     StateEnum mState             = StateEnum::kNotPluggedIn;

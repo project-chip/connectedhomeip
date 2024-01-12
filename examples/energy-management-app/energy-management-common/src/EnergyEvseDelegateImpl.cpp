@@ -43,6 +43,13 @@ EnergyEvseDelegate::~EnergyEvseDelegate()
 }
 
 /**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
+
+/**
  * @brief   Called when EVSE cluster receives Disable command
  */
 Status EnergyEvseDelegate::Disable()
@@ -105,8 +112,6 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         /* check chargingEnabledUntil is in the future */
         ChipLogError(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
         SetChargingEnabledUntil(chargingEnabledUntil);
-        // TODO start a timer to disable charging later
-        // if (checkChargingEnabled)
     }
 
     /* If it looks ok, store the min & max charging current */
@@ -134,6 +139,76 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
     // TODO Do something with timestamp
 
     return HandleStateMachineEvent(EVSEStateMachineEvent::DischargingEnabledEvent);
+}
+
+/**
+ * @brief    Routine to help schedule a timer callback to check if the EVSE should go disabled
+ *
+ * If the clock is sync'd we can work out when to call back to check when to disable the EVSE
+ * automatically. If the clock isn't sync'd the we just set a timer to check once every 30s.
+ *
+ * We first check the SupplyState to check if it is EnabledCharging or EnabledDischarging
+ * Then if the EnabledCharging/DischargingUntil is not Null, then we compute a delay to come
+ * back and check.
+ */
+Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
+{
+
+    uint32_t chipEpoch = 0;
+    DataModel::Nullable<uint32_t> enabledUntilTime;
+
+    if (mSupplyState == SupplyStateEnum::kChargingEnabled)
+    {
+        enabledUntilTime = GetChargingEnabledUntil();
+    }
+    else if (mSupplyState == SupplyStateEnum::kDischargingEnabled)
+    {
+        enabledUntilTime = GetDischargingEnabledUntil();
+    }
+    else
+    {
+        // In all other states the EVSE is disabled
+        return Status::Success;
+    }
+
+    if (enabledUntilTime.IsNull())
+    {
+        /* This is enabled indefinitely so don't schedule a callback */
+        return Status::Success;
+    }
+
+    CHIP_ERROR err = GetEpochTS(chipEpoch);
+    if (err == CHIP_NO_ERROR)
+    {
+        /* time is sync'd */
+        int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - chipEpoch);
+        if (delta > 0)
+        {
+            /* The timer hasn't expired yet - set a timer to check in the future */
+            ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %d seconds", delta);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
+        }
+        else
+        {
+            /* we have gone past the enabledUntilTime - so we need to disable */
+            ChipLogDetail(AppServer, "EVSE enable time expired, disabling charging");
+            Disable();
+        }
+    }
+    else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
+    {
+        /* Real time isn't sync'd -lets check again in 30 seconds - otherwise keep the charger enabled */
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(PERIODIC_CHECK_INTERVAL_REAL_TIME_CLOCK_NOT_SYNCED),
+                                              EvseCheckTimerExpiry, this);
+    }
+    return Status::Success;
+}
+
+void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate)
+{
+    EnergyEvseDelegate * dg = reinterpret_cast<EnergyEvseDelegate *>(delegate);
+
+    dg->ScheduleCheckOnEnabledTimeout();
 }
 
 /**
@@ -615,6 +690,9 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
     default:
         break;
     }
+
+    ScheduleCheckOnEnabledTimeout();
+
     return Status::Success;
 }
 Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
@@ -650,6 +728,9 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
     default:
         break;
     }
+
+    ScheduleCheckOnEnabledTimeout();
+
     return Status::Success;
 }
 Status EnergyEvseDelegate::HandleDisabledEvent()
@@ -1366,6 +1447,14 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
 
     System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+
+    /* If the GetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
+     * This platform cannot ever report real time !
+     * This should not be certifiable since getting time is a Mandatory
+     * feature of EVSE Cluster
+     */
+    VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "EVSE: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());

@@ -59,6 +59,11 @@ CHIP_ERROR EVSEManufacturer::Init()
     // uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
     // dg->HwSetRFID(ByteSpan(uid));
 
+    /* Once the system is initialised then check to see if the state was restored
+     * (e.g. after a power outage), and if the Enable timer check needs to be started
+     */
+    dg->ScheduleCheckOnEnabledTimeout();
+
     return CHIP_NO_ERROR;
 }
 
