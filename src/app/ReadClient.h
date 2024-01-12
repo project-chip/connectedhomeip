@@ -166,7 +166,7 @@ public:
          * applications to call and sequence.
          *
          * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
-         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. The implementation can still issue resubscription by return `CHIP_NO_ERROR`
+         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. In this case, returning `CHIP_NO_ERROR` will still trigger a resubscribe attempt,
          * or return `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` to put the subscription to `InactiveICDSubscription` state and this
          * will be called again when `OnActiveModeNotification` is called.
          *
