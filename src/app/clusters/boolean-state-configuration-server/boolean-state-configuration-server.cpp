@@ -46,6 +46,9 @@ static constexpr size_t kBooleanStateConfigurationDelegateTableSize =
 static_assert(kBooleanStateConfigurationDelegateTableSize <= kEmberInvalidEndpointIndex,
               "BooleanStateConfiguration Delegate table size error");
 
+static constexpr uint8_t kMinSupportedSensitivityLevels = 2;
+static constexpr uint8_t kMaxSupportedSensitivityLevels = 10;
+
 static CHIP_ERROR StoreCurrentSensitivityLevel(EndpointId ep, uint8_t level);
 
 namespace {
@@ -87,12 +90,6 @@ CHIP_ERROR BooleanStateConfigAttrAccess::WriteCurrentSensitivityLevel(const Conc
 {
     uint8_t curSenLevel;
     ReturnErrorOnFailure(aDecoder.Decode(curSenLevel));
-    // VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
-    //                     CHIP_IM_GLOBAL_STATUS(Failure));
-
-    // VerifyOrReturnError(curSenLevel < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    // ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-    //     ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, CurrentSensitivityLevel::Id), curSenLevel));
 
     return StoreCurrentSensitivityLevel(aPath.mEndpointId, curSenLevel);
 }
@@ -101,13 +98,14 @@ CHIP_ERROR BooleanStateConfigAttrAccess::ReadCurrentSensitivityLevel(const Concr
                                                                      AttributeValueEncoder & aEncoder)
 {
     uint8_t senLevel;
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(
-        ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, CurrentSensitivityLevel::Id), senLevel);
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->ReadScalarValue(aPath, senLevel);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         uint8_t supportedSensLevel;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(aPath.mEndpointId, &supportedSensLevel),
                             CHIP_IM_GLOBAL_STATUS(Failure));
+        VerifyOrReturnError(supportedSensLevel >= kMinSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        VerifyOrReturnError(supportedSensLevel <= kMaxSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
         senLevel = static_cast<uint8_t>(supportedSensLevel - 1);
     }
     else if (err != CHIP_NO_ERROR)
@@ -218,8 +216,10 @@ static CHIP_ERROR StoreCurrentSensitivityLevel(EndpointId ep, uint8_t level)
     uint8_t supportedSensLevel;
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == SupportedSensitivityLevels::Get(ep, &supportedSensLevel),
                         CHIP_IM_GLOBAL_STATUS(Failure));
-
+    VerifyOrReturnError(supportedSensLevel >= kMinSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(supportedSensLevel <= kMaxSupportedSensitivityLevels, CHIP_IM_GLOBAL_STATUS(ConstraintError));
     VerifyOrReturnError(level < supportedSensLevel, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+
     ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(ep, BooleanStateConfiguration::Id, CurrentSensitivityLevel::Id), level));
 
