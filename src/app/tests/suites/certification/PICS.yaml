@@ -2105,6 +2105,15 @@ PICS:
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
 
+    - label: "Does the DUT(Server) support SupportedWiFiBands attribute?"
+      id: CNET.S.A0008
+
+    - label: "Does the DUT(Server) support SupportedThreadFeatures attribute?"
+      id: CNET.S.A0009
+
+    - label: "Does the DUT(Server) support ThreadVersion attribute?"
+      id: CNET.S.A000A
+
     #
     # server / commandsReceived
     #

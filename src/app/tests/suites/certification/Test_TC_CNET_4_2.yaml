@@ -193,3 +193,45 @@ tests:
           value: null
           constraints:
               type: int32s
+
+    # Issue: https://github.com/project-chip/connectedhomeip/issues/30081
+    - label:
+          "Step 14: TH reads the SupportedThreadFeatures attribute from the DUT"
+      verification: |
+          ./chip-tool networkcommissioning read supported-thread-features 54 0
+
+          Via the TH (chip-tool), Verify the SupportedThreadFeatures attribute that contains value is an empty bitmap (value 0).
+
+          [1702545740.403752][1890:1893] CHIP:DMG:                                 StatusIB =
+          [1702545740.403824][1890:1893] CHIP:DMG:                                 {
+          [1702545740.403883][1890:1893] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1702545740.403953][1890:1893] CHIP:DMG:                                 },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CNET.S.A0009
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 15:TH reads the ThreadVersion attribute from the DUT"
+      verification: |
+          ./chip-tool networkcommissioning read thread-version 54 0
+
+          Via the TH (chip-tool), Verify the ThreadVersion attribute that contains value is greater than or equal to 4.
+
+          [1702545740.403752][1890:1893] CHIP:DMG:                                 StatusIB =
+          [1702545740.403824][1890:1893] CHIP:DMG:                                 {
+          [1702545740.403883][1890:1893] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1702545740.403953][1890:1893] CHIP:DMG:                                 },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && CNET.S.A000A
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
