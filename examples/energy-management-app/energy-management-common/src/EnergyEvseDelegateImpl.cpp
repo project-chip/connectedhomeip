@@ -360,7 +360,7 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
         default:
             // invalid value for mHwState
             ChipLogError(AppServer, "HwSetState newstate(kNotPluggedIn) - Invalid value for mHwState");
-            mHwState = newState; // set it to the new state
+            mHwState = newState; // set it to the new state anyway
             break;
         }
         break;
@@ -383,8 +383,8 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
             break;
         default:
             // invalid value for mHwState
-            ChipLogError(AppServer, "HwSetState newstate(kNotPluggedIn) - Invalid value for mHwState");
-            mHwState = newState; // set it to the new state
+            ChipLogError(AppServer, "HwSetState newstate(kPluggedInNoDemand) - Invalid value for mHwState");
+            mHwState = newState; // set it to the new state anyway
             break;
         }
         break;
@@ -407,8 +407,8 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
             break;
         default:
             // invalid value for mHwState
-            ChipLogError(AppServer, "HwSetState newstate(kNotPluggedIn) - Invalid value for mHwState");
-            mHwState = newState; // set it to the new state
+            ChipLogError(AppServer, "HwSetState newstate(kPluggedInDemand) - Invalid value for mHwState");
+            mHwState = newState; // set it to the new state anyway
             break;
         }
         break;
