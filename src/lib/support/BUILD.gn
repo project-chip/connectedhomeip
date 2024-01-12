@@ -309,7 +309,6 @@ source_set("test_utils") {
 static_library("testing") {
   output_name = "libSupportTesting"
   output_dir = "${root_out_dir}/lib"
-  complete_static_lib = true
 
   sources = [
     "UnitTestExtendedAssertions.h",
