@@ -16,6 +16,7 @@
 #
 
 import time
+import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -35,7 +36,8 @@ class TC_VALCC_4_2(MatterBaseTest):
     def steps_TC_VALCC_4_2(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read DefaultOpenDuration attribute"),
+            TestStep("2a", "Read DefaultOpenDuration attribute"),
+            TestStep("2b", "Write DefaultOpenDuration attribute"),
             TestStep(3, "Send Open command"),
             TestStep(4, "Read OpenDuration attribute"),
             TestStep(5, "Read RemainingDuration attribute"),
@@ -61,12 +63,21 @@ class TC_VALCC_4_2(MatterBaseTest):
         self.step(1)
         attributes = Clusters.ValveConfigurationAndControl.Attributes
 
-        self.step(2)
-        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        self.step("2a")
+        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.DefaultOpenDuration)
+
+        self.step("2b")
+        if defaultOpenDuration is NullValue:
+            defaultOpenDuration = 60
+
+            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, attributes.DefaultOpenDuration(defaultOpenDuration))])
+            asserts.assert_equal(result[0].Status, Status.Success, "DefaultOpenDuration write failed")
+        else:
+            logging.info("Test step skipped")
 
         self.step(3)
         try:
-            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(openDuration=60), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
