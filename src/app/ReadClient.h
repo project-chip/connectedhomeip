@@ -157,7 +157,9 @@ public:
          * applications to call and sequence.
          *
          * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
-         * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT.
+         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. The implementation can still issue resubscription by return `CHIP_NO_ERROR`
+         * or return `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` to put the subscription to `InactiveICDSubscription` state and this
+         * will be called again when `OnActiveModeNotification` is called.
          *
          * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
          * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
@@ -327,9 +329,10 @@ public:
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
     /**
-     *  Re-activate an idle subscription.
+     *  Re-activate an inactive subscription.
      *
-     *  When subscribing to ICD and liveness timeout reached, the read client will move to the `InactiveICDSubscription` state and
+     *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
+     * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and
      * resubscription can be triggered via OnActiveModeNotification().
      *
      *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
