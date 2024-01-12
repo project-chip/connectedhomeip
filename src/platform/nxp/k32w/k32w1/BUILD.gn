@@ -60,7 +60,7 @@ static_library("k32w1") {
 
   public = [
     "${chip_root}/src/app/reporting/reporting.h",
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h"
+    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
