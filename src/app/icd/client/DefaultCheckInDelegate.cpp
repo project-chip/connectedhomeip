@@ -16,6 +16,7 @@
  */
 
 #include "CheckInHandler.h"
+#include <app/InteractionModelEngine.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
@@ -38,6 +39,9 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
     ChipLogProgress(
         ICD, "Check In Message processing complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
         clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
+    InteractionModelEngine::GetInstance()->OnActiveModeNotification(clientInfo.peer_node);
+#endif
 }
 
 } // namespace app
