@@ -117,7 +117,7 @@ Status ChefFanControlManager::HandleStep(StepDirectionEnum aDirection, bool aWra
         {
             newSpeedSetting = kLowestSpeed;
         }
-        else if ((speedSetting.Value() > 1) && (speedSetting.Value() <= speedMax))
+        else if (speedSetting.Value() > 1)
         {
             newSpeedSetting = static_cast<uint8_t>(speedSetting.Value() - 1);
         }
