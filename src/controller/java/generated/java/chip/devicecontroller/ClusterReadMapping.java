@@ -5950,6 +5950,17 @@ public class ClusterReadMapping {
           readIcdManagementUserActiveModeTriggerInstructionCommandParams
         );
         result.put("readUserActiveModeTriggerInstructionAttribute", readIcdManagementUserActiveModeTriggerInstructionAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementOperatingModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementOperatingModeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IcdManagementCluster) cluster).readOperatingModeAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readIcdManagementOperatingModeCommandParams
+        );
+        result.put("readOperatingModeAttribute", readIcdManagementOperatingModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
