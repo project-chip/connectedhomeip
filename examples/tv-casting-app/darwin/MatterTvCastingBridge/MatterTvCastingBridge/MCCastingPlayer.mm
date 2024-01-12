@@ -18,6 +18,7 @@
 #import "MCCastingPlayer.h"
 
 #import "MCCastingApp.h"
+#import "MCEndpoint_Internal.h"
 #import "MCErrorUtils.h"
 
 #import "core/CastingPlayer.h"
@@ -78,18 +79,18 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     });
 }
 
-- (NSString * _Nonnull)description
-{
-    return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d. Resolved IPAddr?: %@",
-                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO"];
-}
-
 - (instancetype _Nonnull)initWithCppCastingPlayer:(matter::casting::memory::Strong<matter::casting::core::CastingPlayer>)cppCastingPlayer
 {
     if (self = [super init]) {
         _cppCastingPlayer = cppCastingPlayer;
     }
     return self;
+}
+
+- (NSString * _Nonnull)description
+{
+    return [NSString stringWithFormat:@"%@ with Product ID: %@ and Vendor ID: %@. Resolved IPAddr?: %@",
+                     self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO"];
 }
 
 - (NSString * _Nonnull)identifier
@@ -102,19 +103,19 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return [NSString stringWithCString:_cppCastingPlayer->GetDeviceName() encoding:NSUTF8StringEncoding];
 }
 
-- (uint16_t)productId
+- (NSNumber * _Nonnull)productId
 {
-    return _cppCastingPlayer->GetProductId();
+    return [NSNumber numberWithUnsignedShort:_cppCastingPlayer->GetProductId()];
 }
 
-- (uint16_t)vendorId
+- (NSNumber * _Nonnull)vendorId
 {
-    return _cppCastingPlayer->GetVendorId();
+    return [NSNumber numberWithUnsignedShort:_cppCastingPlayer->GetVendorId()];
 }
 
-- (uint32_t)deviceType
+- (NSNumber * _Nonnull)deviceType
 {
-    return _cppCastingPlayer->GetDeviceType();
+    return [NSNumber numberWithUnsignedInt:_cppCastingPlayer->GetDeviceType()];
 }
 
 - (NSArray * _Nonnull)ipAddresses
@@ -128,11 +129,16 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return ipAddresses;
 }
 
-// TODO convert to Obj-C endpoints and return
-/*- (NSArray<MCEndpoint *> * _Nonnull)endpoints
+- (NSArray<MCEndpoint *> * _Nonnull)endpoints
 {
-    return [NSMutableArray new];
-}*/
+    NSMutableArray * endpoints = [NSMutableArray new];
+    const std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> cppEndpoints = _cppCastingPlayer->GetEndpoints();
+    for (matter::casting::memory::Strong<matter::casting::core::Endpoint> cppEndpoint : cppEndpoints) {
+        MCEndpoint * endpoint = [[MCEndpoint alloc] initWithCppEndpoint:cppEndpoint];
+        [endpoints addObject:endpoint];
+    }
+    return endpoints;
+}
 
 - (BOOL)isEqualToMCCastingPlayer:(MCCastingPlayer * _Nullable)other
 {
