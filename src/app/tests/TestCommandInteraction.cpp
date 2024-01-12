@@ -270,7 +270,7 @@ public:
     static void TestCommandHandlerWithSendEmptyCommand(nlTestSuite * apSuite, void * apContext);
     static void TestCommandSenderWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerEncodeSimpleCommandData(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandEncodeFailure(nlTestSuite * apSuite, void * apContext);
     static void TestCommandInvalidMessage1(nlTestSuite * apSuite, void * apContext);
@@ -279,7 +279,7 @@ public:
     static void TestCommandInvalidMessage4(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerInvalidMessageSync(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerEncodeSimpleStatusCode(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerWithSendEmptyResponse(nlTestSuite * apSuite, void * apContext);
 
     static void TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext);
@@ -343,7 +343,7 @@ private:
                                             CommandId aCommandId = kTestCommandIdWithData);
     static void AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
                                       bool aNeedStatusCode, CommandId aCommandId = kTestCommandIdWithData);
-    static void ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
+    static void ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
 };
 
 class TestExchangeDelegate : public Messaging::ExchangeDelegate
@@ -649,7 +649,7 @@ void TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg(nlTestSuite
     NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 }
 
-void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode)
+void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
@@ -663,8 +663,6 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
     err = commandHandler.Finalize();
-    // TODO it seems like this test name expects InitiateSendingCommandResponses to be called
-    // and not Finalize.
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -675,10 +673,10 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     exchange->Close();
 }
 
-void TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerEncodeSimpleCommandData(nlTestSuite * apSuite, void * apContext)
 {
     // Send response which has simple command data and command path
-    ValidateCommandHandlerWithSendCommand(apSuite, apContext, false /*aNeedStatusCode=false*/);
+    ValidateCommandHandlerEncodeInvokeResponseMessage(apSuite, apContext, false /*aNeedStatusCode=false*/);
 }
 
 struct Fields
@@ -723,8 +721,6 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     commandHandler.mExchangeCtx.Grab(exchange);
 
     commandHandler.AddResponse(requestCommandPath, Fields());
-    // TODO it seems with exchange test expected InitiateSendingCommandResponses to be called
-    // and not just Finalize.
     err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -750,8 +746,6 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     commandHandler.mExchangeCtx.Grab(exchange);
 
     commandHandler.AddResponse(requestCommandPath, BadFields());
-    // TODO it seems with exchange test expected InitiateSendingCommandResponses to be called
-    // and not just Finalize.
     err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -1123,8 +1117,6 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = commandHandler.AddResponseData(requestCommandPath, BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
-    // TODO it seems with exchange test expected InitiateSendingCommandResponses to be called
-    // and not just Finalize.
     err = commandHandler.Finalize();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -1137,10 +1129,10 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     exchange->Close();
 }
 
-void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerEncodeSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
 {
     // Send response which has simple status code and command path
-    ValidateCommandHandlerWithSendCommand(apSuite, apContext, true /*aNeedStatusCode=true*/);
+    ValidateCommandHandlerEncodeInvokeResponseMessage(apSuite, apContext, true /*aNeedStatusCode=true*/);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand(nlTestSuite * apSuite, void * apContext)
@@ -1786,11 +1778,11 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandSenderWithSendCommand", chip::app::TestCommandInteraction::TestCommandSenderWithSendCommand),
     NL_TEST_DEF("TestCommandHandlerWithSendEmptyCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand),
     NL_TEST_DEF("TestCommandSenderWithProcessReceivedMsg", chip::app::TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg),
-    NL_TEST_DEF("TestCommandHandlerWithSendSimpleCommandData", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleCommandData),
+    NL_TEST_DEF("TestCommandHandlerEncodeSimpleCommandData", chip::app::TestCommandInteraction::TestCommandHandlerEncodeSimpleCommandData),
     NL_TEST_DEF("TestCommandHandlerCommandDataEncoding", chip::app::TestCommandInteraction::TestCommandHandlerCommandDataEncoding),
     NL_TEST_DEF("TestCommandHandlerCommandEncodeFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeFailure),
     NL_TEST_DEF("TestCommandHandlerCommandEncodeExternalFailure", chip::app::TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure),
-    NL_TEST_DEF("TestCommandHandlerWithSendSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode),
+    NL_TEST_DEF("TestCommandHandlerEncodeSimpleStatusCode", chip::app::TestCommandInteraction::TestCommandHandlerEncodeSimpleStatusCode),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedNotExistCommand", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistCommand),
     NL_TEST_DEF("TestCommandHandlerWithProcessReceivedEmptyDataMsg", chip::app::TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg),
     NL_TEST_DEF("TestCommandHandlerRejectMultipleIdenticalCommands", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleIdenticalCommands),

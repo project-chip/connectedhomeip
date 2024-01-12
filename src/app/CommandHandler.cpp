@@ -72,7 +72,9 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
         // Sending a response command to a response command is going to be removed from spec soon.
         // It was never implemented in the SDK, and there are no commands responses that expect a
         // command response. This means we will never recieve an InvokeResponseMessage in response
-        // to an InvokeResponseMessage that we are sending out. As a result, to satisfy the
+        // to an InvokeResponseMessage that we are sending out. This means that the only response
+        // we are expecting to recieved in responses to an InvokeResponseMessage that we are
+        // sending out is when we are chunking multiple responses. As a result, to satisfy the
         // condition that we don't set suppressResponse to true while also setting
         // MoreChunkedMessages to true we are hardcoding the value to false here.
         mInvokeResponseBuilder.SuppressResponse(/* aSuppressResponse = */ false);
@@ -265,8 +267,12 @@ CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExch
         ReturnErrorOnFailure(StatusResponse::ProcessStatusResponse(std::move(aPayload), err));
         SuccessOrExit(err);
         ReturnErrorOnFailure(SendCommandResponse());
-        // Next check is not looking for error, but if we are not expecting any more responses we want to call Close.
-        VerifyOrExit(mState == State::AwaitingResponse, err = CHIP_NO_ERROR);
+        if (mState != State::AwaitingResponse)
+        {
+            // We are sending out the last message and no longer are expecting any responses. As a results we are
+            // fulfilling out responsibility to call close by calling ExitNow().
+            ExitNow();
+        }
         return CHIP_NO_ERROR;
     }
     ChipLogDetail(DataManagement, "CommandHandler: Unexpected message type %d", aPayloadHeader.GetMessageType());
@@ -287,9 +293,10 @@ exit:
 
 void CommandHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
-    // TODO Verify or die might be a little harsh here.
-    VerifyOrDieWithMsg(mState == State::AwaitingResponse, DataManagement, "Got response timeout while in incorrect state [%10.10s]",
-                       GetStateStr());
+    if (mState != State::AwaitingResponse)
+    {
+        ChipLogError(DataManagement, "Got response timeout while in incorrect state [%10.10s]", GetStateStr());
+    }
     ChipLogDetail(DataManagement, "CommandHandler: Timed out waiting for response from requester to send more responses");
     Close();
 }
@@ -355,6 +362,7 @@ void CommandHandler::DecrementHoldOff()
 
 CHIP_ERROR CommandHandler::SendCommandResponse()
 {
+    VerifyOrReturnError(!mChunks.IsNull(), CHIP_ERROR_INCORRECT_STATE);
     System::PacketBufferHandle packet = mChunks.PopHead();
 
     bool moreToSend               = !mChunks.IsNull();
@@ -846,7 +854,7 @@ CHIP_ERROR CommandHandler::Finalize(bool aHasMoreChunks)
     if (aHasMoreChunks)
     {
         mInvokeResponseBuilder.MoreChunkedMessages(aHasMoreChunks);
-        // TODO check there are no errors With ?GetError()?
+        ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
     }
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
