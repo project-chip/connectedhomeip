@@ -195,7 +195,7 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
                 {
                     return;
                 }
-                else if (aError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
+                if (aError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
                 {
                     VerifyOrDie(originalReason == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
                     ChipLogProgress(DataManagement, "ICD device is inactive mark subscription as InactiveICDSubscription");
