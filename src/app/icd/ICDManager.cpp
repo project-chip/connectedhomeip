@@ -246,7 +246,7 @@ void ICDManager::UpdateICDMode()
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
         postObserverEvent(ObserverEventType::ICDModeChange);
 
-        // Can't use attribute accessors/Attributes::FeatureMap::Get in unit tests
+        // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
         Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
 #endif
