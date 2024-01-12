@@ -649,7 +649,8 @@ void TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg(nlTestSuite
     NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 }
 
-void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode)
+void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext,
+                                                                               bool aNeedStatusCode)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
