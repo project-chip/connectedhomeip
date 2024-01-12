@@ -298,7 +298,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     break;
 
     case OperationalState::Attributes::OperationalState::Id: {
-        ChipLogError(Zcl, "OperationalState: H1");
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentOperationalState()));
     }
     break;
