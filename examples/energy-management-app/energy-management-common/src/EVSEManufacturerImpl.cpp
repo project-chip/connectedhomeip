@@ -42,22 +42,16 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     dg->HwRegisterEvseCallbackHandler(ApplicationCallbackHandler, reinterpret_cast<intptr_t>(this));
 
-    // For Manufacturer to specify the hardware capability in mA
-    // dg->HwSetMaxHardwareCurrentLimit(32000);
-
-    // For Manufacturer to specify the CircuitCapacity (e.g. from DIP switches)
-    // dg->HwSetCircuitCapacity(20000);
-
-    // For now let's pretend the EV is plugged in, and asking for demand
-    // dg->HwSetState(StateEnum::kPluggedInDemand);
-    // dg->HwSetCableAssemblyLimit(63000);
-
-    // For now let's pretend the vehicle ID is set
-    // dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
-
-    // For now let's pretend the RFID sensor was triggered - send an event
-    // uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
-    // dg->HwSetRFID(ByteSpan(uid));
+    /*
+     * This is an example implementation for manufacturers to consider
+     *
+     * For Manufacturer to specify the hardware capability in mA:
+     *  dg->HwSetMaxHardwareCurrentLimit(32000);    // 32A
+     *
+     * For Manufacturer to specify the CircuitCapacity in mA (e.g. from DIP switches)
+     *  dg->HwSetCircuitCapacity(20000);            // 20A
+     *
+     */
 
     /* Once the system is initialised then check to see if the state was restored
      * (e.g. after a power outage), and if the Enable timer check needs to be started
@@ -66,6 +60,32 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     return CHIP_NO_ERROR;
 }
+
+/*
+ * When the EV is plugged in, and asking for demand change the state
+ * and set the CableAssembly current limit
+ *
+ *   EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
+ *   if (dg == nullptr)
+ *   {
+ *       ChipLogError(AppServer, "Delegate is not initialized");
+ *       return CHIP_ERROR_UNINITIALIZED;
+ *   }
+ *
+ *   dg->HwSetState(StateEnum::kPluggedInDemand);
+ *   dg->HwSetCableAssemblyLimit(63000);    // 63A = 63000mA
+ *
+ *
+ * If the vehicle ID can be retrieved (e.g. over Powerline)
+ *   dg->HwSetVehicleID(CharSpan::fromCharString("TEST_VEHICLE_123456789"));
+ *
+ *
+ * If the EVSE has an RFID sensor, the RFID value read can cause an event to be sent
+ * (e.g. can be used to indicate if a user as tried to activate the charging)
+ *
+ *   uint8_t uid[10] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
+ *   dg->HwSetRFID(ByteSpan(uid));
+ */
 
 CHIP_ERROR EVSEManufacturer::Shutdown()
 {

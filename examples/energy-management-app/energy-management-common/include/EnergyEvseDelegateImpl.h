@@ -223,11 +223,11 @@ public:
 
 private:
     /* Constants */
-    static constexpr int DEFAULT_MIN_CHARGE_CURRENT                         = 6000;                  /* 6A */
-    static constexpr int DEFAULT_USER_MAXIMUM_CHARGE_CURRENT                = kMaximumChargeCurrent; /* 80A */
-    static constexpr int DEFAULT_RANDOMIZATION_DELAY_WINDOW                 = 600;                   /* 600s */
-    static constexpr int kMaxVehicleIDBufSize                               = 32;
-    static constexpr int PERIODIC_CHECK_INTERVAL_REAL_TIME_CLOCK_NOT_SYNCED = 30;
+    static constexpr int kDefaultMinChargeCurrent                     = 6000;                  /* 6A */
+    static constexpr int kDefaultUserMaximumChargeCurrent             = kMaximumChargeCurrent; /* 80A */
+    static constexpr int kDefaultRandomizationDelayWindow             = 600;                   /* 600s */
+    static constexpr int kMaxVehicleIDBufSize                         = 32;
+    static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced = 30;
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareCurrentLimit                = 0; /* Hardware current limit in mA */
@@ -279,11 +279,11 @@ private:
     DataModel::Nullable<uint32_t> mChargingEnabledUntil;    // TODO Default to 0 to indicate disabled
     DataModel::Nullable<uint32_t> mDischargingEnabledUntil; // TODO Default to 0 to indicate disabled
     int64_t mCircuitCapacity           = 0;
-    int64_t mMinimumChargeCurrent      = DEFAULT_MIN_CHARGE_CURRENT;
+    int64_t mMinimumChargeCurrent      = kDefaultMinChargeCurrent;
     int64_t mMaximumChargeCurrent      = 0;
     int64_t mMaximumDischargeCurrent   = 0;
-    int64_t mUserMaximumChargeCurrent  = DEFAULT_USER_MAXIMUM_CHARGE_CURRENT; // TODO update spec
-    uint32_t mRandomizationDelayWindow = DEFAULT_RANDOMIZATION_DELAY_WINDOW;
+    int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent; // TODO update spec
+    uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow;
     /* PREF attributes */
     uint8_t mNumberOfWeeklyTargets = 0;
     uint8_t mNumberOfDailyTargets  = 1;

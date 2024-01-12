@@ -105,12 +105,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
 
 CHIP_ERROR EnergyEvseManager::Init()
 {
-    CHIP_ERROR err = Instance::Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        return err;
-    }
-
+    ReturnErrorOnFailure(Instance::Init());
     return LoadPersistentAttributes();
 }
 

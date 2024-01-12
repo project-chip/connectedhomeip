@@ -198,7 +198,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         /* Real time isn't sync'd -lets check again in 30 seconds - otherwise keep the charger enabled */
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(PERIODIC_CHECK_INTERVAL_REAL_TIME_CLOCK_NOT_SYNCED),
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced),
                                               EvseCheckTimerExpiry, this);
     }
     return Status::Success;
@@ -387,7 +387,6 @@ Status EnergyEvseDelegate::HwSetState(StateEnum newState)
         /* All other states should be managed by the Delegate */
         ChipLogError(AppServer, "HwSetState received invalid enum from caller");
         return Status::Failure;
-        break;
     }
 
     return Status::Success;
