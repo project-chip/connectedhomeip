@@ -15,7 +15,8 @@ following interfaces:
 A user can use `FactoryDataProvider::SearchForId` API to extract information
 about custom factory data ids.
 
-What **shall** be done to enable usage of a custom factory provider in the reference app:
+What **shall** be done to enable usage of a custom factory provider in the
+reference app:
 
 -   Set `use_custom_factory_provider=1`. This option is only available when
     factory data is used (`chip_with_factory_data=1`). An assert will be raised
@@ -39,7 +40,8 @@ What **shall** be done to enable usage of a custom factory provider in the refer
 
 Note that new flags were introduced:
 
--   `CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER`: add custom factory data related code in reference app.
+-   `CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER`: add custom factory data related
+    code in reference app.
 
 Please refer to `CustomFactoryDataProvider` for a minimal example of leveraging
 the standard factory data provider to parse custom factory data information.

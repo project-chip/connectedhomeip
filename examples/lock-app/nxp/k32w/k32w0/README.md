@@ -181,7 +181,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 
 To bring the SDK in the environment, the user can:
 
--   download it with west tool, in which case it will be handled automatically by gn:
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
@@ -189,14 +190,19 @@ To bring the SDK in the environment, the user can:
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
     ```
 
-    In case there are local modification to the already installed github NXP SDK, use the below `west forall` command instead of the `west init` command to reset the west workspace. Warning: all local changes will be lost after running this command.
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
     ```
 
--   set up a custom path to the SDK, in which case `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen` command:
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
 
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
@@ -213,21 +219,21 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninj
 To build with Secure Element, follow the same steps as above but set
 `chip_with_se05x=1` in the `gn gen` command.
 
-- K32W041AM flavor
+-   K32W041AM flavor
 
-    Exactly the same steps as above but set argument `build_for_k32w041am=1` in the gn command.
-
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
-build argument (`chip_with_OM15082`) inside the gn build instruction should be set
-to zero. The argument `chip_with_OM15082` is set to zero by default.
+build argument (`chip_with_OM15082`) inside the gn build instruction should be
+set to zero. The argument `chip_with_OM15082` is set to zero by default.
 
 In case that Openthread CLI is needed, `chip_with_ot_cli` build argument must be
 set to 1.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
-running oscillator as a clock source. In this case one must set the `use_fro_32k`
-argument to 1.
+running oscillator as a clock source. In this case one must set the
+`use_fro_32k` argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 (run automatically) install the recommanded packages (python version > 3, pip3,

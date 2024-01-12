@@ -200,7 +200,8 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 
 To bring the SDK in the environment, the user can:
 
--   download it with west tool, in which case it will be handled automatically by gn:
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
@@ -208,20 +209,26 @@ To bring the SDK in the environment, the user can:
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
     ```
 
-    In case there are local modification to the already installed github NXP SDK, use the below `west forall` command instead of the `west init` command to reset the west workspace. Warning: all local changes will be lost after running this command.
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
 
     ```bash
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
     user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
     ```
 
--   set up a custom path to the SDK, in which case `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen` command:
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
 
     ```
     user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
     ```
 
 Start building the application:
+
 ```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
@@ -236,7 +243,8 @@ Secure Element due to flash constraints.
 
 -   K32W041AM flavor
 
-    Exactly the same steps as above but set argument `build_for_k32w041am=1` in the gn command.
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
