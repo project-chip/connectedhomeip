@@ -201,8 +201,8 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
         MoveToState(State::ResponseReceived);
     }
 
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    bool sendStatusResponse = false;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    bool sendStatusResponse  = false;
     bool moreChunkedMessages = false;
     VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
     sendStatusResponse = true;
@@ -255,12 +255,12 @@ exit:
 
     if (sendStatusResponse)
     {
-        bool expectingResponse = false;
+        bool expectingResponse                     = false;
         Protocols::InteractionModel::Status status = Status::InvalidAction;
         if (moreChunkedMessages && err == CHIP_NO_ERROR)
         {
             expectingResponse = true;
-            status = Status::Success;
+            status            = Status::Success;
             MoveToState(State::AwaitingResponse);
         }
         StatusResponse::Send(status, apExchangeContext, expectingResponse);

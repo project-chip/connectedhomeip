@@ -217,9 +217,11 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     TLV::TLVReader invokeRequestsReader;
     invokeRequests.GetReader(&invokeRequestsReader);
 
-    size_t commandCount     = 0;
-    VerifyOrReturnError(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR, Status::InvalidAction);
-    if (commandCount > 1) {
+    size_t commandCount = 0;
+    VerifyOrReturnError(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
+                        Status::InvalidAction);
+    if (commandCount > 1)
+    {
         mReserveSpaceForMoreChunkMessages = true;
     }
 
@@ -258,7 +260,8 @@ CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExch
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState == State::AwaitingResponse && aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse)) {
+    if (mState == State::AwaitingResponse && aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
         ReturnErrorOnFailure(StatusResponse::ProcessStatusResponse(std::move(aPayload), err));
         SuccessOrExit(err);
         ReturnErrorOnFailure(SendCommandResponse());
@@ -285,7 +288,8 @@ exit:
 void CommandHandler::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext)
 {
     // TODO Verify or die might be a little harsh here.
-    VerifyOrDieWithMsg(mState == State::AwaitingResponse, DataManagement, "Got response timeout while in incorrect state [%10.10s]", GetStateStr());
+    VerifyOrDieWithMsg(mState == State::AwaitingResponse, DataManagement, "Got response timeout while in incorrect state [%10.10s]",
+                       GetStateStr());
     ChipLogDetail(DataManagement, "CommandHandler: Timed out waiting for response from requester to send more responses");
     Close();
 }
@@ -353,21 +357,25 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     System::PacketBufferHandle packet = mChunks.PopHead();
 
-    bool moreToSend = !mChunks.IsNull();
+    bool moreToSend               = !mChunks.IsNull();
     Messaging::SendFlags sendFlag = Messaging::SendMessageFlags::kNone;
-    if (moreToSend) {
+    if (moreToSend)
+    {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
     }
 
     // If this is the first response we are sending, and we are waiting on response to send out another
     // InvokeResponseMessages we setup the response timer.
-    if (mState == State::AddedCommand && moreToSend) {
+    if (mState == State::AddedCommand && moreToSend)
+    {
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
 
-    ReturnErrorOnFailure(mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(packet), sendFlag));
+    ReturnErrorOnFailure(
+        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(packet), sendFlag));
     MoveToState(State::CommandSent);
-    if (moreToSend) {
+    if (moreToSend)
+    {
         MoveToState(State::AwaitingResponse);
     }
     return CHIP_NO_ERROR;

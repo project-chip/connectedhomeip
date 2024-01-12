@@ -601,7 +601,7 @@ void TestCommandInteraction::TestCommandSenderWithSendCommand(nlTestSuite * apSu
 
     GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData);
     bool moreChunkedMessages = false;
-    err = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
+    err                      = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 }
@@ -644,7 +644,7 @@ void TestCommandInteraction::TestCommandSenderWithProcessReceivedMsg(nlTestSuite
 
     GenerateInvokeResponse(apSuite, apContext, buf, kTestCommandIdWithData);
     bool moreChunkedMessages = false;
-    err = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
+    err                      = commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, moreChunkedMessages == false);
 }
