@@ -17,10 +17,10 @@
 
 #include "general-diagnostics-server.h"
 
+#include <zap-generated/gen_config.h>
+
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-// Need the `nogncheck` because it's inter-cluster dependency and this
-// breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
-#include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
+#include "app/clusters/time-synchronization-server/time-synchronization-server.h"
 #endif                                                                            // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 
 #include "app/server/Server.h"
