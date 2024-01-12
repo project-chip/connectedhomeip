@@ -166,9 +166,10 @@ public:
          * applications to call and sequence.
          *
          * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
-         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. In this case, returning `CHIP_NO_ERROR` will still trigger a resubscribe attempt,
-         * while returning `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` will put the subscription in the `InactiveICDSubscription` state.  In the latter case, OnResubscriptionNeeded
-         * will be called again when `OnActiveModeNotification` is called.
+         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. In this case, returning `CHIP_NO_ERROR` will still trigger a resubscribe
+         * attempt, while returning `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` will put the subscription in the
+         * `InactiveICDSubscription` state.  In the latter case, OnResubscriptionNeeded will be called again when
+         * `OnActiveModeNotification` is called.
          *
          * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
          * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
