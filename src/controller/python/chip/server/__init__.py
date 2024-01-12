@@ -20,18 +20,13 @@ from chip import native
 from chip.native import PostAttributeChangeCallback
 
 
-_nativeLibraryHandleInitialized = False
-
-
 def GetLibraryHandle(cb: PostAttributeChangeCallback) -> ctypes.CDLL:
     """Get a memoized handle to the chip native code dll."""
 
-    handle = native.GetLibraryHandle(native.Library.SERVER)
+    handle = native._GetLibraryHandle(native.Library.SERVER, False)
+    if not handle.initialized:
+        handle.dll.pychip_server_native_init().raise_on_error()
+        handle.dll.pychip_server_set_callbacks(cb)
+        handle.initialized = True
 
-    global _nativeLibraryHandleInitialized
-    if not _nativeLibraryHandleInitialized:
-        handle.pychip_server_native_init()
-        handle.pychip_server_set_callbacks(cb)
-        _nativeLibraryHandleInitialized = True
-
-    return handle
+    return handle.dll

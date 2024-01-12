@@ -20,6 +20,7 @@ import glob
 import os
 import platform
 import typing
+from dataclasses import dataclass
 
 import chip.exceptions
 import construct
@@ -198,21 +199,25 @@ class NativeLibraryHandleMethodArguments:
         method.argtype = argumentTypes
 
 
-_nativeLibraryHandle: ctypes.CDLL = {}
+@dataclass
+class _Handle:
+    dll: ctypes.CDLL = None
+    initialized: bool = False
+
+
+_nativeLibraryHandles: dict[Library, _Handle] = {}
 
 
 def _GetLibraryHandle(lib: Library, shouldInit: bool) -> ctypes.CDLL:
-    """Get a memoized handle to the chip native code dll."""
+    """Get a memoized _Handle to the chip native code dll."""
 
-    global _nativeLibraryHandle
-    if lib not in _nativeLibraryHandle:
+    global _nativeLibraryHandles
+    if lib not in _nativeLibraryHandles:
 
-        if shouldInit and lib == Library.CONTROLLER:
-            raise Exception("Common stack has not been initialized!")
+        handle = _Handle(ctypes.CDLL(FindNativeLibraryPath(lib)))
+        _nativeLibraryHandles[lib] = handle
 
-        _nativeLibraryHandle[lib] = ctypes.CDLL(FindNativeLibraryPath(lib))
-        setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle[lib])
-
+        setter = NativeLibraryHandleMethodArguments(handle.dll)
         if lib == Library.CONTROLLER:
             setter.Set("pychip_CommonStackInit", PyChipError, [ctypes.c_char_p])
             setter.Set("pychip_FormatError", None,
@@ -221,7 +226,11 @@ def _GetLibraryHandle(lib: Library, shouldInit: bool) -> ctypes.CDLL:
             setter.Set("pychip_server_native_init", PyChipError, [])
             setter.Set("pychip_server_set_callbacks", None, [PostAttributeChangeCallback])
 
-    return _nativeLibraryHandle[lib]
+    handle = _nativeLibraryHandles[lib]
+    if shouldInit and not handle.initialized:
+        raise Exception("CHIP handle has not been initialized!")
+
+    return handle
 
 
 def Init(bluetoothAdapter: int = None):
@@ -233,12 +242,14 @@ def Init(bluetoothAdapter: int = None):
     params = CommonStackParams.build(params)
 
     handle = _GetLibraryHandle(Library.CONTROLLER, False)
-    handle.pychip_CommonStackInit(ctypes.c_char_p(params))
+    handle.dll.pychip_CommonStackInit(ctypes.c_char_p(params)).raise_on_error()
+    handle.initialized = True
 
 
 class HandleFlags(enum.Flag):
     REQUIRE_INITIALIZATION = enum.auto()
 
 
-def GetLibraryHandle(lib: Library = Library.CONTROLLER, flags=HandleFlags.REQUIRE_INITIALIZATION):
-    return _GetLibraryHandle(lib, HandleFlags.REQUIRE_INITIALIZATION in flags)
+def GetLibraryHandle(flags=HandleFlags.REQUIRE_INITIALIZATION) -> ctypes.CDLL:
+    handle = _GetLibraryHandle(Library.CONTROLLER, HandleFlags.REQUIRE_INITIALIZATION in flags)
+    return handle.dll
