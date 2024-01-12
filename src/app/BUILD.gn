@@ -94,6 +94,7 @@ static_library("app") {
     "ChunkedWriteCallback.cpp",
     "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
+    "CommandHandlerDispatcher.cpp",
     "CommandResponseHelper.h",
     "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",

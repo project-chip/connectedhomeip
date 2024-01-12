@@ -31,6 +31,7 @@
 #pragma once
 
 #include "CommandPathRegistry.h"
+#include "CommandHandlerDispatcher.h"
 
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
@@ -54,7 +55,7 @@
 namespace chip {
 namespace app {
 
-class CommandHandler : public Messaging::ExchangeDelegate
+class CommandHandler
 {
 public:
     class Callback
@@ -374,14 +375,14 @@ public:
      * Gets the inner exchange context object, without ownership.
      *
      * WARNING: This is dangerous, since it is directly interacting with the
-     *          exchange being managed automatically by mExchangeCtx and
+     *          exchange being managed automatically by mDispatcher and
      *          if not done carefully, may end up with use-after-free errors.
      *
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mExchangeCtx.Get(); }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mDispatcher.GetExchangeContext(); }
 
     /**
      * @brief Flush acks right away for a slow command
@@ -396,10 +397,7 @@ public:
      */
     void FlushAcksRightAwayOnSlowCommand()
     {
-        VerifyOrReturn(mExchangeCtx);
-        auto * msgContext = mExchangeCtx->GetReliableMessageContext();
-        VerifyOrReturn(msgContext != nullptr);
-        msgContext->FlushAcks();
+        mDispatcher.FlushAcksRightNow();
     }
 
     /**
@@ -411,17 +409,15 @@ public:
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
         VerifyOrDie(!mGoneAsync);
-        return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+        return mDispatcher.GetSubjectDescriptor();
     }
 
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
-
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override;
-
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
+    // TODO would be much better if we provided a Closure instead of using friend here.
+    // This is so Dispatcher can call close.
+    friend class CommandHandlerDispatcher;
 
     enum class State : uint8_t
     {
@@ -429,8 +425,7 @@ private:
         Preparing,           ///< We are prepaing the command or status header.
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
-        CommandSent,         ///< The command has been sent successfully.
-        AwaitingResponse,    ///< Awaiting response from requester, after sending response.
+        DispatchingResponse, ///< The command response are being dispatched.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
@@ -475,7 +470,7 @@ private:
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
-    CHIP_ERROR Finalize(bool aHasMoreChunks = false);
+    CHIP_ERROR FinalizeInvokeRequestMessage(bool aHasMoreChunks);
 
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -495,9 +490,7 @@ private:
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
-    CHIP_ERROR InitiateSendingCommandResponses();
-
-    CHIP_ERROR SendCommandResponse();
+    CHIP_ERROR StartSendingCommandResponses();
 
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
@@ -542,7 +535,6 @@ private:
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
-    Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
@@ -557,8 +549,8 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
-    // A list of InvokeResponseMessages to be sent out by CommandHandler.
-    System::PacketBufferHandle mChunks;
+    // Dispatches responses sent by 
+    CommandHandlerDispatcher mDispatcher;
 
     State mState = State::Idle;
     State mBackupState;

@@ -230,10 +230,7 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
-        if (!moreChunkedMessages)
-        {
-            sendStatusResponse = false;
-        }
+        sendStatusResponse = moreChunkedMessages;
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
@@ -303,9 +300,16 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
         ReturnErrorOnFailure(ProcessInvokeResponseIB(invokeResponse));
     }
 
-    // No need to check error from GetMoreChunkedMessages if the call fails. `moreChunkedMessages` is already set
-    // to the default to use when MoreChunkedMessages is not provided in InvokeResponseMessage.
-    invokeResponseMessage.GetMoreChunkedMessages(&moreChunkedMessages);
+    err = invokeResponseMessage.GetMoreChunkedMessages(&moreChunkedMessages);
+    // We will get CHIP_END_OF_TLV if there was no MoreChunkedMessages element, if that is
+    // the case a default value of false is used as mentioned in the spec.
+    if (CHIP_END_OF_TLV == err)
+    {
+        moreChunkedMessages = false;
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
     if (suppressResponse && moreChunkedMessages)
     {
         ChipLogError(DataManagement, "Spec violation! InvokeResponse has suppressResponse=true, and moreChunkedMessages=true");
