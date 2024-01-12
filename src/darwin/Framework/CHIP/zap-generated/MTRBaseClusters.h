@@ -16712,8 +16712,8 @@ typedef NS_OPTIONS(uint32_t, MTRGroupKeyManagementFeature) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRICDManagementOperatingMode) {
-    MTRICDManagementOperatingModeSITOperatingMode MTR_PROVISIONALLY_AVAILABLE = 0x00,
-    MTRICDManagementOperatingModeLITOperatingMode MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRICDManagementOperatingModeSIT MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRICDManagementOperatingModeLIT MTR_PROVISIONALLY_AVAILABLE = 0x01,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRICDManagementFeature) {

@@ -55,8 +55,8 @@ limitations under the License.
 
     <enum name="OperatingModeEnum" type="enum8">
     <cluster code="0x0046" />
-    <item value="0" name="SITOperatingMode" />
-    <item value="1" name="LITOperatingMode" />
+    <item value="0" name="SIT" />
+    <item value="1" name="LIT" />
     </enum>
 
     <cluster>

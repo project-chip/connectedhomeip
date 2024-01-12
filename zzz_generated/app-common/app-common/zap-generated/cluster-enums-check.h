@@ -1193,8 +1193,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::Operatin
     using EnumType = IcdManagement::OperatingModeEnum;
     switch (val)
     {
-    case EnumType::kSITOperatingMode:
-    case EnumType::kLITOperatingMode:
+    case EnumType::kSit:
+    case EnumType::kLit:
         return val;
     default:
         return static_cast<EnumType>(2);

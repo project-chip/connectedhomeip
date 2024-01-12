@@ -1717,8 +1717,8 @@ cluster IcdManagement = 70 {
   revision 2;
 
   enum OperatingModeEnum : enum8 {
-    kSITOperatingMode = 0;
-    kLITOperatingMode = 1;
+    kSIT = 0;
+    kLIT = 1;
   }
 
   bitmap Feature : bitmap32 {
