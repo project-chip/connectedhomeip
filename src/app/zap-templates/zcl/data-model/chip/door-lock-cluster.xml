@@ -38,6 +38,7 @@ limitations under the License.
         <tag name="YDSCH" description="Year Day Access Schedules" />
         <tag name="HDSCH" description="Holiday Schedules" />
         <tag name="UBOLT" description="Unbolting" />
+        <tag name="ALIRO" description="Aliro Credential Provisioning" />
 
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
@@ -54,11 +55,13 @@ limitations under the License.
             <featureBit tag="DPS" bit="5">true</featureBit>
             <featureBit tag="FACE" bit="6">false</featureBit>
             <featureBit tag="COTA" bit="7">true</featureBit>
-            <featureBit tag="USR" bit="8">true</featureBit> <!-- TODO: Depend on PIN | RID | FGP | FACE -->
+            <featureBit tag="USR" bit="8">true</featureBit> <!-- TODO: Depends on ALIRO, [ PIN | RID | FGP | FACE ]-->
             <featureBit tag="NOT" bit="9">false</featureBit>
             <featureBit tag="YDSCH" bit="10">true</featureBit>
             <featureBit tag="HDSCH" bit="11">true</featureBit>
             <featureBit tag="UBOLT" bit="12">true</featureBit>
+            <featureBit tag="ALIRO" bit="13">true</featureBit>
+            <featureBit tag="ALBU" bit="14">true</featureBit> <!-- TODO: Depends on ALIRO -->
         </globalAttribute>
 
         <!-- The principle behind  mandatory/optional is the following:
@@ -199,6 +202,45 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="administer" />
         </attribute>
+        <!-- Conformance feature [ALIRO] - optional -->
+        <attribute side="server" code="128" define="ALIRO_READER_VERIFICATION_KEY" type="octet_string" length="65" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
+            <description>AliroReaderVerificationKey</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALIRO] - optional -->
+        <attribute side="server" code="129" define="ALIRO_READER_GROUP_IDENTIFIER" type="octet_string" length="16" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
+            <description>AliroReaderGroupIdentifier</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALIRO] - optional -->
+        <attribute side="server" code="130" define="ALIRO_READER_GROUP_SUBIDENTIFIER" type="octet_string" length="16" writable="false" optional="true" apiMaturity="provisional">
+            <description>AliroReaderGroupSubIdentifier</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALIRO] - optional -->
+        <attribute side="server" code="131" define="ALIRO_EXPEDITED_TRANSACTION_SUPPORTED_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" writable="false" optional="true" apiMaturity="provisional">
+            <description>AliroExpeditedTransactionSupportedProtocolVersions</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
+        <attribute side="server" code="132" define="ALIRO_GROUP_RESOLVING_KEY" type="octet_string" length="16" writable="false" optional="true" isNullable="true" apiMaturity="provisional">
+            <description>AliroGroupResolvingKey</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
+        <attribute side="server" code="133" define="ALIRO_SUPPORTED_BLE_UWB_PROTOCOL_VERSIONS" type="array" entryType="octet_string" length="16" writable="false" optional="true" apiMaturity="provisional">
+            <description>AliroSupportedBLEUWBProtocolVersions</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALBU] - optional if ALIRO is supported -->
+        <attribute side="server" code="134" define="ALIRO_BLE_ADVERTISING_VERSION" type="int8u" writable="false" optional="true" apiMaturity="provisional">
+            <description>AliroBLEAdvertisingVersion</description>
+            <access op="read" privilege="administer" />
+        </attribute>
+        <!-- Conformance feature [ALIRO] - optional -->
+        <attribute side="server" code="135" define="NUMBER_OF_ALIRO_CREDENTIAL_ISSUER_KEYS_SUPPORTED" type="int16u" writable="false" optional="true" apiMaturity="provisional">NumberOfAliroCredentialIssuerKeysSupported</attribute>
+        <!-- Conformance feature [ALIRO] - optional -->
+        <attribute side="server" code="136" define="NUMBER_OF_ALIRO_ENDPOINT_KEYS_SUPPORTED" type="int16u" writable="false" optional="true" apiMaturity="provisional">NumberOfAliroEndpointKeysSupported</attribute>
 
         <!-- Commands -->
         <command source="client" code="0" name="LockDoor" mustUseTimedInvoke="true">
@@ -400,6 +442,18 @@ limitations under the License.
             <!-- Conformance feature [COTA & PIN] - for now optional -->
             <arg name="PINCode" type="octet_string" optional="true" />
         </command>
+        <command source="client" code="40" name="SetAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
+            <description>This command communicates an Aliro Reader configuration to the lock.</description>
+            <access op="invoke" privilege="administer" />
+            <arg name="SigningKey" type="octet_string" length="32" />
+            <arg name="VerificationKey" type="octet_string" length="65" />
+            <arg name="GroupIdentifier" type="octet_string" length="16" />
+            <arg name="GroupResolvingKey" type="octet_string" length="16" optional="true" />
+        </command>
+        <command source="client" code="41" name="ClearAliroReaderConfig" mustUseTimedInvoke="true" optional="true" apiMaturity="provisional">
+            <description>This command clears an existing Aliro Reader configuration for the lock.</description>
+            <access op="invoke" privilege="administer" />
+        </command>
 
 
         <!-- Events -->
@@ -487,6 +541,9 @@ limitations under the License.
         <item value="3" name="Fingerprint" />
         <item value="4" name="FingerVein" />
         <item value="5" name="Face" />
+        <item value="6" name="AliroCredentialIssuerKey" />
+        <item value="7" name="AliroEvictableEndpointKey" />
+        <item value="8" name="AliroNonEvictableEndpointKey" />
     </enum>
 
     <enum name="DataOperationTypeEnum" type="enum8">
@@ -530,6 +587,9 @@ limitations under the License.
         <item value="8" name="Fingerprint" />
         <item value="9" name="FingerVein" />
         <item value="10" name="Face" />
+        <item value="11" name="AliroCredentialIssuerKey" />
+        <item value="12" name="AliroEvictableEndpointKey" />
+        <item value="13" name="AliroNonEvictableEndpointKey" />
     </enum>
 
     <enum name="LockOperationTypeEnum" type="enum8">
@@ -571,6 +631,7 @@ limitations under the License.
         <item value="7" name="Remote" />
         <item value="8" name="RFID" />
         <item value="9" name="Biometric" />
+        <item value="10" name="Aliro" />
     </enum>
 
     <enum name="UserStatusEnum" type="enum8">
@@ -769,6 +830,8 @@ limitations under the License.
         <field name="Year Day Access Schedules" mask="0x400" />
         <field name="Holiday Schedules" mask="0x800" />
         <field name="Unbolt" mask="0x1000" />
+        <field name="AliroProvisioning" mask="0x2000" />
+        <field name="AliroBLEUWB" mask="0x4000" />
     </bitmap>
 
     <enum name="DoorLockSetPinOrIdStatus" type="enum8">

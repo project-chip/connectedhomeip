@@ -22,7 +22,7 @@ struct ContentView: View {
         NavigationView {
             if ProcessInfo.processInfo.environment["CHIP_CASTING_SIMPLIFIED"] == "1"
             {
-                MTRDiscoveryExampleView()
+                MCDiscoveryExampleView()
             }
             else
             {
