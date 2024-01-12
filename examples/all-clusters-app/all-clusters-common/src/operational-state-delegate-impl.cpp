@@ -103,6 +103,11 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
 static OperationalState::Instance * gOperationalStateInstance = nullptr;
 static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
 
+OperationalState::Instance * OperationalState::GetOperationalStateInstance()
+{
+    return gOperationalStateInstance;
+}
+
 void OperationalState::Shutdown()
 {
     if (gOperationalStateInstance != nullptr)

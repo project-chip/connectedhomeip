@@ -111,6 +111,8 @@ public:
 
 void Shutdown();
 
+Instance * GetRvcOperationalStateInstance();
+
 } // namespace RvcOperationalState
 } // namespace Clusters
 } // namespace app

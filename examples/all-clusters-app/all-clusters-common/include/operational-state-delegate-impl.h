@@ -111,6 +111,8 @@ public:
     }
 };
 
+Instance * GetOperationalStateInstance();
+
 void Shutdown();
 
 } // namespace OperationalState

@@ -115,6 +115,12 @@ void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::
 static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
 static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
 
+RvcOperationalState::Instance * RvcOperationalState::GetRvcOperationalStateInstance()
+{
+    return gRvcOperationalStateInstance;
+}
+
+
 void RvcOperationalState::Shutdown()
 {
     if (gRvcOperationalStateInstance != nullptr)
