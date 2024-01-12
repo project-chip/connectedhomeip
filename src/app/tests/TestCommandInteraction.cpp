@@ -569,7 +569,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     TestExchangeDelegate delegate;
 
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     err = commandHandler.StartSendingCommandResponses();
 
@@ -619,7 +619,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
     err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
@@ -660,7 +660,7 @@ void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(n
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
     err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
@@ -719,7 +719,7 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     commandHandler.AddResponse(requestCommandPath, Fields());
     err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
@@ -744,7 +744,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     commandHandler.AddResponse(requestCommandPath, BadFields());
     err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
@@ -1113,7 +1113,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     err = commandHandler.AddResponseData(requestCommandPath, BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
@@ -1142,7 +1142,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
     app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     TestExchangeDelegate delegate;
-    commandHandler.mDispatcher.mExchangeCtx.Grab(ctx.NewExchangeToAlice(&delegate));
+    commandHandler.mDispatcher.SetExchangeContext(ctx.NewExchangeToAlice(&delegate));
     // Use some invalid endpoint / cluster / command.
     GenerateInvokeRequest(apSuite, apContext, commandDatabuf, /* aIsTimedRequest = */ false, 0xEF /* command */,
                           0xADBE /* cluster */, 0xDE /* endpoint */);
@@ -1167,7 +1167,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
 
             TestExchangeDelegate delegate;
             auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-            commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+            commandHandler.mDispatcher.SetExchangeContext(exchange);
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);
@@ -1557,7 +1557,7 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
     CommandHandler commandHandler(&mockCommandHandlerDelegate);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1631,7 +1631,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1705,7 +1705,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.mExchangeCtx.Grab(exchange);
+    commandHandler.mDispatcher.SetExchangeContext(exchange);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
