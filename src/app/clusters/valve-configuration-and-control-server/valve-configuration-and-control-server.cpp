@@ -18,6 +18,14 @@
 
 #include "valve-configuration-and-control-server.h"
 
+#include <zap-generated/gen_config.h>
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+// Need the `nogncheck` because it's inter-cluster dependency and this
+// breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
+#include "app/clusters/time-synchronization-server/time-synchronization-server.h" // nogncheck
+
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -308,19 +316,27 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
 
     if (HasFeature(ep, ValveConfigurationAndControl::Feature::kTimeSync))
     {
-        System::Clock::Microseconds64 utcTime;
-        ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
-
-        if (!openDuration.IsNull())
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+        if (!openDuration.IsNull() &&
+            TimeSynchronization::TimeSynchronizationServer::Instance().GetGranularity() !=
+                TimeSynchronization::GranularityEnum::kNoTimeGranularity)
         {
+            System::Clock::Microseconds64 utcTime;
+            uint64_t chipEpochTime;
+            ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
+            VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
+
             uint64_t time = openDuration.Value() * chip::kMicrosecondsPerSecond;
-            autoCloseTime.SetNonNull(utcTime.count() + time);
+            autoCloseTime.SetNonNull(chipEpochTime + time);
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::Set(ep, autoCloseTime), attribute_error);
         }
         else
         {
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::SetNull(ep), attribute_error);
         }
+#else
+        return CHIP_FAILURE;
+#endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     }
 
     // level can only be null if LVL feature is not supported
