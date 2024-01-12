@@ -1749,7 +1749,7 @@ cluster LaundryWasherMode = 81 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+/** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
   revision 1;
 
