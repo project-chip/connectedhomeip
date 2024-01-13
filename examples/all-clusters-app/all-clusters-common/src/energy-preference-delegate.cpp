@@ -7,7 +7,7 @@ using namespace chip::app::Clusters::EnergyPreference::Structs;
 static constexpr const char * kEfficientLabel = "Efficient";
 static constexpr const char * kComfortLabel = "Comfort";
 
-static BalanceStruct::Type gsEnergyBalances[] = 
+static BalanceStruct::Type gsEnergyBalances[] =
 {
 	{
 		.step = 0,
@@ -34,7 +34,7 @@ static constexpr const char * k60MinutesLabel = "60 Minutes";
 static constexpr const char * k120MinutesLabel = "120 Minutes";
 static constexpr const char * kNeverLabel = "Never";
 
-static BalanceStruct::Type gsPowerBalances[] = 
+static BalanceStruct::Type gsPowerBalances[] =
 {
 	{
 		.step = 0,
@@ -83,7 +83,7 @@ struct EPrefDelegate : public EnergyPreferenceDelegate
 {
 	EPrefDelegate();
 	virtual ~EPrefDelegate();
-	
+
 	CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, BalanceStruct::Type &balance) override;
 	CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, EnergyPriorityEnum &priority) override;
 	CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, BalanceStruct::Type &balance) override;
@@ -113,7 +113,7 @@ size_t EPrefDelegate::GetNumLowPowerModes(chip::EndpointId aEndpoint)
 	return (sizeof(gsEnergyBalances) / sizeof (gsEnergyBalances[0]));
 }
 
-CHIP_ERROR 
+CHIP_ERROR
 EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, BalanceStruct::Type &balance)
 {
     if (aIndex < GetNumEnergyBalances(aEndpoint))
@@ -124,7 +124,7 @@ EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR 
+CHIP_ERROR
 EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, EnergyPriorityEnum &priority)
 {
 	static EnergyPriorityEnum priorities[] =
@@ -139,10 +139,10 @@ EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aInde
         return CHIP_NO_ERROR;
     }
 
-	return CHIP_ERROR_NOT_FOUND;	
+	return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR 
+CHIP_ERROR
 EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, BalanceStruct::Type &balance)
 {
     if (aIndex < GetNumLowPowerModes(aEndpoint))
@@ -151,9 +151,8 @@ EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, siz
         return CHIP_NO_ERROR;
     }
 
-	return CHIP_ERROR_NOT_FOUND;	
+	return CHIP_ERROR_NOT_FOUND;
 }
 
 
 static EPrefDelegate gsDelegate;
-

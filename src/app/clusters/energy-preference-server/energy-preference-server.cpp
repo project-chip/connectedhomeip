@@ -97,7 +97,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             {
                 return aEncoder.EncodeNull();
             }
-            
+
             if (gsDelegate != nullptr)
             {
                 return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
@@ -124,7 +124,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             {
                 return aEncoder.EncodeNull();
             }
-            
+
             if (gsDelegate != nullptr)
             {
                 return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
