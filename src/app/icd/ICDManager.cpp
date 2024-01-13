@@ -245,6 +245,11 @@ void ICDManager::UpdateICDMode()
     {
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
         postObserverEvent(ObserverEventType::ICDModeChange);
+
+        // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
+#endif
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.

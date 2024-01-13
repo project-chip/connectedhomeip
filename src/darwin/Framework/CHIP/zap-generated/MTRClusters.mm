@@ -6554,6 +6554,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeUserActiveModeTriggerInstructionID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOperatingModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeOperatingModeID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID) params:params];
@@ -9235,6 +9240,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLevelStepWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeLevelStepID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeGeneratedCommandListID) params:params];
@@ -10873,6 +10883,70 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)setAliroReaderConfigWithParams:(MTRDoorLockClusterSetAliroReaderConfigParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetAliroReaderConfigParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = DoorLock::Commands::SetAliroReaderConfig::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)clearAliroReaderConfigWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self clearAliroReaderConfigWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)clearAliroReaderConfigWithParams:(MTRDoorLockClusterClearAliroReaderConfigParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearAliroReaderConfigParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = DoorLock::Commands::ClearAliroReaderConfig::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeLockStateID) params:params];
@@ -11249,6 +11323,51 @@ using chip::System::Clock::Timeout;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroReaderVerificationKeyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderVerificationKeyID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroReaderGroupIdentifierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupIdentifierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroReaderGroupSubIdentifierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupSubIdentifierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroExpeditedTransactionSupportedProtocolVersionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroExpeditedTransactionSupportedProtocolVersionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroGroupResolvingKeyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroGroupResolvingKeyID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroSupportedBLEUWBProtocolVersionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroSupportedBLEUWBProtocolVersionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroBLEAdvertisingVersionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroBLEAdvertisingVersionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfAliroCredentialIssuerKeysSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroCredentialIssuerKeysSupportedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfAliroEndpointKeysSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroEndpointKeysSupportedID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

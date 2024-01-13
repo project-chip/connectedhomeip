@@ -2848,6 +2848,11 @@ cluster BooleanState = 69 {
 cluster IcdManagement = 70 {
   revision 2;
 
+  enum OperatingModeEnum : enum8 {
+    kSIT = 0;
+    kLIT = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
@@ -2880,6 +2885,9 @@ cluster IcdManagement = 70 {
     fabric_idx fabricIndex = 254;
   }
 
+  critical event OnTransitionToActiveMode = 0 {
+  }
+
   readonly attribute int32u idleModeDuration = 0;
   readonly attribute int32u activeModeDuration = 1;
   readonly attribute int16u activeModeThreshold = 2;
@@ -2888,6 +2896,7 @@ cluster IcdManagement = 70 {
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
   readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
   readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3254,7 +3263,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+/** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
   revision 1;
 
@@ -4101,6 +4110,7 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute optional nullable percent targetLevel = 7;
   attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute optional int8u levelStep = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4816,6 +4826,9 @@ cluster DoorLock = 257 {
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
+    kAliroCredentialIssuerKey = 6;
+    kAliroEvictableEndpointKey = 7;
+    kAliroNonEvictableEndpointKey = 8;
   }
 
   enum DataOperationTypeEnum : enum8 {
@@ -4928,6 +4941,9 @@ cluster DoorLock = 257 {
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
+    kAliroCredentialIssuerKey = 11;
+    kAliroEvictableEndpointKey = 12;
+    kAliroNonEvictableEndpointKey = 13;
   }
 
   enum LockOperationTypeEnum : enum8 {
@@ -4965,6 +4981,7 @@ cluster DoorLock = 257 {
     kRemote = 7;
     kRFID = 8;
     kBiometric = 9;
+    kAliro = 10;
   }
 
   enum UserStatusEnum : enum8 {
@@ -5125,6 +5142,8 @@ cluster DoorLock = 257 {
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
     kUnbolt = 0x1000;
+    kAliroProvisioning = 0x2000;
+    kAliroBLEUWB = 0x4000;
   }
 
   struct CredentialStruct {
@@ -5205,6 +5224,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
+  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5370,6 +5398,13 @@ cluster DoorLock = 257 {
     optional octet_string PINCode = 0;
   }
 
+  request struct SetAliroReaderConfigRequest {
+    octet_string<32> signingKey = 0;
+    octet_string<65> verificationKey = 1;
+    octet_string<16> groupIdentifier = 2;
+    optional octet_string<16> groupResolvingKey = 3;
+  }
+
   /** This command causes the lock device to lock the door. */
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   /** This command causes the lock device to unlock the door. */
@@ -5408,6 +5443,10 @@ cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   /** This command causes the lock device to unlock the door without pulling the latch. */
   timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
+  /** This command communicates an Aliro Reader configuration to the lock. */
+  timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
+  /** This command clears an existing Aliro Reader configuration for the lock. */
+  timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */

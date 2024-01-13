@@ -111,11 +111,25 @@ public:
     InvokeResponseMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
     /**
+     *  @brief Reserved space in TLVWriter for MoreChunkedMessages
+     *  @return CHIP_NO_ERROR upon successfully reserving space for MoreChunkedMessages
+     *  @return other CHIP error see TLVWriter::ReserveBuffer for more details.
+     */
+    CHIP_ERROR ReserveSpaceForMoreChunkedMessages();
+
+    /**
      *  @brief Mark the end of this InvokeResponseMessage
      *
      *  @return The builder's final status.
      */
     CHIP_ERROR EndOfInvokeResponseMessage();
+
+    /**
+     *  @brief Get number of bytes required in the buffer by MoreChunkedMessages
+     *
+     *  @return Expected number of bytes required in the buffer by MoreChunkedMessages()
+     */
+    uint32_t GetSizeForMoreChunkResponses();
 
     /**
      *  @brief Get number of bytes required in the buffer by EndOfInvokeResponseMessage()
@@ -126,7 +140,8 @@ public:
 
 private:
     InvokeResponseIBs::Builder mInvokeResponses;
-    bool mIsEndBufferReserved = false;
+    bool mIsEndBufferReserved              = false;
+    bool mIsMoreChunkMessageBufferReserved = false;
 };
 } // namespace InvokeResponseMessage
 } // namespace app

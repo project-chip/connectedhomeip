@@ -23,7 +23,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -41,21 +42,21 @@ tests:
               - name: "Status"
                 value: 0
 
-    - label: "Step 1: Reads the CurrentState attribute from the DUT"
+    - label: "Step 1: TH reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 1
 
-    - label: "Step 2: Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 2: TH reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C01.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 0
 
-    - label: "Step 3: Sends a FastForward command"
+    - label: "Step 3: TH sends a FastForward command to the DUT"
       PICS: MEDIAPLAYBACK.S.C07.Rsp
       command: "FastForward"
       response:
@@ -74,21 +75,21 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 4: Reads the CurrentState attribute"
+    - label: "Step 4: TH reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "Step 5: Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 5: TH reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 1
 
-    - label: "Step 6: Sends a FastForward command"
+    - label: "Step 6: TH sends a FastForward command to the DUT"
       PICS: MEDIAPLAYBACK.S.C07.Rsp
       command: "FastForward"
       response:
@@ -107,14 +108,14 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 7: Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 7: TH reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C07.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: 2
 
-    - label: "Step 8: Sends a Rewind command to the DUT"
+    - label: "Step 8: TH sends a Rewind command to the DUT"
       PICS: MEDIAPLAYBACK.S.C06.Rsp
       command: "Rewind"
       response:
@@ -133,21 +134,21 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 9: Reads the CurrentState attribute"
+    - label: "Step 9: TH reads the CurrentState attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0000 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "CurrentState"
       response:
           value: 0
 
-    - label: "Step 10: Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 10: TH reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: -1
 
-    - label: "Step 11: Sends a Rewind command to the DUT"
+    - label: "Step 11: TH sends a Rewind command to the DUT"
       PICS: MEDIAPLAYBACK.S.C06.Rsp
       command: "Rewind"
       response:
@@ -171,14 +172,14 @@ tests:
                 value: "y"
 
     #Issue 19800
-    - label: "Step 12: Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 12: TH reads the PlaybackSpeed attribute from the DUT"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C06.Rsp
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       response:
           value: -2
 
-    - label: "Step 13: Sends a Play command"
+    - label: "Step 13: TH sends a Play command to the DUT"
       PICS: MEDIAPLAYBACK.S.C00.Rsp
       command: "Play"
       response:
@@ -201,7 +202,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 14: Reads the PlaybackSpeed attribute from the DUT"
+    - label: "Step 14: TH reads the PlaybackSpeed attribute from the DUT"
       command: "readAttribute"
       attribute: "PlaybackSpeed"
       PICS: MEDIAPLAYBACK.S.A0004 && MEDIAPLAYBACK.S.C00.Rsp
@@ -209,7 +210,9 @@ tests:
           value: 1
 
     #Issue 10988
-    - label: "Step 15: Sends consecutive FastForward commands"
+    - label:
+          "Step 15: STH sends consecutive FastForward commands up to the
+          manufacturer defined max speed"
       verification: |
           Send below command consecutively multiple times to get error code as 4
 
@@ -235,7 +238,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 16: Sends consecutive Rewind commands"
+    - label:
+          "Step 16: TH sends consecutive Rewind commands up to the manufacturer
+          defined max speed"
       verification: |
           Send below command consecutively multiple times to get error code as 4
 

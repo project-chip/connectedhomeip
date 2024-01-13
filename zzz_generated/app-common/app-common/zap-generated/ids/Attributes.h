@@ -2422,6 +2422,10 @@ namespace UserActiveModeTriggerInstruction {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace UserActiveModeTriggerInstruction
 
+namespace OperatingMode {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace OperatingMode
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3618,6 +3622,10 @@ namespace ValveFault {
 static constexpr AttributeId Id = 0x00000009;
 } // namespace ValveFault
 
+namespace LevelStep {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace LevelStep
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -4141,6 +4149,42 @@ static constexpr AttributeId Id = 0x00000033;
 namespace ExpiringUserTimeout {
 static constexpr AttributeId Id = 0x00000035;
 } // namespace ExpiringUserTimeout
+
+namespace AliroReaderVerificationKey {
+static constexpr AttributeId Id = 0x00000080;
+} // namespace AliroReaderVerificationKey
+
+namespace AliroReaderGroupIdentifier {
+static constexpr AttributeId Id = 0x00000081;
+} // namespace AliroReaderGroupIdentifier
+
+namespace AliroReaderGroupSubIdentifier {
+static constexpr AttributeId Id = 0x00000082;
+} // namespace AliroReaderGroupSubIdentifier
+
+namespace AliroExpeditedTransactionSupportedProtocolVersions {
+static constexpr AttributeId Id = 0x00000083;
+} // namespace AliroExpeditedTransactionSupportedProtocolVersions
+
+namespace AliroGroupResolvingKey {
+static constexpr AttributeId Id = 0x00000084;
+} // namespace AliroGroupResolvingKey
+
+namespace AliroSupportedBLEUWBProtocolVersions {
+static constexpr AttributeId Id = 0x00000085;
+} // namespace AliroSupportedBLEUWBProtocolVersions
+
+namespace AliroBLEAdvertisingVersion {
+static constexpr AttributeId Id = 0x00000086;
+} // namespace AliroBLEAdvertisingVersion
+
+namespace NumberOfAliroCredentialIssuerKeysSupported {
+static constexpr AttributeId Id = 0x00000087;
+} // namespace NumberOfAliroCredentialIssuerKeysSupported
+
+namespace NumberOfAliroEndpointKeysSupported {
+static constexpr AttributeId Id = 0x00000088;
+} // namespace NumberOfAliroEndpointKeysSupported
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
