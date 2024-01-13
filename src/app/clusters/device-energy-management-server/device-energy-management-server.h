@@ -37,10 +37,6 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
 
-/**
- *  @brief  Defines methods for implementing application-specific logic for this Cluster.
- *
- */
 class Delegate
 {
 public:
