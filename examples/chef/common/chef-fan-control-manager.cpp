@@ -26,6 +26,8 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <functional>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
