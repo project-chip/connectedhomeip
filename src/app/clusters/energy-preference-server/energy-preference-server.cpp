@@ -52,7 +52,7 @@ public:
 };
 
 EnergyPrefAttrAccess gEnergyPrefAttrAccess;
-EnergyPreferenceDelegate *gsDelegate;
+EnergyPreferenceDelegate * gsDelegate;
 
 CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -65,89 +65,89 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
     switch (aPath.mAttributeId)
     {
-        case EnergyBalances::Id: {
-            if (balanceSupported == false)
-            {
-                return aEncoder.EncodeNull();
-            }
-
-            if (gsDelegate != nullptr)
-            {
-                return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-                    BalanceStruct::Type balance;
-                    size_t index   = 0;
-                    CHIP_ERROR err = CHIP_NO_ERROR;
-                    while ((err = gsDelegate->GetEnergyBalanceAtIndex(endpoint, index, balance)) == CHIP_NO_ERROR)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(balance));
-                        index++;
-                    }
-                    if (err == CHIP_ERROR_NOT_FOUND)
-                    {
-                        return CHIP_NO_ERROR;
-                    }
-                    return err;
-                });
-            }
-            return CHIP_ERROR_INCORRECT_STATE;
+    case EnergyBalances::Id: {
+        if (balanceSupported == false)
+        {
+            return aEncoder.EncodeNull();
         }
-        break;
-        case EnergyPriorities::Id: {
-            if (balanceSupported == false)
-            {
-                return aEncoder.EncodeNull();
-            }
 
-            if (gsDelegate != nullptr)
-            {
-                return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-                    EnergyPriorityEnum priority;
-                    size_t index   = 0;
-                    CHIP_ERROR err = CHIP_NO_ERROR;
-                    while ((err = gsDelegate->GetEnergyPriorityAtIndex(endpoint, index, priority)) == CHIP_NO_ERROR)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(priority));
-                        index++;
-                    }
-                    if (err == CHIP_ERROR_NOT_FOUND)
-                    {
-                        return CHIP_NO_ERROR;
-                    }
-                    return err;
-                });
-            }
-            return CHIP_ERROR_INCORRECT_STATE;
+        if (gsDelegate != nullptr)
+        {
+            return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+                BalanceStruct::Type balance;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = gsDelegate->GetEnergyBalanceAtIndex(endpoint, index, balance)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(balance));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
         }
-        break;
-        case LowPowerModeSensitivities::Id: {
-            if (lowPowerSupported == false)
-            {
-                return aEncoder.EncodeNull();
-            }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    break;
+    case EnergyPriorities::Id: {
+        if (balanceSupported == false)
+        {
+            return aEncoder.EncodeNull();
+        }
 
-            if (gsDelegate != nullptr)
-            {
-                return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
-                    BalanceStruct::Type balance;
-                    size_t index   = 0;
-                    CHIP_ERROR err = CHIP_NO_ERROR;
-                    while ((err = gsDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, balance)) == CHIP_NO_ERROR)
-                    {
-                        ReturnErrorOnFailure(encoder.Encode(balance));
-                        index++;
-                    }
-                    if (err == CHIP_ERROR_NOT_FOUND)
-                    {
-                        return CHIP_NO_ERROR;
-                    }
-                    return err;
-                });
-            }
-            return CHIP_ERROR_INCORRECT_STATE;
+        if (gsDelegate != nullptr)
+        {
+            return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+                EnergyPriorityEnum priority;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = gsDelegate->GetEnergyPriorityAtIndex(endpoint, index, priority)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(priority));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
         }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    break;
+    case LowPowerModeSensitivities::Id: {
+        if (lowPowerSupported == false)
+        {
+            return aEncoder.EncodeNull();
+        }
+
+        if (gsDelegate != nullptr)
+        {
+            return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
+                BalanceStruct::Type balance;
+                size_t index   = 0;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                while ((err = gsDelegate->GetLowPowerModeSensitivityAtIndex(endpoint, index, balance)) == CHIP_NO_ERROR)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(balance));
+                    index++;
+                }
+                if (err == CHIP_ERROR_NOT_FOUND)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                return err;
+            });
+        }
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    break;
+    default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
-        default: // return CHIP_NO_ERROR and just read from the attribute store in default
-            break;
     }
 
     return CHIP_NO_ERROR;
@@ -175,9 +175,9 @@ EnergyPreferenceDelegate * GetMatterEnergyPreferencesDelegate()
 
 Protocols::InteractionModel::Status
 MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
-                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    EndpointId endpoint = attributePath.mEndpointId;
+    EndpointId endpoint                 = attributePath.mEndpointId;
     EnergyPreferenceDelegate * delegate = GetMatterEnergyPreferencesDelegate();
     uint32_t ourFeatureMap;
     bool balanceSupported = (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
@@ -189,29 +189,29 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::Concre
 
     switch (attributePath.mAttributeId)
     {
-        case CurrentEnergyBalance::Id: {
-            if (balanceSupported == false)
-                return imcode::UnsupportedAttribute;
+    case CurrentEnergyBalance::Id: {
+        if (balanceSupported == false)
+            return imcode::UnsupportedAttribute;
 
-            uint8_t index = chip::Encoding::Get8(value);
-            size_t arraySize = delegate->GetNumEnergyBalances(endpoint);
-            if (index >= arraySize)
-                return imcode::InvalidValue;
-            return imcode::Success;
-        }
+        uint8_t index    = chip::Encoding::Get8(value);
+        size_t arraySize = delegate->GetNumEnergyBalances(endpoint);
+        if (index >= arraySize)
+            return imcode::InvalidValue;
+        return imcode::Success;
+    }
 
-        case CurrentLowPowerModeSensitivity::Id: {
-            if (lowPowerSupported == false)
-                return imcode::UnsupportedAttribute;
+    case CurrentLowPowerModeSensitivity::Id: {
+        if (lowPowerSupported == false)
+            return imcode::UnsupportedAttribute;
 
-            uint8_t index = chip::Encoding::Get8(value);
-            size_t arraySize = delegate->GetNumLowPowerModes(endpoint);
-            if (index >= arraySize)
-                return imcode::InvalidValue;
-            return imcode::Success;
-        }
-        default:
-            return imcode::Success;
+        uint8_t index    = chip::Encoding::Get8(value);
+        size_t arraySize = delegate->GetNumLowPowerModes(endpoint);
+        if (index >= arraySize)
+            return imcode::InvalidValue;
+        return imcode::Success;
+    }
+    default:
+        return imcode::Success;
     }
 }
 

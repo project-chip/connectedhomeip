@@ -26,14 +26,18 @@
 
 struct EnergyPreferenceDelegate
 {
-	virtual ~EnergyPreferenceDelegate(){}
+    virtual ~EnergyPreferenceDelegate() {}
 
-	virtual CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type &balance) = 0;
-	virtual CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::EnergyPreference::EnergyPriorityEnum &priority) = 0;
-	virtual CHIP_ERROR GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex, chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type &balance) = 0;
+    virtual CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
+                                               chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & balance) = 0;
+    virtual CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
+                                                chip::app::Clusters::EnergyPreference::EnergyPriorityEnum & priority)         = 0;
+    virtual CHIP_ERROR
+    GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
+                                      chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & balance) = 0;
 
-	virtual size_t GetNumEnergyBalances(chip::EndpointId aEndpoint) = 0;
-	virtual size_t GetNumLowPowerModes(chip::EndpointId aEndpoint) = 0;
+    virtual size_t GetNumEnergyBalances(chip::EndpointId aEndpoint) = 0;
+    virtual size_t GetNumLowPowerModes(chip::EndpointId aEndpoint)  = 0;
 };
 
 void SetMatterEnergyPreferencesDelegate(EnergyPreferenceDelegate * aDelegate);
