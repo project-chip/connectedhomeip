@@ -201,7 +201,7 @@ CHIP_ERROR EVSEManufacturerInit()
 {
     CHIP_ERROR err;
 
-    if (gEvseManufacturer != nullptr)
+    if (gEvseManufacturer)
     {
         ChipLogError(AppServer, "EvseManufacturer already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
