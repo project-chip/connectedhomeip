@@ -38,6 +38,8 @@ using namespace chip::app::Clusters::EnergyPreference;
 using namespace chip::app::Clusters::EnergyPreference::Structs;
 using namespace chip::app::Clusters::EnergyPreference::Attributes;
 
+using imcode = Protocols::InteractionModel::Status;
+
 namespace {
 
 class EnergyPrefAttrAccess : public AttributeAccessInterface
@@ -56,10 +58,19 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 {
     VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
     EndpointId endpoint = aPath.mEndpointId;
+    uint32_t ourFeatureMap;
+    bool balanceSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
+    bool lowPowerSupported = (ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0;
 
     switch (aPath.mAttributeId)
     {
         case EnergyBalances::Id: {
+            if (balanceSupported == false)
+            {
+                return aEncoder.EncodeNull();
+            }
+
             if (gsDelegate != nullptr)
             {
                 return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
@@ -82,6 +93,11 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         break;
         case EnergyPriorities::Id: {
+            if (balanceSupported == false)
+            {
+                return aEncoder.EncodeNull();
+            }
+            
             if (gsDelegate != nullptr)
             {
                 return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
@@ -104,6 +120,11 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         }
         break;
         case LowPowerModeSensitivities::Id: {
+            if (lowPowerSupported == false)
+            {
+                return aEncoder.EncodeNull();
+            }
+            
             if (gsDelegate != nullptr)
             {
                 return aEncoder.EncodeList([endpoint](const auto & encoder) -> CHIP_ERROR {
@@ -150,6 +171,48 @@ void SetMatterEnergyPreferencesDelegate(EnergyPreferenceDelegate * aDelegate)
 EnergyPreferenceDelegate * GetMatterEnergyPreferencesDelegate()
 {
     return gsDelegate;
+}
+
+Protocols::InteractionModel::Status
+MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+                                                         EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+{
+    EndpointId endpoint = attributePath.mEndpointId;
+    EnergyPreferenceDelegate * delegate = GetMatterEnergyPreferencesDelegate();
+    uint32_t ourFeatureMap;
+    bool balanceSupported = (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
+        ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
+    bool lowPowerSupported = (ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0;
+
+    if (delegate == nullptr)
+        return imcode::UnsupportedWrite;
+
+    switch (attributePath.mAttributeId)
+    {
+        case CurrentEnergyBalance::Id: {
+            if (balanceSupported == false)
+                return imcode::UnsupportedAttribute;
+
+            uint8_t index = chip::Encoding::Get8(value);
+            size_t arraySize = delegate->GetNumEnergyBalances(endpoint);
+            if (index >= arraySize)
+                return imcode::InvalidValue;
+            return imcode::Success;
+        }
+
+        case CurrentLowPowerModeSensitivity::Id: {
+            if (lowPowerSupported == false)
+                return imcode::UnsupportedAttribute;
+
+            uint8_t index = chip::Encoding::Get8(value);
+            size_t arraySize = delegate->GetNumLowPowerModes(endpoint);
+            if (index >= arraySize)
+                return imcode::InvalidValue;
+            return imcode::Success;
+        }
+        default:
+            return imcode::Success;
+    }
 }
 
 void MatterEnergyPreferencePluginServerInitCallback()
