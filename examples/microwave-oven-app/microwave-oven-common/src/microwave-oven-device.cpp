@@ -67,7 +67,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
 
     mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
 
-    // if using power as number, check if powerSettingNum has value before setting the power number 
+    // if using power as number, check if powerSettingNum has value before setting the power number
     if (powerSettingNum.HasValue())
     {
         mPowerSettingNum = powerSettingNum.Value();
