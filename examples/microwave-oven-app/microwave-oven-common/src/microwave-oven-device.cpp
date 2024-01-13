@@ -29,6 +29,7 @@ using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
+
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
@@ -54,8 +55,7 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
  */
 Protocols::InteractionModel::Status
 ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec, bool startAfterSetting,
-                                                               Optional<uint8_t> powerSettingNum,
-                                                               Optional<uint8_t> wattSettingIndex)
+                                                               Optional<uint8_t> powerSettingNum, Optional<uint8_t> wattSettingIndex)
 {
     // placeholder implementation
     Status status;
@@ -65,23 +65,21 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
         return status;
     }
 
-    // set the cooking time in seconds
     mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
 
-    // set the power setting if power is in number
+    // if using power as number, check if powerSettingNum has value before setting the power number 
     if (powerSettingNum.HasValue())
     {
         mPowerSettingNum = powerSettingNum.Value();
     }
 
-    // set the watt rating and watt list index if power is in watt
+    // if using power in watt, check if wattSettingIndex has value before setting the watt rating and watt list index
     if (wattSettingIndex.HasValue())
     {
         mSelectedWattIndex = wattSettingIndex.Value();
         mWattRating        = mWattSettingList[mSelectedWattIndex];
     }
 
-    // start for cooking operation if startAfterSetting is TRUE
     if (startAfterSetting)
     {
         mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kRunning));

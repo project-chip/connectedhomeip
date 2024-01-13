@@ -64,22 +64,22 @@ CHIP_ERROR Instance::Init()
         ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    // Check if the feature bits are not include both PowerAsNumber and PowerInWatts
+    // Exactly one of the PowerAsNumber and PowerInWatts features must be supported, per spec.
     if ((!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) &&
          !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)))
     {
         ChipLogError(Zcl,
-                     "Microwave Oven Control: feature bits error, feature must supports one of PowerInWatts and PowerAsNumber");
+                     "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts and PowerAsNumber");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    // Check if the feature bits are include both PowerAsNumber and PowerInWatts
+    // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
     if ((mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) && mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)))
     {
         ChipLogError(Zcl,
                      "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    // Check if the feature bits are include PowerNumberLimits but not include PowerAsNumber
+    // Per spec, the PowerNumberLimits feature is only allowed if the PowerAsNumber feature is supported.
     if ((mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) &&
          !mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber)))
     {
@@ -89,7 +89,8 @@ CHIP_ERROR Instance::Init()
     }
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
-    // get the count of supported watt levels if feature support PowerInWatts
+    // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
+    // ensure incoming watt level values are valid.
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
         mSupportedWattLevels = GetCountOfSupportedWattLevels();
