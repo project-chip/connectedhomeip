@@ -52,7 +52,7 @@ public:
 };
 
 EnergyPrefAttrAccess gEnergyPrefAttrAccess;
-EnergyPreferenceDelegate * gsDelegate;
+EnergyPreferenceDelegate * gsDelegate = nullptr;
 
 CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
