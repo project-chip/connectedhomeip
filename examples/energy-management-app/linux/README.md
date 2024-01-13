@@ -237,7 +237,9 @@ Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
 ```python
     # Read from NodeID 1234, Endpoint 1, all attributes on EnergyEvse cluster
     await devCtrl.ReadAttribute(1234,[(1, chip.clusters.EnergyEvse)])
+```
 
+```
 {
 │   1: {
 │   │   <class 'chip.clusters.Objects.EnergyEvse'>: {
@@ -327,7 +329,7 @@ Attribute Changed:
 
 After 60 seconds the charging should automatically become disabled:
 
-```python
+```
 Attribute Changed:
 {
 │   'Endpoint': 1,
@@ -374,10 +376,6 @@ To send a test event trigger to the app, use the following commands (in
 chip-repl):
 
 ```python
-    # Read the events
-    await devCtrl.ReadEvent(1234,[(1, chip.clusters.EnergyEvse,1)])
-[]
-
     # send 1st event trigger to 'install' the EVSE on a 32A supply
     await devCtrl.SendCommand(1234, 0, chip.clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=bytes([b for b in range(16)]), eventTrigger=0x0099000000000000))
 
@@ -401,6 +399,9 @@ Now send the test event trigger to simulate the EV asking for demand:
 
     # Read the events
     await devCtrl.ReadEvent(1234,[(1, chip.clusters.EnergyEvse,1)])
+```
+
+```
 [
 │   EventReadResult(
 │   │   Header=EventHeader(
@@ -450,7 +451,7 @@ What happens when we unplug the vehicle?
 
 When we re-read the events:
 
-```python
+```
 [
 │   EventReadResult(
 │   │   Header=EventHeader(
