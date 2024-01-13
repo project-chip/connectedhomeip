@@ -218,5 +218,4 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::Concre
 void MatterEnergyPreferencePluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gEnergyPrefAttrAccess);
-    // Get the delegate?
 }
