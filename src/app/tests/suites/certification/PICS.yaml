@@ -8920,7 +8920,7 @@ PICS:
 
     - label: "Can the device be controlled manually?"
       id: DRYERCTRL.S.M.ManuallyControlled
-      
+
     #  Oven Mode Cluster
 
     - label: "Does the device implement the OM cluster as a server?"
@@ -8928,7 +8928,7 @@ PICS:
 
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
-    
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"

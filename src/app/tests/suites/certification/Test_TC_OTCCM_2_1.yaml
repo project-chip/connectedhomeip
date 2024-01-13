@@ -133,7 +133,7 @@ tests:
                 value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
-    
+
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
       PICS: OTCCM.S.A0001
       command: "readAttribute"
