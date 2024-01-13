@@ -35,48 +35,47 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-static EnergyEvseDelegate * gDelegate       = nullptr;
-static EnergyEvseManager * gInstance        = nullptr;
-static EVSEManufacturer * gEvseManufacturer = nullptr;
+static std::unique_ptr<EnergyEvseDelegate> gDelegate;
+static std::unique_ptr<EnergyEvseManager> gInstance;
+static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
-EVSEManufacturer * GetEvseManufacturer()
+EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
-    return gEvseManufacturer;
+    return gEvseManufacturer.get();
 }
 
 void ApplicationInit()
 {
     CHIP_ERROR err;
 
-    if ((gDelegate != nullptr) || (gInstance != nullptr) || (gEvseManufacturer != nullptr))
+    if (gDelegate || gInstance || gEvseManufacturer)
     {
         ChipLogError(AppServer, "EVSE Instance or Delegate, EvseManufacturer already exist.");
         return;
     }
 
-    gDelegate = new EnergyEvseDelegate();
-    if (gDelegate == nullptr)
+    gDelegate = std::make_unique<EnergyEvseDelegate>();
+    if (!gDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseDelegate");
         return;
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gInstance =
-        new EnergyEvseManager(EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
-                              BitMask<EnergyEvse::Feature, uint32_t>(
-                                  EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
-                                  EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
-                              BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                                    OptionalAttributes::kSupportsRandomizationWindow,
-                                                                    OptionalAttributes::kSupportsApproximateEvEfficiency),
-                              BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
+    gInstance = std::make_unique<EnergyEvseManager>(
+        EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
+        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
+                                               EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting,
+                                               EnergyEvse::Feature::kV2x),
+        BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                              OptionalAttributes::kSupportsRandomizationWindow,
+                                              OptionalAttributes::kSupportsApproximateEvEfficiency),
+        BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
 
-    if (gInstance == nullptr)
+    if (!gInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseManager");
-        delete gDelegate;
-        gDelegate = nullptr;
+        gDelegate.reset();
         return;
     }
 
@@ -84,22 +83,18 @@ void ApplicationInit()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gInstance");
-        delete gInstance;
-        delete gDelegate;
-        gInstance = nullptr;
-        gDelegate = nullptr;
+        gInstance.reset();
+        gDelegate.reset();
         return;
     }
 
     /* Now create EVSEManufacturer*/
-    gEvseManufacturer = new EVSEManufacturer(gInstance);
-    if (gEvseManufacturer == nullptr)
+    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gInstance.get());
+    if (!gEvseManufacturer)
     {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
-        delete gInstance;
-        delete gDelegate;
-        gInstance = nullptr;
-        gDelegate = nullptr;
+        gInstance.reset();
+        gDelegate.reset();
         return;
     }
 
@@ -108,12 +103,9 @@ void ApplicationInit()
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gEvseManufacturer");
-        delete gEvseManufacturer;
-        delete gInstance;
-        delete gDelegate;
-        gEvseManufacturer = nullptr;
-        gInstance         = nullptr;
-        gDelegate         = nullptr;
+        gEvseManufacturer.reset();
+        gInstance.reset();
+        gDelegate.reset();
         return;
     }
 }
@@ -123,17 +115,12 @@ void ApplicationShutdown()
     ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
 
     /* Shutdown the EVSEManufacturer*/
-    gEvseManufacturer->Shutdown();
+    if (gEvseManufacturer)
+        gEvseManufacturer->Shutdown();
 
     /* Shutdown the Instance - deregister attribute & command handler */
-    gInstance->Shutdown();
-
-    delete gEvseManufacturer;
-    delete gInstance;
-    delete gDelegate;
-    gEvseManufacturer = nullptr;
-    gInstance         = nullptr;
-    gDelegate         = nullptr;
+    if (gInstance)
+        gInstance->Shutdown();
 }
 
 int main(int argc, char * argv[])

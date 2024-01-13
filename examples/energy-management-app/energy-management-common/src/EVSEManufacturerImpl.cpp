@@ -25,9 +25,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 
-/* Function prototype - this should be implemented somewhere in main.cpp or similar */
-EVSEManufacturer * GetEvseManufacturer();
-
 CHIP_ERROR EVSEManufacturer::Init()
 {
     /* Manufacturers should modify this to do any custom initialisation */

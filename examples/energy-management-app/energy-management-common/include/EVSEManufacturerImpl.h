@@ -66,6 +66,17 @@ private:
     int64_t mLastDischargingEnergyMeter = 0;
 };
 
+/** @brief Helper function to return the singleton EVSEManufacturer instance
+ *
+ * This is needed by the EVSEManufacturer class to support TestEventTriggers
+ * which are called outside of any class context. This allows the EVSEManufacturer
+ * class to return the relevant Delegate instance in which to invoke the test
+ * events on.
+ *
+ * This function is typically found in main.cpp or wherever the singleton is created.
+ */
+EVSEManufacturer * GetEvseManufacturer();
+
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
