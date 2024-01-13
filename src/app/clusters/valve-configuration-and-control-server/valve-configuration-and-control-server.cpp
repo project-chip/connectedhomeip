@@ -18,7 +18,7 @@
 
 #include "valve-configuration-and-control-server.h"
 
-#include <zap-generated/gen_config.h>
+#include <app/util/config.h>
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 // Need the `nogncheck` because it's inter-cluster dependency and this
 // breaks GN deps checks since that doesn't know how to deal with #ifdef'd includes :(.
