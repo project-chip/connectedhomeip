@@ -29,7 +29,6 @@ using ModeTagStructType    = chip::app::Clusters::detail::Structs::ModeTagStruct
 using OperationalStateEnum = chip::app::Clusters::OperationalState::OperationalStateEnum;
 using Status               = Protocols::InteractionModel::Status;
 
-
 void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
 {
     mOperationalStateInstance.SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
@@ -55,7 +54,8 @@ void ExampleMicrowaveOvenDevice::MicrowaveOvenInit()
  */
 Protocols::InteractionModel::Status
 ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, uint32_t cookTimeSec, bool startAfterSetting,
-                                                               Optional<uint8_t> powerSettingNum, Optional<uint8_t> wattSettingIndex)
+                                                               Optional<uint8_t> powerSettingNum,
+                                                               Optional<uint8_t> wattSettingIndex)
 {
     // placeholder implementation
     Status status;
