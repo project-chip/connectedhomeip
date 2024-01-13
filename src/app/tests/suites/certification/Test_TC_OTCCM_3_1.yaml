@@ -93,8 +93,6 @@ tests:
       command: "readAttribute"
       attribute: "SupportedModes"
       response:
-          #need to review this step
-          saveAs: supported_modes_dut
           constraints:
               type: list
               minLength: 2

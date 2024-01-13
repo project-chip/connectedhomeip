@@ -27,7 +27,7 @@ config:
         defaultValue: 0
     new_mode_th:
         type: int8u
-        defaultValue: 0
+        defaultValue: 1
 
 tests:
     - label:
