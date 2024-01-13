@@ -23,7 +23,7 @@ from chip.tlv import uint
 from conformance_support import ConformanceDecision, conformance_allowed
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                    MatterBaseTest, async_test_body, default_matter_test_main)
+                                    MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
 from spec_parsing_support import CommandType, build_xml_clusters, build_xml_device_types
 
 
