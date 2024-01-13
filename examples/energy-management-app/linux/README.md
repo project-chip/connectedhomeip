@@ -17,7 +17,7 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
     -   [Running RPC Console](#running-rpc-console)
     -   [Device Tracing](#device-tracing)
-    -   [Python TestCases](#python-testcases)
+    -   [Python Test Cases](#python-test-cases)
         -   [Running the test cases:](#running-the-test-cases)
     -   [CHIP-REPL Interaction](#chip-repl-interaction)
         -   [Building chip-repl:](#building-chip-repl)
@@ -149,7 +149,7 @@ Obtain tracing json file.
      -o {OUTPUT_FILE} -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
 ```
 
-## Python TestCases
+## Python Test Cases
 
 When you want to test this cluster you can use chip-repl or chip-tool by hand.
 CHIP-REPL is slightly easier to interact with when dealing with some of the
@@ -158,20 +158,20 @@ complex structures.
 There are several test scripts provided for EVSE (in
 [src/python_testing](src/python_testing)):
 
--   TC_EEVSE_2_2: This validates the primary functionality
--   TC_EEVSE_2_3: This validates Get/Set/Clear target commands
--   TC_EEVSE_2_4: This validates Faults
--   TC_EEVSE_2_5: This validates EVSE diagnostic command (optional)
+-   `TC_EEVSE_2_2`: This validates the primary functionality
+-   `TC_EEVSE_2_3`: This validates Get/Set/Clear target commands
+-   `TC_EEVSE_2_4`: This validates Faults
+-   `TC_EEVSE_2_5`: This validates EVSE diagnostic command (optional)
 
-These scripts require the use of TestEventsTriggers via the GeneralDiagnostics
-cluster on Endpoint 0. This requires an enableKey (16 bytes) and a set of
-reserved int64_t TestEvent trigger codes.
+These scripts require the use of Test Event Triggers via the GeneralDiagnostics
+cluster on Endpoint 0. This requires an `enableKey` (16 bytes) and a set of
+reserved int64_t test event trigger codes.
 
 By default the test event support is not enabled, and when compiling the example
 app you need to add `chip_enable_energy_evse_trigger=true` to the gn args.
 
           $ gn gen out/debug
-          $ ninja -C out/debug --args='chip_enable_energy_evse_trigger=true`
+          $ ninja -C out/debug --args='chip_enable_energy_evse_trigger=true'
 
 Once the application is built you also need to tell it at runtime what the
 chosen enable key is using the `--enable-key` command line option.
@@ -292,10 +292,11 @@ Out[2]: <chip.native.PyChipError object at 0x7f2432b16140>
    subscription = await devCtrl.ReadAttribute(1234,[(1, chip.clusters.EnergyEvse)], reportInterval=reportingTimingParams)
 ```
 
--   Step 6: Send an EnableCharging command which lasts for 60 seconds The
-    EnableCharging takes an optional parameter which allows the charger to
-    automatically disable itself at some preset time in the future. Note that it
-    uses Epoch_s (which is from Jan 1 2000) which is a uint32_t in seconds.
+-   Step 6: Send an `EnableCharging` command which lasts for 60 seconds The
+    `EnableCharging` takes an optional `chargingEnabledUntil` parameter which
+    allows the charger to automatically disable itself at some preset time in
+    the future. Note that it uses Epoch_s (which is from Jan 1 2000) which is a
+    uint32_t in seconds.
 
 ```python
    from datetime import datetime, timezone, timedelta
@@ -369,7 +370,7 @@ The test event triggers values can be found in:
 
 -   0x0099000000000000 - Simulates the EVSE being installed on a 32A supply
 -   0x0099000000000002 - Simulates the EVSE being plugged in (this should
-    generate an EVConnected event)
+    generate an `EVConnected` event)
 -   0x0099000000000004 - Simulates the EVSE requesting power
 
 To send a test event trigger to the app, use the following commands (in
@@ -384,7 +385,7 @@ chip-repl):
 
 ```
 
-Now send the enable charging command (omit the chargingEnabledUntil arg this
+Now send the enable charging command (omit the `chargingEnabledUntil` arg this
 time):
 
 ```python
@@ -440,7 +441,7 @@ Now send the test event trigger to simulate the EV asking for demand:
 
 -   We can see that the `EventNumber 65538` was sent when the vehicle was
     plugged in, and a new `sessionID=0` was created.
--   We can also see that the EnergyTransferStarted was sent in
+-   We can also see that the `EnergyTransferStarted` was sent in
     `EventNumber 65539`
 
 What happens when we unplug the vehicle?
@@ -494,13 +495,14 @@ When we re-read the events:
 
 ```
 
--   In `EventNumber 65540` we had an EnergyTransferStopped event with reason
+-   In `EventNumber 65540` we had an `EnergyTransferStopped` event with reason
     `kOther`.
 
     This was a rather abrupt end to a charging session (normally we would see
     the EVSE or EV decide to stop charging), but this demonstrates the cable
     being pulled out without a graceful charging shutdown.
 
--   In `EventNumber 65541` we had an EvNotDetected event showing that the state
-    was `kPluggedInCharging` prior to the EV being not detected (normally in a
-    graceful shutdown this would be `kPluggedInNoDemand` or `kPluggedInDemand`).
+-   In `EventNumber 65541` we had an `EvNotDetected` event showing that the
+    state was `kPluggedInCharging` prior to the EV being not detected (normally
+    in a graceful shutdown this would be `kPluggedInNoDemand` or
+    `kPluggedInDemand`).
