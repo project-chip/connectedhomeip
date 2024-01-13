@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-3.4] UpOrOpen Long-Run Verification with server as
-    DUT
+    Window Covering [TC-WNCV-3.4] UpOrOpen command Long-Run Verification [DUT as
+    Server]
 
 PICS:
     - WNCV.S
@@ -50,9 +50,7 @@ tests:
 
     ### DUT adjusts to a non-open position
     ### Testers should input the fastMotionDuration parameter that match their DUT behavior
-    - label:
-          "Step 1b: TH Waits for fastMotionDuration seconds movement(s) on the
-          device"
+    - label: "Step 1b: TH waits for 5-15 seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -69,9 +67,7 @@ tests:
 
     ### DUT move toward its fully-open position
     ### Testers should input the fullMotionDuration parameter that match their DUT behavior
-    - label:
-          "Step 2b: TH Waits for fullMotionDuration seconds movement(s) on the
-          device"
+    - label: "Step 2b: TH waits for PIXIT.WNCV.FULLMOTION on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -79,7 +75,7 @@ tests:
               - name: "ms"
                 value: fullMotionDuration
 
-    - label: "Step 2c: TH reads OperationalStatus attribute from DUT"
+    - label: "Step 2c: TH checks OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a

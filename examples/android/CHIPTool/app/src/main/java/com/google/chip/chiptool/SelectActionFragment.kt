@@ -74,6 +74,7 @@ class SelectActionFragment : Fragment() {
     binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
     binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
     binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
+    binding.icdBtn.setOnClickListener { handleICDClicked() }
 
     return binding.root
   }
@@ -242,6 +243,10 @@ class SelectActionFragment : Fragment() {
 
   private fun handleGroupSettingClicked() {
     showFragment(GroupSettingFragment.newInstance())
+  }
+
+  private fun handleICDClicked() {
+    showFragment(ICDFragment.newInstance())
   }
 
   companion object {

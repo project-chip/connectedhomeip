@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -133,3 +135,12 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 4
+
+    - label: "Step 12: TH reads from the DUT the Uncertainty attribute."
+      PICS: NDOCONC.S.A0007
+      command: "readAttribute"
+      attribute: "Uncertainty"
+      response:
+          constraints:
+              type: single
+              minValue: 0

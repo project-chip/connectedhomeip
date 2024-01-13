@@ -39,10 +39,10 @@ struct GetConnectedDeviceCallback
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-    static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
-    Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
+    Callback::Callback<OperationalSessionSetup::OnSetupFailure> mOnFailure;
     JniGlobalReference mWrapperCallbackRef;
     JniGlobalReference mJavaCallbackRef;
 };

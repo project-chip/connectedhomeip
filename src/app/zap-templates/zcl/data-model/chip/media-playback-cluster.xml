@@ -34,9 +34,9 @@ limitations under the License.
     <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
     <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
     <attribute side="server" code="0x0007" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_AUDIO_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveAudioTrack</attribute>
-    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true"  type="ARRAY" entryType="TrackStruct"     writable="false" isNullable="true">AvailableAudioTracks</attribute>
+    <attribute side="server" code="0x0008" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_AUDIO_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableAudioTracks</attribute>
     <attribute side="server" code="0x0009" define="MEDIA_PLAYBACK_PLAYBACK_ACTIVE_TEXT_TRACK" optional="true"      type="TrackStruct"     writable="false" isNullable="true">ActiveTextTrack</attribute>
-    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true"  type="ARRAY" entryType="TrackStruct"     writable="false" isNullable="true">AvailableTextTracks</attribute>
+    <attribute side="server" code="0x000A" define="MEDIA_PLAYBACK_PLAYBACK_AVAILABLE_TEXT_TRACKS" optional="true"  type="array" entryType="TrackStruct"     writable="false" isNullable="true">AvailableTextTracks</attribute>
 
 
     <command source="client" code="0x00" name="Play" response="PlaybackResponse" optional="false">

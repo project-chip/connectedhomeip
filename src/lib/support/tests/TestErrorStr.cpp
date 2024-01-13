@@ -183,14 +183,14 @@ int TestErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "-Error-Strings",
+        "Test the ErrorStr primitives",
         &sTests[0],
         nullptr,
         nullptr
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);

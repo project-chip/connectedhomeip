@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 
 # Setup Ameba
 ARG AMEBA_DIR=/opt/ameba
-ARG TAG_NAME=ameba_update_2023_08_11
+ARG TAG_NAME=ameba_update_2023_12_15
 RUN set -x \
     && apt-get update \
     && mkdir ${AMEBA_DIR} \

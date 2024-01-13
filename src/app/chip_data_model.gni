@@ -268,6 +268,7 @@ template("chip_data_model") {
       } else if (cluster == "time-synchronization-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
         ]

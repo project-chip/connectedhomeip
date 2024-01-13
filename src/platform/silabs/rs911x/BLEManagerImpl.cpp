@@ -58,6 +58,12 @@ extern "C" {
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <string.h>
 
+#ifdef SIWX_917
+extern "C" {
+#include "sl_si91x_trng.h"
+}
+#endif // SIWX_917
+
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #include <setup_payload/AdditionalDataPayloadGenerator.h>
 #endif
@@ -78,8 +84,23 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
-    uint8_t randomAddrBLE[6] = { 0 };
-    uint64_t randomAddr      = chip::Crypto::GetRandU64();
+    uint8_t randomAddrBLE[RSI_BLE_ADDR_LENGTH] = { 0 };
+#if SIWX_917
+    sl_status_t sl_status;
+    //! Get Random number of desired length
+    sl_status = sl_si91x_trng_get_random_num((uint32_t *) randomAddrBLE, RSI_BLE_ADDR_LENGTH);
+    if (sl_status != SL_STATUS_OK)
+    {
+        ChipLogError(DeviceLayer, " TRNG Random number generation Failed ");
+        return;
+    }
+    // Set the two least significant bits as the first 2 bits of the address has to be '11' to ensure the address is a random
+    // non-resolvable private address
+    randomAddrBLE[5] |= 0xC0;
+#else
+    uint64_t randomAddr = chip::Crypto::GetRandU64();
+    memcpy(randomAddrBLE, &randomAddr, RSI_BLE_ADDR_LENGTH);
+#endif // SIWX_917
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -93,10 +114,9 @@ void sl_ble_init()
     //  Exchange of GATT info with BLE stack
 
     rsi_ble_add_matter_service();
-
     //  initializing the application events map
     rsi_ble_app_init_events();
-    memcpy(randomAddrBLE, &randomAddr, 6);
+
     rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
@@ -161,6 +181,13 @@ void sl_ble_event_handling_task(void)
         break;
         default:
             break;
+        }
+
+        if (chip::DeviceLayer::ConnectivityMgr().IsWiFiStationConnected())
+        {
+            // Once DUT is connected adding a 500ms delay
+            // TODO: Fix this with a better event handling
+            vTaskDelay(pdMS_TO_TICKS(500));
         }
     }
 }
@@ -563,6 +590,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
     mDeviceNameLength = strlen(mDeviceName); // Device Name length + length field
     VerifyOrExit(mDeviceNameLength < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+    static_assert((kFlagTlvSize + kUUIDTlvSize + kDeviceNameTlvSize) <= MAX_RESPONSE_DATA_LEN, "Scan Response buffer is too small");
 
     mDeviceIdInfoLength = sizeof(mDeviceIdInfo); // Servicedatalen + length+ UUID (Short)
     static_assert(sizeof(mDeviceIdInfo) + CHIP_ADV_SHORT_UUID_LEN + 1 <= UINT8_MAX, "Our length won't fit in a uint8_t");

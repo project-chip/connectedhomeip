@@ -1508,30 +1508,28 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BooleanSensorConfiguration::SensitivityEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::StatusCodeEnum val)
 {
-    using EnumType = BooleanSensorConfiguration::SensitivityEnum;
+    using EnumType = ValveConfigurationAndControl::StatusCodeEnum;
     switch (val)
     {
-    case EnumType::kHigh:
-    case EnumType::kStandard:
-    case EnumType::kLow:
+    case EnumType::kFailureDueToFault:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(0);
     }
 }
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::ValveStateEnum val)
 {
     using EnumType = ValveConfigurationAndControl::ValveStateEnum;
     switch (val)
     {
-    case EnumType::kOpen:
     case EnumType::kClosed:
+    case EnumType::kOpen:
+    case EnumType::kTransitioning:
         return val;
     default:
-        return static_cast<EnumType>(2);
+        return static_cast<EnumType>(3);
     }
 }
 
@@ -1773,6 +1771,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyState
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::EnergyPriorityEnum val)
+{
+    using EnumType = EnergyPreference::EnergyPriorityEnum;
+    switch (val)
+    {
+    case EnumType::kComfort:
+    case EnumType::kSpeed:
+    case EnumType::kEfficiency:
+    case EnumType::kWaterConsumption:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;
@@ -1815,9 +1828,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::CredentialTyp
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(9);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DataOperationTypeEnum val)
@@ -2004,9 +2020,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(11);
+        return static_cast<EnumType>(14);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)
@@ -2069,9 +2088,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSour
     case EnumType::kRemote:
     case EnumType::kRfid:
     case EnumType::kBiometric:
+    case EnumType::kAliro:
         return val;
     default:
-        return static_cast<EnumType>(10);
+        return static_cast<EnumType>(11);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserStatusEnum val)

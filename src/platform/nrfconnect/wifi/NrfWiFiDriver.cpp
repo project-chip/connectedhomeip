@@ -276,6 +276,22 @@ void NrfWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
     }
 }
 
+CHIP_ERROR NrfWiFiDriver::GetSupportedWiFiBands(Span<WiFiBand> & bands)
+{
+    static constexpr WiFiBand kBands[] = {
+        WiFiBand::k2g4,
+#ifndef CONFIG_BOARD_NRF7001
+        WiFiBand::k5g,
+#endif
+    };
+
+    VerifyOrReturnError(ArraySize(kBands) <= bands.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(bands.data(), kBands, sizeof(kBands));
+    bands.reduce_size(ArraySize(kBands));
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
