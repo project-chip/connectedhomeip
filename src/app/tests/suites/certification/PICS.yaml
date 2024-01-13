@@ -8883,7 +8883,7 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: LWM.S.C01.Tx
 
-  #  Laundry DRYER Mode Cluster
+    #  Laundry DRYER Mode Cluster
 
     - label: "Does the device implement the Dryer cluster as a server?"
       id: DRYERCTRL.S

@@ -112,7 +112,8 @@ tests:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.OTCCM.MODE_CHANGE_FAIL"
       PICS:
-          OTCCM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
+          OTCCM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp &&
+          PICS_SKIP_SAMPLE_APP
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 

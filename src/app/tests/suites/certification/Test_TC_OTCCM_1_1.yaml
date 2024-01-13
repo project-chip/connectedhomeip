@@ -39,7 +39,8 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
+    - label:
+          "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
           be 1 if and only if OTCCM.S.F00(DEPONOFF)"
       command: "readAttribute"
       attribute: "FeatureMap"
