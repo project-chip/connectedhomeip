@@ -23,8 +23,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
-static DeviceEnergyManagementDelegate * gDelegate = nullptr;
-static DeviceEnergyManagementManager * gInstance  = nullptr;
+static std::unique_ptr<DeviceEnergyManagementDelegate> gDelegate;
+static std::unique_ptr<DeviceEnergyManagementManager> gInstance;
 
 void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId)
 {
@@ -33,21 +33,21 @@ void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointI
 
     CHIP_ERROR err;
 
-    if ((gDelegate != nullptr) || (gInstance != nullptr))
+    if (gDelegate || gInstance)
     {
         ChipLogError(AppServer, "DEM Instance or Delegate already exist.");
         return;
     }
 
-    gDelegate = new DeviceEnergyManagementDelegate();
-    if (gDelegate == nullptr)
+    gDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
+    if (!gDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementDelegate");
         return;
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gInstance = new DeviceEnergyManagementManager(
+    gInstance = std::make_unique<DeviceEnergyManagementManager>(
         endpointId, *gDelegate,
         BitMask<DeviceEnergyManagement::Feature, uint32_t>(
             DeviceEnergyManagement::Feature::kPowerForecastReporting, DeviceEnergyManagement::Feature::kStateForecastReporting,
@@ -55,11 +55,10 @@ void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointI
         BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsModifyForecastRequest,
                                             OptionalCommands::kSupportsRequestConstraintBasedForecast));
 
-    if (gInstance == nullptr)
+    if (!gInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for DeviceEnergyManagementManager");
-        delete gDelegate;
-        gDelegate = nullptr;
+        gDelegate.reset();
         return;
     }
 
@@ -67,10 +66,8 @@ void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointI
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Init failed on gInstance");
-        delete gInstance;
-        delete gDelegate;
-        gInstance = nullptr;
-        gDelegate = nullptr;
+        gInstance.reset();
+        gDelegate.reset();
         return;
     }
 }
