@@ -1510,9 +1510,12 @@ void EvseSession::StartSession(int64_t chargingMeterValue, int64_t dischargingMe
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "EVSE: Failed to get timestamp when starting session");
+        /* Note that the error will be also be logged inside GetErrorTS() -
+         * adding context here to help debugging */
+        ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
     mStartTime = chipEpoch;
@@ -1556,9 +1559,13 @@ void EvseSession::RecalculateSessionDuration()
 {
     /* Get Timestamp */
     uint32_t chipEpoch = 0;
-    if (GetEpochTS(chipEpoch) != CHIP_NO_ERROR)
+    CHIP_ERROR err     = GetEpochTS(chipEpoch);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "EVSE: Failed to get timestamp when updating session duration");
+        /* Note that the error will be also be logged inside GetErrorTS() -
+         * adding context here to help debugging */
+        ChipLogError(AppServer, "EVSE: Unable to get current time when updating session duration - err:%" CHIP_ERROR_FORMAT,
+                     err.Format());
         return;
     }
 
