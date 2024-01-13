@@ -1899,6 +1899,9 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     case Attributes::UserActiveModeTriggerInstruction::Id: {
         return YES;
     }
+    case Attributes::OperatingMode::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
