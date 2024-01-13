@@ -85,8 +85,9 @@ public:
      *         CHIP_ERROR_BUFFER_TOO_SMALL if appData buffer is too small
      *         CHIP_ERROR_INTERNAL if we were not able to decrypt or validate the Check-In message
      */
+
     static CHIP_ERROR ParseCheckinMessagePayload(const Crypto::Aes128KeyHandle & aes128KeyHandle,
-                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, ByteSpan & payload,
+                                                 const Crypto::Hmac128KeyHandle & hmacKeyHandle, const ByteSpan & payload,
                                                  CounterType & counter, MutableByteSpan & appData);
 
     static inline size_t GetCheckinPayloadSize(size_t appDataSize) { return appDataSize + kMinPayloadSize; }
@@ -97,7 +98,7 @@ public:
      * @param payload   The undecrypted payload
      * @return size_t size in byte of the application data from the payload
      */
-    static size_t GetAppDataSize(ByteSpan & payload);
+    static size_t GetAppDataSize(const ByteSpan & payload);
 
     static constexpr uint16_t kMinPayloadSize =
         CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES + sizeof(CounterType) + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;

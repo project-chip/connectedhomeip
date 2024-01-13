@@ -46,6 +46,8 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
+    CHIP_ERROR LoadPersistentAttributes();
+
     EnergyEvseDelegate * GetDelegate() { return mDelegate; };
 
 private:

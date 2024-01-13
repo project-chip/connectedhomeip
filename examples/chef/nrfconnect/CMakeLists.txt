@@ -80,13 +80,15 @@ if (CONFIG_CHIP_LIB_SHELL)
 endif()
 
 target_sources(app PRIVATE
-    ${CHEF}/nrfconnect/main.cpp
-    ${CHEF}/common/stubs.cpp
-    ${CHEF}/common/chef-channel-manager.cpp
     ${CHEF}/common/chef-air-quality.cpp
+    ${CHEF}/common/chef-channel-manager.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
+    ${CHEF}/common/chef-fan-control-manager.cpp
+    ${CHEF}/common/chef-resource-monitoring-delegates.cpp
     ${CHEF}/common/chef-rvc-mode-delegate.cpp
     ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
+    ${CHEF}/common/stubs.cpp
+    ${CHEF}/nrfconnect/main.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)

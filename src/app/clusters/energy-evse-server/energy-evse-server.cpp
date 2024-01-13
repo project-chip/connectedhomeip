@@ -23,6 +23,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
@@ -170,7 +171,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         }
         uint16_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(newValue));
+        ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(MakeNullable(newValue)));
         return CHIP_NO_ERROR;
     }
 

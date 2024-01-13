@@ -1899,6 +1899,9 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     case Attributes::UserActiveModeTriggerInstruction::Id: {
         return YES;
     }
+    case Attributes::OperatingMode::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2904,6 +2907,9 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::ValveFault::Id: {
         return YES;
     }
+    case Attributes::LevelStep::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3322,6 +3328,33 @@ static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ExpiringUserTimeout::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderVerificationKey::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderGroupIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderGroupSubIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+        return YES;
+    }
+    case Attributes::AliroGroupResolvingKey::Id: {
+        return YES;
+    }
+    case Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
+        return YES;
+    }
+    case Attributes::AliroBLEAdvertisingVersion::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfAliroEndpointKeysSupported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

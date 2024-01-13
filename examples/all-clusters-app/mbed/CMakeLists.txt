@@ -67,6 +67,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
                ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
                ${ALL_CLUSTERS_COMMON}/src/smco-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/static-supported-modes-manager.cpp

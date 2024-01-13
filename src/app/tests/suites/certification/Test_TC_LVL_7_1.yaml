@@ -33,7 +33,8 @@ config:
         defaultValue: 30000
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -50,7 +51,7 @@ tests:
       arguments:
           value: 0
 
-    - label: "Step 0a: TH writes 0 to the Options attribute"
+    - label: "Step 0a: TH writes 0x00 to the Options attribute"
       PICS: LVL.S.A000f
       command: "writeAttribute"
       attribute: "Options"
