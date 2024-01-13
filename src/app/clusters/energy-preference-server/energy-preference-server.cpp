@@ -155,7 +155,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
 CHIP_ERROR EnergyPrefAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
-    VerifyOrDie(aPath.mClusterId == Thermostat::Id);
+    VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
 
     // return CHIP_NO_ERROR and just write to the attribute store in default
     return CHIP_NO_ERROR;
