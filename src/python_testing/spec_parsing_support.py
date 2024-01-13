@@ -29,7 +29,7 @@ import chip.clusters as Clusters
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
                                  PROVISIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                 ConformanceParseParameters, feature, is_disallowed, mandatory, mandatory, optional, or_operation,
+                                 ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                  parse_callable_from_xml, parse_device_type_callable_from_xml)
 from global_attribute_ids import GlobalAttributeIds
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
