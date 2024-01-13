@@ -30,14 +30,15 @@ from mobly import asserts
 
 
 class TC_OPCREDS_3_1(MatterBaseTest):
-    def FindAndEstablishPase(self, discriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None, ):
+    def FindAndEstablishPase(self, longDiscriminator: int, setupPinCode: int, nodeid: int, dev_ctrl: ChipDeviceCtrl = None):
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
 
         devices = dev_ctrl.DiscoverCommissionableNodes(
-            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=discriminator, stopOnFirst=False)
+            filterType=Discovery.FilterType.LONG_DISCRIMINATOR, filter=longDiscriminator, stopOnFirst=False)
         # For some reason, the devices returned here aren't filtered, so filter ourselves
-        device = next(filter(lambda d: d.commissioningMode == 2 and d.longDiscriminator == discriminator, devices))
+        device = next(filter(lambda d: d.commissioningMode ==
+                      Discovery.FilterType.LONG_DISCRIMINATOR and d.longDiscriminator == longDiscriminator, devices))
         for a in device.addresses:
             try:
                 dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
@@ -52,14 +53,14 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
     def OpenCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int):
         # TODO: abstract this in the base layer? Do we do this a lot?
-        discriminator = random.randint(0, 4095)
+        longDiscriminator = random.randint(0, 4095)
         try:
             params = dev_ctrl.OpenCommissioningWindow(
-                nodeid=node_id, timeout=600, iteration=10000, discriminator=discriminator, option=1)
+                nodeid=node_id, timeout=600, iteration=10000, discriminator=longDiscriminator, option=ChipDeviceCtrl.ChipDeviceControllerBase.CommissioningWindowPasscode.kTokenWithRandomPin)
         except Exception as e:
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
-        return (discriminator, params)
+        return (longDiscriminator, params)
 
     @async_test_body
     async def test_TC_OPCREDS_3_1(self):
@@ -84,7 +85,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                             "Device fabric table is full - please remove one fabric and retry")
 
         self.print_step(1, "TH0 opens a commissioning window on the DUT")
-        discriminator, params = self.OpenCommissioningWindow(self.default_controller, self.dut_node_id)
+        longDiscriminator, params = self.OpenCommissioningWindow(self.default_controller, self.dut_node_id)
 
         self.print_step(
             2, "TH0 reads the BasicCommissioningInfo field from the General commissioning cluster saves MaxCumulativeFailsafeSeconds as `failsafe_max`")
@@ -93,7 +94,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(3, "TH1 opens a PASE connection to the DUT")
         newNodeId = self.dut_node_id + 1
-        self.FindAndEstablishPase(dev_ctrl=TH1, discriminator=discriminator, setupPinCode=params.setupPinCode, nodeid=newNodeId)
+        self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
+                                  setupPinCode=params.setupPinCode, nodeid=newNodeId)
 
         self.print_step(4, "TH1 sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to failsafe_max")
         resp = await self.send_single_cmd(dev_ctrl=TH1, node_id=newNodeId, cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(failsafe_max))
@@ -340,7 +342,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
 
         self.print_step(33, "TH1 reconnects to the DUT over PASE")
         TH1.ExpireSessions(newNodeId)
-        self.FindAndEstablishPase(dev_ctrl=TH1, discriminator=discriminator, setupPinCode=params.setupPinCode, nodeid=newNodeId)
+        self.FindAndEstablishPase(dev_ctrl=TH1, longDiscriminator=longDiscriminator,
+                                  setupPinCode=params.setupPinCode, nodeid=newNodeId)
 
         self.print_step(34, "TH1 reads the TrustedRootCertificates list from DUT and verifies the TH1 root is not present")
         trusted_root_list = await self.read_single_attribute_check_success(dev_ctrl=TH1, node_id=newNodeId, cluster=opcreds, attribute=opcreds.Attributes.TrustedRootCertificates)
@@ -401,7 +404,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
             resp.statusCode, opcreds.Enums.NodeOperationalCertStatusEnum.kOk, "Failure on UpdateFabricLabel")
 
         self.print_step(44, "TH1 sends an OpenCommissioningWindow command to the Administrator Commissioning cluster")
-        discriminator, params = self.OpenCommissioningWindow(TH1, newNodeId)
+        longDiscriminator, params = self.OpenCommissioningWindow(TH1, newNodeId)
 
         self.print_step(45, "TH2 commissions the DUT")
         TH2_CA = self.certificate_authority_manager.NewCertificateAuthority(maximizeCertChains=True)
@@ -412,7 +415,7 @@ class TC_OPCREDS_3_1(MatterBaseTest):
         TH2_dut_nodeid = self.dut_node_id+2
         TH2.CommissionOnNetwork(
             nodeId=TH2_dut_nodeid, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator)
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=longDiscriminator)
 
         self.print_step(
             46, "TH2 sends UpdateFabricLabel command with 'Label 2' as Label field to DUT and verify status OK")
