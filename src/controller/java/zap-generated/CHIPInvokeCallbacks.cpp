@@ -3970,92 +3970,149 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/util/ArrayList;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/ArrayList;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject DayOfWeekforSequence;
-    std::string DayOfWeekforSequenceClassName     = "java/lang/Integer";
-    std::string DayOfWeekforSequenceCtorSignature = "(I)V";
-    jint jniDayOfWeekforSequence                  = static_cast<jint>(dataResponse.dayOfWeekforSequence.Raw());
-    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(DayOfWeekforSequenceClassName.c_str(),
-                                                               DayOfWeekforSequenceCtorSignature.c_str(), jniDayOfWeekforSequence,
-                                                               DayOfWeekforSequence);
-    jobject ChargingTargets;
-    chip::JniReferences::GetInstance().CreateArrayList(ChargingTargets);
+    jobject ChargingTargetSchedules;
+    chip::JniReferences::GetInstance().CreateArrayList(ChargingTargetSchedules);
 
-    auto iter_ChargingTargets_0 = dataResponse.chargingTargets.begin();
-    while (iter_ChargingTargets_0.Next())
+    auto iter_ChargingTargetSchedules_0 = dataResponse.chargingTargetSchedules.begin();
+    while (iter_ChargingTargetSchedules_0.Next())
     {
-        auto & entry_0 = iter_ChargingTargets_0.GetValue();
+        auto & entry_0 = iter_ChargingTargetSchedules_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_targetTimeMinutesPastMidnight;
-        std::string newElement_0_targetTimeMinutesPastMidnightClassName     = "java/lang/Integer";
-        std::string newElement_0_targetTimeMinutesPastMidnightCtorSignature = "(I)V";
-        jint jninewElement_0_targetTimeMinutesPastMidnight = static_cast<jint>(entry_0.targetTimeMinutesPastMidnight);
-        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_targetTimeMinutesPastMidnightClassName.c_str(),
-                                                                   newElement_0_targetTimeMinutesPastMidnightCtorSignature.c_str(),
-                                                                   jninewElement_0_targetTimeMinutesPastMidnight,
-                                                                   newElement_0_targetTimeMinutesPastMidnight);
-        jobject newElement_0_targetSoC;
-        if (!entry_0.targetSoC.HasValue())
+        jobject newElement_0_dayOfWeekforSequence;
+        if (!entry_0.dayOfWeekforSequence.HasValue())
         {
-            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_targetSoC);
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_dayOfWeekforSequence);
         }
         else
         {
-            jobject newElement_0_targetSoCInsideOptional;
-            std::string newElement_0_targetSoCInsideOptionalClassName     = "java/lang/Integer";
-            std::string newElement_0_targetSoCInsideOptionalCtorSignature = "(I)V";
-            jint jninewElement_0_targetSoCInsideOptional                  = static_cast<jint>(entry_0.targetSoC.Value());
+            jobject newElement_0_dayOfWeekforSequenceInsideOptional;
+            std::string newElement_0_dayOfWeekforSequenceInsideOptionalClassName     = "java/lang/Integer";
+            std::string newElement_0_dayOfWeekforSequenceInsideOptionalCtorSignature = "(I)V";
+            jint jninewElement_0_dayOfWeekforSequenceInsideOptional = static_cast<jint>(entry_0.dayOfWeekforSequence.Value().Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                newElement_0_targetSoCInsideOptionalClassName.c_str(), newElement_0_targetSoCInsideOptionalCtorSignature.c_str(),
-                jninewElement_0_targetSoCInsideOptional, newElement_0_targetSoCInsideOptional);
-            chip::JniReferences::GetInstance().CreateOptional(newElement_0_targetSoCInsideOptional, newElement_0_targetSoC);
+                newElement_0_dayOfWeekforSequenceInsideOptionalClassName.c_str(),
+                newElement_0_dayOfWeekforSequenceInsideOptionalCtorSignature.c_str(),
+                jninewElement_0_dayOfWeekforSequenceInsideOptional, newElement_0_dayOfWeekforSequenceInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_dayOfWeekforSequenceInsideOptional,
+                                                              newElement_0_dayOfWeekforSequence);
         }
-        jobject newElement_0_addedEnergy;
-        if (!entry_0.addedEnergy.HasValue())
+        jobject newElement_0_chargingTargets;
+        if (!entry_0.chargingTargets.HasValue())
         {
-            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_addedEnergy);
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_chargingTargets);
         }
         else
         {
-            jobject newElement_0_addedEnergyInsideOptional;
-            std::string newElement_0_addedEnergyInsideOptionalClassName     = "java/lang/Long";
-            std::string newElement_0_addedEnergyInsideOptionalCtorSignature = "(J)V";
-            jlong jninewElement_0_addedEnergyInsideOptional                 = static_cast<jlong>(entry_0.addedEnergy.Value());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_addedEnergyInsideOptionalClassName.c_str(),
-                                                                        newElement_0_addedEnergyInsideOptionalCtorSignature.c_str(),
-                                                                        jninewElement_0_addedEnergyInsideOptional,
-                                                                        newElement_0_addedEnergyInsideOptional);
-            chip::JniReferences::GetInstance().CreateOptional(newElement_0_addedEnergyInsideOptional, newElement_0_addedEnergy);
+            jobject newElement_0_chargingTargetsInsideOptional;
+            chip::JniReferences::GetInstance().CreateArrayList(newElement_0_chargingTargetsInsideOptional);
+
+            auto iter_newElement_0_chargingTargetsInsideOptional_3 = entry_0.chargingTargets.Value().begin();
+            while (iter_newElement_0_chargingTargetsInsideOptional_3.Next())
+            {
+                auto & entry_3 = iter_newElement_0_chargingTargetsInsideOptional_3.GetValue();
+                jobject newElement_3;
+                jobject newElement_3_targetTimeMinutesPastMidnight;
+                std::string newElement_3_targetTimeMinutesPastMidnightClassName     = "java/lang/Integer";
+                std::string newElement_3_targetTimeMinutesPastMidnightCtorSignature = "(I)V";
+                jint jninewElement_3_targetTimeMinutesPastMidnight = static_cast<jint>(entry_3.targetTimeMinutesPastMidnight);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_3_targetTimeMinutesPastMidnightClassName.c_str(),
+                    newElement_3_targetTimeMinutesPastMidnightCtorSignature.c_str(), jninewElement_3_targetTimeMinutesPastMidnight,
+                    newElement_3_targetTimeMinutesPastMidnight);
+                jobject newElement_3_targetSoC;
+                if (!entry_3.targetSoC.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_targetSoC);
+                }
+                else
+                {
+                    jobject newElement_3_targetSoCInsideOptional;
+                    std::string newElement_3_targetSoCInsideOptionalClassName     = "java/lang/Integer";
+                    std::string newElement_3_targetSoCInsideOptionalCtorSignature = "(I)V";
+                    jint jninewElement_3_targetSoCInsideOptional                  = static_cast<jint>(entry_3.targetSoC.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_3_targetSoCInsideOptionalClassName.c_str(),
+                        newElement_3_targetSoCInsideOptionalCtorSignature.c_str(), jninewElement_3_targetSoCInsideOptional,
+                        newElement_3_targetSoCInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_3_targetSoCInsideOptional, newElement_3_targetSoC);
+                }
+                jobject newElement_3_addedEnergy;
+                if (!entry_3.addedEnergy.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_addedEnergy);
+                }
+                else
+                {
+                    jobject newElement_3_addedEnergyInsideOptional;
+                    std::string newElement_3_addedEnergyInsideOptionalClassName     = "java/lang/Long";
+                    std::string newElement_3_addedEnergyInsideOptionalCtorSignature = "(J)V";
+                    jlong jninewElement_3_addedEnergyInsideOptional = static_cast<jlong>(entry_3.addedEnergy.Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        newElement_3_addedEnergyInsideOptionalClassName.c_str(),
+                        newElement_3_addedEnergyInsideOptionalCtorSignature.c_str(), jninewElement_3_addedEnergyInsideOptional,
+                        newElement_3_addedEnergyInsideOptional);
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_3_addedEnergyInsideOptional,
+                                                                      newElement_3_addedEnergy);
+                }
+
+                jclass chargingTargetStructStructClass_4;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$EnergyEvseClusterChargingTargetStruct",
+                    chargingTargetStructStructClass_4);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$EnergyEvseClusterChargingTargetStruct");
+                    return;
+                }
+
+                jmethodID chargingTargetStructStructCtor_4;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, chargingTargetStructStructClass_4, "<init>",
+                    "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V", &chargingTargetStructStructCtor_4);
+                if (err != CHIP_NO_ERROR || chargingTargetStructStructCtor_4 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$EnergyEvseClusterChargingTargetStruct constructor");
+                    return;
+                }
+
+                newElement_3 =
+                    env->NewObject(chargingTargetStructStructClass_4, chargingTargetStructStructCtor_4,
+                                   newElement_3_targetTimeMinutesPastMidnight, newElement_3_targetSoC, newElement_3_addedEnergy);
+                chip::JniReferences::GetInstance().AddToList(newElement_0_chargingTargetsInsideOptional, newElement_3);
+            }
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_chargingTargetsInsideOptional,
+                                                              newElement_0_chargingTargets);
         }
 
-        jclass chargingTargetStructStructClass_1;
+        jclass chargingTargetScheduleStructStructClass_1;
         err = chip::JniReferences::GetInstance().GetClassRef(
-            env, "chip/devicecontroller/ChipStructs$EnergyEvseClusterChargingTargetStruct", chargingTargetStructStructClass_1);
+            env, "chip/devicecontroller/ChipStructs$EnergyEvseClusterChargingTargetScheduleStruct",
+            chargingTargetScheduleStructStructClass_1);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "Could not find class ChipStructs$EnergyEvseClusterChargingTargetStruct");
+            ChipLogError(Zcl, "Could not find class ChipStructs$EnergyEvseClusterChargingTargetScheduleStruct");
             return;
         }
 
-        jmethodID chargingTargetStructStructCtor_1;
-        err = chip::JniReferences::GetInstance().FindMethod(env, chargingTargetStructStructClass_1, "<init>",
-                                                            "(Ljava/lang/Integer;Ljava/util/Optional;Ljava/util/Optional;)V",
-                                                            &chargingTargetStructStructCtor_1);
-        if (err != CHIP_NO_ERROR || chargingTargetStructStructCtor_1 == nullptr)
+        jmethodID chargingTargetScheduleStructStructCtor_1;
+        err = chip::JniReferences::GetInstance().FindMethod(env, chargingTargetScheduleStructStructClass_1, "<init>",
+                                                            "(Ljava/util/Optional;Ljava/util/Optional;)V",
+                                                            &chargingTargetScheduleStructStructCtor_1);
+        if (err != CHIP_NO_ERROR || chargingTargetScheduleStructStructCtor_1 == nullptr)
         {
-            ChipLogError(Zcl, "Could not find ChipStructs$EnergyEvseClusterChargingTargetStruct constructor");
+            ChipLogError(Zcl, "Could not find ChipStructs$EnergyEvseClusterChargingTargetScheduleStruct constructor");
             return;
         }
 
-        newElement_0 = env->NewObject(chargingTargetStructStructClass_1, chargingTargetStructStructCtor_1,
-                                      newElement_0_targetTimeMinutesPastMidnight, newElement_0_targetSoC, newElement_0_addedEnergy);
-        chip::JniReferences::GetInstance().AddToList(ChargingTargets, newElement_0);
+        newElement_0 = env->NewObject(chargingTargetScheduleStructStructClass_1, chargingTargetScheduleStructStructCtor_1,
+                                      newElement_0_dayOfWeekforSequence, newElement_0_chargingTargets);
+        chip::JniReferences::GetInstance().AddToList(ChargingTargetSchedules, newElement_0);
     }
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, DayOfWeekforSequence, ChargingTargets);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, ChargingTargetSchedules);
 }
 CHIPDoorLockClusterGetWeekDayScheduleResponseCallback::CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(CallbackFn, this)

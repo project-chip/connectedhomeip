@@ -15857,10 +15857,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace ChargingTargetStruct
-} // namespace Structs
 
-namespace Commands {
-namespace GetTargetsResponse {
+namespace ChargingTargetScheduleStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -15890,6 +15888,44 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kChargingTargets))
         {
             err = DataModel::Decode(reader, chargingTargets);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ChargingTargetScheduleStruct
+} // namespace Structs
+
+namespace Commands {
+namespace GetTargetsResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kChargingTargetSchedules), chargingTargetSchedules);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kChargingTargetSchedules))
+        {
+            err = DataModel::Decode(reader, chargingTargetSchedules);
         }
         else
         {
@@ -16026,8 +16062,7 @@ namespace SetTargets {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kDayOfWeekforSequence), dayOfWeekforSequence);
-    encoder.Encode(to_underlying(Fields::kChargingTargets), chargingTargets);
+    encoder.Encode(to_underlying(Fields::kChargingTargetSchedules), chargingTargetSchedules);
     return encoder.Finalize();
 }
 
@@ -16045,13 +16080,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kDayOfWeekforSequence))
+        if (__context_tag == to_underlying(Fields::kChargingTargetSchedules))
         {
-            err = DataModel::Decode(reader, dayOfWeekforSequence);
-        }
-        else if (__context_tag == to_underlying(Fields::kChargingTargets))
-        {
-            err = DataModel::Decode(reader, chargingTargets);
+            err = DataModel::Decode(reader, chargingTargetSchedules);
         }
         else
         {
@@ -16065,7 +16096,6 @@ namespace GetTargets {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kDaysToReturn), daysToReturn);
     return encoder.Finalize();
 }
 
@@ -16079,19 +16109,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kDaysToReturn))
-        {
-            err = DataModel::Decode(reader, daysToReturn);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetTargets.
@@ -16144,10 +16161,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, userMaximumChargeCurrent);
     case Attributes::RandomizationDelayWindow::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, randomizationDelayWindow);
-    case Attributes::NumberOfWeeklyTargets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfWeeklyTargets);
-    case Attributes::NumberOfDailyTargets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfDailyTargets);
     case Attributes::NextChargeStartTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, nextChargeStartTime);
     case Attributes::NextChargeTargetTime::TypeInfo::GetAttributeId():

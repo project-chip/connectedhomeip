@@ -16835,9 +16835,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekforSequence = @(0);
-
-        _chargingTargets = [NSArray array];
+        _chargingTargetSchedules = [NSArray array];
     }
     return self;
 }
@@ -16846,15 +16844,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterGetTargetsResponseParams alloc] init];
 
-    other.dayOfWeekforSequence = self.dayOfWeekforSequence;
-    other.chargingTargets = self.chargingTargets;
+    other.chargingTargetSchedules = self.chargingTargetSchedules;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekforSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekforSequence, _chargingTargets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chargingTargetSchedules:%@; >", NSStringFromClass([self class]), _chargingTargetSchedules];
     return descriptionString;
 }
 
@@ -16905,26 +16902,47 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType &)decodableStruct
 {
     {
-        self.dayOfWeekforSequence = [NSNumber numberWithUnsignedChar:decodableStruct.dayOfWeekforSequence.Raw()];
-    }
-    {
         { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.chargingTargets.begin();
+            auto iter_0 = decodableStruct.chargingTargetSchedules.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTREnergyEVSEClusterChargingTargetStruct * newElement_0;
-                newElement_0 = [MTREnergyEVSEClusterChargingTargetStruct new];
-                newElement_0.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_0.targetTimeMinutesPastMidnight];
-                if (entry_0.targetSoC.HasValue()) {
-                    newElement_0.targetSoC = [NSNumber numberWithUnsignedChar:entry_0.targetSoC.Value()];
+                MTREnergyEVSEClusterChargingTargetScheduleStruct * newElement_0;
+                newElement_0 = [MTREnergyEVSEClusterChargingTargetScheduleStruct new];
+                if (entry_0.dayOfWeekforSequence.HasValue()) {
+                    newElement_0.dayOfWeekforSequence = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeekforSequence.Value().Raw()];
                 } else {
-                    newElement_0.targetSoC = nil;
+                    newElement_0.dayOfWeekforSequence = nil;
                 }
-                if (entry_0.addedEnergy.HasValue()) {
-                    newElement_0.addedEnergy = [NSNumber numberWithLongLong:entry_0.addedEnergy.Value()];
+                if (entry_0.chargingTargets.HasValue()) {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_0.chargingTargets.Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTREnergyEVSEClusterChargingTargetStruct * newElement_3;
+                            newElement_3 = [MTREnergyEVSEClusterChargingTargetStruct new];
+                            newElement_3.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_3.targetTimeMinutesPastMidnight];
+                            if (entry_3.targetSoC.HasValue()) {
+                                newElement_3.targetSoC = [NSNumber numberWithUnsignedChar:entry_3.targetSoC.Value()];
+                            } else {
+                                newElement_3.targetSoC = nil;
+                            }
+                            if (entry_3.addedEnergy.HasValue()) {
+                                newElement_3.addedEnergy = [NSNumber numberWithLongLong:entry_3.addedEnergy.Value()];
+                            } else {
+                                newElement_3.addedEnergy = nil;
+                            }
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        newElement_0.chargingTargets = array_3;
+                    }
                 } else {
-                    newElement_0.addedEnergy = nil;
+                    newElement_0.chargingTargets = nil;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -16932,7 +16950,7 @@ NS_ASSUME_NONNULL_BEGIN
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            self.chargingTargets = array_0;
+            self.chargingTargetSchedules = array_0;
         }
     }
     return CHIP_NO_ERROR;
@@ -17277,9 +17295,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekforSequence = @(0);
-
-        _chargingTargets = [NSArray array];
+        _chargingTargetSchedules = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -17290,8 +17306,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterSetTargetsParams alloc] init];
 
-    other.dayOfWeekforSequence = self.dayOfWeekforSequence;
-    other.chargingTargets = self.chargingTargets;
+    other.chargingTargetSchedules = self.chargingTargetSchedules;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -17300,7 +17315,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekforSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekforSequence, _chargingTargets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chargingTargetSchedules:%@; >", NSStringFromClass([self class]), _chargingTargetSchedules];
     return descriptionString;
 }
 
@@ -17313,37 +17328,62 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::EnergyEvse::Commands::SetTargets::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.dayOfWeekforSequence = static_cast<std::remove_reference_t<decltype(encodableStruct.dayOfWeekforSequence)>>(self.dayOfWeekforSequence.unsignedCharValue);
-    }
-    {
         {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.chargingTargets)>;
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.chargingTargetSchedules)>;
             using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.chargingTargets.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.chargingTargets.count);
+            if (self.chargingTargetSchedules.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.chargingTargetSchedules.count);
                 if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                     return CHIP_ERROR_INVALID_ARGUMENT;
                 }
                 listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.chargingTargets.count; ++i_0) {
-                    if (![self.chargingTargets[i_0] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
+                for (size_t i_0 = 0; i_0 < self.chargingTargetSchedules.count; ++i_0) {
+                    if (![self.chargingTargetSchedules[i_0] isKindOfClass:[MTREnergyEVSEClusterChargingTargetScheduleStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTREnergyEVSEClusterChargingTargetStruct *) self.chargingTargets[i_0];
-                    listHolder_0->mList[i_0].targetTimeMinutesPastMidnight = element_0.targetTimeMinutesPastMidnight.unsignedShortValue;
-                    if (element_0.targetSoC != nil) {
-                        auto & definedValue_2 = listHolder_0->mList[i_0].targetSoC.Emplace();
-                        definedValue_2 = element_0.targetSoC.unsignedCharValue;
+                    auto element_0 = (MTREnergyEVSEClusterChargingTargetScheduleStruct *) self.chargingTargetSchedules[i_0];
+                    if (element_0.dayOfWeekforSequence != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].dayOfWeekforSequence.Emplace();
+                        definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.dayOfWeekforSequence.unsignedCharValue);
                     }
-                    if (element_0.addedEnergy != nil) {
-                        auto & definedValue_2 = listHolder_0->mList[i_0].addedEnergy.Emplace();
-                        definedValue_2 = element_0.addedEnergy.longLongValue;
+                    if (element_0.chargingTargets != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].chargingTargets.Emplace();
+                        {
+                            using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                            using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                            if (element_0.chargingTargets.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.chargingTargets.count);
+                                if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_3);
+                                for (size_t i_3 = 0; i_3 < element_0.chargingTargets.count; ++i_3) {
+                                    if (![element_0.chargingTargets[i_3] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_3 = (MTREnergyEVSEClusterChargingTargetStruct *) element_0.chargingTargets[i_3];
+                                    listHolder_3->mList[i_3].targetTimeMinutesPastMidnight = element_3.targetTimeMinutesPastMidnight.unsignedShortValue;
+                                    if (element_3.targetSoC != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].targetSoC.Emplace();
+                                        definedValue_5 = element_3.targetSoC.unsignedCharValue;
+                                    }
+                                    if (element_3.addedEnergy != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].addedEnergy.Emplace();
+                                        definedValue_5 = element_3.addedEnergy.longLongValue;
+                                    }
+                                }
+                                definedValue_2 = ListType_3(listHolder_3->mList, element_0.chargingTargets.count);
+                            } else {
+                                definedValue_2 = ListType_3();
+                            }
+                        }
                     }
                 }
-                encodableStruct.chargingTargets = ListType_0(listHolder_0->mList, self.chargingTargets.count);
+                encodableStruct.chargingTargetSchedules = ListType_0(listHolder_0->mList, self.chargingTargetSchedules.count);
             } else {
-                encodableStruct.chargingTargets = ListType_0();
+                encodableStruct.chargingTargetSchedules = ListType_0();
             }
         }
     }
@@ -17390,8 +17430,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _daysToReturn = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -17402,7 +17440,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterGetTargetsParams alloc] init];
 
-    other.daysToReturn = self.daysToReturn;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -17411,7 +17448,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: daysToReturn:%@; >", NSStringFromClass([self class]), _daysToReturn];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 
@@ -17423,9 +17460,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     chip::app::Clusters::EnergyEvse::Commands::GetTargets::Type encodableStruct;
     ListFreer listFreer;
-    {
-        encodableStruct.daysToReturn = static_cast<std::remove_reference_t<decltype(encodableStruct.daysToReturn)>>(self.daysToReturn.unsignedCharValue);
-    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {

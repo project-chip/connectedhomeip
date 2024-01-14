@@ -1374,14 +1374,6 @@ CHIP_ERROR EnergyEvseDelegate::SetRandomizationDelayWindow(uint32_t newValue)
 }
 
 /* PREF attributes */
-uint8_t EnergyEvseDelegate::GetNumberOfWeeklyTargets()
-{
-    return mNumberOfWeeklyTargets;
-}
-uint8_t EnergyEvseDelegate::GetNumberOfDailyTargets()
-{
-    return mNumberOfDailyTargets;
-}
 DataModel::Nullable<uint32_t> EnergyEvseDelegate::GetNextChargeStartTime()
 {
     return mNextChargeStartTime;

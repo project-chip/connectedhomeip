@@ -9997,7 +9997,11 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)getTargetsWithParams:(MTREnergyEVSEClusterGetTargetsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion
+- (void)getTargetsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self getTargetsWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)getTargetsWithParams:(MTREnergyEVSEClusterGetTargetsParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTREnergyEVSEClusterGetTargetsParams
@@ -10136,16 +10140,6 @@ using chip::System::Clock::Timeout;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeEnergyEVSEID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEAttributeRandomizationDelayWindowID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfWeeklyTargetsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeEnergyEVSEID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfWeeklyTargetsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfDailyTargetsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeEnergyEVSEID) attributeID:@(MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfDailyTargetsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeNextChargeStartTimeWithParams:(MTRReadParams * _Nullable)params

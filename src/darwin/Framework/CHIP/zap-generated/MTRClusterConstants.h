@@ -2669,8 +2669,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterEnergyEVSEAttributeMaximumDischargeCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeUserMaximumChargeCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeRandomizationDelayWindowID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfWeeklyTargetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000021,
-    MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfDailyTargetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000022,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeStartTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000023,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeTargetTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000024,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeRequiredEnergyID MTR_PROVISIONALLY_AVAILABLE = 0x00000025,
