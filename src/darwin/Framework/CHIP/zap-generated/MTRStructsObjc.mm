@@ -5266,7 +5266,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekForSequence = nil;
+        _dayOfWeekforSequence = nil;
 
         _chargingTargets = nil;
     }
@@ -5277,7 +5277,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterChargingTargetScheduleStruct alloc] init];
 
-    other.dayOfWeekForSequence = self.dayOfWeekForSequence;
+    other.dayOfWeekforSequence = self.dayOfWeekforSequence;
     other.chargingTargets = self.chargingTargets;
 
     return other;
@@ -5285,7 +5285,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekForSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekForSequence, _chargingTargets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekforSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekforSequence, _chargingTargets];
     return descriptionString;
 }
 

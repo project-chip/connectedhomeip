@@ -3259,13 +3259,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("dayOfWeekForSequence"))
+    if (value.isMember("dayOfWeekforSequence"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekForSequence");
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekforSequence");
         ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekForSequence, value["dayOfWeekForSequence"]));
+            ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekforSequence, value["dayOfWeekforSequence"]));
     }
-    valueCopy.removeMember("dayOfWeekForSequence");
+    valueCopy.removeMember("dayOfWeekforSequence");
 
     if (value.isMember("chargingTargets"))
     {
@@ -3279,7 +3279,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.dayOfWeekForSequence);
+    ComplexArgumentParser::Finalize(request.dayOfWeekforSequence);
     ComplexArgumentParser::Finalize(request.chargingTargets);
 }
 

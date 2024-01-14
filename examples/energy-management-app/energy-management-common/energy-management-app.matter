@@ -973,7 +973,7 @@ provisional cluster EnergyEvse = 153 {
   }
 
   struct ChargingTargetScheduleStruct {
-    optional TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
+    optional TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
     optional ChargingTargetStruct chargingTargets[] = 1;
   }
 
