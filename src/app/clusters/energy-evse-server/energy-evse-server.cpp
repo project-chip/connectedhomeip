@@ -356,27 +356,26 @@ void Instance::HandleStartDiagnostics(HandlerContext & ctx, const Commands::Star
 void Instance::HandleSetTargets(HandlerContext & ctx, const Commands::SetTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.SetTargets();
-    Status status = Status::UnsupportedCommand;
+    auto & chargingTargetSchedules = commandData.chargingTargetSchedules;
+
+    Status status = mDelegate.SetTargets(chargingTargetSchedules);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 void Instance::HandleGetTargets(HandlerContext & ctx, const Commands::GetTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.GetTargets();
-    Status status = Status::UnsupportedCommand;
+    Commands::GetTargetsResponse::Type response;
+    Status status = mDelegate.GetTargets(response);
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 void Instance::HandleClearTargets(HandlerContext & ctx, const Commands::ClearTargets::DecodableType & commandData)
 {
     // Call the delegate
-    // TODO
-    // Status status = mDelegate.ClearTargets();
-    Status status = Status::UnsupportedCommand;
+    Status status = mDelegate.ClearTargets();
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }

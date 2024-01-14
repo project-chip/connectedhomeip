@@ -234,6 +234,48 @@ Status EnergyEvseDelegate::StartDiagnostics()
     return Status::Success;
 }
 
+/**
+ * @brief    Called when EVSE cluster receives SetTargets command
+ */
+Status EnergyEvseDelegate::SetTargets(
+    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> chargingTargetSchedules)
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::SetTargets()");
+    size_t size;
+    CHIP_ERROR err = chargingTargetSchedules.ComputeSize(&size);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Unknown size in chargingTargetSchedules");
+    }
+    ChipLogProgress(AppServer, "n = %zu", size);
+
+    return Status::Success;
+}
+
+/**
+ * @brief    Called when EVSE cluster receives GetTargets command
+ */
+Status EnergyEvseDelegate::GetTargets(Commands::GetTargetsResponse::Type &)
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::GetTargets()");
+
+    // TODO return target response
+
+    return Status::Success;
+}
+
+/**
+ * @brief    Called when EVSE cluster receives ClearTargets command
+ */
+Status EnergyEvseDelegate::ClearTargets()
+{
+    ChipLogProgress(AppServer, "EnergyEvseDelegate::ClearTargets()");
+
+    // TODO clear targets
+
+    return Status::Success;
+}
+
 /* ---------------------------------------------------------------------------
  *  EVSE Hardware interface below
  */

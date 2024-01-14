@@ -80,6 +80,27 @@ public:
      */
     virtual Status StartDiagnostics() = 0;
 
+    /**
+     * @brief Delegate should implement a handler to SetTargets command.
+     * It should report Status::Success if successful and may
+     * return other Status codes if it fails
+     */
+    virtual Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType>) = 0;
+
+    /**
+     * @brief Delegate should implement a handler to GetTargets command.
+     * It should report Status::Success if successful and may
+     * return other Status codes if it fails
+     */
+    virtual Status GetTargets(Commands::GetTargetsResponse::Type &) = 0;
+
+    /**
+     * @brief Delegate should implement a handler to ClearTargets command.
+     * It should report Status::Success if successful and may
+     * return other Status codes if it fails
+     */
+    virtual Status ClearTargets() = 0;
+
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual StateEnum GetState()                                       = 0;

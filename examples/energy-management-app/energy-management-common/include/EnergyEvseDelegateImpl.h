@@ -132,6 +132,22 @@ public:
     Status StartDiagnostics() override;
 
     /**
+     * @brief    Called when EVSE cluster receives SetTargets command
+     */
+
+    Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType>) override;
+
+    /**
+     * @brief    Called when EVSE cluster receives GetTargets command
+     */
+
+    Status GetTargets(Commands::GetTargetsResponse::Type &) override;
+    /**
+     * @brief    Called when EVSE cluster receives ClearTargets command
+     */
+    Status ClearTargets() override;
+
+    /**
      * @brief    Called by EVSE Hardware to register a single callback handler
      */
     Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
