@@ -3258,20 +3258,19 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    char labelWithMember[kMaxLabelLength];
-    if (value.isMember("dayOfWeekforSequence"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekforSequence");
-        ReturnErrorOnFailure(
-            ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekforSequence, value["dayOfWeekforSequence"]));
-    }
-    valueCopy.removeMember("dayOfWeekforSequence");
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetScheduleStruct.dayOfWeekForSequence",
+                                                                  "dayOfWeekForSequence", value.isMember("dayOfWeekForSequence")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetScheduleStruct.chargingTargets", "chargingTargets",
+                                                                  value.isMember("chargingTargets")));
 
-    if (value.isMember("chargingTargets"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chargingTargets");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chargingTargets, value["chargingTargets"]));
-    }
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekForSequence");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekForSequence, value["dayOfWeekForSequence"]));
+    valueCopy.removeMember("dayOfWeekForSequence");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chargingTargets");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chargingTargets, value["chargingTargets"]));
     valueCopy.removeMember("chargingTargets");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
@@ -3279,7 +3278,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.dayOfWeekforSequence);
+    ComplexArgumentParser::Finalize(request.dayOfWeekForSequence);
     ComplexArgumentParser::Finalize(request.chargingTargets);
 }
 

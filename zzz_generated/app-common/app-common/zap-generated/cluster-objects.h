@@ -22007,15 +22007,15 @@ using DecodableType = Type;
 namespace ChargingTargetScheduleStruct {
 enum class Fields : uint8_t
 {
-    kDayOfWeekforSequence = 0,
+    kDayOfWeekForSequence = 0,
     kChargingTargets      = 1,
 };
 
 struct Type
 {
 public:
-    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekforSequence;
-    Optional<DataModel::List<const Structs::ChargingTargetStruct::Type>> chargingTargets;
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
+    DataModel::List<const Structs::ChargingTargetStruct::Type> chargingTargets;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -22025,8 +22025,8 @@ public:
 struct DecodableType
 {
 public:
-    Optional<chip::BitMask<TargetDayOfWeekBitmap>> dayOfWeekforSequence;
-    Optional<DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType>> chargingTargets;
+    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
+    DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> chargingTargets;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
