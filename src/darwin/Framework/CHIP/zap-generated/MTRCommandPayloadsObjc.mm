@@ -16909,10 +16909,10 @@ NS_ASSUME_NONNULL_BEGIN
                 auto & entry_0 = iter_0.GetValue();
                 MTREnergyEVSEClusterChargingTargetScheduleStruct * newElement_0;
                 newElement_0 = [MTREnergyEVSEClusterChargingTargetScheduleStruct new];
-                if (entry_0.dayOfWeekforSequence.HasValue()) {
-                    newElement_0.dayOfWeekforSequence = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeekforSequence.Value().Raw()];
+                if (entry_0.dayOfWeekForSequence.HasValue()) {
+                    newElement_0.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeekForSequence.Value().Raw()];
                 } else {
-                    newElement_0.dayOfWeekforSequence = nil;
+                    newElement_0.dayOfWeekForSequence = nil;
                 }
                 if (entry_0.chargingTargets.HasValue()) {
                     { // Scope for our temporary variables
@@ -17343,9 +17343,9 @@ NS_ASSUME_NONNULL_BEGIN
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     auto element_0 = (MTREnergyEVSEClusterChargingTargetScheduleStruct *) self.chargingTargetSchedules[i_0];
-                    if (element_0.dayOfWeekforSequence != nil) {
-                        auto & definedValue_2 = listHolder_0->mList[i_0].dayOfWeekforSequence.Emplace();
-                        definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.dayOfWeekforSequence.unsignedCharValue);
+                    if (element_0.dayOfWeekForSequence != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].dayOfWeekForSequence.Emplace();
+                        definedValue_2 = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(element_0.dayOfWeekForSequence.unsignedCharValue);
                     }
                     if (element_0.chargingTargets != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].chargingTargets.Emplace();
