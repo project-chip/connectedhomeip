@@ -163,6 +163,7 @@ chip_test_suite_using_nltest("tests") {
   }
 
   test_sources += [ "TestAclAttribute.cpp" ]
+
   # DefaultICDClientStorage assumes that raw AES key is used by the application
   if (chip_crypto != "psa") {
     test_sources += [ "TestDefaultICDClientStorage.cpp" ]
