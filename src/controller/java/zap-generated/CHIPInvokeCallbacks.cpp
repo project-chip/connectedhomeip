@@ -3981,23 +3981,23 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
     {
         auto & entry_0 = iter_ChargingTargetSchedules_0.GetValue();
         jobject newElement_0;
-        jobject newElement_0_dayOfWeekForSequence;
-        if (!entry_0.dayOfWeekForSequence.HasValue())
+        jobject newElement_0_dayOfWeekforSequence;
+        if (!entry_0.dayOfWeekforSequence.HasValue())
         {
-            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_dayOfWeekForSequence);
+            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_dayOfWeekforSequence);
         }
         else
         {
-            jobject newElement_0_dayOfWeekForSequenceInsideOptional;
-            std::string newElement_0_dayOfWeekForSequenceInsideOptionalClassName     = "java/lang/Integer";
-            std::string newElement_0_dayOfWeekForSequenceInsideOptionalCtorSignature = "(I)V";
-            jint jninewElement_0_dayOfWeekForSequenceInsideOptional = static_cast<jint>(entry_0.dayOfWeekForSequence.Value().Raw());
+            jobject newElement_0_dayOfWeekforSequenceInsideOptional;
+            std::string newElement_0_dayOfWeekforSequenceInsideOptionalClassName     = "java/lang/Integer";
+            std::string newElement_0_dayOfWeekforSequenceInsideOptionalCtorSignature = "(I)V";
+            jint jninewElement_0_dayOfWeekforSequenceInsideOptional = static_cast<jint>(entry_0.dayOfWeekforSequence.Value().Raw());
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                newElement_0_dayOfWeekForSequenceInsideOptionalClassName.c_str(),
-                newElement_0_dayOfWeekForSequenceInsideOptionalCtorSignature.c_str(),
-                jninewElement_0_dayOfWeekForSequenceInsideOptional, newElement_0_dayOfWeekForSequenceInsideOptional);
-            chip::JniReferences::GetInstance().CreateOptional(newElement_0_dayOfWeekForSequenceInsideOptional,
-                                                              newElement_0_dayOfWeekForSequence);
+                newElement_0_dayOfWeekforSequenceInsideOptionalClassName.c_str(),
+                newElement_0_dayOfWeekforSequenceInsideOptionalCtorSignature.c_str(),
+                jninewElement_0_dayOfWeekforSequenceInsideOptional, newElement_0_dayOfWeekforSequenceInsideOptional);
+            chip::JniReferences::GetInstance().CreateOptional(newElement_0_dayOfWeekforSequenceInsideOptional,
+                                                              newElement_0_dayOfWeekforSequence);
         }
         jobject newElement_0_chargingTargets;
         if (!entry_0.chargingTargets.HasValue())
@@ -4108,7 +4108,7 @@ void CHIPEnergyEvseClusterGetTargetsResponseCallback::CallbackFn(
         }
 
         newElement_0 = env->NewObject(chargingTargetScheduleStructStructClass_1, chargingTargetScheduleStructStructCtor_1,
-                                      newElement_0_dayOfWeekForSequence, newElement_0_chargingTargets);
+                                      newElement_0_dayOfWeekforSequence, newElement_0_chargingTargets);
         chip::JniReferences::GetInstance().AddToList(ChargingTargetSchedules, newElement_0);
     }
 
