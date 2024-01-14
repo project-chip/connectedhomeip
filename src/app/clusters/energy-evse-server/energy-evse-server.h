@@ -94,8 +94,6 @@ public:
     virtual int64_t GetUserMaximumChargeCurrent()                      = 0;
     virtual uint32_t GetRandomizationDelayWindow()                     = 0;
     /* PREF attributes */
-    virtual uint8_t GetNumberOfWeeklyTargets()                         = 0;
-    virtual uint8_t GetNumberOfDailyTargets()                          = 0;
     virtual DataModel::Nullable<uint32_t> GetNextChargeStartTime()     = 0;
     virtual DataModel::Nullable<uint32_t> GetNextChargeTargetTime()    = 0;
     virtual DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() = 0;
@@ -142,9 +140,8 @@ class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
              OptionalCommands aOptionalCmds) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id),
-        CommandHandlerInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
-        mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
+        mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttrs), mOptionalCmds(aOptionalCmds)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);

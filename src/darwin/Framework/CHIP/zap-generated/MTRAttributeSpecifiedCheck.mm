@@ -3111,12 +3111,6 @@ static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
     case Attributes::RandomizationDelayWindow::Id: {
         return YES;
     }
-    case Attributes::NumberOfWeeklyTargets::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfDailyTargets::Id: {
-        return YES;
-    }
     case Attributes::NextChargeStartTime::Id: {
         return YES;
     }

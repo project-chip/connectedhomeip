@@ -3870,14 +3870,6 @@ namespace RandomizationDelayWindow {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace RandomizationDelayWindow
 
-namespace NumberOfWeeklyTargets {
-static constexpr AttributeId Id = 0x00000021;
-} // namespace NumberOfWeeklyTargets
-
-namespace NumberOfDailyTargets {
-static constexpr AttributeId Id = 0x00000022;
-} // namespace NumberOfDailyTargets
-
 namespace NextChargeStartTime {
 static constexpr AttributeId Id = 0x00000023;
 } // namespace NextChargeStartTime

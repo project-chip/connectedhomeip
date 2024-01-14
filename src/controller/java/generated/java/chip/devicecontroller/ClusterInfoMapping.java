@@ -10479,12 +10479,10 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer dayOfWeekforSequence, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets) {
+    public void onSuccess(ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
-      CommandResponseInfo dayOfWeekforSequenceResponseValue = new CommandResponseInfo("dayOfWeekforSequence", "Integer");
-      responseValues.put(dayOfWeekforSequenceResponseValue, dayOfWeekforSequence);
-      // chargingTargets: ChargingTargetStruct
+      // chargingTargetSchedules: ChargingTargetScheduleStruct
       // Conversion from this type to Java is not properly implemented yet
 
       callback.onSuccess(responseValues);
@@ -23303,17 +23301,12 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> energyEvsesetTargetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo energyEvsesetTargetsdayOfWeekforSequenceCommandParameterInfo = new CommandParameterInfo("dayOfWeekforSequence", Integer.class, Integer.class);
-    energyEvsesetTargetsCommandParams.put("dayOfWeekforSequence",energyEvsesetTargetsdayOfWeekforSequenceCommandParameterInfo);
-
     InteractionInfo energyEvsesetTargetsInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.EnergyEvseCluster) cluster)
         .setTargets((DefaultClusterCallback) callback
-        , (Integer)
-        commandArguments.get("dayOfWeekforSequence")
-        , (ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct>)
-        commandArguments.get("chargingTargets"), 10000
+        , (ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct>)
+        commandArguments.get("chargingTargetSchedules"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -23322,16 +23315,10 @@ public class ClusterInfoMapping {
     energyEvseClusterInteractionInfoMap.put("setTargets", energyEvsesetTargetsInteractionInfo);
 
     Map<String, CommandParameterInfo> energyEvsegetTargetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo energyEvsegetTargetsdaysToReturnCommandParameterInfo = new CommandParameterInfo("daysToReturn", Integer.class, Integer.class);
-    energyEvsegetTargetsCommandParams.put("daysToReturn",energyEvsegetTargetsdaysToReturnCommandParameterInfo);
     InteractionInfo energyEvsegetTargetsInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.EnergyEvseCluster) cluster)
           .getTargets((ChipClusters.EnergyEvseCluster.GetTargetsResponseCallback) callback
-           , (Integer)
-             commandArguments.get("daysToReturn")
-
             , 10000);
         },
         () -> new DelegatedEnergyEvseClusterGetTargetsResponseCallback(),

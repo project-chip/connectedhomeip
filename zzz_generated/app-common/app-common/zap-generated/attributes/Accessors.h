@@ -2142,16 +2142,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // elapsed_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace RandomizationDelayWindow
 
-namespace NumberOfWeeklyTargets {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumberOfWeeklyTargets
-
-namespace NumberOfDailyTargets {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumberOfDailyTargets
-
 namespace NextChargeStartTime {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // epoch_s
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
