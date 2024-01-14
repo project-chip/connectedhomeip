@@ -5266,9 +5266,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekForSequence = nil;
+        _dayOfWeekForSequence = @(0);
 
-        _chargingTargets = nil;
+        _chargingTargets = [NSArray array];
     }
     return self;
 }
