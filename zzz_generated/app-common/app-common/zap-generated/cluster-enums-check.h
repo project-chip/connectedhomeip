@@ -1188,6 +1188,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::OperatingModeEnum val)
+{
+    using EnumType = IcdManagement::OperatingModeEnum;
+    switch (val)
+    {
+    case EnumType::kSit:
+    case EnumType::kLit:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum val)
 {
     using EnumType = Timer::TimerStatusEnum;
