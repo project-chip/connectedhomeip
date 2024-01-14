@@ -96,7 +96,7 @@ tests:
   #    response:
   #        constraints:
   #            type: list
-  #            contains: [3]
+  ##            contains: [3]
 
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
