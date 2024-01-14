@@ -25,12 +25,12 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class EnergyEvseClusterChargingTargetScheduleStruct(
-  val dayOfWeekforSequence: Optional<UInt>,
+  val dayOfWeekForSequence: Optional<UInt>,
   val chargingTargets: Optional<List<EnergyEvseClusterChargingTargetStruct>>
 ) {
   override fun toString(): String = buildString {
     append("EnergyEvseClusterChargingTargetScheduleStruct {\n")
-    append("\tdayOfWeekforSequence : $dayOfWeekforSequence\n")
+    append("\tdayOfWeekForSequence : $dayOfWeekForSequence\n")
     append("\tchargingTargets : $chargingTargets\n")
     append("}\n")
   }
@@ -38,9 +38,9 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      if (dayOfWeekforSequence.isPresent) {
-        val optdayOfWeekforSequence = dayOfWeekforSequence.get()
-        put(ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE), optdayOfWeekforSequence)
+      if (dayOfWeekForSequence.isPresent) {
+        val optdayOfWeekForSequence = dayOfWeekForSequence.get()
+        put(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE), optdayOfWeekForSequence)
       }
       if (chargingTargets.isPresent) {
         val optchargingTargets = chargingTargets.get()
@@ -55,14 +55,14 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
   }
 
   companion object {
-    private const val TAG_DAY_OF_WEEKFOR_SEQUENCE = 0
+    private const val TAG_DAY_OF_WEEK_FOR_SEQUENCE = 0
     private const val TAG_CHARGING_TARGETS = 1
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterChargingTargetScheduleStruct {
       tlvReader.enterStructure(tlvTag)
-      val dayOfWeekforSequence =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DAY_OF_WEEKFOR_SEQUENCE)))
+      val dayOfWeekForSequence =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_DAY_OF_WEEK_FOR_SEQUENCE)))
         } else {
           Optional.empty()
         }
@@ -83,7 +83,7 @@ class EnergyEvseClusterChargingTargetScheduleStruct(
 
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterChargingTargetScheduleStruct(dayOfWeekforSequence, chargingTargets)
+      return EnergyEvseClusterChargingTargetScheduleStruct(dayOfWeekForSequence, chargingTargets)
     }
   }
 }

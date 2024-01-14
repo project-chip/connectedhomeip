@@ -24063,11 +24063,11 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=0, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="chargingTargets", Tag=1, Type=typing.Optional[typing.List[EnergyEvse.Structs.ChargingTargetStruct]]),
                     ])
 
-            dayOfWeekforSequence: 'typing.Optional[uint]' = None
+            dayOfWeekForSequence: 'typing.Optional[uint]' = None
             chargingTargets: 'typing.Optional[typing.List[EnergyEvse.Structs.ChargingTargetStruct]]' = None
 
     class Commands:
