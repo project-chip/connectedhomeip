@@ -52,9 +52,9 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner()                                      = default;
-    ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
-    ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
+    ChipDeviceScanner()                          = default;
+    ChipDeviceScanner(ChipDeviceScanner &&)      = default;
+    ChipDeviceScanner(const ChipDeviceScanner &) = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
     ~ChipDeviceScanner() { Shutdown(); }
@@ -75,6 +75,12 @@ public:
     CHIP_ERROR StopScan();
 
 private:
+    enum ChipDeviceScannerState
+    {
+        SCANNER_UNINITIALIZED,
+        SCANNER_INITIALIZED,
+        SCANNER_SCANNING
+    };
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
     static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
     static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
@@ -96,9 +102,7 @@ private:
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
-    bool mIsInitialized                   = false;
-    bool mIsScanning                      = false;
-    bool mIsStopping                      = false;
+    ChipDeviceScannerState mCurrentState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     bool mTimerExpired = false;
 };
