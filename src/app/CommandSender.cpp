@@ -299,8 +299,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     }
 
     err = invokeResponseMessage.GetMoreChunkedMessages(&moreChunkedMessages);
-    // We will get CHIP_END_OF_TLV if there was no MoreChunkedMessages element. If that is
-    // the case, a default value of false is used, as mentioned in the spec.
+    // If the MoreChunkedMessages element is absent, we receive CHIP_END_OF_TLV. In this
+    // case, per the specification, a default value of false is used.
     if (CHIP_END_OF_TLV == err)
     {
         moreChunkedMessages = false;
@@ -311,7 +311,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     if (suppressResponse && moreChunkedMessages)
     {
         ChipLogError(DataManagement, "Spec violation! InvokeResponse has suppressResponse=true, and moreChunkedMessages=true");
-        // TODO Is there a better error. This seems close but not quite what we want.
+        // TODO Is there a better error to return here?
         return CHIP_ERROR_INVALID_TLV_ELEMENT;
     }
 

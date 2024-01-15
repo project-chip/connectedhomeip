@@ -474,7 +474,7 @@ private:
     void Close();
 
     /**
-     * @brief Callback method to know when CommandResponseSender is done sending all messages.
+     * @brief Callback method invoked when CommandResponseSender has finished sending all messages.
      */
     static void HandleOnResponseSenderDone(void * context);
 

@@ -29,7 +29,7 @@ typedef void (*OnResponseSenderDone)(void * context);
 class CommandHandler;
 
 /**
- * Class manages sending `InvokeResponseMessage`(s) back to the initial requester.
+ * Class manages the process of sending `InvokeResponseMessage`(s) back to the initial requester.
  */
 class CommandResponseSender : public Messaging::ExchangeDelegate
 {
@@ -66,10 +66,10 @@ public:
     }
 
     /**
-     * Gets subject descriptor of the exchange
+     * Gets subject descriptor of the exchange.
      *
-     * WARNING: This method should only be called when caller is certain the
-     * session cannot have been evicted.
+     * WARNING: This method should only be called when the caller is certain the
+     * session has not been evicted.
      */
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
@@ -103,11 +103,16 @@ public:
         return mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
-    CHIP_ERROR StartSendingCommandResponse();
+    /**
+     * @brief Initiates the sending of InvokeResponses previously queued using AddInvokeResponseToSend.
+     *
+     * Upon failure, the caller is responsible for closing the exchange appropriately, potentially
+     * by calling `SendStatusResponse`.
+     */
+    CHIP_ERROR StartSendingCommandResponses();
 
     void SendStatusResponse(Protocols::InteractionModel::Status aStatus)
     {
-        // TODO Should this move state to AllInvokeResponsesSent.
         StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
     }
 
@@ -120,12 +125,9 @@ public:
     }
 
     /**
-     * @brief Sets the Callback to be called when CommandResponseSender is done sending Responses
-     * 
-     * When Called with a non-null value CommandResponseSender will call this callback
-     * 
+     * @brief Registers a callback to be invoked when CommandResponseSender has finished sending responses.
      */
-    void SetOnResponseSenderDoneCallback(Callback::Callback<OnResponseSenderDone> * aResponseSenderDoneCallback)
+    void RegisterOnResponseSenderDoneCallback(Callback::Callback<OnResponseSenderDone> * aResponseSenderDoneCallback)
     {
         VerifyOrDie(!mCloseCalled);
         mResponseSenderDoneCallback = aResponseSenderDoneCallback;
@@ -135,7 +137,7 @@ private:
     enum class State : uint8_t
     {
         ReadyForInvokeResponses, ///< Accepting InvokeResponses to send back to requester.
-        AwaitingStatusResponse,  ///< Awaiting response from requester, after sending InvokeResponse.
+        AwaitingStatusResponse,  ///< Awaiting status response from requester, after sending InvokeResponse.
         AllInvokeResponsesSent,  ///< All InvokeResponses have been sent out.
     };
 

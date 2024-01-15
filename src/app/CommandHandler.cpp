@@ -69,11 +69,11 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
             ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
         }
 
-        // Sending an InvokeResponse to a InvokeResponse is going to be removed from spec soon.
-        // It was never implemented in the SDK, and there are no commands responses that expect a
-        // command response. This means we will never recieve an InvokeResponse Message in response
-        // to an InvokeResponse Message that we are sending out. This means that the only response
-        // we are expecting to receive in responses to an InvokeResponse Message that we are
+        // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
+        // It was never implemented in the SDK, and there are no command responses that expect a
+        // command response. This means we will never receive an InvokeResponse Message in response
+        // to an InvokeResponse Message that we are sending. This means that the only response
+        // we are expecting to receive in response to an InvokeResponse Message that we are
         // sending-out is a status when we are chunking multiple responses. As a result, to satisfy the
         // condition that we don't set SuppressResponse to true while also setting
         // MoreChunkedMessages to true, we are hardcoding the value to false here.
@@ -309,15 +309,18 @@ void CommandHandler::DecrementHoldOff()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+                mResponseSender.SendStatusResponse(Status::Failure);
+                Close();
+                return;
             }
         }
     }
 
     if (mResponseSender.AwaitingStatusResponse())
     {
-        // If we are awaiting a status response we want to call Close() only once the response sender is done,
-        // so register to be notified when CommandResponseSender is done.
-        mResponseSender.SetOnResponseSenderDoneCallback(&mResponseSenderDone);
+        // If we are awaiting a status response, we want to call Close() only once the response sender is done.
+        // Therefore, register to be notified when CommandResponseSender is done.
+        mResponseSender.RegisterOnResponseSenderDoneCallback(&mResponseSenderDone);
         return;
     }
     Close();
@@ -330,7 +333,7 @@ CHIP_ERROR CommandHandler::StartSendingCommandResponses()
     VerifyOrReturnError(mResponseSender.HasExchangeContext(), CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false));
-    ReturnErrorOnFailure(mResponseSender.StartSendingCommandResponse());
+    ReturnErrorOnFailure(mResponseSender.StartSendingCommandResponses());
     return CHIP_NO_ERROR;
 }
 
@@ -787,8 +790,8 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
     if (aHasMoreChunks)
     {
-        // Unreserving space that we previously reserved for MoreChunkedMessages is done
-        // in the call in mInvokeResponseBuilder.MoreChunkedMessages.
+        // Unreserving space previously reserved for MoreChunkedMessages is done
+        // in the call to mInvokeResponseBuilder.MoreChunkedMessages.
         mInvokeResponseBuilder.MoreChunkedMessages(aHasMoreChunks);
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
     }

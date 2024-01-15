@@ -41,25 +41,24 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         err = SendCommandResponse();
         VerifyOrExit(err == CHIP_NO_ERROR, sendStatusResponseWithFailure = true);
 
-        if (mState != State::AwaitingStatusResponse)
+        bool moreToSend = !mChunks.IsNull();
+        if (!moreToSend)
         {
-            // We are sending out the last message and no longer are expecting any responses. As a result we are
-            // fulfilling our responsibility to call Close() on CommandHandler by calling ExitNow().
+            // We are sending the final message and do not anticipate any further responses. We are
+            // calling ExitNow() to immediately execute Close() and subsequently return from this function.
             ExitNow();
         }
         return CHIP_NO_ERROR;
     }
+
     ChipLogDetail(DataManagement, "CommandResponseSender: Unexpected message type %d", aPayloadHeader.GetMessageType());
-    StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
-    if (mState == State::AwaitingStatusResponse)
+    if (mState != State::AllInvokeResponsesSent)
     {
-        // We were waiting for a StatusResponse and received something unexpected. As a result,
-        // we've sent a StatusResponse indicating an issue, and we do not anticipate any further
-        // responses. Consequently, we are simply fulfilling our responsibility to call Close()
-        // on CommandHandler by calling ExitNow().
+        sendStatusResponseWithFailure = true;
         ExitNow();
     }
+    StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     return err;
 exit:
     if (sendStatusResponseWithFailure)
@@ -77,8 +76,9 @@ void CommandResponseSender::OnResponseTimeout(Messaging::ExchangeContext * apExc
     Close();
 }
 
-CHIP_ERROR CommandResponseSender::StartSendingCommandResponse()
+CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
 {
+    VerifyOrReturnError(mState == State::ReadyForInvokeResponses, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(SendCommandResponse());
 
     bool moreToSend = !mChunks.IsNull();
@@ -111,8 +111,6 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
 
-    // TODO still need to figure out what should be responsible for closing the exchange if command
-    // below fails.
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse,
                                                    std::move(commandResponsePayload), sendFlag));
 
