@@ -10,16 +10,18 @@ chip_test_suite_using_nltest("tests") {
 
   test_sources = [
     "TestCASESession.cpp",
-
-    # TODO - Fix Message Counter Sync to use group key
-    #    "TestMessageCounterManager.cpp",
     "TestCheckinMsg.cpp",
     "TestDefaultSessionResumptionStorage.cpp",
     "TestPASESession.cpp",
     "TestPairingSession.cpp",
     "TestSimpleSessionResumptionStorage.cpp",
     "TestStatusReport.cpp",
+
+    # TODO - Fix Message Counter Sync to use group key
+    #    "TestMessageCounterManager.cpp",
   ]
+
+  sources = [ "CheckIn_Message_test_vectors.h" ]
 
   public_deps = [
     "${chip_root}/src/app/icd:icd_config",
@@ -27,7 +29,8 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/crypto/tests:tests.lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols",
     "${chip_root}/src/protocols/secure_channel",

@@ -87,6 +87,9 @@ enum
 #if defined(PW_RPC_ENABLED)
     kOptionRpcServerPort = 0x1023,
 #endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    kDeviceOption_SubscriptionCapacity = 0x1024,
+#endif
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -143,6 +146,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "simulate-no-internal-time", kNoArgument, kOptionSimulateNoInternalTime },
 #if defined(PW_RPC_ENABLED)
     { "rpc-server-port", kArgumentRequired, kOptionRpcServerPort },
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    { "subscription-capacity", kArgumentRequired, kDeviceOption_SubscriptionCapacity },
 #endif
     {}
 };
@@ -263,6 +269,10 @@ const char * sDeviceOptionHelp =
 #if defined(PW_RPC_ENABLED)
     "  --rpc-server-port\n"
     "       Start RPC server on specified port\n"
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    "  --subscription-capacity\n"
+    "       Max number of subscriptions the device will allow\n"
 #endif
     "\n";
 
@@ -520,6 +530,11 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if defined(PW_RPC_ENABLED)
     case kOptionRpcServerPort:
         LinuxDeviceOptions::GetInstance().rpcServerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+#endif
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    case kDeviceOption_SubscriptionCapacity:
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity = static_cast<int32_t>(atoi(aValue));
         break;
 #endif
     default:

@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,8 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the mandatory attribute: TemperatureDisplayMode"
+    - label:
+          "Step 2: TH reads the TemperatureDisplayMode attribute from the DUT"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
       attribute: "TemperatureDisplayMode"
@@ -41,7 +42,7 @@ tests:
               minValue: 0
               maxValue: 1
 
-    - label: "Step 3: Read the mandatory attribute: KeypadLockout"
+    - label: "Step 3: TH reads the KeypadLockout attribute from the DUT"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
       attribute: "KeypadLockout"
@@ -52,7 +53,8 @@ tests:
               maxValue: 5
 
     - label:
-          "Step 4: Read the optional attribute: ScheduleProgrammingVisibility"
+          "Step 4: TH reads the ScheduleProgrammingVisibility attribute from the
+          DUT"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
       attribute: "ScheduleProgrammingVisibility"

@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1a: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1a: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -115,8 +117,8 @@ tests:
     #             value: "y"
 
     - label:
-          "Step 4a: TH sends Identify command to DUT, with the IdentifyTime
-          field set to 0x0000 (stop identifying)."
+          "Step 4a: Before 60 seconds expire, TH sends Identify command to DUT,
+          with the identify time field set to 0x0000 (stop identifying)."
       PICS: I.S.C00.Rsp
       command: "Identify"
       arguments:
