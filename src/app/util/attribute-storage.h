@@ -171,10 +171,6 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-// Checks a cluster mask byte against ticks passed bitmask
-// returns true if the mask matches a passed interval
-bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
-
 // Check whether there is an endpoint defined with the given endpoint id that is
 // enabled.
 bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
