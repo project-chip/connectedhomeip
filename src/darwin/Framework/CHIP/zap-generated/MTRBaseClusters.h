@@ -14680,7 +14680,8 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Command Test
  *
- * Simple command without any parameters and without a specific response
+ * Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults.
  */
 - (void)testWithParams:(MTRUnitTestingClusterTestParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)testWithCompletion:(MTRStatusCompletion)completion
