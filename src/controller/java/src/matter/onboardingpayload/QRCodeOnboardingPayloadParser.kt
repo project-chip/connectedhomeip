@@ -20,6 +20,7 @@ package matter.onboardingpayload
 import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicInteger
 import matter.tlv.ContextSpecificTag
+import matter.tlv.Element
 import matter.tlv.IntValue
 import matter.tlv.TlvReader
 import matter.tlv.Utf8StringValue
@@ -94,12 +95,15 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
       if (reader.isEndOfTlv()) {
         break
       }
+      parseTLVFields(element, payload)
+    }
+  }
 
-      // update tag
-      val tag = element.tag
-      if (tag !is ContextSpecificTag) {
-        continue
-      }
+  private fun parseTLVFields(element: Element, payload: OnboardingPayload) {
+    // update tag
+    val tag = element.tag
+    if (tag is ContextSpecificTag) {
+
       if (tag.tagNumber < 0x80) {
         // add serial number
         if (tag.tagNumber == kSerialNumberTag) {
