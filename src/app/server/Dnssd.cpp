@@ -42,6 +42,10 @@ namespace chip {
 namespace app {
 namespace {
 
+static_assert(ConfigurationManager::kMaxDeviceNameLen == Dnssd::kKeyDeviceNameMaxLength,
+              "Max device name length constants are not matching: ConfigurationManager::kMaxDeviceNameLen and "
+              "Dnssd::kKeyDeviceNameMaxLength");
+
 void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     switch (event->Type)
@@ -251,11 +255,21 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetDeviceType(chip::Optional<uint32_t>::Value(val32));
     }
 
-    char deviceName[chip::Dnssd::kKeyDeviceNameMaxLength + 1];
-    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled() &&
-        DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceName, sizeof(deviceName)) == CHIP_NO_ERROR)
+    char deviceName[Dnssd::kKeyDeviceNameMaxLength + 1];
+    MutableCharSpan deviceNameSpan(deviceName, Dnssd::kKeyDeviceNameMaxLength);
+    if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceNameEnabled())
     {
-        advertiseParameters.SetDeviceName(chip::Optional<const char *>::Value(deviceName));
+        CHIP_ERROR err;
+        if ((err = DeviceLayer::ConfigurationMgr().GetCommissionableDeviceName(deviceNameSpan)) == CHIP_NO_ERROR)
+        {
+            // Appending a null terminator since SetDeviceName expects a null terminated string
+            deviceName[deviceNameSpan.size()] = '\0';
+            advertiseParameters.SetDeviceName(Optional<const char *>::Value(deviceName));
+        }
+        else
+        {
+            ChipLogError(Discovery, "Failed to read commissionableDeviceName %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));

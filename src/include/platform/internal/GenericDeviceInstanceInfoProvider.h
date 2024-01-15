@@ -41,6 +41,7 @@ public:
         mGenericConfigManager(configManager)
     {}
 
+    CHIP_ERROR GetDeviceName(MutableCharSpan & deviceNameSpan) override;
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;

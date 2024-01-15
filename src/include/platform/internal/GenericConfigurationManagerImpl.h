@@ -85,7 +85,7 @@ public:
     bool IsCommissionableDeviceTypeEnabled() override;
     CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
     bool IsCommissionableDeviceNameEnabled() override;
-    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetCommissionableDeviceName(MutableCharSpan & deviceNameSpan) override;
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
     CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override;

@@ -30,6 +30,16 @@ public:
     virtual ~DeviceInstanceInfoProvider() = default;
 
     /**
+     * @brief Obtain the Device Name from the device's factory data.
+     *
+     * @param[out] deviceName Buffer to copy the name into.  On success, will be
+                              resized to the actual size of the name.
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetDeviceName(MutableCharSpan & deviceName) = 0;
+
+    /**
      * @brief Obtain the Vendor Name from the device's factory data.
      *
      * @param[out] buf Buffer to copy string.

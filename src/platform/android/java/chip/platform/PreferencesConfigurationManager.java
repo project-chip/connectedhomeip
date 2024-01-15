@@ -103,6 +103,14 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
 
     switch (key) {
         /**
+         * Human readable name of the device name.
+         *
+         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_MfrDeviceName:
+        return "TEST_ANDROID_DEVICE_NAME";
+
+        /**
          * Human readable name of the device model. return a different value than
          * src/include/platform/CHIPDeviceConfig.h for debug
          */

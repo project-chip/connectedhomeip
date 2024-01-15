@@ -65,6 +65,7 @@ public:
 
     enum
     {
+        kMaxDeviceNameLen               = 32,
         kMaxVendorNameLength            = 32,
         kMaxProductNameLength           = 32,
         kMaxLocationLength              = 2,
@@ -141,14 +142,15 @@ public:
 
     virtual void LogDeviceConfig() = 0;
 
-    virtual bool IsCommissionableDeviceTypeEnabled()                              = 0;
-    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType)                     = 0;
-    virtual bool IsCommissionableDeviceNameEnabled()                              = 0;
-    virtual CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize)    = 0;
-    virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)              = 0;
-    virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)   = 0;
-    virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)            = 0;
-    virtual CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) = 0;
+    virtual bool IsCommissionableDeviceTypeEnabled()          = 0;
+    virtual CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) = 0;
+    virtual bool IsCommissionableDeviceNameEnabled()          = 0;
+    // deviceNameSpan gets resized to the actual size of the character data
+    virtual CHIP_ERROR GetCommissionableDeviceName(MutableCharSpan & deviceNameSpan) = 0;
+    virtual CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint)                 = 0;
+    virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)      = 0;
+    virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)               = 0;
+    virtual CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize)    = 0;
 
     virtual CHIP_ERROR GetLocationCapability(uint8_t & location);
 

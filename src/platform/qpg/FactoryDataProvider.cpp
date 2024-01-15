@@ -240,6 +240,11 @@ CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
+CHIP_ERROR FactoryDataProvider::GetDeviceName(MutableCharSpan & deviceNameSpan)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     qvStatus_t status;

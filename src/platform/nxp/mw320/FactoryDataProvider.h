@@ -62,6 +62,7 @@ public:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     // ===== Members functions that implement the GenericDeviceInstanceInfoProvider
+    CHIP_ERROR GetDeviceName(MutableCharSpan & deviceNameSpan) override;
     CHIP_ERROR GetVendorName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;

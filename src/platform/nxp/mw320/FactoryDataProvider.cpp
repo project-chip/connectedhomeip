@@ -267,6 +267,11 @@ CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+CHIP_ERROR FactoryDataProvider::GetDeviceName(MutableCharSpan & devicenameSpan)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;

@@ -240,6 +240,12 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::SetSetupPasscode(uint32_t setu
 }
 
 template <class FlashFactoryData>
+CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetDeviceName(MutableCharSpan & deviceNameSpan)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetVendorName(char * buf, size_t bufSize)
 {
     return GetFactoryDataString(mFactoryData.vendor_name, buf, bufSize);

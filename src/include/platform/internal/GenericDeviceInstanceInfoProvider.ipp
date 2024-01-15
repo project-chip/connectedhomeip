@@ -22,6 +22,14 @@ namespace DeviceLayer {
 namespace Internal {
 
 template <class ConfigClass>
+CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetDeviceName(MutableCharSpan & deviceNameSpan)
+{
+    constexpr char deviceName[] = CHIP_DEVICE_CONFIG_DEVICE_NAME;
+
+    return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(deviceName), deviceNameSpan);
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericDeviceInstanceInfoProvider<ConfigClass>::GetVendorId(uint16_t & vendorId)
 {
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
