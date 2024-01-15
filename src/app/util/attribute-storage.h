@@ -95,7 +95,7 @@ void emAfCallInits(void);
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.

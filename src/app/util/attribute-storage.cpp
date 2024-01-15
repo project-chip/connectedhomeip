@@ -61,9 +61,9 @@ uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 // Loads the attributes from built-in default and storage.
 static void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
-static bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
+static bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttributeSearchRecord * attRecord);
 static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                               EmberAfAttributeSearchRecord * attRecord);
+                               const EmberAfAttributeSearchRecord * attRecord);
 
 namespace {
 
@@ -545,7 +545,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
  *   1. Cluster ids match AND
  *   2. Cluster is a server cluster (because there are no client attributes).
  */
-bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord)
+bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttributeSearchRecord * attRecord)
 {
     return (cluster->clusterId == attRecord->clusterId && (cluster->mask & CLUSTER_MASK_SERVER));
 }
@@ -558,7 +558,7 @@ bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchReco
  * Attributes match if attr ids match.
  */
 bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                        EmberAfAttributeSearchRecord * attRecord)
+                        const EmberAfAttributeSearchRecord * attRecord)
 {
     return (am->attributeId == attRecord->attributeId);
 }
@@ -576,7 +576,7 @@ bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMe
 // type.  For strings, the function will copy as many bytes as will fit in the
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write)
 {
     assertChipStackLockedByCurrentThread();
