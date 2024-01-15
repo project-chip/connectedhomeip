@@ -95,10 +95,7 @@ k32w0_executable("light_app") {
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
-    defines = [
-      "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
-    ]
+    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
   }
 
   deps = [

@@ -2896,10 +2896,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("DayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence);
+        CHIP_ERROR err = LogValue("DayOfWeekforSequence", indent + 1, value.dayOfWeekforSequence);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayOfWeekForSequence'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayOfWeekforSequence'");
             return err;
         }
     }
