@@ -36,18 +36,19 @@ class TC_VALCC_4_3(MatterBaseTest):
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read FeatureMap attribute"),
-            TestStep(3, "Send Open command with duration set to 60"),
-            TestStep(4, "Read UTCTime attribute from TimeSync cluster"),
-            TestStep(5, "Read AutoCloseTime attribute"),
-            TestStep(6, "Send Close command"),
-            TestStep(7, "Read AutoCloseTime attribute"),
-            TestStep("8a", "Read DefaultOpenDuration attribute"),
-            TestStep("8b", "Write DefaultOpenDuration attribute"),
-            TestStep(9, "Send Open command"),
-            TestStep(10, "Read UTCTime attribute from TimeSync cluster"),
-            TestStep(11, "Read AutoCloseTime attribute"),
-            TestStep(12, "Send Close command"),
-            TestStep(13, "Read AutoCloseTime attribute"),
+            TestStep(3, "Verify TimeSync feature is supported"),
+            TestStep(4, "Send Open command with duration set to 60"),
+            TestStep(5, "Read UTCTime attribute from TimeSync cluster"),
+            TestStep(6, "Read AutoCloseTime attribute"),
+            TestStep(7, "Send Close command"),
+            TestStep(8, "Read AutoCloseTime attribute"),
+            TestStep("9a", "Read DefaultOpenDuration attribute"),
+            TestStep("9b", "Write DefaultOpenDuration attribute"),
+            TestStep(10, "Send Open command"),
+            TestStep(11, "Read UTCTime attribute from TimeSync cluster"),
+            TestStep(12, "Read AutoCloseTime attribute"),
+            TestStep(13, "Send Close command"),
+            TestStep(14, "Read AutoCloseTime attribute"),
         ]
         return steps
 
@@ -71,65 +72,56 @@ class TC_VALCC_4_3(MatterBaseTest):
         is_ts_feature_supported = feature_map & Clusters.ValveConfigurationAndControl.Bitmaps.Feature.kTimeSync
 
         self.step(3)
-        if is_ts_feature_supported:
-            try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(openDuration=60), endpoint=endpoint)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
+        if not is_ts_feature_supported:
+            logging.info("TimeSync feature not supported skipping test case")
+
+            # Skipping all remainig steps
+            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
+                self.step(step.test_plan_number)
+                logging.info("Test step skipped")
+
+            return
+
         else:
             logging.info("Test step skipped")
 
         self.step(4)
-        if is_ts_feature_supported:
-            utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
-
-            print(f"TS utcTime - {utcTime}")
-
-            asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
-        else:
-            logging.info("Test step skipped")
+        try:
+            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(openDuration=60), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
         self.step(5)
-        if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
-
-            asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
-            asserts.assert_greater_equal(auto_close_time_dut, (utcTime + 55000000),
-                                         "AutoCloseTime is not in the expected range")
-            asserts.assert_less_equal(auto_close_time_dut, (utcTime + 60000000), "AutoCloseTime is not in the expected range")
-        else:
-            logging.info("Test step skipped")
+        utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
+        asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
 
         self.step(6)
-        if is_ts_feature_supported:
-            try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
-        else:
-            logging.info("Test step skipped")
+        auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+
+        asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
+        asserts.assert_greater_equal(auto_close_time_dut, (utcTime + 55000000),
+                                     "AutoCloseTime is not in the expected range")
+        asserts.assert_less_equal(auto_close_time_dut, (utcTime + 60000000), "AutoCloseTime is not in the expected range")
 
         self.step(7)
-        if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+        try:
+            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
-            asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
-        else:
-            logging.info("Test step skipped")
+        self.step(8)
+        auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
 
-        self.step("8a")
-        defaultOpenDuration = 0
+        asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
 
-        if is_ts_feature_supported:
-            defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
+        self.step("9a")
+        defaultOpenDuration = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.OpenDuration)
 
-            asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
-        else:
-            logging.info("Test step skipped")
+        asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
 
-        self.step("8b")
+        self.step("9b")
         if defaultOpenDuration is NullValue:
             defaultOpenDuration = 60
 
@@ -138,53 +130,38 @@ class TC_VALCC_4_3(MatterBaseTest):
         else:
             logging.info("Test step skipped")
 
-        self.step(9)
-        if is_ts_feature_supported:
-            try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
-        else:
-            logging.info("Test step skipped")
-
         self.step(10)
-        if is_ts_feature_supported:
-            utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
-
-            asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
-        else:
-            logging.info("Test step skipped")
+        try:
+            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Open(), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
         self.step(11)
-        if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+        utcTime = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
 
-            asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
-            asserts.assert_greater_equal(auto_close_time_dut, (utcTime + ((defaultOpenDuration - 5) * 1000000)),
-                                         "AutoCloseTime is not in the expected range")
-            asserts.assert_less_equal(auto_close_time_dut, (utcTime + (defaultOpenDuration * 1000000)),
-                                      "AutoCloseTime is not in the expected range")
-        else:
-            logging.info("Test step skipped")
+        asserts.assert_true(utcTime is not NullValue, "OpenDuration is null")
 
         self.step(12)
-        if is_ts_feature_supported:
-            try:
-                await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-                pass
-        else:
-            logging.info("Test step skipped")
+        auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+
+        asserts.assert_true(auto_close_time_dut is not NullValue, "AutoCloseTime is null")
+        asserts.assert_greater_equal(auto_close_time_dut, (utcTime + ((defaultOpenDuration - 5) * 1000000)),
+                                     "AutoCloseTime is not in the expected range")
+        asserts.assert_less_equal(auto_close_time_dut, (utcTime + (defaultOpenDuration * 1000000)),
+                                  "AutoCloseTime is not in the expected range")
 
         self.step(13)
-        if is_ts_feature_supported:
-            auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+        try:
+            await self.send_single_cmd(cmd=Clusters.Objects.ValveConfigurationAndControl.Commands.Close(), endpoint=endpoint)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
-            asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
-        else:
-            logging.info("Test step skipped")
+        self.step(14)
+        auto_close_time_dut = await self.read_valcc_attribute_expect_success(endpoint=endpoint, attribute=attributes.AutoCloseTime)
+
+        asserts.assert_true(auto_close_time_dut is NullValue, "AutoCloseTime is not null")
 
 
 if __name__ == "__main__":
