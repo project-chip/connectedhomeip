@@ -148,7 +148,9 @@
         "BINARY_INPUT_BASIC_CLUSTER": [],
         "BINDING_CLUSTER": ["bindings"],
         "BOOLEAN_STATE_CLUSTER": [],
-        "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [],
+        "BOOLEAN_STATE_CONFIGURATION_CLUSTER": [
+            "boolean-state-configuration-server"
+        ],
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [
             "bridged-device-basic-information-server"
         ],
