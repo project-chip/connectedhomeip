@@ -314,6 +314,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         uint8_t reqPowerSettingNum;
         uint8_t maxPowerNum = kDefaultMaxPowerNum;
         uint8_t minPowerNum = kDefaultMinPowerNum;
+        uint8_t powerStepNum = kDefaultPowerStepNum;
         VerifyOrExit(!wattSettingIndex.HasValue(), status = Status::InvalidCommand; ChipLogError(
             Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
 
@@ -325,10 +326,14 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         {
             maxPowerNum = mDelegate->GetMaxPowerNum();
             minPowerNum = mDelegate->GetMinPowerNum();
+            powerStepNum = mDelegate->GetPowerStepNum();
         }
         reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
         VerifyOrExit(IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
+
+        VerifyOrExit(reqPowerSettingNum % powerStepNum == 0, status = Status::InvalidCommand;
+                     ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
                                                                MakeOptional(reqPowerSettingNum), NullOptional);
