@@ -43,7 +43,9 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CommandHandler::CommandHandler(Callback * apCallback) : mpCallback(apCallback), mResponseSenderDone(HandleOnResponseSenderDone, this), mSuppressResponse(false) {}
+CommandHandler::CommandHandler(Callback * apCallback) :
+    mpCallback(apCallback), mResponseSenderDone(HandleOnResponseSenderDone, this), mSuppressResponse(false)
+{}
 
 CommandHandler::CommandHandler(TestOnlyMarker aTestMarker, Callback * apCallback, CommandPathRegistry * apCommandPathRegistry) :
     CommandHandler(apCallback)

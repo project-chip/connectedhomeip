@@ -25,12 +25,13 @@ namespace app {
 using Status = Protocols::InteractionModel::Status;
 
 CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
-                                                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+                                                    const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
     bool sendStatusResponseWithFailure = false;
 
-    if (mState == State::AwaitingStatusResponse && aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    if (mState == State::AwaitingStatusResponse &&
+        aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         err                    = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);

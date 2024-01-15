@@ -30,8 +30,8 @@
 
 #pragma once
 
-#include "CommandResponseSender.h"
 #include "CommandPathRegistry.h"
+#include "CommandResponseSender.h"
 
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
