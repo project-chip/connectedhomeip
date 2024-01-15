@@ -59,7 +59,7 @@ uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 // ----- internal-only methods, not part of the external API -----
 
 // Loads the attributes from built-in default and storage.
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
+static void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
 namespace {
 
