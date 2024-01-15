@@ -167,8 +167,6 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
             pass
 
         test = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsEnabled)
-        print(enabledAlarms)
-        print(test)
 
         self.step(6)
         if is_vis_feature_supported:
@@ -183,7 +181,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
         self.step(7)
         if is_vis_feature_supported:
             activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
-            asserts.assert_equal(activeAlarms, 0b01, "AlarmsActive does not match expected value")
+            asserts.assert_equal(activeAlarms, Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
 
@@ -267,7 +265,7 @@ class TC_BOOLCFG_4_3(MatterBaseTest):
         self.step(17)
         if is_aud_feature_supported:
             activeAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsActive)
-            asserts.assert_equal(activeAlarms, 0b10, "AlarmsActive does not match expected value")
+            asserts.assert_equal(activeAlarms, Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible, "AlarmsActive does not match expected value")
         else:
             logging.info("Test step skipped")
 
