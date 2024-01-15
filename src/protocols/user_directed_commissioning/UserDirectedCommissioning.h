@@ -115,7 +115,7 @@ public:
         }
         return false;
     }
-    size_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
+    uint8_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
 
     bool AddTargetAppInfo(TargetAppInfo vid)
     {
@@ -328,7 +328,9 @@ public:
         kAppInstallConsentPending               = 13,
         kAppInstalling                          = 14,
         kAppInstallFailed                       = 15,
-        kAppInstalledRetryNeeded                = 16
+        kAppInstalledRetryNeeded                = 16,
+        kCommissionerPasscodeDisabled           = 17,
+        kUnexpectedCommissionerPasscodeReady    = 18
     };
 
     constexpr static size_t kUdcTLVDataMaxBytes = 500;

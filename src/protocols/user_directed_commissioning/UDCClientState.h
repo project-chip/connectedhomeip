@@ -118,7 +118,7 @@ public:
         }
         return false;
     }
-    size_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
+    uint8_t GetNumTargetAppInfos() const { return mNumTargetAppInfos; }
 
     bool AddTargetAppInfo(TargetAppInfo vid)
     {
@@ -160,6 +160,9 @@ public:
     void SetCancelPasscode(bool newValue) { mCancelPasscode = newValue; };
     bool GetCancelPasscode() const { return mCancelPasscode; };
 
+    void SetCachedCommissionerPasscode(uint32_t newValue) { mCachedCommissionerPasscode = newValue; };
+    uint32_t GetCachedCommissionerPasscode() const { return mCachedCommissionerPasscode; };
+
     /**
      *  Reset the connection state to a completely uninitialized status.
      */
@@ -181,6 +184,7 @@ public:
         mCancelPasscode            = false;
         mExpirationTime            = System::Clock::kZero;
         mUDCClientProcessingState  = UDCClientProcessingState::kNotInitialized;
+        mCachedCommissionerPasscode = 0;
     }
 
 private:
@@ -208,6 +212,8 @@ private:
 
     UDCClientProcessingState mUDCClientProcessingState;
     System::Clock::Timestamp mExpirationTime = System::Clock::kZero;
+
+    uint32_t mCachedCommissionerPasscode = 0;
 };
 
 } // namespace UserDirectedCommissioning
