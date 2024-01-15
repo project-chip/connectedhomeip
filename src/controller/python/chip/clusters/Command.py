@@ -325,13 +325,11 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
         if clusterCommand.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
 
-        commandPath = chip.interaction_model.CommandPathIBStruct.build({
-            "EndpointId": command.EndpointId,
-            "ClusterId": clusterCommand.cluster_id,
-            "CommandId": clusterCommand.command_id})
         payloadTLV = clusterCommand.ToTLV()
 
-        pyBatchCommandsData[idx].commandPath = cast(c_char_p(commandPath), c_void_p)
+        pyBatchCommandsData[idx].commandPath.endpointId = c_uint16(command.EndpointId)
+        pyBatchCommandsData[idx].commandPath.clusterId = c_uint32(clusterCommand.cluster_id)
+        pyBatchCommandsData[idx].commandPath.commandId = c_uint32(clusterCommand.command_id)
         pyBatchCommandsData[idx].tlvData = cast(c_char_p(bytes(payloadTLV)), c_void_p)
         pyBatchCommandsData[idx].tlvLength = c_size_t(len(payloadTLV))
 

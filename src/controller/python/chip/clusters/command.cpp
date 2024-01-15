@@ -68,13 +68,6 @@ OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
 OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
 OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
 
-struct __attribute__((packed)) CommandPath
-{
-    chip::EndpointId endpointId;
-    chip::ClusterId clusterId;
-    chip::CommandId commandId;
-};
-
 class CommandSenderCallback : public CommandSender::ExtendableCallback
 {
 public:
@@ -283,16 +276,16 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 
     for (size_t i = 0; i < length; i++)
     {
-        void * commandPath = batchCommandData[i].mCommandPath;
-        void * tlv         = batchCommandData[i].mTlvData;
-        size_t tlvLength   = batchCommandData[i].mTlvLength;
+        chip::EndpointId endpointId = batchCommandData[i].commandPath.endpointId;
+        chip::ClusterId clusterId = batchCommandData[i].commandPath.clusterId;
+        chip::CommandId commandId = batchCommandData[i].commandPath.commandId;
+        void * tlv         = batchCommandData[i].tlvData;
+        size_t tlvLength   = batchCommandData[i].tlvLength;
 
-        python::CommandPath invokeRequestInfoObj;
-        memcpy(&invokeRequestInfoObj, commandPath, sizeof(python::CommandPath));
         const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
 
-        app::CommandPathParams cmdParams = { invokeRequestInfoObj.endpointId, /* group id */ 0, invokeRequestInfoObj.clusterId,
-                                             invokeRequestInfoObj.commandId, (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId,
+                                             commandId, (app::CommandPathFlags::kEndpointIdValid) };
 
         CommandSender::AdditionalCommandParameters additionalParams;
 

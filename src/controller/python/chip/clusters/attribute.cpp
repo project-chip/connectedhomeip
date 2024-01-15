@@ -359,25 +359,23 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
 
     for (size_t i = 0; i < attributeDataLength; i++)
     {
-        void * path   = writeAttributesData[i].mAttributePath;
-        void * tlv    = writeAttributesData[i].mTlvData;
-        size_t length = writeAttributesData[i].mTlvLength;
+        python::PyAttributePath path = writeAttributesData[i].attributePath;
+        void * tlv                   = writeAttributesData[i].tlvData;
+        size_t length                = writeAttributesData[i].tlvLength;
 
-        python::AttributePath pathObj;
-        memcpy(&pathObj, path, sizeof(python::AttributePath));
         uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
 
         TLV::TLVReader reader;
         reader.Init(tlvBuffer, static_cast<uint32_t>(length));
         reader.Next();
         Optional<DataVersion> dataVersion;
-        if (pathObj.hasDataVersion == 1)
+        if (path.hasDataVersion == 1)
         {
-            dataVersion.SetValue(pathObj.dataVersion);
+            dataVersion.SetValue(path.dataVersion);
         }
         SuccessOrExit(err =
-                          client->PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId,
-                                                                                              pathObj.attributeId, dataVersion),
+                          client->PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId,
+                                                                                              path.attributeId, dataVersion),
                                                          reader));
     }
 
@@ -417,26 +415,24 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
 
     for (size_t i = 0; i < attributeDataLength; i++)
     {
-        void * path   = writeAttributesData[i].mAttributePath;
-        void * tlv    = writeAttributesData[i].mTlvData;
-        size_t length = writeAttributesData[i].mTlvLength;
+        python::PyAttributePath path = writeAttributesData[i].attributePath;
+        void * tlv                   = writeAttributesData[i].tlvData;
+        size_t length                = writeAttributesData[i].tlvLength;
 
-        python::AttributePath pathObj;
-        memcpy(&pathObj, path, sizeof(python::AttributePath));
         uint8_t * tlvBuffer = reinterpret_cast<uint8_t *>(tlv);
 
         TLV::TLVReader reader;
         reader.Init(tlvBuffer, static_cast<uint32_t>(length));
         reader.Next();
         Optional<DataVersion> dataVersion;
-        if (pathObj.hasDataVersion == 1)
+        if (path.hasDataVersion == 1)
         {
-            dataVersion.SetValue(pathObj.dataVersion);
+            dataVersion.SetValue(path.dataVersion);
         }
         // Using kInvalidEndpointId as that used when sending group write requests.
         SuccessOrExit(err =
-                          client->PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(kInvalidEndpointId, pathObj.clusterId,
-                                                                                              pathObj.attributeId, dataVersion),
+                          client->PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(kInvalidEndpointId, path.clusterId,
+                                                                                              path.attributeId, dataVersion),
                                                          reader));
     }
 

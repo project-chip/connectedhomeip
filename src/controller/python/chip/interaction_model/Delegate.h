@@ -27,19 +27,37 @@ namespace python {
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
 
 // This needs to match the python definition that uses the same name.
+struct PyCommandPath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::CommandId commandId;
+};
+
+// This needs to match the python definition that uses the same name.
 struct PyInvokeRequestData
 {
-    void * mCommandPath;
-    void * mTlvData;
-    size_t mTlvLength;
+    PyCommandPath commandPath;
+    void * tlvData;
+    size_t tlvLength;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyAttributePath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::AttributeId attributeId;
+    chip::DataVersion dataVersion;
+    uint8_t hasDataVersion;
 };
 
 // This needs to match the python definition that uses the same name.
 struct PyWriteAttributeData
 {
-    void * mAttributePath;
-    void * mTlvData;
-    size_t mTlvLength;
+    PyAttributePath attributePath;
+    void * tlvData;
+    size_t tlvLength;
 };
 
 } // namespace python

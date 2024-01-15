@@ -962,17 +962,14 @@ def WriteAttributes(future: Future, eventLoop, device,
     for idx, attr in enumerate(attributes):
         if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
-        path = chip.interaction_model.AttributePathIBstruct.parse(
-            b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
-        path.EndpointId = attr.EndpointId
-        path.ClusterId = attr.Attribute.cluster_id
-        path.AttributeId = attr.Attribute.attribute_id
-        path.DataVersion = attr.DataVersion
-        path.HasDataVersion = attr.HasDataVersion
-        path = chip.interaction_model.AttributePathIBstruct.build(path)
+
         tlv = attr.Attribute.ToTLV(None, attr.Data)
 
-        pyWriteAttributes[idx].attributePath = cast(ctypes.c_char_p(path), c_void_p)
+        pyWriteAttributes[idx].attributePath.endpointId = c_uint16(attr.EndpointId)
+        pyWriteAttributes[idx].attributePath.clusterId = c_uint32(attr.Attribute.cluster_id)
+        pyWriteAttributes[idx].attributePath.attributeId = c_uint32(attr.Attribute.attribute_id)
+        pyWriteAttributes[idx].attributePath.dataVersion = c_uint32(attr.DataVersion)
+        pyWriteAttributes[idx].attributePath.hasDataVersion = c_uint8(attr.HasDataVersion)
         pyWriteAttributes[idx].tlvData = cast(ctypes.c_char_p(bytes(tlv)), c_void_p)
         pyWriteAttributes[idx].tlvLength = c_size_t(len(tlv))
 
@@ -998,16 +995,14 @@ def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[Attri
     pyWriteAttributesArrayType = PyWriteAttributeData * numberOfAttributes
     pyWriteAttributes = pyWriteAttributesArrayType()
     for idx, attr in enumerate(attributes):
-        path = chip.interaction_model.AttributePathIBstruct.parse(
-            b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
-        path.EndpointId = attr.EndpointId
-        path.ClusterId = attr.Attribute.cluster_id
-        path.AttributeId = attr.Attribute.attribute_id
-        path.DataVersion = attr.DataVersion
-        path.HasDataVersion = attr.HasDataVersion
-        path = chip.interaction_model.AttributePathIBstruct.build(path)
+
         tlv = attr.Attribute.ToTLV(None, attr.Data)
-        pyWriteAttributes[idx].attributePath = cast(ctypes.c_char_p(path), c_void_p)
+
+        pyWriteAttributes[idx].attributePath.endpointId = c_uint16(attr.EndpointId)
+        pyWriteAttributes[idx].attributePath.clusterId = c_uint32(attr.Attribute.cluster_id)
+        pyWriteAttributes[idx].attributePath.attributeId = c_uint32(attr.Attribute.attribute_id)
+        pyWriteAttributes[idx].attributePath.dataVersion = c_uint32(attr.DataVersion)
+        pyWriteAttributes[idx].attributePath.hasDataVersion = c_uint8(attr.HasDataVersion)
         pyWriteAttributes[idx].tlvData = cast(ctypes.c_char_p(bytes(tlv)), c_void_p)
         pyWriteAttributes[idx].tlvLength = c_size_t(len(tlv))
 
