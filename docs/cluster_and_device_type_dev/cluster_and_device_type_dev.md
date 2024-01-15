@@ -8,8 +8,8 @@ The goal of new cluster and device type development is to
 3. write the unit tests, test plans and automations that prove the code
    correctness and allow these new features to be certified
 
-Unit tests, test plans and certification tests are covered in
-[Testing](testing.md). This document will concentrate on implementing clusters
+Unit tests, test plans and certification tests are covered in the testing section.
+This document will concentrate on implementing clusters
 and device types in the SDK.
 
 -   Cluster Definition
