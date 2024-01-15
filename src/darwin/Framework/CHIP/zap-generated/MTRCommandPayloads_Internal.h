@@ -1288,6 +1288,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRDoorLockClusterSetAliroReaderConfigParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDoorLockClusterClearAliroReaderConfigParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRWindowCoveringClusterUpOrOpenParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
