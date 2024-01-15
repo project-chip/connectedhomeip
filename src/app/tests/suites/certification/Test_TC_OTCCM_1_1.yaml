@@ -77,25 +77,26 @@ tests:
               type: list
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 4b: Read the optional attribute(StartUpMode) in AttributeList"
+    - label:
+          "Step 4b: Read the optional attribute(StartUpMode) in AttributeList"
       PICS: OTCCM.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-        constraints:
-            type: list
-            contains: [2]
+          constraints:
+              type: list
+              contains: [2]
 
     - label:
-            "Step 4c: Read the Feature dependent attribute(DEPONOFF) in
-            AttributeList"
+          "Step 4c: Read the Feature dependent attribute(DEPONOFF) in
+          AttributeList"
       PICS: OTCCM.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
       response:
-        constraints:
-            type: list
-            contains: [3]
+          constraints:
+              type: list
+              contains: [3]
 
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
