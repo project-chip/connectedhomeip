@@ -135,7 +135,7 @@ public:
      * @brief    Called when EVSE cluster receives SetTargets command
      */
 
-    Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType>) override;
+    Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) override;
 
     /**
      * @brief    Called when EVSE cluster receives GetTargets command
@@ -187,6 +187,10 @@ public:
     Status SendEnergyTransferStartedEvent();
     Status SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason);
     Status SendFaultEvent(FaultStateEnum newFaultState);
+    Status
+    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+    Status
+    SaveTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
 
     // ------------------------------------------------------------------
     // Get attribute methods

@@ -85,7 +85,7 @@ public:
      * It should report Status::Success if successful and may
      * return other Status codes if it fails
      */
-    virtual Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType>) = 0;
+    virtual Status SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &) = 0;
 
     /**
      * @brief Delegate should implement a handler to GetTargets command.
