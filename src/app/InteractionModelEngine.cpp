@@ -997,11 +997,12 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
 
 void InteractionModelEngine::OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType)
 {
+    // TODO: Follow up to use a iterator function to avoid copy/paste here.
     for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
     {
-        auto pNextItem = pListItem->GetNextClient();
         // It is possible that pListItem is destroyed by the app in OnPeerTypeChange.
         // Get the next item before invoking `OnPeerTypeChange`.
+        auto pNextItem = pListItem->GetNextClient();
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
         {
             pListItem->OnPeerTypeChange(aType);
