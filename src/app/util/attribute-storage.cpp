@@ -19,6 +19,7 @@
 #include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
+#include <app/util/ZclReturnMacros.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -60,10 +61,6 @@ uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 
 // Loads the attributes from built-in default and storage.
 static void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
-
-static bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttributeSearchRecord * attRecord);
-static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                               const EmberAfAttributeSearchRecord * attRecord);
 
 namespace {
 
@@ -162,6 +159,119 @@ void UnregisterMatchingAttributeAccessInterfaces(F shouldUnregister)
         }
         cur = next;
     }
+}
+
+template <typename T>
+Span<T> make_span(T * data, size_t len)
+{
+    return Span<T>(data, len);
+}
+
+struct EndpointPosition
+{
+    uint16_t index;           // what is the index of the endpoint
+    uint16_t attributeOffset; // offset of attribute data
+    const EmberAfEndpointType * endpointType;
+};
+
+EmberAfStatus FindEndpoint(chip::EndpointId endpointId, EndpointPosition * foundEndpoint)
+{
+    VerifyOrDie(foundEndpoint != nullptr);
+
+    size_t attributeOffset = 0;
+    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
+    {
+        if (!emberAfEndpointIndexIsEnabled(ep))
+        {
+            continue;
+        }
+        if (emAfEndpoints[ep].endpoint == endpointId)
+        {
+            foundEndpoint->index           = ep;
+            foundEndpoint->attributeOffset = static_cast<uint16_t>(attributeOffset);
+            foundEndpoint->endpointType    = emAfEndpoints[ep].endpointType;
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+
+        if (ep < emberAfFixedEndpointCount())
+        {
+            attributeOffset += emAfEndpoints[ep].endpointType->endpointSize;
+        }
+    }
+
+    return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT; // Sorry, endpoint was not found.
+}
+
+struct ClusterPosition
+{
+    uint8_t index;                  // what is the index of the cluster
+    uint16_t attributeOffset;       // offset of attribute data
+    const EmberAfCluster * cluster; // found cluster
+
+    Span<const EmberAfAttributeMetadata> attributes() const { return make_span(cluster->attributes, cluster->attributeCount); }
+};
+
+EmberAfStatus FindServerCluster(const EmberAfEndpointType * endpointType, chip::ClusterId clusterId, ClusterPosition * foundCluster)
+{
+    VerifyOrDie(foundCluster != nullptr);
+
+    size_t attributeOffset = 0;
+
+    for (uint8_t clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
+    {
+        const EmberAfCluster * cluster = &(endpointType->cluster[clusterIndex]);
+
+        if (cluster->clusterId == clusterId && (cluster->mask & CLUSTER_MASK_SERVER))
+        {
+            foundCluster->index           = clusterIndex;
+            foundCluster->attributeOffset = static_cast<uint16_t>(attributeOffset);
+            foundCluster->cluster         = cluster;
+
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+
+        // Not the cluster we are looking for
+        attributeOffset += cluster->clusterSize;
+    }
+
+    // Cluster is not in the endpoint.
+    return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+}
+
+struct AttributePosition
+{
+    uint16_t index;           // what is the index of the attribute
+    uint16_t attributeOffset; // offset of attribute data
+    const EmberAfAttributeMetadata * metadata;
+};
+
+EmberAfStatus FindAttribute(Span<const EmberAfAttributeMetadata> attributes, chip::AttributeId attributeId,
+                            AttributePosition * foundAttribute)
+{
+    VerifyOrDie(foundAttribute != nullptr);
+
+    size_t attributeOffset = 0;
+
+    for (uint16_t attrIndex = 0; attrIndex < attributes.size(); attrIndex++)
+    {
+        const EmberAfAttributeMetadata * am = &(attributes[attrIndex]);
+        if (am->attributeId == attributeId)
+        {
+            foundAttribute->index           = attrIndex;
+            foundAttribute->attributeOffset = static_cast<uint16_t>(attributeOffset);
+            foundAttribute->metadata        = am;
+
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+        // Increase the index if attribute is not externally stored
+        if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) && !(am->mask & ATTRIBUTE_MASK_SINGLETON))
+        {
+            attributeOffset += emberAfAttributeSize(am);
+        }
+    }
+
+    // Attribute is not in the cluster.
+    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
 }
 
 } // anonymous namespace
@@ -535,34 +645,6 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-/**
- * @brief Matches a cluster based on cluster id and direction.
- *
- *   This function assumes that the passed cluster's endpoint already
- *   matches the endpoint of the EmberAfAttributeSearchRecord.
- *
- * Clusters match if:
- *   1. Cluster ids match AND
- *   2. Cluster is a server cluster (because there are no client attributes).
- */
-bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttributeSearchRecord * attRecord)
-{
-    return (cluster->clusterId == attRecord->clusterId && (cluster->mask & CLUSTER_MASK_SERVER));
-}
-
-/**
- * @brief Matches an attribute based on attribute id.
- *   This function assumes that the passed cluster already matches the
- *   clusterId and direction of the passed EmberAfAttributeSearchRecord.
- *
- * Attributes match if attr ids match.
- */
-bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                        const EmberAfAttributeSearchRecord * attRecord)
-{
-    return (am->attributeId == attRecord->attributeId);
-}
-
 // When reading non-string attributes, this function returns an error when destination
 // buffer isn't large enough to accommodate the attribute type.  For strings, the
 // function will copy at most readLength bytes.  This means the resulting string
@@ -581,117 +663,69 @@ EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attR
 {
     assertChipStackLockedByCurrentThread();
 
-    uint16_t attributeOffsetIndex = 0;
+    EndpointPosition endpointPosition;
+    ClusterPosition clusterPosition;
+    AttributePosition attributePosition;
 
-    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++)
+    ReturnStatusOnFailure(FindEndpoint(attRecord->endpoint, &endpointPosition));
+    ReturnStatusOnFailure(FindServerCluster(endpointPosition.endpointType, attRecord->clusterId, &clusterPosition));
+    ReturnStatusOnFailure(FindAttribute(clusterPosition.attributes(), attRecord->attributeId, &attributePosition));
+
+    // If passed metadata location is not null, populate
+    if (metadata != nullptr)
     {
-        // Is this a dynamic endpoint?
-        bool isDynamicEndpoint = (ep >= emberAfFixedEndpointCount());
+        *metadata = attributePosition.metadata;
+    }
 
-        if (emAfEndpoints[ep].endpoint == attRecord->endpoint)
+    uint16_t attributeOffsetIndex = static_cast<uint16_t>(endpointPosition.attributeOffset + clusterPosition.attributeOffset +
+                                                          attributePosition.attributeOffset);
+
+    const EmberAfAttributeMetadata * am = attributePosition.metadata;
+
+    uint8_t * attributeLocation =
+        (am->mask & ATTRIBUTE_MASK_SINGLETON ? singletonAttributeLocation(am) : attributeData + attributeOffsetIndex);
+    uint8_t *src, *dst;
+    if (write)
+    {
+        src = buffer;
+        dst = attributeLocation;
+        if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId, am->attributeId))
         {
-            const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
-            uint8_t clusterIndex;
-            if (!emberAfEndpointIndexIsEnabled(ep))
-            {
-                continue;
-            }
-            for (clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++)
-            {
-                const EmberAfCluster * cluster = &(endpointType->cluster[clusterIndex]);
-                if (emAfMatchCluster(cluster, attRecord))
-                { // Got the cluster
-                    uint16_t attrIndex;
-                    for (attrIndex = 0; attrIndex < cluster->attributeCount; attrIndex++)
-                    {
-                        const EmberAfAttributeMetadata * am = &(cluster->attributes[attrIndex]);
-                        if (emAfMatchAttribute(cluster, am, attRecord))
-                        { // Got the attribute
-                            // If passed metadata location is not null, populate
-                            if (metadata != nullptr)
-                            {
-                                *metadata = am;
-                            }
-
-                            {
-                                uint8_t * attributeLocation =
-                                    (am->mask & ATTRIBUTE_MASK_SINGLETON ? singletonAttributeLocation(am)
-                                                                         : attributeData + attributeOffsetIndex);
-                                uint8_t *src, *dst;
-                                if (write)
-                                {
-                                    src = buffer;
-                                    dst = attributeLocation;
-                                    if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             am->attributeId))
-                                    {
-                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
-                                    }
-                                }
-                                else
-                                {
-                                    if (buffer == nullptr)
-                                    {
-                                        return EMBER_ZCL_STATUS_SUCCESS;
-                                    }
-
-                                    src = attributeLocation;
-                                    dst = buffer;
-                                    if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            am->attributeId))
-                                    {
-                                        return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
-                                    }
-                                }
-
-                                // Is the attribute externally stored?
-                                if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
-                                {
-                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                          am, buffer)
-                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                         am, buffer, emberAfAttributeSize(am)));
-                                }
-
-                                // Internal storage is only supported for fixed endpoints
-                                if (!isDynamicEndpoint)
-                                {
-                                    return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
-                                }
-
-                                return EMBER_ZCL_STATUS_FAILURE;
-                            }
-                        }
-                        else
-                        { // Not the attribute we are looking for
-                            // Increase the index if attribute is not externally stored
-                            if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) && !(am->mask & ATTRIBUTE_MASK_SINGLETON))
-                            {
-                                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
-                            }
-                        }
-                    }
-
-                    // Attribute is not in the cluster.
-                    return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
-                }
-
-                // Not the cluster we are looking for
-                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + cluster->clusterSize);
-            }
-
-            // Cluster is not in the endpoint.
-            return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
-        }
-
-        // Not the endpoint we are looking for
-        // Dynamic endpoints are external and don't factor into storage size
-        if (!isDynamicEndpoint)
-        {
-            attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[ep].endpointType->endpointSize);
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
         }
     }
-    return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT; // Sorry, endpoint was not found.
+    else
+    {
+        if (buffer == nullptr)
+        {
+            return EMBER_ZCL_STATUS_SUCCESS;
+        }
+
+        src = attributeLocation;
+        dst = buffer;
+        if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId, am->attributeId))
+        {
+            return EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS;
+        }
+    }
+
+    // Is the attribute externally stored?
+    if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
+    {
+        return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId, am, buffer)
+                      : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId, am, buffer,
+                                                             emberAfAttributeSize(am)));
+    }
+
+    // Internal storage is only supported for fixed endpoints. If endpoint index is larger that the fixed endpoint
+    // count, then this is a dynamic index
+    if (endpointPosition.index >= emberAfFixedEndpointCount());
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
+
 }
 
 const EmberAfEndpointType * emberAfFindEndpointType(chip::EndpointId endpointId)
