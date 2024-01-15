@@ -71,8 +71,6 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
 
         is_sens_level_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kSensitivityLevel
 
-        numberOfSupportedLevels = 0
-
         self.step(3)
         if is_sens_level_feature_supported:
             numberOfSupportedLevels = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.SupportedSensitivityLevels)
