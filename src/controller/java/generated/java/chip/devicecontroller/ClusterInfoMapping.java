@@ -11276,6 +11276,111 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedDoorLockClusterAliroReaderVerificationKeyAttributeCallback implements ChipClusters.DoorLockCluster.AliroReaderVerificationKeyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterAliroReaderGroupIdentifierAttributeCallback implements ChipClusters.DoorLockCluster.AliroReaderGroupIdentifierAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterAliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback implements ChipClusters.DoorLockCluster.AliroExpeditedTransactionSupportedProtocolVersionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<byte[]> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterAliroGroupResolvingKeyAttributeCallback implements ChipClusters.DoorLockCluster.AliroGroupResolvingKeyAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "byte[]");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedDoorLockClusterAliroSupportedBLEUWBProtocolVersionsAttributeCallback implements ChipClusters.DoorLockCluster.AliroSupportedBLEUWBProtocolVersionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<byte[]> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedDoorLockClusterGeneratedCommandListAttributeCallback implements ChipClusters.DoorLockCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18312,6 +18417,28 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedUnitTestingClusterTestBatchHelperResponseCallback implements ChipClusters.UnitTestingCluster.TestBatchHelperResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] buffer) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo bufferResponseValue = new CommandResponseInfo("buffer", "byte[]");
+      responseValues.put(bufferResponseValue, buffer);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedUnitTestingClusterListInt8uAttributeCallback implements ChipClusters.UnitTestingCluster.ListInt8uAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -23702,6 +23829,50 @@ public class ClusterInfoMapping {
     );
     doorLockClusterInteractionInfoMap.put("unboltDoor", doorLockunboltDoorInteractionInfo);
 
+    Map<String, CommandParameterInfo> doorLocksetAliroReaderConfigCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo doorLocksetAliroReaderConfigsigningKeyCommandParameterInfo = new CommandParameterInfo("signingKey", byte[].class, byte[].class);
+    doorLocksetAliroReaderConfigCommandParams.put("signingKey",doorLocksetAliroReaderConfigsigningKeyCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetAliroReaderConfigverificationKeyCommandParameterInfo = new CommandParameterInfo("verificationKey", byte[].class, byte[].class);
+    doorLocksetAliroReaderConfigCommandParams.put("verificationKey",doorLocksetAliroReaderConfigverificationKeyCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetAliroReaderConfiggroupIdentifierCommandParameterInfo = new CommandParameterInfo("groupIdentifier", byte[].class, byte[].class);
+    doorLocksetAliroReaderConfigCommandParams.put("groupIdentifier",doorLocksetAliroReaderConfiggroupIdentifierCommandParameterInfo);
+
+    CommandParameterInfo doorLocksetAliroReaderConfiggroupResolvingKeyCommandParameterInfo = new CommandParameterInfo("groupResolvingKey", Optional.class, byte[].class);
+    doorLocksetAliroReaderConfigCommandParams.put("groupResolvingKey",doorLocksetAliroReaderConfiggroupResolvingKeyCommandParameterInfo);
+    InteractionInfo doorLocksetAliroReaderConfigInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .setAliroReaderConfig((DefaultClusterCallback) callback
+        , (byte[])
+        commandArguments.get("signingKey")
+        , (byte[])
+        commandArguments.get("verificationKey")
+        , (byte[])
+        commandArguments.get("groupIdentifier")
+        , (Optional<byte[]>)
+        commandArguments.get("groupResolvingKey"), 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLocksetAliroReaderConfigCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("setAliroReaderConfig", doorLocksetAliroReaderConfigInteractionInfo);
+
+    Map<String, CommandParameterInfo> doorLockclearAliroReaderConfigCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo doorLockclearAliroReaderConfigInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DoorLockCluster) cluster)
+        .clearAliroReaderConfig((DefaultClusterCallback) callback, 10000
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        doorLockclearAliroReaderConfigCommandParams
+    );
+    doorLockClusterInteractionInfoMap.put("clearAliroReaderConfig", doorLockclearAliroReaderConfigInteractionInfo);
+
     commandMap.put("doorLock", doorLockClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> windowCoveringClusterInteractionInfoMap = new LinkedHashMap<>();
@@ -26189,6 +26360,66 @@ public class ClusterInfoMapping {
         unitTestingtestEmitTestFabricScopedEventRequestCommandParams
       );
     unitTestingClusterInteractionInfoMap.put("testEmitTestFabricScopedEventRequest", unitTestingtestEmitTestFabricScopedEventRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestBatchHelperRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo unitTestingtestBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo = new CommandParameterInfo("sleepBeforeResponseTimeMs", Integer.class, Integer.class);
+    unitTestingtestBatchHelperRequestCommandParams.put("sleepBeforeResponseTimeMs",unitTestingtestBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestBatchHelperRequestsizeOfResponseBufferCommandParameterInfo = new CommandParameterInfo("sizeOfResponseBuffer", Integer.class, Integer.class);
+    unitTestingtestBatchHelperRequestCommandParams.put("sizeOfResponseBuffer",unitTestingtestBatchHelperRequestsizeOfResponseBufferCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestBatchHelperRequestfillCharacterCommandParameterInfo = new CommandParameterInfo("fillCharacter", Integer.class, Integer.class);
+    unitTestingtestBatchHelperRequestCommandParams.put("fillCharacter",unitTestingtestBatchHelperRequestfillCharacterCommandParameterInfo);
+    InteractionInfo unitTestingtestBatchHelperRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+          .testBatchHelperRequest((ChipClusters.UnitTestingCluster.TestBatchHelperResponseCallback) callback
+           , (Integer)
+             commandArguments.get("sleepBeforeResponseTimeMs")
+
+           , (Integer)
+             commandArguments.get("sizeOfResponseBuffer")
+
+           , (Integer)
+             commandArguments.get("fillCharacter")
+
+            );
+        },
+        () -> new DelegatedUnitTestingClusterTestBatchHelperResponseCallback(),
+        unitTestingtestBatchHelperRequestCommandParams
+      );
+    unitTestingClusterInteractionInfoMap.put("testBatchHelperRequest", unitTestingtestBatchHelperRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestSecondBatchHelperRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo unitTestingtestSecondBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo = new CommandParameterInfo("sleepBeforeResponseTimeMs", Integer.class, Integer.class);
+    unitTestingtestSecondBatchHelperRequestCommandParams.put("sleepBeforeResponseTimeMs",unitTestingtestSecondBatchHelperRequestsleepBeforeResponseTimeMsCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestSecondBatchHelperRequestsizeOfResponseBufferCommandParameterInfo = new CommandParameterInfo("sizeOfResponseBuffer", Integer.class, Integer.class);
+    unitTestingtestSecondBatchHelperRequestCommandParams.put("sizeOfResponseBuffer",unitTestingtestSecondBatchHelperRequestsizeOfResponseBufferCommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestSecondBatchHelperRequestfillCharacterCommandParameterInfo = new CommandParameterInfo("fillCharacter", Integer.class, Integer.class);
+    unitTestingtestSecondBatchHelperRequestCommandParams.put("fillCharacter",unitTestingtestSecondBatchHelperRequestfillCharacterCommandParameterInfo);
+    InteractionInfo unitTestingtestSecondBatchHelperRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+          .testSecondBatchHelperRequest((ChipClusters.UnitTestingCluster.TestBatchHelperResponseCallback) callback
+           , (Integer)
+             commandArguments.get("sleepBeforeResponseTimeMs")
+
+           , (Integer)
+             commandArguments.get("sizeOfResponseBuffer")
+
+           , (Integer)
+             commandArguments.get("fillCharacter")
+
+            );
+        },
+        () -> new DelegatedUnitTestingClusterTestBatchHelperResponseCallback(),
+        unitTestingtestSecondBatchHelperRequestCommandParams
+      );
+    unitTestingClusterInteractionInfoMap.put("testSecondBatchHelperRequest", unitTestingtestSecondBatchHelperRequestInteractionInfo);
 
     commandMap.put("unitTesting", unitTestingClusterInteractionInfoMap);
 

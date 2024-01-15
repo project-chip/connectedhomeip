@@ -84,6 +84,7 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
@@ -110,6 +111,10 @@ ti_simplelink_executable("all-clusters-app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
   } else {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+  }
+
+  if (custom_factory_data) {
+    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
   }
 
   include_dirs = [
