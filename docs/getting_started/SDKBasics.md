@@ -23,7 +23,7 @@ The platform API defines a common layer to interact with the core.
 
 ### Core
 
-Core encompases a huge part of the spec, including all of the the underlying
+Core encompasses a huge part of the spec, including all of the the underlying
 communication protocols. The goal of the core code is to deliver valid messages
 to the ember layer indicating the cluster request and associated endpoint
 information.
@@ -43,9 +43,9 @@ makes your device your device. Most are generated statically using zap.
 ### Cluster implementations
 
 The cluster implementations are the core logic that back the cluster. The
-cluster implementatio code receives messages from the ember layer to request
+cluster implementation code receives messages from the ember layer to request
 data model operations on the cluster (reads / writes / commands). They are also
-responsible for even geneation and attribute change reporting. Simple cluster
+responsible for even generation and attribute change reporting. Simple cluster
 logic can be written in the ember callback functions, but more complex cluster
 logic is handled in the run-time installable interface layers.
 
@@ -60,7 +60,7 @@ logic is handled in the run-time installable interface layers.
     -   [examples/chip-tool](https://github.com/project-chip/connectedhomeip/blob/master/examples/chip-tool) -
         main controller example
     -   [examples/all-clusters-app](https://github.com/project-chip/connectedhomeip/blob/master/examples/all-cluster-app) -
-        QA app</span>
+        QA app
     -   [examples/\<others\>](https://github.com/project-chip/connectedhomeip/blob/master/examples) -
         Specific Device examples
 -   scripts
