@@ -21,12 +21,13 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
-from ctypes import CFUNCTYPE, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, py_object
+from ctypes import CFUNCTYPE, POINTER, c_bool, c_char_p, c_size_t, c_uint8, c_uint16, c_uint32, c_void_p, cast, py_object
 from dataclasses import dataclass
 from typing import List, Optional, Type, Union
 
 import chip.exceptions
 import chip.interaction_model
+from chip.interaction_model import PyInvokeRequestData
 from chip.native import PyChipError
 
 from .ClusterObjects import ClusterCommand
@@ -313,8 +314,10 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
     handle = chip.native.GetLibraryHandle()
 
     responseTypes = []
-    commandargs = []
-    for command in commands:
+    numberOfCommands = len(commands)
+    pyBatchCommandsDataArrayType = PyInvokeRequestData * numberOfCommands
+    pyBatchCommandsData = pyBatchCommandsDataArrayType()
+    for idx, command in enumerate(commands):
         clusterCommand = command.Command
         responseType = command.ResponseType
         if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
@@ -322,15 +325,13 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
         if clusterCommand.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
 
-        commandPath = chip.interaction_model.CommandPathIBStruct.build({
-            "EndpointId": command.EndpointId,
-            "ClusterId": clusterCommand.cluster_id,
-            "CommandId": clusterCommand.command_id})
         payloadTLV = clusterCommand.ToTLV()
 
-        commandargs.append(c_char_p(commandPath))
-        commandargs.append(c_char_p(bytes(payloadTLV)))
-        commandargs.append(c_size_t(len(payloadTLV)))
+        pyBatchCommandsData[idx].commandPath.endpointId = c_uint16(command.EndpointId)
+        pyBatchCommandsData[idx].commandPath.clusterId = c_uint32(clusterCommand.cluster_id)
+        pyBatchCommandsData[idx].commandPath.commandId = c_uint32(clusterCommand.command_id)
+        pyBatchCommandsData[idx].tlvData = cast(c_char_p(bytes(payloadTLV)), c_void_p)
+        pyBatchCommandsData[idx].tlvLength = c_size_t(len(payloadTLV))
 
         responseTypes.append(responseType)
 
@@ -344,7 +345,7 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
             c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             c_uint16(0 if busyWaitMs is None else busyWaitMs),
             c_bool(False if suppressResponse is None else suppressResponse),
-            c_size_t(len(commands)), *commandargs)
+            pyBatchCommandsData, c_size_t(numberOfCommands))
     )
 
 
@@ -375,7 +376,7 @@ def Init():
         setter.Set('pychip_CommandSender_SendCommand',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendBatchCommands',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, c_size_t])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke',
                    PyChipError, [py_object, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendGroupCommand',
