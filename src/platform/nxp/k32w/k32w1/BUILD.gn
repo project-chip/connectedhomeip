@@ -58,9 +58,7 @@ static_library("k32w1") {
     "ram_storage.h",
   ]
 
-  public = [
-    "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h",
-  ]
+  public = [ "${chip_root}/src/platform/nxp/k32w/k32w1/BLEManagerImpl.h" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
