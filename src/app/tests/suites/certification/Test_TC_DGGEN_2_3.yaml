@@ -77,8 +77,8 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Invoke the TestEventTrigger command with EnableKey field set to
-          PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
+          "Step 4: Invoke the TestEventTrigger command with EnableKey field set
+          to PIXIT.DGGEN.ENABLEKEY and EventTrigger field set to 0."
       PICS: DGGEN.S.C00.Rsp
       command: "TestEventTrigger"
       arguments:

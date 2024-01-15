@@ -128,7 +128,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gOperationalStateDelegate           = new OperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
-    gOperationalStateInstance = new Instance(gOperationalStateDelegate, operationalStateEndpoint, Clusters::OperationalState::Id);
+    gOperationalStateInstance           = new OperationalState::Instance(gOperationalStateDelegate, operationalStateEndpoint);
 
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
@@ -137,8 +137,8 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
 // Init RVC Operational State cluster
 
-static OperationalState::Instance * gRvcOperationalStateInstance  = nullptr;
-static RvcOperationalStateDelegate * gRvcOperationalStateDelegate = nullptr;
+static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
+static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;
 
 void RvcOperationalState::Shutdown()
 {
@@ -161,8 +161,7 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gRvcOperationalStateDelegate        = new RvcOperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
-    gRvcOperationalStateInstance =
-        new Instance(gRvcOperationalStateDelegate, operationalStateEndpoint, Clusters::RvcOperationalState::Id);
+    gRvcOperationalStateInstance        = new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint);
 
     gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
