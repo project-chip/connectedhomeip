@@ -16,7 +16,6 @@
 #
 
 import argparse
-import json
 import os
 import pathlib
 import sys
