@@ -119,6 +119,8 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class TestEmitTestFabricScopedEventResponse(val value: ULong)
 
+  class TestBatchHelperResponse(val buffer: ByteArray)
+
   class ListInt8uAttribute(val value: List<UByte>)
 
   sealed class ListInt8uAttributeSubscriptionState {
@@ -2215,6 +2217,122 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     tlvReader.exitContainer()
 
     return TestEmitTestFabricScopedEventResponse(value_decoded)
+  }
+
+  suspend fun testBatchHelperRequest(
+    sleepBeforeResponseTimeMs: UShort,
+    sizeOfResponseBuffer: UShort,
+    fillCharacter: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestBatchHelperResponse {
+    val commandId: UInt = 22u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
+    tlvWriter.put(
+      ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
+      sleepBeforeResponseTimeMs
+    )
+
+    val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SIZE_OF_RESPONSE_BUFFER_REQ), sizeOfResponseBuffer)
+
+    val TAG_FILL_CHARACTER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_FILL_CHARACTER_REQ), fillCharacter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_BUFFER: Int = 0
+    var buffer_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_BUFFER)) {
+        buffer_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (buffer_decoded == null) {
+      throw IllegalStateException("buffer not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestBatchHelperResponse(buffer_decoded)
+  }
+
+  suspend fun testSecondBatchHelperRequest(
+    sleepBeforeResponseTimeMs: UShort,
+    sizeOfResponseBuffer: UShort,
+    fillCharacter: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestBatchHelperResponse {
+    val commandId: UInt = 23u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
+    tlvWriter.put(
+      ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
+      sleepBeforeResponseTimeMs
+    )
+
+    val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SIZE_OF_RESPONSE_BUFFER_REQ), sizeOfResponseBuffer)
+
+    val TAG_FILL_CHARACTER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_FILL_CHARACTER_REQ), fillCharacter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_BUFFER: Int = 0
+    var buffer_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_BUFFER)) {
+        buffer_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (buffer_decoded == null) {
+      throw IllegalStateException("buffer not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestBatchHelperResponse(buffer_decoded)
   }
 
   suspend fun readBooleanAttribute(): Boolean {

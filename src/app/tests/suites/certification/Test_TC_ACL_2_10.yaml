@@ -45,7 +45,7 @@ config:
         defaultValue: "hex:17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
 
 tests:
-    - label: "Step 1:Wait for the commissioned device to be retrieved"
+    - label: "Step 1:TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -70,7 +70,9 @@ tests:
       response:
           saveAs: TH1FabricIndex
 
-    - label: "Step 3:TH1 puts DUT into commissioning mode"
+    - label:
+          "Step 3:TH1 puts DUT into commissioning mode, TH2 commissions DUT
+          using admin node ID N2"
       PICS: PICS_SDK_CI_ONLY && CADMIN.S.C00.Rsp
       cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
@@ -193,7 +195,12 @@ tests:
                 value: "y"
 
     - label:
-          "Step 5:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 5:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.struct : a)Privilege field: Administer (5) b)AuthMode field: CASE
+          (2) c)Subjects field: [N1, 1111] d)Targets field: null 2.Struct :
+          a)Privilege field: Operate (3) b)AuthMode field: Group (3) c)Subjects
+          field: [3333] d)Targets field: null"
       PICS: ACL.S.A0000
       command: "writeAttribute"
       attribute: "ACL"
@@ -217,7 +224,12 @@ tests:
               ]
 
     - label:
-          "Step 6:TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 6:TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute
+          value is list of AccessControlEntryStruct containing 2 elements
+          1.Struct : a)Privilege field: Administer (5) b)AuthMode field: CASE
+          (2) c)Subjects field: [N2, 2222] d)Targets field: null  2.Struct :
+          a)Privilege field: Operate (3) b)AuthMode field: Group (3) c)Subjects
+          field:  [4444] d)Targets field: null"
       PICS: ACL.S.A0000 && PICS_SDK_CI_ONLY
       identity: "beta"
       command: "writeAttribute"

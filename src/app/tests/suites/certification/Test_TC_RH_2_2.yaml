@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Reads constraints of attribute: MinMeasuredValue"
+    - label: "Step 2: TH reads MinMeasuredValue attribute from DUT."
       PICS: RH.S.A0001
       command: "readAttribute"
       attribute: "MinMeasuredValue"
@@ -41,7 +43,7 @@ tests:
               minValue: 0
               maxValue: 9999
 
-    - label: "Step 3: Reads constraints of attribute: MaxMeasuredValue"
+    - label: "Step 3: TH reads MaxMeasuredValue attribute from DUT."
       PICS: RH.S.A0002
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
@@ -51,7 +53,7 @@ tests:
               minValue: 1
               maxValue: 10000
 
-    - label: "Step 4: Reads MeasuredValue attribute from DUT"
+    - label: "Step 4: TH reads MeasuredValue attribute from DUT."
       command: "readAttribute"
       attribute: "MeasuredValue"
       PICS: RH.S.A0000
@@ -75,7 +77,9 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 6: Read the mandatory attribute: MeasuredValue"
+    - label:
+          "Step 6: after a few seconds, TH reads MeasuredValue attribute from
+          DUT."
       command: "readAttribute"
       attribute: "MeasuredValue"
       PICS: RH.S.A0000 && RH.M.ManuallyControlled

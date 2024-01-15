@@ -38,7 +38,7 @@ AndroidCurrentFabricRemover::AndroidCurrentFabricRemover(DeviceController * cont
         env->ExceptionClear();
     }
 
-    mOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(JI)V");
+    mOnErrorMethod = env->GetMethodID(callbackClass, "onError", "(IJ)V");
     if (mOnErrorMethod == nullptr)
     {
         ChipLogError(Controller, "Failed to access callback 'onError' method");
