@@ -92,11 +92,4 @@ static_library("telink") {
       "OTAImageProcessorImpl.h",
     ]
   }
-
-  if (chip_enable_bootloader_mcuboot) {
-    sources += [
-      "OTAUtil.cpp",
-      "OTAUtil.h",
-    ]
-  }
 }
