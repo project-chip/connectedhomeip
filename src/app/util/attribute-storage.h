@@ -98,10 +98,6 @@ void emberAfEndpointConfigure(void);
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write);
 
-bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
-bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                        EmberAfAttributeSearchRecord * attRecord);
-
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
 // mask = 0 -> find either client or server
@@ -170,6 +166,7 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
 
 // Check whether there is an endpoint defined with the given endpoint id that is
 // enabled.

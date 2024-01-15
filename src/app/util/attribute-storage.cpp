@@ -61,6 +61,11 @@ uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 // Loads the attributes from built-in default and storage.
 static void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
+static bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
+static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
+                               EmberAfAttributeSearchRecord * attRecord);
+
+
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
