@@ -141,12 +141,15 @@ class PyChipError(ctypes.Structure):
 
 PostAttributeChangeCallback = ctypes.CFUNCTYPE(
     None,
-    # py_object,
     ctypes.c_uint16,
     ctypes.c_uint16,
     ctypes.c_uint16,
     ctypes.c_uint8,
     ctypes.c_uint16,
+    # TODO: This should be a pointer to uint8_t, but ctypes does not provide
+    #       such a type. The best approximation is c_char_p, however, this
+    #       requires the caller to pass NULL-terminate C-string which might
+    #       not be the case here.
     ctypes.c_char_p,
 )
 
@@ -208,7 +211,7 @@ class _Handle:
 _nativeLibraryHandles: dict[Library, _Handle] = {}
 
 
-def _GetLibraryHandle(lib: Library, shouldInit: bool) -> ctypes.CDLL:
+def _GetLibraryHandle(lib: Library, expectAlreadyInitialized: bool) -> ctypes.CDLL:
     """Get a memoized _Handle to the chip native code dll."""
 
     global _nativeLibraryHandles
@@ -227,7 +230,7 @@ def _GetLibraryHandle(lib: Library, shouldInit: bool) -> ctypes.CDLL:
             setter.Set("pychip_server_set_callbacks", None, [PostAttributeChangeCallback])
 
     handle = _nativeLibraryHandles[lib]
-    if shouldInit and not handle.initialized:
+    if expectAlreadyInitialized and not handle.initialized:
         raise Exception("CHIP handle has not been initialized!")
 
     return handle
