@@ -66,10 +66,6 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}/app-common
                            ${APP_ROOT}/shell_common/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
                ${APP_ROOT}/shell_common/globals.cpp
                ${APP_ROOT}/shell_common/cmd_misc.cpp

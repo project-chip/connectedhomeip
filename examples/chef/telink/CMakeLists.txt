@@ -92,10 +92,6 @@ if (CONFIG_CHIP_LIB_SHELL)
   )
 endif()
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
     src/AppTask.cpp
     ${TELINK_COMMON}/common/src/mainCommon.cpp

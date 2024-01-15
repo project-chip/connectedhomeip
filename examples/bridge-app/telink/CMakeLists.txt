@@ -69,11 +69,6 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-    -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=16
-)
-
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/ZclCallbacks.cpp
