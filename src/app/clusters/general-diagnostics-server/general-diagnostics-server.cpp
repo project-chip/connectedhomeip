@@ -17,7 +17,7 @@
 
 #include "general-diagnostics-server.h"
 
-#include <zap-generated/gen_config.h>
+#include <app/util/config.h>
 
 #ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
 // Need the `nogncheck` because it's inter-cluster dependency and this
