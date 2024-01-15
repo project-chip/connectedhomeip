@@ -64,12 +64,12 @@ class TC_VALCC_3_4(MatterBaseTest):
             logging.info("LevelStep not supported skipping test case")
 
             # Skipping all remainig steps
-            self.step(4)
-            logging.info("Test step skipped")
-            self.step(5)
-            logging.info("Test step skipped")
-            self.step(6)
-            logging.info("Test step skipped")
+            for step in self.get_test_steps("test_TC_VALCC_3_4")[3:]:
+                self.step(step.test_plan_number)
+                logging.info("Test step skipped")
+
+            return
+
         else:
             logging.info("Test step skipped")
 
