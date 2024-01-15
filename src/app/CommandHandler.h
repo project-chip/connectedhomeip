@@ -30,7 +30,7 @@
 
 #pragma once
 
-#include "CommandHandlerDispatcher.h"
+#include "CommandResponseSender.h"
 #include "CommandPathRegistry.h"
 
 #include <app/ConcreteCommandPath.h>
@@ -375,14 +375,14 @@ public:
      * Gets the inner exchange context object, without ownership.
      *
      * WARNING: This is dangerous, since it is directly interacting with the
-     *          exchange being managed automatically by mDispatcher and
+     *          exchange being managed automatically by mResponseSender and
      *          if not done carefully, may end up with use-after-free errors.
      *
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mDispatcher.GetExchangeContext(); }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mResponseSender.GetExchangeContext(); }
 
     /**
      * @brief Flush acks right away for a slow command
@@ -395,7 +395,7 @@ public:
      * execution.
      *
      */
-    void FlushAcksRightAwayOnSlowCommand() { mDispatcher.FlushAcksRightNow(); }
+    void FlushAcksRightAwayOnSlowCommand() { mResponseSender.FlushAcksRightNow(); }
 
     /**
      * GetSubjectDescriptor() may only be called during synchronous command
@@ -406,15 +406,12 @@ public:
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
         VerifyOrDie(!mGoneAsync);
-        return mDispatcher.GetSubjectDescriptor();
+        return mResponseSender.GetSubjectDescriptor();
     }
 
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
-    // TODO would be much better if we provided a Closure instead of using friend here.
-    // This is so Dispatcher can call close.
-    friend class CommandHandlerDispatcher;
 
     enum class State : uint8_t
     {
@@ -422,7 +419,7 @@ private:
         Preparing,           ///< We are prepaing the command or status header.
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
-        DispatchingResponse, ///< The command response are being dispatched.
+        DispatchResponses,   ///< The command response(s) are being dispatched.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
@@ -467,7 +464,7 @@ private:
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
-    CHIP_ERROR FinalizeInvokeRequestMessage(bool aHasMoreChunks);
+    CHIP_ERROR FinalizeInvokeResponseMessage(bool aHasMoreChunks);
 
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -475,6 +472,11 @@ private:
      * safe to release this object.
      */
     void Close();
+
+    /**
+     * @brief Callback method to know when CommandResponseSender is done sending all messages.
+     */
+    static void HandleOnResponseSenderDone(void * context);
 
     /**
      * ProcessCommandDataIB is only called when a unicast invoke command request is received
@@ -546,8 +548,8 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
-    // Dispatches responses sent by
-    CommandHandlerDispatcher mDispatcher;
+    chip::Callback::Callback<OnResponseSenderDone> mResponseSenderDone;
+    CommandResponseSender mResponseSender;
 
     State mState = State::Idle;
     State mBackupState;

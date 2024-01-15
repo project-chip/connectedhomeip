@@ -1,3 +1,21 @@
+/*
+ *
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #pragma once
 
 #include <app/StatusResponse.h>
@@ -7,12 +25,16 @@
 namespace chip {
 namespace app {
 
+typedef void (*OnResponseSenderDone)(void * context);
 class CommandHandler;
 
-class CommandHandlerDispatcher : public Messaging::ExchangeDelegate
+/**
+ * Class manages sending `InvokeResponseMessage`(s) back to the initial requester.
+ */
+class CommandResponseSender : public Messaging::ExchangeDelegate
 {
 public:
-    CommandHandlerDispatcher(CommandHandler * commandHandler) : mpCommandHandler(commandHandler), mExchangeCtx(*this) {}
+    CommandResponseSender() : mExchangeCtx(*this) {}
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
@@ -46,8 +68,8 @@ public:
     /**
      * Gets subject descriptor of the exchange
      *
-     * WARNING: Caller is expected to call this only when it knows session
-     * cannot have been evicted.
+     * WARNING: This method should only be called when caller is certain the
+     * session cannot have been evicted.
      */
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
@@ -81,41 +103,56 @@ public:
         return mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
-    CHIP_ERROR SendCommandResponse();
+    CHIP_ERROR StartSendingCommandResponse();
 
     void SendStatusResponse(Protocols::InteractionModel::Status aStatus)
     {
-        // TODO Should this move state to the end?
+        // TODO Should this move state to AllInvokeResponsesSent.
         StatusResponse::Send(aStatus, mExchangeCtx.Get(), /*aExpectResponse = */ false);
     }
 
-    bool AwaitingResponse() { return mState == State::AwaitingResponse; }
+    bool AwaitingStatusResponse() { return mState == State::AwaitingStatusResponse; }
 
-    void AddPacketToSend(System::PacketBufferHandle && aPacket)
+    void AddInvokeResponseToSend(System::PacketBufferHandle && aPacket)
     {
-        VerifyOrDie(mState == State::Idle);
+        VerifyOrDie(mState == State::ReadyForInvokeResponses);
         mChunks.AddToEnd(std::move(aPacket));
     }
 
-private:
-    friend class TestCommandInteraction;
+    /**
+     * @brief Sets the Callback to be called when CommandResponseSender is done sending Responses
+     * 
+     * When Called with a non-null value CommandResponseSender will call this callback
+     * 
+     */
+    void SetOnResponseSenderDoneCallback(Callback::Callback<OnResponseSenderDone> * aResponseSenderDoneCallback)
+    {
+        VerifyOrDie(!mCloseCalled);
+        mResponseSenderDoneCallback = aResponseSenderDoneCallback;
+    }
 
+private:
     enum class State : uint8_t
     {
-        Idle,             ///< Default state that the object starts out in, where no commands have been dispatched
-        AwaitingResponse, ///< Awaiting response from requester, after sending response.
-        AllCommandsSent,
+        ReadyForInvokeResponses, ///< Accepting InvokeResponses to send back to requester.
+        AwaitingStatusResponse,  ///< Awaiting response from requester, after sending InvokeResponse.
+        AllInvokeResponsesSent,  ///< All InvokeResponses have been sent out.
     };
 
     void MoveToState(const State aTargetState);
     const char * GetStateStr() const;
 
-    // A list of InvokeResponseMessages to be sent out by CommandHandler.
+    CHIP_ERROR SendCommandResponse();
+    void Close();
+
+    // A list of InvokeResponseMessages to be sent out by CommandResponseSender.
     System::PacketBufferHandle mChunks;
 
-    CommandHandler * mpCommandHandler = nullptr;
+    chip::Callback::Callback<OnResponseSenderDone> * mResponseSenderDoneCallback = nullptr;
     Messaging::ExchangeHolder mExchangeCtx;
-    State mState = State::Idle;
+    State mState = State::ReadyForInvokeResponses;
+
+    bool mCloseCalled = false;
 };
 
 } // namespace app

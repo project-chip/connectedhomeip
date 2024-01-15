@@ -230,7 +230,13 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
-        sendStatusResponse = moreChunkedMessages;
+        if (moreChunkedMessages)
+        {
+            StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
+            MoveToState(State::AwaitingResponse);
+            return CHIP_NO_ERROR;
+        }
+        sendStatusResponse = false;
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
     {
@@ -252,15 +258,7 @@ exit:
 
     if (sendStatusResponse)
     {
-        bool expectingResponse                     = false;
-        Protocols::InteractionModel::Status status = Status::InvalidAction;
-        if (moreChunkedMessages && err == CHIP_NO_ERROR)
-        {
-            expectingResponse = true;
-            status            = Status::Success;
-            MoveToState(State::AwaitingResponse);
-        }
-        StatusResponse::Send(status, apExchangeContext, expectingResponse);
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, /*aExpectResponse = */ false);
     }
 
     if (mState != State::AwaitingResponse)
@@ -301,8 +299,8 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     }
 
     err = invokeResponseMessage.GetMoreChunkedMessages(&moreChunkedMessages);
-    // We will get CHIP_END_OF_TLV if there was no MoreChunkedMessages element, if that is
-    // the case a default value of false is used as mentioned in the spec.
+    // We will get CHIP_END_OF_TLV if there was no MoreChunkedMessages element. If that is
+    // the case, a default value of false is used, as mentioned in the spec.
     if (CHIP_END_OF_TLV == err)
     {
         moreChunkedMessages = false;

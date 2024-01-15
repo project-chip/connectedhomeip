@@ -569,7 +569,7 @@ void TestCommandInteraction::TestCommandHandlerWithWrongState(nlTestSuite * apSu
     TestExchangeDelegate delegate;
 
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
+    commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     err = commandHandler.StartSendingCommandResponses();
 
@@ -619,7 +619,7 @@ void TestCommandInteraction::TestCommandHandlerWithSendEmptyCommand(nlTestSuite 
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
+    commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     const CommandHandler::InvokeResponseParameters prepareParams(requestCommandPath);
     err = commandHandler.PrepareInvokeResponseCommand(responseCommandPath, prepareParams);
@@ -660,10 +660,10 @@ void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(n
 
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
+    commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
-    err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -711,52 +711,26 @@ struct BadFields
 
 void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err          = CHIP_NO_ERROR;
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, /* aRef = */ NullOptional);
 
-    TestExchangeDelegate delegate;
-    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
-
     commandHandler.AddResponse(requestCommandPath, Fields());
-    err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    //
-    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
-    //  (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
-    //  expected in normal application logic.
-    //
-    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err          = CHIP_NO_ERROR;
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
 
-    TestExchangeDelegate delegate;
-    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
-
     commandHandler.AddResponse(requestCommandPath, BadFields());
-    err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    //
-    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
-    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
-    // expected in normal application logic.
-    //
-    exchange->Close();
 }
 
 /**
@@ -1105,29 +1079,16 @@ void TestCommandInteraction::TestCommandHandlerInvalidMessageSync(nlTestSuite * 
 
 void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTestSuite * apSuite, void * apContext)
 {
-    TestContext & ctx       = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err          = CHIP_NO_ERROR;
     auto path               = MakeTestCommandPath();
     auto requestCommandPath = ConcreteCommandPath(path.mEndpointId, path.mClusterId, path.mCommandId);
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
 
-    TestExchangeDelegate delegate;
-    auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
-
     err = commandHandler.AddResponseData(requestCommandPath, BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
-    err = commandHandler.FinalizeInvokeRequestMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    //
-    // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
-    // OnMessageReceived callback and not having sent a subsequent message. Since that isn't the case in this artificial setup here
-    // (where we created a responder exchange that's not responding to anything), we need to explicitly close it out. This is not
-    // expected in normal application logic.
-    //
-    exchange->Close();
 }
 
 void TestCommandInteraction::TestCommandHandlerEncodeSimpleStatusCode(nlTestSuite * apSuite, void * apContext)
@@ -1142,7 +1103,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
     app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     TestExchangeDelegate delegate;
-    commandHandler.mDispatcher.SetExchangeContext(ctx.NewExchangeToAlice(&delegate));
+    commandHandler.mResponseSender.SetExchangeContext(ctx.NewExchangeToAlice(&delegate));
     // Use some invalid endpoint / cluster / command.
     GenerateInvokeRequest(apSuite, apContext, commandDatabuf, /* aIsTimedRequest = */ false, 0xEF /* command */,
                           0xADBE /* cluster */, 0xDE /* endpoint */);
@@ -1167,7 +1128,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
 
             TestExchangeDelegate delegate;
             auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-            commandHandler.mDispatcher.SetExchangeContext(exchange);
+            commandHandler.mResponseSender.SetExchangeContext(exchange);
 
             chip::isCommandDispatched = false;
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, messageIsTimed, kTestCommandIdNoData);
@@ -1557,7 +1518,7 @@ void TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenti
     CommandHandler commandHandler(&mockCommandHandlerDelegate);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
+    commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1631,7 +1592,7 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandler
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
+    commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1705,7 +1666,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     TestExchangeDelegate delegate;
     auto exchange = ctx.NewExchangeToAlice(&delegate, false);
-    commandHandler.mDispatcher.SetExchangeContext(exchange);
+    commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     // Hackery to steal the InvokeRequest buffer from commandSender.
     System::PacketBufferHandle commandDatabuf;
@@ -1756,8 +1717,8 @@ void TestCommandInteraction::TestCommandHandlerReleaseWithExchangeClosed(nlTestS
 
     // Mimic closure of the exchange that would happen on a session release and verify that releasing the handle there-after
     // is handled gracefully.
-    asyncCommandHandle.Get()->mDispatcher.mExchangeCtx->GetSessionHolder().Release();
-    asyncCommandHandle.Get()->mDispatcher.mExchangeCtx->OnSessionReleased();
+    asyncCommandHandle.Get()->mResponseSender.GetExchangeContext()->GetSessionHolder().Release();
+    asyncCommandHandle.Get()->mResponseSender.GetExchangeContext()->OnSessionReleased();
 
     asyncCommandHandle = nullptr;
 }
