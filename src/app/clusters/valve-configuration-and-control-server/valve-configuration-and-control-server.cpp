@@ -397,6 +397,21 @@ CHIP_ERROR EmitValveFault(EndpointId ep, BitMask<ValveConfigurationAndControl::V
     return CHIP_NO_ERROR;
 }
 
+void UpdateAutoCloseTime(uint64_t time)
+{
+    for (auto & t : gRemainingDuration)
+    {
+        const auto & d = t.remainingDuration;
+        if (!d.IsNull() && d.Value() != 0)
+        {
+            uint64_t closingTime = d.Value() * chip::kMicrosecondsPerSecond + time;
+            if (EMBER_ZCL_STATUS_SUCCESS != AutoCloseTime::Set(t.endpoint, closingTime))
+            {
+                ChipLogError(Zcl, "Unable to update AutoCloseTime");
+            }
+        }
+    }
+}
 } // namespace ValveConfigurationAndControl
 } // namespace Clusters
 } // namespace app

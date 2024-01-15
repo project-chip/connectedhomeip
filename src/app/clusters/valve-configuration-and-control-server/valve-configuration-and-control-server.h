@@ -44,6 +44,7 @@ CHIP_ERROR SetValveLevel(chip::EndpointId ep, chip::Percent level, DataModel::Nu
 CHIP_ERROR UpdateCurrentLevel(chip::EndpointId ep, chip::Percent currentLevel);
 CHIP_ERROR UpdateCurrentState(chip::EndpointId ep, ValveConfigurationAndControl::ValveStateEnum currentState);
 CHIP_ERROR EmitValveFault(chip::EndpointId ep, chip::BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
+void UpdateAutoCloseTime(uint64_t time);
 
 inline bool HasFeature(EndpointId ep, Feature feature)
 {

@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 
 namespace chip {
@@ -33,6 +34,16 @@ public:
 };
 
 } // namespace ValveConfigurationAndControl
+
+namespace TimeSynchronization {
+
+class ExtendedTimeSyncDelegate : public DefaultTimeSyncDelegate
+{
+public:
+    void UTCTimeChanged(uint64_t time) override;
+};
+
+} // namespace TimeSynchronization
 } // namespace Clusters
 } // namespace app
 } // namespace chip

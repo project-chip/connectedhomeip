@@ -22,6 +22,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ValveConfigurationAndControl;
+using namespace chip::app::Clusters::TimeSynchronization;
 
 static chip::Percent sLevel                = 1;
 static uint32_t sLastOpenDuration          = 0;
@@ -67,4 +68,9 @@ void ValveControlDelegate::HandleRemainingDurationTick(uint32_t duration)
                        ChipLogError(NotSpecified, "Updating current state failed"));
     }
     sLastOpenDuration = duration;
+}
+
+void ExtendedTimeSyncDelegate::UTCTimeChanged(uint64_t time)
+{
+    ValveConfigurationAndControl::UpdateAutoCloseTime(time);
 }

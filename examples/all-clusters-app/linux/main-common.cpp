@@ -39,6 +39,7 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
@@ -67,6 +68,7 @@ Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
+Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon = 7;
@@ -222,6 +224,7 @@ void ApplicationInit()
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
+    Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
