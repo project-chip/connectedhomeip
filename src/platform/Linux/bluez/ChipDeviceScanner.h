@@ -52,9 +52,9 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner()                          = default;
-    ChipDeviceScanner(ChipDeviceScanner &&)      = default;
-    ChipDeviceScanner(const ChipDeviceScanner &) = delete;
+    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
+    ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
     ~ChipDeviceScanner() { Shutdown(); }
