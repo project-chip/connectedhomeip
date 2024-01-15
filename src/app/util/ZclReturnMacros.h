@@ -18,12 +18,22 @@
 #pragma once
 
 // same as ReturnErrorOnFailure but for ZCL statuses
-#define ReturnStatusOnFailure(expr)             \
-    do                                          \
-    {                                           \
-        EmberAfStatus __err = (expr);           \
-        if (__err != EMBER_ZCL_STATUS_SUCCESS)  \
-        {                                       \
-                return __err;                   \
-        }                                       \
+#define ReturnStatusOnFailure(expr)                                                                                                \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        EmberAfStatus __err = (expr);                                                                                              \
+        if (__err != EMBER_ZCL_STATUS_SUCCESS)                                                                                     \
+        {                                                                                                                          \
+            return __err;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+#define VerifyOrReturnStatus(expr, status, ...)                                                                                    \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+            return (status);                                                                                                       \
+        }                                                                                                                          \
     } while (false)
