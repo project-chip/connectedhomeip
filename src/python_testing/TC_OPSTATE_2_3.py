@@ -135,7 +135,7 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(13, "Manually put the device in a state where it cannot receive a Pause command")
+        self.print_step(13, "Manually put the device in the Stopped(0x00) operational state")
         input("Press Enter when done.\n")
 
         self.print_step(14, "Send Pause command")
@@ -144,10 +144,22 @@ class TC_OPSTATE_2_3(MatterBaseTest):
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
                              "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(15, "Manually put the device in a state where it cannot receive a Resume command")
+        self.print_step(15, "Send Resume command")
+        ret = await self.send_resume_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(16, "Manually put the device in a the Error(0x03) operational state")
         input("Press Enter when done.\n")
 
-        self.print_step(16, "Send Resume command")
+        self.print_step(17, "Send Pause command")
+        ret = await self.send_pause_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(18, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
