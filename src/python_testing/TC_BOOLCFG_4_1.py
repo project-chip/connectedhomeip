@@ -62,8 +62,6 @@ class TC_BOOLCFG_4_1(MatterBaseTest):
         is_vis_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kVisual
         is_aud_feature_supported = feature_map & Clusters.BooleanStateConfiguration.Bitmaps.Feature.kAudible
 
-        supportedAlarms = 0
-
         self.step(3)
         if is_vis_feature_supported or is_aud_feature_supported:
             supportedAlarms = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.AlarmsSupported)
