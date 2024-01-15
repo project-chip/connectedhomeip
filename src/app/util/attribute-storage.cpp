@@ -1247,7 +1247,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                 // First check for a persisted value.
                 if (am->IsAutomaticallyPersisted())
                 {
-                    VerifyOrDieWithMsg(attrStorage != nullptr, "Attribute persistence needs a persistence provider");
+                    VerifyOrDieWithMsg(attrStorage != nullptr, Zcl, "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err = attrStorage->ReadValue(
                         app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
