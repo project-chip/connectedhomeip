@@ -63,10 +63,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
 #endif
 
-#ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
-#define CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD "dhclient -nw %s"
-#endif
-
 using namespace ::chip;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer;
@@ -1139,6 +1135,10 @@ void ConnectivityManagerImpl::PostNetworkConnect()
         }
     }
 
+#if defined(CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD)
+    // CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD can be defined to a command pattern
+    // to run once the network has been connected, with a %s placeholder for the
+    // interface name. E.g. "dhclient -nw %s"
     // Run dhclient for IP on WiFi.
     // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
     char cmdBuffer[128];
@@ -1152,6 +1152,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     {
         ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", sWiFiIfName);
     }
+#endif // defined(CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD)
 }
 
 CHIP_ERROR ConnectivityManagerImpl::CommitConfig()

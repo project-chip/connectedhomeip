@@ -171,6 +171,13 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
     chip::Credentials::SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
+    *errInfoOnFailure = wrapper->mICDClientStorage.Init(wrapperStorage, &wrapper->mSessionKeystore);
+    if (*errInfoOnFailure != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "ICD Client Storage failure");
+        return nullptr;
+    }
+
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
 
@@ -358,6 +365,8 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     *errInfoOnFailure = chip::Credentials::SetSingleIpkEpochKey(
         &wrapper->mGroupDataProvider, wrapper->Controller()->GetFabricIndex(), ipkSpan, compressedFabricIdSpan);
 
+    wrapper->getICDClientStorage()->UpdateFabricList(wrapper->Controller()->GetFabricIndex());
+
     memset(ipkBuffer.data(), 0, ipkBuffer.size());
 
     if (*errInfoOnFailure != CHIP_NO_ERROR)
@@ -440,6 +449,68 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
         ChipLogError(Controller, "Both WiFi and Thread credentials were null in NetworkCredentials");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    return err;
+}
+
+CHIP_ERROR AndroidDeviceControllerWrapper::ApplyICDRegistrationInfo(chip::Controller::CommissioningParameters & params,
+                                                                    jobject icdRegistrationInfo)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    mDeviceIsICD = false;
+
+    VerifyOrReturnError(icdRegistrationInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID getCheckInNodeIdMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getCheckInNodeId", "()Ljava/lang/Long;",
+                                                        &getCheckInNodeIdMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject jCheckInNodeId = env->CallObjectMethod(icdRegistrationInfo, getCheckInNodeIdMethod);
+
+    jmethodID getMonitoredSubjectMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getMonitoredSubject", "()Ljava/lang/Long;",
+                                                        &getMonitoredSubjectMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject jMonitoredSubject = env->CallObjectMethod(icdRegistrationInfo, getMonitoredSubjectMethod);
+
+    jmethodID getSymmetricKeyMethod;
+    err =
+        chip::JniReferences::GetInstance().FindMethod(env, icdRegistrationInfo, "getSymmetricKey", "()[B", &getSymmetricKeyMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jbyteArray jSymmetricKey = static_cast<jbyteArray>(env->CallObjectMethod(icdRegistrationInfo, getSymmetricKeyMethod));
+
+    chip::NodeId checkInNodeId = chip::kUndefinedNodeId;
+    if (jCheckInNodeId != nullptr)
+    {
+        checkInNodeId = static_cast<chip::NodeId>(chip::JniReferences::GetInstance().LongToPrimitive(jCheckInNodeId));
+    }
+    else
+    {
+        checkInNodeId = mController->GetNodeId();
+    }
+    params.SetICDCheckInNodeId(checkInNodeId);
+
+    uint64_t monitoredSubject = static_cast<uint64_t>(checkInNodeId);
+    if (jMonitoredSubject != nullptr)
+    {
+        monitoredSubject = static_cast<uint64_t>(chip::JniReferences::GetInstance().LongToPrimitive(jMonitoredSubject));
+    }
+    params.SetICDMonitoredSubject(monitoredSubject);
+
+    if (jSymmetricKey != nullptr)
+    {
+        JniByteArray jniSymmetricKey(env, jSymmetricKey);
+        VerifyOrReturnError(jniSymmetricKey.size() == sizeof(mICDSymmetricKey), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mICDSymmetricKey, jniSymmetricKey.data(), sizeof(mICDSymmetricKey));
+    }
+    else
+    {
+        chip::Crypto::DRBG_get_bytes(mICDSymmetricKey, sizeof(mICDSymmetricKey));
+    }
+    params.SetICDSymmetricKey(chip::ByteSpan(mICDSymmetricKey));
 
     return err;
 }
@@ -577,6 +648,16 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error)
 {
     chip::DeviceLayer::StackUnlock unlock;
+
+    if (error != CHIP_NO_ERROR && mDeviceIsICD)
+    {
+        CHIP_ERROR deleteEntryError = mICDClientStorage.DeleteEntry(ScopedNodeId(deviceId, Controller()->GetFabricIndex()));
+        if (deleteEntryError != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Failed to delete ICD entry: %" CHIP_ERROR_FORMAT, deleteEntryError.Format());
+        }
+    }
+
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID onCommissioningCompleteMethod;
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onCommissioningComplete", "(JI)V",
@@ -631,6 +712,10 @@ void AndroidDeviceControllerWrapper::OnReadCommissioningInfo(const chip::Control
     CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onReadCommissioningInfo", "(IIII)V",
                                                              &onReadCommissioningInfoMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    // For ICD
+    mUserActiveModeTriggerHint = info.icd.userActiveModeTriggerHint;
+    CopyCharSpanToMutableCharSpan(info.icd.userActiveModeTriggerInstruction, mUserActiveModeTriggerInstruction);
 
     env->CallVoidMethod(mJavaObjectRef, onReadCommissioningInfoMethod, static_cast<jint>(info.basic.vendorId),
                         static_cast<jint>(info.basic.productId), static_cast<jint>(info.network.wifi.endpoint),
@@ -812,6 +897,85 @@ void AndroidDeviceControllerWrapper::OnScanNetworksFailure(CHIP_ERROR error)
     chip::DeviceLayer::StackUnlock unlock;
 
     CallJavaMethod("onScanNetworksFailure", static_cast<jint>(error.AsInteger()));
+}
+
+void AndroidDeviceControllerWrapper::OnICDRegistrationInfoRequired()
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID onICDRegistrationInfoRequiredMethod;
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationInfoRequired", "()V",
+                                                             &onICDRegistrationInfoRequiredMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationInfoRequiredMethod);
+}
+
+void AndroidDeviceControllerWrapper::OnICDRegistrationComplete(chip::NodeId icdNodeId, uint32_t icdCounter)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::app::ICDClientInfo clientInfo;
+    clientInfo.peer_node         = ScopedNodeId(icdNodeId, Controller()->GetFabricIndex());
+    clientInfo.monitored_subject = mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value();
+    clientInfo.start_icd_counter = icdCounter;
+
+    ByteSpan symmetricKey = mAutoCommissioner.GetCommissioningParameters().GetICDSymmetricKey().Value();
+
+    err = mICDClientStorage.SetKey(clientInfo, symmetricKey);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mICDClientStorage.StoreEntry(clientInfo);
+    }
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Saved ICD Symmetric key for " ChipLogFormatX64, ChipLogValueX64(icdNodeId));
+    }
+    else
+    {
+        mICDClientStorage.RemoveKey(clientInfo);
+        ChipLogError(Controller, "Failed to persist symmetric key for " ChipLogFormatX64 ": %s", ChipLogValueX64(icdNodeId),
+                     err.AsString());
+    }
+
+    mDeviceIsICD = true;
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    JniLocalReferenceManager manager(env);
+    jmethodID onICDRegistrationCompleteMethod;
+    jclass icdDeviceInfoClass         = nullptr;
+    jmethodID icdDeviceInfoStructCtor = nullptr;
+    jobject icdDeviceInfoObj          = nullptr;
+    jbyteArray jSymmetricKey          = nullptr;
+    CHIP_ERROR methodErr =
+        JniReferences::GetInstance().FindMethod(env, mJavaObjectRef, "onICDRegistrationComplete",
+                                                "(ILchip/devicecontroller/ICDDeviceInfo;)V", &onICDRegistrationCompleteMethod);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, methodErr.Format()));
+
+    methodErr = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDDeviceInfo", icdDeviceInfoClass);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find class ICDDeviceInfo"));
+
+    icdDeviceInfoStructCtor = env->GetMethodID(icdDeviceInfoClass, "<init>", "([BILjava/lang/String;JJJJI)V");
+    VerifyOrReturn(icdDeviceInfoStructCtor != nullptr, ChipLogError(Controller, "Could not find ICDDeviceInfo constructor"));
+
+    methodErr =
+        JniReferences::GetInstance().N2J_ByteArray(env, symmetricKey.data(), static_cast<jint>(symmetricKey.size()), jSymmetricKey);
+    VerifyOrReturn(methodErr == CHIP_NO_ERROR,
+                   ChipLogError(Controller, "Error Parsing Symmetric Key: %" CHIP_ERROR_FORMAT, methodErr.Format()));
+
+    jstring jUserActiveModeTriggerInstruction = env->NewStringUTF(mUserActiveModeTriggerInstruction.data());
+
+    icdDeviceInfoObj = env->NewObject(
+        icdDeviceInfoClass, icdDeviceInfoStructCtor, jSymmetricKey, static_cast<jint>(mUserActiveModeTriggerHint.Raw()),
+        jUserActiveModeTriggerInstruction, static_cast<jlong>(icdNodeId), static_cast<jlong>(icdCounter),
+        static_cast<jlong>(mAutoCommissioner.GetCommissioningParameters().GetICDMonitoredSubject().Value()),
+        static_cast<jlong>(Controller()->GetFabricId()), static_cast<jint>(Controller()->GetFabricIndex()));
+
+    env->CallVoidMethod(mJavaObjectRef, onICDRegistrationCompleteMethod, static_cast<jint>(err.AsInteger()), icdDeviceInfoObj);
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)

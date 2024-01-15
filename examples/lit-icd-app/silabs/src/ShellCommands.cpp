@@ -18,9 +18,6 @@
 #if defined(ENABLE_CHIP_SHELL)
 
 #include "ShellCommands.h"
-#include "BindingHandler.h"
-
-#include <app/clusters/bindings/bindings.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <platform/CHIPDeviceLayer.h>

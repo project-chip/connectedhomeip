@@ -21,10 +21,12 @@
 #include "air-quality-instance.h"
 #include "dishwasher-mode.h"
 #include "include/tv-callbacks.h"
+#include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
 #include "laundry-washer-mode.h"
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
+#include "oven-modes.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "tcc-mode.h"
@@ -33,6 +35,7 @@
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
 #include <app/server/Server.h>
@@ -235,6 +238,7 @@ void ApplicationShutdown()
     Clusters::AirQuality::Shutdown();
     Clusters::OperationalState::Shutdown();
     Clusters::RvcOperationalState::Shutdown();
+    Clusters::OvenMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {
@@ -246,6 +250,12 @@ using namespace chip::app::Clusters::LaundryWasherControls;
 void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
 {
     LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+}
+
+using namespace chip::app::Clusters::LaundryDryerControls;
+void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)

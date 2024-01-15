@@ -55,18 +55,43 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICDManagement" revision="2">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0046" name="ICDManagement" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
-    <revision revision="2" summary="Addition of LIT ICD support and ActiveModeDuration"/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="ICDM" scope="Node"/>
   <features>
     <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
-  <dataTypes/>
+  <dataTypes>
+    <struct name="MonitoringRegistrationStruct">
+      <field id="1" name="CheckInNodeID" type="node-id">
+        <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="MonitoredSubject" type="subject-id">
+        <access read="true" readPrivilege="admin" fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Key">
+        <deprecateConform/>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <enum name="OperatingModeEnum">
+      <item value="0" name="SIT" summary="ICD is operating as a Short Idle Time ICD.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="LIT" summary="ICD is operating as a Long Idle Time ICD.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
   <attributes>
     <attribute id="0x0000" name="IdleModeDuration" type="uint32" default="1">
       <access read="true" readPrivilege="view"/>
@@ -84,8 +109,9 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0003" name="RegisteredClients" type="list[MonitoringRegistrationStruct Type]" default="[]">
-      <access read="true" readPrivilege="admin"/>
+    <attribute id="0x0003" name="RegisteredClients" type="list" default="[]">
+      <entry type="MonitoringRegistrationStruct"/>
+      <access read="true" readPrivilege="admin" fabricScoped="true"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform>
         <feature name="CIP"/>
@@ -107,6 +133,13 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <constraint type="min" value="1"/>
     </attribute>
+    <attribute id="0x0008" name="OperatingMode" type="OperatingModeEnum" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="true"/>
+      <mandatoryConform>
+        <feature name="LITS"/>
+      </mandatoryConform>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="RegisterClient" response="RegisterClientResponse">
@@ -120,17 +153,17 @@ Davis, CA 95616, USA
       <field id="1" name="MonitoredSubject" type="subject-id">
         <mandatoryConform/>
       </field>
-      <field id="2" name="Key" type="octets">
+      <field id="2" name="Key" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
-      <field id="3" name="VerificationKey" type="octets">
+      <field id="3" name="VerificationKey" type="octstr">
         <optionalConform/>
         <constraint type="maxLength" value="16"/>
       </field>
     </command>
     <command id="0x01" name="RegisterClientResponse" direction="responseFromServer">
-      <access invokePrivilege="manage"/>
+      <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>
@@ -146,7 +179,7 @@ Davis, CA 95616, USA
       <field id="0" name="CheckInNodeID" type="node-id">
         <mandatoryConform/>
       </field>
-      <field id="1" name="VerificationKey" type="octets">
+      <field id="1" name="VerificationKey" type="octstr">
         <optionalConform/>
         <constraint type="maxLength" value="16"/>
       </field>
@@ -155,7 +188,7 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
-          <feature name="LIT"/>
+          <feature name="LITS"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
@@ -167,7 +200,7 @@ Davis, CA 95616, USA
       <access invokePrivilege="operate"/>
       <otherwiseConform>
         <mandatoryConform>
-          <feature name="LIT"/>
+          <feature name="LITS"/>
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>

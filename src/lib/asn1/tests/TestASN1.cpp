@@ -304,6 +304,17 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
 
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen == 0);
+
+    // Methods that take a reader should still read from it,
+    // even if the output is suppressed by the null writer.
+    TLVReader emptyTlvReader;
+    emptyTlvReader.Init(ByteSpan());
+    err = writer.PutBitString(0, emptyTlvReader);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
+
+    emptyTlvReader.Init(ByteSpan());
+    err = writer.PutOctetString(kASN1TagClass_ContextSpecific, 123, emptyTlvReader);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
 }
 
 static void TestASN1_ASN1UniversalTime(nlTestSuite * inSuite, void * inContext)

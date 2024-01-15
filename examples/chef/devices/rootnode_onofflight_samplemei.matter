@@ -1167,8 +1167,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
@@ -1490,6 +1490,11 @@ cluster FixedLabel = 64 {
 /** The Sample MEI cluster showcases a cluster manufacturer extensions */
 cluster SampleMei = 4294048800 {
   revision 1; // NOTE: Default/not specifically set
+
+  fabric_sensitive info event PingCountEvent = 0 {
+    int32u count = 1;
+    fabric_idx fabricIndex = 254;
+  }
 
   attribute boolean flipFlop = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1825,9 +1830,11 @@ endpoint 1 {
   }
 
   server cluster SampleMei {
+    emits event PingCountEvent;
     ram      attribute flipFlop default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;

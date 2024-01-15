@@ -29,6 +29,7 @@
 #include <app/AppConfig.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -239,6 +240,14 @@ public:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
+     *  Activate the idle subscriptions.
+     *
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
+     * resubscription can be triggered via OnActiveModeNotification().
+     */
+    void OnActiveModeNotification(ScopedNodeId aPeer);
+
+    /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
      */
@@ -380,6 +389,7 @@ private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
+    friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;

@@ -1899,6 +1899,9 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     case Attributes::UserActiveModeTriggerInstruction::Id: {
         return YES;
     }
+    case Attributes::OperatingMode::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -2819,11 +2822,17 @@ static BOOL AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(Attribu
     }
     }
 }
-static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId aAttributeId)
+static BOOL AttributeIsSpecifiedInBooleanStateConfigurationCluster(AttributeId aAttributeId)
 {
-    using namespace Clusters::BooleanSensorConfiguration;
+    using namespace Clusters::BooleanStateConfiguration;
     switch (aAttributeId) {
-    case Attributes::SensitivityLevel::Id: {
+    case Attributes::CurrentSensitivityLevel::Id: {
+        return YES;
+    }
+    case Attributes::SupportedSensitivityLevels::Id: {
+        return YES;
+    }
+    case Attributes::DefaultSensitivityLevel::Id: {
         return YES;
     }
     case Attributes::AlarmsActive::Id: {
@@ -2833,6 +2842,12 @@ static BOOL AttributeIsSpecifiedInBooleanSensorConfigurationCluster(AttributeId 
         return YES;
     }
     case Attributes::AlarmsEnabled::Id: {
+        return YES;
+    }
+    case Attributes::AlarmsSupported::Id: {
+        return YES;
+    }
+    case Attributes::SensorFault::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2865,6 +2880,9 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::OpenDuration::Id: {
         return YES;
     }
+    case Attributes::DefaultOpenDuration::Id: {
+        return YES;
+    }
     case Attributes::AutoCloseTime::Id: {
         return YES;
     }
@@ -2877,19 +2895,19 @@ static BOOL AttributeIsSpecifiedInValveConfigurationAndControlCluster(AttributeI
     case Attributes::TargetState::Id: {
         return YES;
     }
-    case Attributes::StartUpState::Id: {
-        return YES;
-    }
     case Attributes::CurrentLevel::Id: {
         return YES;
     }
     case Attributes::TargetLevel::Id: {
         return YES;
     }
-    case Attributes::OpenLevel::Id: {
+    case Attributes::DefaultOpenLevel::Id: {
         return YES;
     }
     case Attributes::ValveFault::Id: {
+        return YES;
+    }
+    case Attributes::LevelStep::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3158,6 +3176,48 @@ static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
     }
     }
 }
+static BOOL AttributeIsSpecifiedInEnergyPreferenceCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyPreference;
+    switch (aAttributeId) {
+    case Attributes::EnergyBalances::Id: {
+        return YES;
+    }
+    case Attributes::CurrentEnergyBalance::Id: {
+        return YES;
+    }
+    case Attributes::EnergyPriorities::Id: {
+        return YES;
+    }
+    case Attributes::LowPowerModeSensitivities::Id: {
+        return YES;
+    }
+    case Attributes::CurrentLowPowerModeSensitivity::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -3268,6 +3328,33 @@ static BOOL AttributeIsSpecifiedInDoorLockCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ExpiringUserTimeout::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderVerificationKey::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderGroupIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::AliroReaderGroupSubIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+        return YES;
+    }
+    case Attributes::AliroGroupResolvingKey::Id: {
+        return YES;
+    }
+    case Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
+        return YES;
+    }
+    case Attributes::AliroBLEAdvertisingVersion::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfAliroEndpointKeysSupported::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6342,8 +6429,8 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::ActivatedCarbonFilterMonitoring::Id: {
         return AttributeIsSpecifiedInActivatedCarbonFilterMonitoringCluster(aAttributeId);
     }
-    case Clusters::BooleanSensorConfiguration::Id: {
-        return AttributeIsSpecifiedInBooleanSensorConfigurationCluster(aAttributeId);
+    case Clusters::BooleanStateConfiguration::Id: {
+        return AttributeIsSpecifiedInBooleanStateConfigurationCluster(aAttributeId);
     }
     case Clusters::ValveConfigurationAndControl::Id: {
         return AttributeIsSpecifiedInValveConfigurationAndControlCluster(aAttributeId);
@@ -6359,6 +6446,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::EnergyEvse::Id: {
         return AttributeIsSpecifiedInEnergyEVSECluster(aAttributeId);
+    }
+    case Clusters::EnergyPreference::Id: {
+        return AttributeIsSpecifiedInEnergyPreferenceCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);
