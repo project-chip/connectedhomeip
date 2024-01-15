@@ -26,7 +26,7 @@ chip_test_suite_using_nltest("tests") {
   public_deps = [
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]
