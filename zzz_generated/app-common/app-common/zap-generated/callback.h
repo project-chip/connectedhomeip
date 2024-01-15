@@ -5453,12 +5453,6 @@ bool emberAfOvenCavityOperationalStateClusterResumeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::DecodableType & commandData);
 /**
- * @brief Oven Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfOvenModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OvenMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
 bool emberAfModeSelectClusterChangeToModeCallback(

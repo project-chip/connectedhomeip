@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    Window Covering [TC-WNCV-4.3] GoToLiftPercentage Limits Verification with
-    server as DUT
+    Window Covering [TC-WNCV-4.3] GoToLiftPercentage command Limits Verification
+    [DUT as Server]
 
 PICS:
     - WNCV.S

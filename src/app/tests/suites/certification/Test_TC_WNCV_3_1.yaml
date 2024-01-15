@@ -14,7 +14,7 @@
 
 name:
     Window Covering [TC-WNCV-3.1] UpOrOpen command & OperationalStatus attribute
-    Verification DUT_Server
+    Verification [DUT as Server]
 
 PICS:
     - WNCV.S
@@ -130,7 +130,7 @@ tests:
       PICS: WNCV.S.C00.Rsp
 
     ### Depending on the DUT specs we might prefer a arguments here
-    - label: "Step 2b: DUT updates its attributes"
+    - label: "Step 2b: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -158,7 +158,7 @@ tests:
       response:
           value: 0
 
-    - label: "Step 2e: TH leave the device moving for 1-5 seconds"
+    - label: "Step 2e: TH waits for 1-5 seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -310,9 +310,7 @@ tests:
       command: "StopMotion"
       PICS: WNCV.S.C02.Rsp
 
-    - label:
-          "Step 4b: TH waits for 3 seconds the end of inertial movement(s) on
-          the device"
+    - label: "Step 4b: TH waits for 1-5 seconds end of motion(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -322,9 +320,7 @@ tests:
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
-    - label:
-          "Step 4c: Verify DUT update OperationalStatus attribute to TH after a
-          StopMotion"
+    - label: "Step 4c: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a
@@ -332,7 +328,7 @@ tests:
           value: 0
 
     ### Step 5x -> Check Stop Motion longer period effect
-    - label: "Step 5a: TH waits for x seconds attributes update on the device"
+    - label: "Step 5a: TH waits for 100-1000 ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
