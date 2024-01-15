@@ -65,7 +65,6 @@ static bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSea
 static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
                                EmberAfAttributeSearchRecord * attRecord);
 
-
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)

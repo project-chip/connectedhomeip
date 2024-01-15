@@ -167,7 +167,6 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-
 // Check whether there is an endpoint defined with the given endpoint id that is
 // enabled.
 bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
