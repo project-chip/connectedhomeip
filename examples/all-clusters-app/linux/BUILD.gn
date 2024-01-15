@@ -46,6 +46,7 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
+    "ValveControlDelegate.cpp",
     "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",

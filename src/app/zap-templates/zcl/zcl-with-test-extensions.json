@@ -560,6 +560,7 @@
             "PeriodicEnergyImported",
             "PeriodicEnergyExported"
         ],
+        "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },
     "defaultReportingPolicy": "mandatory",
