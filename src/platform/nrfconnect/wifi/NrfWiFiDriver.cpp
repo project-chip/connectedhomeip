@@ -279,7 +279,7 @@ void NrfWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
     }
 }
 
-uint32_t NrfWiFiDriver::GetSupportedWiFiBands()
+uint32_t NrfWiFiDriver::GetSupportedWiFiBandsMask() const
 {
     uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
 #ifndef CONFIG_BOARD_NRF7001

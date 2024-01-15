@@ -358,7 +358,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     /**
-     *  @brief Provide all the frequency bands supported by the Wi-Fi interface
+     *  @brief Provide all the frequency bands supported by the Wi-Fi interface.
      *
      *  The default implementation returns the 2.4 GHz band support.
      *  Note: WiFi platforms should implement this function in their WiFiDriver to provide their complete device capabilities.
@@ -374,7 +374,7 @@ public:
      *
      *  @return a bitmask of supported Wi-Fi bands where each bit is associated with a WiFiBandEnum value.
      */
-    virtual uint32_t GetSupportedWiFiBands()
+    virtual uint32_t GetSupportedWiFiBandsMask() const
     {
         // Default to 2.4G support (100% example platform coverage as of Matter 1.3) listed.
         return static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
