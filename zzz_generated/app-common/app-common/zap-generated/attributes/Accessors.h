@@ -1286,6 +1286,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // 
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace UserActiveModeTriggerInstruction
 
+namespace OperatingMode {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum * value); // OperatingModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value);
+} // namespace OperatingMode
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);

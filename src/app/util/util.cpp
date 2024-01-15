@@ -157,6 +157,7 @@ void MatterLaundryWasherModePluginServerInitCallback() {}
 void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallback() {}
 void MatterOperationalStatePluginServerInitCallback() {}
 void MatterRvcOperationalStatePluginServerInitCallback() {}
+void MatterOvenModePluginServerInitCallback() {}
 void MatterDishwasherAlarmPluginServerInitCallback() {}
 void MatterValveConfigurationAndControlPluginServerInitCallback() {}
 void MatterMicrowaveOvenModePluginServerInitCallback() {}
