@@ -373,10 +373,9 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         {
             dataVersion.SetValue(path.dataVersion);
         }
-        SuccessOrExit(err =
-                          client->PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId,
-                                                                                              path.attributeId, dataVersion),
-                                                         reader));
+        SuccessOrExit(
+            err = client->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
@@ -430,10 +429,9 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
             dataVersion.SetValue(path.dataVersion);
         }
         // Using kInvalidEndpointId as that used when sending group write requests.
-        SuccessOrExit(err =
-                          client->PutPreencodedAttribute(chip::app::ConcreteDataAttributePath(kInvalidEndpointId, path.clusterId,
-                                                                                              path.attributeId, dataVersion),
-                                                         reader));
+        SuccessOrExit(
+            err = client->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(kInvalidEndpointId, path.clusterId, path.attributeId, dataVersion), reader));
     }
 
     {

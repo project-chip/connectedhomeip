@@ -277,15 +277,15 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
     for (size_t i = 0; i < length; i++)
     {
         chip::EndpointId endpointId = batchCommandData[i].commandPath.endpointId;
-        chip::ClusterId clusterId = batchCommandData[i].commandPath.clusterId;
-        chip::CommandId commandId = batchCommandData[i].commandPath.commandId;
-        void * tlv         = batchCommandData[i].tlvData;
-        size_t tlvLength   = batchCommandData[i].tlvLength;
+        chip::ClusterId clusterId   = batchCommandData[i].commandPath.clusterId;
+        chip::CommandId commandId   = batchCommandData[i].commandPath.commandId;
+        void * tlv                  = batchCommandData[i].tlvData;
+        size_t tlvLength            = batchCommandData[i].tlvLength;
 
         const uint8_t * tlvBuffer = reinterpret_cast<const uint8_t *>(tlv);
 
-        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId,
-                                             commandId, (app::CommandPathFlags::kEndpointIdValid) };
+        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
+                                             (app::CommandPathFlags::kEndpointIdValid) };
 
         CommandSender::AdditionalCommandParameters additionalParams;
 
