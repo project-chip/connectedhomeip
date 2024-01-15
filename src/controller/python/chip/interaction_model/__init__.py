@@ -26,8 +26,8 @@ import enum
 
 from chip.exceptions import ChipStackException
 
-from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath,
-                       EventPathIBstruct, PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct)
+from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct,
+                       PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct)
 
 __all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
            "EventPath", "EventPathIBstruct", "InteractionModelError", "PyInvokeRequestData",
