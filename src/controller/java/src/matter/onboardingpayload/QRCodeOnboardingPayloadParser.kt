@@ -102,27 +102,28 @@ class QRCodeOnboardingPayloadParser(private val mBase38Representation: String) {
   private fun parseTLVFields(element: Element, payload: OnboardingPayload) {
     // update tag
     val tag = element.tag
-    if (tag is ContextSpecificTag) {
+    if (tag !is ContextSpecificTag) {
+      return
+    }
 
-      if (tag.tagNumber < 0x80) {
-        // add serial number
-        if (tag.tagNumber == kSerialNumberTag) {
-          val value = element.value
-          if (value is IntValue) {
-            payload.addSerialNumber(value.value.toInt())
-          }
-          if (value is Utf8StringValue) {
-            payload.addSerialNumber(value.value)
-          }
-        }
-      } else {
-        // add extension values
+    if (tag.tagNumber < 0x80) {
+      // add serial number
+      if (tag.tagNumber == kSerialNumberTag) {
         val value = element.value
         if (value is IntValue) {
-          payload.addOptionalVendorData(tag.tagNumber, value.value.toInt())
-        } else if (value is Utf8StringValue) {
-          payload.addOptionalVendorData(tag.tagNumber, value.value)
+          payload.addSerialNumber(value.value.toInt())
         }
+        if (value is Utf8StringValue) {
+          payload.addSerialNumber(value.value)
+        }
+      }
+    } else {
+      // add extension values
+      val value = element.value
+      if (value is IntValue) {
+        payload.addOptionalVendorData(tag.tagNumber, value.value.toInt())
+      } else if (value is Utf8StringValue) {
+        payload.addOptionalVendorData(tag.tagNumber, value.value)
       }
     }
   }
