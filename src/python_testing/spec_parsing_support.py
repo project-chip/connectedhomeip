@@ -371,9 +371,7 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     resource_clusters = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
                          0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
     resource_base_name = 'Resource Monitoring Clusters'
-    water_clusters = {0x0405: ('Relative Humidity Measurement', 'RH'),
-                      0x0407: ('Leaf Wetness Measurement', '??'),
-                      0x0408: ('Soil Moisture Measurement', '??')}
+    water_clusters = {0x0405: ('Relative Humidity Measurement', 'RH')}
     water_base_name = 'Water Content Measurement Clusters'
     aliases = {conc_base_name: conc_clusters, resource_base_name: resource_clusters, water_base_name: water_clusters}
     for alias_base_name, aliased_clusters in aliases.items():

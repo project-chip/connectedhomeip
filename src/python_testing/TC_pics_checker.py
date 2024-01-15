@@ -46,11 +46,15 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
     async def setup_class(self):
         super().setup_class()
         await self.setup_class_helper(False)
+        # build_xml_cluster returns a list of issues found when paring the XML
+        # Problems in the XML shouldn't cause test failure, but we want them recorded
+        # so they are added to the list of problems that get output when the test set completes.
         self.xml_clusters, self.problems = build_xml_clusters()
 
     def _check_and_record_errors(self, location, required, pics):
         if required and not self.check_pics(pics):
-            self.record_error("PICS check", location=location, problem=f"Required PICS {pics} not found in pics list")
+            self.record_error("PICS check", location=location,
+                              problem=f"An element found on the device, but the corresponding PICS {pics} was not found in pics list")
             self.success = False
         elif not required and self.check_pics(pics):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
@@ -105,6 +109,9 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
         self.success = True
 
         for cluster_id, cluster in Clusters.ClusterObjects.ALL_CLUSTERS.items():
+            # Data model XML is used to get the PICS code for this cluster. If we don't know the PICS
+            # code, we can't evaluate the PICS list. Clusters that are present on the device but are
+            # not present in the spec are checked in the IDM tests.
             if cluster_id not in self.xml_clusters or self.xml_clusters[cluster_id].pics is None:
                 continue
 
@@ -130,6 +137,9 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 feature_map = 0
 
             for feature_mask in cluster_features:
+                # Codegen in python uses feature masks (0x01, 0x02, 0x04 etc.)
+                # PICS uses the mask bit number (1, 2, 3)
+                # Convert the mask to a bit number so we can check the PICS.
                 feature_bit = int(math.log(feature_mask, 2))
                 pics = feature_pics(pics_base, feature_bit)
                 if feature_mask & feature_map:
