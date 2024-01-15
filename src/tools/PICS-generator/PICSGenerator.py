@@ -38,12 +38,9 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     xmlPath = xmlTemplatePathStr
     fileName = ""
 
-    print(f"Handling PICS for {clusterName}")
+    console.print(f"Handling PICS for {clusterName}")
 
     # Map clusters to common XML template if needed
-    # basicInformationCluster = "Basic Information Cluster"
-    # networkCommissioningCluster = "Network Commissioning Cluster"
-
     accessControlCluster = "AccessControl"
     diagnosticLogsCluster = "Diagnostic Logs"
     groupKeyManagementCluster = "GroupKeyManagement"
@@ -78,9 +75,6 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     elif operationalCredentialsCluster == clusterName:
         clusterName = "Node Operational Credentials"
-
-    # elif basicInformationCluster == clusterName or networkCommissioningCluster == clusterName:
-    #     clusterName = clusterName.replace("Cluster", "").strip()
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
