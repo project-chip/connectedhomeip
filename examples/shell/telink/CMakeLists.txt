@@ -75,3 +75,7 @@ target_sources(app PRIVATE
                ${APP_ROOT}/shell_common/cmd_misc.cpp
                ${APP_ROOT}/shell_common/cmd_otcli.cpp
                ${APP_ROOT}/standalone/main.cpp)
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()

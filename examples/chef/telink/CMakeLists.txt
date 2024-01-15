@@ -113,6 +113,10 @@ chip_configure_data_model(app
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
 
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
+
 if (CONFIG_CHIP_PW_RPC)
 
 # Make all targets created below depend on zephyr_interface to inherit MCU-related compilation flags

@@ -90,6 +90,10 @@ chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../common/window-app.zap
 )
 
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
+
 # Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
 add_compile_options(-Wno-error=unused-parameter)
 
