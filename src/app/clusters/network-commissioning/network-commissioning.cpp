@@ -280,7 +280,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
         return aEncoder.EncodeList([this](const auto & encoder) {
-            uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask() const;
+            uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask();
 
             // Extract every band from the bitmap of supported bands, starting positionally on the right.
             for (uint32_t band_bit_pos = 0; band_bit_pos < std::numeric_limits<uint32_t>::digits; ++band_bit_pos)
