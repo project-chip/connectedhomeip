@@ -128,25 +128,29 @@ class TC_BOOLCFG_4_2(MatterBaseTest):
 
         self.step("6a")
         if is_vis_feature_supported:
-            asserts.assert_not_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), 0, "Bit 0 in AlarmsActive is not 1")
+            asserts.assert_not_equal(
+                (activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), 0, "Bit 0 in AlarmsActive is not 1")
         else:
             logging.info("Test step skipped")
 
         self.step("6b")
         if not is_vis_feature_supported:
-            asserts.assert_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), 0, "Bit 0 in AlarmsActive is not 0")
+            asserts.assert_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual),
+                                 0, "Bit 0 in AlarmsActive is not 0")
         else:
             logging.info("Test step skipped")
 
         self.step("7a")
         if is_aud_feature_supported:
-            asserts.assert_not_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), 0, "Bit 1 in AlarmsActive is not 1")
+            asserts.assert_not_equal(
+                (activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), 0, "Bit 1 in AlarmsActive is not 1")
         else:
             logging.info("Test step skipped")
 
         self.step("7b")
         if not is_aud_feature_supported:
-            asserts.assert_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), 0, "Bit 1 in AlarmsActive is not 0")
+            asserts.assert_equal((activeAlarms & Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible),
+                                 0, "Bit 1 in AlarmsActive is not 0")
         else:
             logging.info("Test step skipped")
 
