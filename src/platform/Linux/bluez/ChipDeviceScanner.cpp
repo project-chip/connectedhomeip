@@ -179,8 +179,10 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStopScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan stop.");
+        mIsStopping = false;
         return CHIP_ERROR_INTERNAL;
     }
+    mIsStopping = false;
 
     ChipDeviceScannerDelegate * delegate = this->mDelegate;
     // callback is explicitly allowed to delete the scanner (hence no more
