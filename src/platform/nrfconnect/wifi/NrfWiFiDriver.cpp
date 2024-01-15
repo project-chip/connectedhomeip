@@ -17,10 +17,13 @@
 
 #include "NrfWiFiDriver.h"
 
+#include <stdint.h>
+
 #include <platform/KeyValueStoreManager.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
@@ -280,7 +283,7 @@ uint32_t NrfWiFiDriver::GetSupportedWiFiBands()
 {
     uint32_t bands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
 #ifndef CONFIG_BOARD_NRF7001
-    bands |= static_cast<uint32_t>(1UL << WiFiBandEnum::k5g);
+    bands |= static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k5g));
 #endif
     return bands;
 }
