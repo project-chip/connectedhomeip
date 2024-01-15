@@ -725,7 +725,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip().upper()
+        pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
 
     async def read_single_attribute(

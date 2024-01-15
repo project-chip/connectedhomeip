@@ -26,19 +26,19 @@ from spec_parsing_support import build_xml_clusters
 
 
 def attribute_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.A{id:04X}'
+    return f'{pics_base}.S.A{id:04x}'
 
 
 def accepted_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02X}.Rsp'
+    return f'{pics_base}.S.C{id:02x}.Rsp'
 
 
 def generated_cmd_pics(pics_base: str, id: int) -> str:
-    return f'{pics_base}.S.C{id:02X}.Tx'
+    return f'{pics_base}.S.C{id:02x}.Tx'
 
 
 def feature_pics(pics_base: str, bit: int) -> str:
-    return f'{pics_base}.S.F{bit:02X}'
+    return f'{pics_base}.S.F{bit:02x}'
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
@@ -60,43 +60,41 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
             self.record_error("PICS check", location=location, problem=f"PICS {pics} found in PICS list, but not on device")
             self.success = False
 
-    def _add_pics_for_lists(self, cluster_id: int, global_attribute: GlobalAttributeIds) -> None:
-        if global_attribute == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
-            cluster_object = Clusters.ClusterObjects.ALL_ATTRIBUTES
-            pics_function = attribute_pics
+    def _add_pics_for_lists(self, cluster_id: int, attribute_id_of_element_list: GlobalAttributeIds) -> None:
+        try:
+            if attribute_id_of_element_list == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
+                all_spec_elements_to_check = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]
+                pics_mapper = attribute_pics
+            elif attribute_id_of_element_list == GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID:
+                all_spec_elements_to_check = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]
+                pics_mapper = accepted_cmd_pics
 
-        elif global_attribute == GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID:
-            cluster_object = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS
-            pics_function = accepted_cmd_pics
-
-        elif global_attribute == GlobalAttributeIds.GENERATED_COMMAND_LIST_ID:
-            cluster_object = Clusters.ClusterObjects.ALL_GENERATED_COMMANDS
-            pics_function = generated_cmd_pics
-
-        else:
-            asserts.fail("add_pics_for_list function called for non-list attribute")
-
-        # This cluster does not have any of this element type
-        if cluster_id not in cluster_object.keys():
+            elif attribute_id_of_element_list == GlobalAttributeIds.GENERATED_COMMAND_LIST_ID:
+                all_spec_elements_to_check = Clusters.ClusterObjects.ALL_GENERATED_COMMANDS[cluster_id]
+                pics_mapper = generated_cmd_pics
+            else:
+                asserts.fail("add_pics_for_list function called for non-list attribute")
+        except KeyError:
+            # This cluster does not have any of this element type
             return
 
-        for element_id in cluster_object[cluster_id]:
+        for element_id in all_spec_elements_to_check:
             if element_id > 0xF000:
                 # No pics for global elements
                 continue
-            pics = pics_function(self.xml_clusters[cluster_id].pics, element_id)
+            pics = pics_mapper(self.xml_clusters[cluster_id].pics, element_id)
 
             if cluster_id not in self.endpoint.keys():
                 # This cluster is not on this endpoint
                 required = False
-            elif element_id in self.endpoint[cluster_id][global_attribute]:
+            elif element_id in self.endpoint[cluster_id][attribute_id_of_element_list]:
                 # Cluster and element are on the endpoint
                 required = True
             else:
                 # Cluster is on the endpoint but the element is not in the list
                 required = False
 
-            if global_attribute == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
+            if attribute_id_of_element_list == GlobalAttributeIds.ATTRIBUTE_LIST_ID:
                 location = AttributePathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id, attribute_id=element_id)
             else:
                 location = CommandPathLocation(endpoint_id=self.endpoint_id, cluster_id=cluster_id, command_id=element_id)
@@ -140,7 +138,7 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
                 # Codegen in python uses feature masks (0x01, 0x02, 0x04 etc.)
                 # PICS uses the mask bit number (1, 2, 3)
                 # Convert the mask to a bit number so we can check the PICS.
-                feature_bit = int(math.log(feature_mask, 2))
+                feature_bit = int(math.log2(feature_mask))
                 pics = feature_pics(pics_base, feature_bit)
                 if feature_mask & feature_map:
                     required = True
