@@ -393,7 +393,8 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         [](chip::System::Layer *, void *) {
             PlatformMgr().HandleServerShuttingDown();
             OtaHookReset();
-        }, nullptr);
+        },
+        nullptr);
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
