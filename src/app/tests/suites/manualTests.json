@@ -291,7 +291,7 @@
         "Test_TC_BRBINFO_3_1"
     ],
     "LaundryWasherControl": [],
-    "Oven Mode": [
+    "OvenMode": [
         "Test_TC_OTCCM_1_2",
         "Test_TC_OTCCM_3_2",
         "Test_TC_OTCCM_3_3"
