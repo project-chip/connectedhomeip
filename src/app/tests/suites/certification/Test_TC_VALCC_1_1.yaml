@@ -122,7 +122,18 @@ tests:
               contains: [8]
 
     - label:
-          "Step 4e: TH reads optional (ValveFault) attribute in AttributeList"
+          "Step 4e: Read the feature dependent(VALCC.S.F01) optional attribute
+          in AttributeList"
+      PICS: VALCC.S.F01 && VALCC.S.A000a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [10]
+
+    - label:
+          "Step 4f: TH reads optional (ValveFault) attribute in AttributeList"
       PICS: VALCC.S.A0009
       command: "readAttribute"
       attribute: "AttributeList"
