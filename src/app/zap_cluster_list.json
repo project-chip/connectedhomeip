@@ -285,7 +285,9 @@
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
-        "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [],
+        "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [
+            "valve-configuration-and-control-server"
+        ],
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
