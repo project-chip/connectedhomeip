@@ -18,6 +18,10 @@ class AccessTestType(Enum):
     WRITE = auto()
 
 
+def is_global(id: int) -> bool:
+    return id >= 0xF000 and id <= 0xFFFE
+
+
 def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
                       acl_set_to: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]) -> bool:
     ''' Determines if the action is allowed on the device based on the spec_requirements and the current ACL privilege granted.
@@ -137,20 +141,34 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
-            if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
-                # not writeable
-                continue
+
             attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
+            logging.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")
+            if attribute == Clusters.AccessControl.Attributes.Acl and privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister:
+                logging.info("Skipping ACL attribute check for admin privilege as this is known to be writeable and is being used for this test")
+                continue
 
-            print(f"Testing attribute {attribute} on endpoint {endpoint_id}")
             # Because we read everything with admin, we should have this in the wildcard read
             # This will only not work if we end up with write-only attributes. We do not currently have any of these.
             val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+            if isinstance(val, list):
+                # TODO: does this need a tracking issue? When we attempt to write a list that's too big, it fails.
+                val = []
+
             resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
-            if operation_allowed(spec_requires, privilege):
+            if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+                # not writeable - expect an unsupported write response
+                # Global vars currently return the wrong error code - see <whatever>
+                ok = (is_global(attribute.attribute_id) and resp[0].Status ==
+                      Status.UnsupportedAttribute) or resp[0].Status == Status.UnsupportedWrite
+                if not ok:
+                    self.record_error(test_name=test_name, location=location,
+                                      problem=f"Unexpected error writing non-writeable attribute - expected Unsupported Write, got {resp[0].Status}")
+                    self.success = False
+            elif operation_allowed(spec_requires, privilege):
                 # Write the default attribute. We don't care if this fails, as long as it fails with a DIFFERENT error than the access
                 # This is OK because access is required to be checked BEFORE any other thing to avoid leaking device information.
                 # For example, because we don't have any range information, we might be writing an out of range value, but this will
@@ -161,6 +179,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                       problem="Unexpected UnsupportedAccess writing attribute")
                     self.success = False
             else:
+                # TODO: handle optionally writeable attributes in here.
                 if resp[0].Status != Status.UnsupportedAccess:
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing attribute - expected Unsupported Access, got {resp[0].Status}")
