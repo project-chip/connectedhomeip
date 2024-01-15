@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,24 +17,29 @@
 
 #pragma once
 
-#include "time-synchronization-delegate.h"
+#include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TimeSynchronization {
-class DefaultTimeSyncDelegate : public Delegate
-{
+namespace ValveConfigurationAndControl {
 
+class ValveControlDelegate : public Delegate
+{
 public:
-    DefaultTimeSyncDelegate() : Delegate(){};
-    void TimeZoneListChanged(const Span<TimeSyncDataProvider::TimeZoneStore> timeZoneList) override;
-    bool HandleUpdateDSTOffset(CharSpan name) override;
-    bool IsNTPAddressValid(CharSpan ntp) override;
-    bool IsNTPAddressDomain(CharSpan ntp) override;
-    CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
-    CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
-                                          chip::Callback::Callback<OnFallbackNTPCompletion> * callback) override;
+    DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
+    CHIP_ERROR HandleCloseValve() override;
+    void HandleRemainingDurationTick(uint32_t duration) override;
+};
+
+} // namespace ValveConfigurationAndControl
+
+namespace TimeSynchronization {
+
+class ExtendedTimeSyncDelegate : public DefaultTimeSyncDelegate
+{
+public:
     void UTCTimeChanged(uint64_t time) override;
 };
 

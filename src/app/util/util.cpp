@@ -160,7 +160,6 @@ void MatterRvcOperationalStatePluginServerInitCallback() {}
 void MatterOvenModePluginServerInitCallback() {}
 void MatterDishwasherAlarmPluginServerInitCallback() {}
 void MatterBooleanStateConfigurationPluginServerInitCallback() {}
-void MatterValveConfigurationAndControlPluginServerInitCallback() {}
 void MatterMicrowaveOvenModePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
