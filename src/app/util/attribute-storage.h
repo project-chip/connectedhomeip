@@ -156,14 +156,8 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::Endpoi
 // cast it.
 EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
-// Public APIs for loading attributes
+// Loads attribute defaults and any non-volatile attributes stored
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
-void emberAfResetAttributes(chip::EndpointId endpoint);
-
-// Loads the attributes from built-in default and / or storage.  If
-// ignoreStorage is true, only defaults will be read, and the storage for
-// non-volatile attributes will be overwritten with those defaults.
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
 // After the RAM value has changed, code should call this function. If this
 // attribute has been tagged as non-volatile, its value will be stored.

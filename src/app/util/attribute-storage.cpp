@@ -56,6 +56,11 @@ EmberAfDefinedEndpoint emAfEndpoints[MAX_ENDPOINT_COUNT];
 
 uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 
+// ----- internal-only methods, not part of the external API -----
+
+// Loads the attributes from built-in default and storage.
+void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
+
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
@@ -1187,15 +1192,10 @@ uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterL
 
 void emberAfInitializeAttributes(EndpointId endpoint)
 {
-    emAfLoadAttributeDefaults(endpoint, false);
+    emAfLoadAttributeDefaults(endpoint);
 }
 
-void emberAfResetAttributes(EndpointId endpoint)
-{
-    emAfLoadAttributeDefaults(endpoint, true);
-}
-
-void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional<ClusterId> clusterId)
+void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterId)
 {
     uint16_t ep;
     uint8_t clusterI;
@@ -1203,7 +1203,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
     uint8_t * ptr;
     uint16_t epCount = emberAfEndpointCount();
     uint8_t attrData[ATTRIBUTE_LARGEST];
-    auto * attrStorage = ignoreStorage ? nullptr : app::GetAttributePersistenceProvider();
+    auto * attrStorage = app::GetAttributePersistenceProvider();
     // Don't check whether we actually have an attrStorage here, because it's OK
     // to have one if none of our attributes have NVM storage.
 
@@ -1245,7 +1245,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 ptr                                 = nullptr; // Will get set to the value to write, as needed.
 
                 // First check for a persisted value.
-                if (!ignoreStorage && am->IsAutomaticallyPersisted())
+                if (am->IsAutomaticallyPersisted())
                 {
                     VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
@@ -1328,10 +1328,6 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                                              ptr,
                                              0,     // buffer size - unused
                                              true); // write?
-                    if (ignoreStorage)
-                    {
-                        emAfSaveAttributeToStorageIfNeeded(ptr, de->endpoint, record.clusterId, am);
-                    }
                 }
             }
         }
