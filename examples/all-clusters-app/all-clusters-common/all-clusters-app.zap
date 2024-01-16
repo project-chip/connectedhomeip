@@ -6464,8 +6464,8 @@
           ]
         },
         {
-          "name": "Scenes",
-          "code": 5,
+          "name": "Scenes Management",
+          "code": 98,
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
@@ -22086,8 +22086,8 @@
           ]
         },
         {
-          "name": "Scenes",
-          "code": 5,
+          "name": "Scenes Management",
+          "code": 98,
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",

@@ -583,721 +583,6 @@ class Groups(Cluster):
 
 
 @dataclass
-class Scenes(Cluster):
-    id: typing.ClassVar[int] = 0x00000005
-
-    @ChipUtility.classproperty
-    def descriptor(cls) -> ClusterObjectDescriptor:
-        return ClusterObjectDescriptor(
-            Fields=[
-                ClusterObjectFieldDescriptor(Label="sceneCount", Tag=0x00000000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="currentScene", Tag=0x00000001, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="currentGroup", Tag=0x00000002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="sceneValid", Tag=0x00000003, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="nameSupport", Tag=0x00000004, Type=uint),
-                ClusterObjectFieldDescriptor(Label="lastConfiguredBy", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="sceneTableSize", Tag=0x00000006, Type=uint),
-                ClusterObjectFieldDescriptor(Label="fabricSceneInfo", Tag=0x00000007, Type=typing.List[Scenes.Structs.SceneInfoStruct]),
-                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
-                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
-            ])
-
-    sceneCount: 'typing.Optional[uint]' = None
-    currentScene: 'typing.Optional[uint]' = None
-    currentGroup: 'typing.Optional[uint]' = None
-    sceneValid: 'typing.Optional[bool]' = None
-    nameSupport: 'uint' = None
-    lastConfiguredBy: 'typing.Union[None, Nullable, uint]' = None
-    sceneTableSize: 'uint' = None
-    fabricSceneInfo: 'typing.List[Scenes.Structs.SceneInfoStruct]' = None
-    generatedCommandList: 'typing.List[uint]' = None
-    acceptedCommandList: 'typing.List[uint]' = None
-    eventList: 'typing.List[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'uint' = None
-    clusterRevision: 'uint' = None
-
-    class Bitmaps:
-        class CopyModeBitmap(IntFlag):
-            kCopyAllScenes = 0x1
-
-        class Feature(IntFlag):
-            kSceneNames = 0x1
-            kExplicit = 0x2
-            kTableSize = 0x4
-            kFabricScenes = 0x8
-
-        class NameSupportBitmap(IntFlag):
-            kSceneNames = 0x80
-
-    class Structs:
-        @dataclass
-        class AttributeValuePair(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="attributeValue", Tag=1, Type=uint),
-                    ])
-
-            attributeID: 'uint' = 0
-            attributeValue: 'uint' = 0
-
-        @dataclass
-        class ExtensionFieldSet(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="clusterID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="attributeValueList", Tag=1, Type=typing.List[Scenes.Structs.AttributeValuePair]),
-                    ])
-
-            clusterID: 'uint' = 0
-            attributeValueList: 'typing.List[Scenes.Structs.AttributeValuePair]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class SceneInfoStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="sceneCount", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="currentScene", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="currentGroup", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneValid", Tag=3, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="remainingCapacity", Tag=4, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
-                    ])
-
-            sceneCount: 'uint' = 0
-            currentScene: 'uint' = 0
-            currentGroup: 'uint' = 0
-            sceneValid: 'bool' = False
-            remainingCapacity: 'uint' = 0
-            fabricIndex: 'uint' = 0
-
-    class Commands:
-        @dataclass
-        class AddScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000000
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'AddSceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=4, Type=typing.List[Scenes.Structs.ExtensionFieldSet]),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-            transitionTime: 'uint' = 0
-            sceneName: 'str' = ""
-            extensionFieldSets: 'typing.List[Scenes.Structs.ExtensionFieldSet]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class AddSceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000000
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class ViewScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000001
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'ViewSceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class ViewSceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000001
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=3, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=4, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=5, Type=typing.Optional[typing.List[Scenes.Structs.ExtensionFieldSet]]),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-            transitionTime: 'typing.Optional[uint]' = None
-            sceneName: 'typing.Optional[str]' = None
-            extensionFieldSets: 'typing.Optional[typing.List[Scenes.Structs.ExtensionFieldSet]]' = None
-
-        @dataclass
-        class RemoveScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000002
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'RemoveSceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class RemoveSceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000002
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class RemoveAllScenes(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'RemoveAllScenesResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                    ])
-
-            groupID: 'uint' = 0
-
-        @dataclass
-        class RemoveAllScenesResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-
-        @dataclass
-        class StoreScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'StoreSceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class StoreSceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class RecallScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000005
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-            transitionTime: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
-        class GetSceneMembership(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000006
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'GetSceneMembershipResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                    ])
-
-            groupID: 'uint' = 0
-
-        @dataclass
-        class GetSceneMembershipResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000006
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="capacity", Tag=1, Type=typing.Union[Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneList", Tag=3, Type=typing.Optional[typing.List[uint]]),
-                    ])
-
-            status: 'uint' = 0
-            capacity: 'typing.Union[Nullable, uint]' = NullValue
-            groupID: 'uint' = 0
-            sceneList: 'typing.Optional[typing.List[uint]]' = None
-
-        @dataclass
-        class EnhancedAddScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000040
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'EnhancedAddSceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=4, Type=typing.List[Scenes.Structs.ExtensionFieldSet]),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-            transitionTime: 'uint' = 0
-            sceneName: 'str' = ""
-            extensionFieldSets: 'typing.List[Scenes.Structs.ExtensionFieldSet]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class EnhancedAddSceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000040
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class EnhancedViewScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000041
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'EnhancedViewSceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
-                    ])
-
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-
-        @dataclass
-        class EnhancedViewSceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000041
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=3, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=4, Type=typing.Optional[str]),
-                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=5, Type=typing.Optional[typing.List[Scenes.Structs.ExtensionFieldSet]]),
-                    ])
-
-            status: 'uint' = 0
-            groupID: 'uint' = 0
-            sceneID: 'uint' = 0
-            transitionTime: 'typing.Optional[uint]' = None
-            sceneName: 'typing.Optional[str]' = None
-            extensionFieldSets: 'typing.Optional[typing.List[Scenes.Structs.ExtensionFieldSet]]' = None
-
-        @dataclass
-        class CopyScene(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000042
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'CopySceneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="mode", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupIdentifierFrom", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneIdentifierFrom", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupIdentifierTo", Tag=3, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneIdentifierTo", Tag=4, Type=uint),
-                    ])
-
-            mode: 'uint' = 0
-            groupIdentifierFrom: 'uint' = 0
-            sceneIdentifierFrom: 'uint' = 0
-            groupIdentifierTo: 'uint' = 0
-            sceneIdentifierTo: 'uint' = 0
-
-        @dataclass
-        class CopySceneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000005
-            command_id: typing.ClassVar[int] = 0x00000042
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[str] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="groupIdentifierFrom", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="sceneIdentifierFrom", Tag=2, Type=uint),
-                    ])
-
-            status: 'uint' = 0
-            groupIdentifierFrom: 'uint' = 0
-            sceneIdentifierFrom: 'uint' = 0
-
-    class Attributes:
-        @dataclass
-        class SceneCount(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class CurrentScene(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class CurrentGroup(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000002
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class SceneValid(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000003
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
-
-            value: 'typing.Optional[bool]' = None
-
-        @dataclass
-        class NameSupport(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000004
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = 0
-
-        @dataclass
-        class LastConfiguredBy(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
-        class SceneTableSize(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000006
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = 0
-
-        @dataclass
-        class FabricSceneInfo(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000007
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[Scenes.Structs.SceneInfoStruct])
-
-            value: 'typing.List[Scenes.Structs.SceneInfoStruct]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class GeneratedCommandList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFF8
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class AcceptedCommandList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFF9
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class EventList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFA
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class AttributeList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFB
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = 0
-
-        @dataclass
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000005
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = 0
-
-
-@dataclass
 class OnOff(Cluster):
     id: typing.ClassVar[int] = 0x00000006
 
@@ -20936,6 +20221,721 @@ class RvcOperationalState(Cluster):
             completionErrorCode: 'uint' = 0
             totalOperationalTime: 'typing.Union[None, Nullable, uint]' = None
             pausedTime: 'typing.Union[None, Nullable, uint]' = None
+
+
+@dataclass
+class ScenesManagement(Cluster):
+    id: typing.ClassVar[int] = 0x00000062
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields=[
+                ClusterObjectFieldDescriptor(Label="sceneCount", Tag=0x00000000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="currentScene", Tag=0x00000001, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="currentGroup", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="sceneValid", Tag=0x00000003, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="nameSupport", Tag=0x00000004, Type=uint),
+                ClusterObjectFieldDescriptor(Label="lastConfiguredBy", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="sceneTableSize", Tag=0x00000006, Type=uint),
+                ClusterObjectFieldDescriptor(Label="fabricSceneInfo", Tag=0x00000007, Type=typing.List[ScenesManagement.Structs.SceneInfoStruct]),
+                ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
+                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
+                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+            ])
+
+    sceneCount: 'typing.Optional[uint]' = None
+    currentScene: 'typing.Optional[uint]' = None
+    currentGroup: 'typing.Optional[uint]' = None
+    sceneValid: 'typing.Optional[bool]' = None
+    nameSupport: 'uint' = None
+    lastConfiguredBy: 'typing.Union[None, Nullable, uint]' = None
+    sceneTableSize: 'uint' = None
+    fabricSceneInfo: 'typing.List[ScenesManagement.Structs.SceneInfoStruct]' = None
+    generatedCommandList: 'typing.List[uint]' = None
+    acceptedCommandList: 'typing.List[uint]' = None
+    eventList: 'typing.List[uint]' = None
+    attributeList: 'typing.List[uint]' = None
+    featureMap: 'uint' = None
+    clusterRevision: 'uint' = None
+
+    class Bitmaps:
+        class CopyModeBitmap(IntFlag):
+            kCopyAllScenes = 0x1
+
+        class Feature(IntFlag):
+            kSceneNames = 0x1
+            kExplicit = 0x2
+            kTableSize = 0x4
+            kFabricScenes = 0x8
+
+        class NameSupportBitmap(IntFlag):
+            kSceneNames = 0x80
+
+    class Structs:
+        @dataclass
+        class AttributeValuePair(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="attributeID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="attributeValue", Tag=1, Type=uint),
+                    ])
+
+            attributeID: 'uint' = 0
+            attributeValue: 'uint' = 0
+
+        @dataclass
+        class ExtensionFieldSet(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="clusterID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="attributeValueList", Tag=1, Type=typing.List[ScenesManagement.Structs.AttributeValuePair]),
+                    ])
+
+            clusterID: 'uint' = 0
+            attributeValueList: 'typing.List[ScenesManagement.Structs.AttributeValuePair]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class SceneInfoStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="sceneCount", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="currentScene", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="currentGroup", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneValid", Tag=3, Type=bool),
+                        ClusterObjectFieldDescriptor(Label="remainingCapacity", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
+                    ])
+
+            sceneCount: 'uint' = 0
+            currentScene: 'uint' = 0
+            currentGroup: 'uint' = 0
+            sceneValid: 'bool' = False
+            remainingCapacity: 'uint' = 0
+            fabricIndex: 'uint' = 0
+
+    class Commands:
+        @dataclass
+        class AddScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'AddSceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=4, Type=typing.List[ScenesManagement.Structs.ExtensionFieldSet]),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+            transitionTime: 'uint' = 0
+            sceneName: 'str' = ""
+            extensionFieldSets: 'typing.List[ScenesManagement.Structs.ExtensionFieldSet]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AddSceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000000
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class ViewScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'ViewSceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class ViewSceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=4, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=5, Type=typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+            transitionTime: 'typing.Optional[uint]' = None
+            sceneName: 'typing.Optional[str]' = None
+            extensionFieldSets: 'typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]' = None
+
+        @dataclass
+        class RemoveScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'RemoveSceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class RemoveSceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class RemoveAllScenes(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'RemoveAllScenesResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                    ])
+
+            groupID: 'uint' = 0
+
+        @dataclass
+        class RemoveAllScenesResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000003
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+
+        @dataclass
+        class StoreScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'StoreSceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class StoreSceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000004
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class RecallScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000005
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=typing.Union[None, Nullable, uint]),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+            transitionTime: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class GetSceneMembership(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'GetSceneMembershipResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                    ])
+
+            groupID: 'uint' = 0
+
+        @dataclass
+        class GetSceneMembershipResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000006
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="capacity", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneList", Tag=3, Type=typing.Optional[typing.List[uint]]),
+                    ])
+
+            status: 'uint' = 0
+            capacity: 'typing.Union[Nullable, uint]' = NullValue
+            groupID: 'uint' = 0
+            sceneList: 'typing.Optional[typing.List[uint]]' = None
+
+        @dataclass
+        class EnhancedAddScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000040
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'EnhancedAddSceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=4, Type=typing.List[ScenesManagement.Structs.ExtensionFieldSet]),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+            transitionTime: 'uint' = 0
+            sceneName: 'str' = ""
+            extensionFieldSets: 'typing.List[ScenesManagement.Structs.ExtensionFieldSet]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EnhancedAddSceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000040
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class EnhancedViewScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000041
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'EnhancedViewSceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=1, Type=uint),
+                    ])
+
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+
+        @dataclass
+        class EnhancedViewSceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000041
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneID", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="transitionTime", Tag=3, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="sceneName", Tag=4, Type=typing.Optional[str]),
+                        ClusterObjectFieldDescriptor(Label="extensionFieldSets", Tag=5, Type=typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]),
+                    ])
+
+            status: 'uint' = 0
+            groupID: 'uint' = 0
+            sceneID: 'uint' = 0
+            transitionTime: 'typing.Optional[uint]' = None
+            sceneName: 'typing.Optional[str]' = None
+            extensionFieldSets: 'typing.Optional[typing.List[ScenesManagement.Structs.ExtensionFieldSet]]' = None
+
+        @dataclass
+        class CopyScene(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000042
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'CopySceneResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mode", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupIdentifierFrom", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneIdentifierFrom", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupIdentifierTo", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneIdentifierTo", Tag=4, Type=uint),
+                    ])
+
+            mode: 'uint' = 0
+            groupIdentifierFrom: 'uint' = 0
+            sceneIdentifierFrom: 'uint' = 0
+            groupIdentifierTo: 'uint' = 0
+            sceneIdentifierTo: 'uint' = 0
+
+        @dataclass
+        class CopySceneResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000062
+            command_id: typing.ClassVar[int] = 0x00000042
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="groupIdentifierFrom", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="sceneIdentifierFrom", Tag=2, Type=uint),
+                    ])
+
+            status: 'uint' = 0
+            groupIdentifierFrom: 'uint' = 0
+            sceneIdentifierFrom: 'uint' = 0
+
+    class Attributes:
+        @dataclass
+        class SceneCount(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class CurrentScene(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class CurrentGroup(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class SceneValid(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class NameSupport(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class LastConfiguredBy(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: 'typing.Union[None, Nullable, uint]' = None
+
+        @dataclass
+        class SceneTableSize(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class FabricSceneInfo(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ScenesManagement.Structs.SceneInfoStruct])
+
+            value: 'typing.List[ScenesManagement.Structs.SceneInfoStruct]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class GeneratedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF8
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AcceptedCommandList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFF9
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class EventList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFA
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class AttributeList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFB
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000062
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
 
 
 @dataclass

@@ -24,249 +24,6 @@ import java.util.Optional;
 import static chip.devicecontroller.ChipTLVType.*;
 
 public class ChipStructs {
-public static class ScenesClusterAttributeValuePair {
-  public Long attributeID;
-  public Long attributeValue;
-  private static final long ATTRIBUTE_I_D_ID = 0L;
-  private static final long ATTRIBUTE_VALUE_ID = 1L;
-
-  public ScenesClusterAttributeValuePair(
-    Long attributeID,
-    Long attributeValue
-  ) {
-    this.attributeID = attributeID;
-    this.attributeValue = attributeValue;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(ATTRIBUTE_I_D_ID, new UIntType(attributeID)));
-    values.add(new StructElement(ATTRIBUTE_VALUE_ID, new UIntType(attributeValue)));
-
-    return new StructType(values);
-  }
-
-  public static ScenesClusterAttributeValuePair decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long attributeID = null;
-    Long attributeValue = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == ATTRIBUTE_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          attributeID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == ATTRIBUTE_VALUE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          attributeValue = castingValue.value(Long.class);
-        }
-      }
-    }
-    return new ScenesClusterAttributeValuePair(
-      attributeID,
-      attributeValue
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ScenesClusterAttributeValuePair {\n");
-    output.append("\tattributeID: ");
-    output.append(attributeID);
-    output.append("\n");
-    output.append("\tattributeValue: ");
-    output.append(attributeValue);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ScenesClusterExtensionFieldSet {
-  public Long clusterID;
-  public ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList;
-  private static final long CLUSTER_I_D_ID = 0L;
-  private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
-
-  public ScenesClusterExtensionFieldSet(
-    Long clusterID,
-    ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList
-  ) {
-    this.clusterID = clusterID;
-    this.attributeValueList = attributeValueList;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(CLUSTER_I_D_ID, new UIntType(clusterID)));
-    values.add(new StructElement(ATTRIBUTE_VALUE_LIST_ID, ArrayType.generateArrayType(attributeValueList, (elementattributeValueList) -> elementattributeValueList.encodeTlv())));
-
-    return new StructType(values);
-  }
-
-  public static ScenesClusterExtensionFieldSet decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Long clusterID = null;
-    ArrayList<ChipStructs.ScenesClusterAttributeValuePair> attributeValueList = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == CLUSTER_I_D_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          clusterID = castingValue.value(Long.class);
-        }
-      } else if (element.contextTagNum() == ATTRIBUTE_VALUE_LIST_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-          ArrayType castingValue = element.value(ArrayType.class);
-          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesClusterAttributeValuePair.decodeTlv(elementcastingValue));
-        }
-      }
-    }
-    return new ScenesClusterExtensionFieldSet(
-      clusterID,
-      attributeValueList
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ScenesClusterExtensionFieldSet {\n");
-    output.append("\tclusterID: ");
-    output.append(clusterID);
-    output.append("\n");
-    output.append("\tattributeValueList: ");
-    output.append(attributeValueList);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ScenesClusterSceneInfoStruct {
-  public Integer sceneCount;
-  public Integer currentScene;
-  public Integer currentGroup;
-  public Boolean sceneValid;
-  public Integer remainingCapacity;
-  public Integer fabricIndex;
-  private static final long SCENE_COUNT_ID = 0L;
-  private static final long CURRENT_SCENE_ID = 1L;
-  private static final long CURRENT_GROUP_ID = 2L;
-  private static final long SCENE_VALID_ID = 3L;
-  private static final long REMAINING_CAPACITY_ID = 4L;
-  private static final long FABRIC_INDEX_ID = 254L;
-
-  public ScenesClusterSceneInfoStruct(
-    Integer sceneCount,
-    Integer currentScene,
-    Integer currentGroup,
-    Boolean sceneValid,
-    Integer remainingCapacity,
-    Integer fabricIndex
-  ) {
-    this.sceneCount = sceneCount;
-    this.currentScene = currentScene;
-    this.currentGroup = currentGroup;
-    this.sceneValid = sceneValid;
-    this.remainingCapacity = remainingCapacity;
-    this.fabricIndex = fabricIndex;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(SCENE_COUNT_ID, new UIntType(sceneCount)));
-    values.add(new StructElement(CURRENT_SCENE_ID, new UIntType(currentScene)));
-    values.add(new StructElement(CURRENT_GROUP_ID, new UIntType(currentGroup)));
-    values.add(new StructElement(SCENE_VALID_ID, new BooleanType(sceneValid)));
-    values.add(new StructElement(REMAINING_CAPACITY_ID, new UIntType(remainingCapacity)));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
-
-    return new StructType(values);
-  }
-
-  public static ScenesClusterSceneInfoStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer sceneCount = null;
-    Integer currentScene = null;
-    Integer currentGroup = null;
-    Boolean sceneValid = null;
-    Integer remainingCapacity = null;
-    Integer fabricIndex = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == SCENE_COUNT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          sceneCount = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == CURRENT_SCENE_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currentScene = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == CURRENT_GROUP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          currentGroup = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == SCENE_VALID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          sceneValid = castingValue.value(Boolean.class);
-        }
-      } else if (element.contextTagNum() == REMAINING_CAPACITY_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          remainingCapacity = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
-      }
-    }
-    return new ScenesClusterSceneInfoStruct(
-      sceneCount,
-      currentScene,
-      currentGroup,
-      sceneValid,
-      remainingCapacity,
-      fabricIndex
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ScenesClusterSceneInfoStruct {\n");
-    output.append("\tsceneCount: ");
-    output.append(sceneCount);
-    output.append("\n");
-    output.append("\tcurrentScene: ");
-    output.append(currentScene);
-    output.append("\n");
-    output.append("\tcurrentGroup: ");
-    output.append(currentGroup);
-    output.append("\n");
-    output.append("\tsceneValid: ");
-    output.append(sceneValid);
-    output.append("\n");
-    output.append("\tremainingCapacity: ");
-    output.append(remainingCapacity);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class DescriptorClusterDeviceTypeStruct {
   public Long deviceType;
   public Integer revision;
@@ -5301,6 +5058,249 @@ public static class RvcOperationalStateClusterOperationalStateStruct {
     output.append("\n");
     output.append("\toperationalStateLabel: ");
     output.append(operationalStateLabel);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ScenesManagementClusterAttributeValuePair {
+  public Long attributeID;
+  public Long attributeValue;
+  private static final long ATTRIBUTE_I_D_ID = 0L;
+  private static final long ATTRIBUTE_VALUE_ID = 1L;
+
+  public ScenesManagementClusterAttributeValuePair(
+    Long attributeID,
+    Long attributeValue
+  ) {
+    this.attributeID = attributeID;
+    this.attributeValue = attributeValue;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ATTRIBUTE_I_D_ID, new UIntType(attributeID)));
+    values.add(new StructElement(ATTRIBUTE_VALUE_ID, new UIntType(attributeValue)));
+
+    return new StructType(values);
+  }
+
+  public static ScenesManagementClusterAttributeValuePair decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long attributeID = null;
+    Long attributeValue = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ATTRIBUTE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          attributeID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ATTRIBUTE_VALUE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          attributeValue = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ScenesManagementClusterAttributeValuePair(
+      attributeID,
+      attributeValue
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ScenesManagementClusterAttributeValuePair {\n");
+    output.append("\tattributeID: ");
+    output.append(attributeID);
+    output.append("\n");
+    output.append("\tattributeValue: ");
+    output.append(attributeValue);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ScenesManagementClusterExtensionFieldSet {
+  public Long clusterID;
+  public ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList;
+  private static final long CLUSTER_I_D_ID = 0L;
+  private static final long ATTRIBUTE_VALUE_LIST_ID = 1L;
+
+  public ScenesManagementClusterExtensionFieldSet(
+    Long clusterID,
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList
+  ) {
+    this.clusterID = clusterID;
+    this.attributeValueList = attributeValueList;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CLUSTER_I_D_ID, new UIntType(clusterID)));
+    values.add(new StructElement(ATTRIBUTE_VALUE_LIST_ID, ArrayType.generateArrayType(attributeValueList, (elementattributeValueList) -> elementattributeValueList.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static ScenesManagementClusterExtensionFieldSet decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long clusterID = null;
+    ArrayList<ChipStructs.ScenesManagementClusterAttributeValuePair> attributeValueList = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CLUSTER_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          clusterID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == ATTRIBUTE_VALUE_LIST_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          attributeValueList = castingValue.map((elementcastingValue) -> ChipStructs.ScenesManagementClusterAttributeValuePair.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ScenesManagementClusterExtensionFieldSet(
+      clusterID,
+      attributeValueList
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ScenesManagementClusterExtensionFieldSet {\n");
+    output.append("\tclusterID: ");
+    output.append(clusterID);
+    output.append("\n");
+    output.append("\tattributeValueList: ");
+    output.append(attributeValueList);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class ScenesManagementClusterSceneInfoStruct {
+  public Integer sceneCount;
+  public Integer currentScene;
+  public Integer currentGroup;
+  public Boolean sceneValid;
+  public Integer remainingCapacity;
+  public Integer fabricIndex;
+  private static final long SCENE_COUNT_ID = 0L;
+  private static final long CURRENT_SCENE_ID = 1L;
+  private static final long CURRENT_GROUP_ID = 2L;
+  private static final long SCENE_VALID_ID = 3L;
+  private static final long REMAINING_CAPACITY_ID = 4L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public ScenesManagementClusterSceneInfoStruct(
+    Integer sceneCount,
+    Integer currentScene,
+    Integer currentGroup,
+    Boolean sceneValid,
+    Integer remainingCapacity,
+    Integer fabricIndex
+  ) {
+    this.sceneCount = sceneCount;
+    this.currentScene = currentScene;
+    this.currentGroup = currentGroup;
+    this.sceneValid = sceneValid;
+    this.remainingCapacity = remainingCapacity;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(SCENE_COUNT_ID, new UIntType(sceneCount)));
+    values.add(new StructElement(CURRENT_SCENE_ID, new UIntType(currentScene)));
+    values.add(new StructElement(CURRENT_GROUP_ID, new UIntType(currentGroup)));
+    values.add(new StructElement(SCENE_VALID_ID, new BooleanType(sceneValid)));
+    values.add(new StructElement(REMAINING_CAPACITY_ID, new UIntType(remainingCapacity)));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static ScenesManagementClusterSceneInfoStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer sceneCount = null;
+    Integer currentScene = null;
+    Integer currentGroup = null;
+    Boolean sceneValid = null;
+    Integer remainingCapacity = null;
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == SCENE_COUNT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          sceneCount = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_SCENE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentScene = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CURRENT_GROUP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          currentGroup = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == SCENE_VALID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
+          BooleanType castingValue = element.value(BooleanType.class);
+          sceneValid = castingValue.value(Boolean.class);
+        }
+      } else if (element.contextTagNum() == REMAINING_CAPACITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          remainingCapacity = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new ScenesManagementClusterSceneInfoStruct(
+      sceneCount,
+      currentScene,
+      currentGroup,
+      sceneValid,
+      remainingCapacity,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ScenesManagementClusterSceneInfoStruct {\n");
+    output.append("\tsceneCount: ");
+    output.append(sceneCount);
+    output.append("\n");
+    output.append("\tcurrentScene: ");
+    output.append(currentScene);
+    output.append("\n");
+    output.append("\tcurrentGroup: ");
+    output.append(currentGroup);
+    output.append("\n");
+    output.append("\tsceneValid: ");
+    output.append(sceneValid);
+    output.append("\n");
+    output.append("\tremainingCapacity: ");
+    output.append(remainingCapacity);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();
