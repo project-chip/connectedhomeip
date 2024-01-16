@@ -2422,6 +2422,10 @@ namespace UserActiveModeTriggerInstruction {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace UserActiveModeTriggerInstruction
 
+namespace OperatingMode {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace OperatingMode
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

@@ -34,7 +34,7 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/lib/dnssd/minimal_mdns",
     "${chip_root}/src/lib/dnssd/minimal_mdns:default_policy",
     "${chip_root}/src/lib/dnssd/minimal_mdns/responders",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

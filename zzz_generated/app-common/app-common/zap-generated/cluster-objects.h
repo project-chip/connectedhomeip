@@ -14403,6 +14403,18 @@ struct TypeInfo
     static constexpr size_t MaxLength() { return 128; }
 };
 } // namespace UserActiveModeTriggerInstruction
+namespace OperatingMode {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::IcdManagement::OperatingModeEnum;
+    using DecodableType    = chip::app::Clusters::IcdManagement::OperatingModeEnum;
+    using DecodableArgType = chip::app::Clusters::IcdManagement::OperatingModeEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace OperatingMode
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -14457,6 +14469,8 @@ struct TypeInfo
         Attributes::UserActiveModeTriggerHint::TypeInfo::DecodableType userActiveModeTriggerHint =
             static_cast<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>(0);
         Attributes::UserActiveModeTriggerInstruction::TypeInfo::DecodableType userActiveModeTriggerInstruction;
+        Attributes::OperatingMode::TypeInfo::DecodableType operatingMode =
+            static_cast<chip::app::Clusters::IcdManagement::OperatingModeEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

@@ -2785,6 +2785,62 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster OvenMode = 73 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kBake = 16384;
+    kConvection = 16385;
+    kGrill = 16386;
+    kRoast = 16387;
+    kClean = 16388;
+    kConvectionBake = 16389;
+    kConvectionRoast = 16390;
+    kWarming = 16391;
+    kProofing = 16392;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
 /** This cluster supports remotely monitoring and controling the different typs of
             functionality available to a drying device, such as a laundry dryer. */
 cluster LaundryDryerControls = 74 {
@@ -2950,7 +3006,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+/** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
   revision 1;
 
@@ -3658,6 +3714,130 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
   /** Reset the condition of the replaceable to the non degraded state */
   command ResetCondition(): DefaultSuccess = 0;
+}
+
+/** This cluster is used to configure a boolean sensor. */
+provisional cluster BooleanStateConfiguration = 128 {
+  revision 1;
+
+  bitmap AlarmModeBitmap : bitmap8 {
+    kVisual = 0x1;
+    kAudible = 0x2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kVisual = 0x1;
+    kAudible = 0x2;
+    kAlarmSuppress = 0x4;
+    kSensitivityLevel = 0x8;
+  }
+
+  bitmap SensorFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+  }
+
+  info event AlarmsStateChanged = 0 {
+    AlarmModeBitmap alarmsActive = 0;
+    optional AlarmModeBitmap alarmsSuppressed = 1;
+  }
+
+  info event SensorFault = 1 {
+    SensorFaultBitmap sensorFault = 0;
+  }
+
+  attribute optional int8u currentSensitivityLevel = 0;
+  readonly attribute optional int8u supportedSensitivityLevels = 1;
+  readonly attribute optional int8u defaultSensitivityLevel = 2;
+  readonly attribute optional AlarmModeBitmap alarmsActive = 3;
+  readonly attribute optional AlarmModeBitmap alarmsSuppressed = 4;
+  readonly attribute optional AlarmModeBitmap alarmsEnabled = 5;
+  readonly attribute optional AlarmModeBitmap alarmsSupported = 6;
+  readonly attribute optional SensorFaultBitmap sensorFault = 7;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SuppressAlarmRequest {
+    AlarmModeBitmap alarmsToSuppress = 0;
+  }
+
+  request struct EnableDisableAlarmRequest {
+    AlarmModeBitmap alarmsToEnableDisable = 0;
+  }
+
+  /** This command is used to suppress the specified alarm mode. */
+  command SuppressAlarm(SuppressAlarmRequest): DefaultSuccess = 0;
+  /** This command is used to enable or disable the specified alarm mode. */
+  command EnableDisableAlarm(EnableDisableAlarmRequest): DefaultSuccess = 1;
+}
+
+/** This cluster is used to configure a valve. */
+provisional cluster ValveConfigurationAndControl = 129 {
+  revision 1;
+
+  enum StatusCodeEnum : enum8 {
+    kFailureDueToFault = 2;
+  }
+
+  enum ValveStateEnum : enum8 {
+    kClosed = 0;
+    kOpen = 1;
+    kTransitioning = 2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kTimeSync = 0x1;
+    kLevel = 0x2;
+  }
+
+  bitmap ValveFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+    kBlocked = 0x2;
+    kLeaking = 0x4;
+    kNotConnected = 0x8;
+    kShortCircuit = 0x10;
+    kCurrentExceeded = 0x20;
+  }
+
+  info event ValveStateChanged = 0 {
+    ValveStateEnum valveState = 0;
+    optional percent valveLevel = 1;
+  }
+
+  info event ValveFault = 1 {
+    ValveFaultBitmap valveFault = 0;
+  }
+
+  readonly attribute nullable elapsed_s openDuration = 0;
+  attribute nullable elapsed_s defaultOpenDuration = 1;
+  readonly attribute optional nullable epoch_us autoCloseTime = 2;
+  readonly attribute nullable elapsed_s remainingDuration = 3;
+  readonly attribute nullable ValveStateEnum currentState = 4;
+  readonly attribute nullable ValveStateEnum targetState = 5;
+  readonly attribute optional nullable percent currentLevel = 6;
+  readonly attribute optional nullable percent targetLevel = 7;
+  attribute optional percent defaultOpenLevel = 8;
+  readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute optional int8u levelStep = 10;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OpenRequest {
+    optional nullable elapsed_s openDuration = 0;
+    optional percent targetLevel = 1;
+  }
+
+  /** This command is used to set the valve to its open position. */
+  command Open(OpenRequest): DefaultSuccess = 0;
+  /** This command is used to set the valve to its closed position. */
+  command Close(): DefaultSuccess = 1;
 }
 
 /** This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server. */
@@ -7080,6 +7260,17 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster OvenMode {
+    callback attribute supportedModes;
+    ram      attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster LaundryDryerControls {
     callback attribute supportedDrynessLevels;
     ram      attribute selectedDrynessLevel;
@@ -7357,6 +7548,53 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCondition;
+  }
+
+  server cluster BooleanStateConfiguration {
+    emits event AlarmsStateChanged;
+    emits event SensorFault;
+    callback attribute currentSensitivityLevel;
+    ram      attribute supportedSensitivityLevels default = 3;
+    ram      attribute defaultSensitivityLevel default = 2;
+    ram      attribute alarmsActive;
+    ram      attribute alarmsSuppressed;
+    persist  attribute alarmsEnabled;
+    ram      attribute alarmsSupported default = 0x03;
+    ram      attribute sensorFault default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0F;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SuppressAlarm;
+    handle command EnableDisableAlarm;
+  }
+
+  server cluster ValveConfigurationAndControl {
+    emits event ValveStateChanged;
+    emits event ValveFault;
+    ram      attribute openDuration;
+    persist  attribute defaultOpenDuration;
+    ram      attribute autoCloseTime;
+    callback attribute remainingDuration;
+    ram      attribute currentState;
+    ram      attribute targetState;
+    ram      attribute currentLevel;
+    ram      attribute targetLevel;
+    persist  attribute defaultOpenLevel default = 100;
+    ram      attribute valveFault default = 0;
+    ram      attribute levelStep default = 1;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 3;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Open;
+    handle command Close;
   }
 
   server cluster ElectricalEnergyMeasurement {
