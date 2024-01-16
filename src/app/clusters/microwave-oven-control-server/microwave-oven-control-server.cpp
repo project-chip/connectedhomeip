@@ -59,33 +59,27 @@ Instance::~Instance()
 CHIP_ERROR Instance::Init()
 {
     // Check if the cluster has been selected in zap
-    if (!emberAfContainsServer(mEndpointId, mClusterId))
-    {
-        ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId));
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrReturnError(emberAfContainsServer(mEndpointId, mClusterId), 
+                        CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId)));
+
     // Exactly one of the PowerAsNumber and PowerInWatts features must be supported, per spec.
-    if ((!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) &&
-         !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)))
-    {
-        ChipLogError(Zcl, "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts and PowerAsNumber");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrReturnError(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts), 
+                        CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl, "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts and PowerAsNumber"));
+
     // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
-    if ((mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) && mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)))
-    {
-        ChipLogError(Zcl,
-                     "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrReturnError(!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts), 
+                        CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl,
+                        "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts"));
+                        
     // Per spec, the PowerNumberLimits feature is only allowed if the PowerAsNumber feature is supported.
-    if ((mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) &&
-         !mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber)))
-    {
-        ChipLogError(
-            Zcl, "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber");
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
+    VerifyOrReturnError(!mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber), 
+                        CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Zcl,
+                        "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
+                        
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
@@ -93,7 +87,9 @@ CHIP_ERROR Instance::Init()
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
         mSupportedWattLevels = GetCountOfSupportedWattLevels();
-        VerifyOrReturnError(mSupportedWattLevels > 0, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mSupportedWattLevels > 0, 
+                            CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "Microwave Oven Control: supported watt levels is empty"));
     }
     return CHIP_NO_ERROR;
 }
@@ -135,110 +131,88 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case MicrowaveOvenControl::Attributes::CookTime::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetCookTimeSec()));
-        break;
+        return aEncoder.Encode(GetCookTimeSec());
 
     case MicrowaveOvenControl::Attributes::MaxCookTime::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetMaxCookTimeSec()));
-        break;
+        return aEncoder.Encode(mDelegate->GetMaxCookTimeSec());
 
     case MicrowaveOvenControl::Attributes::PowerSetting::Id:
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetPowerSettingNum()));
-        }
-        else
-        {
-            ChipLogError(Zcl, "Microwave Oven Control: can not get PowerSetting number, feature is not supported");
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        break;
+        VerifyOrReturnError(
+            HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Microwave Oven Control: can not get PowerSetting number, feature is not supported")
+        );
+
+        return aEncoder.Encode(mDelegate->GetPowerSettingNum());
 
     case MicrowaveOvenControl::Attributes::MinPower::Id:
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(
-                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMinPowerNum() : kDefaultMinPowerNum));
-        }
-        else
-        {
-            ChipLogError(Zcl, "Microwave Oven Control: can not get MinPower number, feature is not supported");
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        break;
+        VerifyOrReturnError(
+            HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Microwave Oven Control: can not get MinPower number, feature is not supported")
+        );
+
+        return aEncoder.Encode(
+                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMinPowerNum() : kDefaultMinPowerNum);
 
     case MicrowaveOvenControl::Attributes::MaxPower::Id:
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(
-                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMaxPowerNum() : kDefaultMaxPowerNum));
-        }
-        else
-        {
-            ChipLogError(Zcl, "Microwave Oven Control: can not get MaxPower number, feature is not supported");
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        break;
+        VerifyOrReturnError(
+            HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Microwave Oven Control: can not get MaxPower number, feature is not supported")
+        );
+
+        return aEncoder.Encode(
+                HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits) ? mDelegate->GetMaxPowerNum() : kDefaultMaxPowerNum);
 
     case MicrowaveOvenControl::Attributes::PowerStep::Id:
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber))
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits)
-                                                     ? mDelegate->GetPowerStepNum()
-                                                     : kDefaultPowerStepNum));
-        }
-        else
-        {
-            ChipLogError(Zcl, "Microwave Oven Control: can not get PowerStep number, feature is not supported");
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        break;
+        VerifyOrReturnError(
+            HasFeature(MicrowaveOvenControl::Feature::kPowerAsNumber),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Microwave Oven Control: can not get PowerStep number, feature is not supported")
+        );
+
+        return aEncoder.Encode(HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits)
+                                                     ? mDelegate->GetPowerStepNum() : kDefaultPowerStepNum);
 
     case MicrowaveOvenControl::Attributes::SupportedWatts::Id:
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
-        {
-            aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
-                uint16_t wattRating;
-                uint8_t index  = 0;
-                CHIP_ERROR err = CHIP_NO_ERROR;
-                while ((err = delegate->GetWattSettingByIndex(index, wattRating)) == CHIP_NO_ERROR)
-                {
-                    ReturnErrorOnFailure(encoder.Encode(wattRating));
-                    index++;
-                }
-                if (err == CHIP_ERROR_NOT_FOUND)
-                {
-                    return CHIP_NO_ERROR;
-                }
-                return err;
-            });
-        }
-        else
-        {
-            ChipLogError(Zcl, "Microwave Oven Control: can not get SuppoertWatts list, feature is not supported");
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        break;
+        VerifyOrReturnError(
+            HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Microwave Oven Control: can not get SuppoertWatts list, feature is not supported")
+        );
+        
+        return aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
+            uint16_t wattRating;
+            uint8_t index  = 0;
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            while ((err = delegate->GetWattSettingByIndex(index, wattRating)) == CHIP_NO_ERROR)
+            {
+                ReturnErrorOnFailure(encoder.Encode(wattRating));
+                index++;
+            }
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                return CHIP_NO_ERROR;
+            }
+            return err;
+        });
 
     case MicrowaveOvenControl::Attributes::SelectedWattIndex::Id:
-        if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
-        {
-            ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCurrentWattIndex()));
-        }
-        else
-        {
-            ChipLogError(Zcl, "Microwave Oven Control: can not get SelectedWattIndex number, feature is not supported");
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        }
-        break;
+        VerifyOrReturnError(
+            HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts),
+            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Microwave Oven Control: can not get SelectedWattIndex number, feature is not supported")
+        );
+
+        return aEncoder.Encode(mDelegate->GetCurrentWattIndex());
 
     case MicrowaveOvenControl::Attributes::WattRating::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mDelegate->GetCurrentWattRating()));
-        break;
+        return aEncoder.Encode(mDelegate->GetWattRating());
 
     case MicrowaveOvenControl::Attributes::FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
-        break;
+        return aEncoder.Encode(mFeature.Raw());
+
     }
     return CHIP_NO_ERROR;
 }
@@ -312,8 +286,8 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
     {
         // if using power as number, check if the param is invalid and set PowerSetting number.
         uint8_t reqPowerSettingNum;
-        uint8_t maxPowerNum  = kDefaultMaxPowerNum;
-        uint8_t minPowerNum  = kDefaultMinPowerNum;
+        uint8_t maxPowerNum = kDefaultMaxPowerNum;
+        uint8_t minPowerNum = kDefaultMinPowerNum;
         uint8_t powerStepNum = kDefaultPowerStepNum;
         VerifyOrExit(!wattSettingIndex.HasValue(), status = Status::InvalidCommand; ChipLogError(
             Zcl, "Microwave Oven Control: Failed to set cooking parameters, should have no value for wattSettingIndex"));
@@ -324,18 +298,17 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
 
         if (HasFeature(MicrowaveOvenControl::Feature::kPowerNumberLimits))
         {
-            maxPowerNum  = mDelegate->GetMaxPowerNum();
-            minPowerNum  = mDelegate->GetMinPowerNum();
+            maxPowerNum = mDelegate->GetMaxPowerNum();
+            minPowerNum = mDelegate->GetMinPowerNum();
             powerStepNum = mDelegate->GetPowerStepNum();
         }
         reqPowerSettingNum = powerSetting.ValueOr(maxPowerNum);
         VerifyOrExit(IsPowerSettingNumberInRange(reqPowerSettingNum, minPowerNum, maxPowerNum), status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value is out of range"));
 
-        VerifyOrExit(
-            reqPowerSettingNum % powerStepNum == 0, status = Status::InvalidCommand; ChipLogError(
-                Zcl,
-                "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
+
+        VerifyOrExit(reqPowerSettingNum % powerStepNum == 0, status = Status::InvalidCommand;
+                     ChipLogError(Zcl, "Microwave Oven Control: Failed to set PowerSetting, PowerSetting value must be multiple of PowerStep number"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting,
                                                                MakeOptional(reqPowerSettingNum), NullOptional);

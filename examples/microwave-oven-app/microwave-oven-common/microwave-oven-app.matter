@@ -1413,8 +1413,6 @@ endpoint 1 {
     callback attribute minPower;
     callback attribute maxPower;
     callback attribute powerStep;
-    callback attribute supportedWatts;
-    callback attribute selectedWattIndex;
     callback attribute wattRating;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

@@ -48,7 +48,7 @@ public:
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                       BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
-                                                                             MicrowaveOvenControl::Feature::kPowerNumberLimits),
+                                                                            MicrowaveOvenControl::Feature::kPowerNumberLimits),
                                       mOperationalStateInstance, mMicrowaveOvenModeInstance)
     {}
 
@@ -56,6 +56,7 @@ public:
      * Init all the clusters used by this device.
      */
     void MicrowaveOvenInit();
+    
 
     // delegates from MicrowaveOvenControl cluster
     /**
@@ -114,7 +115,7 @@ public:
     /**
      * Get the value of watt rating.
      */
-    uint16_t GetCurrentWattRating() const override { return mWattRating; };
+    uint16_t GetWattRating() const override { return mWattRating; };
 
     // delegates from OperationalState cluster
     using ModeTagStructType = detail::Structs::ModeTagStruct::Type;
@@ -227,7 +228,7 @@ private:
 
     // set default value for the optional attributes
     static constexpr uint8_t kMinPowerNum            = 20u;
-    static constexpr uint8_t kMaxPowerNum            = 110u;
+    static constexpr uint8_t kMaxPowerNum            = 90u;
     static constexpr uint8_t kPowerStepNum           = 10u;
     static constexpr uint32_t kMaxCookTimeSec        = 86400u;
     static constexpr uint8_t kDefaultPowerSettingNum = 100u;

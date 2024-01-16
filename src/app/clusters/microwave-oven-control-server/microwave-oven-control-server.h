@@ -173,7 +173,7 @@ public:
 
     virtual uint8_t GetCurrentWattIndex() const = 0;
 
-    virtual uint16_t GetCurrentWattRating() const = 0;
+    virtual uint16_t GetWattRating() const = 0;
 
 private:
     friend class Instance;

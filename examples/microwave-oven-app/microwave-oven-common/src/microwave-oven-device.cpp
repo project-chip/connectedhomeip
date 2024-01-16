@@ -59,7 +59,7 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
 {
     // placeholder implementation
     Status status;
-    // update cook mode
+    // Update cook mode.
     if ((status = mMicrowaveOvenModeInstance.UpdateCurrentMode(cookMode)) != Status::Success)
     {
         return status;
@@ -67,13 +67,17 @@ ExampleMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode,
 
     mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
 
-    // if using power as number, check if powerSettingNum has value before setting the power number
+    // If using power as number, check if powerSettingNum has value before setting the power number.
+    // If powerSetting field is missing in the command, the powerSettingNum passed here is handled to the max value 
+    // and user can use this value directly. 
     if (powerSettingNum.HasValue())
     {
         mPowerSettingNum = powerSettingNum.Value();
     }
 
-    // if using power in watt, check if wattSettingIndex has value before setting the watt rating and watt list index
+    // If using power in watt, check if wattSettingIndex has value before setting the watt rating and watt list index.
+    // If wattSettinIndex field is missing in the command, the wattSettingIndex passed here is handled to the max value 
+    // and user can use this value directly. 
     if (wattSettingIndex.HasValue())
     {
         mSelectedWattIndex = wattSettingIndex.Value();
