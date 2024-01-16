@@ -119,7 +119,7 @@ Blue sections can be overridden.
 -   Ember layer
 -   Override
 
-**ZAP files and implemetation**
+**ZAP files and implementation**
 
 -   For attributes marked as **“RAM”** storage in the zap file
     -   Storage allocated automatically, Ember handles read/write
