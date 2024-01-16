@@ -9386,6 +9386,17 @@ PICS:
           device?"
       id: VALCC.S.M.ManualTargetLevel
 
+    #Features
+    - label:
+          "Does the device support the ability to use UTC time is used for time
+          indications?"
+      id: VALCC.S.F00
+
+    - label:
+          "Does the device support the ability to setting the specific position
+          of the valve?"
+      id: VALCC.S.F01
+
     #Attributes
     - label: "Does the device implement the OpenDuration attribute?"
       id: VALCC.S.A0000
