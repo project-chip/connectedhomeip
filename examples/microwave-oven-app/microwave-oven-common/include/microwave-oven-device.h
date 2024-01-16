@@ -48,7 +48,7 @@ public:
         mMicrowaveOvenModeInstance(this, aClustersEndpoint, MicrowaveOvenMode::Id, 0),
         mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                       BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
-                                                                            MicrowaveOvenControl::Feature::kPowerNumberLimits),
+                                                                             MicrowaveOvenControl::Feature::kPowerNumberLimits),
                                       mOperationalStateInstance, mMicrowaveOvenModeInstance)
     {}
 
