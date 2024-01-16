@@ -129,9 +129,7 @@ static_library("ESP32") {
       ]
     }
     if (chip_mdns == "minimal") {
-      sources += [
-        "ESP32EndpointQueueFilter.h",
-      ]
+      sources += [ "ESP32EndpointQueueFilter.h" ]
     }
     if (chip_enable_route_hook) {
       sources += [
