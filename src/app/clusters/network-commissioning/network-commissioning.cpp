@@ -299,15 +299,12 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
                 return CHIP_NO_ERROR;
             });
         }
-        else
 #endif
-        {
-            return aEncoder.EncodeList([](const auto & encoder) {
-                WiFiBandEnum bands = WiFiBandEnum::k2g4;
-                ReturnErrorOnFailure(encoder.Encode(bands));
-                return CHIP_NO_ERROR;
-            });
-        }
+        return aEncoder.EncodeList([](const auto & encoder) {
+            WiFiBandEnum bands = WiFiBandEnum::k2g4;
+            ReturnErrorOnFailure(encoder.Encode(bands));
+            return CHIP_NO_ERROR;
+        });
     }
     break;
     case Attributes::SupportedThreadFeatures::Id: {
