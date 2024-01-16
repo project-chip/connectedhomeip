@@ -159,7 +159,7 @@ tests:
     - label:
           "Step 4f: Read the feature dependent(BOOLCFG.S.F02) attribute in
           AttributeList"
-      PICS: BOOLCFG.S.F00 && BOOLCFG.S.F02
+      PICS: BOOLCFG.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -168,18 +168,7 @@ tests:
               contains: [4]
 
     - label:
-          "Step 4g: Read the feature dependent(BOOLCFG.S.F02) attribute in
-          AttributeList"
-      PICS: BOOLCFG.S.F01 && BOOLCFG.S.F02
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [4]
-
-    - label:
-          "Step 4h: Read the feature dependent(BOOLCFG.S.F03) attribute in
+          "Step 4g: Read the feature dependent(BOOLCFG.S.F03) attribute in
           AttributeList"
       PICS: BOOLCFG.S.F03
       command: "readAttribute"
@@ -190,7 +179,7 @@ tests:
               contains: [0, 1]
 
     - label:
-          "Step 4i: Read the feature dependent(BOOLCFG.S.F03) optional attribute
+          "Step 4h: Read the feature dependent(BOOLCFG.S.F03) optional attribute
           in AttributeList"
       PICS: BOOLCFG.S.F03 && BOOLCFG.S.A0002
       command: "readAttribute"
@@ -201,7 +190,7 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4j: TH reads optional (SensorFault) attribute in AttributeList"
+          "Step 4i: TH reads optional (SensorFault) attribute in AttributeList"
       PICS: BOOLCFG.S.A0007
       command: "readAttribute"
       attribute: "AttributeList"
