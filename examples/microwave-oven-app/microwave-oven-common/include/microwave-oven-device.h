@@ -57,7 +57,6 @@ public:
      */
     void MicrowaveOvenInit();
     
-
     // delegates from MicrowaveOvenControl cluster
     /**
      * handle command for microwave oven control: set cooking parameters
