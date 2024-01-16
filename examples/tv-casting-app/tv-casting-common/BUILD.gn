@@ -93,12 +93,18 @@ chip_data_model("tv-casting-common") {
 
   # Add simplified casting API files here
   sources += [
+    "clusters/Clusters.h",
+    "core/Attribute.h",
+    "core/BaseCluster.h",
     "core/CastingApp.cpp",
     "core/CastingApp.h",
     "core/CastingPlayer.cpp",
     "core/CastingPlayer.h",
     "core/CastingPlayerDiscovery.cpp",
     "core/CastingPlayerDiscovery.h",
+    "core/Command.h",
+    "core/Endpoint.cpp",
+    "core/Endpoint.h",
     "core/Types.h",
     "support/AppParameters.h",
     "support/CastingStore.cpp",
@@ -106,10 +112,14 @@ chip_data_model("tv-casting-common") {
     "support/ChipDeviceEventHandler.cpp",
     "support/ChipDeviceEventHandler.h",
     "support/DataProvider.h",
+    "support/EndpointListLoader.cpp",
+    "support/EndpointListLoader.h",
   ]
 
   deps = [
     "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/tracing",

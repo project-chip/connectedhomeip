@@ -167,7 +167,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
 #if !ENABLE_SE05X_GENERATE_EC_KEY
     return ECDSA_sign_msg_H(&mKeypair, msg, msg_length, out_signature);
@@ -236,7 +236,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
 
     if (0 != memcmp(&mKeypair.mBytes[0], se05x_magic_no, sizeof(se05x_magic_no)))
     {
-        VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+        VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
         return Serialize_H(mKeypair, mPublicKey, output);
     }
 
@@ -338,7 +338,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
 #if !ENABLE_SE05X_GENERATE_EC_KEY
     return ECDH_derive_secret_H(&mKeypair, remote_public_key, out_secret);
@@ -603,7 +603,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     uint8_t nist256_header[] = { 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
                                  0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00 };
 
-    VerifyOrReturnError(mInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_UNINITIALIZED);
 
     if (CHIP_NO_ERROR != parse_se05x_keyid_from_keypair(mKeypair, &keyid))
     {

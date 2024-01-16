@@ -24,9 +24,10 @@
  **/
 
 #include "DeviceCallbacks.h"
+#include <esp_log.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-static const char * TAG = "light-switch-app-callbacks";
+static const char TAG[] = "light-switch-app-callbacks";
 
 using namespace chip;
 using namespace chip::Inet;

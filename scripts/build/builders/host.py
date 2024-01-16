@@ -70,11 +70,14 @@ class HostApp(Enum):
     KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
     DISHWASHER = auto()
+    MICROWAVE_OVEN = auto()
     REFRIGERATOR = auto()
     RVC = auto()
     AIR_PURIFIER = auto()
     LIT_ICD = auto()
     AIR_QUALITY_SENSOR = auto()
+    NETWORK_MANAGER = auto()
+    ENERGY_MANAGEMENT = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -123,6 +126,8 @@ class HostApp(Enum):
             return 'contact-sensor-app/linux'
         elif self == HostApp.DISHWASHER:
             return 'dishwasher-app/linux'
+        elif self == HostApp.MICROWAVE_OVEN:
+            return 'microwave-oven-app/linux'
         elif self == HostApp.REFRIGERATOR:
             return 'refrigerator-app/linux'
         elif self == HostApp.RVC:
@@ -133,6 +138,10 @@ class HostApp(Enum):
             return 'lit-icd-app/linux'
         elif self == HostApp.AIR_QUALITY_SENSOR:
             return 'air-quality-sensor-app/linux'
+        elif self == HostApp.NETWORK_MANAGER:
+            return 'network-manager-app/linux'
+        elif self == HostApp.ENERGY_MANAGEMENT:
+            return 'energy-management-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -218,6 +227,9 @@ class HostApp(Enum):
         elif self == HostApp.DISHWASHER:
             yield 'dishwasher-app'
             yield 'dishwasher-app.map'
+        elif self == HostApp.MICROWAVE_OVEN:
+            yield 'microwave-oven-app'
+            yield 'microwave-oven-app.map'
         elif self == HostApp.REFRIGERATOR:
             yield 'refrigerator-app'
             yield 'refrigerator-app.map'
@@ -230,6 +242,9 @@ class HostApp(Enum):
         elif self == HostApp.LIT_ICD:
             yield 'lit-icd-app'
             yield 'lit-icd-app.map'
+        elif self == HostApp.ENERGY_MANAGEMENT:
+            yield 'chip-energy-management-app'
+            yield 'chip-energy-management-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -282,7 +297,8 @@ class HostBuilder(GnBuilder):
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False, minmdns_address_policy=None,
-                 minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None):
+                 minmdns_high_verbosity=False, imgui_ui=False, crypto_library: HostCryptoLibrary = None,
+                 enable_test_event_triggers=None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -382,6 +398,10 @@ class HostBuilder(GnBuilder):
         # and mbedtls for android/freertos/zephyr/mbed/...)
         if crypto_library:
             self.extra_gn_options.append(crypto_library.gn_argument)
+
+        if enable_test_event_triggers is not None:
+            if 'EVSE' in enable_test_event_triggers:
+                self.extra_gn_options.append('chip_enable_energy_evse_trigger=true')
 
         if self.board == HostBoard.ARM64:
             if not use_clang:

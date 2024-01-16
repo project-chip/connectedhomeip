@@ -107,12 +107,21 @@
         "Test_TC_ULABEL_2_3",
         "Test_TC_ULABEL_2_4"
     ],
-    "LaundryWasherMode": ["Test_TC_LWM_1_1", "Test_TC_LWM_2_1"],
+    "LaundryWasherMode": [
+        "Test_TC_LWM_1_1",
+        "Test_TC_LWM_2_1",
+        "Test_TC_LWM_3_1",
+        "Test_TC_LWM_3_2",
+        "Test_TC_LWM_3_3"
+    ],
     "LaundryWasherControl": [
         "Test_TC_WASHERCTRL_1_1",
         "Test_TC_WASHERCTRL_2_1",
         "Test_TC_WASHERCTRL_2_2"
     ],
+
+    "LaundryDryerControl": ["Test_TC_DRYERCTRL_1_1", "Test_TC_DRYERCTRL_2_1"],
+
     "MediaControl": [
         "Test_TC_LOWPOWER_1_1",
         "Test_TC_KEYPADINPUT_1_2",
@@ -207,7 +216,9 @@
         "Test_TC_TCTL_1_1",
         "Test_TC_TCTL_2_1",
         "Test_TC_TCTL_2_2",
-        "Test_TC_TCTL_2_3"
+        "Test_TC_TCTL_2_3",
+        "Test_TC_TCTL_3_2",
+        "Test_TC_TCTL_3_3"
     ],
     "TemperatureMeasurement": ["Test_TC_TMP_1_1", "Test_TC_TMP_2_1"],
     "Thermostat": ["Test_TC_TSTAT_1_1", "Test_TC_TSTAT_2_1"],
@@ -390,6 +401,7 @@
         "TimeFormatLocalization",
         "LaundryWasherMode",
         "LaundryWasherControl",
+        "LaundryDryerControl",
         "MediaControl",
         "ModeSelect",
         "MultipleFabrics",

@@ -184,8 +184,8 @@ bool FormatStatusIBError(char * buf, uint16_t bufSize, CHIP_ERROR err)
 
     const char * desc = nullptr;
 #if !CHIP_CONFIG_SHORT_ERROR_STR
-    constexpr char generalFormat[] = "General error: " ChipLogFormatIMStatus;
-    constexpr char clusterFormat[] = "Cluster-specific error: 0x%02x";
+    static constexpr char generalFormat[] = "General error: " ChipLogFormatIMStatus;
+    static constexpr char clusterFormat[] = "Cluster-specific error: 0x%02x";
 
     // Formatting an 8-bit int will take at most 2 chars, and replace the '%02x'
     // so a buffer big enough to hold our format string will also hold our

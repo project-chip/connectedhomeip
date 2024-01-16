@@ -41,16 +41,14 @@ ti_sysconfig("sysconfig") {
     "ti_radio_config.h",
     "ti_drivers_config.c",
     "ti_drivers_config.h",
-    "ti_devices_config.c",
-    "ti_devices_config.h",
     "ti_ble_config.c",
     "ti_ble_config.h",
     "ti_dmm_application_policy.c",
     "ti_dmm_application_policy.h",
 
-    # disabled until upstream generation is aligned
-    #"tiop_config.h",
-    #"tiop_config.c",
+    # CCFG generation disabled for OTA-able application
+    #"ti_devices_config.c",
+    #"ti_devices_config.h",
 
     # not traditional source files
     #"ti_utils_build_linker.cmd.genlibs",
@@ -95,6 +93,10 @@ ti_simplelink_executable("lock_app") {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
   } else {
     deps += [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+  }
+
+  if (custom_factory_data) {
+    defines = [ "CC13XX_26XX_FACTORY_DATA" ]
   }
 
   include_dirs = [

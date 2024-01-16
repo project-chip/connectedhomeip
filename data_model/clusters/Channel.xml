@@ -104,26 +104,23 @@ Davis, CA 95616, USA
     </struct>
     <struct name="LineupInfoStruct">
       <field id="0" name="OperatorName" type="string">
-        <access read="true" write="true"/>
         <mandatoryConform/>
       </field>
       <field id="1" name="LineupName" type="string" default="empty">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="2" name="PostalCode" type="string" default="empty">
-        <access read="true" write="true"/>
         <optionalConform/>
       </field>
       <field id="3" name="LineupInfoType" type="LineupInfoTypeEnum">
-        <access read="true" write="true"/>
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="ChannelList" type="list[ChannelInfoStruct Type]" default="empty">
+    <attribute id="0x0000" name="ChannelList" type="list" default="empty">
+      <entry type="ChannelInfoStruct"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="CL"/>

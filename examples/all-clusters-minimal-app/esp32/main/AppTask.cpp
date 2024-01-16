@@ -41,7 +41,7 @@
 #define APP_EVENT_QUEUE_SIZE 10
 #define APP_TASK_STACK_SIZE (3072)
 
-static const char * TAG = "app-task";
+static const char TAG[] = "app-task";
 
 namespace {
 

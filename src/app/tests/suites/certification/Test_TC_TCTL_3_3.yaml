@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     178.2.5. [TC-TCTL-3.3] Optional temperature level functionality with DUT as
@@ -23,123 +22,117 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Temperature Control"
+    endpoint: 1
+    Step_4_setLevel:
+        type: int8u
+        defaultValue: 1
+    Step_7_setLevel:
+        type: int8u
+        defaultValue: 3
 
 tests:
-    - label: "Note"
-      verification: |
-          This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
-
-          While verifying below test case we will get 0 and null value for few attributes, as per spec 0 and null value is default for those attributes.
-      disabled: true
-
-    - label: "Step 1: Commission DUT to TH"
-      verification: |
-
-      disabled: true
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label:
           "Step 2: Operate device such that a temperature level can be accepted"
       verification: |
           Operate device such that a temperature level can be accepted
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 3: TH reads from the DUT the SupportedTemperatureLevels
           attribute"
       PICS: TCTL.S.A0005
-      verification: |
-          ./chip-tool temperaturecontrol read supported-temperature-levels 1 1
-          On TH(chip-tool), Verify that the DUT response contains a list of up to 32 strings with each string length not exceeding 16 characters.
-          [1689770716.974439][9291:9293] CHIP:DMG:         SuppressResponse = true,
-          [1689770716.974446][9291:9293] CHIP:DMG:         InteractionModelRevision = 1
-          [1689770716.974451][9291:9293] CHIP:DMG: }
-          [1689770716.974558][9291:9293] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0005 DataVersion: 2844459846
-          [1689770716.974594][9291:9293] CHIP:TOO:   SupportedTemperatureLevels: 3 entries
-          [1689770716.974607][9291:9293] CHIP:TOO:     [1]: Hot
-          [1689770716.974614][9291:9293] CHIP:TOO:     [2]: Warm
-          [1689770716.974620][9291:9293] CHIP:TOO:     [3]: Freezing
-          [1689770716.974685][9291:9293] CHIP:EM: <<< [E:59031i S:44407 M:101895658 (Ack:80765321)] (S) Msg TX to 1:0000000000000001 [9CA1] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1689770716.974699][9291:9293] CHIP:IN: (S) Sending msg 101895658 on secure session with LSID: 44407
-          [1689770716.974728][9291:9293] CHIP:EM: Flushed pending ack for MessageCounter:80765321 on exchange 59031i
-      disabled: true
+      command: "readAttribute"
+      attribute: "SupportedTemperatureLevels"
+      response:
+          saveAs: supportedLevels
+          constraints:
+              type: list
 
     - label:
           "Step 4: TH sends command SetTemperatureCommand with a value from
           supportedLevels saved as setLevel"
       PICS: TCTL.S.C00.Rsp
-      verification: |
-          ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperatureLevel 1
-          On TH(chip-tool), Verify that the DUT response contains SUCCESS
-          [1692265679.055214][13978:13980] CHIP:DMG:         ],
-          [1692265679.055279][13978:13980] CHIP:DMG:
-          [1692265679.055306][13978:13980] CHIP:DMG:         InteractionModelRevision = 10
-          [1692265679.055329][13978:13980] CHIP:DMG: },
-          [1692265679.055422][13978:13980] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x0
-          [1692265679.055501][13978:13980] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1692265679.055673][13978:13980] CHIP:EM: <<< [E:45460i S:40447 M:82497399 (Ack:231075843)] (S) Msg TX to 1:0000000000000001 [6311] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1692265679.055722][13978:13980] CHIP:IN: (S) Sending msg 82497399 on secure session with LSID: 40447
-      disabled: true
+      command: "SetTemperature"
+      arguments:
+          values:
+              - name: "TargetTemperatureLevel"
+                value: Step_4_setLevel
+
+    - label: "Wait for 5s"
+      PICS: TCTL.S.C00.Rsp
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label:
-          "Step 5: After a few seconds, TH reads from the DUT the
-          SelectedTemperatureLevel attribute"
-      PICS: TCTL.S.A0004
-      verification: |
-          After a few seconds, please send the below mentioned command to read SelectedTemperatureLevel attribute from TH to DUT
-
-          ./chip-tool temperaturecontrol read selected-temperature-level 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setLevel value written in step 4
-          [1692265713.881978][13985:13987] CHIP:DMG: }
-          [1692265713.882145][13985:13987] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0004 DataVersion: 3892542637
-          [1692265713.882212][13985:13987] CHIP:TOO:   SelectedTemperatureLevel: 1
-          [1692265713.882429][13985:13987] CHIP:EM: <<< [E:46803i S:60267 M:79585227 (Ack:218909199)] (S) Msg TX to 1:0000000000000001 [6311] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1692265713.882475][13985:13987] CHIP:IN: (S) Sending msg 79585227 on secure session with LSID: 60267
-          [1692265713.882578][13985:13987] CHIP:EM: Flushed pending ack for MessageCounter:218909199 on exchange 46803i
-      disabled: true
+          "Step 5: TH reads from the DUT the SelectedTemperatureLevel attribute"
+      PICS: TCTL.S.A0004 && TCTL.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "SelectedTemperatureLevel"
+      response:
+          value: Step_4_setLevel
 
     - label:
-          "Step 6: Operate device such that a temperature level cannot be
+          "Step 6:Operate device such that a temperature level cannot be
           accepted"
-      PICS: TCTL.S.M.SupportsInvalidInMode
       verification: |
           Operate device such that a temperature level cannot be accepted
-      disabled: true
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInMode
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
-          "Step 7: TH sends command SetTemperatureCommand with a value from
-          supportedLevels that is different from setLevel"
-      PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.C00.Rsp
-      verification: |
-          ./chip-tool temperaturecontrol set-temperature 1 1 --TargetTemperatureLevel 3
-          On TH(chip-tool), Verify that the DUT response contains CONSTRAINT_ERROR
-          [1692265766.674998][13994:13996] CHIP:DMG:
-          [1692265766.675028][13994:13996] CHIP:DMG:         InteractionModelRevision = 10
-          [1692265766.675058][13994:13996] CHIP:DMG: },
-          [1692265766.675136][13994:13996] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0056 Command=0x0000_0000 Status=0x87
-          [1692265766.675180][13994:13996] CHIP:TOO: Error: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1692265766.675227][13994:13996] CHIP:DMG: ICR moving to [AwaitingDe]
-          [1692265766.675356][13994:13996] CHIP:EM: <<< [E:29432i S:48831 M:234714759 (Ack:36101797)] (S) Msg TX to 1:0000000000000001 [6311] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1692265766.675409][13994:13996] CHIP:IN: (S) Sending msg 234714759 on secure session with LSID: 48831
-          [1692265766.675519][13994:13996] CHIP:EM: Flushed pending ack for MessageCounter:36101797 on exchange 29432i
-      disabled: true
+          "Step 7: TH sends command SetTemperatureCommand with an invalid value"
+      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInMode
+      command: "SetTemperature"
+      arguments:
+          values:
+              - name: "TargetTemperatureLevel"
+                value: Step_7_setLevel
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Wait for 5s"
+      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInMode
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 5000
 
     - label:
-          "Step 8: after a few seconds, TH reads from the DUT the
-          SelectedTemperatureLevel attribute"
-      PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.A0004
-      verification: |
-          After a few seconds, please send the below mentioned command to read SelectedTemperatureLevel attribute from TH to DUT
-
-          ./chip-tool temperaturecontrol read selected-temperature-level 1 1
-          On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setLevel value written in step 4
-          [1692265822.762570][14005:14007] CHIP:DMG:         SuppressResponse = true,
-          [1692265822.762602][14005:14007] CHIP:DMG:         InteractionModelRevision = 10
-          [1692265822.762631][14005:14007] CHIP:DMG: }
-          [1692265822.762811][14005:14007] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0056 Attribute 0x0000_0004 DataVersion: 3892542639
-          [1692265822.762940][14005:14007] CHIP:TOO:   SelectedTemperatureLevel: 1
-          [1692265822.763134][14005:14007] CHIP:EM: <<< [E:14178i S:20433 M:165826928 (Ack:66881663)] (S) Msg TX to 1:0000000000000001 [6311] --- Type 0000:10 (SecureChannel:StandaloneAck)
-          [1692265822.763186][14005:14007] CHIP:IN: (S) Sending msg 165826928 on secure session with LSID: 20433
-          [1692265822.763307][14005:14007] CHIP:EM: Flushed pending ack for MessageCounter:66881663 on exchange 14178i
-      disabled: true
+          "Step 8: TH reads from the DUT the SelectedTemperatureLevel attribute"
+      PICS: TCTL.S.A0004 && TCTL.S.M.SupportsInvalidInMode
+      command: "readAttribute"
+      attribute: "SelectedTemperatureLevel"
+      response:
+          value: Step_4_setLevel

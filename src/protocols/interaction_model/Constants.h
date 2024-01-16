@@ -45,7 +45,7 @@ namespace chip {
 namespace Protocols {
 namespace InteractionModel {
 
-inline constexpr const char * kProtocolName = "IM";
+inline constexpr char kProtocolName[] = "IM";
 
 /**
  * Version of the Interaction Model used by the node.

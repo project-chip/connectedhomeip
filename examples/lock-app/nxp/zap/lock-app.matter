@@ -480,13 +480,13 @@ cluster NetworkCommissioning = 49 {
   }
 
   request struct QueryIdentityRequest {
-    OCTET_STRING<20> keyIdentifier = 0;
-    optional OCTET_STRING<32> possessionNonce = 1;
+    octet_string<20> keyIdentifier = 0;
+    optional octet_string<32> possessionNonce = 1;
   }
 
   response struct QueryIdentityResponse = 10 {
-    OCTET_STRING<140> identity = 0;
-    optional OCTET_STRING<64> possessionSignature = 1;
+    octet_string<140> identity = 0;
+    optional octet_string<64> possessionSignature = 1;
   }
 
   /** Detemine the set of networks the device sees as available. */
@@ -507,7 +507,7 @@ cluster NetworkCommissioning = 49 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -610,8 +610,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
@@ -1105,6 +1105,9 @@ cluster DoorLock = 257 {
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
+    kAliroCredentialIssuerKey = 6;
+    kAliroEvictableEndpointKey = 7;
+    kAliroNonEvictableEndpointKey = 8;
   }
 
   enum DataOperationTypeEnum : enum8 {
@@ -1217,6 +1220,9 @@ cluster DoorLock = 257 {
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
+    kAliroCredentialIssuerKey = 11;
+    kAliroEvictableEndpointKey = 12;
+    kAliroNonEvictableEndpointKey = 13;
   }
 
   enum LockOperationTypeEnum : enum8 {
@@ -1254,6 +1260,7 @@ cluster DoorLock = 257 {
     kRemote = 7;
     kRFID = 8;
     kBiometric = 9;
+    kAliro = 10;
   }
 
   enum UserStatusEnum : enum8 {
@@ -1414,6 +1421,8 @@ cluster DoorLock = 257 {
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
     kUnbolt = 0x1000;
+    kAliroProvisioning = 0x2000;
+    kAliroBLEUWB = 0x4000;
   }
 
   struct CredentialStruct {
@@ -1494,6 +1503,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
+  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1627,7 +1645,7 @@ cluster DoorLock = 257 {
   request struct SetCredentialRequest {
     DataOperationTypeEnum operationType = 0;
     CredentialStruct credential = 1;
-    LONG_OCTET_STRING credentialData = 2;
+    long_octet_string credentialData = 2;
     nullable int16u userIndex = 3;
     nullable UserStatusEnum userStatus = 4;
     nullable UserTypeEnum userType = 5;
@@ -1657,6 +1675,13 @@ cluster DoorLock = 257 {
 
   request struct UnboltDoorRequest {
     optional octet_string PINCode = 0;
+  }
+
+  request struct SetAliroReaderConfigRequest {
+    octet_string<32> signingKey = 0;
+    octet_string<65> verificationKey = 1;
+    octet_string<16> groupIdentifier = 2;
+    optional octet_string<16> groupResolvingKey = 3;
   }
 
   /** This command causes the lock device to lock the door. */
@@ -1697,6 +1722,10 @@ cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   /** This command causes the lock device to unlock the door without pulling the latch. */
   timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
+  /** This command communicates an Aliro Reader configuration to the lock. */
+  timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
+  /** This command clears an existing Aliro Reader configuration for the lock. */
+  timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
 }
 
 endpoint 0 {
@@ -1709,35 +1738,35 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute subjectsPerAccessControlEntry default = 4;
-    callback attribute targetsPerAccessControlEntry default = 3;
-    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute subjectsPerAccessControlEntry;
+    callback attribute targetsPerAccessControlEntry;
+    callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute dataModelRevision default = 10;
+    callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion default = 0;
+    callback attribute location;
+    callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion default = 0;
+    callback attribute softwareVersion;
     callback attribute softwareVersionString;
     callback attribute capabilityMinima;
     callback attribute specificationVersion;
@@ -1749,9 +1778,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig default = 0;
-    callback attribute locationCapability default = 0;
-    callback attribute supportsConcurrentConnection default = 1;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -1788,8 +1817,8 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount default = 0x0000;
-    callback attribute upTime default = 0x0000000000000000;
+    callback attribute rebootCount;
+    callback attribute upTime;
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0002;
@@ -1801,10 +1830,10 @@ endpoint 0 {
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    callback attribute currentHeapFree default = 0x0000000000000000;
-    callback attribute currentHeapUsed default = 0x0000000000000000;
-    callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    callback attribute featureMap default = 1;
+    callback attribute currentHeapFree;
+    callback attribute currentHeapUsed;
+    callback attribute currentHeapHighWatermark;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command ResetWatermarks;
@@ -1813,11 +1842,11 @@ endpoint 0 {
   server cluster ThreadNetworkDiagnostics {
     callback attribute channel;
     callback attribute routingRole;
-    callback attribute networkName default = "0";
-    callback attribute panId default = 0x0000;
-    callback attribute extendedPanId default = 0x0000000000000000;
+    callback attribute networkName;
+    callback attribute panId;
+    callback attribute extendedPanId;
     callback attribute meshLocalPrefix;
-    callback attribute overrunCount default = 0x0000000000000000;
+    callback attribute overrunCount;
     callback attribute neighborTable;
     callback attribute routeTable;
     callback attribute partitionId;
@@ -1825,50 +1854,50 @@ endpoint 0 {
     callback attribute dataVersion;
     callback attribute stableDataVersion;
     callback attribute leaderRouterId;
-    callback attribute detachedRoleCount default = 0x0000;
-    callback attribute childRoleCount default = 0x0000;
-    callback attribute routerRoleCount default = 0x0000;
-    callback attribute leaderRoleCount default = 0x0000;
-    callback attribute attachAttemptCount default = 0x0000;
-    callback attribute partitionIdChangeCount default = 0x0000;
-    callback attribute betterPartitionAttachAttemptCount default = 0x0000;
-    callback attribute parentChangeCount default = 0x0000;
-    callback attribute txTotalCount default = 0x0000;
-    callback attribute txUnicastCount default = 0x0000;
-    callback attribute txBroadcastCount default = 0x0000;
-    callback attribute txAckRequestedCount default = 0x0000;
-    callback attribute txAckedCount default = 0x0000;
-    callback attribute txNoAckRequestedCount default = 0x0000;
-    callback attribute txDataCount default = 0x0000;
-    callback attribute txDataPollCount default = 0x0000;
-    callback attribute txBeaconCount default = 0x0000;
-    callback attribute txBeaconRequestCount default = 0x0000;
-    callback attribute txOtherCount default = 0x0000;
-    callback attribute txRetryCount default = 0x0000;
-    callback attribute txDirectMaxRetryExpiryCount default = 0x0000;
-    callback attribute txIndirectMaxRetryExpiryCount default = 0x0000;
-    callback attribute txErrCcaCount default = 0x0000;
-    callback attribute txErrAbortCount default = 0x0000;
-    callback attribute txErrBusyChannelCount default = 0x0000;
-    callback attribute rxTotalCount default = 0x0000;
-    callback attribute rxUnicastCount default = 0x0000;
-    callback attribute rxBroadcastCount default = 0x0000;
-    callback attribute rxDataCount default = 0x0000;
-    callback attribute rxDataPollCount default = 0x0000;
-    callback attribute rxBeaconCount default = 0x0000;
-    callback attribute rxBeaconRequestCount default = 0x0000;
-    callback attribute rxOtherCount default = 0x0000;
-    callback attribute rxAddressFilteredCount default = 0x0000;
-    callback attribute rxDestAddrFilteredCount default = 0x0000;
-    callback attribute rxDuplicatedCount default = 0x0000;
-    callback attribute rxErrNoFrameCount default = 0x0000;
-    callback attribute rxErrUnknownNeighborCount default = 0x0000;
-    callback attribute rxErrInvalidSrcAddrCount default = 0x0000;
-    callback attribute rxErrSecCount default = 0x0000;
-    callback attribute rxErrFcsCount default = 0x0000;
-    callback attribute rxErrOtherCount default = 0x0000;
+    callback attribute detachedRoleCount;
+    callback attribute childRoleCount;
+    callback attribute routerRoleCount;
+    callback attribute leaderRoleCount;
+    callback attribute attachAttemptCount;
+    callback attribute partitionIdChangeCount;
+    callback attribute betterPartitionAttachAttemptCount;
+    callback attribute parentChangeCount;
+    callback attribute txTotalCount;
+    callback attribute txUnicastCount;
+    callback attribute txBroadcastCount;
+    callback attribute txAckRequestedCount;
+    callback attribute txAckedCount;
+    callback attribute txNoAckRequestedCount;
+    callback attribute txDataCount;
+    callback attribute txDataPollCount;
+    callback attribute txBeaconCount;
+    callback attribute txBeaconRequestCount;
+    callback attribute txOtherCount;
+    callback attribute txRetryCount;
+    callback attribute txDirectMaxRetryExpiryCount;
+    callback attribute txIndirectMaxRetryExpiryCount;
+    callback attribute txErrCcaCount;
+    callback attribute txErrAbortCount;
+    callback attribute txErrBusyChannelCount;
+    callback attribute rxTotalCount;
+    callback attribute rxUnicastCount;
+    callback attribute rxBroadcastCount;
+    callback attribute rxDataCount;
+    callback attribute rxDataPollCount;
+    callback attribute rxBeaconCount;
+    callback attribute rxBeaconRequestCount;
+    callback attribute rxOtherCount;
+    callback attribute rxAddressFilteredCount;
+    callback attribute rxDestAddrFilteredCount;
+    callback attribute rxDuplicatedCount;
+    callback attribute rxErrNoFrameCount;
+    callback attribute rxErrUnknownNeighborCount;
+    callback attribute rxErrInvalidSrcAddrCount;
+    callback attribute rxErrSecCount;
+    callback attribute rxErrFcsCount;
+    callback attribute rxErrOtherCount;
     callback attribute securityPolicy;
-    callback attribute channelPage0Mask default = "0x0000";
+    callback attribute channelPage0Mask;
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
@@ -1878,9 +1907,9 @@ endpoint 0 {
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus default = 0;
-    callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId default = 0;
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex;
+    callback attribute adminVendorId;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -1917,8 +1946,8 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1954,7 +1983,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster DoorLock {

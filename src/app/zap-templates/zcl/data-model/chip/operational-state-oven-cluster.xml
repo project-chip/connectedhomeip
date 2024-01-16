@@ -27,10 +27,10 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
+    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="array" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
     <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0x00" max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
-    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
+    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="array" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
     <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="OperationalStateEnum"                                              writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
 

@@ -392,7 +392,10 @@ void PacketBufferTest::CheckNew(nlTestSuite * inSuite, void * inContext)
 
         if (!buffer.IsNull())
         {
+            // TODO: the code below seems maybe questionable: OF_LWIP_PBUF is never used
+            // NOLINTBEGIN(bugprone-casting-through-void)
             const pbuf * const pb = TO_LWIP_PBUF(buffer.Get());
+            // NOLINTEND(bugprone-casting-through-void)
 
             NL_TEST_ASSERT(inSuite, pb->len == 0);
             NL_TEST_ASSERT(inSuite, pb->tot_len == 0);
@@ -1779,9 +1782,9 @@ void PacketBufferTest::CheckHandleRightSize(nlTestSuite * inSuite, void * inCont
     PacketBufferTest * const test         = theContext->test;
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
-    const char kPayload[]     = "Joy!";
-    PacketBufferHandle handle = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    PacketBuffer * buffer     = handle.mBuffer;
+    static const char kPayload[] = "Joy!";
+    PacketBufferHandle handle    = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    PacketBuffer * buffer        = handle.mBuffer;
 
     memcpy(handle->Start(), kPayload, sizeof kPayload);
     buffer->SetDataLength(sizeof kPayload);
@@ -1940,7 +1943,7 @@ void PacketBufferTest::CheckPacketBufferWriter(nlTestSuite * inSuite, void * inC
     PacketBufferTest * const test         = theContext->test;
     NL_TEST_ASSERT(inSuite, test->mContext == theContext);
 
-    const char kPayload[] = "Hello, world!";
+    static const char kPayload[] = "Hello, world!";
 
     PacketBufferWriter yay(PacketBufferHandle::New(sizeof(kPayload)));
     PacketBufferWriter nay(PacketBufferHandle::New(sizeof(kPayload)), sizeof(kPayload) - 2);
@@ -2021,7 +2024,7 @@ int TestSystemPacketBuffer()
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, &sContext);
 
     return (nlTestRunnerStats(&theSuite));

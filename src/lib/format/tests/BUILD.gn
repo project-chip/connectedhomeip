@@ -40,7 +40,7 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/lib/format:flat-tree",
     "${chip_root}/src/lib/format:protocol-decoder",
     "${chip_root}/src/lib/format:protocol-tlv-metadata",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

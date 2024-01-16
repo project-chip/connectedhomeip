@@ -387,7 +387,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     nullable int64s platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOTAProviders[] = 0;
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
@@ -634,13 +634,13 @@ cluster NetworkCommissioning = 49 {
   }
 
   request struct QueryIdentityRequest {
-    OCTET_STRING<20> keyIdentifier = 0;
-    optional OCTET_STRING<32> possessionNonce = 1;
+    octet_string<20> keyIdentifier = 0;
+    optional octet_string<32> possessionNonce = 1;
   }
 
   response struct QueryIdentityResponse = 10 {
-    OCTET_STRING<140> identity = 0;
-    optional OCTET_STRING<64> possessionSignature = 1;
+    octet_string<140> identity = 0;
+    optional octet_string<64> possessionSignature = 1;
   }
 
   /** Detemine the set of networks the device sees as available. */
@@ -697,7 +697,7 @@ cluster DiagnosticLogs = 50 {
 
   response struct RetrieveLogsResponse = 1 {
     StatusEnum status = 0;
-    LONG_OCTET_STRING logContent = 1;
+    long_octet_string logContent = 1;
     optional epoch_us UTCTimeStamp = 2;
     optional systime_us timeSinceBoot = 3;
   }
@@ -708,7 +708,7 @@ cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -811,8 +811,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
@@ -1902,7 +1902,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -1915,25 +1915,25 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute dataModelRevision default = 10;
+    callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion default = 0;
+    callback attribute location;
+    callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion default = 0;
+    callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute manufacturingDate;
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
@@ -1964,9 +1964,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig default = 0;
-    callback attribute locationCapability default = 0;
-    callback attribute supportsConcurrentConnection default = 1;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -2011,9 +2011,9 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount default = 0x0000;
-    callback attribute upTime default = 0x0000000000000000;
-    callback attribute totalOperationalHours default = 0x00000000;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -2028,9 +2028,9 @@ endpoint 0 {
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus default = 0;
-    callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId default = 0;
+    callback attribute windowStatus;
+    callback attribute adminFabricIndex;
+    callback attribute adminVendorId;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
 
@@ -2067,8 +2067,8 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -2085,10 +2085,10 @@ endpoint 1 {
   server cluster Identify {
     ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute eventList;
-    callback attribute attributeList default = 0;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
@@ -2097,47 +2097,47 @@ endpoint 1 {
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList default = 0;
-    callback attribute serverList default = 0;
-    callback attribute clientList default = 0;
-    callback attribute partsList default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
     callback attribute eventList;
-    callback attribute attributeList default = 0;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster HepaFilterMonitoring {
-    callback attribute condition default = 100;
-    callback attribute degradationDirection default = 1;
-    callback attribute changeIndication default = 0;
-    callback attribute inPlaceIndicator default = 1;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication;
+    callback attribute inPlaceIndicator;
     callback attribute lastChangedTime;
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCondition;
   }
 
   server cluster ActivatedCarbonFilterMonitoring {
-    callback attribute condition default = 100;
-    callback attribute degradationDirection default = 1;
-    callback attribute changeIndication default = 0;
-    callback attribute inPlaceIndicator default = 1;
+    callback attribute condition;
+    callback attribute degradationDirection;
+    callback attribute changeIndication;
+    callback attribute inPlaceIndicator;
     callback attribute lastChangedTime;
     callback attribute replacementProductList;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCondition;
@@ -2193,16 +2193,16 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AirQuality {
-    callback attribute airQuality default = 0;
+    callback attribute airQuality;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2211,18 +2211,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2231,18 +2231,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2251,18 +2251,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2271,18 +2271,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2291,18 +2291,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2311,18 +2311,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2331,18 +2331,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2351,18 +2351,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2371,18 +2371,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -2391,18 +2391,18 @@ endpoint 2 {
     callback attribute minMeasuredValue;
     callback attribute maxMeasuredValue;
     callback attribute peakMeasuredValue;
-    callback attribute peakMeasuredValueWindow default = 1;
+    callback attribute peakMeasuredValueWindow;
     callback attribute averageMeasuredValue;
-    callback attribute averageMeasuredValueWindow default = 1;
-    callback attribute uncertainty default = 0;
-    callback attribute measurementUnit default = 0;
-    callback attribute measurementMedium default = 0;
-    callback attribute levelValue default = 0;
+    callback attribute averageMeasuredValueWindow;
+    callback attribute uncertainty;
+    callback attribute measurementUnit;
+    callback attribute measurementMedium;
+    callback attribute levelValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
 }
@@ -2434,7 +2434,7 @@ endpoint 3 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster TemperatureMeasurement {
@@ -2478,7 +2478,7 @@ endpoint 4 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {

@@ -31,7 +31,7 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
     <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
+    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">
@@ -54,7 +54,7 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
     <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
     <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
-    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="ARRAY" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
+    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ResetCondition" optional="true">

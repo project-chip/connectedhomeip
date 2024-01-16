@@ -536,7 +536,7 @@ cluster OtaSoftwareUpdateRequestor = 42 {
     nullable int64s platformCode = 3;
   }
 
-  attribute ProviderLocation defaultOTAProviders[] = 0;
+  attribute access(write: administer) ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
   readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
@@ -596,11 +596,13 @@ cluster TimeFormatLocalization = 44 {
     kKorean = 9;
     kPersian = 10;
     kTaiwanese = 11;
+    kUseActiveLocale = 255;
   }
 
   enum HourFormatEnum : enum8 {
     k12hr = 0;
     k24hr = 1;
+    kUseActiveLocale = 255;
   }
 
   bitmap Feature : bitmap32 {
@@ -842,13 +844,13 @@ cluster NetworkCommissioning = 49 {
   }
 
   request struct QueryIdentityRequest {
-    OCTET_STRING<20> keyIdentifier = 0;
-    optional OCTET_STRING<32> possessionNonce = 1;
+    octet_string<20> keyIdentifier = 0;
+    optional octet_string<32> possessionNonce = 1;
   }
 
   response struct QueryIdentityResponse = 10 {
-    OCTET_STRING<140> identity = 0;
-    optional OCTET_STRING<64> possessionSignature = 1;
+    octet_string<140> identity = 0;
+    optional octet_string<64> possessionSignature = 1;
   }
 
   /** Detemine the set of networks the device sees as available. */
@@ -869,7 +871,7 @@ cluster NetworkCommissioning = 49 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster GeneralDiagnostics = 51 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum BootReasonEnum : enum8 {
     kUnspecified = 0;
@@ -972,8 +974,8 @@ cluster GeneralDiagnostics = 51 {
   }
 
   response struct TimeSnapshotResponse = 2 {
-    systime_us systemTimeUs = 0;
-    nullable epoch_us UTCTimeUs = 1;
+    systime_ms systemTimeMs = 0;
+    nullable posix_ms posixTimeMs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */
@@ -1284,7 +1286,7 @@ endpoint 0 {
     callback attribute clientList;
     callback attribute partsList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster AccessControl {
@@ -1292,30 +1294,30 @@ endpoint 0 {
     emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
-    callback attribute subjectsPerAccessControlEntry default = 4;
-    callback attribute targetsPerAccessControlEntry default = 3;
-    callback attribute accessControlEntriesPerFabric default = 4;
+    callback attribute subjectsPerAccessControlEntry;
+    callback attribute targetsPerAccessControlEntry;
+    callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster BasicInformation {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    callback attribute dataModelRevision default = 10;
+    callback attribute dataModelRevision;
     callback attribute vendorName;
     callback attribute vendorID;
     callback attribute productName;
     callback attribute productID;
     persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion default = 0;
+    callback attribute location;
+    callback attribute hardwareVersion;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion default = 0;
+    callback attribute softwareVersion;
     callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
+    callback attribute manufacturingDate;
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
@@ -1333,7 +1335,7 @@ endpoint 0 {
     emits event StateTransition;
     emits event VersionApplied;
     emits event DownloadError;
-    callback attribute defaultOTAProviders default = 0;
+    callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
@@ -1345,7 +1347,7 @@ endpoint 0 {
 
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
-    callback attribute supportedLocales default = 0;
+    callback attribute supportedLocales;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1361,9 +1363,9 @@ endpoint 0 {
   server cluster GeneralCommissioning {
     ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig default = 0;
-    callback attribute locationCapability default = 0;
-    callback attribute supportsConcurrentConnection default = 1;
+    callback attribute regulatoryConfig;
+    callback attribute locationCapability;
+    callback attribute supportsConcurrentConnection;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
@@ -1401,9 +1403,9 @@ endpoint 0 {
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount default = 0x0000;
-    callback attribute upTime default = 0x0000000000000000;
-    callback attribute totalOperationalHours default = 0x00000000;
+    callback attribute rebootCount;
+    callback attribute upTime;
+    callback attribute totalOperationalHours;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -1458,8 +1460,8 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command KeySetWrite;
     handle command KeySetRead;
@@ -1538,7 +1540,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 }
 endpoint 65534 {
@@ -1555,7 +1557,7 @@ endpoint 65534 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
   }
 
   server cluster NetworkCommissioning {

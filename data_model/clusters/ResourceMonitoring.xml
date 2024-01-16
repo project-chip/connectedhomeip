@@ -59,6 +59,9 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial version of the Resource Monitoring cluster"/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0072" name="Activated Carbon Filter Monitoring"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="REPM" scope="Endpoint"/>
   <features>
     <feature bit="0" code="CON" name="Condition" summary="Supports monitoring the condition of the resource in percentage">
@@ -97,13 +100,13 @@ Davis, CA 95616, USA
       <item value="0" name="UPC" summary="12-digit Universal Product Code">
         <mandatoryConform/>
       </item>
-      <item value="1" name="GTIN-8" summary="8-digit Global Trade Item Number">
+      <item value="1" name="GTIN" summary="8-digit Global Trade Item Number">
         <mandatoryConform/>
       </item>
       <item value="2" name="EAN" summary="13-digit European Article Number">
         <mandatoryConform/>
       </item>
-      <item value="3" name="GTIN-14" summary="14-digit Global Trade Item Number">
+      <item value="3" name="GTIN" summary="14-digit Global Trade Item Number">
         <mandatoryConform/>
       </item>
       <item value="4" name="OEM" summary="Original Equipment Manufacturer part number">
@@ -151,13 +154,14 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0005" name="ReplacementProductList" type="list[ReplacementProductStruct Type]">
+    <attribute id="0x0005" name="ReplacementProductList" type="list">
+      <entry type="ReplacementProductStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
         <feature name="REP"/>
       </mandatoryConform>
-      <constraint type="max" value="5"/>
+      <constraint type="maxCount" value="5"/>
     </attribute>
   </attributes>
   <commands>
