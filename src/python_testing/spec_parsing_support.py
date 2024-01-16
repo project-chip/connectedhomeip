@@ -149,7 +149,7 @@ def get_conformance(element: ElementTree.Element, cluster_id: int) -> ElementTre
     elif element.tag == 'event':
         location = EventPathLocation(endpoint_id=0, cluster_id=cluster_id, event_id=int(element.attrib['id'], 0))
     else:
-        location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id)
+        location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
     problem = ProblemNotice(test_name='Spec XML parsing', location=location,
                             severity=ProblemSeverity.WARNING, problem='Unable to find conformance element')
 
@@ -604,7 +604,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[list[ProblemNot
                 conformance = parse_device_type_callable_from_xml(conformance_xml)
                 device_types[id].clusters[cid] = XmlDeviceTypeClusterRequirements(
                     name=c.attrib['name'], conformance=conformance)
-            except ConformanceException as ex:
+            except ConformanceException:
                 location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to parse conformance for cluster"))

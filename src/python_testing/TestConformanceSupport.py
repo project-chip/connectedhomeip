@@ -20,7 +20,7 @@ import xml.etree.ElementTree as ElementTree
 from conformance_support import (ConformanceDecision, ConformanceException, ConformanceParseParameters, deprecated, disallowed,
                                  mandatory, optional, parse_basic_callable_from_xml, parse_callable_from_xml,
                                  parse_device_type_callable_from_xml, provisional, zigbee)
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
 
