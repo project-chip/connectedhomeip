@@ -46,7 +46,7 @@ the cluster
 The zap file will list all the available attributes in the cluster. The column
 settings are as follows:
 
--   enabled - turn this on to enable the attribute on the device.
+-   Enabled - turn this on to enable the attribute on the device.
 -   Attribute ID - Attribute ID of the attribute from the spec
 -   Attribute - Attribute name from the spec
 -   Required - This is set to yes if the attribute is mandatory. Note that some
@@ -56,7 +56,7 @@ settings are as follows:
     checked using the conformance checker test
     [TC_DeviceConformance.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py)
 
--   client/server - For Matter, all attributes will be server
+-   Client/Server - For Matter, all attributes will be server
 -   Mfg code - applies only to manufacturer specific attributes
 -   Storage option - determines whether ember allocates storage for the
     attribute. The correct value for this field is determined by the cluster
@@ -71,8 +71,8 @@ settings are as follows:
     #
     "NOTE: Insert a link to the override specification documentation once that is up"
 
--   type - type from the spec
--   default - this is different than the "default" set in the spec, and
+-   Type - type from the spec
+-   Default - this is different than the "default" set in the spec, and
     represents the desired starting value for an attribute IF it is implemented
     in the ember layer (RAM storage)
 

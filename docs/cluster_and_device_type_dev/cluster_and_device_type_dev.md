@@ -39,9 +39,8 @@ and the SDK.
 
 [https://groups.csa-iot.org/wg/matter-tsg/wiki/howto-add-a-new-device-type](https://groups.csa-iot.org/wg/matter-tsg/wiki/howto-add-a-new-device-type)
 
-The following set of tools can be used to translate spec documents into a ZAP
-xml: https://github.com/hasty/alchemy. Note that the output should also be
-verified against the spec using the .matter parser tools.
+Note that the output should also be verified against the spec using the
+[.matter parser tools](https://project-chip.github.io/connectedhomeip-doc/guides/matter_idl_tooling.html).
 
 ## ZAP, Ember and Overrides
 
@@ -115,9 +114,13 @@ Blue sections can be overridden.
 
 #### Cluster Server Attributes
 
--   **Two mechanisms**
+**Two mechanisms**
+
 -   Ember layer
 -   Override
+
+**ZAP files and implemetation**
+
 -   For attributes marked as **“RAM”** storage in the zap file
     -   Storage allocated automatically, Ember handles read/write
     -   Generated “Get” and “Set” functions for each attribute in Accessors.h
