@@ -20,6 +20,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <glib.h>
+#include <mutex>
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
@@ -103,6 +104,7 @@ private:
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
     ChipDeviceScannerState mCurrentState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
+    std::mutex mScannerLock;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     bool mTimerExpired = false;
 };
