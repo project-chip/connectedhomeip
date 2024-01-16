@@ -9443,3 +9443,69 @@ PICS:
 
     - label: "Does the device implement sending the Resume command?"
       id: RVCOPSTATE.C.C04.Tx
+
+    #
+    #Boolean State Configuration
+    #
+    - label:
+          "Does the device implement the Boolean State Configuration cluster as
+          a server?"
+      id: BOOLCFG.S
+
+    #Features
+    - label: "Does the device support visual alarms?"
+      id: BOOLCFG.S.F00
+
+    - label: "Does the device support audible alarms??"
+      id: BOOLCFG.S.F01
+
+    - label:
+          "Does the device support the ability to suppress or acknowledge
+          alarms?"
+      id: BOOLCFG.S.F02
+
+    - label:
+          "Does the device support the ability to set level of threshold
+          detection sensitivity?"
+      id: BOOLCFG.S.F03
+
+    #Attributes
+    - label: "Does the device implement the CurrentSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0000
+
+    - label:
+          "Does the device implement the SupportedSensitivityLevels attribute?"
+      id: BOOLCFG.S.A0001
+
+    - label: "Does the device implement the DefaultSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0002
+
+    - label: "Does the device implement the AlarmsActive attribute?"
+      id: BOOLCFG.S.A0003
+
+    - label: "Does the device implement the AlarmsSuppressed attribute?"
+      id: BOOLCFG.S.A0004
+
+    - label: "Does the device implement the AlarmsEnabled attribute?"
+      id: BOOLCFG.S.A0005
+
+    - label: "Does the device implement the AlarmsSupported attribute?"
+      id: BOOLCFG.S.A0006
+
+    - label: "Does the device implement the SensorFault attribute?"
+      id: BOOLCFG.S.A0007
+
+    #Commands received
+    - label: "Does the device implement receiving the SuppressAlarm command?"
+      id: BOOLCFG.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the EnableDisableAlarm command?"
+      id: BOOLCFG.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the AlarmsStateChanged event?"
+      id: BOOLCFG.S.E00
+
+    - label: "Does the device implement the SensorFault event?"
+      id: BOOLCFG.S.E01
