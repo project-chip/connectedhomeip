@@ -34,6 +34,10 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <platform/LockTracker.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
 namespace chip {
 namespace app {
 
@@ -676,6 +680,32 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     Close(CHIP_ERROR_TIMEOUT);
 }
 
+CHIP_ERROR ReadClient::ReadICDOperationModeFromAttributeDataIB(const TLV::TLVReader & aReader, PeerType & aType)
+{
+    TLV::TLVReader reader;
+    reader.Init(aReader);
+
+    Clusters::IcdManagement::Attributes::OperatingMode::TypeInfo::DecodableType operatingMode;
+
+    CHIP_ERROR err = DataModel::Decode(reader, operatingMode);
+    ReturnErrorOnFailure(err);
+
+    switch (operatingMode)
+    {
+    case Clusters::IcdManagement::OperatingModeEnum::kSit:
+        aType = PeerType::kNormal;
+        break;
+    case Clusters::IcdManagement::OperatingModeEnum::kLit:
+        aType = PeerType::kLITICD;
+        break;
+    default:
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+
+    return err;
+}
+
 CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttributePathParser,
                                             ConcreteDataAttributePath & aAttributePath)
 {
@@ -768,6 +798,24 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
             if (!attributePath.IsListOperation() && dataReader.GetType() == TLV::kTLVType_Array)
             {
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
+            }
+
+            if (attributePath ==
+                ConcreteDataAttributePath(kRootEndpointId, Clusters::IcdManagement::Id,
+                                          Clusters::IcdManagement::Attributes::OperatingMode::Id))
+            {
+                PeerType peerType;
+                if (CHIP_NO_ERROR == ReadICDOperationModeFromAttributeDataIB(dataReader, peerType))
+                {
+                    // Since we are in the middle of parsing the attribute data, it is safe to call `OnPeerTypeChange`
+                    // As it will only update the LIT / SIT bit for us without triggerring resubscription on this read client.
+                    InteractionModelEngine::GetInstance()->OnPeerTypeChange(mPeer, peerType);
+                }
+                else
+                {
+                    ChipLogError(DataManagement, "Failed to get ICD state from attribute data with error'%" CHIP_ERROR_FORMAT "'",
+                                 err.Format());
+                }
             }
 
             NoteReportingData();

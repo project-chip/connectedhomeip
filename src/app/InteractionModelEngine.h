@@ -250,8 +250,8 @@ public:
     /**
      *  Used to notify whether a peer becomes LIT ICD or vice versa.
      *
-     *  When the app knows that the peer becoms LIT ICD, it is expected to call this method with PeerType::kLITICD and when
-     * the peer is nolonger a LIT ICD, it is expected to call this method with PeerType::kNormal.
+     *  The read client will call this function when it found any updates of the OperationMode attribute from ICD management
+     * cluster. The application don't need to call this function usually.
      */
     void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
 

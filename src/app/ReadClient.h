@@ -292,7 +292,8 @@ public:
         Subscribe,
     };
 
-    enum class PeerType : uint8_t {
+    enum class PeerType : uint8_t
+    {
         kNormal,
         kLITICD,
     };
@@ -354,16 +355,6 @@ public:
      * call this function when a check-in message is received.
      */
     void OnActiveModeNotification();
-
-    /**
-     *  Used to notify whether a peer becomes LIT ICD or vice versa.
-     *
-     *  When the app knows that the peer becoms LIT ICD, it is expected to call this method with PeerType::kLITICD and when
-     * the peer is nolonger a LIT ICD, it is expected to call this method with PeerType::kNormal.
-     *
-     *  Users should call InteractionModelEngine::OnPeerTypeChange instead of this function.  
-     */
-    void OnPeerTypeChange(PeerType aType);
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
@@ -540,6 +531,15 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
+     *  Updates the type (LIT ICD or not) of the peer.
+     *
+     *  When the subscription is active, this function will just set the flag. When the subscription is an InactiveICDSubscription,
+     * Setting the peer type to SIT or normal devices will also trigger resubscription.
+     *
+     */
+    void OnPeerTypeChange(PeerType aType);
+
+    /**
      *  Check if current read client is being used
      *
      */
@@ -559,6 +559,7 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR ReadICDOperationModeFromAttributeDataIB(const TLV::TLVReader & aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
