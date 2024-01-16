@@ -53,7 +53,7 @@ class EvseSession
 public:
     EvseSession(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
     /**
-     * @brief This function samples the start-time, and energy meter to hold the session info
+     * @brief This function records the start time and provided energy meter values as part of the new session.
      *
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
