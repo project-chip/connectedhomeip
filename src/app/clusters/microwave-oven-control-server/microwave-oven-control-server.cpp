@@ -59,27 +59,27 @@ Instance::~Instance()
 CHIP_ERROR Instance::Init()
 {
     // Check if the cluster has been selected in zap
-    VerifyOrReturnError(emberAfContainsServer(mEndpointId, mClusterId), 
+    VerifyOrReturnError(emberAfContainsServer(mEndpointId, mClusterId),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "Microwave Oven Control: The cluster with ID %lu was not enabled in zap.", long(mClusterId)));
 
     // Exactly one of the PowerAsNumber and PowerInWatts features must be supported, per spec.
-    VerifyOrReturnError(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts), 
+    VerifyOrReturnError(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "Microwave Oven Control: feature bits error, feature must support one of PowerInWatts and PowerAsNumber"));
 
     // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
-    VerifyOrReturnError(!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts), 
+    VerifyOrReturnError(!mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
                         "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts"));
-                        
+
     // Per spec, the PowerNumberLimits feature is only allowed if the PowerAsNumber feature is supported.
-    VerifyOrReturnError(!mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber), 
+    VerifyOrReturnError(!mFeature.Has(MicrowaveOvenControl::Feature::kPowerNumberLimits) || mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
                         "Microwave Oven Control: feature bits error, if feature supports PowerNumberLimits it must support PowerAsNumber"));
-                        
+
     ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
     VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
     // If the PowerInWatts feature is supported, get the count of supported watt levels so we can later
@@ -87,7 +87,7 @@ CHIP_ERROR Instance::Init()
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
         mSupportedWattLevels = GetCountOfSupportedWattLevels();
-        VerifyOrReturnError(mSupportedWattLevels > 0, 
+        VerifyOrReturnError(mSupportedWattLevels > 0,
                             CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl, "Microwave Oven Control: supported watt levels is empty"));
     }
@@ -181,7 +181,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
             ChipLogError(Zcl, "Microwave Oven Control: can not get SuppoertWatts list, feature is not supported")
         );
-        
+
         return aEncoder.EncodeList([delegate = mDelegate](const auto & encoder) -> CHIP_ERROR {
             uint16_t wattRating;
             uint8_t index  = 0;
