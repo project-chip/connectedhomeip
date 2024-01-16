@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <EnergyEvseDelegateImpl.h>
+#include <DeviceEnergyManagementDelegateImpl.h>
 #include <app/clusters/energy-evse-server/energy-evse-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
@@ -26,35 +26,32 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace EnergyEvse {
 
-class EnergyEvseManager : public Instance
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+class DeviceEnergyManagementManager : public Instance
 {
 public:
-    EnergyEvseManager(EndpointId aEndpointId, EnergyEvseDelegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-                      OptionalCommands aOptionalCmds) :
-        EnergyEvse::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds)
+    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature,
+                                  OptionalCommands aOptionalCmds) :
+        DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature, aOptionalCmds)
     {
         mDelegate = &aDelegate;
     }
 
     // Delete copy constructor and assignment operator.
-    EnergyEvseManager(const EnergyEvseManager &)             = delete;
-    EnergyEvseManager(const EnergyEvseManager &&)            = delete;
-    EnergyEvseManager & operator=(const EnergyEvseManager &) = delete;
+    DeviceEnergyManagementManager(const DeviceEnergyManagementManager &)             = delete;
+    DeviceEnergyManagementManager(const DeviceEnergyManagementManager &&)            = delete;
+    DeviceEnergyManagementManager & operator=(const DeviceEnergyManagementManager &) = delete;
 
     CHIP_ERROR Init();
     void Shutdown();
 
-    CHIP_ERROR LoadPersistentAttributes();
-
-    EnergyEvseDelegate * GetDelegate() { return mDelegate; };
+    DeviceEnergyManagementDelegate * GetDelegate() { return mDelegate; };
 
 private:
-    EnergyEvseDelegate * mDelegate;
+    DeviceEnergyManagementDelegate * mDelegate;
 };
 
-} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip

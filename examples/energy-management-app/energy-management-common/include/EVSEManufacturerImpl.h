@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <DeviceEnergyManagementManager.h>
 #include <EnergyEvseManager.h>
 
 using chip::Protocols::InteractionModel::Status;

@@ -33,7 +33,7 @@ CHIP_ERROR EVSEManufacturer::Init()
     EnergyEvseDelegate * dg = GetEvseManufacturer()->GetDelegate();
     if (dg == nullptr)
     {
-        ChipLogError(AppServer, "Delegate is not initialized");
+        ChipLogError(AppServer, "EVSE Delegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
 
