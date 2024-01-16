@@ -45,7 +45,7 @@ makes your device your device. Most are generated statically using zap.
 The cluster implementations are the core logic that back the cluster. The
 cluster implementation code receives messages from the ember layer to request
 data model operations on the cluster (reads / writes / commands). They are also
-responsible for even generation and attribute change reporting. Simple cluster
+responsible for event generation and attribute change reporting. Simple cluster
 logic can be written in the ember callback functions, but more complex cluster
 logic is handled in the run-time installed interface layers.
 
