@@ -26,6 +26,7 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
 
         default:
             result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+            break;
     }
     
     return result;
@@ -73,6 +74,7 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
             default:
                 result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+                break;
         }
         break;    
 
@@ -80,6 +82,7 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         default:
            result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
+           break;
         }
 
     return result;
