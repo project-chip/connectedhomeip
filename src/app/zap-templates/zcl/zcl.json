@@ -362,16 +362,8 @@
             "OnMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
-        "RVC Run Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
+        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
             "OperationalState",
             "OperationalError",
