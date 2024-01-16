@@ -59,12 +59,14 @@ public:
 private:
     bool IsMdnsBroadcastPacket(const IPPacketInfo & pktInfo)
     {
+#if INET_CONFIG_ENABLE_IPV4
         if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == 5353)
         {
             ip4_addr_t mdnsBroadcastAddr4;
             ip4addr_aton("224.0.0.251", &mdnsBroadcastAddr4);
             return pktInfo.DestAddress.ToIPv4().addr == mdnsBroadcastAddr4.addr;
         }
+#endif
         if (pktInfo.DestAddress.IsIPv6() && pktInfo.DestPort == 5353)
         {
             ip6_addr_t mdnsBroadcastAddr6;
