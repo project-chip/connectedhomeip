@@ -273,9 +273,18 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::ClusterRevision::Id:
         return aEncoder.Encode(kCurrentClusterRevision);
 
-    case Attributes::SupportedWiFiBands::Id:
+    case Attributes::SupportedWiFiBands::Id: {
 #if (!CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION && !CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
+        // This is a case of shared zap config where mandatory wifi attributes are enabled for a thread platform (e.g
+        // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
+        // product. Temporarily return an list of 1 element of value 0 until a solution is implemented with the attribute list
+        // return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            WiFiBandEnum bands = WiFiBandEnum::k2g4;
+            ReturnErrorOnFailure(encoder.Encode(bands));
+            return CHIP_NO_ERROR;
+        });
 #else
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
@@ -294,22 +303,40 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_NO_ERROR;
         });
 #endif
-    case Attributes::SupportedThreadFeatures::Id:
+    }
+    break;
+    case Attributes::SupportedThreadFeatures::Id: {
 #if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD)
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
+        // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
+        // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
+        // product. Temporarily encode a value of 0 reflecting no thread capabilities until a solution is implemented with the
+        // attribute list
+        // return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        BitMask<ThreadCapabilities> noThreadCapabilities = 0;
+        return aEncoder.Encode(noThreadCapabilities);
 #else
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures());
 #endif
-        break;
-    case Attributes::ThreadVersion::Id:
+    }
+    break;
+    case Attributes::ThreadVersion::Id: {
 #if (!CHIP_DEVICE_CONFIG_ENABLE_THREAD)
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
+        // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
+        // all-cluster-app) Real world product must only enable the attributes tied to the network technology supported by their
+        // product. Temporarily encode a value of 0 reflecting no thread version until a solution is implemented with the
+        // attribute list
+        // return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        uint16_t noThreadVersion = 0;
+        return aEncoder.Encode(noThreadVersion);
 #else
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
         return aEncoder.Encode(mpDriver.Get<ThreadDriver *>()->GetThreadVersion());
 #endif
-        break;
+    }
+    break;
     default:
         return CHIP_NO_ERROR;
     }
