@@ -14,21 +14,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package chip.devicecontroller.cluster.structs
+package matter.controller.cluster.structs
 
-import chip.devicecontroller.cluster.*
+import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesClusterExtensionFieldSet(
-  val clusterID: ULong,
-  val attributeValueList: List<ScenesClusterAttributeValuePair>
+class ScenesManagementClusterExtensionFieldSet(
+  val clusterID: UInt,
+  val attributeValueList: List<ScenesManagementClusterAttributeValuePair>
 ) {
   override fun toString(): String = buildString {
-    append("ScenesClusterExtensionFieldSet {\n")
+    append("ScenesManagementClusterExtensionFieldSet {\n")
     append("\tclusterID : $clusterID\n")
     append("\tattributeValueList : $attributeValueList\n")
     append("}\n")
@@ -51,21 +51,21 @@ class ScenesClusterExtensionFieldSet(
     private const val TAG_CLUSTER_I_D = 0
     private const val TAG_ATTRIBUTE_VALUE_LIST = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesClusterExtensionFieldSet {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterExtensionFieldSet {
       tlvReader.enterStructure(tlvTag)
-      val clusterID = tlvReader.getULong(ContextSpecificTag(TAG_CLUSTER_I_D))
+      val clusterID = tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER_I_D))
       val attributeValueList =
-        buildList<ScenesClusterAttributeValuePair> {
+        buildList<ScenesManagementClusterAttributeValuePair> {
           tlvReader.enterArray(ContextSpecificTag(TAG_ATTRIBUTE_VALUE_LIST))
           while (!tlvReader.isEndOfContainer()) {
-            add(ScenesClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
+            add(ScenesManagementClusterAttributeValuePair.fromTlv(AnonymousTag, tlvReader))
           }
           tlvReader.exitContainer()
         }
 
       tlvReader.exitContainer()
 
-      return ScenesClusterExtensionFieldSet(clusterID, attributeValueList)
+      return ScenesManagementClusterExtensionFieldSet(clusterID, attributeValueList)
     }
   }
 }
