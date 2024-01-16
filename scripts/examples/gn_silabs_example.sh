@@ -34,6 +34,7 @@ USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
+USE_OT_LIB=false
 GN_PATH=gn
 GN_PATH_PROVIDED=false
 USE_BOOTLOADER=false
@@ -166,6 +167,7 @@ else
 
     shift
     shift
+    otLibArgs=""
     while [ $# -gt 0 ]; do
         case $1 in
             --clean)
@@ -209,11 +211,13 @@ else
                 shift
                 ;;
             --use_ot_lib)
-                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
+                USE_OT_LIB=true
+                otLibArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
                 shift
                 ;;
             --use_ot_coap_lib)
-                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
+                USE_OT_LIB=true
+                otLibArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
             --use_chip_lwip_lib)
@@ -297,6 +301,10 @@ else
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
         optArgs+="chip_device_platform =\"SiWx917\" is_debug=false "
+    fi
+
+    if [ "$USE_OT_LIB" == true ] && [ "$USE_WIFI" == false ]; then
+        optArgs+="$otLibArgs"
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
