@@ -190,7 +190,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     bool testOnlySuppressTimedRequestMessage = false;
-    uint16_t * testOnlyCommandRefsOverride = nullptr;
+    uint16_t * testOnlyCommandRefsOverride   = nullptr;
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
@@ -204,7 +204,8 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         }
         if (testOnlyOverrides->overrideCommandRefsList != nullptr)
         {
-            VerifyOrReturnError(length == testOnlyOverrides->overrideCommandRefsListLength, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+            VerifyOrReturnError(length == testOnlyOverrides->overrideCommandRefsListLength,
+                                ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
             testOnlyCommandRefsOverride = testOnlyOverrides->overrideCommandRefsList;
         }
     }
@@ -224,8 +225,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
 
     bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
     std::unique_ptr<CommandSender> sender =
-        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
-                                        isTimedRequest, suppressResponse);
+        std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(), isTimedRequest, suppressResponse);
 
     SuccessOrExit(err = sender->SetCommandSenderConfig(config));
 
@@ -271,22 +271,25 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
             VerifyOrDie(additionalParams.commandRef.Value() == testOnlyCommandRefsOverride[i]);
             // Ignoring the result of adding to index as the test might be trying to set duplicate CommandRefs.
             callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i);
-        } else {
+        }
+        else
+        {
             SuccessOrExit(err = callback->AddCommandRefToIndexLookup(additionalParams.commandRef.Value(), i));
         }
     }
 
     {
-        Optional<System::Clock::Timeout> interactionTimeout = interactionTimeoutMs != 0 ? MakeOptional(System::Clock::Milliseconds32(interactionTimeoutMs)) : Optional<System::Clock::Timeout>::Missing();
+        Optional<System::Clock::Timeout> interactionTimeout = interactionTimeoutMs != 0
+            ? MakeOptional(System::Clock::Milliseconds32(interactionTimeoutMs))
+            : Optional<System::Clock::Timeout>::Missing();
         if (testOnlySuppressTimedRequestMessage)
         {
-            SuccessOrExit(err = sender->TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(
-                              device->GetSecureSession().Value(), interactionTimeout));
+            SuccessOrExit(err = sender->TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(device->GetSecureSession().Value(),
+                                                                                               interactionTimeout));
         }
         else
         {
-            SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(),
-                                                           interactionTimeout));
+            SuccessOrExit(err = sender->SendCommandRequest(device->GetSecureSession().Value(), interactionTimeout));
         }
     }
 
@@ -380,7 +383,8 @@ PyChipError pychip_CommandSender_SendBatchCommands(void * appContext, DeviceProx
 }
 
 PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                                           uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
+                                                           uint16_t interactionTimeoutMs, uint16_t busyWaitMs,
+                                                           bool suppressResponse,
                                                            python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
                                                            python::PyInvokeRequestData * batchCommandData, size_t length)
 {
@@ -391,7 +395,6 @@ PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, De
     return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
 #endif
 }
-
 
 PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
     void * appContext, DeviceProxy * device, chip::EndpointId endpointId, chip::ClusterId clusterId, chip::CommandId commandId,
