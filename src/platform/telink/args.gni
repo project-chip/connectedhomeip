@@ -19,7 +19,4 @@ chip_inet_config_enable_ipv4 = false
 declare_args() {
   # Enable factory data support
   chip_enable_factory_data = false
-
-  # Enable Zephyr application to be booted by MCUboot
-  chip_enable_bootloader_mcuboot = false
 }
