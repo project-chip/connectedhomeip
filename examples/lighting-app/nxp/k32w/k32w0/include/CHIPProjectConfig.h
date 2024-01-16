@@ -48,13 +48,6 @@
 #define CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER 0
 #endif
 
-#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
-#ifndef CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS
-// Set to 3: default number of custom Ids from CustomFactoryDataProvider example
-#define CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS 3
-#endif
-#endif
-
 // VID/PID for product => will be used by Basic Information Cluster
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x1037
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0xA220
