@@ -141,6 +141,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
+            is_optional_write = xml_cluster.attributes[attribute_id].write_optional
 
             attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
@@ -155,7 +156,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # This will only not work if we end up with write-only attributes. We do not currently have any of these.
             val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
             if isinstance(val, list):
-                # TODO: does this need a tracking issue? When we attempt to write a list that's too big, it fails.
+                # Use an empty list for writes in case the list is large and does not fit
                 val = []
 
             resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
@@ -179,8 +180,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                       problem="Unexpected UnsupportedAccess writing attribute")
                     self.success = False
             else:
-                # TODO: handle optionally writeable attributes in here.
-                if resp[0].Status != Status.UnsupportedAccess:
+                ok = (is_optional_write and resp[0].Status == Status.UnsupportedWrite) or resp[0].Status == Status.UnsupportedAccess
+                if not ok:
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing attribute - expected Unsupported Access, got {resp[0].Status}")
                     self.success = False
