@@ -70,8 +70,9 @@ class HelloTest(MatterBaseTest):
 
     def steps_pics(self) -> list[TestStep]:
         steps = [TestStep(1, "Commissioning, already done", is_commissioning=True),
-                 TestStep(2, "Skip this step"),
-                 TestStep(3, "Run this step")
+                 TestStep(2, "Skip this step based on pics"),
+                 TestStep(3, "Run this step"),
+                 TestStep(4, "Always skip this step")
                  ]
         return steps
 
@@ -89,6 +90,8 @@ class HelloTest(MatterBaseTest):
 
         self.step(3)
         print('This should also be run')
+
+        self.skip_step(4)
 
 
 if __name__ == "__main__":

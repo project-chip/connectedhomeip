@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 36.2.3. [TC-WNCV-2.3] Mode Attribute with server as DUT
+name: 36.2.3. [TC-WNCV-2.3] Mode attribute [DUT as Server]
 
 PICS:
     - WNCV.S

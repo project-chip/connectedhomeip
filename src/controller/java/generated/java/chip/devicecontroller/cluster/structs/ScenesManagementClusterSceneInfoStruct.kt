@@ -14,24 +14,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package matter.controller.cluster.structs
+package chip.devicecontroller.cluster.structs
 
-import matter.controller.cluster.*
+import chip.devicecontroller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesClusterSceneInfoStruct(
-  val sceneCount: UByte,
-  val currentScene: UByte,
-  val currentGroup: UShort,
+class ScenesManagementClusterSceneInfoStruct(
+  val sceneCount: UInt,
+  val currentScene: UInt,
+  val currentGroup: UInt,
   val sceneValid: Boolean,
-  val remainingCapacity: UByte,
-  val fabricIndex: UByte
+  val remainingCapacity: UInt,
+  val fabricIndex: UInt
 ) {
   override fun toString(): String = buildString {
-    append("ScenesClusterSceneInfoStruct {\n")
+    append("ScenesManagementClusterSceneInfoStruct {\n")
     append("\tsceneCount : $sceneCount\n")
     append("\tcurrentScene : $currentScene\n")
     append("\tcurrentGroup : $currentGroup\n")
@@ -62,18 +62,18 @@ class ScenesClusterSceneInfoStruct(
     private const val TAG_REMAINING_CAPACITY = 4
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesClusterSceneInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterSceneInfoStruct {
       tlvReader.enterStructure(tlvTag)
-      val sceneCount = tlvReader.getUByte(ContextSpecificTag(TAG_SCENE_COUNT))
-      val currentScene = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_SCENE))
-      val currentGroup = tlvReader.getUShort(ContextSpecificTag(TAG_CURRENT_GROUP))
+      val sceneCount = tlvReader.getUInt(ContextSpecificTag(TAG_SCENE_COUNT))
+      val currentScene = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_SCENE))
+      val currentGroup = tlvReader.getUInt(ContextSpecificTag(TAG_CURRENT_GROUP))
       val sceneValid = tlvReader.getBoolean(ContextSpecificTag(TAG_SCENE_VALID))
-      val remainingCapacity = tlvReader.getUByte(ContextSpecificTag(TAG_REMAINING_CAPACITY))
-      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
+      val remainingCapacity = tlvReader.getUInt(ContextSpecificTag(TAG_REMAINING_CAPACITY))
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
-      return ScenesClusterSceneInfoStruct(
+      return ScenesManagementClusterSceneInfoStruct(
         sceneCount,
         currentScene,
         currentGroup,

@@ -24,7 +24,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 0: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -44,10 +46,14 @@ tests:
       command: "readAttribute"
       attribute: "InputList"
 
-    - label: "Step 2: Show Input Status Command"
+    - label:
+          "Step 2: TH sends ShowInputStatus command to DUT to show active status
+          of the input list"
       PICS: MEDIAINPUT.S.C01.Rsp
       command: "ShowInputStatus"
 
-    - label: "Step 3: Hide Input Status Command"
+    - label:
+          "Step 3: TH sends HideInputStatus command to DUT to hide active status
+          of the input list"
       PICS: MEDIAINPUT.S.C02.Rsp
       command: "HideInputStatus"

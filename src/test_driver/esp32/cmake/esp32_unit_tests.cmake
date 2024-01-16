@@ -37,6 +37,7 @@ macro(esp32_unit_test)
         -Wl,--whole-archive ${UNIT_TEST_LIBRARY} -Wl,--no-whole-archive
         ${UNIT_TEST_EXTRA_LIBRARIES}
         -lSupportTesting
+        -lTestUtils
         nlunit-test
         nlfaultinjection
     )
