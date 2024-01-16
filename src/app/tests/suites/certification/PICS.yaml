@@ -9364,28 +9364,6 @@ PICS:
           as a server?"
       id: VALCC.S
 
-    # ManuallyControlled
-
-    - label:
-          "Can the CurrentState attribute changed by physical control at the
-          device?"
-      id: VALCC.S.M.ManualCurrentState
-
-    - label:
-          "Can the TargetState attribute changed by physical control at the
-          device?"
-      id: VALCC.S.M.ManualTargetState
-
-    - label:
-          "Can the CurrentLevel attribute changed by physical control at the
-          device?"
-      id: VALCC.S.M.ManualCurrentLevel
-
-    - label:
-          "Can the TargetLevel attribute changed by physical control at the
-          device?"
-      id: VALCC.S.M.ManualTargetLevel
-
     #Features
     - label:
           "Does the device support the ability to use UTC time is used for time
