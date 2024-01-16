@@ -304,7 +304,7 @@ public:
      * @return CHIP_ERROR_INVALID_ARGUMENT
      *                      Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-     *                      CommandSender has not been provided callbacks expected for supporting batck commands.
+     *                      CommandSender has not been provided callbacks expected for supporting batch commands.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
