@@ -74,7 +74,7 @@ events.
 
 Last, ensure that your attributes have the storage option set appropriately.
 
-![](img/zap5.png)
+![](../getting_started/img/zap5.png)
 
 ### Cluster implementation - Ember and overrides
 
