@@ -367,13 +367,11 @@
         "RVC Clean Mode": [
             "SupportedModes",
             "CurrentMode",
-            "OnMode",
             "FeatureMap"
         ],
         "RVC Run Mode": [
             "SupportedModes",
             "CurrentMode",
-            "OnMode",
             "FeatureMap"
         ],
         "Operational State": [
