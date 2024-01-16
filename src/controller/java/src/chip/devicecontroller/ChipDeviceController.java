@@ -141,7 +141,28 @@ public class ChipDeviceController {
       long deviceId,
       long setupPincode,
       NetworkCredentials networkCredentials) {
-    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials);
+    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials, null);
+  }
+
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      NetworkCredentials networkCredentials,
+      ICDRegistrationInfo registrationInfo) {
+    pairDevice(
+        bleServer, connId, deviceId, setupPincode, null, networkCredentials, registrationInfo);
+  }
+
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials) {
+    pairDevice(bleServer, connId, deviceId, setupPincode, csrNonce, networkCredentials, null);
   }
 
   /**
@@ -153,6 +174,11 @@ public class ChipDeviceController {
    * @param setupPincode the pincode for the device
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
+   *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
+   *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
+   *     ICDRegistrationInfo value.
    */
   public void pairDevice(
       BluetoothGatt bleServer,
@@ -160,7 +186,8 @@ public class ChipDeviceController {
       long deviceId,
       long setupPincode,
       @Nullable byte[] csrNonce,
-      NetworkCredentials networkCredentials) {
+      NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo) {
     if (connectionId == 0) {
       connectionId = connId;
 
@@ -173,7 +200,13 @@ public class ChipDeviceController {
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
       pairDevice(
-          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials);
+          deviceControllerPtr,
+          deviceId,
+          connectionId,
+          setupPincode,
+          csrNonce,
+          networkCredentials,
+          icdRegistrationInfo);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -188,21 +221,43 @@ public class ChipDeviceController {
       long pinCode,
       @Nullable byte[] csrNonce) {
     pairDeviceWithAddress(
-        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
+        deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce, null);
   }
 
   /**
-   * Pair a device connected using the scanned QR code or manual entry code.
+   * Pair a device connected using IP Address.
    *
    * @param deviceId the node ID to assign to the device
-   * @param setupCode the scanned QR code or manual entry code
-   * @param discoverOnce the flag to enable/disable PASE auto retry mechanism
-   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
-   *     the network
+   * @param address IP Address of the connecting device
+   * @param port the port of the connecting device
+   * @param discriminator the discriminator for connecting device
+   * @param pinCode the pincode for connecting device
    * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
    *     generated CSR nonce.
-   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
+   *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
+   *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
+   *     ICDRegistrationInfo value.
    */
+  public void pairDeviceWithAddress(
+      long deviceId,
+      String address,
+      int port,
+      int discriminator,
+      long pinCode,
+      @Nullable byte[] csrNonce,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo) {
+    pairDeviceWithAddress(
+        deviceControllerPtr,
+        deviceId,
+        address,
+        port,
+        discriminator,
+        pinCode,
+        csrNonce,
+        icdRegistrationInfo);
+  }
+
   public void pairDeviceWithCode(
       long deviceId,
       String setupCode,
@@ -217,7 +272,43 @@ public class ChipDeviceController {
         discoverOnce,
         useOnlyOnNetworkDiscovery,
         csrNonce,
-        networkCredentials);
+        networkCredentials,
+        null);
+  }
+
+  /**
+   * Pair a device connected using the scanned QR code or manual entry code.
+   *
+   * @param deviceId the node ID to assign to the device
+   * @param setupCode the scanned QR code or manual entry code
+   * @param discoverOnce the flag to enable/disable PASE auto retry mechanism
+   * @param useOnlyOnNetworkDiscovery the flag to indicate the commissionable device is available on
+   *     the network
+   * @param csrNonce the 32-byte CSR nonce to use, or null if we want to use an internally randomly
+   *     generated CSR nonce.
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   * @param icdRegistrationInfo the informations for ICD registration. For detailed information
+   *     {@link ICDRegistrationInfo}. If this value is null when commissioning an ICD device, {@link
+   *     CompletionListener.onICDRegistrationInfoRequired} is called to request the
+   *     ICDRegistrationInfo value.
+   */
+  public void pairDeviceWithCode(
+      long deviceId,
+      String setupCode,
+      boolean discoverOnce,
+      boolean useOnlyOnNetworkDiscovery,
+      @Nullable byte[] csrNonce,
+      @Nullable NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo) {
+    pairDeviceWithCode(
+        deviceControllerPtr,
+        deviceId,
+        setupCode,
+        discoverOnce,
+        useOnlyOnNetworkDiscovery,
+        csrNonce,
+        networkCredentials,
+        icdRegistrationInfo);
   }
 
   public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
@@ -323,6 +414,19 @@ public class ChipDeviceController {
    */
   public void updateCommissioningNetworkCredentials(NetworkCredentials networkCredentials) {
     updateCommissioningNetworkCredentials(deviceControllerPtr, networkCredentials);
+  }
+
+  /**
+   * Update the ICD registration information held by the commissioner for the current commissioning
+   * session.
+   *
+   * <p>Its expected that this method will be called in response the onICDRegistrationInfoRequired
+   * callbacks.
+   *
+   * @param ICDRegistrationInfo the ICD registration information to use in commissioning
+   */
+  public void updateCommissioningICDRegistrationInfo(ICDRegistrationInfo icdRegistrationInfo) {
+    updateCommissioningICDRegistrationInfo(deviceControllerPtr, icdRegistrationInfo);
   }
 
   public void unpairDevice(long deviceId) {
@@ -496,6 +600,18 @@ public class ChipDeviceController {
     completionListener.onError(error);
   }
 
+  public void onICDRegistrationInfoRequired() {
+    if (completionListener != null) {
+      completionListener.onICDRegistrationInfoRequired();
+    }
+  }
+
+  public void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo) {
+    if (completionListener != null) {
+      completionListener.onICDRegistrationComplete(errorCode, icdDeviceInfo);
+    }
+  }
+
   public void onNOCChainGenerationNeeded(CSRInfo csrInfo, AttestationInfo attestationInfo) {
     if (nocChainIssuer != null) {
       nocChainIssuer.onNOCChainGenerationNeeded(csrInfo, attestationInfo);
@@ -594,6 +710,19 @@ public class ChipDeviceController {
 
   public int getFabricIndex() {
     return getFabricIndex(deviceControllerPtr);
+  }
+
+  public List<ICDClientInfo> getICDClientInfo() {
+    return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
+  }
+
+  /**
+   * Returns the ICD Client Information
+   *
+   * @param fabricIndex the fabric index to check
+   */
+  public List<ICDClientInfo> getICDClientInfo(int fabricIndex) {
+    return getICDClientInfo(deviceControllerPtr, fabricIndex);
   }
 
   /* Shuts down all active subscriptions. */
@@ -1248,7 +1377,8 @@ public class ChipDeviceController {
       int connectionId,
       long pinCode,
       @Nullable byte[] csrNonce,
-      NetworkCredentials networkCredentials);
+      NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,
@@ -1257,7 +1387,8 @@ public class ChipDeviceController {
       int port,
       int discriminator,
       long pinCode,
-      @Nullable byte[] csrNonce);
+      @Nullable byte[] csrNonce,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
 
   private native void pairDeviceWithCode(
       long deviceControllerPtr,
@@ -1266,7 +1397,8 @@ public class ChipDeviceController {
       boolean discoverOnce,
       boolean useOnlyOnNetworkDiscovery,
       @Nullable byte[] csrNonce,
-      @Nullable NetworkCredentials networkCredentials);
+      @Nullable NetworkCredentials networkCredentials,
+      @Nullable ICDRegistrationInfo icdRegistrationInfo);
 
   private native void establishPaseConnection(
       long deviceControllerPtr, long deviceId, int connId, long setupPincode);
@@ -1363,6 +1495,11 @@ public class ChipDeviceController {
 
   private native void updateCommissioningNetworkCredentials(
       long deviceControllerPtr, NetworkCredentials networkCredentials);
+
+  private native void updateCommissioningICDRegistrationInfo(
+      long deviceControllerPtr, ICDRegistrationInfo icdRegistrationInfo);
+
+  private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
 
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
@@ -1475,5 +1612,14 @@ public class ChipDeviceController {
 
     /** Notifies the Commissioner when the OpCSR for the Comissionee is generated. */
     void onOpCSRGenerationComplete(byte[] csr);
+
+    /**
+     * Notifies when the ICD registration information (ICD symmetric key, check-in node ID and
+     * monitored subject) is required.
+     */
+    void onICDRegistrationInfoRequired();
+
+    /** Notifies when the registration flow for the ICD completes. */
+    void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo);
   }
 }

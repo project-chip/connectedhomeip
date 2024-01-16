@@ -38,6 +38,10 @@ shared_library("jni") {
   sources += [
     "App/app/src/main/jni/cpp/core/CastingApp-JNI.cpp",
     "App/app/src/main/jni/cpp/core/CastingApp-JNI.h",
+    "App/app/src/main/jni/cpp/core/CastingPlayerDiscovery-JNI.cpp",
+    "App/app/src/main/jni/cpp/core/CastingPlayerDiscovery-JNI.h",
+    "App/app/src/main/jni/cpp/support/CastingPlayerConverter-JNI.cpp",
+    "App/app/src/main/jni/cpp/support/CastingPlayerConverter-JNI.h",
     "App/app/src/main/jni/cpp/support/ErrorConverter-JNI.cpp",
     "App/app/src/main/jni/cpp/support/ErrorConverter-JNI.h",
     "App/app/src/main/jni/cpp/support/RotatingDeviceIdUniqueIdProvider-JNI.cpp",
@@ -97,6 +101,10 @@ android_library("java") {
   sources += [
     "App/app/src/main/jni/com/matter/casting/core/CastingApp.java",
     "App/app/src/main/jni/com/matter/casting/core/CastingAppState.java",
+    "App/app/src/main/jni/com/matter/casting/core/CastingPlayer.java",
+    "App/app/src/main/jni/com/matter/casting/core/CastingPlayerDiscovery.java",
+    "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayer.java",
+    "App/app/src/main/jni/com/matter/casting/core/MatterCastingPlayerDiscovery.java",
     "App/app/src/main/jni/com/matter/casting/support/AppParameters.java",
     "App/app/src/main/jni/com/matter/casting/support/CommissionableData.java",
     "App/app/src/main/jni/com/matter/casting/support/DACProvider.java",

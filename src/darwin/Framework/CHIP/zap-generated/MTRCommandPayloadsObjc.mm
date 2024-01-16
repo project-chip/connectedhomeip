@@ -1158,2389 +1158,6 @@ NS_ASSUME_NONNULL_BEGIN
     return self.groupID;
 }
 @end
-@implementation MTRScenesClusterAddSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-
-        _transitionTime = @(0);
-
-        _sceneName = @"";
-
-        _extensionFieldSets = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterAddSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.transitionTime = self.transitionTime;
-    other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterAddSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::AddScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-    {
-        encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneName = AsCharSpan(self.sceneName);
-    }
-    {
-        {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSets)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.extensionFieldSets.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSets.count);
-                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesClusterExtensionFieldSet class]]) {
-                        // Wrong kind of value.
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    auto element_0 = (MTRScenesClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
-                    listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
-                    {
-                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
-                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                        if (element_0.attributeValueList.count != 0) {
-                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
-                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            listFreer.add(listHolder_2);
-                            for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesClusterAttributeValuePair class]]) {
-                                    // Wrong kind of value.
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
-                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
-                            }
-                            listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
-                        } else {
-                            listHolder_0->mList[i_0].attributeValueList = ListType_2();
-                        }
-                    }
-                }
-                encodableStruct.extensionFieldSets = ListType_0(listHolder_0->mList, self.extensionFieldSets.count);
-            } else {
-                encodableStruct.extensionFieldSets = ListType_0();
-            }
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterAddSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterAddSceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterAddSceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterAddSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterAddSceneResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterViewSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterViewSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterViewSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::ViewScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterViewSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterViewSceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-
-        _transitionTime = nil;
-
-        _sceneName = nil;
-
-        _extensionFieldSets = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterViewSceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.transitionTime = self.transitionTime;
-    other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterViewSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
-    }
-    {
-        if (decodableStruct.transitionTime.HasValue()) {
-            self.transitionTime = [NSNumber numberWithUnsignedShort:decodableStruct.transitionTime.Value()];
-        } else {
-            self.transitionTime = nil;
-        }
-    }
-    {
-        if (decodableStruct.sceneName.HasValue()) {
-            self.sceneName = AsString(decodableStruct.sceneName.Value());
-            if (self.sceneName == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.sceneName = nil;
-        }
-    }
-    {
-        if (decodableStruct.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
-                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            return err;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-                self.extensionFieldSets = array_1;
-            }
-        } else {
-            self.extensionFieldSets = nil;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterViewSceneResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterRemoveSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterRemoveSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterRemoveSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::RemoveScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterRemoveSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterRemoveSceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterRemoveSceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterRemoveSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterRemoveSceneResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterRemoveAllScenesParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterRemoveAllScenesParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterRemoveAllScenesParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterRemoveAllScenesParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-@end
-@implementation MTRScenesClusterRemoveAllScenesResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterRemoveAllScenesResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterRemoveAllScenesResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterRemoveAllScenesResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-@end
-@implementation MTRScenesClusterStoreSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterStoreSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterStoreSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::StoreScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterStoreSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterStoreSceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterStoreSceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterStoreSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterStoreSceneResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterRecallSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-
-        _transitionTime = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterRecallSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.transitionTime = self.transitionTime;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterRecallSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::RecallScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-    {
-        if (self.transitionTime != nil) {
-            auto & definedValue_0 = encodableStruct.transitionTime.Emplace();
-            if (self.transitionTime == nil) {
-                definedValue_0.SetNull();
-            } else {
-                auto & nonNullValue_1 = definedValue_0.SetNonNull();
-                nonNullValue_1 = self.transitionTime.unsignedShortValue;
-            }
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterRecallSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterGetSceneMembershipParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterGetSceneMembershipParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterGetSceneMembershipParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterGetSceneMembershipParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-@end
-@implementation MTRScenesClusterGetSceneMembershipResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _capacity = nil;
-
-        _groupID = @(0);
-
-        _sceneList = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterGetSceneMembershipResponseParams alloc] init];
-
-    other.status = self.status;
-    other.capacity = self.capacity;
-    other.groupID = self.groupID;
-    other.sceneList = self.sceneList;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupID:%@; sceneList:%@; >", NSStringFromClass([self class]), _status, _capacity, _groupID, _sceneList];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterGetSceneMembershipResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        if (decodableStruct.capacity.IsNull()) {
-            self.capacity = nil;
-        } else {
-            self.capacity = [NSNumber numberWithUnsignedChar:decodableStruct.capacity.Value()];
-        }
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        if (decodableStruct.sceneList.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.sceneList.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    NSNumber * newElement_1;
-                    newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-                self.sceneList = array_1;
-            }
-        } else {
-            self.sceneList = nil;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterGetSceneMembershipResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-@end
-@implementation MTRScenesClusterEnhancedAddSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-
-        _transitionTime = @(0);
-
-        _sceneName = @"";
-
-        _extensionFieldSets = [NSArray array];
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterEnhancedAddSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.transitionTime = self.transitionTime;
-    other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterEnhancedAddSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::EnhancedAddScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-    {
-        encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneName = AsCharSpan(self.sceneName);
-    }
-    {
-        {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSets)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.extensionFieldSets.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSets.count);
-                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
-                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesClusterExtensionFieldSet class]]) {
-                        // Wrong kind of value.
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    auto element_0 = (MTRScenesClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
-                    listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
-                    {
-                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
-                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                        if (element_0.attributeValueList.count != 0) {
-                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
-                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            listFreer.add(listHolder_2);
-                            for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
-                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesClusterAttributeValuePair class]]) {
-                                    // Wrong kind of value.
-                                    return CHIP_ERROR_INVALID_ARGUMENT;
-                                }
-                                auto element_2 = (MTRScenesClusterAttributeValuePair *) element_0.attributeValueList[i_2];
-                                listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
-                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
-                            }
-                            listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
-                        } else {
-                            listHolder_0->mList[i_0].attributeValueList = ListType_2();
-                        }
-                    }
-                }
-                encodableStruct.extensionFieldSets = ListType_0(listHolder_0->mList, self.extensionFieldSets.count);
-            } else {
-                encodableStruct.extensionFieldSets = ListType_0();
-            }
-        }
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterEnhancedAddSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterEnhancedAddSceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterEnhancedAddSceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterEnhancedAddSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterEnhancedAddSceneResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterEnhancedViewSceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterEnhancedViewSceneParams alloc] init];
-
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterEnhancedViewSceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::EnhancedViewScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.groupID = self.groupID.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterEnhancedViewSceneParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterEnhancedViewSceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupID = @(0);
-
-        _sceneID = @(0);
-
-        _transitionTime = nil;
-
-        _sceneName = nil;
-
-        _extensionFieldSets = nil;
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterEnhancedViewSceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupID = self.groupID;
-    other.sceneID = self.sceneID;
-    other.transitionTime = self.transitionTime;
-    other.sceneName = self.sceneName;
-    other.extensionFieldSets = self.extensionFieldSets;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterEnhancedViewSceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
-    }
-    {
-        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
-    }
-    {
-        if (decodableStruct.transitionTime.HasValue()) {
-            self.transitionTime = [NSNumber numberWithUnsignedShort:decodableStruct.transitionTime.Value()];
-        } else {
-            self.transitionTime = nil;
-        }
-    }
-    {
-        if (decodableStruct.sceneName.HasValue()) {
-            self.sceneName = AsString(decodableStruct.sceneName.Value());
-            if (self.sceneName == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
-        } else {
-            self.sceneName = nil;
-        }
-    }
-    {
-        if (decodableStruct.extensionFieldSets.HasValue()) {
-            { // Scope for our temporary variables
-                auto * array_1 = [NSMutableArray new];
-                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
-                while (iter_1.Next()) {
-                    auto & entry_1 = iter_1.GetValue();
-                    MTRScenesClusterExtensionFieldSet * newElement_1;
-                    newElement_1 = [MTRScenesClusterExtensionFieldSet new];
-                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
-                    { // Scope for our temporary variables
-                        auto * array_3 = [NSMutableArray new];
-                        auto iter_3 = entry_1.attributeValueList.begin();
-                        while (iter_3.Next()) {
-                            auto & entry_3 = iter_3.GetValue();
-                            MTRScenesClusterAttributeValuePair * newElement_3;
-                            newElement_3 = [MTRScenesClusterAttributeValuePair new];
-                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
-                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
-                            [array_3 addObject:newElement_3];
-                        }
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            return err;
-                        }
-                        newElement_1.attributeValueList = array_3;
-                    }
-                    [array_1 addObject:newElement_1];
-                }
-                CHIP_ERROR err = iter_1.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    return err;
-                }
-                self.extensionFieldSets = array_1;
-            }
-        } else {
-            self.extensionFieldSets = nil;
-        }
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterEnhancedViewSceneResponseParams (Deprecated)
-
-- (void)setGroupId:(NSNumber * _Nonnull)groupId
-{
-    self.groupID = groupId;
-}
-
-- (NSNumber * _Nonnull)groupId
-{
-    return self.groupID;
-}
-
-- (void)setSceneId:(NSNumber * _Nonnull)sceneId
-{
-    self.sceneID = sceneId;
-}
-
-- (NSNumber * _Nonnull)sceneId
-{
-    return self.sceneID;
-}
-@end
-@implementation MTRScenesClusterCopySceneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mode = @(0);
-
-        _groupIdentifierFrom = @(0);
-
-        _sceneIdentifierFrom = @(0);
-
-        _groupIdentifierTo = @(0);
-
-        _sceneIdentifierTo = @(0);
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterCopySceneParams alloc] init];
-
-    other.mode = self.mode;
-    other.groupIdentifierFrom = self.groupIdentifierFrom;
-    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
-    other.groupIdentifierTo = self.groupIdentifierTo;
-    other.sceneIdentifierTo = self.sceneIdentifierTo;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mode:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; groupIdentifierTo:%@; sceneIdentifierTo:%@; >", NSStringFromClass([self class]), _mode, _groupIdentifierFrom, _sceneIdentifierFrom, _groupIdentifierTo, _sceneIdentifierTo];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRScenesClusterCopySceneParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::Scenes::Commands::CopyScene::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.mode = static_cast<std::remove_reference_t<decltype(encodableStruct.mode)>>(self.mode.unsignedCharValue);
-    }
-    {
-        encodableStruct.groupIdentifierFrom = self.groupIdentifierFrom.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneIdentifierFrom = self.sceneIdentifierFrom.unsignedCharValue;
-    }
-    {
-        encodableStruct.groupIdentifierTo = self.groupIdentifierTo.unsignedShortValue;
-    }
-    {
-        encodableStruct.sceneIdentifierTo = self.sceneIdentifierTo.unsignedCharValue;
-    }
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRScenesClusterCopySceneParams (Deprecated)
-
-- (void)setGroupIdFrom:(NSNumber * _Nonnull)groupIdFrom
-{
-    self.groupIdentifierFrom = groupIdFrom;
-}
-
-- (NSNumber * _Nonnull)groupIdFrom
-{
-    return self.groupIdentifierFrom;
-}
-
-- (void)setSceneIdFrom:(NSNumber * _Nonnull)sceneIdFrom
-{
-    self.sceneIdentifierFrom = sceneIdFrom;
-}
-
-- (NSNumber * _Nonnull)sceneIdFrom
-{
-    return self.sceneIdentifierFrom;
-}
-
-- (void)setGroupIdTo:(NSNumber * _Nonnull)groupIdTo
-{
-    self.groupIdentifierTo = groupIdTo;
-}
-
-- (NSNumber * _Nonnull)groupIdTo
-{
-    return self.groupIdentifierTo;
-}
-
-- (void)setSceneIdTo:(NSNumber * _Nonnull)sceneIdTo
-{
-    self.sceneIdentifierTo = sceneIdTo;
-}
-
-- (NSNumber * _Nonnull)sceneIdTo
-{
-    return self.sceneIdentifierTo;
-}
-@end
-@implementation MTRScenesClusterCopySceneResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _groupIdentifierFrom = @(0);
-
-        _sceneIdentifierFrom = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRScenesClusterCopySceneResponseParams alloc] init];
-
-    other.status = self.status;
-    other.groupIdentifierFrom = self.groupIdentifierFrom;
-    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; >", NSStringFromClass([self class]), _status, _groupIdentifierFrom, _sceneIdentifierFrom];
-    return descriptionString;
-}
-
-- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
-                                         error:(NSError * __autoreleasing *)error
-{
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    using DecodableType = chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
-    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
-                                                                           clusterID:DecodableType::GetClusterId()
-                                                                           commandID:DecodableType::GetCommandId()
-                                                                               error:error];
-    if (buffer.IsNull()) {
-        return nil;
-    }
-
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer->Start(), buffer->DataLength());
-
-    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
-    if (err == CHIP_NO_ERROR) {
-        DecodableType decodedStruct;
-        err = chip::app::DataModel::Decode(reader, decodedStruct);
-        if (err == CHIP_NO_ERROR) {
-            err = [self _setFieldsFromDecodableStruct:decodedStruct];
-            if (err == CHIP_NO_ERROR) {
-                return self;
-            }
-        }
-    }
-
-    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
-    MTR_LOG_ERROR("%s", errorStr.UTF8String);
-    if (error != nil) {
-        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
-        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
-    }
-    return nil;
-}
-
-@end
-
-@implementation MTRScenesClusterCopySceneResponseParams (InternalMethods)
-
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &)decodableStruct
-{
-    {
-        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
-    }
-    {
-        self.groupIdentifierFrom = [NSNumber numberWithUnsignedShort:decodableStruct.groupIdentifierFrom];
-    }
-    {
-        self.sceneIdentifierFrom = [NSNumber numberWithUnsignedChar:decodableStruct.sceneIdentifierFrom];
-    }
-    return CHIP_NO_ERROR;
-}
-
-@end
-
-@implementation MTRScenesClusterCopySceneResponseParams (Deprecated)
-
-- (void)setGroupIdFrom:(NSNumber * _Nonnull)groupIdFrom
-{
-    self.groupIdentifierFrom = groupIdFrom;
-}
-
-- (NSNumber * _Nonnull)groupIdFrom
-{
-    return self.groupIdentifierFrom;
-}
-
-- (void)setSceneIdFrom:(NSNumber * _Nonnull)sceneIdFrom
-{
-    self.sceneIdentifierFrom = sceneIdFrom;
-}
-
-- (NSNumber * _Nonnull)sceneIdFrom
-{
-    return self.sceneIdentifierFrom;
-}
-@end
 @implementation MTROnOffClusterOffParams
 - (instancetype)init
 {
@@ -15236,6 +12853,1973 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRScenesManagementClusterAddSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+
+        _transitionTime = @(0);
+
+        _sceneName = @"";
+
+        _extensionFieldSets = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterAddSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterAddSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::AddScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+    {
+        encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneName = AsCharSpan(self.sceneName);
+    }
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSets)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.extensionFieldSets.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSets.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
+                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesManagementClusterExtensionFieldSet class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (MTRScenesManagementClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
+                    listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
+                    {
+                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
+                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                        if (element_0.attributeValueList.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
+                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePair class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
+                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
+                            }
+                            listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
+                        } else {
+                            listHolder_0->mList[i_0].attributeValueList = ListType_2();
+                        }
+                    }
+                }
+                encodableStruct.extensionFieldSets = ListType_0(listHolder_0->mList, self.extensionFieldSets.count);
+            } else {
+                encodableStruct.extensionFieldSets = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterAddSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterAddSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterAddSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::AddSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterViewSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterViewSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterViewSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::ViewScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterViewSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+
+        _transitionTime = nil;
+
+        _sceneName = nil;
+
+        _extensionFieldSets = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterViewSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterViewSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::ViewSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    {
+        if (decodableStruct.transitionTime.HasValue()) {
+            self.transitionTime = [NSNumber numberWithUnsignedShort:decodableStruct.transitionTime.Value()];
+        } else {
+            self.transitionTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.sceneName.HasValue()) {
+            self.sceneName = AsString(decodableStruct.sceneName.Value());
+            if (self.sceneName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.sceneName = nil;
+        }
+    }
+    {
+        if (decodableStruct.extensionFieldSets.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRScenesManagementClusterExtensionFieldSet * newElement_1;
+                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSet new];
+                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.attributeValueList.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTRScenesManagementClusterAttributeValuePair * newElement_3;
+                            newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        newElement_1.attributeValueList = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.extensionFieldSets = array_1;
+            }
+        } else {
+            self.extensionFieldSets = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRemoveSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterRemoveSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRemoveSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::RemoveScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterRemoveSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterRemoveSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRemoveSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRemoveAllScenesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterRemoveAllScenesParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRemoveAllScenesParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenes::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterRemoveAllScenesResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterRemoveAllScenesResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRemoveAllScenesResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterStoreSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterStoreSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterStoreSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::StoreScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterStoreSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterStoreSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterStoreSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::StoreSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRecallSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+
+        _transitionTime = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterRecallSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.transitionTime = self.transitionTime;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterRecallSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::RecallScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+    {
+        if (self.transitionTime != nil) {
+            auto & definedValue_0 = encodableStruct.transitionTime.Emplace();
+            if (self.transitionTime == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.transitionTime.unsignedShortValue;
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterGetSceneMembershipParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterGetSceneMembershipParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterGetSceneMembershipParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::GetSceneMembership::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterGetSceneMembershipResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _capacity = nil;
+
+        _groupID = @(0);
+
+        _sceneList = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterGetSceneMembershipResponseParams alloc] init];
+
+    other.status = self.status;
+    other.capacity = self.capacity;
+    other.groupID = self.groupID;
+    other.sceneList = self.sceneList;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupID:%@; sceneList:%@; >", NSStringFromClass([self class]), _status, _capacity, _groupID, _sceneList];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterGetSceneMembershipResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        if (decodableStruct.capacity.IsNull()) {
+            self.capacity = nil;
+        } else {
+            self.capacity = [NSNumber numberWithUnsignedChar:decodableStruct.capacity.Value()];
+        }
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        if (decodableStruct.sceneList.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.sceneList.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    NSNumber * newElement_1;
+                    newElement_1 = [NSNumber numberWithUnsignedChar:entry_1];
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.sceneList = array_1;
+            }
+        } else {
+            self.sceneList = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterEnhancedAddSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+
+        _transitionTime = @(0);
+
+        _sceneName = @"";
+
+        _extensionFieldSets = [NSArray array];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterEnhancedAddSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterEnhancedAddSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::EnhancedAddScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+    {
+        encodableStruct.transitionTime = self.transitionTime.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneName = AsCharSpan(self.sceneName);
+    }
+    {
+        {
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.extensionFieldSets)>;
+            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+            if (self.extensionFieldSets.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.extensionFieldSets.count);
+                if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
+                listFreer.add(listHolder_0);
+                for (size_t i_0 = 0; i_0 < self.extensionFieldSets.count; ++i_0) {
+                    if (![self.extensionFieldSets[i_0] isKindOfClass:[MTRScenesManagementClusterExtensionFieldSet class]]) {
+                        // Wrong kind of value.
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    auto element_0 = (MTRScenesManagementClusterExtensionFieldSet *) self.extensionFieldSets[i_0];
+                    listHolder_0->mList[i_0].clusterID = element_0.clusterID.unsignedIntValue;
+                    {
+                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].attributeValueList)>;
+                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                        if (element_0.attributeValueList.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.attributeValueList.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i_2 = 0; i_2 < element_0.attributeValueList.count; ++i_2) {
+                                if (![element_0.attributeValueList[i_2] isKindOfClass:[MTRScenesManagementClusterAttributeValuePair class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_2 = (MTRScenesManagementClusterAttributeValuePair *) element_0.attributeValueList[i_2];
+                                listHolder_2->mList[i_2].attributeID = element_2.attributeID.unsignedIntValue;
+                                listHolder_2->mList[i_2].attributeValue = element_2.attributeValue.unsignedIntValue;
+                            }
+                            listHolder_0->mList[i_0].attributeValueList = ListType_2(listHolder_2->mList, element_0.attributeValueList.count);
+                        } else {
+                            listHolder_0->mList[i_0].attributeValueList = ListType_2();
+                        }
+                    }
+                }
+                encodableStruct.extensionFieldSets = ListType_0(listHolder_0->mList, self.extensionFieldSets.count);
+            } else {
+                encodableStruct.extensionFieldSets = ListType_0();
+            }
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterEnhancedAddSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterEnhancedAddSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterEnhancedAddSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterEnhancedViewSceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterEnhancedViewSceneParams alloc] init];
+
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterEnhancedViewSceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::EnhancedViewScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.groupID = self.groupID.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneID = self.sceneID.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterEnhancedViewSceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupID = @(0);
+
+        _sceneID = @(0);
+
+        _transitionTime = nil;
+
+        _sceneName = nil;
+
+        _extensionFieldSets = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterEnhancedViewSceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
+    other.transitionTime = self.transitionTime;
+    other.sceneName = self.sceneName;
+    other.extensionFieldSets = self.extensionFieldSets;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterEnhancedViewSceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupID = [NSNumber numberWithUnsignedShort:decodableStruct.groupID];
+    }
+    {
+        self.sceneID = [NSNumber numberWithUnsignedChar:decodableStruct.sceneID];
+    }
+    {
+        if (decodableStruct.transitionTime.HasValue()) {
+            self.transitionTime = [NSNumber numberWithUnsignedShort:decodableStruct.transitionTime.Value()];
+        } else {
+            self.transitionTime = nil;
+        }
+    }
+    {
+        if (decodableStruct.sceneName.HasValue()) {
+            self.sceneName = AsString(decodableStruct.sceneName.Value());
+            if (self.sceneName == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.sceneName = nil;
+        }
+    }
+    {
+        if (decodableStruct.extensionFieldSets.HasValue()) {
+            { // Scope for our temporary variables
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = decodableStruct.extensionFieldSets.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    MTRScenesManagementClusterExtensionFieldSet * newElement_1;
+                    newElement_1 = [MTRScenesManagementClusterExtensionFieldSet new];
+                    newElement_1.clusterID = [NSNumber numberWithUnsignedInt:entry_1.clusterID];
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = entry_1.attributeValueList.begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            MTRScenesManagementClusterAttributeValuePair * newElement_3;
+                            newElement_3 = [MTRScenesManagementClusterAttributeValuePair new];
+                            newElement_3.attributeID = [NSNumber numberWithUnsignedInt:entry_3.attributeID];
+                            newElement_3.attributeValue = [NSNumber numberWithUnsignedInt:entry_3.attributeValue];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            return err;
+                        }
+                        newElement_1.attributeValueList = array_3;
+                    }
+                    [array_1 addObject:newElement_1];
+                }
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    return err;
+                }
+                self.extensionFieldSets = array_1;
+            }
+        } else {
+            self.extensionFieldSets = nil;
+        }
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterCopySceneParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mode = @(0);
+
+        _groupIdentifierFrom = @(0);
+
+        _sceneIdentifierFrom = @(0);
+
+        _groupIdentifierTo = @(0);
+
+        _sceneIdentifierTo = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterCopySceneParams alloc] init];
+
+    other.mode = self.mode;
+    other.groupIdentifierFrom = self.groupIdentifierFrom;
+    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
+    other.groupIdentifierTo = self.groupIdentifierTo;
+    other.sceneIdentifierTo = self.sceneIdentifierTo;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mode:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; groupIdentifierTo:%@; sceneIdentifierTo:%@; >", NSStringFromClass([self class]), _mode, _groupIdentifierFrom, _sceneIdentifierFrom, _groupIdentifierTo, _sceneIdentifierTo];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterCopySceneParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::ScenesManagement::Commands::CopyScene::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.mode = static_cast<std::remove_reference_t<decltype(encodableStruct.mode)>>(self.mode.unsignedCharValue);
+    }
+    {
+        encodableStruct.groupIdentifierFrom = self.groupIdentifierFrom.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneIdentifierFrom = self.sceneIdentifierFrom.unsignedCharValue;
+    }
+    {
+        encodableStruct.groupIdentifierTo = self.groupIdentifierTo.unsignedShortValue;
+    }
+    {
+        encodableStruct.sceneIdentifierTo = self.sceneIdentifierTo.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRScenesManagementClusterCopySceneResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _groupIdentifierFrom = @(0);
+
+        _sceneIdentifierFrom = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRScenesManagementClusterCopySceneResponseParams alloc] init];
+
+    other.status = self.status;
+    other.groupIdentifierFrom = self.groupIdentifierFrom;
+    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; >", NSStringFromClass([self class]), _status, _groupIdentifierFrom, _sceneIdentifierFrom];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterCopySceneResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ScenesManagement::Commands::CopySceneResponse::DecodableType &)decodableStruct
+{
+    {
+        self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
+    }
+    {
+        self.groupIdentifierFrom = [NSNumber numberWithUnsignedShort:decodableStruct.groupIdentifierFrom];
+    }
+    {
+        self.sceneIdentifierFrom = [NSNumber numberWithUnsignedChar:decodableStruct.sceneIdentifierFrom];
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
 @implementation MTRHEPAFilterMonitoringClusterResetConditionParams
 - (instancetype)init
 {
@@ -15382,7 +14966,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSuppressRequestParams
+@implementation MTRBooleanStateConfigurationClusterSuppressAlarmParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15396,7 +14980,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterSuppressRequestParams alloc] init];
+    auto other = [[MTRBooleanStateConfigurationClusterSuppressAlarmParams alloc] init];
 
     other.alarmsToSuppress = self.alarmsToSuppress;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15413,14 +14997,93 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
+@implementation MTRBooleanStateConfigurationClusterSuppressAlarmParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Type encodableStruct;
+    chip::app::Clusters::BooleanStateConfiguration::Commands::SuppressAlarm::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.alarmsToSuppress = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToSuppress)>>(self.alarmsToSuppress.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRBooleanStateConfigurationClusterEnableDisableAlarmParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _alarmsToEnableDisable = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRBooleanStateConfigurationClusterEnableDisableAlarmParams alloc] init];
+
+    other.alarmsToEnableDisable = self.alarmsToEnableDisable;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: alarmsToEnableDisable:%@; >", NSStringFromClass([self class]), _alarmsToEnableDisable];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRBooleanStateConfigurationClusterEnableDisableAlarmParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::BooleanStateConfiguration::Commands::EnableDisableAlarm::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.alarmsToEnableDisable = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToEnableDisable)>>(self.alarmsToEnableDisable.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -15467,6 +15130,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _openDuration = nil;
+
+        _targetLevel = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15478,6 +15143,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRValveConfigurationAndControlClusterOpenParams alloc] init];
 
     other.openDuration = self.openDuration;
+    other.targetLevel = self.targetLevel;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15486,7 +15152,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: openDuration:%@; >", NSStringFromClass([self class]), _openDuration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: openDuration:%@; targetLevel:%@; >", NSStringFromClass([self class]), _openDuration, _targetLevel];
     return descriptionString;
 }
 
@@ -15501,7 +15167,18 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (self.openDuration != nil) {
             auto & definedValue_0 = encodableStruct.openDuration.Emplace();
-            definedValue_0 = self.openDuration.unsignedIntValue;
+            if (self.openDuration == nil) {
+                definedValue_0.SetNull();
+            } else {
+                auto & nonNullValue_1 = definedValue_0.SetNonNull();
+                nonNullValue_1 = self.openDuration.unsignedIntValue;
+            }
+        }
+    }
+    {
+        if (self.targetLevel != nil) {
+            auto & definedValue_0 = encodableStruct.targetLevel.Emplace();
+            definedValue_0 = self.targetLevel.unsignedCharValue;
         }
     }
 
@@ -15577,94 +15254,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     chip::app::Clusters::ValveConfigurationAndControl::Commands::Close::Type encodableStruct;
     ListFreer listFreer;
-
-    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
-    if (buffer.IsNull()) {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    chip::System::PacketBufferTLVWriter writer;
-    // Commands never need chained buffers, since they cannot be chunked.
-    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
-
-    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
-
-    ReturnErrorOnFailure(writer.Finalize(&buffer));
-
-    reader.Init(std::move(buffer));
-    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
-{
-    chip::System::PacketBufferTLVReader reader;
-    CHIP_ERROR err = [self _encodeToTLVReader:reader];
-    if (err != CHIP_NO_ERROR) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:err];
-        }
-        return nil;
-    }
-
-    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
-    if (decodedObj == nil) {
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
-        }
-    }
-    return decodedObj;
-}
-@end
-
-@implementation MTRValveConfigurationAndControlClusterSetLevelParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _level = @(0);
-
-        _openDuration = nil;
-        _timedInvokeTimeoutMs = nil;
-        _serverSideProcessingTimeout = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRValveConfigurationAndControlClusterSetLevelParams alloc] init];
-
-    other.level = self.level;
-    other.openDuration = self.openDuration;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: level:%@; openDuration:%@; >", NSStringFromClass([self class]), _level, _openDuration];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRValveConfigurationAndControlClusterSetLevelParams (InternalMethods)
-
-- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
-{
-    chip::app::Clusters::ValveConfigurationAndControl::Commands::SetLevel::Type encodableStruct;
-    ListFreer listFreer;
-    {
-        encodableStruct.level = self.level.unsignedCharValue;
-    }
-    {
-        if (self.openDuration != nil) {
-            auto & definedValue_0 = encodableStruct.openDuration.Emplace();
-            definedValue_0 = self.openDuration.unsignedIntValue;
-        }
-    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
@@ -16910,7 +16499,7 @@ NS_ASSUME_NONNULL_BEGIN
                 auto & entry_0 = iter_0.GetValue();
                 MTREnergyEVSEClusterChargingTargetStruct * newElement_0;
                 newElement_0 = [MTREnergyEVSEClusterChargingTargetStruct new];
-                newElement_0.targetTime = [NSNumber numberWithUnsignedShort:entry_0.targetTime];
+                newElement_0.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_0.targetTimeMinutesPastMidnight];
                 if (entry_0.targetSoC.HasValue()) {
                     newElement_0.targetSoC = [NSNumber numberWithUnsignedChar:entry_0.targetSoC.Value()];
                 } else {
@@ -17326,7 +16915,7 @@ NS_ASSUME_NONNULL_BEGIN
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     auto element_0 = (MTREnergyEVSEClusterChargingTargetStruct *) self.chargingTargets[i_0];
-                    listHolder_0->mList[i_0].targetTime = element_0.targetTime.unsignedShortValue;
+                    listHolder_0->mList[i_0].targetTimeMinutesPastMidnight = element_0.targetTimeMinutesPastMidnight.unsignedShortValue;
                     if (element_0.targetSoC != nil) {
                         auto & definedValue_2 = listHolder_0->mList[i_0].targetSoC.Emplace();
                         definedValue_2 = element_0.targetSoC.unsignedCharValue;
@@ -20072,6 +19661,179 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRDoorLockClusterSetAliroReaderConfigParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _signingKey = [NSData data];
+
+        _verificationKey = [NSData data];
+
+        _groupIdentifier = [NSData data];
+
+        _groupResolvingKey = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDoorLockClusterSetAliroReaderConfigParams alloc] init];
+
+    other.signingKey = self.signingKey;
+    other.verificationKey = self.verificationKey;
+    other.groupIdentifier = self.groupIdentifier;
+    other.groupResolvingKey = self.groupResolvingKey;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: signingKey:%@; verificationKey:%@; groupIdentifier:%@; groupResolvingKey:%@; >", NSStringFromClass([self class]), [_signingKey base64EncodedStringWithOptions:0], [_verificationKey base64EncodedStringWithOptions:0], [_groupIdentifier base64EncodedStringWithOptions:0], [_groupResolvingKey base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDoorLockClusterSetAliroReaderConfigParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.signingKey = AsByteSpan(self.signingKey);
+    }
+    {
+        encodableStruct.verificationKey = AsByteSpan(self.verificationKey);
+    }
+    {
+        encodableStruct.groupIdentifier = AsByteSpan(self.groupIdentifier);
+    }
+    {
+        if (self.groupResolvingKey != nil) {
+            auto & definedValue_0 = encodableStruct.groupResolvingKey.Emplace();
+            definedValue_0 = AsByteSpan(self.groupResolvingKey);
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDoorLockClusterClearAliroReaderConfigParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDoorLockClusterClearAliroReaderConfigParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDoorLockClusterClearAliroReaderConfigParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRWindowCoveringClusterUpOrOpenParams
 - (instancetype)init
 {
@@ -21217,6 +20979,550 @@ NS_ASSUME_NONNULL_BEGIN
 {
     chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type encodableStruct;
     ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterSetActiveScheduleRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleHandle = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterSetActiveScheduleRequestParams alloc] init];
+
+    other.scheduleHandle = self.scheduleHandle;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: scheduleHandle:%@; >", NSStringFromClass([self class]), [_scheduleHandle base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetActiveScheduleRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.scheduleHandle = AsByteSpan(self.scheduleHandle);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterSetActivePresetRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = [NSData data];
+
+        _delayMinutes = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterSetActivePresetRequestParams alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.delayMinutes = self.delayMinutes;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; delayMinutes:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _delayMinutes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetActivePresetRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.presetHandle = AsByteSpan(self.presetHandle);
+    }
+    {
+        if (self.delayMinutes != nil) {
+            auto & definedValue_0 = encodableStruct.delayMinutes.Emplace();
+            definedValue_0 = self.delayMinutes.unsignedShortValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterStartPresetsSchedulesEditRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeoutSeconds = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterStartPresetsSchedulesEditRequestParams alloc] init];
+
+    other.timeoutSeconds = self.timeoutSeconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeoutSeconds:%@; >", NSStringFromClass([self class]), _timeoutSeconds];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.timeoutSeconds = self.timeoutSeconds.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterCancelPresetsSchedulesEditRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterCancelPresetsSchedulesEditRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterCommitPresetsSchedulesRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterCommitPresetsSchedulesRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterCancelSetActivePresetRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterCancelSetActivePresetRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterCancelSetActivePresetRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _temperatureSetpointHoldPolicy = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams alloc] init];
+
+    other.temperatureSetpointHoldPolicy = self.temperatureSetpointHoldPolicy;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: temperatureSetpointHoldPolicy:%@; >", NSStringFromClass([self class]), _temperatureSetpointHoldPolicy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.temperatureSetpointHoldPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.temperatureSetpointHoldPolicy)>>(self.temperatureSetpointHoldPolicy.unsignedCharValue);
+    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
@@ -23852,7 +24158,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _channelPagingStruct = @(0);
+        _paging = [MTRChannelClusterChannelPagingStruct new];
 
         _programList = [NSArray array];
     }
@@ -23863,7 +24169,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRChannelClusterProgramGuideResponseParams alloc] init];
 
-    other.channelPagingStruct = self.channelPagingStruct;
+    other.paging = self.paging;
     other.programList = self.programList;
 
     return other;
@@ -23871,7 +24177,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: channelPagingStruct:%@; programList:%@; >", NSStringFromClass([self class]), _channelPagingStruct, _programList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paging:%@; programList:%@; >", NSStringFromClass([self class]), _paging, _programList];
     return descriptionString;
 }
 
@@ -23922,7 +24228,71 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Channel::Commands::ProgramGuideResponse::DecodableType &)decodableStruct
 {
     {
-        self.channelPagingStruct = [NSNumber numberWithShort:decodableStruct.channelPagingStruct];
+        self.paging = [MTRChannelClusterChannelPagingStruct new];
+        if (decodableStruct.paging.previousToken.HasValue()) {
+            if (decodableStruct.paging.previousToken.Value().IsNull()) {
+                self.paging.previousToken = nil;
+            } else {
+                self.paging.previousToken = [MTRChannelClusterPageTokenStruct new];
+                if (decodableStruct.paging.previousToken.Value().Value().limit.HasValue()) {
+                    self.paging.previousToken.limit = [NSNumber numberWithUnsignedShort:decodableStruct.paging.previousToken.Value().Value().limit.Value()];
+                } else {
+                    self.paging.previousToken.limit = nil;
+                }
+                if (decodableStruct.paging.previousToken.Value().Value().after.HasValue()) {
+                    self.paging.previousToken.after = AsString(decodableStruct.paging.previousToken.Value().Value().after.Value());
+                    if (self.paging.previousToken.after == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
+                } else {
+                    self.paging.previousToken.after = nil;
+                }
+                if (decodableStruct.paging.previousToken.Value().Value().before.HasValue()) {
+                    self.paging.previousToken.before = AsString(decodableStruct.paging.previousToken.Value().Value().before.Value());
+                    if (self.paging.previousToken.before == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
+                } else {
+                    self.paging.previousToken.before = nil;
+                }
+            }
+        } else {
+            self.paging.previousToken = nil;
+        }
+        if (decodableStruct.paging.nextToken.HasValue()) {
+            if (decodableStruct.paging.nextToken.Value().IsNull()) {
+                self.paging.nextToken = nil;
+            } else {
+                self.paging.nextToken = [MTRChannelClusterPageTokenStruct new];
+                if (decodableStruct.paging.nextToken.Value().Value().limit.HasValue()) {
+                    self.paging.nextToken.limit = [NSNumber numberWithUnsignedShort:decodableStruct.paging.nextToken.Value().Value().limit.Value()];
+                } else {
+                    self.paging.nextToken.limit = nil;
+                }
+                if (decodableStruct.paging.nextToken.Value().Value().after.HasValue()) {
+                    self.paging.nextToken.after = AsString(decodableStruct.paging.nextToken.Value().Value().after.Value());
+                    if (self.paging.nextToken.after == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
+                } else {
+                    self.paging.nextToken.after = nil;
+                }
+                if (decodableStruct.paging.nextToken.Value().Value().before.HasValue()) {
+                    self.paging.nextToken.before = AsString(decodableStruct.paging.nextToken.Value().Value().before.Value());
+                    if (self.paging.nextToken.before == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        return err;
+                    }
+                } else {
+                    self.paging.nextToken.before = nil;
+                }
+            }
+        } else {
+            self.paging.nextToken = nil;
+        }
     }
     {
         { // Scope for our temporary variables
@@ -28697,11 +29067,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _status = nil;
+        _status = @(0);
 
-        _data = @"";
+        _data = nil;
 
-        _encodingHint = @"";
+        _encodingHint = nil;
     }
     return self;
 }
@@ -28770,24 +29140,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessageResponse::DecodableType &)decodableStruct
 {
     {
-        if (decodableStruct.status.HasValue()) {
-            self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status.Value())];
+        self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
+    }
+    {
+        if (decodableStruct.data.HasValue()) {
+            self.data = AsString(decodableStruct.data.Value());
+            if (self.data == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
         } else {
-            self.status = nil;
+            self.data = nil;
         }
     }
     {
-        self.data = AsString(decodableStruct.data);
-        if (self.data == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
-        }
-    }
-    {
-        self.encodingHint = AsString(decodableStruct.encodingHint);
-        if (self.encodingHint == nil) {
-            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-            return err;
+        if (decodableStruct.encodingHint.HasValue()) {
+            self.encodingHint = AsString(decodableStruct.encodingHint.Value());
+            if (self.encodingHint == nil) {
+                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                return err;
+            }
+        } else {
+            self.encodingHint = nil;
         }
     }
     return CHIP_NO_ERROR;
@@ -32440,6 +32814,85 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
 @end
+@implementation MTRUnitTestingClusterTestBatchHelperResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _buffer = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRUnitTestingClusterTestBatchHelperResponseParams alloc] init];
+
+    other.buffer = self.buffer;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: buffer:%@; >", NSStringFromClass([self class]), [_buffer base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestBatchHelperResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType &)decodableStruct
+{
+    {
+        self.buffer = AsData(decodableStruct.buffer);
+    }
+    return CHIP_NO_ERROR;
+}
+
+@end
+
 @implementation MTRUnitTestingClusterTestListInt8UReverseRequestParams
 - (instancetype)init
 {
@@ -33483,6 +33936,188 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic timedInvokeTimeoutMs;
 @dynamic serverSideProcessingTimeout;
 @end
+@implementation MTRUnitTestingClusterTestBatchHelperRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sleepBeforeResponseTimeMs = @(0);
+
+        _sizeOfResponseBuffer = @(0);
+
+        _fillCharacter = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRUnitTestingClusterTestBatchHelperRequestParams alloc] init];
+
+    other.sleepBeforeResponseTimeMs = self.sleepBeforeResponseTimeMs;
+    other.sizeOfResponseBuffer = self.sizeOfResponseBuffer;
+    other.fillCharacter = self.fillCharacter;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sleepBeforeResponseTimeMs:%@; sizeOfResponseBuffer:%@; fillCharacter:%@; >", NSStringFromClass([self class]), _sleepBeforeResponseTimeMs, _sizeOfResponseBuffer, _fillCharacter];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestBatchHelperRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::UnitTesting::Commands::TestBatchHelperRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.sleepBeforeResponseTimeMs = self.sleepBeforeResponseTimeMs.unsignedShortValue;
+    }
+    {
+        encodableStruct.sizeOfResponseBuffer = self.sizeOfResponseBuffer.unsignedShortValue;
+    }
+    {
+        encodableStruct.fillCharacter = self.fillCharacter.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRUnitTestingClusterTestSecondBatchHelperRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sleepBeforeResponseTimeMs = @(0);
+
+        _sizeOfResponseBuffer = @(0);
+
+        _fillCharacter = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRUnitTestingClusterTestSecondBatchHelperRequestParams alloc] init];
+
+    other.sleepBeforeResponseTimeMs = self.sleepBeforeResponseTimeMs;
+    other.sizeOfResponseBuffer = self.sizeOfResponseBuffer;
+    other.fillCharacter = self.fillCharacter;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sleepBeforeResponseTimeMs:%@; sizeOfResponseBuffer:%@; fillCharacter:%@; >", NSStringFromClass([self class]), _sleepBeforeResponseTimeMs, _sizeOfResponseBuffer, _fillCharacter];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRUnitTestingClusterTestSecondBatchHelperRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.sleepBeforeResponseTimeMs = self.sleepBeforeResponseTimeMs.unsignedShortValue;
+    }
+    {
+        encodableStruct.sizeOfResponseBuffer = self.sizeOfResponseBuffer.unsignedShortValue;
+    }
+    {
+        encodableStruct.fillCharacter = self.fillCharacter.unsignedCharValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRSampleMEIClusterPingParams
 - (instancetype)init
 {

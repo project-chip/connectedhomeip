@@ -31,9 +31,6 @@ static constexpr ClusterId Id = 0x00000003;
 namespace Groups {
 static constexpr ClusterId Id = 0x00000004;
 } // namespace Groups
-namespace Scenes {
-static constexpr ClusterId Id = 0x00000005;
-} // namespace Scenes
 namespace OnOff {
 static constexpr ClusterId Id = 0x00000006;
 } // namespace OnOff
@@ -208,15 +205,18 @@ static constexpr ClusterId Id = 0x00000060;
 namespace RvcOperationalState {
 static constexpr ClusterId Id = 0x00000061;
 } // namespace RvcOperationalState
+namespace ScenesManagement {
+static constexpr ClusterId Id = 0x00000062;
+} // namespace ScenesManagement
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
 static constexpr ClusterId Id = 0x00000072;
 } // namespace ActivatedCarbonFilterMonitoring
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 static constexpr ClusterId Id = 0x00000080;
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 namespace ValveConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000081;
 } // namespace ValveConfigurationAndControl
@@ -232,6 +232,9 @@ static constexpr ClusterId Id = 0x00000098;
 namespace EnergyEvse {
 static constexpr ClusterId Id = 0x00000099;
 } // namespace EnergyEvse
+namespace EnergyPreference {
+static constexpr ClusterId Id = 0x0000009B;
+} // namespace EnergyPreference
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

@@ -225,7 +225,7 @@ int TestCHIPErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "Core-Error-Strings",
+        "Test CHIP_ERROR string conversions",
         &sTests[0],
         nullptr,
         nullptr

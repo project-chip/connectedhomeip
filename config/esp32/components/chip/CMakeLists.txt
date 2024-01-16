@@ -224,6 +224,7 @@ if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
         chip_gn_arg_append("chip_shell_platform"    "\"esp32\"")
     endif()
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
+    chip_gn_arg_append("chip_external_platform_include_dir" "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_INCLUDE_DIR}\"")
 endif()
 
 # Set up CHIP project configuration file

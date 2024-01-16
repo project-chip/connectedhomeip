@@ -690,8 +690,12 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
+    class CommissioningWindowPasscode(enum.IntEnum):
+        kOriginalSetupCode = 0,
+        kTokenWithRandomPin = 1,
+
     def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
-                                discriminator: int, option: int) -> CommissioningParameters:
+                                discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
         ''' Opens a commissioning window on the device with the given nodeid.
             nodeid:        Node id of the device
             timeout:       Command timeout
@@ -1417,7 +1421,8 @@ class ChipDeviceControllerBase():
 
         return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
 
-    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True):
+    def ZCLSubscribeAttribute(self, cluster, attribute, nodeid, endpoint, minInterval, maxInterval, blocking=True,
+                              keepSubscriptions=False, autoResubscribe=True):
         ''' Wrapper over ReadAttribute for a single attribute
             Returns a SubscriptionTransaction. See ReadAttribute for more information.
         '''
@@ -1428,7 +1433,8 @@ class ChipDeviceControllerBase():
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
         except BaseException:
             raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval)))
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval),
+                                              keepSubscriptions=keepSubscriptions, autoResubscribe=autoResubscribe))
 
     def ZCLCommandList(self):
         self.CheckIsActive()

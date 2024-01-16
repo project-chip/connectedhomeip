@@ -178,199 +178,6 @@ cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-/** Attributes and commands for scene configuration and manipulation. */
-provisional cluster Scenes = 5 {
-  revision 5;
-
-  bitmap CopyModeBitmap : bitmap8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kSceneNames = 0x1;
-    kExplicit = 0x2;
-    kTableSize = 0x4;
-    kFabricScenes = 0x8;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kSceneNames = 0x80;
-  }
-
-  struct AttributeValuePair {
-    attrib_id attributeID = 0;
-    int32u attributeValue = 1;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
-  fabric_scoped struct SceneInfoStruct {
-    int8u sceneCount = 0;
-    fabric_sensitive int8u currentScene = 1;
-    fabric_sensitive group_id currentGroup = 2;
-    fabric_sensitive boolean sceneValid = 3;
-    int8u remainingCapacity = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute optional int8u sceneCount = 0;
-  readonly attribute optional int8u currentScene = 1;
-  readonly attribute optional group_id currentGroup = 2;
-  readonly attribute optional boolean sceneValid = 3;
-  readonly attribute NameSupportBitmap nameSupport = 4;
-  readonly attribute optional nullable node_id lastConfiguredBy = 5;
-  readonly attribute int16u sceneTableSize = 6;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 7;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    optional nullable int16u transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable int8u capacity = 1;
-    group_id groupID = 2;
-    optional int8u sceneList[] = 3;
-  }
-
-  request struct EnhancedAddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct EnhancedAddSceneResponse = 64 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct EnhancedViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct EnhancedViewSceneResponse = 65 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct CopySceneRequest {
-    CopyModeBitmap mode = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-    group_id groupIdentifierTo = 3;
-    int8u sceneIdentifierTo = 4;
-  }
-
-  response struct CopySceneResponse = 66 {
-    status status = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-  }
-
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a scene to be added using a finer scene transition time than the AddScene command. */
-  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
-  /** Allows a scene to be retrieved using a finer scene transition time than the ViewScene command */
-  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
-}
-
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
   revision 6;
@@ -2544,7 +2351,7 @@ cluster BridgedDeviceBasicInformation = 57 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -2599,7 +2406,7 @@ cluster Switch = 59 {
 Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
 Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 cluster Switch = 59 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kLatchingSwitch = 0x1;
@@ -3183,423 +2990,52 @@ cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
-/** An interface to a generic way to secure a door */
-cluster DoorLock = 257 {
-  revision 7;
+/** Attributes and commands for scene configuration and manipulation. */
+provisional cluster ScenesManagement = 98 {
+  revision 5;
 
-  enum AlarmCodeEnum : enum8 {
-    kLockJammed = 0;
-    kLockFactoryReset = 1;
-    kLockRadioPowerCycled = 3;
-    kWrongCodeEntryLimit = 4;
-    kFrontEsceutcheonRemoved = 5;
-    kDoorForcedOpen = 6;
-    kDoorAjar = 7;
-    kForcedUser = 8;
-  }
-
-  enum CredentialRuleEnum : enum8 {
-    kSingle = 0;
-    kDual = 1;
-    kTri = 2;
-  }
-
-  enum CredentialTypeEnum : enum8 {
-    kProgrammingPIN = 0;
-    kPIN = 1;
-    kRFID = 2;
-    kFingerprint = 3;
-    kFingerVein = 4;
-    kFace = 5;
-  }
-
-  enum DataOperationTypeEnum : enum8 {
-    kAdd = 0;
-    kClear = 1;
-    kModify = 2;
-  }
-
-  enum DlLockState : enum8 {
-    kNotFullyLocked = 0;
-    kLocked = 1;
-    kUnlocked = 2;
-    kUnlatched = 3;
-  }
-
-  enum DlLockType : enum8 {
-    kDeadBolt = 0;
-    kMagnetic = 1;
-    kOther = 2;
-    kMortise = 3;
-    kRim = 4;
-    kLatchBolt = 5;
-    kCylindricalLock = 6;
-    kTubularLock = 7;
-    kInterconnectedLock = 8;
-    kDeadLatch = 9;
-    kDoorFurniture = 10;
-    kEurocylinder = 11;
-  }
-
-  enum DlStatus : enum8 {
-    kSuccess = 0;
-    kFailure = 1;
-    kDuplicate = 2;
-    kOccupied = 3;
-    kInvalidField = 133;
-    kResourceExhausted = 137;
-    kNotFound = 139;
-  }
-
-  enum DoorLockOperationEventCode : enum8 {
-    kUnknownOrMfgSpecific = 0;
-    kLock = 1;
-    kUnlock = 2;
-    kLockInvalidPinOrId = 3;
-    kLockInvalidSchedule = 4;
-    kUnlockInvalidPinOrId = 5;
-    kUnlockInvalidSchedule = 6;
-    kOneTouchLock = 7;
-    kKeyLock = 8;
-    kKeyUnlock = 9;
-    kAutoLock = 10;
-    kScheduleLock = 11;
-    kScheduleUnlock = 12;
-    kManualLock = 13;
-    kManualUnlock = 14;
-  }
-
-  enum DoorLockProgrammingEventCode : enum8 {
-    kUnknownOrMfgSpecific = 0;
-    kMasterCodeChanged = 1;
-    kPinAdded = 2;
-    kPinDeleted = 3;
-    kPinChanged = 4;
-    kIdAdded = 5;
-    kIdDeleted = 6;
-  }
-
-  enum DoorLockSetPinOrIdStatus : enum8 {
-    kSuccess = 0;
-    kGeneralFailure = 1;
-    kMemoryFull = 2;
-    kDuplicateCodeError = 3;
-  }
-
-  enum DoorLockUserStatus : enum8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-    kNotSupported = 255;
-  }
-
-  enum DoorLockUserType : enum8 {
-    kUnrestricted = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kMasterUser = 3;
-    kNonAccessUser = 4;
-    kNotSupported = 255;
-  }
-
-  enum DoorStateEnum : enum8 {
-    kDoorOpen = 0;
-    kDoorClosed = 1;
-    kDoorJammed = 2;
-    kDoorForcedOpen = 3;
-    kDoorUnspecifiedError = 4;
-    kDoorAjar = 5;
-  }
-
-  enum LockDataTypeEnum : enum8 {
-    kUnspecified = 0;
-    kProgrammingCode = 1;
-    kUserIndex = 2;
-    kWeekDaySchedule = 3;
-    kYearDaySchedule = 4;
-    kHolidaySchedule = 5;
-    kPIN = 6;
-    kRFID = 7;
-    kFingerprint = 8;
-    kFingerVein = 9;
-    kFace = 10;
-  }
-
-  enum LockOperationTypeEnum : enum8 {
-    kLock = 0;
-    kUnlock = 1;
-    kNonAccessUserEvent = 2;
-    kForcedUserEvent = 3;
-    kUnlatch = 4;
-  }
-
-  enum OperatingModeEnum : enum8 {
-    kNormal = 0;
-    kVacation = 1;
-    kPrivacy = 2;
-    kNoRemoteLockUnlock = 3;
-    kPassage = 4;
-  }
-
-  enum OperationErrorEnum : enum8 {
-    kUnspecified = 0;
-    kInvalidCredential = 1;
-    kDisabledUserDenied = 2;
-    kRestricted = 3;
-    kInsufficientBattery = 4;
-  }
-
-  enum OperationSourceEnum : enum8 {
-    kUnspecified = 0;
-    kManual = 1;
-    kProprietaryRemote = 2;
-    kKeypad = 3;
-    kAuto = 4;
-    kButton = 5;
-    kSchedule = 6;
-    kRemote = 7;
-    kRFID = 8;
-    kBiometric = 9;
-  }
-
-  enum UserStatusEnum : enum8 {
-    kAvailable = 0;
-    kOccupiedEnabled = 1;
-    kOccupiedDisabled = 3;
-  }
-
-  enum UserTypeEnum : enum8 {
-    kUnrestrictedUser = 0;
-    kYearDayScheduleUser = 1;
-    kWeekDayScheduleUser = 2;
-    kProgrammingUser = 3;
-    kNonAccessUser = 4;
-    kForcedUser = 5;
-    kDisposableUser = 6;
-    kExpiringUser = 7;
-    kScheduleRestrictedUser = 8;
-    kRemoteOnlyUser = 9;
-  }
-
-  bitmap DaysMaskMap : bitmap8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
-  }
-
-  bitmap DlCredentialRuleMask : bitmap8 {
-    kSingle = 0x1;
-    kDual = 0x2;
-    kTri = 0x4;
-  }
-
-  bitmap DlCredentialRulesSupport : bitmap8 {
-    kSingle = 0x1;
-    kDual = 0x2;
-    kTri = 0x4;
-  }
-
-  bitmap DlDefaultConfigurationRegister : bitmap16 {
-    kEnableLocalProgrammingEnabled = 0x1;
-    kKeypadInterfaceDefaultAccessEnabled = 0x2;
-    kRemoteInterfaceDefaultAccessIsEnabled = 0x4;
-    kSoundEnabled = 0x20;
-    kAutoRelockTimeSet = 0x40;
-    kLEDSettingsSet = 0x80;
-  }
-
-  bitmap DlKeypadOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidPIN = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidCode = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-    kNonAccessUserOpEvent = 0x80;
-  }
-
-  bitmap DlKeypadProgrammingEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kProgrammingPINChanged = 0x2;
-    kPINAdded = 0x4;
-    kPINCleared = 0x8;
-    kPINChanged = 0x10;
-  }
-
-  bitmap DlLocalProgrammingFeatures : bitmap8 {
-    kAddUsersCredentialsSchedulesLocally = 0x1;
-    kModifyUsersCredentialsSchedulesLocally = 0x2;
-    kClearUsersCredentialsSchedulesLocally = 0x4;
-    kAdjustLockSettingsLocally = 0x8;
-  }
-
-  bitmap DlManualOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kThumbturnLock = 0x2;
-    kThumbturnUnlock = 0x4;
-    kOneTouchLock = 0x8;
-    kKeyLock = 0x10;
-    kKeyUnlock = 0x20;
-    kAutoLock = 0x40;
-    kScheduleLock = 0x80;
-    kScheduleUnlock = 0x100;
-    kManualLock = 0x200;
-    kManualUnlock = 0x400;
-  }
-
-  bitmap DlRFIDOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidRFID = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidRFID = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-  }
-
-  bitmap DlRFIDProgrammingEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kRFIDCodeAdded = 0x20;
-    kRFIDCodeCleared = 0x40;
-  }
-
-  bitmap DlRemoteOperationEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kLock = 0x2;
-    kUnlock = 0x4;
-    kLockInvalidCode = 0x8;
-    kLockInvalidSchedule = 0x10;
-    kUnlockInvalidCode = 0x20;
-    kUnlockInvalidSchedule = 0x40;
-  }
-
-  bitmap DlRemoteProgrammingEventMask : bitmap16 {
-    kUnknown = 0x1;
-    kProgrammingPINChanged = 0x2;
-    kPINAdded = 0x4;
-    kPINCleared = 0x8;
-    kPINChanged = 0x10;
-    kRFIDCodeAdded = 0x20;
-    kRFIDCodeCleared = 0x40;
-  }
-
-  bitmap DlSupportedOperatingModes : bitmap16 {
-    kNormal = 0x1;
-    kVacation = 0x2;
-    kPrivacy = 0x4;
-    kNoRemoteLockUnlock = 0x8;
-    kPassage = 0x10;
-  }
-
-  bitmap DoorLockDayOfWeek : bitmap8 {
-    kSunday = 0x1;
-    kMonday = 0x2;
-    kTuesday = 0x4;
-    kWednesday = 0x8;
-    kThursday = 0x10;
-    kFriday = 0x20;
-    kSaturday = 0x40;
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
   }
 
   bitmap Feature : bitmap32 {
-    kPINCredential = 0x1;
-    kRFIDCredential = 0x2;
-    kFingerCredentials = 0x4;
-    kLogging = 0x8;
-    kWeekDayAccessSchedules = 0x10;
-    kDoorPositionSensor = 0x20;
-    kFaceCredentials = 0x40;
-    kCredentialsOverTheAirAccess = 0x80;
-    kUser = 0x100;
-    kNotification = 0x200;
-    kYearDayAccessSchedules = 0x400;
-    kHolidaySchedules = 0x800;
-    kUnbolt = 0x1000;
+    kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
-  struct CredentialStruct {
-    CredentialTypeEnum credentialType = 0;
-    int16u credentialIndex = 1;
+  bitmap NameSupportBitmap : bitmap8 {
+    kSceneNames = 0x80;
   }
 
-  critical event DoorLockAlarm = 0 {
-    AlarmCodeEnum alarmCode = 0;
+  struct AttributeValuePair {
+    attrib_id attributeID = 0;
+    int32u attributeValue = 1;
   }
 
-  critical event DoorStateChange = 1 {
-    DoorStateEnum doorState = 0;
+  struct ExtensionFieldSet {
+    cluster_id clusterID = 0;
+    AttributeValuePair attributeValueList[] = 1;
   }
 
-  critical event LockOperation = 2 {
-    LockOperationTypeEnum lockOperationType = 0;
-    OperationSourceEnum operationSource = 1;
-    nullable int16u userIndex = 2;
-    nullable fabric_idx fabricIndex = 3;
-    nullable node_id sourceNode = 4;
-    optional nullable CredentialStruct credentials[] = 5;
+  fabric_scoped struct SceneInfoStruct {
+    int8u sceneCount = 0;
+    fabric_sensitive int8u currentScene = 1;
+    fabric_sensitive group_id currentGroup = 2;
+    fabric_sensitive boolean sceneValid = 3;
+    int8u remainingCapacity = 4;
+    fabric_idx fabricIndex = 254;
   }
 
-  critical event LockOperationError = 3 {
-    LockOperationTypeEnum lockOperationType = 0;
-    OperationSourceEnum operationSource = 1;
-    OperationErrorEnum operationError = 2;
-    nullable int16u userIndex = 3;
-    nullable fabric_idx fabricIndex = 4;
-    nullable node_id sourceNode = 5;
-    optional nullable CredentialStruct credentials[] = 6;
-  }
-
-  info event LockUserChange = 4 {
-    LockDataTypeEnum lockDataType = 0;
-    DataOperationTypeEnum dataOperationType = 1;
-    OperationSourceEnum operationSource = 2;
-    nullable int16u userIndex = 3;
-    nullable fabric_idx fabricIndex = 4;
-    nullable node_id sourceNode = 5;
-    nullable int16u dataIndex = 6;
-  }
-
-  readonly attribute nullable DlLockState lockState = 0;
-  readonly attribute DlLockType lockType = 1;
-  readonly attribute boolean actuatorEnabled = 2;
-  readonly attribute optional nullable DoorStateEnum doorState = 3;
-  attribute access(write: manage) optional int32u doorOpenEvents = 4;
-  attribute access(write: manage) optional int32u doorClosedEvents = 5;
-  attribute access(write: manage) optional int16u openPeriod = 6;
-  readonly attribute optional int16u numberOfTotalUsersSupported = 17;
-  readonly attribute optional int16u numberOfPINUsersSupported = 18;
-  readonly attribute optional int16u numberOfRFIDUsersSupported = 19;
-  readonly attribute optional int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  readonly attribute optional int8u numberOfYearDaySchedulesSupportedPerUser = 21;
-  readonly attribute optional int8u numberOfHolidaySchedulesSupported = 22;
-  readonly attribute optional int8u maxPINCodeLength = 23;
-  readonly attribute optional int8u minPINCodeLength = 24;
-  readonly attribute optional int8u maxRFIDCodeLength = 25;
-  readonly attribute optional int8u minRFIDCodeLength = 26;
-  readonly attribute optional DlCredentialRuleMask credentialRulesSupport = 27;
-  readonly attribute optional int8u numberOfCredentialsSupportedPerUser = 28;
-  attribute access(write: manage) optional char_string<3> language = 33;
-  attribute access(write: manage) optional int8u LEDSettings = 34;
-  attribute access(write: manage) int32u autoRelockTime = 35;
-  attribute access(write: manage) optional int8u soundVolume = 36;
-  attribute access(write: manage) OperatingModeEnum operatingMode = 37;
-  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
-  readonly attribute optional DlDefaultConfigurationRegister defaultConfigurationRegister = 39;
-  attribute access(write: administer) optional boolean enableLocalProgramming = 40;
-  attribute access(write: manage) optional boolean enableOneTouchLocking = 41;
-  attribute access(write: manage) optional boolean enableInsideStatusLED = 42;
-  attribute access(write: manage) optional boolean enablePrivacyModeButton = 43;
-  attribute access(write: administer) optional DlLocalProgrammingFeatures localProgrammingFeatures = 44;
-  attribute access(write: administer) optional int8u wrongCodeEntryLimit = 48;
-  attribute access(write: administer) optional int8u userCodeTemporaryDisableTime = 49;
-  attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
-  attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
-  attribute access(write: administer) optional int16u expiringUserTimeout = 53;
+  readonly attribute optional int8u sceneCount = 0;
+  readonly attribute optional int8u currentScene = 1;
+  readonly attribute optional group_id currentGroup = 2;
+  readonly attribute optional boolean sceneValid = 3;
+  readonly attribute NameSupportBitmap nameSupport = 4;
+  readonly attribute optional nullable node_id lastConfiguredBy = 5;
+  readonly attribute int16u sceneTableSize = 6;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3607,202 +3043,144 @@ cluster DoorLock = 257 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct LockDoorRequest {
-    optional octet_string PINCode = 0;
+  request struct AddSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    int16u transitionTime = 2;
+    char_string sceneName = 3;
+    ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
-  request struct UnlockDoorRequest {
-    optional octet_string PINCode = 0;
+  response struct AddSceneResponse = 0 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
   }
 
-  request struct UnlockWithTimeoutRequest {
-    int16u timeout = 0;
-    optional octet_string PINCode = 1;
+  request struct ViewSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
   }
 
-  request struct SetWeekDayScheduleRequest {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
-    DaysMaskMap daysMask = 2;
-    int8u startHour = 3;
-    int8u startMinute = 4;
-    int8u endHour = 5;
-    int8u endMinute = 6;
+  response struct ViewSceneResponse = 1 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+    optional int16u transitionTime = 3;
+    optional char_string sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
 
-  request struct GetWeekDayScheduleRequest {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
+  request struct RemoveSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
   }
 
-  response struct GetWeekDayScheduleResponse = 12 {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
-    DlStatus status = 2;
-    optional DaysMaskMap daysMask = 3;
-    optional int8u startHour = 4;
-    optional int8u startMinute = 5;
-    optional int8u endHour = 6;
-    optional int8u endMinute = 7;
+  response struct RemoveSceneResponse = 2 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
   }
 
-  request struct ClearWeekDayScheduleRequest {
-    int8u weekDayIndex = 0;
-    int16u userIndex = 1;
+  request struct RemoveAllScenesRequest {
+    group_id groupID = 0;
   }
 
-  request struct SetYearDayScheduleRequest {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
-    epoch_s localStartTime = 2;
-    epoch_s localEndTime = 3;
+  response struct RemoveAllScenesResponse = 3 {
+    status status = 0;
+    group_id groupID = 1;
   }
 
-  request struct GetYearDayScheduleRequest {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
+  request struct StoreSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
   }
 
-  response struct GetYearDayScheduleResponse = 15 {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
-    DlStatus status = 2;
-    optional epoch_s localStartTime = 3;
-    optional epoch_s localEndTime = 4;
+  response struct StoreSceneResponse = 4 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
   }
 
-  request struct ClearYearDayScheduleRequest {
-    int8u yearDayIndex = 0;
-    int16u userIndex = 1;
+  request struct RecallSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    optional nullable int16u transitionTime = 2;
   }
 
-  request struct SetHolidayScheduleRequest {
-    int8u holidayIndex = 0;
-    epoch_s localStartTime = 1;
-    epoch_s localEndTime = 2;
-    OperatingModeEnum operatingMode = 3;
+  request struct GetSceneMembershipRequest {
+    group_id groupID = 0;
   }
 
-  request struct GetHolidayScheduleRequest {
-    int8u holidayIndex = 0;
+  response struct GetSceneMembershipResponse = 6 {
+    status status = 0;
+    nullable int8u capacity = 1;
+    group_id groupID = 2;
+    optional int8u sceneList[] = 3;
   }
 
-  response struct GetHolidayScheduleResponse = 18 {
-    int8u holidayIndex = 0;
-    DlStatus status = 1;
-    optional epoch_s localStartTime = 2;
-    optional epoch_s localEndTime = 3;
-    optional OperatingModeEnum operatingMode = 4;
+  request struct EnhancedAddSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    int16u transitionTime = 2;
+    char_string sceneName = 3;
+    ExtensionFieldSet extensionFieldSets[] = 4;
   }
 
-  request struct ClearHolidayScheduleRequest {
-    int8u holidayIndex = 0;
+  response struct EnhancedAddSceneResponse = 64 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
   }
 
-  request struct SetUserRequest {
-    DataOperationTypeEnum operationType = 0;
-    int16u userIndex = 1;
-    nullable char_string userName = 2;
-    nullable int32u userUniqueID = 3;
-    nullable UserStatusEnum userStatus = 4;
-    nullable UserTypeEnum userType = 5;
-    nullable CredentialRuleEnum credentialRule = 6;
+  request struct EnhancedViewSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
   }
 
-  request struct GetUserRequest {
-    int16u userIndex = 0;
+  response struct EnhancedViewSceneResponse = 65 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+    optional int16u transitionTime = 3;
+    optional char_string sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
 
-  response struct GetUserResponse = 28 {
-    int16u userIndex = 0;
-    nullable char_string userName = 1;
-    nullable int32u userUniqueID = 2;
-    nullable UserStatusEnum userStatus = 3;
-    nullable UserTypeEnum userType = 4;
-    nullable CredentialRuleEnum credentialRule = 5;
-    nullable CredentialStruct credentials[] = 6;
-    nullable fabric_idx creatorFabricIndex = 7;
-    nullable fabric_idx lastModifiedFabricIndex = 8;
-    nullable int16u nextUserIndex = 9;
+  request struct CopySceneRequest {
+    CopyModeBitmap mode = 0;
+    group_id groupIdentifierFrom = 1;
+    int8u sceneIdentifierFrom = 2;
+    group_id groupIdentifierTo = 3;
+    int8u sceneIdentifierTo = 4;
   }
 
-  request struct ClearUserRequest {
-    int16u userIndex = 0;
+  response struct CopySceneResponse = 66 {
+    status status = 0;
+    group_id groupIdentifierFrom = 1;
+    int8u sceneIdentifierFrom = 2;
   }
 
-  request struct SetCredentialRequest {
-    DataOperationTypeEnum operationType = 0;
-    CredentialStruct credential = 1;
-    long_octet_string credentialData = 2;
-    nullable int16u userIndex = 3;
-    nullable UserStatusEnum userStatus = 4;
-    nullable UserTypeEnum userType = 5;
-  }
-
-  response struct SetCredentialResponse = 35 {
-    DlStatus status = 0;
-    nullable int16u userIndex = 1;
-    nullable int16u nextCredentialIndex = 2;
-  }
-
-  request struct GetCredentialStatusRequest {
-    CredentialStruct credential = 0;
-  }
-
-  response struct GetCredentialStatusResponse = 37 {
-    boolean credentialExists = 0;
-    nullable int16u userIndex = 1;
-    nullable fabric_idx creatorFabricIndex = 2;
-    nullable fabric_idx lastModifiedFabricIndex = 3;
-    nullable int16u nextCredentialIndex = 4;
-  }
-
-  request struct ClearCredentialRequest {
-    nullable CredentialStruct credential = 0;
-  }
-
-  request struct UnboltDoorRequest {
-    optional octet_string PINCode = 0;
-  }
-
-  /** This command causes the lock device to lock the door. */
-  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
-  /** This command causes the lock device to unlock the door. */
-  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
-  /** This command causes the lock device to unlock the door with a timeout parameter. */
-  timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
-  /** Set a weekly repeating schedule for a specified user. */
-  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
-  /** Retrieve the specific weekly schedule for the specific user. */
-  command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
-  /** Clear the specific weekly schedule or all weekly schedules for the specific user. */
-  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
-  /** Set a time-specific schedule ID for a specified user. */
-  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
-  /** Returns the year day schedule data for the specified schedule and user indexes. */
-  command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
-  /** Clears the specific year day schedule or all year day schedules for the specific user. */
-  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
-  /** Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode. */
-  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
-  /** Get the holiday schedule for the specified index. */
-  command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
-  /** Clears the holiday schedule or all holiday schedules. */
-  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
-  /** Set User into the lock. */
-  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
-  /** Retrieve User. */
-  command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
-  /** Clears a User or all Users. */
-  timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
-  /** Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser. */
-  timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
-  /** Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index. */
-  command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
-  /** Clear one, one type, or all credentials except ProgrammingPIN credential. */
-  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
-  /** This command causes the lock device to unlock the door without pulling the latch. */
-  timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
+  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
+  /** Retrieves the requested scene entry from its Scene table. */
+  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
+  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
+  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
+  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
+  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
+  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  /** Allows a scene to be added using a finer scene transition time than the AddScene command. */
+  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
+  /** Allows a scene to be retrieved using a finer scene transition time than the ViewScene command */
+  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
+  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
 }
 
 /** An interface to a generic way to secure a door */
@@ -3833,6 +3211,9 @@ cluster DoorLock = 257 {
     kFingerprint = 3;
     kFingerVein = 4;
     kFace = 5;
+    kAliroCredentialIssuerKey = 6;
+    kAliroEvictableEndpointKey = 7;
+    kAliroNonEvictableEndpointKey = 8;
   }
 
   enum DataOperationTypeEnum : enum8 {
@@ -3945,6 +3326,9 @@ cluster DoorLock = 257 {
     kFingerprint = 8;
     kFingerVein = 9;
     kFace = 10;
+    kAliroCredentialIssuerKey = 11;
+    kAliroEvictableEndpointKey = 12;
+    kAliroNonEvictableEndpointKey = 13;
   }
 
   enum LockOperationTypeEnum : enum8 {
@@ -3982,6 +3366,7 @@ cluster DoorLock = 257 {
     kRemote = 7;
     kRFID = 8;
     kBiometric = 9;
+    kAliro = 10;
   }
 
   enum UserStatusEnum : enum8 {
@@ -4142,6 +3527,8 @@ cluster DoorLock = 257 {
     kYearDayAccessSchedules = 0x400;
     kHolidaySchedules = 0x800;
     kUnbolt = 0x1000;
+    kAliroProvisioning = 0x2000;
+    kAliroBLEUWB = 0x4000;
   }
 
   struct CredentialStruct {
@@ -4222,6 +3609,15 @@ cluster DoorLock = 257 {
   attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
   attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
   attribute access(write: administer) optional int16u expiringUserTimeout = 53;
+  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4387,6 +3783,13 @@ cluster DoorLock = 257 {
     optional octet_string PINCode = 0;
   }
 
+  request struct SetAliroReaderConfigRequest {
+    octet_string<32> signingKey = 0;
+    octet_string<65> verificationKey = 1;
+    octet_string<16> groupIdentifier = 2;
+    optional octet_string<16> groupResolvingKey = 3;
+  }
+
   /** This command causes the lock device to lock the door. */
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   /** This command causes the lock device to unlock the door. */
@@ -4425,6 +3828,661 @@ cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
   /** This command causes the lock device to unlock the door without pulling the latch. */
   timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
+  /** This command communicates an Aliro Reader configuration to the lock. */
+  timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
+  /** This command clears an existing Aliro Reader configuration for the lock. */
+  timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
+}
+
+/** An interface to a generic way to secure a door */
+cluster DoorLock = 257 {
+  revision 7;
+
+  enum AlarmCodeEnum : enum8 {
+    kLockJammed = 0;
+    kLockFactoryReset = 1;
+    kLockRadioPowerCycled = 3;
+    kWrongCodeEntryLimit = 4;
+    kFrontEsceutcheonRemoved = 5;
+    kDoorForcedOpen = 6;
+    kDoorAjar = 7;
+    kForcedUser = 8;
+  }
+
+  enum CredentialRuleEnum : enum8 {
+    kSingle = 0;
+    kDual = 1;
+    kTri = 2;
+  }
+
+  enum CredentialTypeEnum : enum8 {
+    kProgrammingPIN = 0;
+    kPIN = 1;
+    kRFID = 2;
+    kFingerprint = 3;
+    kFingerVein = 4;
+    kFace = 5;
+    kAliroCredentialIssuerKey = 6;
+    kAliroEvictableEndpointKey = 7;
+    kAliroNonEvictableEndpointKey = 8;
+  }
+
+  enum DataOperationTypeEnum : enum8 {
+    kAdd = 0;
+    kClear = 1;
+    kModify = 2;
+  }
+
+  enum DlLockState : enum8 {
+    kNotFullyLocked = 0;
+    kLocked = 1;
+    kUnlocked = 2;
+    kUnlatched = 3;
+  }
+
+  enum DlLockType : enum8 {
+    kDeadBolt = 0;
+    kMagnetic = 1;
+    kOther = 2;
+    kMortise = 3;
+    kRim = 4;
+    kLatchBolt = 5;
+    kCylindricalLock = 6;
+    kTubularLock = 7;
+    kInterconnectedLock = 8;
+    kDeadLatch = 9;
+    kDoorFurniture = 10;
+    kEurocylinder = 11;
+  }
+
+  enum DlStatus : enum8 {
+    kSuccess = 0;
+    kFailure = 1;
+    kDuplicate = 2;
+    kOccupied = 3;
+    kInvalidField = 133;
+    kResourceExhausted = 137;
+    kNotFound = 139;
+  }
+
+  enum DoorLockOperationEventCode : enum8 {
+    kUnknownOrMfgSpecific = 0;
+    kLock = 1;
+    kUnlock = 2;
+    kLockInvalidPinOrId = 3;
+    kLockInvalidSchedule = 4;
+    kUnlockInvalidPinOrId = 5;
+    kUnlockInvalidSchedule = 6;
+    kOneTouchLock = 7;
+    kKeyLock = 8;
+    kKeyUnlock = 9;
+    kAutoLock = 10;
+    kScheduleLock = 11;
+    kScheduleUnlock = 12;
+    kManualLock = 13;
+    kManualUnlock = 14;
+  }
+
+  enum DoorLockProgrammingEventCode : enum8 {
+    kUnknownOrMfgSpecific = 0;
+    kMasterCodeChanged = 1;
+    kPinAdded = 2;
+    kPinDeleted = 3;
+    kPinChanged = 4;
+    kIdAdded = 5;
+    kIdDeleted = 6;
+  }
+
+  enum DoorLockSetPinOrIdStatus : enum8 {
+    kSuccess = 0;
+    kGeneralFailure = 1;
+    kMemoryFull = 2;
+    kDuplicateCodeError = 3;
+  }
+
+  enum DoorLockUserStatus : enum8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+    kNotSupported = 255;
+  }
+
+  enum DoorLockUserType : enum8 {
+    kUnrestricted = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kMasterUser = 3;
+    kNonAccessUser = 4;
+    kNotSupported = 255;
+  }
+
+  enum DoorStateEnum : enum8 {
+    kDoorOpen = 0;
+    kDoorClosed = 1;
+    kDoorJammed = 2;
+    kDoorForcedOpen = 3;
+    kDoorUnspecifiedError = 4;
+    kDoorAjar = 5;
+  }
+
+  enum LockDataTypeEnum : enum8 {
+    kUnspecified = 0;
+    kProgrammingCode = 1;
+    kUserIndex = 2;
+    kWeekDaySchedule = 3;
+    kYearDaySchedule = 4;
+    kHolidaySchedule = 5;
+    kPIN = 6;
+    kRFID = 7;
+    kFingerprint = 8;
+    kFingerVein = 9;
+    kFace = 10;
+    kAliroCredentialIssuerKey = 11;
+    kAliroEvictableEndpointKey = 12;
+    kAliroNonEvictableEndpointKey = 13;
+  }
+
+  enum LockOperationTypeEnum : enum8 {
+    kLock = 0;
+    kUnlock = 1;
+    kNonAccessUserEvent = 2;
+    kForcedUserEvent = 3;
+    kUnlatch = 4;
+  }
+
+  enum OperatingModeEnum : enum8 {
+    kNormal = 0;
+    kVacation = 1;
+    kPrivacy = 2;
+    kNoRemoteLockUnlock = 3;
+    kPassage = 4;
+  }
+
+  enum OperationErrorEnum : enum8 {
+    kUnspecified = 0;
+    kInvalidCredential = 1;
+    kDisabledUserDenied = 2;
+    kRestricted = 3;
+    kInsufficientBattery = 4;
+  }
+
+  enum OperationSourceEnum : enum8 {
+    kUnspecified = 0;
+    kManual = 1;
+    kProprietaryRemote = 2;
+    kKeypad = 3;
+    kAuto = 4;
+    kButton = 5;
+    kSchedule = 6;
+    kRemote = 7;
+    kRFID = 8;
+    kBiometric = 9;
+    kAliro = 10;
+  }
+
+  enum UserStatusEnum : enum8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+  }
+
+  enum UserTypeEnum : enum8 {
+    kUnrestrictedUser = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kProgrammingUser = 3;
+    kNonAccessUser = 4;
+    kForcedUser = 5;
+    kDisposableUser = 6;
+    kExpiringUser = 7;
+    kScheduleRestrictedUser = 8;
+    kRemoteOnlyUser = 9;
+  }
+
+  bitmap DaysMaskMap : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  bitmap DlCredentialRuleMask : bitmap8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
+  bitmap DlCredentialRulesSupport : bitmap8 {
+    kSingle = 0x1;
+    kDual = 0x2;
+    kTri = 0x4;
+  }
+
+  bitmap DlDefaultConfigurationRegister : bitmap16 {
+    kEnableLocalProgrammingEnabled = 0x1;
+    kKeypadInterfaceDefaultAccessEnabled = 0x2;
+    kRemoteInterfaceDefaultAccessIsEnabled = 0x4;
+    kSoundEnabled = 0x20;
+    kAutoRelockTimeSet = 0x40;
+    kLEDSettingsSet = 0x80;
+  }
+
+  bitmap DlKeypadOperationEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidPIN = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidCode = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+    kNonAccessUserOpEvent = 0x80;
+  }
+
+  bitmap DlKeypadProgrammingEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kProgrammingPINChanged = 0x2;
+    kPINAdded = 0x4;
+    kPINCleared = 0x8;
+    kPINChanged = 0x10;
+  }
+
+  bitmap DlLocalProgrammingFeatures : bitmap8 {
+    kAddUsersCredentialsSchedulesLocally = 0x1;
+    kModifyUsersCredentialsSchedulesLocally = 0x2;
+    kClearUsersCredentialsSchedulesLocally = 0x4;
+    kAdjustLockSettingsLocally = 0x8;
+  }
+
+  bitmap DlManualOperationEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kThumbturnLock = 0x2;
+    kThumbturnUnlock = 0x4;
+    kOneTouchLock = 0x8;
+    kKeyLock = 0x10;
+    kKeyUnlock = 0x20;
+    kAutoLock = 0x40;
+    kScheduleLock = 0x80;
+    kScheduleUnlock = 0x100;
+    kManualLock = 0x200;
+    kManualUnlock = 0x400;
+  }
+
+  bitmap DlRFIDOperationEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidRFID = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidRFID = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+  }
+
+  bitmap DlRFIDProgrammingEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kRFIDCodeAdded = 0x20;
+    kRFIDCodeCleared = 0x40;
+  }
+
+  bitmap DlRemoteOperationEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kLock = 0x2;
+    kUnlock = 0x4;
+    kLockInvalidCode = 0x8;
+    kLockInvalidSchedule = 0x10;
+    kUnlockInvalidCode = 0x20;
+    kUnlockInvalidSchedule = 0x40;
+  }
+
+  bitmap DlRemoteProgrammingEventMask : bitmap16 {
+    kUnknown = 0x1;
+    kProgrammingPINChanged = 0x2;
+    kPINAdded = 0x4;
+    kPINCleared = 0x8;
+    kPINChanged = 0x10;
+    kRFIDCodeAdded = 0x20;
+    kRFIDCodeCleared = 0x40;
+  }
+
+  bitmap DlSupportedOperatingModes : bitmap16 {
+    kNormal = 0x1;
+    kVacation = 0x2;
+    kPrivacy = 0x4;
+    kNoRemoteLockUnlock = 0x8;
+    kPassage = 0x10;
+  }
+
+  bitmap DoorLockDayOfWeek : bitmap8 {
+    kSunday = 0x1;
+    kMonday = 0x2;
+    kTuesday = 0x4;
+    kWednesday = 0x8;
+    kThursday = 0x10;
+    kFriday = 0x20;
+    kSaturday = 0x40;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPINCredential = 0x1;
+    kRFIDCredential = 0x2;
+    kFingerCredentials = 0x4;
+    kLogging = 0x8;
+    kWeekDayAccessSchedules = 0x10;
+    kDoorPositionSensor = 0x20;
+    kFaceCredentials = 0x40;
+    kCredentialsOverTheAirAccess = 0x80;
+    kUser = 0x100;
+    kNotification = 0x200;
+    kYearDayAccessSchedules = 0x400;
+    kHolidaySchedules = 0x800;
+    kUnbolt = 0x1000;
+    kAliroProvisioning = 0x2000;
+    kAliroBLEUWB = 0x4000;
+  }
+
+  struct CredentialStruct {
+    CredentialTypeEnum credentialType = 0;
+    int16u credentialIndex = 1;
+  }
+
+  critical event DoorLockAlarm = 0 {
+    AlarmCodeEnum alarmCode = 0;
+  }
+
+  critical event DoorStateChange = 1 {
+    DoorStateEnum doorState = 0;
+  }
+
+  critical event LockOperation = 2 {
+    LockOperationTypeEnum lockOperationType = 0;
+    OperationSourceEnum operationSource = 1;
+    nullable int16u userIndex = 2;
+    nullable fabric_idx fabricIndex = 3;
+    nullable node_id sourceNode = 4;
+    optional nullable CredentialStruct credentials[] = 5;
+  }
+
+  critical event LockOperationError = 3 {
+    LockOperationTypeEnum lockOperationType = 0;
+    OperationSourceEnum operationSource = 1;
+    OperationErrorEnum operationError = 2;
+    nullable int16u userIndex = 3;
+    nullable fabric_idx fabricIndex = 4;
+    nullable node_id sourceNode = 5;
+    optional nullable CredentialStruct credentials[] = 6;
+  }
+
+  info event LockUserChange = 4 {
+    LockDataTypeEnum lockDataType = 0;
+    DataOperationTypeEnum dataOperationType = 1;
+    OperationSourceEnum operationSource = 2;
+    nullable int16u userIndex = 3;
+    nullable fabric_idx fabricIndex = 4;
+    nullable node_id sourceNode = 5;
+    nullable int16u dataIndex = 6;
+  }
+
+  readonly attribute nullable DlLockState lockState = 0;
+  readonly attribute DlLockType lockType = 1;
+  readonly attribute boolean actuatorEnabled = 2;
+  readonly attribute optional nullable DoorStateEnum doorState = 3;
+  attribute access(write: manage) optional int32u doorOpenEvents = 4;
+  attribute access(write: manage) optional int32u doorClosedEvents = 5;
+  attribute access(write: manage) optional int16u openPeriod = 6;
+  readonly attribute optional int16u numberOfTotalUsersSupported = 17;
+  readonly attribute optional int16u numberOfPINUsersSupported = 18;
+  readonly attribute optional int16u numberOfRFIDUsersSupported = 19;
+  readonly attribute optional int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
+  readonly attribute optional int8u numberOfYearDaySchedulesSupportedPerUser = 21;
+  readonly attribute optional int8u numberOfHolidaySchedulesSupported = 22;
+  readonly attribute optional int8u maxPINCodeLength = 23;
+  readonly attribute optional int8u minPINCodeLength = 24;
+  readonly attribute optional int8u maxRFIDCodeLength = 25;
+  readonly attribute optional int8u minRFIDCodeLength = 26;
+  readonly attribute optional DlCredentialRuleMask credentialRulesSupport = 27;
+  readonly attribute optional int8u numberOfCredentialsSupportedPerUser = 28;
+  attribute access(write: manage) optional char_string<3> language = 33;
+  attribute access(write: manage) optional int8u LEDSettings = 34;
+  attribute access(write: manage) int32u autoRelockTime = 35;
+  attribute access(write: manage) optional int8u soundVolume = 36;
+  attribute access(write: manage) OperatingModeEnum operatingMode = 37;
+  readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
+  readonly attribute optional DlDefaultConfigurationRegister defaultConfigurationRegister = 39;
+  attribute access(write: administer) optional boolean enableLocalProgramming = 40;
+  attribute access(write: manage) optional boolean enableOneTouchLocking = 41;
+  attribute access(write: manage) optional boolean enableInsideStatusLED = 42;
+  attribute access(write: manage) optional boolean enablePrivacyModeButton = 43;
+  attribute access(write: administer) optional DlLocalProgrammingFeatures localProgrammingFeatures = 44;
+  attribute access(write: administer) optional int8u wrongCodeEntryLimit = 48;
+  attribute access(write: administer) optional int8u userCodeTemporaryDisableTime = 49;
+  attribute access(write: administer) optional boolean sendPINOverTheAir = 50;
+  attribute access(write: administer) optional boolean requirePINforRemoteOperation = 51;
+  attribute access(write: administer) optional int16u expiringUserTimeout = 53;
+  readonly attribute access(read: administer) optional nullable octet_string<65> aliroReaderVerificationKey = 128;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroReaderGroupIdentifier = 129;
+  readonly attribute access(read: administer) optional octet_string<16> aliroReaderGroupSubIdentifier = 130;
+  readonly attribute access(read: administer) optional octet_string aliroExpeditedTransactionSupportedProtocolVersions[] = 131;
+  readonly attribute access(read: administer) optional nullable octet_string<16> aliroGroupResolvingKey = 132;
+  readonly attribute access(read: administer) optional octet_string aliroSupportedBLEUWBProtocolVersions[] = 133;
+  readonly attribute access(read: administer) optional int8u aliroBLEAdvertisingVersion = 134;
+  readonly attribute optional int16u numberOfAliroCredentialIssuerKeysSupported = 135;
+  readonly attribute optional int16u numberOfAliroEndpointKeysSupported = 136;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct LockDoorRequest {
+    optional octet_string PINCode = 0;
+  }
+
+  request struct UnlockDoorRequest {
+    optional octet_string PINCode = 0;
+  }
+
+  request struct UnlockWithTimeoutRequest {
+    int16u timeout = 0;
+    optional octet_string PINCode = 1;
+  }
+
+  request struct SetWeekDayScheduleRequest {
+    int8u weekDayIndex = 0;
+    int16u userIndex = 1;
+    DaysMaskMap daysMask = 2;
+    int8u startHour = 3;
+    int8u startMinute = 4;
+    int8u endHour = 5;
+    int8u endMinute = 6;
+  }
+
+  request struct GetWeekDayScheduleRequest {
+    int8u weekDayIndex = 0;
+    int16u userIndex = 1;
+  }
+
+  response struct GetWeekDayScheduleResponse = 12 {
+    int8u weekDayIndex = 0;
+    int16u userIndex = 1;
+    DlStatus status = 2;
+    optional DaysMaskMap daysMask = 3;
+    optional int8u startHour = 4;
+    optional int8u startMinute = 5;
+    optional int8u endHour = 6;
+    optional int8u endMinute = 7;
+  }
+
+  request struct ClearWeekDayScheduleRequest {
+    int8u weekDayIndex = 0;
+    int16u userIndex = 1;
+  }
+
+  request struct SetYearDayScheduleRequest {
+    int8u yearDayIndex = 0;
+    int16u userIndex = 1;
+    epoch_s localStartTime = 2;
+    epoch_s localEndTime = 3;
+  }
+
+  request struct GetYearDayScheduleRequest {
+    int8u yearDayIndex = 0;
+    int16u userIndex = 1;
+  }
+
+  response struct GetYearDayScheduleResponse = 15 {
+    int8u yearDayIndex = 0;
+    int16u userIndex = 1;
+    DlStatus status = 2;
+    optional epoch_s localStartTime = 3;
+    optional epoch_s localEndTime = 4;
+  }
+
+  request struct ClearYearDayScheduleRequest {
+    int8u yearDayIndex = 0;
+    int16u userIndex = 1;
+  }
+
+  request struct SetHolidayScheduleRequest {
+    int8u holidayIndex = 0;
+    epoch_s localStartTime = 1;
+    epoch_s localEndTime = 2;
+    OperatingModeEnum operatingMode = 3;
+  }
+
+  request struct GetHolidayScheduleRequest {
+    int8u holidayIndex = 0;
+  }
+
+  response struct GetHolidayScheduleResponse = 18 {
+    int8u holidayIndex = 0;
+    DlStatus status = 1;
+    optional epoch_s localStartTime = 2;
+    optional epoch_s localEndTime = 3;
+    optional OperatingModeEnum operatingMode = 4;
+  }
+
+  request struct ClearHolidayScheduleRequest {
+    int8u holidayIndex = 0;
+  }
+
+  request struct SetUserRequest {
+    DataOperationTypeEnum operationType = 0;
+    int16u userIndex = 1;
+    nullable char_string userName = 2;
+    nullable int32u userUniqueID = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+    nullable CredentialRuleEnum credentialRule = 6;
+  }
+
+  request struct GetUserRequest {
+    int16u userIndex = 0;
+  }
+
+  response struct GetUserResponse = 28 {
+    int16u userIndex = 0;
+    nullable char_string userName = 1;
+    nullable int32u userUniqueID = 2;
+    nullable UserStatusEnum userStatus = 3;
+    nullable UserTypeEnum userType = 4;
+    nullable CredentialRuleEnum credentialRule = 5;
+    nullable CredentialStruct credentials[] = 6;
+    nullable fabric_idx creatorFabricIndex = 7;
+    nullable fabric_idx lastModifiedFabricIndex = 8;
+    nullable int16u nextUserIndex = 9;
+  }
+
+  request struct ClearUserRequest {
+    int16u userIndex = 0;
+  }
+
+  request struct SetCredentialRequest {
+    DataOperationTypeEnum operationType = 0;
+    CredentialStruct credential = 1;
+    long_octet_string credentialData = 2;
+    nullable int16u userIndex = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+  }
+
+  response struct SetCredentialResponse = 35 {
+    DlStatus status = 0;
+    nullable int16u userIndex = 1;
+    nullable int16u nextCredentialIndex = 2;
+  }
+
+  request struct GetCredentialStatusRequest {
+    CredentialStruct credential = 0;
+  }
+
+  response struct GetCredentialStatusResponse = 37 {
+    boolean credentialExists = 0;
+    nullable int16u userIndex = 1;
+    nullable fabric_idx creatorFabricIndex = 2;
+    nullable fabric_idx lastModifiedFabricIndex = 3;
+    nullable int16u nextCredentialIndex = 4;
+  }
+
+  request struct ClearCredentialRequest {
+    nullable CredentialStruct credential = 0;
+  }
+
+  request struct UnboltDoorRequest {
+    optional octet_string PINCode = 0;
+  }
+
+  request struct SetAliroReaderConfigRequest {
+    octet_string<32> signingKey = 0;
+    octet_string<65> verificationKey = 1;
+    octet_string<16> groupIdentifier = 2;
+    optional octet_string<16> groupResolvingKey = 3;
+  }
+
+  /** This command causes the lock device to lock the door. */
+  timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
+  /** This command causes the lock device to unlock the door. */
+  timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  /** This command causes the lock device to unlock the door with a timeout parameter. */
+  timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
+  /** Set a weekly repeating schedule for a specified user. */
+  command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  /** Retrieve the specific weekly schedule for the specific user. */
+  command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  /** Clear the specific weekly schedule or all weekly schedules for the specific user. */
+  command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  /** Set a time-specific schedule ID for a specified user. */
+  command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  /** Returns the year day schedule data for the specified schedule and user indexes. */
+  command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
+  /** Clears the specific year day schedule or all year day schedules for the specific user. */
+  command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  /** Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode. */
+  command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
+  /** Get the holiday schedule for the specified index. */
+  command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
+  /** Clears the holiday schedule or all holiday schedules. */
+  command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
+  /** Set User into the lock. */
+  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
+  /** Retrieve User. */
+  command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
+  /** Clears a User or all Users. */
+  timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  /** Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser. */
+  timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  /** Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index. */
+  command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  /** Clear one, one type, or all credentials except ProgrammingPIN credential. */
+  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  /** This command causes the lock device to unlock the door without pulling the latch. */
+  timed command UnboltDoor(UnboltDoorRequest): DefaultSuccess = 39;
+  /** This command communicates an Aliro Reader configuration to the lock. */
+  timed command access(invoke: administer) SetAliroReaderConfig(SetAliroReaderConfigRequest): DefaultSuccess = 40;
+  /** This command clears an existing Aliro Reader configuration for the lock. */
+  timed command access(invoke: administer) ClearAliroReaderConfig(): DefaultSuccess = 41;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -4751,6 +4809,16 @@ cluster Thermostat = 513 {
     kCoolingAndHeatingWithReheat = 5;
   }
 
+  enum PresetScenarioEnum : enum8 {
+    kUnspecified = 0;
+    kOccupied = 1;
+    kUnoccupied = 2;
+    kSleep = 3;
+    kWake = 4;
+    kVacation = 5;
+    kUserDefined = 6;
+  }
+
   enum SetpointChangeSourceEnum : enum8 {
     kManual = 0;
     kSchedule = 1;
@@ -4812,6 +4880,10 @@ cluster Thermostat = 513 {
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
+    kMatterScheduleConfiguration = 0x80;
+    kPresets = 0x100;
+    kSetpoints = 0x200;
+    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4819,6 +4891,11 @@ cluster Thermostat = 513 {
     kHeatingStage = 0xC;
     kHeatingIsHeatPump = 0x10;
     kHeatingUsesFuel = 0x20;
+  }
+
+  bitmap PresetTypeFeaturesBitmap : bitmap16 {
+    kAutomatic = 0x1;
+    kSupportsNames = 0x2;
   }
 
   bitmap ProgrammingOperationModeBitmap : bitmap8 {
@@ -4857,6 +4934,62 @@ cluster Thermostat = 513 {
   bitmap ScheduleModeBitmap : bitmap8 {
     kHeatSetpointPresent = 0x1;
     kCoolSetpointPresent = 0x2;
+  }
+
+  bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
+    kSupportsPresets = 0x1;
+    kSupportsSetpoints = 0x2;
+    kSupportsNames = 0x4;
+    kSupportsOff = 0x8;
+  }
+
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
+    kHoldDurationElapsed = 0x1;
+    kHoldDurationElapsedOrPresetChanged = 0x2;
+  }
+
+  struct ScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    optional octet_string<16> presetHandle = 2;
+    optional SystemModeEnum systemMode = 3;
+    optional temperature coolingSetpoint = 4;
+    optional temperature heatingSetpoint = 5;
+  }
+
+  struct ScheduleStruct {
+    nullable octet_string<16> scheduleHandle = 0;
+    SystemModeEnum systemMode = 1;
+    optional char_string<64> name = 2;
+    optional octet_string<16> presetHandle = 3;
+    ScheduleTransitionStruct transitions[] = 4;
+    optional nullable boolean builtIn = 5;
+  }
+
+  struct PresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    PresetScenarioEnum presetScenario = 1;
+    optional nullable char_string<64> name = 2;
+    optional temperature coolingSetpoint = 3;
+    optional temperature heatingSetpoint = 4;
+    nullable boolean builtIn = 5;
+  }
+
+  struct PresetTypeStruct {
+    PresetScenarioEnum presetScenario = 0;
+    int8u numberOfPresets = 1;
+    PresetTypeFeaturesBitmap presetTypeFeatures = 2;
+  }
+
+  struct QueuedPresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    nullable epoch_s transitionTimestamp = 1;
+  }
+
+  struct ScheduleTypeStruct {
+    SystemModeEnum systemMode = 0;
+    int8u numberOfSchedules = 1;
+    ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
   struct WeeklyScheduleTransitionStruct {
@@ -4914,6 +5047,20 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
   attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
+  readonly attribute optional PresetTypeStruct presetTypes[] = 72;
+  readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute optional int8u numberOfPresets = 74;
+  readonly attribute optional int8u numberOfSchedules = 75;
+  readonly attribute optional int8u numberOfScheduleTransitions = 76;
+  readonly attribute optional nullable int8u numberOfScheduleTransitionPerDay = 77;
+  readonly attribute optional nullable octet_string<16> activePresetHandle = 78;
+  readonly attribute optional nullable octet_string<16> activeScheduleHandle = 79;
+  attribute access(write: manage) optional PresetStruct presets[] = 80;
+  attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
+  readonly attribute optional boolean presetsSchedulesEditable = 82;
+  readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
+  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
+  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4945,14 +5092,45 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
+  }
+
+  request struct SetActivePresetRequestRequest {
+    octet_string<16> presetHandle = 0;
+    optional int16u delayMinutes = 1;
+  }
+
+  request struct StartPresetsSchedulesEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct SetTemperatureSetpointHoldPolicyRequest {
+    TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
+  }
+
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** Command description for SetWeeklySchedule */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
+  /** This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
+  /** This command is used to set the active schedule. */
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  /** This command is used to set the active preset. */
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command is used to start editing the presets and schedules. */
+  command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
+  /** This command is used to cancel editing presets and schedules. */
+  command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
+  /** This command is used to notify the server that all edits are done and should be committed. */
+  command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
+  /** This command is sent to cancel a queued preset. */
+  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
+  /** This command sets the set point hold policy. */
+  command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
@@ -5002,6 +5180,16 @@ cluster Thermostat = 513 {
     kCoolingAndHeatingWithReheat = 5;
   }
 
+  enum PresetScenarioEnum : enum8 {
+    kUnspecified = 0;
+    kOccupied = 1;
+    kUnoccupied = 2;
+    kSleep = 3;
+    kWake = 4;
+    kVacation = 5;
+    kUserDefined = 6;
+  }
+
   enum SetpointChangeSourceEnum : enum8 {
     kManual = 0;
     kSchedule = 1;
@@ -5063,6 +5251,10 @@ cluster Thermostat = 513 {
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
+    kMatterScheduleConfiguration = 0x80;
+    kPresets = 0x100;
+    kSetpoints = 0x200;
+    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5070,6 +5262,11 @@ cluster Thermostat = 513 {
     kHeatingStage = 0xC;
     kHeatingIsHeatPump = 0x10;
     kHeatingUsesFuel = 0x20;
+  }
+
+  bitmap PresetTypeFeaturesBitmap : bitmap16 {
+    kAutomatic = 0x1;
+    kSupportsNames = 0x2;
   }
 
   bitmap ProgrammingOperationModeBitmap : bitmap8 {
@@ -5108,6 +5305,62 @@ cluster Thermostat = 513 {
   bitmap ScheduleModeBitmap : bitmap8 {
     kHeatSetpointPresent = 0x1;
     kCoolSetpointPresent = 0x2;
+  }
+
+  bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
+    kSupportsPresets = 0x1;
+    kSupportsSetpoints = 0x2;
+    kSupportsNames = 0x4;
+    kSupportsOff = 0x8;
+  }
+
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
+    kHoldDurationElapsed = 0x1;
+    kHoldDurationElapsedOrPresetChanged = 0x2;
+  }
+
+  struct ScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    optional octet_string<16> presetHandle = 2;
+    optional SystemModeEnum systemMode = 3;
+    optional temperature coolingSetpoint = 4;
+    optional temperature heatingSetpoint = 5;
+  }
+
+  struct ScheduleStruct {
+    nullable octet_string<16> scheduleHandle = 0;
+    SystemModeEnum systemMode = 1;
+    optional char_string<64> name = 2;
+    optional octet_string<16> presetHandle = 3;
+    ScheduleTransitionStruct transitions[] = 4;
+    optional nullable boolean builtIn = 5;
+  }
+
+  struct PresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    PresetScenarioEnum presetScenario = 1;
+    optional nullable char_string<64> name = 2;
+    optional temperature coolingSetpoint = 3;
+    optional temperature heatingSetpoint = 4;
+    nullable boolean builtIn = 5;
+  }
+
+  struct PresetTypeStruct {
+    PresetScenarioEnum presetScenario = 0;
+    int8u numberOfPresets = 1;
+    PresetTypeFeaturesBitmap presetTypeFeatures = 2;
+  }
+
+  struct QueuedPresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    nullable epoch_s transitionTimestamp = 1;
+  }
+
+  struct ScheduleTypeStruct {
+    SystemModeEnum systemMode = 0;
+    int8u numberOfSchedules = 1;
+    ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
   struct WeeklyScheduleTransitionStruct {
@@ -5165,6 +5418,20 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
   attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
+  readonly attribute optional PresetTypeStruct presetTypes[] = 72;
+  readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute optional int8u numberOfPresets = 74;
+  readonly attribute optional int8u numberOfSchedules = 75;
+  readonly attribute optional int8u numberOfScheduleTransitions = 76;
+  readonly attribute optional nullable int8u numberOfScheduleTransitionPerDay = 77;
+  readonly attribute optional nullable octet_string<16> activePresetHandle = 78;
+  readonly attribute optional nullable octet_string<16> activeScheduleHandle = 79;
+  attribute access(write: manage) optional PresetStruct presets[] = 80;
+  attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
+  readonly attribute optional boolean presetsSchedulesEditable = 82;
+  readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
+  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
+  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5196,14 +5463,45 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
+  }
+
+  request struct SetActivePresetRequestRequest {
+    octet_string<16> presetHandle = 0;
+    optional int16u delayMinutes = 1;
+  }
+
+  request struct StartPresetsSchedulesEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct SetTemperatureSetpointHoldPolicyRequest {
+    TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
+  }
+
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** Command description for SetWeeklySchedule */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
+  /** This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
+  /** This command is used to set the active schedule. */
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  /** This command is used to set the active preset. */
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command is used to start editing the presets and schedules. */
+  command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
+  /** This command is used to cancel editing presets and schedules. */
+  command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
+  /** This command is used to notify the server that all edits are done and should be committed. */
+  command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
+  /** This command is sent to cancel a queued preset. */
+  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
+  /** This command sets the set point hold policy. */
+  command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
 
 /** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
@@ -6224,7 +6522,7 @@ cluster Channel = 1284 {
   }
 
   response struct ProgramGuideResponse = 5 {
-    int16s channelPagingStruct = 0;
+    ChannelPagingStruct paging = 0;
     ProgramStruct programList[] = 1;
   }
 
@@ -6398,7 +6696,7 @@ cluster Channel = 1284 {
   }
 
   response struct ProgramGuideResponse = 5 {
-    int16s channelPagingStruct = 0;
+    ChannelPagingStruct paging = 0;
     ProgramStruct programList[] = 1;
   }
 
@@ -8750,31 +9048,6 @@ endpoint 1 {
     handle command AddGroupIfIdentifying;
   }
 
-  server cluster Scenes {
-    ram      attribute nameSupport;
-    ram      attribute sceneTableSize default = 16;
-    callback attribute fabricSceneInfo;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 15;
-    ram      attribute clusterRevision default = 5;
-
-    handle command AddScene;
-    handle command AddSceneResponse;
-    handle command ViewScene;
-    handle command ViewSceneResponse;
-    handle command RemoveScene;
-    handle command RemoveSceneResponse;
-    handle command RemoveAllScenes;
-    handle command RemoveAllScenesResponse;
-    handle command StoreScene;
-    handle command StoreSceneResponse;
-    handle command RecallScene;
-    handle command GetSceneMembership;
-    handle command GetSceneMembershipResponse;
-  }
-
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
     ram      attribute globalSceneControl default = 0x01;
@@ -8885,6 +9158,31 @@ endpoint 1 {
     callback attribute labelList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
+  }
+
+  server cluster ScenesManagement {
+    ram      attribute nameSupport;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute fabricSceneInfo;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 15;
+    ram      attribute clusterRevision default = 5;
+
+    handle command AddScene;
+    handle command AddSceneResponse;
+    handle command ViewScene;
+    handle command ViewSceneResponse;
+    handle command RemoveScene;
+    handle command RemoveSceneResponse;
+    handle command RemoveAllScenes;
+    handle command RemoveAllScenesResponse;
+    handle command StoreScene;
+    handle command StoreSceneResponse;
+    handle command RecallScene;
+    handle command GetSceneMembership;
+    handle command GetSceneMembershipResponse;
   }
 
   server cluster ColorControl {

@@ -1,5 +1,19 @@
 ## Using ESP32 Factory Data Provider
 
+**WARNING:** The following steps outline the development workflow for building a
+matter device.
+
+Please take a look at
+[security considerations](https://docs.espressif.com/projects/esp-matter/en/latest/esp32/security.html)
+and review the security guidelines outlined in
+[security workflow](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/security/host-based-security-workflows.html)
+for production workflows.
+
+Ensure to select the appropriate SoC from the menu on the left-hand side, as the
+provided references are specific to ESP32.
+
+---
+
 By default applications uses test-mode or default commissionable data provider,
 device attestation credentials provider, device instance info provider, and
 device info provider.
@@ -46,6 +60,15 @@ specific implementation of `CommissionableDataProvider` and
 
 [Component config → CHIP Device Layer → Commissioning options → Use ESP32
 Factory Data Provider]
+
+By default, the factory data provider implementation reads the Certification
+Declaration (CD) from the 'chip-factory' NVS namespace. Enable
+`CONFIG_ENABLE_SET_CERT_DECLARATION_API` option to enable an API which lets you
+set the CD from the application and the configured CD will be used for
+subsequent CD reads.
+
+[Component config -> CHIP Device Layer -> Commissioning options -> Enable Set CD
+API]
 
 Enable config option `CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER` to use
 ESP32 specific implementation of `DeviceInstanceInfoProvider`.
@@ -107,4 +130,6 @@ appropriate address.
 
 ### Securing NVS binary image with NVS Encryption
 
-Please check [Flash and NVS encryption guide](flash_nvs_encryption.md)
+WARNING: NVS binary image may contain the sensitive information and it must be
+secured using NVS encryption. For more details please check
+[Flash and NVS encryption guide](flash_nvs_encryption.md)

@@ -21,14 +21,17 @@
 #include "core/Endpoint.h"
 #include "core/Types.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCluster.h>
 
 namespace matter {
 namespace casting {
-namespace support {
 
+namespace core {
+class EndpointAttributes;
+};
+
+namespace support {
 /**
  * @brief EndpointListLoader builds Endpoints corresponding to the CastingPlayer::GetTargetCastingPlayer by reading Bindings and
  * fetching Endpoint attributes (like VendorID, ProductID, DeviceTypeList, ServerList, etc). It then loads all of these Endpoints
@@ -100,18 +103,6 @@ enum DesiredAttributes
     kServerList,
 
     kTotalDesiredAttributes
-};
-
-/**
- * @brief MediaClusterBase is used by the EndpointListLoader to invoke controller/CHIPCluster.h#ReadAttribute() API calls
- */
-class MediaClusterBase : public chip::Controller::ClusterBase
-{
-public:
-    MediaClusterBase(chip::Messaging::ExchangeManager & exchangeManager, const chip::SessionHandle & session,
-                     chip::EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, endpoint)
-    {}
 };
 
 }; // namespace support
