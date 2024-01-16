@@ -1115,9 +1115,9 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     char station_mac_str[12];
     for (size_t i = 0; i < 6; ++i)
     {
-        uint8_t dig1 = (station_mac[i] & 0xF0) >> 4;
-        uint8_t dig2 = station_mac[i] & 0x0F;
-        station_mac_str[2 * i] = dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1);
+        uint8_t dig1               = (station_mac[i] & 0xF0) >> 4;
+        uint8_t dig2               = station_mac[i] & 0x0F;
+        station_mac_str[2 * i]     = dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1);
         station_mac_str[2 * i + 1] = dig2 > 9 ? ('A' + dig2 - 0xA) : ('0' + dig2);
     }
     static chip::Inet::ESP32EndpointQueueFilter endpointQueueFilter;
