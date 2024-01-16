@@ -343,11 +343,11 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     }
 
     /* Temporary variable to save keep calling .Value() on the Optional element */
-    auto & earliestStartTimeOptional = forecast.earliestStartTime.Value();
+    DataModel::Nullable<uint32_t> & earliestStartTimeNullable = forecast.earliestStartTime.Value();
     /* Latest End Time is optional & cannot be null - unlike earliestStartTime! */
     latestEndTimeEpoch = forecast.latestEndTime.Value();
 
-    if (earliestStartTimeOptional.IsNull())
+    if (earliestStartTimeNullable.IsNull())
     {
         System::Clock::Milliseconds64 cTMs;
         CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
@@ -372,7 +372,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     }
     else
     {
-        earliestStartTimeEpoch = earliestStartTimeOptional.Value();
+        earliestStartTimeEpoch = earliestStartTimeNullable.Value();
     }
 
     duration = forecast.endTime - forecast.startTime; // the current entire forecast duration
