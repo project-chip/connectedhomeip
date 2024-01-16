@@ -7,9 +7,9 @@ The following docs are a brief introduction to SDK development.
 :maxdepth: 1
 :hidden:
 
-```
+*
 
-## Guides
+```
 
 -   [SDK Basics](./SDKBasics.md)
 -   [ZAP](./zap.md)

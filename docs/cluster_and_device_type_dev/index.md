@@ -8,6 +8,8 @@ types in the SDK.
 :maxdepth: 1
 :hidden:
 
+*
+
 ```
 
 -   [Cluster and device type development](./cluster_and_device_type_dev.md)
