@@ -53,10 +53,7 @@ settings are as follows:
     attributes become mandatory when features or other attributes are enabled.
     This will NOT be reflected in the UI. It is up to the device manufacture to
     ensure the device is conformant with the specification.
-
-[//]:
-    #
-    "NOTE: Insert a link to conformance checker documentation once that is up"
+    Conformance can be checked using the conformance checker test [TC_DeviceConformance.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py)
 
 -   client/server - For Matter, all attributes will be server
 -   Mfg code - applies only to manufacturer specific attributes
