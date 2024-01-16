@@ -320,7 +320,7 @@ def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTim
         pyBatchCommandsData[idx].tlvLength = c_size_t(len(payloadTLV))
 
         responseTypes.append(responseType)
-    
+
     return pyBatchCommandsData
 
 
@@ -377,7 +377,8 @@ def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[
     handle = chip.native.GetLibraryHandle()
 
     responseTypes = []
-    pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs, responseTypes, suppressTimedRequestMessage=suppressTimedRequestMessage)
+    pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs,
+                                                    responseTypes, suppressTimedRequestMessage=suppressTimedRequestMessage)
 
     transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))

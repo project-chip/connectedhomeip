@@ -199,7 +199,6 @@ class PyWriteAttributeData(ctypes.Structure):
     _fields_ = [('attributePath', PyAttributePath), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
 
 
-
 class TestOnlyPyBatchCommandsOverrides(ctypes.Structure):
     ''' TestOnly struct for overriding aspects of batch command to send invalid commands.
 
@@ -215,7 +214,8 @@ class TestOnlyPyBatchCommandsOverrides(ctypes.Structure):
     };
     ```
     '''
-    _fields_ = [('overrideRemoteMaxPathsPerInvoke', ctypes.c_uint16), ('suppressTimedRequestMessage', ctypes.c_bool), ('overrideCommandRefsList', POINTER(ctypes.c_uint16)), ('overrideCommandRefsListLength', ctypes.c_size_t)]
+    _fields_ = [('overrideRemoteMaxPathsPerInvoke', ctypes.c_uint16), ('suppressTimedRequestMessage', ctypes.c_bool),
+                ('overrideCommandRefsList', POINTER(ctypes.c_uint16)), ('overrideCommandRefsListLength', ctypes.c_size_t)]
 
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
