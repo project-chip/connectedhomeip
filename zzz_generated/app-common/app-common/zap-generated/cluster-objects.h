@@ -16325,18 +16325,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcRunMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -16384,7 +16372,6 @@ struct TypeInfo
 
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -16514,18 +16501,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentMode
-namespace OnMode {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcCleanMode::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OnMode
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -16573,7 +16548,6 @@ struct TypeInfo
 
         Attributes::SupportedModes::TypeInfo::DecodableType supportedModes;
         Attributes::CurrentMode::TypeInfo::DecodableType currentMode = static_cast<uint8_t>(0);
-        Attributes::OnMode::TypeInfo::DecodableType onMode;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -18755,16 +18729,6 @@ struct Type;
 struct DecodableType;
 } // namespace Pause
 
-namespace Stop {
-struct Type;
-struct DecodableType;
-} // namespace Stop
-
-namespace Start {
-struct Type;
-struct DecodableType;
-} // namespace Start
-
 namespace Resume {
 struct Type;
 struct DecodableType;
@@ -18806,62 +18770,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Pause
-namespace Stop {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Stop
-namespace Start {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Start::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::RvcOperationalState::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Start
 namespace Resume {
 enum class Fields : uint8_t
 {

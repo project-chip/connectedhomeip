@@ -3312,10 +3312,6 @@ cluster RvcRunMode = 84 {
     kBatteryLow = 72;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3329,7 +3325,6 @@ cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3365,10 +3360,6 @@ cluster RvcCleanMode = 85 {
     kCleaningInProgress = 64;
   }
 
-  bitmap Feature : bitmap32 {
-    kOnOff = 0x1;
-  }
-
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3382,7 +3373,6 @@ cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3896,10 +3886,6 @@ cluster RvcOperationalState = 97 {
 
   /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
   command Pause(): OperationalCommandResponse = 0;
-  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
-  command Stop(): OperationalCommandResponse = 1;
-  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
-  command Start(): OperationalCommandResponse = 2;
   /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
   command Resume(): OperationalCommandResponse = 3;
 }

@@ -2836,10 +2836,6 @@ namespace CurrentMode {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace OnMode
-
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -2877,10 +2873,6 @@ static constexpr AttributeId Id = 0x00000000;
 namespace CurrentMode {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
-
-namespace OnMode {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace OnMode
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

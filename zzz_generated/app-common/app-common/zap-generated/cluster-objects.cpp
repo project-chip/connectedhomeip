@@ -11844,8 +11844,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedModes);
     case Attributes::CurrentMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentMode);
-    case Attributes::OnMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onMode);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -11955,8 +11953,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedModes);
     case Attributes::CurrentMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentMode);
-    case Attributes::OnMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onMode);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -13246,46 +13242,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace Pause.
-namespace Stop {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace Stop.
-namespace Start {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace Start.
 namespace Resume {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
