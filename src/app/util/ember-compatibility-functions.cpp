@@ -503,29 +503,26 @@ Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAtt
     return Status::UnsupportedAttribute;
 }
 
-// Will set exactly one of the out-params (aAttributeCluster or
-// aAttributeMetadata) to non-null.
+// Will set at most one of the out-params (aAttributeCluster or
+// aAttributeMetadata) to non-null.  Both null means attribute not supported,
+// aAttributeCluster non-null means this is a supported global attribute that
+// does not have metadata.
 void FindAttributeMetadata(const ConcreteAttributePath & aPath, const EmberAfCluster ** aAttributeCluster,
                            const EmberAfAttributeMetadata ** aAttributeMetadata)
 {
     *aAttributeCluster  = nullptr;
     *aAttributeMetadata = nullptr;
 
-    bool isGlobalAttributeNotInMetadata = false;
     for (auto & attr : GlobalAttributesNotInMetadata)
     {
         if (attr == aPath.mAttributeId)
         {
-            isGlobalAttributeNotInMetadata = true;
-            *aAttributeCluster             = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            break;
+            *aAttributeCluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
+            return;
         }
     }
 
-    if (!isGlobalAttributeNotInMetadata)
-    {
-        *aAttributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    }
+    *aAttributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
 
 } // anonymous namespace
