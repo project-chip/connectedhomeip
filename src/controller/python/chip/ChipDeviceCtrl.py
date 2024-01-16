@@ -852,7 +852,7 @@ class ChipDeviceControllerBase():
                                         timedRequestTimeoutMs: typing.Optional[int] = None,
                                         interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
                                         suppressResponse: typing.Optional[bool] = None, remoteMaxPathsPerInvoke: typing.Optional[int] = None,
-                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[list[int]] = None):
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[typing.List[int]] = None):
         '''
 
         Please see SendBatchCommands for description.

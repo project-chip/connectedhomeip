@@ -361,7 +361,7 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
 def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
                               timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
                               suppressResponse: Optional[bool] = None, remoteMaxPathsPerInvoke: Optional[int] = None,
-                              suppressTimedRequestMessage: bool = False, commandRefsOverride: Optional[list[int]] = None) -> PyChipError:
+                              suppressTimedRequestMessage: bool = False, commandRefsOverride: Optional[List[int]] = None) -> PyChipError:
     ''' ONLY TO BE USED FOR TEST: Send batch commands using various overrides.
     '''
     if suppressTimedRequestMessage and timedRequestTimeoutMs is not None:
