@@ -78,7 +78,8 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
 
         state_ids = set([s.operationalStateID for s in op_state_list])
 
-        asserts.assert_true(all(id in state_ids for id in defined_states), "OvenCavityOperationalStateList is missing a required entry")
+        asserts.assert_true(all(id in state_ids for id in defined_states),
+                            "OvenCavityOperationalStateList is missing a required entry")
 
         self.print_step(4, "Send Pause command")
         ret = await self.send_pause_cmd()

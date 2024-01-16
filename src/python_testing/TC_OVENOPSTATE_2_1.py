@@ -127,7 +127,8 @@ class TC_OVENOPSTATE_2_1(MatterBaseTest):
             logging.info("OvenCavityOperationalState: %s" % (operational_state))
 
             in_range = (0x80 <= operational_state <= 0xBF)
-            asserts.assert_true(operational_state in defined_states or in_range, "OvenCavityOperationalState has an invalid ID value!")
+            asserts.assert_true(operational_state in defined_states or in_range,
+                                "OvenCavityOperationalState has an invalid ID value!")
 
             if self.check_pics("OVENOPSTATE.S.M.ST_STOPPED"):
                 self.print_step("6a", "Manually put the device in the stopped state")
