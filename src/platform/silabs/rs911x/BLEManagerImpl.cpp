@@ -675,8 +675,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
     }
 
-    err = ConfigureAdvertisingData();
-    SuccessOrExit(err);
+    if (!(mFlags.Has(Flags::kAdvertising)))
+    {
+      err = ConfigureAdvertisingData();
+      SuccessOrExit(err);
+    }
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
