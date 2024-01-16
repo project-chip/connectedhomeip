@@ -79,7 +79,7 @@ class TC_IDM_1_4(MatterBaseTest):
         asserts.assert_greater_equal(len(list_of_commands_to_send), 2,
                                      "Step 2 is always expected to try sending at least 2 command, something wrong with test logic")
         try:
-            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, list_of_commands_to_send, remoteMaxPathsPerInvoke = number_of_commands_to_send)
+            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, list_of_commands_to_send, remoteMaxPathsPerInvoke=number_of_commands_to_send)
             # If you get the assert below it is likely because cap_for_batch_commands is actually too low.
             # This might happen after TCP is enabled and DUT supports TCP.
             asserts.fail(
@@ -164,7 +164,8 @@ class TC_IDM_1_4(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
-        self.print_step(6, "Verify DUT is able to responsed to InvokeRequestMessage that contains one paths InvokeRequest, and one InvokeRequest to unsupported endpoint")
+        self.print_step(
+            6, "Verify DUT is able to responsed to InvokeRequestMessage that contains one paths InvokeRequest, and one InvokeRequest to unsupported endpoint")
         # First finding non-existent endpoint
         wildcard_descriptor = await dev_ctrl.ReadAttribute(dut_node_id, [(Clusters.Descriptor)])
         endpoints = list(wildcard_descriptor.keys())
@@ -187,8 +188,10 @@ class TC_IDM_1_4(MatterBaseTest):
                 result[0], Clusters.OperationalCredentials.Commands.CertificateChainResponse), "Unexpected return type for first InvokeRequest")
             asserts.assert_true(type_matches(
                 result[1], InteractionModelError), "Unexpected return type for second InvokeRequest")
-            asserts.assert_equal(result[1].status, Status.UnsupportedEndpoint, "Unexpected Interaction model error, was expecting UnsupportedEndpoint")
-            logging.info("DUT successfully responded to first valid InvokeRequest, and successfully errored with UnsupportedEndpoint for the second")
+            asserts.assert_equal(result[1].status, Status.UnsupportedEndpoint,
+                                 "Unexpected Interaction model error, was expecting UnsupportedEndpoint")
+            logging.info(
+                "DUT successfully responded to first valid InvokeRequest, and successfully errored with UnsupportedEndpoint for the second")
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
