@@ -461,7 +461,7 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 
     mIsPeerLIT = (aType == PeerType::kLITICD);
 
-    // If the peer is nolonger LIT, try to wake up the subscription and do resubsribe when necessary.
+    // If the peer is no longer LIT, try to wake up the subscription and do resubsribe when necessary.
     if (!mIsPeerLIT)
     {
         OnActiveModeNotification();
