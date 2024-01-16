@@ -21434,6 +21434,550 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTRThermostatClusterSetActiveScheduleRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleHandle = [NSData data];
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterSetActiveScheduleRequestParams alloc] init];
+
+    other.scheduleHandle = self.scheduleHandle;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: scheduleHandle:%@; >", NSStringFromClass([self class]), [_scheduleHandle base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetActiveScheduleRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.scheduleHandle = AsByteSpan(self.scheduleHandle);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterSetActivePresetRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = [NSData data];
+
+        _delayMinutes = nil;
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterSetActivePresetRequestParams alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.delayMinutes = self.delayMinutes;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; delayMinutes:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _delayMinutes];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetActivePresetRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.presetHandle = AsByteSpan(self.presetHandle);
+    }
+    {
+        if (self.delayMinutes != nil) {
+            auto & definedValue_0 = encodableStruct.delayMinutes.Emplace();
+            definedValue_0 = self.delayMinutes.unsignedShortValue;
+        }
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterStartPresetsSchedulesEditRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _timeoutSeconds = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterStartPresetsSchedulesEditRequestParams alloc] init];
+
+    other.timeoutSeconds = self.timeoutSeconds;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeoutSeconds:%@; >", NSStringFromClass([self class]), _timeoutSeconds];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.timeoutSeconds = self.timeoutSeconds.unsignedShortValue;
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterCancelPresetsSchedulesEditRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterCancelPresetsSchedulesEditRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterCommitPresetsSchedulesRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterCommitPresetsSchedulesRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterCancelSetActivePresetRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterCancelSetActivePresetRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterCancelSetActivePresetRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _temperatureSetpointHoldPolicy = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams alloc] init];
+
+    other.temperatureSetpointHoldPolicy = self.temperatureSetpointHoldPolicy;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: temperatureSetpointHoldPolicy:%@; >", NSStringFromClass([self class]), _temperatureSetpointHoldPolicy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::Type encodableStruct;
+    ListFreer listFreer;
+    {
+        encodableStruct.temperatureSetpointHoldPolicy = static_cast<std::remove_reference_t<decltype(encodableStruct.temperatureSetpointHoldPolicy)>>(self.temperatureSetpointHoldPolicy.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRFanControlClusterStepParams
 - (instancetype)init
 {

@@ -8112,6 +8112,53 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000005: {
+                "commandId": 0x00000005,
+                "commandName": "SetActiveScheduleRequest",
+                "args": {
+                    "scheduleHandle": "bytes",
+                },
+            },
+            0x00000006: {
+                "commandId": 0x00000006,
+                "commandName": "SetActivePresetRequest",
+                "args": {
+                    "presetHandle": "bytes",
+                    "delayMinutes": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "StartPresetsSchedulesEditRequest",
+                "args": {
+                    "timeoutSeconds": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "CancelPresetsSchedulesEditRequest",
+                "args": {
+                },
+            },
+            0x00000009: {
+                "commandId": 0x00000009,
+                "commandName": "CommitPresetsSchedulesRequest",
+                "args": {
+                },
+            },
+            0x0000000A: {
+                "commandId": 0x0000000A,
+                "commandName": "CancelSetActivePresetRequest",
+                "args": {
+                },
+            },
+            0x0000000B: {
+                "commandId": 0x0000000B,
+                "commandName": "SetTemperatureSetpointHoldPolicy",
+                "args": {
+                    "temperatureSetpointHoldPolicy": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -8434,6 +8481,92 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x00000048: {
+                "attributeName": "PresetTypes",
+                "attributeId": 0x00000048,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000049: {
+                "attributeName": "ScheduleTypes",
+                "attributeId": 0x00000049,
+                "type": "",
+                "reportable": True,
+            },
+            0x0000004A: {
+                "attributeName": "NumberOfPresets",
+                "attributeId": 0x0000004A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004B: {
+                "attributeName": "NumberOfSchedules",
+                "attributeId": 0x0000004B,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004C: {
+                "attributeName": "NumberOfScheduleTransitions",
+                "attributeId": 0x0000004C,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004D: {
+                "attributeName": "NumberOfScheduleTransitionPerDay",
+                "attributeId": 0x0000004D,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000004E: {
+                "attributeName": "ActivePresetHandle",
+                "attributeId": 0x0000004E,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000004F: {
+                "attributeName": "ActiveScheduleHandle",
+                "attributeId": 0x0000004F,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x00000050: {
+                "attributeName": "Presets",
+                "attributeId": 0x00000050,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000051: {
+                "attributeName": "Schedules",
+                "attributeId": 0x00000051,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000052: {
+                "attributeName": "PresetsSchedulesEditable",
+                "attributeId": 0x00000052,
+                "type": "bool",
+                "reportable": True,
+            },
+            0x00000053: {
+                "attributeName": "TemperatureSetpointHoldPolicy",
+                "attributeId": 0x00000053,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000054: {
+                "attributeName": "SetpointHoldExpiryTimestamp",
+                "attributeId": 0x00000054,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000055: {
+                "attributeName": "QueuedPreset",
+                "attributeId": 0x00000055,
+                "type": "",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",

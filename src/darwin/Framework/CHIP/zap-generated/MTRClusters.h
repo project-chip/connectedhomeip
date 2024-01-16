@@ -4236,6 +4236,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)setActiveScheduleRequestWithParams:(MTRThermostatClusterSetActiveScheduleRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)setActivePresetRequestWithParams:(MTRThermostatClusterSetActivePresetRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)startPresetsSchedulesEditRequestWithParams:(MTRThermostatClusterStartPresetsSchedulesEditRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)cancelPresetsSchedulesEditRequestWithParams:(MTRThermostatClusterCancelPresetsSchedulesEditRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)cancelPresetsSchedulesEditRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+- (void)commitPresetsSchedulesRequestWithParams:(MTRThermostatClusterCommitPresetsSchedulesRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)commitPresetsSchedulesRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+- (void)cancelSetActivePresetRequestWithParams:(MTRThermostatClusterCancelSetActivePresetRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)cancelSetActivePresetRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+    MTR_PROVISIONALLY_AVAILABLE;
+- (void)setTemperatureSetpointHoldPolicyWithParams:(MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
@@ -4388,6 +4401,38 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeACCapacityformatWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACCapacityformatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACCapacityformatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePresetTypesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeScheduleTypesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfPresetsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfSchedulesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfScheduleTransitionsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfScheduleTransitionPerDayWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePresetHandleWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveScheduleHandleWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePresetsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributePresetsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributePresetsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSchedulesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeSchedulesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
+- (void)writeAttributeSchedulesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePresetsSchedulesEditableWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTemperatureSetpointHoldPolicyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSetpointHoldExpiryTimestampWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeQueuedPresetWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 

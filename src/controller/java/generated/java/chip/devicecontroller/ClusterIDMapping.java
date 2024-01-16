@@ -10887,6 +10887,20 @@ public class ClusterIDMapping {
             ACLouverPosition(69L),
             ACCoilTemperature(70L),
             ACCapacityformat(71L),
+            PresetTypes(72L),
+            ScheduleTypes(73L),
+            NumberOfPresets(74L),
+            NumberOfSchedules(75L),
+            NumberOfScheduleTransitions(76L),
+            NumberOfScheduleTransitionPerDay(77L),
+            ActivePresetHandle(78L),
+            ActiveScheduleHandle(79L),
+            Presets(80L),
+            Schedules(81L),
+            PresetsSchedulesEditable(82L),
+            TemperatureSetpointHoldPolicy(83L),
+            SetpointHoldExpiryTimestamp(84L),
+            QueuedPreset(85L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -10936,7 +10950,14 @@ public class ClusterIDMapping {
             SetpointRaiseLower(0L),
             SetWeeklySchedule(1L),
             GetWeeklySchedule(2L),
-            ClearWeeklySchedule(3L),;
+            ClearWeeklySchedule(3L),
+            SetActiveScheduleRequest(5L),
+            SetActivePresetRequest(6L),
+            StartPresetsSchedulesEditRequest(7L),
+            CancelPresetsSchedulesEditRequest(8L),
+            CommitPresetsSchedulesRequest(9L),
+            CancelSetActivePresetRequest(10L),
+            SetTemperatureSetpointHoldPolicy(11L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10999,6 +11020,74 @@ public class ClusterIDMapping {
                     }
                     public static GetWeeklyScheduleCommandField value(int id) throws NoSuchFieldError {
                         for (GetWeeklyScheduleCommandField field : GetWeeklyScheduleCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetActiveScheduleRequestCommandField {ScheduleHandle(0),;
+                    private final int id;
+                    SetActiveScheduleRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetActiveScheduleRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (SetActiveScheduleRequestCommandField field : SetActiveScheduleRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetActivePresetRequestCommandField {PresetHandle(0),DelayMinutes(1),;
+                    private final int id;
+                    SetActivePresetRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetActivePresetRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (SetActivePresetRequestCommandField field : SetActivePresetRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum StartPresetsSchedulesEditRequestCommandField {TimeoutSeconds(0),;
+                    private final int id;
+                    StartPresetsSchedulesEditRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static StartPresetsSchedulesEditRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (StartPresetsSchedulesEditRequestCommandField field : StartPresetsSchedulesEditRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum SetTemperatureSetpointHoldPolicyCommandField {TemperatureSetpointHoldPolicy(0),;
+                    private final int id;
+                    SetTemperatureSetpointHoldPolicyCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static SetTemperatureSetpointHoldPolicyCommandField value(int id) throws NoSuchFieldError {
+                        for (SetTemperatureSetpointHoldPolicyCommandField field : SetTemperatureSetpointHoldPolicyCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

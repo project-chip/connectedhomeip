@@ -1455,6 +1455,56 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject <NSCopying>
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterScheduleTransitionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeek MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable presetHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable systemMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable coolingSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable heatingSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterScheduleStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nullable scheduleHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull systemMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable name MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nullable presetHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull transitions MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable builtIn MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterPresetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nullable presetHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull presetScenario MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nullable name MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable coolingSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable heatingSetpoint MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable builtIn MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterPresetTypeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull presetScenario MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfPresets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull presetTypeFeatures MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterQueuedPresetStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSData * _Nullable presetHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable transitionTimestamp MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterScheduleTypeStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull systemMode MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull numberOfSchedules MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull scheduleTypeFeatures MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));

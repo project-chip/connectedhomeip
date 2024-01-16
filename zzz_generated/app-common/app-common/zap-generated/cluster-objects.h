@@ -26892,6 +26892,183 @@ public:
 } // namespace PumpConfigurationAndControl
 namespace Thermostat {
 namespace Structs {
+namespace ScheduleTransitionStruct {
+enum class Fields : uint8_t
+{
+    kDayOfWeek       = 0,
+    kTransitionTime  = 1,
+    kPresetHandle    = 2,
+    kSystemMode      = 3,
+    kCoolingSetpoint = 4,
+    kHeatingSetpoint = 5,
+};
+
+struct Type
+{
+public:
+    chip::BitMask<ScheduleDayOfWeekBitmap> dayOfWeek = static_cast<chip::BitMask<ScheduleDayOfWeekBitmap>>(0);
+    uint16_t transitionTime                          = static_cast<uint16_t>(0);
+    Optional<chip::ByteSpan> presetHandle;
+    Optional<SystemModeEnum> systemMode;
+    Optional<int16_t> coolingSetpoint;
+    Optional<int16_t> heatingSetpoint;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ScheduleTransitionStruct
+namespace ScheduleStruct {
+enum class Fields : uint8_t
+{
+    kScheduleHandle = 0,
+    kSystemMode     = 1,
+    kName           = 2,
+    kPresetHandle   = 3,
+    kTransitions    = 4,
+    kBuiltIn        = 5,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::ByteSpan> scheduleHandle;
+    SystemModeEnum systemMode = static_cast<SystemModeEnum>(0);
+    Optional<chip::CharSpan> name;
+    Optional<chip::ByteSpan> presetHandle;
+    DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
+    Optional<DataModel::Nullable<bool>> builtIn;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::Nullable<chip::ByteSpan> scheduleHandle;
+    SystemModeEnum systemMode = static_cast<SystemModeEnum>(0);
+    Optional<chip::CharSpan> name;
+    Optional<chip::ByteSpan> presetHandle;
+    DataModel::DecodableList<Structs::ScheduleTransitionStruct::DecodableType> transitions;
+    Optional<DataModel::Nullable<bool>> builtIn;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace ScheduleStruct
+namespace PresetStruct {
+enum class Fields : uint8_t
+{
+    kPresetHandle    = 0,
+    kPresetScenario  = 1,
+    kName            = 2,
+    kCoolingSetpoint = 3,
+    kHeatingSetpoint = 4,
+    kBuiltIn         = 5,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
+    PresetScenarioEnum presetScenario = static_cast<PresetScenarioEnum>(0);
+    Optional<DataModel::Nullable<chip::CharSpan>> name;
+    Optional<int16_t> coolingSetpoint;
+    Optional<int16_t> heatingSetpoint;
+    DataModel::Nullable<bool> builtIn;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PresetStruct
+namespace PresetTypeStruct {
+enum class Fields : uint8_t
+{
+    kPresetScenario     = 0,
+    kNumberOfPresets    = 1,
+    kPresetTypeFeatures = 2,
+};
+
+struct Type
+{
+public:
+    PresetScenarioEnum presetScenario                          = static_cast<PresetScenarioEnum>(0);
+    uint8_t numberOfPresets                                    = static_cast<uint8_t>(0);
+    chip::BitMask<PresetTypeFeaturesBitmap> presetTypeFeatures = static_cast<chip::BitMask<PresetTypeFeaturesBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace PresetTypeStruct
+namespace QueuedPresetStruct {
+enum class Fields : uint8_t
+{
+    kPresetHandle        = 0,
+    kTransitionTimestamp = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<chip::ByteSpan> presetHandle;
+    DataModel::Nullable<uint32_t> transitionTimestamp;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace QueuedPresetStruct
+namespace ScheduleTypeStruct {
+enum class Fields : uint8_t
+{
+    kSystemMode           = 0,
+    kNumberOfSchedules    = 1,
+    kScheduleTypeFeatures = 2,
+};
+
+struct Type
+{
+public:
+    SystemModeEnum systemMode                                      = static_cast<SystemModeEnum>(0);
+    uint8_t numberOfSchedules                                      = static_cast<uint8_t>(0);
+    chip::BitMask<ScheduleTypeFeaturesBitmap> scheduleTypeFeatures = static_cast<chip::BitMask<ScheduleTypeFeaturesBitmap>>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ScheduleTypeStruct
 namespace WeeklyScheduleTransitionStruct {
 enum class Fields : uint8_t
 {
@@ -26946,6 +27123,41 @@ namespace ClearWeeklySchedule {
 struct Type;
 struct DecodableType;
 } // namespace ClearWeeklySchedule
+
+namespace SetActiveScheduleRequest {
+struct Type;
+struct DecodableType;
+} // namespace SetActiveScheduleRequest
+
+namespace SetActivePresetRequest {
+struct Type;
+struct DecodableType;
+} // namespace SetActivePresetRequest
+
+namespace StartPresetsSchedulesEditRequest {
+struct Type;
+struct DecodableType;
+} // namespace StartPresetsSchedulesEditRequest
+
+namespace CancelPresetsSchedulesEditRequest {
+struct Type;
+struct DecodableType;
+} // namespace CancelPresetsSchedulesEditRequest
+
+namespace CommitPresetsSchedulesRequest {
+struct Type;
+struct DecodableType;
+} // namespace CommitPresetsSchedulesRequest
+
+namespace CancelSetActivePresetRequest {
+struct Type;
+struct DecodableType;
+} // namespace CancelSetActivePresetRequest
+
+namespace SetTemperatureSetpointHoldPolicy {
+struct Type;
+struct DecodableType;
+} // namespace SetTemperatureSetpointHoldPolicy
 
 } // namespace Commands
 
@@ -27130,6 +27342,223 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ClearWeeklySchedule
+namespace SetActiveScheduleRequest {
+enum class Fields : uint8_t
+{
+    kScheduleHandle = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetActiveScheduleRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::ByteSpan scheduleHandle;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetActiveScheduleRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::ByteSpan scheduleHandle;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetActiveScheduleRequest
+namespace SetActivePresetRequest {
+enum class Fields : uint8_t
+{
+    kPresetHandle = 0,
+    kDelayMinutes = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::ByteSpan presetHandle;
+    Optional<uint16_t> delayMinutes;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetActivePresetRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::ByteSpan presetHandle;
+    Optional<uint16_t> delayMinutes;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetActivePresetRequest
+namespace StartPresetsSchedulesEditRequest {
+enum class Fields : uint8_t
+{
+    kTimeoutSeconds = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StartPresetsSchedulesEditRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    uint16_t timeoutSeconds = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StartPresetsSchedulesEditRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    uint16_t timeoutSeconds = static_cast<uint16_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StartPresetsSchedulesEditRequest
+namespace CancelPresetsSchedulesEditRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CancelPresetsSchedulesEditRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CancelPresetsSchedulesEditRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelPresetsSchedulesEditRequest
+namespace CommitPresetsSchedulesRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CommitPresetsSchedulesRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CommitPresetsSchedulesRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CommitPresetsSchedulesRequest
+namespace CancelSetActivePresetRequest {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CancelSetActivePresetRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CancelSetActivePresetRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CancelSetActivePresetRequest
+namespace SetTemperatureSetpointHoldPolicy {
+enum class Fields : uint8_t
+{
+    kTemperatureSetpointHoldPolicy = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetTemperatureSetpointHoldPolicy::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::BitMask<TemperatureSetpointHoldPolicyBitmap> temperatureSetpointHoldPolicy =
+        static_cast<chip::BitMask<TemperatureSetpointHoldPolicyBitmap>>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetTemperatureSetpointHoldPolicy::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+
+    chip::BitMask<TemperatureSetpointHoldPolicyBitmap> temperatureSetpointHoldPolicy =
+        static_cast<chip::BitMask<TemperatureSetpointHoldPolicyBitmap>>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetTemperatureSetpointHoldPolicy
 } // namespace Commands
 
 namespace Attributes {
@@ -27722,6 +28151,186 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ACCapacityformat
+namespace PresetTypes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PresetTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PresetTypes
+namespace ScheduleTypes {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ScheduleTypes
+namespace NumberOfPresets {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPresets::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfPresets
+namespace NumberOfSchedules {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfSchedules::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfSchedules
+namespace NumberOfScheduleTransitions {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfScheduleTransitions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfScheduleTransitions
+namespace NumberOfScheduleTransitionPerDay {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfScheduleTransitionPerDay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfScheduleTransitionPerDay
+namespace ActivePresetHandle {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePresetHandle::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace ActivePresetHandle
+namespace ActiveScheduleHandle {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveScheduleHandle::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 16; }
+};
+} // namespace ActiveScheduleHandle
+namespace Presets {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::PresetStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Presets::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Presets
+namespace Schedules {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Schedules::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Schedules
+namespace PresetsSchedulesEditable {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PresetsSchedulesEditable::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PresetsSchedulesEditable
+namespace TemperatureSetpointHoldPolicy {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldPolicy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TemperatureSetpointHoldPolicy
+namespace SetpointHoldExpiryTimestamp {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SetpointHoldExpiryTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SetpointHoldExpiryTimestamp
+namespace QueuedPreset {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::QueuedPreset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace QueuedPreset
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -27830,6 +28439,21 @@ struct TypeInfo
         Attributes::ACCoilTemperature::TypeInfo::DecodableType ACCoilTemperature;
         Attributes::ACCapacityformat::TypeInfo::DecodableType ACCapacityformat =
             static_cast<chip::app::Clusters::Thermostat::ACCapacityFormatEnum>(0);
+        Attributes::PresetTypes::TypeInfo::DecodableType presetTypes;
+        Attributes::ScheduleTypes::TypeInfo::DecodableType scheduleTypes;
+        Attributes::NumberOfPresets::TypeInfo::DecodableType numberOfPresets                         = static_cast<uint8_t>(0);
+        Attributes::NumberOfSchedules::TypeInfo::DecodableType numberOfSchedules                     = static_cast<uint8_t>(0);
+        Attributes::NumberOfScheduleTransitions::TypeInfo::DecodableType numberOfScheduleTransitions = static_cast<uint8_t>(0);
+        Attributes::NumberOfScheduleTransitionPerDay::TypeInfo::DecodableType numberOfScheduleTransitionPerDay;
+        Attributes::ActivePresetHandle::TypeInfo::DecodableType activePresetHandle;
+        Attributes::ActiveScheduleHandle::TypeInfo::DecodableType activeScheduleHandle;
+        Attributes::Presets::TypeInfo::DecodableType presets;
+        Attributes::Schedules::TypeInfo::DecodableType schedules;
+        Attributes::PresetsSchedulesEditable::TypeInfo::DecodableType presetsSchedulesEditable = static_cast<bool>(0);
+        Attributes::TemperatureSetpointHoldPolicy::TypeInfo::DecodableType temperatureSetpointHoldPolicy =
+            static_cast<chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>>(0);
+        Attributes::SetpointHoldExpiryTimestamp::TypeInfo::DecodableType setpointHoldExpiryTimestamp;
+        Attributes::QueuedPreset::TypeInfo::DecodableType queuedPreset;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

@@ -1384,6 +1384,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRThermostatClusterSetActiveScheduleRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterSetActivePresetRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterStartPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterCancelPresetsSchedulesEditRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterCommitPresetsSchedulesRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterCancelSetActivePresetRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterSetTemperatureSetpointHoldPolicyParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRFanControlClusterStepParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

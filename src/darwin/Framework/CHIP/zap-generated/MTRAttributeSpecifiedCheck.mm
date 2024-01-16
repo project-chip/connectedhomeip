@@ -3777,6 +3777,48 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ACCapacityformat::Id: {
         return YES;
     }
+    case Attributes::PresetTypes::Id: {
+        return YES;
+    }
+    case Attributes::ScheduleTypes::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfPresets::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfSchedules::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfScheduleTransitions::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfScheduleTransitionPerDay::Id: {
+        return YES;
+    }
+    case Attributes::ActivePresetHandle::Id: {
+        return YES;
+    }
+    case Attributes::ActiveScheduleHandle::Id: {
+        return YES;
+    }
+    case Attributes::Presets::Id: {
+        return YES;
+    }
+    case Attributes::Schedules::Id: {
+        return YES;
+    }
+    case Attributes::PresetsSchedulesEditable::Id: {
+        return YES;
+    }
+    case Attributes::TemperatureSetpointHoldPolicy::Id: {
+        return YES;
+    }
+    case Attributes::SetpointHoldExpiryTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::QueuedPreset::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
