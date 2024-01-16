@@ -3,6 +3,8 @@
     "disable": [
         "Test_TC_SC_4_1",
         "Test_TC_SC_5_2",
+        "TestBasicInformation disabled because codegen test don't support writing readonly attributes",
+        "TestBasicInformation",
         "TestClusterComplexTypes",
         "TestEvents",
         "TestDiscovery",
