@@ -11,5 +11,4 @@ The following docs are a brief introduction to SDK development.
 
 -   [SDK Basics](./SDKBasics.md)
 -   [ZAP](./zap.md)
--   [Coding Conventions](./coding_conventions.md)
 -   [Discover from a host computer](./discovery_from_a_host_computer.md)
