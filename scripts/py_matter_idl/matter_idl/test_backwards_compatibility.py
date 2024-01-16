@@ -104,6 +104,13 @@ class TestCompatibilityChecks(unittest.TestCase):
             "server cluster A = 16 { enum X : ENUM8 { A = 1; }}",
             Compatibility.FORWARD_FAIL)
 
+    def test_provisional_cluster(self):
+        self.ValidateUpdate(
+            "Provisional cluster changes are ok.",
+            "provisional server cluster A = 16 { enum X : ENUM8 { A = 1; B = 2; } info event A = 1 { int8u x = 1;} }",
+            "provisional server cluster A = 16 { enum X : ENUM8 { A = 1; B = 3; } info event A = 2 { int16u x = 1;} }",
+            Compatibility.ALL_OK)
+
     def test_clusters_enum_code(self):
         self.ValidateUpdate(
             "Adding an enum is ok. Also validates code formatting",

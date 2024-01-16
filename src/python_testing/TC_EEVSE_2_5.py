@@ -51,12 +51,12 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("5", "TH sends command StartDiagnostics. Verify that command is rejected with Failure"),
             TestStep("6", "TH sends command Disable."),
             TestStep("6a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("6b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x04 (Disabled)"),
+            TestStep("6b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
             TestStep("7", "TH sends command StartDiagnostics. Verify that command is accepted with Success"),
             TestStep("7a", "TH reads from the DUT the SupplyState attribute. Verify value is 0x04 (DisabledDiagnostics)"),
             TestStep("8", "A few seconds later TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Diagnostics Complete Event"),
             TestStep("8a", "TH reads from the DUT the State attribute. Verify value is 0x00 (NotPluggedIn)"),
-            TestStep("8b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x04 (Disabled)"),
+            TestStep("8b", "TH reads from the DUT the SupplyState attribute. Verify value is 0x00 (Disabled)"),
             TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event Clear."),
         ]
 

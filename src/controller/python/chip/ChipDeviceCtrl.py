@@ -690,8 +690,12 @@ class ChipDeviceControllerBase():
                 self.devCtrl)
         ).raise_on_error()
 
+    class CommissioningWindowPasscode(enum.IntEnum):
+        kOriginalSetupCode = 0,
+        kTokenWithRandomPin = 1,
+
     def OpenCommissioningWindow(self, nodeid: int, timeout: int, iteration: int,
-                                discriminator: int, option: int) -> CommissioningParameters:
+                                discriminator: int, option: CommissioningWindowPasscode) -> CommissioningParameters:
         ''' Opens a commissioning window on the device with the given nodeid.
             nodeid:        Node id of the device
             timeout:       Command timeout

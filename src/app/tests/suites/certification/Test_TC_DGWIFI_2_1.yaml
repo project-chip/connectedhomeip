@@ -56,7 +56,7 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 5
+              maxValue: 6
 
     - label: "Step 5: TH reads ChannelNumber attribute constraints"
       PICS: DGWIFI.S.A0003
