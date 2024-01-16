@@ -202,6 +202,11 @@ class TC_IDM_1_4(MatterBaseTest):
 
         command = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+        # It is safe to use RevokeCommissioning in this test without opening the commissioning window because
+        # we expect a non-path-specific error. As per the specification, non-path-specific errors of this
+        # nature is generated before command dispatch to cluster. In the next test step, we anticipate
+        # receiving a path-specific response to the same command, with the TimedRequestMessage sent before
+        # the InvokeRequestMessage.
         try:
             result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
             asserts.fail("Unexpected success call to sending Batch command when non-path specific error expected")
