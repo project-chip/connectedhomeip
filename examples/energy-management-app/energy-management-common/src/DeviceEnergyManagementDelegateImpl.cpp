@@ -332,66 +332,13 @@ CHIP_ERROR DeviceEnergyManagementDelegate::SetAbsMaxPower(int64_t newValue)
 CHIP_ERROR
 DeviceEnergyManagementDelegate::SetPowerAdjustmentCapability(PowerAdjustmentCapability::TypeInfo::Type powerAdjustmentCapability)
 {
-    if (powerAdjustmentCapability.IsNull())
-    {
-        mPowerAdjustmentCapability.SetNull();
-        ChipLogDetail(AppServer, "DEM: PowerAdjustmentCapability is null");
-    }
-    else
-    {
-        auto src    = powerAdjustmentCapability.Value();
-        auto target = mPowerAdjustmentCapability.Value();
-        auto size   = src.size();
-
-        if (size > 8)
-        {
-            return CHIP_ERROR_BAD_REQUEST;
-        }
-
-        target.reduce_size(0);
-
-        for (size_t i = 0; i < size; i++)
-        {
-            const_cast<Structs::PowerAdjustStruct::Type &>(target[i]) = src[i];
-        }
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, PowerAdjustmentCapability::Id);
+    // TODO see Issue #31147
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceEnergyManagementDelegate::SetForecast(DataModel::Nullable<Structs::ForecastStruct::Type> forecast)
 {
-    if (forecast.IsNull())
-    {
-        mForecast.SetNull();
-        ChipLogDetail(AppServer, "DEM: Forecast is null");
-    }
-    else
-    {
-        auto src    = forecast.Value();
-        auto target = mForecast.Value();
-
-        target.forecastId++;
-        target.activeSlotNumber  = src.activeSlotNumber;
-        target.startTime         = src.startTime;
-        target.endTime           = src.endTime;
-        target.earliestStartTime = src.earliestStartTime;
-        target.latestEndTime     = src.latestEndTime;
-        target.isPauseable       = src.isPauseable;
-
-        auto slots = src.slots;
-        auto size  = slots.size();
-        target.slots.reduce_size(0); // clear them
-
-        for (size_t i = 0; i < size; i++)
-        {
-            const_cast<Structs::SlotStruct::Type &>(target.slots[i]) =
-                slots[i]; // TODO: test if this works for optional/nullable stuff
-        }
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, DeviceEnergyManagement::Id, Forecast::Id);
+    // TODO see Issue #31147
 
     return CHIP_NO_ERROR;
 }
