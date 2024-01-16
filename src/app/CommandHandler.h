@@ -464,6 +464,16 @@ private:
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
+    CHIP_ERROR FinalizeLastInvokeResponseMessage()
+    {
+        return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
+    }
+
+    CHIP_ERROR FinalizeIntermediateInvokeResponseMessage()
+    {
+        return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true);
+    }
+
     CHIP_ERROR FinalizeInvokeResponseMessage(bool aHasMoreChunks);
 
     /**

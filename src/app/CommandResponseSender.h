@@ -77,7 +77,7 @@ public:
         return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
     }
 
-    bool ValidateExchangeHasSessionHandle() { return mExchangeCtx && mExchangeCtx->HasSessionHandle(); }
+    bool HasSessionHandle() { return mExchangeCtx && mExchangeCtx->HasSessionHandle(); }
 
     FabricIndex GetAccessingFabricIndex() const
     {
@@ -89,7 +89,7 @@ public:
 
     void WillSendMessage() { mExchangeCtx->WillSendMessage(); }
 
-    bool IsGroupExchangeContext()
+    bool IsForGroup()
     {
         VerifyOrDie(mExchangeCtx);
         return mExchangeCtx->IsGroupExchangeContext();

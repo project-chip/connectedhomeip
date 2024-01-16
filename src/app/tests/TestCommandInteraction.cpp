@@ -663,7 +663,7 @@ void TestCommandInteraction::ValidateCommandHandlerEncodeInvokeResponseMessage(n
     commandHandler.mResponseSender.SetExchangeContext(exchange);
 
     AddInvokeResponseData(apSuite, apContext, &commandHandler, aNeedStatusCode);
-    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeLastInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Ordinarily, the ExchangeContext will close itself on a responder exchange when unwinding back from an
@@ -717,7 +717,7 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, /* aRef = */ NullOptional);
 
     commandHandler.AddResponse(requestCommandPath, Fields());
-    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeLastInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -729,7 +729,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     CommandHandlerWithOutstandingCommand commandHandler(nullptr, requestCommandPath, NullOptional);
 
     commandHandler.AddResponse(requestCommandPath, BadFields());
-    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeLastInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -1087,7 +1087,7 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = commandHandler.AddResponseData(requestCommandPath, BadFields());
     NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR);
     commandHandler.AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Failure);
-    err = commandHandler.FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false);
+    err = commandHandler.FinalizeLastInvokeResponseMessage();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 

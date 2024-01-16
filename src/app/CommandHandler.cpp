@@ -110,6 +110,12 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
     // handler errors vs our caller's.
     Handle workHandle(this);
 
+    // TODO(#30453): It should be possible for SetExchangeContext to internally call WillSendMessage.
+    // Unfortunately, doing so would require us to either:
+    // * Make TestCommandInteraction a friend of CommandResponseSender to allow it to set the exchange
+    //   context without calling WillSendMessage, or
+    // * Understand why unit tests fail when WillSendMessage is called during the execution of
+    //   SetExchangeContext.
     mResponseSender.WillSendMessage();
     status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
     if (status != Status::Success)
@@ -202,7 +208,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     invokeRequestMessage.PrettyPrint();
 #endif
-    if (mResponseSender.IsGroupExchangeContext())
+    if (mResponseSender.IsForGroup())
     {
         SetGroupRequest(true);
     }
@@ -311,9 +317,20 @@ void CommandHandler::DecrementHoldOff()
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
-                mResponseSender.SendStatusResponse(Status::Failure);
-                Close();
-                return;
+                // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
+                // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
+                // CommandHandler does not send any message. Changing this behavior should be done in a standalone
+                // PR where change where only that specific change is made. Here is a possible solution that should
+                // be done that fulfills our responsibility to send a Failure StatusResponse, but this causes unit
+                // tests to start failing.
+                //   ```
+                //   if (mResponseSender.HasSessionHandle())
+                //   {
+                //       mResponseSender.SendStatusResponse(Status::Failure);
+                //   }
+                //   Close();
+                //   return;
+                //   ```
             }
         }
     }
@@ -334,7 +351,7 @@ CHIP_ERROR CommandHandler::StartSendingCommandResponses()
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mResponseSender.HasExchangeContext(), CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false));
+    ReturnErrorOnFailure(FinalizeLastInvokeResponseMessage());
     ReturnErrorOnFailure(mResponseSender.StartSendingCommandResponses());
     return CHIP_NO_ERROR;
 }
@@ -377,7 +394,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         }
     }
 
-    VerifyOrExit(mResponseSender.ValidateExchangeHasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mResponseSender.HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
