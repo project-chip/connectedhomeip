@@ -221,7 +221,8 @@ class ClusterParser:
             self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
-    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: ElementTree.element) -> bool:
+
+    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element) -> bool:
         return access_xml.attrib['write'] == 'optional'
 
     def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element, conformance: Callable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
@@ -298,7 +299,7 @@ class ClusterParser:
                 conformance = or_operation([conformance, attributes[code].conformance])
             read_access, write_access, _ = self.parse_access(element, access_xml, conformance)
             write_optional = False
-            if write_access is not in [None, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue]:
+            if write_access not in [None, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue]:
                 write_optional = self.parse_write_optional(element, access_xml)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
                                             conformance=conformance, read_access=read_access, write_access=write_access, write_optional=write_optional)

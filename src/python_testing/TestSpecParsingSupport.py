@@ -97,7 +97,7 @@ class TestSpecParsingSupport(MatterBaseTest):
     def test_write_optional(self):
         for write_support in ['true', 'optional']:
             xml = single_attribute_cluster_xml('view', 'view', write_support)
-            xml_cluster = pase_cluster(xml)
+            xml_cluster = parse_cluster(xml)
             asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
             asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
             asserts.assert_equal(len(xml_cluster.attributes), len(GlobalAttributeIds) + 1, "Unexpected number of attributes")
