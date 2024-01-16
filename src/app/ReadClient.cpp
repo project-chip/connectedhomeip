@@ -67,6 +67,7 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+
     MoveToState(ClientState::Idle);
 }
 
@@ -187,9 +188,18 @@ void ReadClient::Close(CHIP_ERROR aError, bool allowResubscription)
             if (allowResubscription &&
                 (mReadPrepareParams.mEventPathParamsListSize != 0 || mReadPrepareParams.mAttributePathParamsListSize != 0))
             {
+                CHIP_ERROR originalReason = aError;
+
                 aError = mpCallback.OnResubscriptionNeeded(this, aError);
                 if (aError == CHIP_NO_ERROR)
                 {
+                    return;
+                }
+                if (aError == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
+                {
+                    VerifyOrDie(originalReason == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT);
+                    ChipLogProgress(DataManagement, "ICD device is inactive mark subscription as InactiveICDSubscription");
+                    MoveToState(ClientState::InactiveICDSubscription);
                     return;
                 }
             }
@@ -223,6 +233,8 @@ const char * ReadClient::GetStateStr() const
         return "AwaitingSubscribeResponse";
     case ClientState::SubscriptionActive:
         return "SubscriptionActive";
+    case ClientState::InactiveICDSubscription:
+        return "InactiveICDSubscription";
     }
 #endif // CHIP_DETAIL_LOGGING
     return "N/A";
@@ -427,6 +439,18 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
     return CHIP_NO_ERROR;
 }
 
+void ReadClient::OnActiveModeNotification()
+{
+    // This function just tries to complete the deferred resubscription logic in `OnLivenessTimeoutCallback`.
+    VerifyOrDie(mpImEngine->InActiveReadClientList(this));
+    // If we are not in InactiveICDSubscription state, that means the liveness timeout has not been reached. Simply do nothing.
+    VerifyOrReturn(IsInactiveICDSubscription());
+
+    // When we reach here, the subscription definitely exceeded the liveness timeout. Just continue the unfinished resubscription
+    // logic in `OnLivenessTimeoutCallback`.
+    TriggerResubscriptionForLivenessTimeout(CHIP_ERROR_TIMEOUT);
+}
+
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
@@ -617,6 +641,7 @@ exit:
             // a subscription and have a valid value for mMaxInterval which the function
             // relies on.
             //
+            mpCallback.NotifySubscriptionStillActive(*this);
             err = RefreshLivenessCheckTimer();
         }
     }
@@ -883,6 +908,10 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 {
     ReadClient * const _this = reinterpret_cast<ReadClient *>(apAppState);
 
+    // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
+    // response timeouts).
+    CHIP_ERROR subscriptionTerminationCause = CHIP_ERROR_TIMEOUT;
+
     //
     // Might as well try to see if this instance exists in the tracked list in the IM.
     // This might blow-up if either the client has since been free'ed (use-after-free), or if the engine has since
@@ -894,32 +923,39 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
                  "Subscription Liveness timeout with SubscriptionID = 0x%08" PRIx32 ", Peer = %02x:" ChipLogFormatX64,
                  _this->mSubscriptionId, _this->GetFabricIndex(), ChipLogValueX64(_this->GetPeerNodeId()));
 
+    if (_this->mIsPeerLIT)
+    {
+        subscriptionTerminationCause = CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
+    }
+
+    _this->TriggerResubscriptionForLivenessTimeout(subscriptionTerminationCause);
+}
+
+void ReadClient::TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason)
+{
     // We didn't get a message from the server on time; it's possible that it no
     // longer has a useful CASE session to us.  Mark defunct all sessions that
     // have not seen peer activity in at least as long as our session.
-    const auto & holder = _this->mReadPrepareParams.mSessionHolder;
+    const auto & holder = mReadPrepareParams.mSessionHolder;
     if (holder)
     {
         System::Clock::Timestamp lastPeerActivity = holder->AsSecureSession()->GetLastPeerActivityTime();
-        _this->mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(
-            _this->mPeer, [&lastPeerActivity](auto * session) {
-                if (!session->IsCASESession())
-                {
-                    return;
-                }
+        mpImEngine->GetExchangeManager()->GetSessionManager()->ForEachMatchingSession(mPeer, [&lastPeerActivity](auto * session) {
+            if (!session->IsCASESession())
+            {
+                return;
+            }
 
-                if (session->GetLastPeerActivityTime() > lastPeerActivity)
-                {
-                    return;
-                }
+            if (session->GetLastPeerActivityTime() > lastPeerActivity)
+            {
+                return;
+            }
 
-                session->MarkAsDefunct();
-            });
+            session->MarkAsDefunct();
+        });
     }
 
-    // TODO: add a more specific error here for liveness timeout failure to distinguish between other classes of timeouts (i.e
-    // response timeouts).
-    _this->Close(CHIP_ERROR_TIMEOUT);
+    Close(aReason);
 }
 
 CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aPayload)
@@ -997,6 +1033,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
     {
         mReadPrepareParams.mSessionHolder = aReadPrepareParams.mSessionHolder;
     }
+
+    mIsPeerLIT = aReadPrepareParams.mIsPeerLIT;
 
     mMinIntervalFloorSeconds = aReadPrepareParams.mMinIntervalFloorSeconds;
 
@@ -1102,6 +1140,12 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
 CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
 {
+    if (aTerminationCause == CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT)
+    {
+        ChipLogProgress(DataManagement, "ICD device is inactive, skipping scheduling resubscribe within DefaultResubscribePolicy");
+        return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
+    }
+
     VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
 
     auto timeTillNextResubscription = ComputeTimeTillNextSubscription();
@@ -1110,8 +1154,7 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
                     "ms due to error %" CHIP_ERROR_FORMAT,
                     GetFabricIndex(), ChipLogValueX64(GetPeerNodeId()), mNumRetries, timeTillNextResubscription,
                     aTerminationCause.Format());
-    ReturnErrorOnFailure(ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT));
-    return CHIP_NO_ERROR;
+    return ScheduleResubscription(timeTillNextResubscription, NullOptional, aTerminationCause == CHIP_ERROR_TIMEOUT);
 }
 
 void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,

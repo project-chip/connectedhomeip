@@ -1005,6 +1005,7 @@ cluster RvcRunMode = 84 {
   enum ModeTag : enum16 {
     kIdle = 16384;
     kCleaning = 16385;
+    kMapping = 16386;
   }
 
   enum StatusCode : enum8 {
@@ -1112,7 +1113,7 @@ cluster RvcCleanMode = 85 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
 cluster RvcOperationalState = 97 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kFailedToFindChargingDock = 64;
@@ -1451,6 +1452,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Pause;
+    handle command Stop;
+    handle command Start;
     handle command Resume;
     handle command OperationalCommandResponse;
   }

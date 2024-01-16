@@ -5156,6 +5156,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const IcdManagement::Events::OnTransitionToActiveMode::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const OvenCavityOperationalState::Events::OperationalError::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -7064,7 +7072,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Channel::Commands::ProgramGuideResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("channelPagingStruct", indent + 1, value.channelPagingStruct));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("paging", indent + 1, value.paging));
     ReturnErrorOnFailure(DataModelLogger::LogValue("programList", indent + 1, value.programList));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
@@ -7299,6 +7307,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("value", indent + 1, value.value));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Commands::TestBatchHelperResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("buffer", indent + 1, value.buffer));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -10246,6 +10262,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UserActiveModeTriggerInstruction", 1, value);
         }
+        case IcdManagement::Attributes::OperatingMode::Id: {
+            chip::app::Clusters::IcdManagement::OperatingModeEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperatingMode", 1, value);
+        }
         case IcdManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -11720,6 +11741,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ValveFault", 1, value);
         }
+        case ValveConfigurationAndControl::Attributes::LevelStep::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LevelStep", 1, value);
+        }
         case ValveConfigurationAndControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -12382,6 +12408,51 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ExpiringUserTimeout", 1, value);
+        }
+        case DoorLock::Attributes::AliroReaderVerificationKey::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroReaderVerificationKey", 1, value);
+        }
+        case DoorLock::Attributes::AliroReaderGroupIdentifier::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroReaderGroupIdentifier", 1, value);
+        }
+        case DoorLock::Attributes::AliroReaderGroupSubIdentifier::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroReaderGroupSubIdentifier", 1, value);
+        }
+        case DoorLock::Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroExpeditedTransactionSupportedProtocolVersions", 1, value);
+        }
+        case DoorLock::Attributes::AliroGroupResolvingKey::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroGroupResolvingKey", 1, value);
+        }
+        case DoorLock::Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroSupportedBLEUWBProtocolVersions", 1, value);
+        }
+        case DoorLock::Attributes::AliroBLEAdvertisingVersion::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroBLEAdvertisingVersion", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfAliroCredentialIssuerKeysSupported", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfAliroEndpointKeysSupported::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfAliroEndpointKeysSupported", 1, value);
         }
         case DoorLock::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -17455,6 +17526,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestFabricScopedEventResponse", 1, value);
         }
+        case UnitTesting::Commands::TestBatchHelperResponse::Id: {
+            UnitTesting::Commands::TestBatchHelperResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestBatchHelperResponse", 1, value);
+        }
         }
         break;
     }
@@ -17783,6 +17859,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StateChange", 1, value);
+        }
+        }
+        break;
+    }
+    case IcdManagement::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case IcdManagement::Events::OnTransitionToActiveMode::Id: {
+            chip::app::Clusters::IcdManagement::Events::OnTransitionToActiveMode::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnTransitionToActiveMode", 1, value);
         }
         }
         break;

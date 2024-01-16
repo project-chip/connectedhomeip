@@ -557,9 +557,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRWiFiNetworkDiagnosticsClusterAssociationFailureEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull associationFailureCause MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull associationFailure MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use associationFailureCause");
+@property (nonatomic, copy) NSNumber * _Nonnull associationFailureCause MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nonnull associationFailure MTR_DEPRECATED("Please use associationFailureCause", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4));
 @property (nonatomic, copy) NSNumber * _Nonnull status MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
@@ -791,6 +790,10 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRICDManagementClusterOnTransitionToActiveModeEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenCavityOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_PROVISIONALLY_AVAILABLE;
@@ -873,30 +876,30 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCRunModeClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCRunModeClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCCleanModeClusterModeTagStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull value MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable mfgCode MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nonnull value MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCCleanModeClusterModeOptionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSString * _Nonnull label MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSString * _Nonnull label MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nonnull mode MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -990,54 +993,54 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSArray * _Nonnull modeTags MTR_PROVISIONALLY_AVAILABLE;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTROperationalStateClusterErrorStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTROperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTROperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTROperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTROperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTROperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSString * _Nullable errorStateDetails MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCOperationalStateClusterOperationalStateStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull operationalStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSString * _Nullable operationalStateLabel MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCOperationalStateClusterOperationalErrorEvent : NSObject <NSCopying>
-@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull errorState MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRRVCOperationalStateClusterOperationCompletionEvent : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull completionErrorCode MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nullable totalOperationalTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nullable pausedTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
@@ -1452,22 +1455,18 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRPumpConfigurationAndControlClusterTurbineOperationEvent : NSObject <NSCopying>
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 @end
 
-MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct")
+MTR_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4))
 @interface MTRThermostatClusterThermostatScheduleTransition : MTRThermostatClusterWeeklyScheduleTransitionStruct
-@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
-@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
-@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct");
+@property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4));
+@property (nonatomic, copy) NSNumber * _Nullable heatSetpoint MTR_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4));
+@property (nonatomic, copy) NSNumber * _Nullable coolSetpoint MTR_DEPRECATED("Please use MTRThermostatClusterWeeklyScheduleTransitionStruct", ios(16.1, 17.4), macos(13.0, 14.4), watchos(9.1, 10.4), tvos(16.1, 17.4));
 @end
 
 MTR_PROVISIONALLY_AVAILABLE

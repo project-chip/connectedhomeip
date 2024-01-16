@@ -71,7 +71,10 @@ using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-static AppTask::FactoryDataProvider sFactoryDataProvider;
+static chip::DeviceLayer::FactoryDataProviderImpl sFactoryDataProvider;
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+static chip::DeviceLayer::CustomFactoryDataProvider sCustomFactoryDataProvider;
+#endif
 #endif
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -102,6 +105,9 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
     SetCommissionableDataProvider(&sFactoryDataProvider);
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    sCustomFactoryDataProvider.ParseFunctionExample();
+#endif
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());

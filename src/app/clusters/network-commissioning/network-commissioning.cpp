@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <limits>
 
 #include "network-commissioning.h"
 
@@ -53,6 +55,8 @@ namespace {
 
 // For WiFi and Thread scan results, each item will cost ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
 constexpr size_t kMaxNetworksInScanResponse = 15;
+
+constexpr uint16_t kCurrentClusterRevision = 2;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 constexpr size_t kPossessionNonceSize = 32;
@@ -266,10 +270,31 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
 
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(kCurrentClusterRevision);
+
     case Attributes::SupportedWiFiBands::Id:
-        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_NO_ERROR);
-        VerifyOrReturnError(mpDriver.Valid(), CHIP_NO_ERROR);
-        return aEncoder.Encode(mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBands());
+#if (!CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION && !CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+#else
+        VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+
+        return aEncoder.EncodeList([this](const auto & encoder) {
+            uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask();
+
+            // Extract every band from the bitmap of supported bands, starting positionally on the right.
+            for (uint32_t band_bit_pos = 0; band_bit_pos < std::numeric_limits<uint32_t>::digits; ++band_bit_pos)
+            {
+                uint32_t band_mask = static_cast<uint32_t>(1UL << band_bit_pos);
+                if ((bands & band_mask) != 0)
+                {
+                    ReturnErrorOnFailure(encoder.Encode(static_cast<WiFiBandEnum>(band_bit_pos)));
+                }
+            }
+            return CHIP_NO_ERROR;
+        });
+#endif
+        break;
 
     case Attributes::SupportedThreadFeatures::Id:
         VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_NO_ERROR);
@@ -295,7 +320,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         ReturnErrorOnFailure(aDecoder.Decode(value));
         return mpBaseDriver->SetEnabled(value);
     default:
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
     }
 }
 

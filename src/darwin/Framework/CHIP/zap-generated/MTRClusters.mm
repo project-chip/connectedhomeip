@@ -3737,6 +3737,10 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterNetworkCommissioning
 
+- (void)scanNetworksWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self scanNetworksWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -6550,6 +6554,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeUserActiveModeTriggerInstructionID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOperatingModeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeOperatingModeID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeICDManagementID) attributeID:@(MTRAttributeIDTypeClusterICDManagementAttributeGeneratedCommandListID) params:params];
@@ -7674,6 +7683,10 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterTemperatureControl
 
+- (void)setTemperatureWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self setTemperatureWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -8249,6 +8262,10 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterMicrowaveOvenControl
 
+- (void)setCookingParametersWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self setCookingParametersWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)setCookingParametersWithParams:(MTRMicrowaveOvenControlClusterSetCookingParametersParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -9089,6 +9106,10 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterValveConfigurationAndControl
 
+- (void)openWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self openWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)openWithParams:(MTRValveConfigurationAndControlClusterOpenParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -9217,6 +9238,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeValveFaultWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeValveFaultID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLevelStepWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeValveConfigurationAndControlID) attributeID:@(MTRAttributeIDTypeClusterValveConfigurationAndControlAttributeLevelStepID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -10308,6 +10334,10 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterDoorLock
 
+- (void)lockDoorWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self lockDoorWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -10338,6 +10368,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)unlockDoorWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self unlockDoorWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -10815,6 +10849,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)unboltDoorWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self unboltDoorWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)unboltDoorWithParams:(MTRDoorLockClusterUnboltDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -10832,6 +10870,70 @@ using chip::System::Clock::Timeout;
     }
 
     using RequestType = DoorLock::Commands::UnboltDoor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)setAliroReaderConfigWithParams:(MTRDoorLockClusterSetAliroReaderConfigParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetAliroReaderConfigParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = DoorLock::Commands::SetAliroReaderConfig::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)clearAliroReaderConfigWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self clearAliroReaderConfigWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)clearAliroReaderConfigWithParams:(MTRDoorLockClusterClearAliroReaderConfigParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearAliroReaderConfigParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = DoorLock::Commands::ClearAliroReaderConfig::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -11221,6 +11323,51 @@ using chip::System::Clock::Timeout;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeExpiringUserTimeoutID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroReaderVerificationKeyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderVerificationKeyID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroReaderGroupIdentifierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupIdentifierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroReaderGroupSubIdentifierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroReaderGroupSubIdentifierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroExpeditedTransactionSupportedProtocolVersionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroExpeditedTransactionSupportedProtocolVersionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroGroupResolvingKeyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroGroupResolvingKeyID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroSupportedBLEUWBProtocolVersionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroSupportedBLEUWBProtocolVersionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAliroBLEAdvertisingVersionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeAliroBLEAdvertisingVersionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfAliroCredentialIssuerKeysSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroCredentialIssuerKeysSupportedID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfAliroEndpointKeysSupportedWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeDoorLockID) attributeID:@(MTRAttributeIDTypeClusterDoorLockAttributeNumberOfAliroEndpointKeysSupportedID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -16139,6 +16286,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)getProgramGuideWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRChannelClusterProgramGuideResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self getProgramGuideWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)getProgramGuideWithParams:(MTRChannelClusterGetProgramGuideParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRChannelClusterProgramGuideResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -16570,6 +16721,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self rewindWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -16597,6 +16752,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self fastForwardWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -16964,6 +17123,10 @@ using chip::System::Clock::Timeout;
                                                                                                                                      completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
                                                                                                                                  }];
 }
+- (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self rewindWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+}
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     [self fastForwardWithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
@@ -16971,6 +17134,10 @@ using chip::System::Clock::Timeout;
                                                                                                                                           // Cast is safe because subclass does not add any selectors.
                                                                                                                                           completionHandler(static_cast<MTRMediaPlaybackClusterPlaybackResponseParams *>(data), error);
                                                                                                                                       }];
+}
+- (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self fastForwardWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
@@ -17609,6 +17776,10 @@ using chip::System::Clock::Timeout;
 
 @implementation MTRClusterApplicationLauncher
 
+- (void)launchAppWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self launchAppWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -17636,6 +17807,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)stopAppWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self stopAppWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -17663,6 +17838,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)hideAppWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self hideAppWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -17921,6 +18100,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self logoutWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -18007,6 +18190,10 @@ using chip::System::Clock::Timeout;
 {
     [self logoutWithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
                                                                                                                                  completionHandler];
+}
+- (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self logoutWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
 @end
 
@@ -18132,6 +18319,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)addBonusTimeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self addBonusTimeWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)addBonusTimeWithParams:(MTRContentControlClusterAddBonusTimeParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -19701,6 +19892,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)testNullableOptionalRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self testNullableOptionalRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)testNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestNullableOptionalRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
@@ -19816,6 +20011,10 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
+- (void)testSimpleOptionalArgumentRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self testSimpleOptionalArgumentRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
@@ -19893,6 +20092,60 @@ using chip::System::Clock::Timeout;
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
                                      responseClass:MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)testBatchHelperRequestWithParams:(MTRUnitTestingClusterTestBatchHelperRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestBatchHelperResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestBatchHelperRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestBatchHelperRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestBatchHelperResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)testSecondBatchHelperRequestWithParams:(MTRUnitTestingClusterTestSecondBatchHelperRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestBatchHelperResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestSecondBatchHelperRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestSecondBatchHelperRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestBatchHelperResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }
@@ -21388,6 +21641,10 @@ using chip::System::Clock::Timeout;
                                                                                                                                                           completionHandler(static_cast<MTRTestClusterClusterTestNullableOptionalResponseParams *>(data), error);
                                                                                                                                                       }];
 }
+- (void)testNullableOptionalRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRTestClusterClusterTestNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    [self testNullableOptionalRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+}
 - (void)testComplexNullableOptionalRequestWithParams:(MTRTestClusterClusterTestComplexNullableOptionalRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRTestClusterClusterTestComplexNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {
     [self testComplexNullableOptionalRequestWithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
@@ -21417,6 +21674,10 @@ using chip::System::Clock::Timeout;
 {
     [self testSimpleOptionalArgumentRequestWithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
                                                                                                                                                             completionHandler];
+}
+- (void)testSimpleOptionalArgumentRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self testSimpleOptionalArgumentRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
 - (void)testEmitTestEventRequestWithParams:(MTRTestClusterClusterTestEmitTestEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(void (^)(MTRTestClusterClusterTestEmitTestEventResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
 {

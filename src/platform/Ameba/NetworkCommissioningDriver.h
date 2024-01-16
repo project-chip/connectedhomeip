@@ -18,7 +18,6 @@
 #pragma once
 #include "chip_porting.h"
 #include <platform/NetworkCommissioning.h>
-#include <wifi_structures.h>
 
 namespace chip {
 namespace DeviceLayer {

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 165.2.1. [TC-HEPAFREMON-2.1] Attributes with server as DUT
+name: 165.2.1. [TC-HEPAFREMON-2.1] Attributes with DUT as Server
 
 PICS:
     - HEPAFREMON.S
@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:

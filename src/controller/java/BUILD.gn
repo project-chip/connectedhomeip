@@ -45,6 +45,8 @@ shared_library("jni") {
     "AndroidClusterExceptions.h",
     "AndroidCommissioningWindowOpener.cpp",
     "AndroidCommissioningWindowOpener.h",
+    "AndroidConnectionFailureExceptions.cpp",
+    "AndroidConnectionFailureExceptions.h",
     "AndroidControllerExceptions.cpp",
     "AndroidControllerExceptions.h",
     "AndroidCurrentFabricRemover.cpp",
@@ -63,6 +65,7 @@ shared_library("jni") {
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/client:handler",
     "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
@@ -439,11 +442,15 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/ConnectionFailureException.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
+    "src/chip/devicecontroller/ICDClientInfo.java",
+    "src/chip/devicecontroller/ICDDeviceInfo.java",
+    "src/chip/devicecontroller/ICDRegistrationInfo.java",
     "src/chip/devicecontroller/InvokeCallback.java",
     "src/chip/devicecontroller/InvokeCallbackJni.java",
     "src/chip/devicecontroller/KeypairDelegate.java",

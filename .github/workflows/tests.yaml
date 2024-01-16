@@ -28,7 +28,7 @@ concurrency:
 
 env:
     CHIP_NO_LOG_TIMESTAMPS: true
-    
+
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
@@ -47,7 +47,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:26
+            image: ghcr.io/project-chip/chip-build:32
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -283,7 +283,7 @@ jobs:
                      --lit-icd-app ./out/linux-x64-lit-icd-${BUILD_VARIANT}/lit-icd-app \
                   "
             - name: Uploading core files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -291,7 +291,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -386,7 +386,7 @@ jobs:
                   "
 
             - name: Uploading core files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -394,13 +394,13 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
@@ -418,7 +418,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:26
+            image: ghcr.io/project-chip/chip-build:32
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -477,6 +477,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TC_TIMESYNC_2_12.py" --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TC_TIMESYNC_2_13.py" --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TC_TIMESYNC_3_1.py" --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TC_DGGEN_2_4.py" --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-lit-icd-ipv6only-no-ble-no-wifi-tsan-clang-test/lit-icd-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_ICDM_2_1.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_DA_1_5.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_IDM_1_2.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
@@ -487,12 +488,15 @@ jobs:
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_RVCRUNM_1_2.py" --script-args "--int-arg PIXIT_ENDPOINT:1 --storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestMatterTestingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestConformanceSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TestSpecParsingSupport.py" --script-args "--trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_DRLK_2_2.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_DRLK_2_3.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script "src/python_testing/TC_DRLK_2_12.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
                   scripts/run_in_python_env.sh out/venv './scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TC_AccessChecker.py" --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto"'
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --script "src/python_testing/TC_DeviceConformance.py" --app out/linux-x64-lock-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-lock-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace-to json:out/trace_data/app-{SCRIPT_BASE_NAME}.json" --script-args "--storage-path admin_storage.json --manual-code 10054912339 --bool-arg ignore_in_progress:True allow_provisional:True --PICS src/app/tests/suites/certification/ci-pics-values --trace-to json:out/trace_data/test-{SCRIPT_BASE_NAME}.json --trace-to perfetto:out/trace_data/test-{SCRIPT_BASE_NAME}.perfetto  --tests test_TC_IDM_10_2"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-python-repl
@@ -500,7 +504,7 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-linux-python-repl
@@ -553,7 +557,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --app out/darwin-x64-all-clusters-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app --factoryreset --app-args "--discriminator 3840 --interface-id -1" --script-args "-t 3600 --disable-test ClusterObjectTests.TestTimedRequestTimeout"'
             - name: Uploading core files
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-darwin-python-repl
@@ -561,20 +565,20 @@ jobs:
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
             - name: Uploading traces on failure
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: trace-data-python-repl
                   path: out/trace_data/
                   retention-days: 5
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin-python-repl
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-objdir-darwin-python-repl

@@ -1286,6 +1286,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value); // 
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace UserActiveModeTriggerInstruction
 
+namespace OperatingMode {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum * value); // OperatingModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::IcdManagement::OperatingModeEnum value);
+} // namespace OperatingMode
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1822,11 +1827,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace BooleanStateConfiguration {
 namespace Attributes {
 
-namespace CurrentSensitivityLevel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CurrentSensitivityLevel
-
 namespace SupportedSensitivityLevels {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
@@ -1905,13 +1905,6 @@ EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value);
 } // namespace AutoCloseTime
 
-namespace RemainingDuration {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // elapsed_s
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value);
-} // namespace RemainingDuration
-
 namespace CurrentState {
 EmberAfStatus Get(chip::EndpointId endpoint,
                   DataModel::Nullable<chip::app::Clusters::ValveConfigurationAndControl::ValveStateEnum> & value); // ValveStateEnum
@@ -1955,6 +1948,11 @@ EmberAfStatus Get(chip::EndpointId endpoint,
 EmberAfStatus Set(chip::EndpointId endpoint,
                   chip::BitMask<chip::app::Clusters::ValveConfigurationAndControl::ValveFaultBitmap> value);
 } // namespace ValveFault
+
+namespace LevelStep {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace LevelStep
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -2460,6 +2458,47 @@ namespace ExpiringUserTimeout {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ExpiringUserTimeout
+
+namespace AliroReaderVerificationKey {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
+} // namespace AliroReaderVerificationKey
+
+namespace AliroReaderGroupIdentifier {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
+} // namespace AliroReaderGroupIdentifier
+
+namespace AliroReaderGroupSubIdentifier {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan & value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+} // namespace AliroReaderGroupSubIdentifier
+
+namespace AliroGroupResolvingKey {
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
+} // namespace AliroGroupResolvingKey
+
+namespace AliroBLEAdvertisingVersion {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace AliroBLEAdvertisingVersion
+
+namespace NumberOfAliroCredentialIssuerKeysSupported {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace NumberOfAliroCredentialIssuerKeysSupported
+
+namespace NumberOfAliroEndpointKeysSupported {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace NumberOfAliroEndpointKeysSupported
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

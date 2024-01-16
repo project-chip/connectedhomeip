@@ -7491,6 +7491,12 @@
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
+          RVCCleanMode:
+              # People are trying to deprecate this one
+              - OnMode
+          RVCRunMode:
+              # People are trying to deprecate this one
+              - OnMode
       commands:
           FanControl:
               # Not stable yet
@@ -7543,6 +7549,14 @@
               Feature:
                   - Step
                   - AirflowDirection
+          RVCRunMode:
+              Feature:
+                  # People are trying to deprecate this one
+                  - OnOff
+          RVCCleanMode:
+              Feature:
+                  # People are trying to deprecate this one
+                  - OnOff
       global attributes:
           - EventList
       # Once we actually unmark TimeSynchronization as provisional, all these bits except EventList should go away too, and we should instead
@@ -7789,8 +7803,12 @@
               Feature:
                   DeadFrontBehavior: DeadFront
 
-- release: "Future"
-  versions: "future"
+- release: "Early 2024"
+  versions:
+      iOS: "17.4"
+      macOS: "14.4"
+      watchOS: "10.4"
+      tvOS: "17.4"
   introduced:
       clusters:
           - RVCRunMode
@@ -7801,7 +7819,6 @@
           RVCRunMode:
               - SupportedModes
               - CurrentMode
-              - OnMode
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -7810,7 +7827,6 @@
           RVCCleanMode:
               - SupportedModes
               - CurrentMode
-              - OnMode
               - GeneratedCommandList
               - AcceptedCommandList
               - AttributeList
@@ -8186,12 +8202,6 @@
               OptionsBitmap:
                   - ExecuteIfOff
                   - CoupleColorTempToLevel
-          RVCRunMode:
-              Feature:
-                  - OnOff
-          RVCCleanMode:
-              Feature:
-                  - OnOff
           Thermostat:
               ScheduleDayOfWeekBitmap:
                   - Sunday
@@ -8260,6 +8270,7 @@
           - ContentAppObserver
           - DeviceEnergyManagement
           - ElectricalEnergyMeasurement
+          - EnergyPreference
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8302,6 +8313,12 @@
               - ActivateAudioTrack
               - ActivateTextTrack
               - DeactivateTextTrack
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestBatchHelperResponse
+              - TestBatchHelperRequest
+              - TestSecondBatchHelperRequest
       command fields:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8517,3 +8534,47 @@
               # as the enum.  The old enum name never had the new value name.
               ContentLaunchStatusEnum:
                   - URLNotAvailable
+
+- release: "Future"
+  versions: "future"
+  provisional:
+      attributes:
+          DoorLock:
+              # Aliro is not ready yet.
+              - AliroReaderVerificationKey
+              - AliroReaderGroupIdentifier
+              - AliroReaderGroupSubIdentifier
+              - AliroExpeditedTransactionSupportedProtocolVersions
+              - AliroGroupResolvingKey
+              - AliroSupportedBLEUWBProtocolVersions
+              - AliroBLEAdvertisingVersion
+              - NumberOfAliroCredentialIssuerKeysSupported
+              - NumberOfAliroEndpointKeysSupported
+          ICDManagement:
+              - OperatingMode
+      commands:
+          DoorLock:
+              # Aliro is not ready yet.
+              - SetAliroReaderConfig
+              - ClearAliroReaderConfig
+      enum values:
+          DoorLock:
+              CredentialTypeEnum:
+                  # Aliro is not ready yet.
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              LockDataTypeEnum:
+                  # Aliro is not ready yet.
+                  - AliroCredentialIssuerKey
+                  - AliroEvictableEndpointKey
+                  - AliroNonEvictableEndpointKey
+              OperationSourceEnum:
+                  # Aliro is not ready yet.
+                  - Aliro
+      bitmap values:
+          DoorLock:
+              Feature:
+                  # Aliro is not ready yet.
+                  - AliroProvisioning
+                  - AliroBLEUWB
