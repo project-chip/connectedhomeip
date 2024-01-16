@@ -1,6 +1,7 @@
 # Cluster and Device Type development
 
-The following docs present a guide on how to develop new clusters and device types in the SDK.
+The following docs present a guide on how to develop new clusters and device
+types in the SDK.
 
 ```{toctree}
 :glob:

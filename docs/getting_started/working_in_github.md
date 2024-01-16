@@ -19,7 +19,7 @@
 ## Pull Request process
 
 -   make changes locally, push to a branch on your fork
-    -   git push origin $(git branch --show-current)
+    -   git push origin \$(git branch --show-current)
 -   open a pull request (PR) from your fork to master (web UI)
 -   Add reviewers as required
     -   if you’re having trouble getting reviews, try slack
