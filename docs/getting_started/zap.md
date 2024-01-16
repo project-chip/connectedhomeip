@@ -15,7 +15,7 @@ review
 
 ## A quick tour
 
-run ./scripts/tools/zap/run_zaptool.sh \<filename\> to open a file in zap.
+Run ./scripts/tools/zap/run_zaptool.sh \<filename\> to open a file in zap.
 Select the Matter format.
 
 The left hand side shows the endpoint configuration.
