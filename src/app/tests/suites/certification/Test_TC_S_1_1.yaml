@@ -41,7 +41,8 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
+    - label:
+          "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
       PICS: (!S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -50,7 +51,8 @@ tests:
               type: bitmap32
               hasMasksClear: [0x1]
 
-    - label: "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
+    - label:
+          "Step 3: TH reads FeatureMap NameSupport bit (global attribute 65532)"
       PICS: (S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -79,7 +81,7 @@ tests:
               type: list
               contains: []
 
-    - label: "Step 6a:TH reads from the DUT the AcceptedCommandList attribute"
+    - label: "Step 6a: TH reads from the DUT the AcceptedCommandList attribute"
       PICS: S.S
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -89,8 +91,8 @@ tests:
               contains: [0, 1, 2, 3, 4, 5, 6]
 
     - label:
-          "Step 6b: Read optional command(CopySceneResponse) AcceptedCommandList
-          (global attribute 65529)"
+          "Step 6b: TH reads optional command(CopySceneResponse)
+          AcceptedCommandList (global attribute 65529)"
       PICS: S.S.C40.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
