@@ -280,7 +280,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
         // product. Temporarily return an list of 1 element of value 0 until a solution is implemented with the attribute list
         // return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        return aEncoder.EncodeList([this](const auto & encoder) {
+        return aEncoder.EncodeList([](const auto & encoder) {
             WiFiBandEnum bands = WiFiBandEnum::k2g4;
             ReturnErrorOnFailure(encoder.Encode(bands));
             return CHIP_NO_ERROR;
