@@ -47,11 +47,11 @@ cluster implementation code receives messages from the ember layer to request
 data model operations on the cluster (reads / writes / commands). They are also
 responsible for even generation and attribute change reporting. Simple cluster
 logic can be written in the ember callback functions, but more complex cluster
-logic is handled in the run-time installable interface layers.
+logic is handled in the run-time installed interface layers.
 
 ## SDK Organization (some key bits)
 
--   docs ( _quality and recency varies_ )
+-   docs
     -   [docs/guides/BUILDING\.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md) -
         follow this first
     -   [docs/guides/chip_tool_guide.md](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/chip_tool_guide.md) -
@@ -84,15 +84,15 @@ logic is handled in the run-time installable interface layers.
     -   [app/zap-templates/zcl/data-model/chip/](https://github.com/project-chip/connectedhomeip/blob/master/src/app/zap-templates/zcl/data-model/chip/) -
         cluster definitions (.xml)
     -   [app/tests/suites/certification](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/certification) -
-        yaml cert test automations
+        yaml cert test automation scripts
     -   [lib/support/](https://github.com/project-chip/connectedhomeip/blob/master/src/lib/support/) -
         Embedded versions of common utilities
     -   [platform](https://github.com/project-chip/connectedhomeip/blob/master/src/platform) -
-        platform delegate APIs / impls
+        platform delegate APIs / implementations
     -   [include/platform](https://github.com/project-chip/connectedhomeip/blob/master/src/include/platform) -
-        platform delegate APIs / impls
+        platform delegate APIs / implementations
     -   [python_testing](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing) -
-        python cert test automations
+        python cert test automation scripts
 -   zzz_generated/app-common/app-common/zap-generated/\*
     -   all the generated cluster logic / namespaces
 -   data_model

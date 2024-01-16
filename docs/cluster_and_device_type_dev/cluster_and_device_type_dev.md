@@ -4,8 +4,8 @@ The goal of new cluster and device type development is to
 
 1. write the cluster implementations
 2. write the code and supporting material that will allow zap to generate the
-   appropriate ember layersS
-3. write the unit tests, test plans and automations that prove the code
+   appropriate ember layers
+3. write the unit tests, test plans and automation scripts that prove the code
    correctness and allow these new features to be certified
 
 Unit tests, test plans and certification tests are covered in the testing section.
@@ -128,7 +128,7 @@ Blue sections can be overridden.
         -   If you _DO_ always encode the attribute in the access override
             function, you’re wasting space.
 -   For attributes marked as **“External”** storage in the zap file
-    -   NO storage is allocated, no fallthrough to ember storage
+    -   NO storage is allocated, no fall through to ember storage
     -   NEED to register an access override for these to work
 
 ##### Cluster Server Attributes via Override (read)
