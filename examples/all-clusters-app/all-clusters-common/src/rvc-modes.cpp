@@ -26,6 +26,8 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
+const uint32_t NO_FEATURES = 0;
+
 // RVC Run
 
 static RvcRunModeDelegate * gRvcRunModeDelegate = nullptr;
@@ -113,7 +115,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
     gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
+        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, NO_FEATURES);
     gRvcRunModeInstance->Init();
 }
 
@@ -202,6 +204,6 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
     gRvcCleanModeInstance =
-        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
+        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, NO_FEATURES);
     gRvcCleanModeInstance->Init();
 }
