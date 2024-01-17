@@ -34,7 +34,6 @@ declare_args() {
   use_wf200 = false
   use_rs9116 = false
   use_SiWx917 = false
-  chip_enable_ble_rs911x = false
 
   wifi_soc = false
 
