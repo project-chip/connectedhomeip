@@ -198,6 +198,7 @@ private:
     void InvokeCommand(HandlerContext & handlerContext) override;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
+    Status CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause);
     void HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);
     void HandleCancelPowerAdjustRequest(HandlerContext & ctx,
                                         const Commands::CancelPowerAdjustRequest::DecodableType & commandData);

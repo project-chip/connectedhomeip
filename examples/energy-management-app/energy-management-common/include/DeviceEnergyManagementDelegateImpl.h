@@ -76,7 +76,8 @@ private:
     int64_t mAbsMaxPower;
     Attributes::PowerAdjustmentCapability::TypeInfo::Type mPowerAdjustmentCapability;
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
-    OptOutStateEnum mOptOutState;
+    // Default to NoOptOut
+    OptOutStateEnum mOptOutState = OptOutStateEnum::kNoOptOut;
 };
 
 } // namespace DeviceEnergyManagement
