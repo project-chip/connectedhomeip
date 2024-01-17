@@ -43,8 +43,6 @@ from typing import Any, Collection
 
 import pw_system.console
 from pw_hdlc import rpc
-from pw_tokenizer import tokens
-from pw_tokenizer.database import LoadTokenDatabases
 
 # Protos
 # isort: off
