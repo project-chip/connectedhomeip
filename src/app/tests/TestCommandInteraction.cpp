@@ -1211,7 +1211,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
                 commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
             if (messageIsTimed != transactionIsTimed)
             {
-                NL_TEST_ASSERT(apSuite, status == Protocols::InteractionModel::Status::UnsupportedAccess);
+                NL_TEST_ASSERT(apSuite, status == Protocols::InteractionModel::Status::TimedRequestMismatch);
             }
             else
             {

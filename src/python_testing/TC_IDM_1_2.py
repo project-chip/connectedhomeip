@@ -255,7 +255,7 @@ class TC_IDM_1_2(MatterBaseTest):
             await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Unexpected success response from sending an Invoke with TimedRequest flag and no timed interaction")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
+            asserts.assert_equal(e.status, Status.TimedRequestMismatch,
                                  "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
 
         # Try with RevokeCommissioning
@@ -267,7 +267,7 @@ class TC_IDM_1_2(MatterBaseTest):
             await self.default_controller.TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
             asserts.fail("Unexpected success response from sending an Invoke with TimedRequest flag and no timed interaction")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
+            asserts.assert_equal(e.status, Status.TimedRequestMismatch,
                                  "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
 
         self.print_step(9, "Send invoke for a command that requires timedRequest, but doesn't use one")

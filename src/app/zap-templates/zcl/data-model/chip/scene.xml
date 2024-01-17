@@ -16,17 +16,17 @@ limitations under the License.
 -->
 <configurator>
   <bitmap name="NameSupportBitmap" type="bitmap8">
-      <cluster code="0x0005"/>
+      <cluster code="0x0062"/>
       <field name="SceneNames" mask="0x80"/>
   </bitmap>
 
   <bitmap name="CopyModeBitmap" type="bitmap8">
-    <cluster code="0x0005"/>
+    <cluster code="0x0062"/>
     <field name="CopyAllScenes" mask="0x01"/>
   </bitmap>
 
   <struct name="SceneInfoStruct" isFabricScoped="true">
-    <cluster code="0x0005"/>
+    <cluster code="0x0062"/>
     <item name="SceneCount" type="int8u" optional="false"/>
     <item name="CurrentScene" type="int8u" optional="false" isFabricSensitive="true"/>
     <item name="CurrentGroup" type="group_id" optional="false" isFabricSensitive="true"/>
@@ -35,23 +35,23 @@ limitations under the License.
   </struct>
 
   <struct name="AttributeValuePair">
-    <cluster code="0x0005"/>
+    <cluster code="0x0062"/>
     <item name="AttributeID" type="attrib_id" optional="false"/>
     <item name="AttributeValue" type="int32u" optional="false"/>
   </struct>
 
   <struct name="ExtensionFieldSet">
-    <cluster code="0x0005"/>
+    <cluster code="0x0062"/>
     <item name="ClusterID" type="cluster_id"/>
     <item name="AttributeValueList" type="AttributeValuePair" array="true"/>
   </struct>
 
   <domain name="CHIP"/>
   <cluster apiMaturity="provisional">
-    <name>Scenes</name>
+    <name>Scenes Management</name>
     <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>
-    <code>0x0005</code>
+    <code>0x0062</code>
     <define>SCENES_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
@@ -244,7 +244,7 @@ limitations under the License.
   </cluster>
 
   <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0005" />
+    <cluster code="0x0062" />
     <field name="SceneNames" mask="0x01" />
     <field name="Explicit" mask="0x02" />
     <field name="TableSize" mask="0x04" />

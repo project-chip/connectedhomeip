@@ -195,7 +195,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
-    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
+    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
         InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;

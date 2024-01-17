@@ -9509,3 +9509,70 @@ PICS:
 
     - label: "Does the device implement the SensorFault event?"
       id: BOOLCFG.S.E01
+
+    #
+    #Valve Configuration and Control
+    #
+    - label:
+          "Does the device implement the Valve Configuration and Control cluster
+          as a server?"
+      id: VALCC.S
+
+    #Features
+    - label:
+          "Does the device support the ability to use UTC time is used for time
+          indications?"
+      id: VALCC.S.F00
+
+    - label:
+          "Does the device support the ability to setting the specific position
+          of the valve?"
+      id: VALCC.S.F01
+
+    #Attributes
+    - label: "Does the device implement the OpenDuration attribute?"
+      id: VALCC.S.A0000
+
+    - label: "Does the device implement the DefaultOpenDuration attribute?"
+      id: VALCC.S.A0001
+
+    - label: "Does the device implement the AutoCloseTime attribute?"
+      id: VALCC.S.A0002
+
+    - label: "Does the device implement the RemainingDuration attribute?"
+      id: VALCC.S.A0003
+
+    - label: "Does the device implement the CurrentState attribute?"
+      id: VALCC.S.A0004
+
+    - label: "Does the device implement the TargetState attribute?"
+      id: VALCC.S.A0005
+
+    - label: "Does the device implement the CurrentLevel attribute?"
+      id: VALCC.S.A0006
+
+    - label: "Does the device implement the TargetLevel attribute?"
+      id: VALCC.S.A0007
+
+    - label: "Does the device implement the DefaultOpenLevel attribute?"
+      id: VALCC.S.A0008
+
+    - label: "Does the device implement the ValveFault attribute?"
+      id: VALCC.S.A0009
+
+    - label: "Does the device implement the LevelStep attribute?"
+      id: VALCC.S.A000a
+
+    #Commands received
+    - label: "Does the device implement receiving the Open command?"
+      id: VALCC.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Close command?"
+      id: VALCC.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the ValveStateChanged event?"
+      id: VALCC.S.E00
+
+    - label: "Does the device implement the ValveFault event?"
+      id: VALCC.S.E01
