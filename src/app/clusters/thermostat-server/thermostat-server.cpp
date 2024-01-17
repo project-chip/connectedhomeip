@@ -785,6 +785,62 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * com
     return false;
 }
 
+bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterStartPresetsSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCancelPresetsSchedulesEditRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCommitPresetsSchedulesRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterCancelSetActivePresetRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
+bool emberAfThermostatClusterSetTemperatureSetpointHoldPolicyCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType & commandData)
+{
+    // TODO
+    return false;
+}
+
 int16_t EnforceHeatingSetpointLimits(int16_t HeatingSetpoint, EndpointId endpoint)
 {
     // Optional Mfg supplied limits

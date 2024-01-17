@@ -46,11 +46,6 @@ void emberAfGroupsClusterInitCallback(chip::EndpointId endpoint);
 /**
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfScenesClusterInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
 void emberAfOnOffClusterInitCallback(chip::EndpointId endpoint);
 
 /**
@@ -337,6 +332,11 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfScenesManagementClusterInitCallback(chip::EndpointId endpoint);
 
 /**
  * @param endpoint    Endpoint that is being initialized
@@ -677,45 +677,6 @@ MatterGroupsClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAt
  * @param endpoint  Endpoint that is being served
  */
 void emberAfGroupsClusterServerTickCallback(chip::EndpointId endpoint);
-
-//
-// Scenes Cluster
-//
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfScenesClusterServerInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being shutdown
- */
-void MatterScenesClusterServerShutdownCallback(chip::EndpointId endpoint);
-
-/**
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfScenesClusterClientInitCallback(chip::EndpointId endpoint);
-
-/**
- * @param attributePath Concrete attribute path that changed
- */
-void MatterScenesClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/**
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status
-MatterScenesClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                     EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/**
- * @param endpoint  Endpoint that is being served
- */
-void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // On/Off Cluster
@@ -2954,6 +2915,45 @@ chip::Protocols::InteractionModel::Status MatterRvcOperationalStateClusterServer
  * @param endpoint  Endpoint that is being served
  */
 void emberAfRvcOperationalStateClusterServerTickCallback(chip::EndpointId endpoint);
+
+//
+// Scenes Management Cluster
+//
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfScenesManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterScenesManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
+/**
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfScenesManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/**
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterScenesManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/**
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterScenesManagementClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/**
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfScenesManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 //
 // HEPA Filter Monitoring Cluster
@@ -5452,12 +5452,6 @@ bool emberAfOvenCavityOperationalStateClusterStartCallback(
 bool emberAfOvenCavityOperationalStateClusterResumeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::DecodableType & commandData);
-/**
- * @brief Oven Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfOvenModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OvenMode::Commands::ChangeToMode::DecodableType & commandData);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */

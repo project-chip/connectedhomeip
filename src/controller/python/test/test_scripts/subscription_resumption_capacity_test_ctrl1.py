@@ -113,7 +113,8 @@ def main():
         "Failed on on-network commissioing")
 
     FailIfNot(
-        test.TestSubscriptionResumptionCapacityStep1(options.nodeid, TEST_ENDPOINT_ID, options.subscriptionCapacity),
+        test.TestSubscriptionResumptionCapacityStep1(
+            options.nodeid, TEST_ENDPOINT_ID, options.setuppin, options.subscriptionCapacity),
         "Failed on step 1 of testing subscription resumption capacity")
 
     timeoutTicker.stop()

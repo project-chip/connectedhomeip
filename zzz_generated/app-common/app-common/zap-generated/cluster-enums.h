@@ -86,30 +86,6 @@ enum class NameSupportBitmap : uint8_t
 };
 } // namespace Groups
 
-namespace Scenes {
-
-// Bitmap for CopyModeBitmap
-enum class CopyModeBitmap : uint8_t
-{
-    kCopyAllScenes = 0x1,
-};
-
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kSceneNames   = 0x1,
-    kExplicit     = 0x2,
-    kTableSize    = 0x4,
-    kFabricScenes = 0x8,
-};
-
-// Bitmap for NameSupportBitmap
-enum class NameSupportBitmap : uint8_t
-{
-    kSceneNames = 0x80,
-};
-} // namespace Scenes
-
 namespace OnOff {
 
 // Enum for DelayedAllOffEffectVariantEnum
@@ -1472,6 +1448,18 @@ namespace BooleanState {} // namespace BooleanState
 
 namespace IcdManagement {
 
+// Enum for OperatingModeEnum
+enum class OperatingModeEnum : uint8_t
+{
+    kSit = 0x00,
+    kLit = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -1686,6 +1674,7 @@ enum class ModeTag : uint16_t
 {
     kIdle     = 0x4000,
     kCleaning = 0x4001,
+    kMapping  = 0x4002,
     // kUnknownEnumValue intentionally not defined. This enum never goes
     // through DataModel::Decode, likely because it is a part of a derived
     // cluster. As a result having kUnknownEnumValue in this enum is error
@@ -1956,7 +1945,16 @@ enum class Feature : uint32_t
 };
 } // namespace MicrowaveOvenMode
 
-namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
+namespace MicrowaveOvenControl {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kPowerAsNumber     = 0x1,
+    kPowerInWatts      = 0x2,
+    kPowerNumberLimits = 0x4,
+};
+} // namespace MicrowaveOvenControl
 
 namespace OperationalState {
 
@@ -2022,6 +2020,30 @@ enum class OperationalStateEnum : uint8_t
     // src/app/common/templates/config-data.yaml.
 };
 } // namespace RvcOperationalState
+
+namespace ScenesManagement {
+
+// Bitmap for CopyModeBitmap
+enum class CopyModeBitmap : uint8_t
+{
+    kCopyAllScenes = 0x1,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kSceneNames   = 0x1,
+    kExplicit     = 0x2,
+    kTableSize    = 0x4,
+    kFabricScenes = 0x8,
+};
+
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
+{
+    kSceneNames = 0x80,
+};
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 

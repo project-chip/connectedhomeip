@@ -13,14 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 123.2.2. [TC-S-2.2] Primary functionality with server as DUT
+name: 123.2.2. [TC-S-2.2] Primary functionality with DUT as Server
 
 PICS:
     - S.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
     G1:
         type: group_id
