@@ -209,6 +209,24 @@ Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
     return status;
 }
 
+/**
+ * @brief Delegate handler for CancelRequest
+ *
+ * Note: This is a more complex use-case and requires higher-level work by the delegate.
+ *
+ * It SHALL:
+ *      1) Check if the forecastUpdateReason was already InternalOptimization (and reject the command)
+ *      2) Update its forecast (based on its optimization strategy) ignoring previous requests
+ *      3) Update its Forecast attribute to match its new intended operation, and update the
+ *         ForecastStruct.ForecastUpdateReason to `Internal Optimization`.
+ */
+Status DeviceEnergyManagementDelegate::CancelRequest()
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+    // TODO: implement the behaviour above
+    return status;
+}
+
 // ------------------------------------------------------------------
 // Get attribute methods
 ESATypeEnum DeviceEnergyManagementDelegate::GetESAType()

@@ -135,6 +135,25 @@ public:
     virtual Status
     RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints) = 0;
 
+    /**
+     * @brief Delegate handler for CancelRequest
+     *
+     *   The ESA SHALL attempt to cancel the effects of any previous adjustment request commands, and re-evaluate its
+     *   forecast for intended operation ignoring those previous requests.
+     *
+     *   If the ESA ForecastStruct ForecastUpdateReason was already `Internal Optimization`, then the command SHALL
+     *   be rejected with FAILURE.
+     *
+     *   If the command is accepted, the ESA SHALL update its ESAState if required, and the command status returned
+     *   SHALL be SUCCESS.
+     *
+     *   The ESA SHALL update its Forecast attribute to match its new intended operation, and update the
+     *   ForecastStruct.ForecastUpdateReason to `Internal Optimization`
+     *
+     * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
+     */
+    virtual Status CancelRequest() = 0;
+
     // ------------------------------------------------------------------
     // Get attribute methods
     virtual ESATypeEnum GetESAType()                                                 = 0;
@@ -160,18 +179,12 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
-enum class OptionalCommands : uint32_t
-{
-    kSupportsModifyForecastRequest          = 0x1,
-    kSupportsRequestConstraintBasedForecast = 0x2
-};
-
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalCommands aOptionalCmds) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature), mOptionalCmds(aOptionalCmds)
+        mDelegate(aDelegate), mFeature(aFeature)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -183,12 +196,10 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
-    bool SupportsOptCmd(OptionalCommands aOptionalCmds) const;
 
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
-    BitMask<OptionalCommands> mOptionalCmds;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -208,6 +219,7 @@ private:
     void HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData);
     void HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                                               const Commands::RequestConstraintBasedForecast::DecodableType & commandData);
+    void HandleCancelRequest(HandlerContext & ctx, const Commands::CancelRequest::DecodableType & commandData);
 };
 
 } // namespace DeviceEnergyManagement

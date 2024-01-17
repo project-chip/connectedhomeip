@@ -53,11 +53,6 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-bool Instance::SupportsOptCmd(OptionalCommands aOptionalCmds) const
-{
-    return mOptionalCmds.Has(aOptionalCmds);
-}
-
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -122,26 +117,31 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
         }
     }
 
-    if (HasFeature(Feature::kForecastAdjustment))
+    if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        for (auto && cmd : {
-                 StartTimeAdjustRequest::Id,
-                 PauseRequest::Id,
-                 ResumeRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
     }
 
-    if (SupportsOptCmd(OptionalCommands::kSupportsModifyForecastRequest))
+    if (HasFeature(Feature::kPausable))
+    {
+        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kForecastAdjustment))
     {
         VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
     }
 
-    if (SupportsOptCmd(OptionalCommands::kSupportsRequestConstraintBasedForecast))
+    if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
         VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
+        HasFeature(Feature::kConstraintBasedAdjustment))
+    {
+        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
     }
 
 exit:
@@ -179,7 +179,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case StartTimeAdjustRequest::Id:
-        if (!HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kStartTimeAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -191,7 +191,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case PauseRequest::Id:
-        if (!HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kPausable))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -202,7 +202,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case ResumeRequest::Id:
-        if (!HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kPausable))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -213,7 +213,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case ModifyForecastRequest::Id:
-        if (!SupportsOptCmd(OptionalCommands::kSupportsModifyForecastRequest))
+        if (!HasFeature(Feature::kForecastAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -225,7 +225,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case RequestConstraintBasedForecast::Id:
-        if (!SupportsOptCmd(OptionalCommands::kSupportsRequestConstraintBasedForecast))
+        if (!HasFeature(Feature::kConstraintBasedAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -234,6 +234,18 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
             HandleCommand<RequestConstraintBasedForecast::DecodableType>(
                 handlerContext,
                 [this](HandlerContext & ctx, const auto & commandData) { HandleRequestConstraintBasedForecast(ctx, commandData); });
+        }
+        return;
+    case CancelRequest::Id:
+        if (!HasFeature(Feature::kStartTimeAdjustment) && !HasFeature(Feature::kForecastAdjustment) &&
+            !HasFeature(Feature::kConstraintBasedAdjustment))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<CancelRequest::DecodableType>(
+                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCancelRequest(ctx, commandData); });
         }
         return;
     }
@@ -563,10 +575,10 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     }
 
     status = mDelegate.PauseRequest(duration);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
+        ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
         return;
     }
 }
@@ -574,7 +586,6 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
 void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData)
 {
     Status status;
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
     if (ESAStateEnum::kPaused != mDelegate.GetESAState())
     {
@@ -584,10 +595,10 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
     }
 
     status = mDelegate.ResumeRequest();
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.ResumeRequest() FAILURE");
+        ChipLogError(Zcl, "DEM: ResumeRequest FAILURE");
         return;
     }
 }
@@ -618,10 +629,10 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     }
 
     status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.ModifyForecastRequest() FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
         return;
     }
 }
@@ -642,10 +653,23 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     status = mDelegate.RequestConstraintBasedForecast(commandData.constraints);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.commandData.constraints() FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast FAILURE");
+        return;
+    }
+}
+
+void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelRequest::DecodableType & commandData)
+{
+    Status status;
+
+    status = mDelegate.CancelRequest();
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: CancelRequest FAILURE");
         return;
     }
 }

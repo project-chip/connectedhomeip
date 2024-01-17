@@ -46,6 +46,7 @@ public:
                           const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments) override;
     virtual Status RequestConstraintBasedForecast(
         const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints) override;
+    virtual Status CancelRequest() override;
 
     // ------------------------------------------------------------------
     // Get attribute methods
