@@ -9,7 +9,7 @@ Links to download Simplicity Commander's standalone versions are included below.
  - Mac: https://www.silabs.com/documents/public/software/SimplicityCommander-Mac.zip
  - Windows: https://www.silabs.com/documents/public/software/SimplicityCommander-Windows.zip
 
-To Flash the bootloader and Binaries, refer [Flashing using Commander](./FLASHING_USING_COMMANDER.md)
+To Flash the bootloader and binaries, refer to the [Flashing using Commander](./FLASHING_USING_COMMANDER.md) guide.
 
 ## (Optional) J-Link RTT for Logging:
 Multi-platform Logging software for device logs. Links to download J-Link RTT for logging are included below

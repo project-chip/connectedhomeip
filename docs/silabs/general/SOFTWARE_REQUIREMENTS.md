@@ -145,7 +145,7 @@ $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.
 
 ### Software Packages Required for Wi-Fi EFR32 NCP Devices
 
-1. GeckoSDK package.
+1. Gecko SDK package.
 2. WiseConnect SDK v2.x for RS9116 NCP.
 3. Wiseconnect SDK v3.x for SiWx917 NCP.
 4. [Firmware for RS9116 NCP](../general/ARTIFACTS.md#rs9116-firmware)

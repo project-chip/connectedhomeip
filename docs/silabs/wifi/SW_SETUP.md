@@ -158,5 +158,5 @@ Navigate to
 
 If having issues building the above examples, users may need to run the following commands:
 
-    git submodule update --init --recursive --checkout
+    git submodule update --init --checkout
     pip install --upgrade prompt-toolkit

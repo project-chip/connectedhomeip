@@ -229,13 +229,13 @@ Persistent subscriptions are enabled by default on all Silicon Labs sample appli
 
 ### Subscription Timeout Resumption
 
-Matter also provides a retry mechanism for devices to try to re-establish a lost subscription with a client. This feature should not be used on an ICD since it can significantly reduce battery life. This functionality is provided by enabling 
+Matter also provides a retry mechanism for devices to try to re-establish a lost subscription with a client. This feature should not be used on an ICD since it can significantly reduce battery life. This functionality can be disabled by adding
 
 `chip_subscription_timeout_resumption = false`
 
 ## Subscription Synchronization
 
-To avoid forcing an ICD to become active multiple times, the Matter SDK allows an ICD to synchronize its subscription reporting and send all the reports at the same time. The mecansim syncrhonizes the maximum interval of the all subscription to only require the ICD to become active one. This functionality is provided by enabling
+To avoid forcing an ICD to become active multiple times, the Matter SDK allows an ICD to synchronize its subscription reporting and send all the reports at the same time. The mecansim syncrhonizes the maximum interval of the all subscription to only require the ICD to become active one. This functionality can be enabled by adding
 
 `sl_use_subscription_synching = true`
 
