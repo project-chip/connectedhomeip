@@ -29,6 +29,7 @@
 #import <Matter/MTRCluster.h>
 #import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRClusterStateCacheContainer.h>
+#import <Matter/MTRClusterNames.h>
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRCommissionableBrowserDelegate.h>
