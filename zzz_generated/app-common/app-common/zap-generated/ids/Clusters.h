@@ -31,9 +31,6 @@ static constexpr ClusterId Id = 0x00000003;
 namespace Groups {
 static constexpr ClusterId Id = 0x00000004;
 } // namespace Groups
-namespace Scenes {
-static constexpr ClusterId Id = 0x00000005;
-} // namespace Scenes
 namespace OnOff {
 static constexpr ClusterId Id = 0x00000006;
 } // namespace OnOff
@@ -208,6 +205,9 @@ static constexpr ClusterId Id = 0x00000060;
 namespace RvcOperationalState {
 static constexpr ClusterId Id = 0x00000061;
 } // namespace RvcOperationalState
+namespace ScenesManagement {
+static constexpr ClusterId Id = 0x00000062;
+} // namespace ScenesManagement
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring
