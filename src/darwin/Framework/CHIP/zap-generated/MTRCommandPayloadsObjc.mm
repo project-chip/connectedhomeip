@@ -11904,6 +11904,10 @@ NS_ASSUME_NONNULL_BEGIN
         _cookTime = nil;
 
         _powerSetting = nil;
+
+        _wattSettingIndex = nil;
+
+        _startAfterSetting = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -11917,6 +11921,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.cookMode = self.cookMode;
     other.cookTime = self.cookTime;
     other.powerSetting = self.powerSetting;
+    other.wattSettingIndex = self.wattSettingIndex;
+    other.startAfterSetting = self.startAfterSetting;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -11925,7 +11931,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cookMode:%@; cookTime:%@; powerSetting:%@; >", NSStringFromClass([self class]), _cookMode, _cookTime, _powerSetting];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cookMode:%@; cookTime:%@; powerSetting:%@; wattSettingIndex:%@; startAfterSetting:%@; >", NSStringFromClass([self class]), _cookMode, _cookTime, _powerSetting, _wattSettingIndex, _startAfterSetting];
     return descriptionString;
 }
 
@@ -11953,6 +11959,18 @@ NS_ASSUME_NONNULL_BEGIN
         if (self.powerSetting != nil) {
             auto & definedValue_0 = encodableStruct.powerSetting.Emplace();
             definedValue_0 = self.powerSetting.unsignedCharValue;
+        }
+    }
+    {
+        if (self.wattSettingIndex != nil) {
+            auto & definedValue_0 = encodableStruct.wattSettingIndex.Emplace();
+            definedValue_0 = self.wattSettingIndex.unsignedCharValue;
+        }
+    }
+    {
+        if (self.startAfterSetting != nil) {
+            auto & definedValue_0 = encodableStruct.startAfterSetting.Emplace();
+            definedValue_0 = self.startAfterSetting.boolValue;
         }
     }
 

@@ -5388,11 +5388,15 @@ private:
 | * AddMoreTime                                                       |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * CookTime                                                          | 0x0001 |
+| * CookTime                                                          | 0x0000 |
+| * MaxCookTime                                                       | 0x0001 |
 | * PowerSetting                                                      | 0x0002 |
 | * MinPower                                                          | 0x0003 |
 | * MaxPower                                                          | 0x0004 |
 | * PowerStep                                                         | 0x0005 |
+| * SupportedWatts                                                    | 0x0006 |
+| * SelectedWattIndex                                                 | 0x0007 |
+| * WattRating                                                        | 0x0008 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -5415,6 +5419,8 @@ public:
         AddArgument("CookMode", 0, UINT8_MAX, &mRequest.cookMode);
         AddArgument("CookTime", 0, UINT32_MAX, &mRequest.cookTime);
         AddArgument("PowerSetting", 0, UINT8_MAX, &mRequest.powerSetting);
+        AddArgument("WattSettingIndex", 0, UINT8_MAX, &mRequest.wattSettingIndex);
+        AddArgument("StartAfterSetting", 0, 1, &mRequest.startAfterSetting);
         ClusterCommand::AddArguments();
     }
 
@@ -19177,10 +19183,14 @@ void registerClusterMicrowaveOvenControl(Commands & commands, CredentialIssuerCo
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "cook-time", Attributes::CookTime::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "max-cook-time", Attributes::MaxCookTime::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "power-setting", Attributes::PowerSetting::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "min-power", Attributes::MinPower::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "max-power", Attributes::MaxPower::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "power-step", Attributes::PowerStep::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "supported-watts", Attributes::SupportedWatts::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "selected-watt-index", Attributes::SelectedWattIndex::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "watt-rating", Attributes::WattRating::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -19190,6 +19200,8 @@ void registerClusterMicrowaveOvenControl(Commands & commands, CredentialIssuerCo
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttribute<uint32_t>>(Id, "cook-time", 0, UINT32_MAX, Attributes::CookTime::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "max-cook-time", 0, UINT32_MAX, Attributes::MaxCookTime::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "power-setting", 0, UINT8_MAX, Attributes::PowerSetting::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "min-power", 0, UINT8_MAX, Attributes::MinPower::Id, WriteCommandType::kForceWrite,
@@ -19198,6 +19210,12 @@ void registerClusterMicrowaveOvenControl(Commands & commands, CredentialIssuerCo
                                              credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "power-step", 0, UINT8_MAX, Attributes::PowerStep::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const uint16_t>>>(
+            Id, "supported-watts", Attributes::SupportedWatts::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "selected-watt-index", 0, UINT8_MAX, Attributes::SelectedWattIndex::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "watt-rating", 0, UINT16_MAX, Attributes::WattRating::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -19213,10 +19231,14 @@ void registerClusterMicrowaveOvenControl(Commands & commands, CredentialIssuerCo
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "cook-time", Attributes::CookTime::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "max-cook-time", Attributes::MaxCookTime::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "power-setting", Attributes::PowerSetting::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "min-power", Attributes::MinPower::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "max-power", Attributes::MaxPower::Id, credsIssuerConfig),                          //
         make_unique<SubscribeAttribute>(Id, "power-step", Attributes::PowerStep::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "supported-watts", Attributes::SupportedWatts::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "selected-watt-index", Attributes::SelectedWattIndex::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "watt-rating", Attributes::WattRating::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //

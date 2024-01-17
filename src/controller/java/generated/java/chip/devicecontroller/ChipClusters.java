@@ -24412,11 +24412,15 @@ public class ChipClusters {
   public static class MicrowaveOvenControlCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 95L;
 
-    private static final long COOK_TIME_ATTRIBUTE_ID = 1L;
+    private static final long COOK_TIME_ATTRIBUTE_ID = 0L;
+    private static final long MAX_COOK_TIME_ATTRIBUTE_ID = 1L;
     private static final long POWER_SETTING_ATTRIBUTE_ID = 2L;
     private static final long MIN_POWER_ATTRIBUTE_ID = 3L;
     private static final long MAX_POWER_ATTRIBUTE_ID = 4L;
     private static final long POWER_STEP_ATTRIBUTE_ID = 5L;
+    private static final long SUPPORTED_WATTS_ATTRIBUTE_ID = 6L;
+    private static final long SELECTED_WATT_INDEX_ATTRIBUTE_ID = 7L;
+    private static final long WATT_RATING_ATTRIBUTE_ID = 8L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -24434,11 +24438,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void setCookingParameters(DefaultClusterCallback callback, Optional<Integer> cookMode, Optional<Long> cookTime, Optional<Integer> powerSetting) {
-      setCookingParameters(callback, cookMode, cookTime, powerSetting, 0);
+    public void setCookingParameters(DefaultClusterCallback callback, Optional<Integer> cookMode, Optional<Long> cookTime, Optional<Integer> powerSetting, Optional<Integer> wattSettingIndex, Optional<Boolean> startAfterSetting) {
+      setCookingParameters(callback, cookMode, cookTime, powerSetting, wattSettingIndex, startAfterSetting, 0);
     }
 
-    public void setCookingParameters(DefaultClusterCallback callback, Optional<Integer> cookMode, Optional<Long> cookTime, Optional<Integer> powerSetting, int timedInvokeTimeoutMs) {
+    public void setCookingParameters(DefaultClusterCallback callback, Optional<Integer> cookMode, Optional<Long> cookTime, Optional<Integer> powerSetting, Optional<Integer> wattSettingIndex, Optional<Boolean> startAfterSetting, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -24453,6 +24457,14 @@ public class ChipClusters {
       final long powerSettingFieldID = 2L;
       BaseTLVType powerSettingtlvValue = powerSetting.<BaseTLVType>map((nonOptionalpowerSetting) -> new UIntType(nonOptionalpowerSetting)).orElse(new EmptyType());
       elements.add(new StructElement(powerSettingFieldID, powerSettingtlvValue));
+
+      final long wattSettingIndexFieldID = 3L;
+      BaseTLVType wattSettingIndextlvValue = wattSettingIndex.<BaseTLVType>map((nonOptionalwattSettingIndex) -> new UIntType(nonOptionalwattSettingIndex)).orElse(new EmptyType());
+      elements.add(new StructElement(wattSettingIndexFieldID, wattSettingIndextlvValue));
+
+      final long startAfterSettingFieldID = 4L;
+      BaseTLVType startAfterSettingtlvValue = startAfterSetting.<BaseTLVType>map((nonOptionalstartAfterSetting) -> new BooleanType(nonOptionalstartAfterSetting)).orElse(new EmptyType());
+      elements.add(new StructElement(startAfterSettingFieldID, startAfterSettingtlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -24480,6 +24492,10 @@ public class ChipClusters {
           public void onResponse(StructType invokeStructValue) {
           callback.onSuccess();
         }}, commandId, value, timedInvokeTimeoutMs);
+    }
+
+    public interface SupportedWattsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<Integer> value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -24521,6 +24537,31 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, COOK_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxCookTimeAttribute(
+        LongAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_COOK_TIME_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_COOK_TIME_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxCookTimeAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_COOK_TIME_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, MAX_COOK_TIME_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPowerSettingAttribute(
@@ -24621,6 +24662,81 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, POWER_STEP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSupportedWattsAttribute(
+        SupportedWattsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_WATTS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SUPPORTED_WATTS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSupportedWattsAttribute(
+        SupportedWattsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SUPPORTED_WATTS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<Integer> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, SUPPORTED_WATTS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readSelectedWattIndexAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SELECTED_WATT_INDEX_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, SELECTED_WATT_INDEX_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeSelectedWattIndexAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, SELECTED_WATT_INDEX_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, SELECTED_WATT_INDEX_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readWattRatingAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WATT_RATING_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, WATT_RATING_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeWattRatingAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, WATT_RATING_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, WATT_RATING_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

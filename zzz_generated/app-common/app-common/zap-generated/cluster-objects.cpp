@@ -11800,6 +11800,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kCookMode), cookMode);
     encoder.Encode(to_underlying(Fields::kCookTime), cookTime);
     encoder.Encode(to_underlying(Fields::kPowerSetting), powerSetting);
+    encoder.Encode(to_underlying(Fields::kWattSettingIndex), wattSettingIndex);
+    encoder.Encode(to_underlying(Fields::kStartAfterSetting), startAfterSetting);
     return encoder.Finalize();
 }
 
@@ -11828,6 +11830,14 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPowerSetting))
         {
             err = DataModel::Decode(reader, powerSetting);
+        }
+        else if (__context_tag == to_underlying(Fields::kWattSettingIndex))
+        {
+            err = DataModel::Decode(reader, wattSettingIndex);
+        }
+        else if (__context_tag == to_underlying(Fields::kStartAfterSetting))
+        {
+            err = DataModel::Decode(reader, startAfterSetting);
         }
         else
         {
@@ -11880,6 +11890,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     {
     case Attributes::CookTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, cookTime);
+    case Attributes::MaxCookTime::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxCookTime);
     case Attributes::PowerSetting::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, powerSetting);
     case Attributes::MinPower::TypeInfo::GetAttributeId():
@@ -11888,6 +11900,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, maxPower);
     case Attributes::PowerStep::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, powerStep);
+    case Attributes::SupportedWatts::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedWatts);
+    case Attributes::SelectedWattIndex::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, selectedWattIndex);
+    case Attributes::WattRating::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, wattRating);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
