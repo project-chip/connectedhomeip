@@ -5,7 +5,7 @@
 If you have not downloaded or cloned this repository, you can run the following
 commands on a Linux terminal running on either Linux machine, WSL or Virtual
 Machine to clone the repository and run bootstrap to prepare to build the sample
-application images.
+application images. Users may need to run the various commands as the root user or with certain privilges enabled.
 
 1. To download the
    [SiliconLabs Matter codebase](https://github.com/SiliconLabs/matter.git) run
@@ -46,9 +46,6 @@ If you are just running the Matter demo, and are not interested in building the
 Matter Accessory Device images from scratch, you can download the MAD images for
 Wi-Fi from this software release on the
 [Matter Artifacts Page](../general/ARTIFACTS.md)
-
-> **Note:** A pre-built image is not available for SiWx917 in SoC mode. It must be built from scratch in this release.
-> Pre-built images will be provided in the next release.
 
 Once you have downloaded the image you require for your device, you can skip
 forward to the instructions for running the demo.
@@ -104,22 +101,15 @@ Build command for EFR32MG24 + WF200:
 $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting BRD41xxx chip_build_libshell=false --wifi wf200 |& tee out/wf200_lighting.log
 ```
 
-Build command for SiWx917 SoC processor(dual flash):
-
-```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4325B |& tee out/soc_lighting.out
-```
-
 Build command for SiWx917 SoC processor(common flash):
 
 ```shell
-./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4325x is_debug=false |& tee out/soc_lighting.out
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/SiWx917_lighting BRD4338A |& tee out/soc_lighting.out
 ```
 
 >    **Note:**
 >    1. LED and button features are enabled for SiWx917 SoC.
->    2. LCD and QR code features are not enabled for SiWx917 SoC.
->    3. Before building for SiWx917 SoC, you must first obtain the WiseMCU Combo SDK package and install it. See the [Software Requirements page](../general/SOFTWARE_REQUIREMENTS.md).
+>    2. Before building for SiWx917 SoC, you must first obtain the WiseMCU Combo SDK package and install it. See the [Software Requirements page](../general/SOFTWARE_REQUIREMENTS.md).
 
 A complete list of hardware supported is included on the [Hardware Requirements page](../general/HARDWARE_REQUIREMENTS.md).
 
@@ -163,3 +153,10 @@ Navigate to
 `examples/platform/silabs/efr32/FreeRTOSConfig.h`. Find the macro:
 \``configMINIMAL_STACK_SIZE`\`, and change the macro value from `140` to
  **`320`**.
+
+ ### Troubleshooting
+
+If having issues building the above examples, users may need to run the following commands:
+
+    git submodule update --init --recursive --checkout
+    pip install --upgrade prompt-toolkit

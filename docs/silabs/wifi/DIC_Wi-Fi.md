@@ -36,6 +36,7 @@ To set up and configure AWS or Mosquitto for DIC support please see the followin
 ### Building Matter DIC Application
 1. To Build DIC Application, refer [Building of DIC](./BUILD_DIC.md)
 2. Commission the Matter Device and confirm DIC connection is done from Device side logs.
+
 ## End-to-End Test of DIC Application
 
   - **Sharing status of device to cloud**
@@ -44,7 +45,7 @@ To set up and configure AWS or Mosquitto for DIC support please see the followin
       ![Silicon Labs - DIC design](./images/dic-status-sharing.png)
 
 **Note**: For reference, Lighting App commands given in the above image. Similarly other application commands also can be passed. 
-    - End-to-end command to be executed from chip-tool, refer [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md#demo-execution---commissioning-a-wi-fi-device-using-chip-tool-for-linux)
+    - End-to-end command to be executed from chip-tool, refer [Running the Matter Demo](RUN_DEMO.md#demo-execution---commissioning-a-wi-fi-device-using-chip-tool-for-linux)
     - Below is the application specific attribute/s information or state shared to the cloud through Direct Internet Connectivity Solution
        - For Lighting App, On/Off Attributes
        - For Lock App, lock/unlock Attributes
@@ -62,7 +63,7 @@ To set up and configure AWS or Mosquitto for DIC support please see the followin
 
 **Note**: For reference, Lighting App commands given in the above image. Similarly other application commands also can be passed.
      
-- Make sure matter device is up and commissioned successfully, refer [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md#demo-execution---commissioning-a-wi-fi-device-using-chip-tool-for-linux)
+- Make sure matter device is up and commissioned successfully, refer [Running the Matter Demo](RUN_DEMO.md#demo-execution---commissioning-a-wi-fi-device-using-chip-tool-for-linux)
      
 - For Controlling the device, set topic name and the commands to be executed in the mqtt_explorer for below applications.
   - Lighting App
@@ -102,7 +103,7 @@ To set up and configure AWS or Mosquitto for DIC support please see the followin
       
        ![Silicon Labs - DIC design](./images/dic-aws-ota.png)
      - Build DIC with AWS OTA , refer [Building DIC AWS OTA](./BUILD_DIC.md#build-command-with-dic-aws-ota)
-     - Make sure matter device is up and commissioned successfully, refer [Running the Matter Demo on EFR32 hosts](RUN_DEMO.md)
+     - Make sure matter device is up and commissioned successfully, refer [Running the Matter Demo on EFR Hosts](RUN_DEMO.md) or [Running the Matter Demo on SiWx917 SoC Hosts](RUN_DEMO_SiWx917_SoC.md)
      - Make sure device is connected to MQTT Server successfully.
      - Then Create a AWS OTA Job in the AWS Website, refer [How to create AWS OTA JOB](AWS_CONFIGURATION_REGISTRATION.md)
      - Trigger OTA Command through MQTT Explorer like below.

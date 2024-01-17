@@ -10,3 +10,4 @@ Matter Over Thread
     Setting up the RCP <./thread/RCP.md>
     Build, Flash Matter Device <./thread/BUILD_FLASH_MAD.md>
     Using the Matter Hub <./thread/CHIP_TOOL.md>
+    Intermittently Connected Devices over OpenThread <./thread/OT_SLEEPY_END_DEVICE.md>

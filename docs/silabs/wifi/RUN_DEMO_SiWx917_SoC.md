@@ -1,34 +1,38 @@
 # Getting Started with SoC Mode
+
 This guide describes how to get started developing an application for the SiWx91x in System-on-chip (SoC) mode, where both the application and the networking stack run on the SiWx917 chipset.
 
-## Hardware Requirements
-The following hardware devices are required for executing Matter over Wi-Fi for SOC Mode:
+## Check Prerequisites
+
+In order to run Matter over Wi-Fi, check for the following prerequisites:
+
+### Hardware Requirements
+
+The following hardware devices are required for executing Matter over Wi-Fi:
  - Refer, [Hardware Requirements](../general/HARDWARE_REQUIREMENTS.md#matter-over-wi-fi-accessory-device-requirements-for-soc-mode)
- - Additional hardwares required for SOC Boards:
-    - Windows/Linux/MacOS computer with a USB port
-    - USB cable for connecting WSTK Board to Computer
-    - Raspberry Pi with a >32 GB SD Card
-    - Access Point with Internet Access
+- Silicon Labs Wireless starter/development kit (WSTK)
+- SiWx917 SoC development kit
+- Wi-Fi Dev Kit
+  - SiWx917
+    - SoC mode:
+      - BRD4388A (B0 2.0 common flash)
+             SiWx917
+- Windows/Linux/MacOS computer with a USB port
+- USB cable for connecting WSTK Board to Computer
+- Raspberry Pi with a >32 GB SD Card
+- Access Point with Internet Access
 
-## Software Requirements
-Below are the software tools, packages and images required for executing Matter over Wi-Fi for SOC Mode:
+### Software Requirements
 
-### Software Tools Requirements
- - Simplicity Commander for flashing firmware and binary on SOC Boards
- - Putty for controlling SOC hardware using chip-tool controller
- - Ozone Debugger for logging and debugging (Optional)
- - JLink RTT for logging only (Optional)
-To install above software tools , refer [Software Installation](../general/SOFTWARE_REQUIREMENTS.md)
+Refer to [Software Requirements & Installation ](../general/SOFTWARE_REQUIREMENTS.md)
 
-## Connect the Boards to a Computer
+## Connect SiWx917 SOC to Computer
+
 1. Mount the SiWx917 radio board on the SiWx917 WSTK board.
     
    ![Silicon Labs - design](./images/mount-soc.png)
     
 2. Connect your SiWx917 Wireless Starter Kit (WSTK) board to your computer using a USB cable.
-
-## Updating SiWx917 SoC Connectivity Firmware
-- Download the recommended version of firmware before you start with the update process from the [Matter Artifacts page](../general/ARTIFACTS.md#siwx917-firmware-for-siwx917-soc)
 
 ### Steps to update the firmware on SiWx917 SoC radio board using Simplicity Commander
 
@@ -74,18 +78,15 @@ If the firmware update fails, try the following:
 1. SiWx917 SoC device support is available in the latest Simplicity Commander(version 1v15p3). To flash the TA Firmware/Matter application on SiWx917 SoC,
     - Convert the .s37 file into .rps file using the below command,
 
-          commander rps create <file-name>.rps --app <file-name>.s37
     - Flash to the device using,          
     
-          commander rps load <file-name>.rps
- 
-2. Official support for SiWx917 SoC for Common Flash Board is not yet available in the Ozone Debugger, but can be configured for dual flash board - [Ozone Environment Setup for SiWx917 SoC](SiWx917_Enablement_For_Ozone.md).
+          commander rps load <file-name>.rps 
 
-3. 917 SoC switch positions for Dual Flash Boards: Left switch should be on the **OFF/LOW**, and right switch should be on the **NORMAL** side.
-  
-4. After creating rps file flash the binary to board by using Simplicity Commander, refer [Flashing SiWx917 SOC Using Simplicity Commander](../general/FLASHING_USING_COMMANDER.md#flashing-the-siwx917-soc-matter-pre-built-binary-using-simplicity-commander)
+2. Official support for SiWx917 SoC for Common Flash Board is not yet available in the Ozone Debugger, but can be configured - [Ozone Environment Setup for SiWx917 SoC](SiWx917_Enablement_For_Ozone.md).
 
-5. Flashing the Matter application using Ozone Debugger
+3. After creating the rps file flash the binary to the board by using Simplicity Commander, refer [Flashing SiWx917 SOC Using Simplicity Commander](../general/FLASHING_USING_COMMANDER.md#flashing-the-siwx917-soc-matter-pre-built-binary-using-simplicity-commander)
+
+4. Flashing the Matter application using Ozone Debugger
 
    - Download the Pre-built images for SiWx917 SoC Matter Application (.out file) from [Matter Artifacts page](../general/ARTIFACTS.md)
    - Refer [Flashing MATTER Application Using Ozone debugger](./SiWx917_Enablement_For_Ozone.md)

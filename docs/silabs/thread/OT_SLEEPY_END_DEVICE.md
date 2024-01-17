@@ -8,7 +8,7 @@ Matter provides an Intermittently Connected Device (ICD) operating mode to exten
 The Matter ICD manager leverages subscription report synchronization and OpenThread functionalities to allow devices to sleep for set periods
 without disrupting their Matter sessions.
 
-Currently, in Matter v1.2 only ICD with Short Idle Time (SIT) is supported. ICD SIT are devices that SHOULD be configured with a Slow Polling Interval shorter than or equal to 15 seconds. For example, in a typical scenario for door locks and window coverings, commands need to be sent to the ICD with a use-case imposed latency requirement. Typically, devices that are Short Idle Time ICDs are not initiators in the communication flow.
+In Matter v1.2 only ICD's with Short Idle Time (SIT) is supported. Matter 1.3 alpha provides provisional support for Long Idle Time (LIT) ICD's. A SIT ICD  are devices that SHOULD be configured with a Slow Polling Interval shorter than or equal to 15 seconds. For example, in a typical scenario for door locks and window coverings, commands need to be sent to the ICD with a use-case imposed latency requirement. Typically, devices that are Short Idle Time ICDs are not initiators in the communication flow.
 
 ## Operating Modes
 
@@ -48,7 +48,7 @@ Matter exposes some defines to configure the polling intervals of the openthread
 | SlowPollInterval | CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL | Interval, in milliseconds, at which the thread radio will poll its network in idle mode. | 15000 ms | <= IdleModeInterval |
 | FastPollInterval | CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL | Interval, in milliseconds, at which the thread radio will poll its network in active mode. | 200 ms | < ActiveModeInterval |
 
-For Matter configuration, see the [Matter ICD](./MATTER_ICD.md) documentation.
+For Matter configuration, see the [Matter ICD](../general/MATTER_ICD.md) documentation.
 
 ### Usage
 

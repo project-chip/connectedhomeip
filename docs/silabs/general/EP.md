@@ -7,7 +7,7 @@ developing an energy-friendly device.
 Using Energy Profiler with Matter is the same as any other protocol except that
 you need to start the usage from within Energy Profiler inside Simplicity
 Studio, rather than using an existing Simplicity Studio project, since your
-Matter project will not have been created inside Simplicity Studio.
+Matter project will not have been created inside Simplicity Studio. 
 
 Complete documentation on using the Simplicity Studio Energy Profiler is
 provided in the

@@ -62,7 +62,7 @@ Follow the instructions in
 in the section "Installing prerequisites on Raspberry Pi
 4".
 
-2. To build enviorment follow the `Software setup` and `Compiling chip-tool` steps given in [Software setup](./SW_SETUP.md),
+2. To build enviorment follow the `Software setup` and `Compiling chip-tool` steps given in [Software setup](./SW_SETUP.md).
 
 ## Bluetooth Setup
 

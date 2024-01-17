@@ -40,7 +40,7 @@ Regardless of the Network topology being used, Matter has a concept of Fabrics. 
 | Vendor  | 16 bit number that uniquely identifies a particular product manufacturer, vendor, or group thereof. |
 | Product  | 16 bit number that uniquely identifies the product from a specific vendor. |
 | Group  | 16 bit number ID set of nodes across a Matter Fabric  |
-| Universal Group | 16 bit subrange of the Group ID reserved for groups across Matter Standard. Specifically a UID for all nodes, all non-sleepy nodes, and all proxies. |
+| Universal Group | 16 bit subrange of the Group ID reserved for groups across Matter Standard. Specifically a UID for all nodes, all non-ICD nodes, and all proxies. |
 | Operational Node  | 64 bit number that uniquely identifies an individual node on the fabric |
 | PAKE Key Identifiers | This is a subrange of Node ID used to assign an Access Control subject to a particular PAKE key. This creates an ACL (Access Control List) entry to provide admin access via a PASE session. |
 

@@ -1,6 +1,6 @@
 # Using Simplicity Studio's GATT Configurator with Matter
 
-The Simplicity Studio Bluetooth GATT Configurator is an Advanced Configurator
+The Simplicity Studio Bluetooth LE (BLE) GATT Configurator is an Advanced Configurator
 within the Simplicity Studio Project Configuration suite. For more information on
 using the
 [Simplicity Studio Project Configurator in Matter refer to this guide](./PINTOOL.md).

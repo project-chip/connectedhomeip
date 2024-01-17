@@ -32,12 +32,13 @@ use one of the following options:
     > Matter 15.4 development is included on the
     > [Matter Software Requirements](../general/SOFTWARE_REQUIREMENTS.md) page.
     > Be sure that you have satisfied these requirements before proceeding.
+    > Users may need to run the various commands as the root user or with certain privilges enabled.  
 
     The Matter Accessory Device (lighting-app) can be built out of this repo.
 
     Documentation on how to build and use the lighting-app Matter Accessory
     Device is provided in this
-    [README.md](https://github.com/SiliconLabs/matter/blob/latest/examples/lighting-app/silabs/efr32/README.md)
+    [README.md](https://github.com/SiliconLabs/matter/blob/latest/examples/lighting-app/silabs/README.md)
 
     Please note that you only need to build a single device for the demo such as
     the lighting-app. If you wish to build other examples such as the sleepy end

@@ -4,7 +4,7 @@ At some point during product development you may need to move your project over 
 you will likely need to change the pinout and hardware configuration in the example project to reflect your own custom project. You can do this
 with Simplicity Studio's Pintool starting from a blank C++ project.
 
-## 1. Locating the board support files in the Matter repo
+## 1. Locate the board support files in the Matter repo
 
 The pin and peripheral configuration for your example application is stored
 within the Silicon Labs Matter support directory. For all the examples used in

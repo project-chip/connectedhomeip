@@ -35,10 +35,10 @@ Bootloader Storage Slot component (it should be already installed) configure
 Slot 0's Start Address and Slot size.
 
 -   For external storage bootloaders the Start Address should be 0 and Slot size
-    should be 1048576 -- both values are set by default
+        should be 1048576 -- both values are set by default
 -   For internal storage bootloaders see the "Internal Bootloader: Image Size,
-    Selecting Storage Slot Address and Size" section below In the Common Storage
-    component leave the "Start address of bootload info" at 0.
+        Selecting Storage Slot Address and Size" section below In the Common Storage
+        component leave the "Start address of bootload info" at 0.
 
 ### Configuring Other Components
 
@@ -125,10 +125,9 @@ by using the Simplicity Commander tool:
     beginning of the second or third available block to account for potential
     growth of the application image -- this way the bootloader won't have to be
     reconfigured for every increase in the image size. The storage slot must
-    still be able to accommodate the GBL image for the update. Another way to
+    still be able to accommodate the GBL image for the update. Another way to 
     calculate the Storage Slot parameters is by examining the application's .map
     file:
-
 -   Build the running image for the Matter application
 -   In the application .map file find the highest address preceding the .data
     section, round it up to align on the 8K page boundary (e.g.
@@ -143,39 +142,42 @@ by using the Simplicity Commander tool:
 This example is for an internal storage bootloader for the Matter lighting app
 on BRD4186C.
 
--   Build the application disabling all optional features
-
+- Build the application disabling all optional features
+  
     ```shell
     $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs out lighting-app BRD4186A chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false is_debug=false show_qr_code=false chip_build_libshell=false enable_openthread_cli=false chip_openthread_ftd=true
     ```
 
--   Build the GBL file for the update image and note its size
+- Build the GBL file for the update image and note its size
 
     ```shell
     $ commander gbl create --compress lzma ~/chip/connectedhomeip/out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl --app ~/chip/connectedhomeip/out/lighting-app/BRD4186A/chip-efr32-lighting-example.s37
     ```
 
     ```shell
-    $ ls -la out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl 451176 Jul 19 16:39 out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl
+    $ ls -la out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl
+    451176 Jul 19 16:39 out/lighting-app/BRD4186A/chip-efr32-lighting-example.gbl
     ```
 
 -   Flash the application image, bootloader (pre-built BRD4186C bootloader
     binary from the [Matter Artifacts page](./ARTIFACTS.md). Erase the flash.
 
-![Erase Flash](./images/ApplicationUploadEraseFlash.png)
+        ![Erase Flash](./images/ApplicationUploadEraseFlash.png)
 
 -   In Simplicity Commander display the flash map
-    ![Flash Map](./images/CommanderFlashMap.png)
+  
+        ![Flash Map](./images/CommanderFlashMap.png)
 
 -   The address of the first available page is 0x080b8000, the end address of
-    the last available block is 0x08172000. This means you can set the Slot
-    Start Address to 0x080b8000 and the Slot Size to 761856 (761856 =
-    0x08172000 - 0x080b8000). The slot size is sufficient for our GBL file
-    (451176 bytes)
+       the last available block is 0x08172000. This means you can set the Slot
+        Start Address to 0x080b8000 and the Slot Size to 761856 (761856 =
+        0x08172000 - 0x080b8000). The slot size is sufficient for our GBL file
+        (451176 bytes)
 -   Create a project base on the "Bootloader - SoC Internal Storage (single
-    image on 512kB device)" example. Configure the Bootloader Storage Slot
-    component and set Slot Address and Slot Size.
-    ![StudioProject](./images/StudioProject.png)
+        image on 512kB device)" example. Configure the Bootloader Storage Slot
+        component and set Slot Address and Slot Size.
+
+        ![StudioProject](./images/StudioProject.png)
 
 -   Enable the "GBL Compression (LZMA)" component.
 -   Build the project

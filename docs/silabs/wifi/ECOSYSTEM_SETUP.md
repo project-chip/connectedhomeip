@@ -31,12 +31,7 @@
 
     -   **Wi-Fi SoC Dev kits and boards**
       - SiWx917 / BRD4002A / Wireless Starter Kit
-      - SiWx917 SoC / Dual Flash Radio Board / 2.4GHz
-        - BRD4325B - A0 dual flash 1.1
-        - BRD4325B - A0 dual flash 1.2
       - SiWx917 SoC / Common Flash Radio Board / 2.4GHz
-        - BRD4325C - B0 common flash v1.2
-        - BRD4325G - B0 Stacked Flash + External PSRAM v1.2
         - BRD4338A - B0 common flash v2.0
 
     -   **Wi-Fi NCP Dev kits and boards**
@@ -47,39 +42,27 @@
             -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
                 -   [XG24-RB4187C](https://www.silabs.com/development-tools/wireless/xg24-rb4187c-efr32xg24-wireless-gecko-radio-board)
                 -   MG24 with WSTK : [xG24-PK6010A](https://www.silabs.com/development-tools/wireless/efr32xg24-pro-kit-20-dbm?tab=overview)
-      -   **MG12 boards:**
-            -   [EFR32MG12 Development Kit](https://www.silabs.com/development-tools/wireless/zigbee/efr32mg12-dual-band-starter-kit)
-            -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-                -   [SLWRB4161A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4161a-efr32mg12-radio-board)
-            -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-                -   [SLWRB4162A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4162a-efr32mg12-radio-board)
-            -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-                -   [SLWRB4163A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4163a-efr32mg12-radio-board)
-            -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-                -   [SLWRB4164A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4164a-efr32mg12-radio-board)
-            -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm, 915MHz@19dBm
-                -   [SLWRB4170A](https://www.silabs.com/development-tools/wireless/zigbee/slwrb4170a-efr32mg12-radio-board)
 
       -   **Wi-Fi Dev Kits & boards**
             -   RS9116
                 -   SB-EVK1 / Single Band Wi-Fi Development Kit / 2.4GHz
                     -   [RS9116X-SB-EVK1](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-sb-evk-development-kit)
-            -   SB-EVK2 / Single Band Wi-Fi Development Kit / 2.4GHz
-                -   [RS9116X-SB-EVK2](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-sb-evk2-development-kit)
-            -   DB-EVK1 / Dual Band Wi-Fi Development Kit / 2.4GHz & 5GHz
-                -   [RS9116X-DB-EVK1](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-db-evk-development-kit)
+                -   SB-EVK2 / Single Band Wi-Fi Development Kit / 2.4GHz
+                    -   [RS9116X-SB-EVK2](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-sb-evk2-development-kit)
+                -   DB-EVK1 / Dual Band Wi-Fi Development Kit / 2.4GHz & 5GHz
+                    -   [RS9116X-DB-EVK1](https://www.silabs.com/development-tools/wireless/wi-fi/rs9116x-db-evk-development-kit)
                 **Note:** Matter only supported over 2.4GHz on this Dev kit.
-            -   Interconnect board (included in the Wi-Fi kits)
-            -   SPI Cable (included in the RS9116 kit)
-            -   Jumper Cables (included in the RS9116 kit)
+                -   Interconnect board (included in the Wi-Fi kits)
+                -   SPI Cable (included in the RS9116 kit)
+                -   Jumper Cables (included in the RS9116 kit)
             -   SiWx917
                 -   SiWx917 NCP Mode / Wi-Fi Expansion Board / 2.4GHz
-                    -   BRD8036A (A0 Expansion v1.1)
+                    -   BRD4346A
             -   WF200
                 -   WF200 / Single Band Wi-Fi Expansion Board / 2.4GHz
-                -   [SLEXP8022A](https://www.silabs.com/development-tools/wireless/wi-fi/wf200-wifi-expansion-kit)
-            -   WFM200S / Single Band Wi-Fi Expansion Board / 2.4GHz
-                -   [SLEXP8023A](https://www.silabs.com/development-tools/wireless/wi-fi/wfm200-wifi-expansion-kit)
+                    -   [SLEXP8022A](https://www.silabs.com/development-tools/wireless/wi-fi/wf200-wifi-expansion-kit)
+                -   WFM200S / Single Band Wi-Fi Expansion Board / 2.4GHz
+                    -   [SLEXP8023A](https://www.silabs.com/development-tools/wireless/wi-fi/wfm200-wifi-expansion-kit)
 
 - Windows/Linux/MacOS computer with a USB port
 - USB cable for connecting WSTK Board to Computer

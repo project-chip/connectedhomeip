@@ -16,6 +16,7 @@ Welcome to Silicon Labs' Matter documentation!
    ./nav_2_prereq
    ./nav_4_thread
    ./nav_5_wifi
+   ./nav_7_prod_guide
    ./unify/index
    ./nav_3_general
    ./nav_6_faq

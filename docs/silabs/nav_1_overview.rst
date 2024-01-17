@@ -12,7 +12,7 @@ Matter Overview
    ./general/FUNDAMENTALS_DATA_MODEL.md
    ./general/FUNDAMENTALS_INTERACTION_MODEL.md
    ./general/COMMISSIONING.md
-   ./general/OT_SLEEPY_END_DEVICE.md
+   ./general/SECURITY.md
+   ./general/MATTER_ICD.md
    ./general/OTA_BOOTLOADER.md
    ./general/OTA_SOFTWARE_UPDATE.md
-   ./general/SECURITY.md

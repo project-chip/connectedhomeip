@@ -11,7 +11,6 @@ Developer Reference
     Flashing Using Simplicity Commander <./general/FLASHING_USING_COMMANDER.md>
     Flash an EFR32 Device <./general/FLASH_SILABS_DEVICE.md>
     Flash a 917SoC Device <./general/FLASH_SILABS_SiWx917_SOC_DEVICE.md>
-    Matter ICDs <./general/MATTER_ICD.md>
     Using ZAP <./general/ZAP.md>
     Using Wireshark <./general/WIRESHARK.md>
     Using Energy Profiler <./general/EP.md>

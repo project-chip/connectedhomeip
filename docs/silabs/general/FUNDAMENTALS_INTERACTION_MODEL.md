@@ -98,7 +98,7 @@ An Untimed Write Transaction requires only the Write Request Action and the Writ
 
 Untimed and timed Write Transactions differ in their restrictions. All actions in timed transactions are unicast-only, whereas Untimed Write Request Actions may be multicast but require the Suppress Response flag to be set to prevent the network from flooding with status responses.
 
-## The Invoke Interaction
+## Invoke Interaction
 
 ![Diagram of a Timed Invoke Interaction](resources/timed-invoke-interaction.jpg)
 
@@ -121,7 +121,7 @@ Just like a Timed Write Transaction, a Timed Invoke Transaction consists of the 
 
 Untimed and timed Invoke Transactions differ in the same way that untimed and timed Write Transactions differ, both in their actions and restrictions on unicast or multicast.
 
-## The Subscription Interaction
+## Subscription Interaction
 
 ![Diagram of a Subscription Interaction](resources/subscription-interaction.jpg)
 

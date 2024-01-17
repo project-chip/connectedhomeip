@@ -31,7 +31,6 @@ application example.
 ```shell
 $ ./scripts/tools/zap/run_zaptool.sh examples/lighting-app/lighting-common/lighting-app.zap
 ```
-
 On the left side of the application, there is a tab for Endpoint 0 and
 Endpoint 1. Endpoint 0 is known as the root node. This endpoint is akin to a
 "read me first" endpoint that describes itself and the other endpoints that make
@@ -53,7 +52,7 @@ your application to the full power of the Matter SDK.
 For example, if a lighting application only includes
 single color LEDs instead of RGB LEDs, it might make sense to disable the Color
 Control cluster in the ZAP configuration. Similarly, if a
-lighting application doesn't take advantage of the Level Control cluster,
+lighting application does not take advantage of the Level Control cluster,
 which allows you to customize current flow to an LED, it might make sense to
 disable the Level Control cluster.
 
@@ -64,11 +63,10 @@ generate ZAP code.
 ```shell
 $ ./scripts/tools/zap/generate.py examples/lighting-app/lighting-common/lighting-app.zap -o zzz_generated/lighting-app/zap-generated/
 ```
-
 ## Receiving Matter Commands
 
 All Matter commands reach the application through the intermediate function
-MatterPostAttributeChangeCallback(). When a request is made by a Matter client,
+`MatterPostAttributeChangeCallback()`. When a request is made by a Matter client,
 the information contained in the request is forwarded to a Matter application
 through this function. The command can then be dissected using conditional logic
 to call the proper application functions based on the most recent command
@@ -113,6 +111,7 @@ MoveToLevel action.
        LightMgr().InitiateActionLight(AppEvent::kEventType_Light, action_type, endpoint, *value);
     }
    ```
+
 ## Send a MoveToLevel Command and Read the CurrentLevel Attribute
 
 Rebuild the application and load the new executable on your EFR32 device. Send
@@ -133,4 +132,4 @@ $ mattertool levelcontrol read current-level 1 1 // Returns 10
 ```
 
 For more information on running a Silicon Labs lighting example on a Thunderboard Sense 2 see 
-[sl-newlight/efr32](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/sl-newLight/efr32/README.md).
+[sl-newlight/efr32](https://github.com/SiliconLabs/matter/blob/latest/silabs_examples/sl-newLight/efr32/README.md). 

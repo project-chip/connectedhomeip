@@ -79,7 +79,7 @@ With 1.1, devices will remain in Active Mode until the commissioning is complete
 The timer starts after the last communication.
 For this feature to take affect, there needs to be at least one message coming in or going out. If the device just polls its thread router and nothing else happens, this doesn't come into play.
 
-    For more details see the [Openthread Sleepy End Device](./general/OT_SLEEPY_END_DEVICE.md) section.
+    For more details see the [Openthread Sleepy End Device](./thread/OT_SLEEPY_END_DEVICE.md) section.
 
 ### Matter Sleepy End Devices over Wi-Fi
 

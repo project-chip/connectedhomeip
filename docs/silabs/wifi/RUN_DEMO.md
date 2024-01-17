@@ -43,17 +43,52 @@ To install above software tools , refer [Software Installation](../general/SOFTW
 
 ### Steps to update the firmware on NCP boards using Tera Term
 - SiWx917 NCP or RS9116 EVK connectivity firmware can be upgraded using tera-term or kermit.
-1. Make sure that the switches on the expansion board are towards UART side.
 
-   ![Switch Position before firmware flash](./images/si917-board.png)
+#### Firmware Upgrade On RS9116
 
-2. Refer [Updating the Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware) 
+1. Connect the EVK to PC using the USB interface labeled UART as identified below.
 
-**Note**:Instructions are the same for both SiWx917 NCP and RS9116 EVK.
+    ![Switch Position before firmware flash](images/rs916-board.png)
 
-3. Once firmware flashing is done make sure to make switches back to Expansion mode, while using it with the host platform.
+2. If this is the first time connecting the EVK to your PC, verfy that it is properly detected by the PC. The EVK will appear to the PC as a COM port labeled USB Serial Port (COMx)
 
-   ![Switch Position after firmware flash](./images/mg21-si917-board.jpg)
+3. Configure your terminal application with the following settings:
+
+   - Configure the serial port settings to 115200 baud / 8-bit data / No parity / 1 stop bit
+   - Enable local echo
+   - Set receive and transmit new-line characters to CR+LF
+
+4. Refer to [Setup Tera Term and Updating the Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup).
+
+    ```shell
+    Instructions are the same for both SiWx917 NCP and RS9116 EVK.
+    ```
+
+5. Once firmware flashing is done The console displays **Loading...** followed by **Loading Done**.
+
+#### Firmware Upgrade On SIWx917 NCP
+
+1. Connect USB-UART Cable to Machine and WPK board as well with SOC Mounted on it.
+
+    ![Connect NCP Board](./images/ncp-board-connect.png)
+
+2. Connect USB-UART Cable 2(Yellow) to F9 and 3(Green) to F8 on WPK Board shown below.
+
+    ![Connect Port Wires](./images/connect-board-port.png)
+
+3. Configure your terminal application with the following settings:
+
+   - Configure the serial port settings to 115200 baud / 8-bit data / No parity / 1 stop bit
+   - Enable local echo
+   - Set receive and transmit new-line characters to CR+LF
+
+4. Refer to [Setup Tera Term and Updating the Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup).
+
+    ```shell
+    Instructions are the same for both SiWx917 NCP and RS9116 EVK.
+    ```
+
+5. Once firmware flashing is done The console displays **Loading...** followed by **Loading Done**.
 
 ### Troubleshoot NCP Firmware Update Failure
 If the firmware update fails, try the following:

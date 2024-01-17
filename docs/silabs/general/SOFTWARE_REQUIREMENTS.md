@@ -143,21 +143,27 @@ $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.
 
 ## Wi-Fi Specific Requirements:
 
-Before you run the demo or development on the Wi-Fi, please be sure that you update the NCP firmware to the latest version.
+### Software Packages Required for Wi-Fi EFR32 NCP Devices
 
-Pre-Built firmware images are available in the github repository under `third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
+1. GeckoSDK package.
+2. WiseConnect SDK v2.x for RS9116 NCP.
+3. Wiseconnect SDK v3.x for SiWx917 NCP.
+4. [Firmware for RS9116 NCP](../general/ARTIFACTS.md#rs9116-firmware)
+5. [Firmware for SiWx917 NCP](../general/ARTIFACTS.md#siwx917-firmware-for-siwx917-ncp)
 
-1. [Setting up TeraTerm](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup)
-2. [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware)
+### Software Packages Required for Wi-Fi SiWx917 SoC Devices
 
+1. GeckoSDK package.
+2. WiSeConnect SDK v3.x.
+3. [Firmware for SoC](../general/ARTIFACTS.md#siwx917-firmware-for-siwx917-soc)
 
-## Wi-Fi SiWx917 Specific Requirements:
+**Note:**
+Before you run the demo or development on the Wi-Fi, please be sure that you update the NCP or SiWx917 firmware to the latest version.
 
-Before you run the demo or development on the SiWx917, please be sure that you update the SiWx917 firmware to the latest version.
-
-Pre-Built SiWx917 firmware images are available in the github repository under `third_party/silabs/wifi-sdk/connectivity_firmware`
+Pre-Built firmware images are available in the following path of github repository:
+   1. For RS9116 NCP images: under `third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
+   2. For SiWx917 NCP & SoC images: under `third_party/silabs/wifi-sdk/connectivity_firmware`
 
 1. [Setting up TeraTerm](https://docs.silabs.com/SiWx917/wiseconnect/2.0/tera-term-setup)
-2. For updating the SiWx917 NCP Firmware, refer [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware). 
-Instructions are the same for both SiWx917 and RS9116.
-3. For updating the SiWx917 SoC Firmware, refer [Updating the SiWx917 SOC Firmware Using Simplicity Commander](../wifi/RUN_DEMO_SiWx917_SoC.md#steps-to-update-the-firmware-on-siwx917-soc-radio-board-using-simplicity-commander)
+2. [Updating the RS9116 or SiWx917 NCP Firmware](../wifi/RUN_DEMO.md#steps-to-update-the-firmware-on-ncp-boards-using-tera-term)
+3. [Updating the SiWx917 SOC Firmware Using Simplicity Commander](../wifi/RUN_DEMO_SiWx917_SoC.md#steps-to-update-the-firmware-on-siwx917-soc-radio-board-using-simplicity-commander)

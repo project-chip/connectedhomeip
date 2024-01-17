@@ -17,11 +17,17 @@ For WF200:-
 ./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/wf200_lock BRD41xxx chip_build_libshell=true --wifi wf200
 
 For RS9116:-
-./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/rs911x_lock BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=true chip_enable_ble_rs911x=true --wifi rs9116
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/rs911x_lock BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=true --wifi rs9116
+
+For SiWx917 NCP:-
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/siwx917_lock BRD41xxx disable_lcd=true use_external_flash=false chip_build_libshell=true --wifi SiWx917 
+
+For SiWx917 SoC:-
+./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/SiWx917_lock BRD4338A chip_build_libshell=true
 ```
 
 3. Connect Matter Device to the machine.
-
+  
 4. Flash the Builded binary to the board by following, [Flashing the Silabs Device](../general/FLASH_SILABS_DEVICE.md) document.
 
 5. After successful flashing commission the device , refer [Commission Matter Platform](../wifi/RUN_DEMO.md#demo-execution---commissioning-a-wi-fi-device-using-chip-tool-for-linux)

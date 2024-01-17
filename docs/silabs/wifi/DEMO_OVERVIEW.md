@@ -22,7 +22,7 @@ of two platforms, either Linux/Mac or Raspberry Pi.
 
 ## Step 3: Building the Matter Accessory Device (MAD) for Wi-Fi
 
-To build a Matter of Wi-Fi Accessory Device, follow the steps in the [Software Setup](SW_SETUP.md)
+To build a Matter Wi-Fi Accessory Device, follow the steps in the [Software Setup](SW_SETUP.md)
 
 Build commands are provided for the EFR32MG24 host processor, with the RS9116, SiWx917 and WF200 network co-processors.
 
