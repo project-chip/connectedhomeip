@@ -346,7 +346,7 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
 
     ChipLogProgress(Zcl, "DEM: Good PowerAdjustRequest() args.");
 
-    status = mDelegate.PowerAdjustRequest(power, durationSec);
+    status = mDelegate.PowerAdjustRequest(power, durationSec, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -476,7 +476,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     }
 
     ChipLogProgress(Zcl, "DEM: Good requestedStartTimeEpoch %ld.", static_cast<long unsigned int>(requestedStartTimeEpoch));
-    status = mDelegate.StartTimeAdjustRequest(requestedStartTimeEpoch);
+    status = mDelegate.StartTimeAdjustRequest(requestedStartTimeEpoch, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -574,7 +574,7 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    status = mDelegate.PauseRequest(duration);
+    status = mDelegate.PauseRequest(duration, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -628,7 +628,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments);
+    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -642,7 +642,8 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
 {
     Status status;
 
-    AdjustmentCauseEnum adjustmentCause = commandData.cause;
+    DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> constraints = commandData.constraints;
+    AdjustmentCauseEnum adjustmentCause                                             = commandData.cause;
 
     status = CheckOptOutAllowsRequest(adjustmentCause);
     if (status != Status::Success)
@@ -652,7 +653,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
         return;
     }
 
-    status = mDelegate.RequestConstraintBasedForecast(commandData.constraints);
+    status = mDelegate.RequestConstraintBasedForecast(constraints, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {

@@ -36,16 +36,18 @@ namespace DeviceEnergyManagement {
 class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 {
 public:
-    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration) override;
+    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) override;
     virtual Status CancelPowerAdjustRequest() override;
-    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime) override;
-    virtual Status PauseRequest(const uint32_t duration) override;
+    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) override;
+    virtual Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) override;
     virtual Status ResumeRequest() override;
     virtual Status
     ModifyForecastRequest(const uint32_t forecastId,
-                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments) override;
-    virtual Status RequestConstraintBasedForecast(
-        const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints) override;
+                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+                          AdjustmentCauseEnum cause) override;
+    virtual Status
+    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints,
+                                   AdjustmentCauseEnum cause) override;
     virtual Status CancelRequest() override;
 
     // ------------------------------------------------------------------

@@ -52,7 +52,7 @@ public:
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration) = 0;
+    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate SHALL make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -76,7 +76,7 @@ public:
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
      * IM_Status.
      */
-    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime) = 0;
+    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for PauseRequest command
@@ -91,7 +91,7 @@ public:
      * @param duration Duration that the ESA SHALL be paused for.
      * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
-    virtual Status PauseRequest(const uint32_t duration) = 0;
+    virtual Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for ResumeRequest command
@@ -119,7 +119,8 @@ public:
      *          SHALL be rejected returning other IM_Status.
      */
     virtual Status ModifyForecastRequest(const uint32_t forecastId,
-                                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments) = 0;
+                                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
+                                         AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for RequestConstraintBasedForecast
@@ -132,8 +133,8 @@ public:
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
-    virtual Status
-    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints) = 0;
+    virtual Status RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints,
+                                                  AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for CancelRequest
