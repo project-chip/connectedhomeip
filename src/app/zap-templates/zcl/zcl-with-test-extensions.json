@@ -380,10 +380,15 @@
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
             "CookTime",
+            "MaxCookTime",
             "PowerSetting",
             "MinPower",
             "MaxPower",
-            "PowerStep"
+            "PowerStep",
+            "SupportedWatts",
+            "SelectedWattIndex",
+            "WattRating",
+            "FeatureMap"
         ],
         "Laundry Washer Mode": [
             "SupportedModes",

@@ -17059,9 +17059,11 @@ namespace Commands {
 namespace SetCookingParameters {
 enum class Fields : uint8_t
 {
-    kCookMode     = 0,
-    kCookTime     = 1,
-    kPowerSetting = 2,
+    kCookMode          = 0,
+    kCookTime          = 1,
+    kPowerSetting      = 2,
+    kWattSettingIndex  = 3,
+    kStartAfterSetting = 4,
 };
 
 struct Type
@@ -17074,6 +17076,8 @@ public:
     Optional<uint8_t> cookMode;
     Optional<uint32_t> cookTime;
     Optional<uint8_t> powerSetting;
+    Optional<uint8_t> wattSettingIndex;
+    Optional<bool> startAfterSetting;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -17091,6 +17095,8 @@ public:
     Optional<uint8_t> cookMode;
     Optional<uint32_t> cookTime;
     Optional<uint8_t> powerSetting;
+    Optional<uint8_t> wattSettingIndex;
+    Optional<bool> startAfterSetting;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCookingParameters
@@ -17142,6 +17148,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CookTime
+namespace MaxCookTime {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxCookTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxCookTime
 namespace PowerSetting {
 struct TypeInfo
 {
@@ -17190,6 +17208,42 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerStep
+namespace SupportedWatts {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const uint16_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedWatts::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedWatts
+namespace SelectedWattIndex {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SelectedWattIndex::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SelectedWattIndex
+namespace WattRating {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MicrowaveOvenControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WattRating::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace WattRating
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -17236,10 +17290,14 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::CookTime::TypeInfo::DecodableType cookTime         = static_cast<uint32_t>(0);
+        Attributes::MaxCookTime::TypeInfo::DecodableType maxCookTime   = static_cast<uint32_t>(0);
         Attributes::PowerSetting::TypeInfo::DecodableType powerSetting = static_cast<uint8_t>(0);
         Attributes::MinPower::TypeInfo::DecodableType minPower         = static_cast<uint8_t>(0);
         Attributes::MaxPower::TypeInfo::DecodableType maxPower         = static_cast<uint8_t>(0);
         Attributes::PowerStep::TypeInfo::DecodableType powerStep       = static_cast<uint8_t>(0);
+        Attributes::SupportedWatts::TypeInfo::DecodableType supportedWatts;
+        Attributes::SelectedWattIndex::TypeInfo::DecodableType selectedWattIndex = static_cast<uint8_t>(0);
+        Attributes::WattRating::TypeInfo::DecodableType wattRating               = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
