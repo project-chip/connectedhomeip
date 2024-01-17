@@ -117,7 +117,8 @@
         "random": "cpp",
         "thread": "cpp",
         "variant": "cpp",
-        "any": "cpp"
+        "any": "cpp",
+        "forward_list": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {

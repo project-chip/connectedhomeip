@@ -216,7 +216,7 @@ config NET_L2_OPENTHREAD
 
 choice CHIP_THREAD_DEVICE_ROLE
     prompt "Thread network device role"
-    default CHIP_THREAD_DEVICE_ROLE_ROUTER
+    default CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE
 config CHIP_THREAD_DEVICE_ROLE_ROUTER
 	depends on !PM
 	bool "thread device router"

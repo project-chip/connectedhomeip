@@ -66,8 +66,10 @@ public:
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t * value);
     void InitiateBlinkAction(uint32_t onTimeMS, uint32_t offTimeMS);
     void InitiateBreatheAction(BreatheType_t type, uint32_t cycleTimeMS);
+    void InitiateMotorAction(uint32_t cycleTimeMS);
     void StopAction(void);
     void UpdateAction(void);
+    void UpdateMotorAction(void);
 
 private:
     State_t mState;

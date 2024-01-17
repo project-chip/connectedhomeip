@@ -24,6 +24,7 @@ struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
 class LEDWidget;
+class MotorWidget;
 
 struct AppEvent
 {
@@ -39,7 +40,10 @@ struct AppEvent
         kEventType_Install,
         kEventType_Contact,
         kEventType_Start,
-        kEventType_Lock
+        kEventType_Lock,
+        kEventType_MotorStop,
+        kEventType_MotorStateUpdate,
+        kEventType_ButtonReleaseCheck
     };
 
     uint16_t Type;
@@ -72,6 +76,10 @@ struct AppEvent
         {
             LEDWidget * LedWidget;
         } UpdateLedStateEvent;
+        struct
+        {
+            MotorWidget * motorWidget;
+        } UpdateMotorStateEvent;
     };
 
     EventHandler Handler;

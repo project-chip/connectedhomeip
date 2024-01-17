@@ -33,6 +33,8 @@
 #include "WS2812Device.h"
 #endif
 
+#include "MotorWidget.h"
+
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
@@ -101,6 +103,9 @@ protected:
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
+    EventHandler UserFactoryResetHandler;
+    void SetFactoryResetButtonCallbacks(EventHandler aAction_CB);
+    static void FactoryReset(void);
 
 #if APP_USE_BLE_START_BUTTON
     static void StartBleAdvButtonEventHandler(void);
@@ -132,6 +137,7 @@ protected:
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void UpdateStatusLED(void);
+    static void UpdateStatusLEDExt(bool MotorIsOn, bool WaitFactoryReset);
 #endif
 
 #if CONFIG_CHIP_FACTORY_DATA

@@ -19,11 +19,17 @@
 #pragma once
 
 #include "AppTaskCommon.h"
+#include "ContactSensorManager.h"
+
+#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
 
 class AppTask : public AppTaskCommon
 {
 public:
     void UpdateClusterState();
+
+    bool IsSyncClusterToButtonAction(void);
+    void SetSyncClusterToButtonAction(bool value);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -33,10 +39,36 @@ private:
 
     static void SwitchActionEventHandler(AppEvent * aEvent);
 
+    static void ContactActionEventHandler(AppEvent * aEvent);
+
+    static void OnStateChanged(ContactSensorManager::State aState);
+
+    static void UpdateClusterStateInternal(intptr_t arg);
+
+    static void FactoryResetEventHandler(AppEvent * aEvent);
+    static void MotorStateUpdateHandler(MotorWidget * motorWidget);
+    static void MotorStopHandler(MotorWidget * motorWidget);
+    static void UpdateMotorEventHandler(AppEvent * aEvent);
+    static void UpdateMotor();
+    static void buttonReleaseCheckTimerHandler(k_timer * timer);
+    static void buttonReleaseCheckEventHandler(AppEvent * aEvent);
+
+    bool mSyncClusterToButtonAction = false;
+
     static AppTask sAppTask;
 };
 
 inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
+}
+
+inline bool AppTask::IsSyncClusterToButtonAction()
+{
+    return mSyncClusterToButtonAction;
+}
+
+inline void AppTask::SetSyncClusterToButtonAction(bool value)
+{
+    mSyncClusterToButtonAction = value;
 }

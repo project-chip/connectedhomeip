@@ -11,45 +11,64 @@
 		/delete-property/ led2;
 		/delete-property/ led3;
 		/delete-property/ mcuboot-led0;
-		/delete-property/ pwm-led0;
-		/delete-property/ pwm-0;
+		led0 = &led_blue;
+		sw0 = &key_switch;
+		motorsleep = &motor_sleep;
+		motordetect = &motor_detect;
+		pwmmotorin1 = &pwm_motor_1;
+		pwmmotorin2 = &pwm_motor_2;
 	};
 
-	/delete-node/ leds;
-	/delete-node/ pwm_leds;
-
 	keys {
-		/delete-node/ button_1;
-		/delete-node/ button_3;
-		compatible = "gpio-keys";
-		key_1: button_1 {
-			gpios = <&gpiod 2 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_2: button_2 {
-			gpios = <&gpiod 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_3: button_3 {
-			gpios = <&gpiod 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
-		key_4: button_4 {
-			gpios = <&gpiof 6 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-		};
+		/delete-node/ button_switch;
 
-		key_matrix_col1: key_matrix_col1 {
-			gpios = <&gpiod 6 GPIO_ACTIVE_HIGH>;
+		key_switch: button_switch {
+			label = "BUTTON SWITCH";
+			gpios = <&gpioa 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 		};
-		key_matrix_col2: key_matrix_col2 {
-			gpios = <&gpiof 6 GPIO_ACTIVE_HIGH>;
+		motor_detect: motor_switch {
+			label = "MOTOR SWITCH";
+			gpios = <&gpioc 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
 		};
-		key_matrix_row1: key_matrix_row1 {
-			gpios = <&gpiod 2 GPIO_PULL_DOWN>;
+	};
+	leds {
+		/delete-node/ led_0;
+
+		led_blue: led_0 {
+			gpios = <&gpioc 2 GPIO_ACTIVE_HIGH>;
+			label = "LED Blue";
 		};
-		key_matrix_row2: key_matrix_row2 {
-			gpios = <&gpiod 7 GPIO_PULL_DOWN>;
+		motor_sleep: io_sleep {
+			gpios = <&gpioa 1 GPIO_ACTIVE_LOW>;
+			label = "Motor sleep";
 		};
+	};
+	pwm_leds {
+		/delete-node/ pwm_led_0;
+		pwm_led0: pwm_led_0 {
+			pwms = <&pwm0 3 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM LED Blue";
+		};
+		pwm_motor_1: pwm_in_0 {
+			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM motor in1";
+		};
+		pwm_motor_2: pwm_in_1 {
+			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM motor in2";
+		};
+    };
+};
+
+&pinctrl {
+	pwm_ch0_pa2_default: pwm_ch0_pa2_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_A, B9x_PIN_2, B92_FUNC_PWM0)>;
+	};
+	pwm_ch1_pa3_default: pwm_ch1_pa3_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_A, B9x_PIN_3, B92_FUNC_PWM1)>;
 	};
 };
 
 &pwm0 {
-	status = "disabled";
+	pinctrl-0 = <&pwm_ch0_pa2_default &pwm_ch1_pa3_default>;
 };

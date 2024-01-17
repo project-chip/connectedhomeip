@@ -47,7 +47,7 @@ constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios);
+const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_switch), gpios);
 #if APP_USE_BLE_START_BUTTON
 const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
 #endif
@@ -73,7 +73,7 @@ constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
 constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
 constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
 
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
+const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwmmotorin1));
 #endif
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
@@ -105,6 +105,9 @@ bool sIsThreadProvisioned   = false;
 bool sIsThreadEnabled       = false;
 bool sIsThreadAttached      = false;
 bool sHaveBLEConnections    = false;
+bool sIsBLEAdvertising      = false;
+bool sMotorIsOn             = false;
+bool sWaitFactoryReset      = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
@@ -261,7 +264,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Initialize status LED
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(system_state_led), gpios, {}));
+    sStatusLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios));
 
     UpdateStatusLED();
 #endif
@@ -450,16 +453,31 @@ void AppTaskCommon::UpdateStatusLED()
     {
         if (sIsThreadAttached)
         {
-            sStatusLED.Blink(950, 50);
+            sStatusLED.Blink(50, 5000);
         }
         else
         {
-            sStatusLED.Blink(100, 100);
+            sStatusLED.Blink(50, 300);
         }
     }
     else
     {
-        sStatusLED.Blink(50, 950);
+        if(sIsBLEAdvertising)
+            sStatusLED.Blink(200, 200);
+    }
+}
+
+void AppTaskCommon::UpdateStatusLEDExt(bool MotorIsOn, bool WaitFactoryReset)
+{
+    sMotorIsOn             = MotorIsOn;
+    sWaitFactoryReset      = WaitFactoryReset;
+    if (!sMotorIsOn && !sWaitFactoryReset)
+    {
+        UpdateStatusLED();
+    }
+    else
+    {
+        sStatusLED.Set(true);
     }
 }
 #endif
@@ -570,7 +588,10 @@ void AppTaskCommon::FactoryResetButtonEventHandler(void)
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = FactoryResetHandler;
+    if(GetAppTask().UserFactoryResetHandler)
+        event.Handler            = GetAppTask().UserFactoryResetHandler;
+    else
+        event.Handler            = FactoryResetHandler;
     GetAppTask().PostEvent(&event);
 }
 
@@ -591,6 +612,11 @@ void AppTaskCommon::FactoryResetHandler(AppEvent * aEvent)
 
         chip::Server::GetInstance().ScheduleFactoryReset();
     }
+}
+
+void AppTaskCommon::FactoryReset(void)
+{
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void AppTaskCommon::FactoryResetTimerTimeoutCallback(k_timer * timer)
@@ -617,6 +643,10 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
+void AppTaskCommon::SetFactoryResetButtonCallbacks(EventHandler aAction_CB)
+{
+    UserFactoryResetHandler = aAction_CB;
+}
 #if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
@@ -678,6 +708,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+        sIsBLEAdvertising   = ConnectivityMgr().IsBLEAdvertisingEnabled();
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
 #endif
