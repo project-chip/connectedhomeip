@@ -951,7 +951,7 @@ class ChipDeviceControllerBase():
                       - A value of `None` indicates success.
                       - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
                         contain `interaction_model.Status.UnsupportedCommand`.
-                      - If a command is not responded to by server, command will contain `interaction_model.Status.Failure`
+                      - If a command is not responded to by server, command will contain `interaction_model.Status.NoCommandResponse`
         Raises:
             - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
         '''

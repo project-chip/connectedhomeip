@@ -327,17 +327,29 @@ def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTim
 def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
                       timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
                       suppressResponse: Optional[bool] = None) -> PyChipError:
-    ''' Send a cluster-object encapsulated command to a device and does the following:
-            - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
-            - None (on a successful response containing no data)
-            - Raises an exception if any errors are encountered.
+    ''' Initiates an InvokeInteraction with the batch commands provided.
 
-        If no response type is provided above, the type will be automatically deduced.
+    Arguments:
+        - timedRequestTimeoutMs: If a valid value is provided, a timed interaction will be initiated.
+        - interactionTimeoutMs: If a valid value is provided, the interaction will terminate with a
+          CHIP_ERROR_TIMEOUT if a response is not received within the specified timeout. If not provided,
+          a suitable value will be automatically computed based on transport characteristics and
+          receiver responsiveness.
 
-        If a valid timedRequestTimeoutMs is provided, a timed interaction will be initiated instead.
-        If a valid interactionTimeoutMs is provided, the interaction will terminate with a CHIP_ERROR_TIMEOUT if a response
-        has not been received within that timeout. If it isn't provided, a sensible value will be automatically computed that
-        accounts for the underlying characteristics of both the transport and the responsiveness of the receiver.
+    Returns:
+        - PyChipError: Indicates the outcome of initiating the InvokeRequest. Upon success the caller
+          is expected to await on `future` to get result of the InvokeInteraction.
+
+    Results passed via the provided future:
+        - Successful InvokeInteraction with path-specific responses (including path-specific errors):
+            - A list of responses is returned in the same order as the `commands` argument.
+            - Possible response elements:
+                - `None`: Successful command execution without additional cluster data.
+                - Encapsulated cluster-object: Successful command with response data.
+                - interaction_model.Status.*: Command failure with IM Status.
+                - interaction_model.Status.NoCommandResponse: No response from the server for
+                  a specific command.
+        - Non-path-specific error: An `InteractionModelError` exception is raised through the future.
     '''
     handle = chip.native.GetLibraryHandle()
 
