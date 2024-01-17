@@ -72,7 +72,7 @@ CHIP_ERROR Instance::Init()
 
     // Check that the feature bits do not include both PowerAsNumber and PowerInWatts
     VerifyOrReturnError(
-        !mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) || !mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts),
+        !(mFeature.Has(MicrowaveOvenControl::Feature::kPowerAsNumber) && mFeature.Has(MicrowaveOvenControl::Feature::kPowerInWatts)),
         CHIP_ERROR_INVALID_ARGUMENT,
         ChipLogError(Zcl,
                      "Microwave Oven Control: feature bits error, feature could not support both PowerAsNumber and PowerInWatts"));
