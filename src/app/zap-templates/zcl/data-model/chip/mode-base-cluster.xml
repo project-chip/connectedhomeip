@@ -82,11 +82,11 @@ This is because zap does not currently support generating code for clusters that
 <!--    </command>-->
 <!--  </cluster>-->
 
+  <!-- The feature map for the RvcRunMode (0x0054) and RvcCleanMode (0x0055) clusters is implemented in their respective files -->
   <bitmap name="Feature" type="bitmap32">
 <!--    <cluster code="0x..."/>-->
     <cluster code="0x0051"/>
     <cluster code="0x0052"/>
-    <!-- Feature OnOff with code 0x01 is deprecated for the RvcRunMode (0x0054) and RvcCleanMode (0x0055) clusters -->
     <cluster code="0x0059"/>
     <cluster code="0x005E"/>
     <cluster code="0x0049"/>
