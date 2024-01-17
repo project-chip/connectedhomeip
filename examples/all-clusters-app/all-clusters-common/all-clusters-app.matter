@@ -7340,6 +7340,7 @@ endpoint 1 {
     callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
@@ -7353,6 +7354,7 @@ endpoint 1 {
     callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
@@ -7500,6 +7502,7 @@ endpoint 1 {
     callback attribute operationalError;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
+    callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
@@ -7576,7 +7579,6 @@ endpoint 1 {
     ram      attribute targetLevel;
     persist  attribute defaultOpenLevel default = 100;
     ram      attribute valveFault default = 0;
-    ram      attribute levelStep default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -8261,8 +8263,6 @@ endpoint 1 {
     handle command TestSimpleOptionalArgumentRequest;
     handle command TestEmitTestEventRequest;
     handle command TestEmitTestFabricScopedEventRequest;
-    handle command TestBatchHelperRequest;
-    handle command TestSecondBatchHelperRequest;
   }
 }
 endpoint 2 {
