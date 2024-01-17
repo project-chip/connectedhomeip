@@ -998,6 +998,10 @@ namespace RequestConstraintBasedForecast {
 static constexpr CommandId Id = 0x00000006;
 } // namespace RequestConstraintBasedForecast
 
+namespace CancelRequest {
+static constexpr CommandId Id = 0x00000007;
+} // namespace CancelRequest
+
 } // namespace Commands
 } // namespace DeviceEnergyManagement
 

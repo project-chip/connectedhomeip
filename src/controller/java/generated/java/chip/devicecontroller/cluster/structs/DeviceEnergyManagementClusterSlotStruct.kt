@@ -30,9 +30,9 @@ class DeviceEnergyManagementClusterSlotStruct(
   val defaultDuration: ULong,
   val elapsedSlotTime: ULong,
   val remainingSlotTime: ULong,
-  val slotIsPauseable: Boolean,
-  val minPauseDuration: ULong,
-  val maxPauseDuration: ULong,
+  val slotIsPauseable: Optional<Boolean>,
+  val minPauseDuration: Optional<ULong>,
+  val maxPauseDuration: Optional<ULong>,
   val manufacturerESAState: Optional<UInt>,
   val nominalPower: Optional<Long>,
   val minPower: Optional<Long>,
@@ -75,9 +75,18 @@ class DeviceEnergyManagementClusterSlotStruct(
       put(ContextSpecificTag(TAG_DEFAULT_DURATION), defaultDuration)
       put(ContextSpecificTag(TAG_ELAPSED_SLOT_TIME), elapsedSlotTime)
       put(ContextSpecificTag(TAG_REMAINING_SLOT_TIME), remainingSlotTime)
-      put(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE), slotIsPauseable)
-      put(ContextSpecificTag(TAG_MIN_PAUSE_DURATION), minPauseDuration)
-      put(ContextSpecificTag(TAG_MAX_PAUSE_DURATION), maxPauseDuration)
+      if (slotIsPauseable.isPresent) {
+        val optslotIsPauseable = slotIsPauseable.get()
+        put(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE), optslotIsPauseable)
+      }
+      if (minPauseDuration.isPresent) {
+        val optminPauseDuration = minPauseDuration.get()
+        put(ContextSpecificTag(TAG_MIN_PAUSE_DURATION), optminPauseDuration)
+      }
+      if (maxPauseDuration.isPresent) {
+        val optmaxPauseDuration = maxPauseDuration.get()
+        put(ContextSpecificTag(TAG_MAX_PAUSE_DURATION), optmaxPauseDuration)
+      }
       if (manufacturerESAState.isPresent) {
         val optmanufacturerESAState = manufacturerESAState.get()
         put(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE), optmanufacturerESAState)
@@ -153,9 +162,24 @@ class DeviceEnergyManagementClusterSlotStruct(
       val defaultDuration = tlvReader.getULong(ContextSpecificTag(TAG_DEFAULT_DURATION))
       val elapsedSlotTime = tlvReader.getULong(ContextSpecificTag(TAG_ELAPSED_SLOT_TIME))
       val remainingSlotTime = tlvReader.getULong(ContextSpecificTag(TAG_REMAINING_SLOT_TIME))
-      val slotIsPauseable = tlvReader.getBoolean(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE))
-      val minPauseDuration = tlvReader.getULong(ContextSpecificTag(TAG_MIN_PAUSE_DURATION))
-      val maxPauseDuration = tlvReader.getULong(ContextSpecificTag(TAG_MAX_PAUSE_DURATION))
+      val slotIsPauseable =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_SLOT_IS_PAUSEABLE)))
+        } else {
+          Optional.empty()
+        }
+      val minPauseDuration =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MIN_PAUSE_DURATION))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MIN_PAUSE_DURATION)))
+        } else {
+          Optional.empty()
+        }
+      val maxPauseDuration =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAX_PAUSE_DURATION))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MAX_PAUSE_DURATION)))
+        } else {
+          Optional.empty()
+        }
       val manufacturerESAState =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE))) {
           Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MANUFACTURER_E_S_A_STATE)))

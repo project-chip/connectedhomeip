@@ -15830,6 +15830,8 @@ NS_ASSUME_NONNULL_BEGIN
         _power = @(0);
 
         _duration = @(0);
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15842,6 +15844,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.power = self.power;
     other.duration = self.duration;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15850,7 +15853,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: power:%@; duration:%@; >", NSStringFromClass([self class]), _power, _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: power:%@; duration:%@; cause:%@; >", NSStringFromClass([self class]), _power, _duration, _cause];
     return descriptionString;
 }
 
@@ -15867,6 +15870,9 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.duration = self.duration.unsignedIntValue;
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -15986,6 +15992,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _requestedStartTime = @(0);
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15997,6 +16005,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDeviceEnergyManagementClusterStartTimeAdjustRequestParams alloc] init];
 
     other.requestedStartTime = self.requestedStartTime;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16005,7 +16014,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestedStartTime:%@; >", NSStringFromClass([self class]), _requestedStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestedStartTime:%@; cause:%@; >", NSStringFromClass([self class]), _requestedStartTime, _cause];
     return descriptionString;
 }
 
@@ -16019,6 +16028,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.requestedStartTime = self.requestedStartTime.unsignedIntValue;
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16065,6 +16077,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _duration = @(0);
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16076,6 +16090,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDeviceEnergyManagementClusterPauseRequestParams alloc] init];
 
     other.duration = self.duration;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16084,7 +16099,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: duration:%@; >", NSStringFromClass([self class]), _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: duration:%@; cause:%@; >", NSStringFromClass([self class]), _duration, _cause];
     return descriptionString;
 }
 
@@ -16098,6 +16113,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.duration = self.duration.unsignedIntValue;
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16219,6 +16237,8 @@ NS_ASSUME_NONNULL_BEGIN
         _forecastId = @(0);
 
         _slotAdjustments = [NSArray array];
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16231,6 +16251,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.forecastId = self.forecastId;
     other.slotAdjustments = self.slotAdjustments;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16239,7 +16260,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; slotAdjustments:%@; >", NSStringFromClass([self class]), _forecastId, _slotAdjustments];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; slotAdjustments:%@; cause:%@; >", NSStringFromClass([self class]), _forecastId, _slotAdjustments, _cause];
     return descriptionString;
 }
 
@@ -16279,6 +16300,9 @@ NS_ASSUME_NONNULL_BEGIN
                 encodableStruct.slotAdjustments = ListType_0();
             }
         }
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16325,6 +16349,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _constraints = [NSArray array];
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16336,6 +16362,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDeviceEnergyManagementClusterRequestConstraintBasedForecastParams alloc] init];
 
     other.constraints = self.constraints;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16344,7 +16371,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: constraints:%@; >", NSStringFromClass([self class]), _constraints];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: constraints:%@; cause:%@; >", NSStringFromClass([self class]), _constraints, _cause];
     return descriptionString;
 }
 
@@ -16393,6 +16420,82 @@ NS_ASSUME_NONNULL_BEGIN
             }
         }
     }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDeviceEnergyManagementClusterCancelRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDeviceEnergyManagementClusterCancelRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterCancelRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Type encodableStruct;
+    ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
