@@ -41,8 +41,8 @@ source_set("handler") {
     "CheckInHandler.h",
     "DefaultCheckInDelegate.cpp",
     "DefaultCheckInDelegate.h",
-    "ICDRefreshKeyInfo.h",
     "ICDRefreshKeyInfo.cpp",
+    "ICDRefreshKeyInfo.h",
   ]
   public_deps = [
     ":manager",
