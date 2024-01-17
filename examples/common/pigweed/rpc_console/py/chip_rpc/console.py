@@ -27,9 +27,9 @@ Alternatively to connect to a linux CHIP device provide the port.
 This starts an IPython console for communicating with the connected device. A
 few variables are predefined in the interactive console. These include:
 
-    device  - the serial device used for communication
-    rpcs    - used to invoke RPCs
-    client  - the HDLC rpc client
+    rpcs   - used to invoke RPCs
+    device - the serial device used for communication
+    client - the HDLC rpc client
     protos - protocol buffer messages indexed by proto package
 
 An example RPC command:
