@@ -3,7 +3,8 @@ import glob
 import os
 import platform
 
-from chip.server.types import PostAttributeChangeCallback
+from chip.server.types import (ExternalAttributeReadCallback, ExternalAttributeWriteCallback, PostAttributeChangeCallback,
+                               PreAttributeChangeCallback)
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipServer.so"
 
@@ -73,7 +74,10 @@ class NativeLibraryHandleMethodArguments:
 _nativeLibraryHandle: ctypes.CDLL = None
 
 
-def GetLibraryHandle(cb: PostAttributeChangeCallback) -> ctypes.CDLL:
+def GetLibraryHandle(pre: PreAttributeChangeCallback = None,
+                     post: PostAttributeChangeCallback = None,
+                     read: ExternalAttributeReadCallback = None,
+                     write: ExternalAttributeWriteCallback = None) -> ctypes.CDLL:
     """Get a memoized handle to the chip native code dll."""
 
     global _nativeLibraryHandle
@@ -83,9 +87,9 @@ def GetLibraryHandle(cb: PostAttributeChangeCallback) -> ctypes.CDLL:
         setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
         setter.Set("pychip_server_native_init", None, [])
         setter.Set("pychip_server_set_callbacks",
-                   None, [PostAttributeChangeCallback])
+                   None, [PreAttributeChangeCallback, PostAttributeChangeCallback, ExternalAttributeReadCallback, ExternalAttributeWriteCallback])
 
         _nativeLibraryHandle.pychip_server_native_init()
-        _nativeLibraryHandle.pychip_server_set_callbacks(cb)
+        _nativeLibraryHandle.pychip_server_set_callbacks(pre, post, read, write)
 
     return _nativeLibraryHandle
