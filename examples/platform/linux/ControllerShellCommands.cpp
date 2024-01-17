@@ -287,7 +287,7 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         }
         char * eptr;
         uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
-        size_t index     = (size_t) strtol(argv[2], &eptr, 10);
+        size_t index      = (size_t) strtol(argv[2], &eptr, 10);
         return pairUDC(true, passcode, index);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE

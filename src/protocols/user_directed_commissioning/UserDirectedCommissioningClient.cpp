@@ -172,7 +172,7 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
 
-    return writer.GetLengthWritten() + sizeof(mInstanceName);
+    return writer.GetLengthWritten() + static_cast<uint32_t>(sizeof(mInstanceName));
 
 exit:
     ChipLogError(AppServer, "IdentificationDeclaration::WritePayload exiting early error %" CHIP_ERROR_FORMAT, err.Format());

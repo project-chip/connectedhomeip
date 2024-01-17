@@ -39,14 +39,14 @@ static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 static constexpr size_t kKeyLongIdleTimeICDMaxLength             = 1;
 
 // Commissionable/commissioner node TXT entries
-static constexpr size_t kKeyLongDiscriminatorMaxLength  = 5;
-static constexpr size_t kKeyVendorProductMaxLength      = 11;
-static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength         = 10;
-static constexpr size_t kKeyDeviceNameMaxLength         = 32;
-static constexpr size_t kKeyRotatingDeviceIdMaxLength   = 100;
-static constexpr size_t kKeyPairingInstructionMaxLength = 128;
-static constexpr size_t kKeyPairingHintMaxLength        = 10;
+static constexpr size_t kKeyLongDiscriminatorMaxLength    = 5;
+static constexpr size_t kKeyVendorProductMaxLength        = 11;
+static constexpr size_t kKeyCommissioningModeMaxLength    = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength           = 10;
+static constexpr size_t kKeyDeviceNameMaxLength           = 32;
+static constexpr size_t kKeyRotatingDeviceIdMaxLength     = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength   = 128;
+static constexpr size_t kKeyPairingHintMaxLength          = 10;
 static constexpr size_t kKeyCommissionerPasscodeMaxLength = 1;
 
 enum class TxtKeyUse : uint8_t

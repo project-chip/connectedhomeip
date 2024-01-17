@@ -168,22 +168,22 @@ public:
      */
     void Reset()
     {
-        mPeerAddress               = PeerAddress::Uninitialized();
-        mLongDiscriminator         = 0;
-        mVendorId                  = 0;
-        mProductId                 = 0;
-        mRotatingIdLen             = 0;
-        mCdPort                    = 0;
-        mDeviceName[0]             = '\0';
-        mPairingInst[0]            = '\0';
-        mPairingHint               = 0;
-        mNoPasscode                = false;
-        mCdUponPasscodeDialog      = false;
-        mCommissionerPasscode      = false;
-        mCommissionerPasscodeReady = false;
-        mCancelPasscode            = false;
-        mExpirationTime            = System::Clock::kZero;
-        mUDCClientProcessingState  = UDCClientProcessingState::kNotInitialized;
+        mPeerAddress                = PeerAddress::Uninitialized();
+        mLongDiscriminator          = 0;
+        mVendorId                   = 0;
+        mProductId                  = 0;
+        mRotatingIdLen              = 0;
+        mCdPort                     = 0;
+        mDeviceName[0]              = '\0';
+        mPairingInst[0]             = '\0';
+        mPairingHint                = 0;
+        mNoPasscode                 = false;
+        mCdUponPasscodeDialog       = false;
+        mCommissionerPasscode       = false;
+        mCommissionerPasscodeReady  = false;
+        mCancelPasscode             = false;
+        mExpirationTime             = System::Clock::kZero;
+        mUDCClientProcessingState   = UDCClientProcessingState::kNotInitialized;
         mCachedCommissionerPasscode = 0;
     }
 

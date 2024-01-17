@@ -246,7 +246,7 @@ public:
         }
         if (mCommissionerPasscodeReady)
         {
-            ChipLogDetail(AppServer, "\ttcommissioner passcode ready: true");
+            ChipLogDetail(AppServer, "\tcommissioner passcode ready: true");
         }
         if (mCancelPasscode)
         {
