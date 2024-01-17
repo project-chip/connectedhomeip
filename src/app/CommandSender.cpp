@@ -77,6 +77,12 @@ CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messagin
     assertChipStackLockedByCurrentThread();
 }
 
+CommandSender::CommandSender(bool aIsTimedRequest, bool aSuppressResponse) :
+    mExchangeCtx(*this), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
+{
+    assertChipStackLockedByCurrentThread();
+}
+
 CommandSender::~CommandSender()
 {
     assertChipStackLockedByCurrentThread();
@@ -440,6 +446,11 @@ CHIP_ERROR CommandSender::SetCommandSenderConfig(CommandSender::ConfigParameters
     VerifyOrReturnError(aConfigParams.remoteMaxPathsPerInvoke == 1, CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     return CHIP_NO_ERROR;
 #endif
+}
+
+void CommandSender::SetExchangeManager(Messaging::ExchangeManager * apExchangeMgr)
+{
+    mpExchangeMgr = apExchangeMgr;
 }
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs)

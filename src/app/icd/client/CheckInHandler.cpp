@@ -23,8 +23,8 @@
  */
 
 #include <app/InteractionModelTimeout.h>
-#include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/ICDRefreshKeyInfo.h>
 
 #include <cinttypes>
 
@@ -109,8 +109,13 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
 
     if (refreshKey)
     {
-        // TODO: A new CASE session should be established to re-register the client using a new key. The registration will happen in
-        // CASE session callback
+        ICDRefreshKeyInfo * refreshKeyInfo = mpCheckInDelegate->OnKeyRefreshNeeded(clientInfo);
+        if (refreshKeyInfo == nullptr)
+        {
+            ChipLogError(ICD, "Key Refresh failed");
+            return CHIP_NO_ERROR;
+        }
+        refreshKeyInfo->EstablishSessionToPeer();
     }
     else
     {

@@ -33,9 +33,11 @@ public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
+    virtual ICDRefreshKeyInfo * OnKeyRefreshNeeded(const ICDClientInfo & clientInfo) override;
 
 private:
-    ICDClientStorage * mpStorage = nullptr;
+    ICDClientStorage * mpStorage            = nullptr;
+    ICDRefreshKeyInfo * mpICDRefreshKeyInfo = nullptr;
 };
 
 } // namespace app

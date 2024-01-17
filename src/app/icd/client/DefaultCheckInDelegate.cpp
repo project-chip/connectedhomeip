@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include "CheckInHandler.h"
 #include <app/InteractionModelEngine.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/icd/client/ICDRefreshKeyInfo.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -44,5 +44,26 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 #endif
 }
 
+ICDRefreshKeyInfo * DefaultCheckInDelegate::OnKeyRefreshNeeded(const ICDClientInfo & clientInfo)
+{
+    if (mpICDRefreshKeyInfo != nullptr)
+    {
+        return nullptr;
+    }
+
+    mpICDRefreshKeyInfo = new ICDRefreshKeyInfo(this, clientInfo);
+    if (mpICDRefreshKeyInfo == nullptr)
+    {
+        return nullptr;
+    }
+
+    CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(mpICDRefreshKeyInfo->mNewKey.Bytes(), mpICDRefreshKeyInfo->mNewKey.Capacity());
+    if (err != CHIP_NO_ERROR)
+    {
+        return nullptr;
+    }
+
+    return mpICDRefreshKeyInfo;
+}
 } // namespace app
 } // namespace chip
