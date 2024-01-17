@@ -852,6 +852,34 @@ class ChipDeviceControllerBase():
 
         return res
 
+    async def TestOnlySendBatchCommands(self, nodeid: int, commands: typing.List[ClusterCommand.InvokeRequestInfo],
+                                        timedRequestTimeoutMs: typing.Optional[int] = None,
+                                        interactionTimeoutMs: typing.Optional[int] = None, busyWaitMs: typing.Optional[int] = None,
+                                        suppressResponse: typing.Optional[bool] = None, remoteMaxPathsPerInvoke: typing.Optional[int] = None,
+                                        suppressTimedRequestMessage: bool = False, commandRefsOverride: typing.Optional[typing.List[int]] = None):
+        '''
+
+        Please see SendBatchCommands for description.
+        TestOnly overridable arguments:
+            remoteMaxPathsPerInvoke: Overrides the number of batch commands we think can be sent to remote node.
+            suppressTimedRequestMessage: When set to true, we suppress sending Timed Request Message.
+            commandRefsOverride: List of commandRefs to use for each command with the same index in `commands`.
+        '''
+        self.CheckIsActive()
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid, timeoutMs=interactionTimeoutMs)
+
+        ClusterCommand.TestOnlySendBatchCommands(
+            future, eventLoop, device.deviceProxy, commands,
+            timedRequestTimeoutMs=timedRequestTimeoutMs,
+            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
+            remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
+            commandRefsOverride=commandRefsOverride).raise_on_error()
+        return await future
+
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeid: int, endpoint: int,
                                                                    payload: ClusterObjects.ClusterCommand, responseType=None):
         '''
@@ -927,7 +955,7 @@ class ChipDeviceControllerBase():
                       - A value of `None` indicates success.
                       - If only a single command fails, for example with `UNSUPPORTED_COMMAND`, the corresponding index associated with the command will,
                         contain `interaction_model.Status.UnsupportedCommand`.
-                      - If a command is not responded to by server, command will contain `interaction_model.Status.Failure`
+                      - If a command is not responded to by server, command will contain `interaction_model.Status.NoCommandResponse`
         Raises:
             - InteractionModelError if error with sending of InvokeRequestMessage fails as a whole.
         '''

@@ -112,6 +112,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case app::Clusters::LowPower::Id:
         emberAfLowPowerClusterInitCallback(endpoint);
         break;
+    case app::Clusters::MatterScenes::Id:
+        emberAfMatterScenesClusterInitCallback(endpoint);
+        break;
     case app::Clusters::MediaInput::Id:
         emberAfMediaInputClusterInitCallback(endpoint);
         break;
@@ -153,9 +156,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::RelativeHumidityMeasurement::Id:
         emberAfRelativeHumidityMeasurementClusterInitCallback(endpoint);
-        break;
-    case app::Clusters::Scenes::Id:
-        emberAfScenesClusterInitCallback(endpoint);
         break;
     case app::Clusters::SoftwareDiagnostics::Id:
         emberAfSoftwareDiagnosticsClusterInitCallback(endpoint);
@@ -374,6 +374,11 @@ void __attribute__((weak)) emberAfLowPowerClusterInitCallback(EndpointId endpoin
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfMatterScenesClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -440,11 +445,6 @@ void __attribute__((weak)) emberAfPumpConfigurationAndControlClusterInitCallback
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfRelativeHumidityMeasurementClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfScenesClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

@@ -102,7 +102,7 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster Scenes = 5 {
+server cluster MatterScenes = 98 {
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
   }
@@ -4221,7 +4221,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Scenes {
+  server cluster MatterScenes {
     ram      attribute sceneCount;
     ram      attribute currentScene;
     ram      attribute currentGroup;

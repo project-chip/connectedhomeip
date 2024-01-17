@@ -58,18 +58,6 @@ static id _Nullable DecodeEventPayloadForGroupsCluster(EventId aEventId, TLV::TL
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForScenesCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::Scenes;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForOnOffCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OnOff;
@@ -2353,6 +2341,18 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForScenesManagementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ScenesManagement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -4313,9 +4313,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::Groups::Id: {
         return DecodeEventPayloadForGroupsCluster(aPath.mEventId, aReader, aError);
     }
-    case Clusters::Scenes::Id: {
-        return DecodeEventPayloadForScenesCluster(aPath.mEventId, aReader, aError);
-    }
     case Clusters::OnOff::Id: {
         return DecodeEventPayloadForOnOffCluster(aPath.mEventId, aReader, aError);
     }
@@ -4480,6 +4477,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::RvcOperationalState::Id: {
         return DecodeEventPayloadForRVCOperationalStateCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ScenesManagement::Id: {
+        return DecodeEventPayloadForScenesManagementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return DecodeEventPayloadForHEPAFilterMonitoringCluster(aPath.mEventId, aReader, aError);

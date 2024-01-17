@@ -74,7 +74,7 @@ required."/>
     <cluster id="0x0004" name="Groups" side="client">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0005" name="Scenes" side="client">
+    <cluster id="0x0062" name="Scenes Management" side="client">
       <otherwiseConform>
         <provisionalConform/>
         <mandatoryConform/>

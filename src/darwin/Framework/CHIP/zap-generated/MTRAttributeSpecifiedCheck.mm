@@ -86,57 +86,6 @@ static BOOL AttributeIsSpecifiedInGroupsCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL AttributeIsSpecifiedInScenesCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::Scenes;
-    switch (aAttributeId) {
-    case Attributes::SceneCount::Id: {
-        return YES;
-    }
-    case Attributes::CurrentScene::Id: {
-        return YES;
-    }
-    case Attributes::CurrentGroup::Id: {
-        return YES;
-    }
-    case Attributes::SceneValid::Id: {
-        return YES;
-    }
-    case Attributes::NameSupport::Id: {
-        return YES;
-    }
-    case Attributes::LastConfiguredBy::Id: {
-        return YES;
-    }
-    case Attributes::SceneTableSize::Id: {
-        return YES;
-    }
-    case Attributes::FabricSceneInfo::Id: {
-        return YES;
-    }
-    case Attributes::GeneratedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::AcceptedCommandList::Id: {
-        return YES;
-    }
-    case Attributes::EventList::Id: {
-        return YES;
-    }
-    case Attributes::AttributeList::Id: {
-        return YES;
-    }
-    case Attributes::FeatureMap::Id: {
-        return YES;
-    }
-    case Attributes::ClusterRevision::Id: {
-        return YES;
-    }
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL AttributeIsSpecifiedInOnOffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OnOff;
@@ -2601,6 +2550,9 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttri
     case Attributes::CookTime::Id: {
         return YES;
     }
+    case Attributes::MaxCookTime::Id: {
+        return YES;
+    }
     case Attributes::PowerSetting::Id: {
         return YES;
     }
@@ -2611,6 +2563,15 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttri
         return YES;
     }
     case Attributes::PowerStep::Id: {
+        return YES;
+    }
+    case Attributes::SupportedWatts::Id: {
+        return YES;
+    }
+    case Attributes::SelectedWattIndex::Id: {
+        return YES;
+    }
+    case Attributes::WattRating::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -2701,6 +2662,57 @@ static BOOL AttributeIsSpecifiedInRVCOperationalStateCluster(AttributeId aAttrib
         return YES;
     }
     case Attributes::OperationalError::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ScenesManagement;
+    switch (aAttributeId) {
+    case Attributes::SceneCount::Id: {
+        return YES;
+    }
+    case Attributes::CurrentScene::Id: {
+        return YES;
+    }
+    case Attributes::CurrentGroup::Id: {
+        return YES;
+    }
+    case Attributes::SceneValid::Id: {
+        return YES;
+    }
+    case Attributes::NameSupport::Id: {
+        return YES;
+    }
+    case Attributes::LastConfiguredBy::Id: {
+        return YES;
+    }
+    case Attributes::SceneTableSize::Id: {
+        return YES;
+    }
+    case Attributes::FabricSceneInfo::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3769,6 +3781,48 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::ACCapacityformat::Id: {
+        return YES;
+    }
+    case Attributes::PresetTypes::Id: {
+        return YES;
+    }
+    case Attributes::ScheduleTypes::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfPresets::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfSchedules::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfScheduleTransitions::Id: {
+        return YES;
+    }
+    case Attributes::NumberOfScheduleTransitionPerDay::Id: {
+        return YES;
+    }
+    case Attributes::ActivePresetHandle::Id: {
+        return YES;
+    }
+    case Attributes::ActiveScheduleHandle::Id: {
+        return YES;
+    }
+    case Attributes::Presets::Id: {
+        return YES;
+    }
+    case Attributes::Schedules::Id: {
+        return YES;
+    }
+    case Attributes::PresetsSchedulesEditable::Id: {
+        return YES;
+    }
+    case Attributes::TemperatureSetpointHoldPolicy::Id: {
+        return YES;
+    }
+    case Attributes::SetpointHoldExpiryTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::QueuedPreset::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6249,9 +6303,6 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     case Clusters::Groups::Id: {
         return AttributeIsSpecifiedInGroupsCluster(aAttributeId);
     }
-    case Clusters::Scenes::Id: {
-        return AttributeIsSpecifiedInScenesCluster(aAttributeId);
-    }
     case Clusters::OnOff::Id: {
         return AttributeIsSpecifiedInOnOffCluster(aAttributeId);
     }
@@ -6416,6 +6467,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::RvcOperationalState::Id: {
         return AttributeIsSpecifiedInRVCOperationalStateCluster(aAttributeId);
+    }
+    case Clusters::ScenesManagement::Id: {
+        return AttributeIsSpecifiedInScenesManagementCluster(aAttributeId);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return AttributeIsSpecifiedInHEPAFilterMonitoringCluster(aAttributeId);

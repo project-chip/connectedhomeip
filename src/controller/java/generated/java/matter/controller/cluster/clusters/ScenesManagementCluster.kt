@@ -41,7 +41,10 @@ import matter.tlv.ContextSpecificTag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesCluster(private val controller: MatterController, private val endpointId: UShort) {
+class ScenesManagementCluster(
+  private val controller: MatterController,
+  private val endpointId: UShort
+) {
   class AddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
 
   class ViewSceneResponse(
@@ -50,7 +53,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val sceneID: UByte,
     val transitionTime: UShort?,
     val sceneName: String?,
-    val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
+    val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?
   )
 
   class RemoveSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
@@ -74,7 +77,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     val sceneID: UByte,
     val transitionTime: UShort?,
     val sceneName: String?,
-    val extensionFieldSets: List<ScenesClusterExtensionFieldSet>?
+    val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?
   )
 
   class CopySceneResponse(
@@ -93,10 +96,10 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     object SubscriptionEstablished : LastConfiguredByAttributeSubscriptionState()
   }
 
-  class FabricSceneInfoAttribute(val value: List<ScenesClusterSceneInfoStruct>)
+  class FabricSceneInfoAttribute(val value: List<ScenesManagementClusterSceneInfoStruct>)
 
   sealed class FabricSceneInfoAttributeSubscriptionState {
-    data class Success(val value: List<ScenesClusterSceneInfoStruct>) :
+    data class Success(val value: List<ScenesManagementClusterSceneInfoStruct>) :
       FabricSceneInfoAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : FabricSceneInfoAttributeSubscriptionState()
@@ -149,7 +152,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneID: UByte,
     transitionTime: UShort,
     sceneName: String,
-    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
+    extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
     timedInvokeTimeout: Duration? = null
   ): AddSceneResponse {
     val commandId: UInt = 0u
@@ -278,7 +281,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     var sceneName_decoded: String? = null
 
     val TAG_EXTENSION_FIELD_SETS: Int = 5
-    var extensionFieldSets_decoded: List<ScenesClusterExtensionFieldSet>? = null
+    var extensionFieldSets_decoded: List<ScenesManagementClusterExtensionFieldSet>? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
@@ -330,10 +333,10 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             null
           } else {
             if (tlvReader.isNextTag(tag)) {
-              buildList<ScenesClusterExtensionFieldSet> {
+              buildList<ScenesManagementClusterExtensionFieldSet> {
                 tlvReader.enterArray(tag)
                 while (!tlvReader.isEndOfContainer()) {
-                  add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                  add(ScenesManagementClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
                 }
                 tlvReader.exitContainer()
               }
@@ -717,7 +720,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     sceneID: UByte,
     transitionTime: UShort,
     sceneName: String,
-    extensionFieldSets: List<ScenesClusterExtensionFieldSet>,
+    extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
     timedInvokeTimeout: Duration? = null
   ): EnhancedAddSceneResponse {
     val commandId: UInt = 64u
@@ -846,7 +849,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
     var sceneName_decoded: String? = null
 
     val TAG_EXTENSION_FIELD_SETS: Int = 5
-    var extensionFieldSets_decoded: List<ScenesClusterExtensionFieldSet>? = null
+    var extensionFieldSets_decoded: List<ScenesManagementClusterExtensionFieldSet>? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
@@ -898,10 +901,10 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
             null
           } else {
             if (tlvReader.isNextTag(tag)) {
-              buildList<ScenesClusterExtensionFieldSet> {
+              buildList<ScenesManagementClusterExtensionFieldSet> {
                 tlvReader.enterArray(tag)
                 while (!tlvReader.isEndOfContainer()) {
-                  add(ScenesClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
+                  add(ScenesManagementClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
                 }
                 tlvReader.exitContainer()
               }
@@ -1684,11 +1687,11 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<ScenesClusterSceneInfoStruct> =
-      buildList<ScenesClusterSceneInfoStruct> {
+    val decodedValue: List<ScenesManagementClusterSceneInfoStruct> =
+      buildList<ScenesManagementClusterSceneInfoStruct> {
         tlvReader.enterArray(AnonymousTag)
         while (!tlvReader.isEndOfContainer()) {
-          add(ScenesClusterSceneInfoStruct.fromTlv(AnonymousTag, tlvReader))
+          add(ScenesManagementClusterSceneInfoStruct.fromTlv(AnonymousTag, tlvReader))
         }
         tlvReader.exitContainer()
       }
@@ -1737,11 +1740,11 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<ScenesClusterSceneInfoStruct> =
-            buildList<ScenesClusterSceneInfoStruct> {
+          val decodedValue: List<ScenesManagementClusterSceneInfoStruct> =
+            buildList<ScenesManagementClusterSceneInfoStruct> {
               tlvReader.enterArray(AnonymousTag)
               while (!tlvReader.isEndOfContainer()) {
-                add(ScenesClusterSceneInfoStruct.fromTlv(AnonymousTag, tlvReader))
+                add(ScenesManagementClusterSceneInfoStruct.fromTlv(AnonymousTag, tlvReader))
               }
               tlvReader.exitContainer()
             }
@@ -2304,7 +2307,7 @@ class ScenesCluster(private val controller: MatterController, private val endpoi
   }
 
   companion object {
-    private val logger = Logger.getLogger(ScenesCluster::class.java.name)
-    const val CLUSTER_ID: UInt = 5u
+    private val logger = Logger.getLogger(ScenesManagementCluster::class.java.name)
+    const val CLUSTER_ID: UInt = 98u
   }
 }
