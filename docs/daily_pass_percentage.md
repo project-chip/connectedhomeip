@@ -1,10 +1,10 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| tests                                   |          65 |
-| builds                                  |          94 |
-| darwin                                  |          94 |
-| bloat-check                             |          99 |
+| builds                                  |          87 |
+| build-example-stm32                     |          93 |
+| darwin                                  |          93 |
+| tests                                   |          93 |
 | build-example-mw320                     |         100 |
 | build-example-nrf-connect-sdk           |         100 |
 | build-example-ti-cc26x2x7               |         100 |
@@ -28,9 +28,9 @@
 | build-example-linux-standalone          |         100 |
 | build-example-mbed-os                   |         100 |
 | qemu                                    |         100 |
-| build-example-stm32                     |         100 |
 | cirque                                  |         100 |
 | build-example-efr32                     |         100 |
+| bloat-check                             |         100 |
 | darwin-tests                            |         100 |
 | build-example-bouffalolab               |         100 |
 | recent-fail-summary                     |         100 |
