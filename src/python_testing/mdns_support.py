@@ -95,6 +95,8 @@ class TxtRecordUtil:
                 `default_controller`.
         key: An optional string specifying which particular property to extract from 
                 the TXT record. If None, all properties will be returned.
+        refresh: An optional flag that skips returning cached values, it will peform
+                the calls again.
 
     Returns:
         The value of the specified key from the device's TXT record. If the key is None,
@@ -104,14 +106,14 @@ class TxtRecordUtil:
         AssertError: If the service information is not found or the MDNS operational 
                         service type is missing.
     """
-    async def get(self, key: str = None):
+    async def get(self, key: str = None, refresh = False):
         
         # Setup service listener
         await self._azc.async_remove_all_service_listeners()
         await self._azc.async_add_service_listener(MDNS_TYPE_OPERATIONAL, self._listener)
 
         # Fetch service types and cache them
-        if self._service_types is None:
+        if self._service_types is None or refresh:
             service_types = list(await AsyncZeroconfServiceTypes.async_find())
             asserts.assert_greater(len(service_types), 0, "No running services found")
             self._service_types = service_types
@@ -120,7 +122,7 @@ class TxtRecordUtil:
                           f"The MDNS operational service type '{MDNS_TYPE_OPERATIONAL}' was not found")
 
         # Fetch service info and properties (TXT) and cache them
-        if self._properties is None:
+        if self._properties is None or refresh:
             service_info: AsyncServiceInfo = await self._azc.async_get_service_info(
                 name=self._name,
                 type_=MDNS_TYPE_OPERATIONAL

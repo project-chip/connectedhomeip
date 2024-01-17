@@ -57,9 +57,9 @@ class TC_SC_4_10(MatterBaseTest):
         print("\n" * 10)
         
         tru = TxtRecordUtil(self)
-        SAI = await tru.get("SAI")
-        SII = await tru.get("SII")
-        props = await tru.get()
+        SAI = await tru.get(key="SAI", refresh=True)
+        SII = await tru.get(key="SII", refresh=True)
+        props = await tru.get(refresh=True)
 
         print(f"SAI: {SAI}")
         print(f"SII: {SII}")
