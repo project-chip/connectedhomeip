@@ -883,7 +883,7 @@ CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout *
     // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
     // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
     //
-    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    auto ourMrpConfig = GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig());
     auto publisherTransmissionTimeout =
         GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
                                  System::SystemClock().GetMonotonicTimestamp(), ourMrpConfig.mActiveThresholdTime);
