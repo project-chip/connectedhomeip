@@ -127,68 +127,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Groups
 
-namespace Scenes {
-namespace Attributes {
-
-namespace SceneCount {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace SceneCount
-
-namespace CurrentScene {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace CurrentScene
-
-namespace CurrentGroup {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace CurrentGroup
-
-namespace SceneValid {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace SceneValid
-
-namespace NameSupport {
-static constexpr AttributeId Id = 0x00000004;
-} // namespace NameSupport
-
-namespace LastConfiguredBy {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace LastConfiguredBy
-
-namespace SceneTableSize {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace SceneTableSize
-
-namespace FabricSceneInfo {
-static constexpr AttributeId Id = 0x00000007;
-} // namespace FabricSceneInfo
-
-namespace GeneratedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
-} // namespace GeneratedCommandList
-
-namespace AcceptedCommandList {
-static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
-} // namespace AcceptedCommandList
-
-namespace EventList {
-static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
-
-namespace AttributeList {
-static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
-} // namespace AttributeList
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace Scenes
-
 namespace OnOff {
 namespace Attributes {
 
@@ -3255,8 +3193,12 @@ namespace MicrowaveOvenControl {
 namespace Attributes {
 
 namespace CookTime {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace CookTime
+
+namespace MaxCookTime {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MaxCookTime
 
 namespace PowerSetting {
 static constexpr AttributeId Id = 0x00000002;
@@ -3273,6 +3215,18 @@ static constexpr AttributeId Id = 0x00000004;
 namespace PowerStep {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace PowerStep
+
+namespace SupportedWatts {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SupportedWatts
+
+namespace SelectedWattIndex {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace SelectedWattIndex
+
+namespace WattRating {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace WattRating
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -3408,6 +3362,68 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace RvcOperationalState
+
+namespace ScenesManagement {
+namespace Attributes {
+
+namespace SceneCount {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace SceneCount
+
+namespace CurrentScene {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CurrentScene
+
+namespace CurrentGroup {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace CurrentGroup
+
+namespace SceneValid {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace SceneValid
+
+namespace NameSupport {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace NameSupport
+
+namespace LastConfiguredBy {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastConfiguredBy
+
+namespace SceneTableSize {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SceneTableSize
+
+namespace FabricSceneInfo {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace FabricSceneInfo
+
+namespace GeneratedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
+} // namespace GeneratedCommandList
+
+namespace AcceptedCommandList {
+static constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
+} // namespace AcceptedCommandList
+
+namespace EventList {
+static constexpr AttributeId Id = Globals::Attributes::EventList::Id;
+} // namespace EventList
+
+namespace AttributeList {
+static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
+} // namespace AttributeList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ScenesManagement
 
 namespace HepaFilterMonitoring {
 namespace Attributes {
@@ -4721,6 +4737,62 @@ static constexpr AttributeId Id = 0x00000046;
 namespace ACCapacityformat {
 static constexpr AttributeId Id = 0x00000047;
 } // namespace ACCapacityformat
+
+namespace PresetTypes {
+static constexpr AttributeId Id = 0x00000048;
+} // namespace PresetTypes
+
+namespace ScheduleTypes {
+static constexpr AttributeId Id = 0x00000049;
+} // namespace ScheduleTypes
+
+namespace NumberOfPresets {
+static constexpr AttributeId Id = 0x0000004A;
+} // namespace NumberOfPresets
+
+namespace NumberOfSchedules {
+static constexpr AttributeId Id = 0x0000004B;
+} // namespace NumberOfSchedules
+
+namespace NumberOfScheduleTransitions {
+static constexpr AttributeId Id = 0x0000004C;
+} // namespace NumberOfScheduleTransitions
+
+namespace NumberOfScheduleTransitionPerDay {
+static constexpr AttributeId Id = 0x0000004D;
+} // namespace NumberOfScheduleTransitionPerDay
+
+namespace ActivePresetHandle {
+static constexpr AttributeId Id = 0x0000004E;
+} // namespace ActivePresetHandle
+
+namespace ActiveScheduleHandle {
+static constexpr AttributeId Id = 0x0000004F;
+} // namespace ActiveScheduleHandle
+
+namespace Presets {
+static constexpr AttributeId Id = 0x00000050;
+} // namespace Presets
+
+namespace Schedules {
+static constexpr AttributeId Id = 0x00000051;
+} // namespace Schedules
+
+namespace PresetsSchedulesEditable {
+static constexpr AttributeId Id = 0x00000052;
+} // namespace PresetsSchedulesEditable
+
+namespace TemperatureSetpointHoldPolicy {
+static constexpr AttributeId Id = 0x00000053;
+} // namespace TemperatureSetpointHoldPolicy
+
+namespace SetpointHoldExpiryTimestamp {
+static constexpr AttributeId Id = 0x00000054;
+} // namespace SetpointHoldExpiryTimestamp
+
+namespace QueuedPreset {
+static constexpr AttributeId Id = 0x00000055;
+} // namespace QueuedPreset
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
