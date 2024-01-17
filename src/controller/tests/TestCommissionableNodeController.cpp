@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "lib/dnssd/Resolver.h"
 #include <controller/CHIPCommissionableNodeController.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -43,7 +44,10 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
     CHIP_ERROR StopDiscovery(DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter, DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

@@ -59,6 +59,19 @@ public:
     virtual void OnOperationalNodeResolutionFailed(const PeerId & peerId, CHIP_ERROR error) = 0;
 };
 
+/// Callback for Browsing for nodes without resolving the DNS records
+///
+class OperationalBrowseDelegate
+{
+public:
+    virtual ~OperationalBrowseDelegate() = default;
+    /// Called within the CHIP event loop once a node is discovered.
+    ///
+    /// May be called multiple times as more nodes send their answer to a
+    /// multicast discovery query
+    virtual void OnOperationalNodeDiscovered(const OperationalNodeData & operationalData) = 0;
+};
+
 /**
  * Node discovery context class.
  *
@@ -91,8 +104,22 @@ public:
         }
     }
 
+    void SetOperationalBrowseDelegate(OperationalBrowseDelegate * delegate) { mBrowseOperationalDelegate = delegate; }
+
+    void OnOperationalNodeDiscovered(const OperationalNodeData & operationalData)
+    {
+        if (mBrowseOperationalDelegate != nullptr){
+            mBrowseOperationalDelegate->OnOperationalNodeDiscovered(operationalData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing Browse delegate. Data discarded");
+        }
+    }
+
 private:
     CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    OperationalBrowseDelegate * mBrowseOperationalDelegate = nullptr;
     Optional<intptr_t> mBrowseIdentifier;
 };
 
@@ -192,7 +219,21 @@ public:
     virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
-     * Stop discovery (of commissionable or commissioner nodes).
+     * @brief Start Browising for operational devices
+     *
+     * This will start periodical brwosing of operational devices. The when a new node is
+     * found the delegate set with SetOperationalBrowseDelegate is called. The mDNS queryies
+     * will continue unitil StopDiscovery is called.
+     *
+     * Note, this will locate all the Operational devices on the network. Typically an
+     * application would filter the found nodes by relevant fabrics.
+     *
+     * If needed a discovery filter may be specified to narrow the search.
+     */
+    virtual CHIP_ERROR DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context) = 0;
+
+    /**
+     * Stop discovery (of operational, commissionable or commissioner nodes).
      *
      * Some back ends may not support stopping discovery, so consumers should
      * not assume they will stop getting callbacks after calling this.

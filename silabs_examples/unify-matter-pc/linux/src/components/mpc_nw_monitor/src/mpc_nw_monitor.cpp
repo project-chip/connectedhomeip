@@ -83,7 +83,7 @@ static void generateUNID(string & unid)
 }
 
 #ifndef UMPC_DISABLE_DISCOVERY
-class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
+class OperationalDiscover : public chip::Dnssd::OperationalBrowseDelegate
 {
     bool needs_update(attribute node)
     {
@@ -255,11 +255,15 @@ static void mpc_start_node_discovery()
 {
 #ifndef UMPC_DISABLE_DISCOVERY
     static OperationalDiscover mDNSdiscover;
+    static chip::Dnssd::ResolverProxy * mResolver = nullptr;
+
     // Start discovering nodes
-    if (chip::Dnssd::Resolver::Instance().IsInitialized())
+    if (mResolver == nullptr)
     {
-        chip::Dnssd::Resolver::Instance().SetOperationalBrowseDelegate(&mDNSdiscover);
-        chip::Dnssd::Resolver::Instance().DiscoverOperational();
+        mResolver = Platform::New<chip::Dnssd::ResolverProxy>();
+        mResolver->Init();
+        mResolver->SetOperationalBrowseDelegate(&mDNSdiscover);
+        mResolver->DiscoverOperational();
     }
 #endif
 }

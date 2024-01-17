@@ -46,8 +46,6 @@ config("unify-config") {
   if (is_debug_build) {
     defines += [ "DEBUG_BUILD" ]
   }
-  # flag to temporarily disable node discovery until the changes are available from CSA
-  defines += ["UMPC_DISABLE_DISCOVERY"]
 }
 
 config("coverage") {

@@ -26,7 +26,10 @@ CHIP_ERROR ResolverProxy::Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEnd
 {
     VerifyOrReturnError(mContext == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(mResolver.Init(udpEndPoint));
+    if (!mResolver.IsInitialized())
+    {
+        ReturnErrorOnFailure(mResolver.Init(udpEndPoint));
+    }
     mContext = Platform::New<DiscoveryContext>();
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -53,6 +56,13 @@ CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
     VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     return mResolver.DiscoverCommissioners(filter, *mContext);
+}
+
+CHIP_ERROR ResolverProxy::DiscoverOperational(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    return mResolver.DiscoverOperational(filter, *mContext);
 }
 
 CHIP_ERROR ResolverProxy::StopDiscovery()

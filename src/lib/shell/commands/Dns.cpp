@@ -228,6 +228,21 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
     return sResolverProxy.DiscoverCommissioners(filter);
 }
 
+CHIP_ERROR BrowseOpertionalHandler(int argc, char ** argv)
+{
+    Dnssd::DiscoveryFilter filter;
+
+    if (!ParseSubType(argc, argv, filter))
+    {
+        streamer_printf(streamer_get(), "Invalid argument\r\n");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    streamer_printf(streamer_get(), "Browsing operational nodes...\r\n");
+
+    return sResolverProxy.DiscoverOperational(filter);
+}
+
 CHIP_ERROR BrowseHandler(int argc, char ** argv)
 {
     if (argc == 0)
@@ -262,6 +277,9 @@ void RegisterDnsCommands()
           "Browse Matter commissionable nodes. Usage: dns browse commissionable [subtype]" },
         { &BrowseCommissionerHandler, "commissioner",
           "Browse Matter commissioner nodes. Usage: dns browse commissioner [subtype]" },
+        { &BrowseOpertionalHandler, "operational",
+          "Browse Matter all operationional nodes. Usage: dns browse operational [subtype]" },
+
     };
 
     static const shell_command_t sDnsSubCommands[] = {

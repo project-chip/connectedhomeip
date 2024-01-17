@@ -52,8 +52,17 @@ public:
         }
     }
 
+    void SetOperationalBrowseDelegate(OperationalBrowseDelegate * delegate)
+    {
+        if (mContext != nullptr)
+        {
+            mContext->SetOperationalBrowseDelegate(delegate);
+        }
+    }
+
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter());
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter());
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter = DiscoveryFilter());
     CHIP_ERROR StopDiscovery();
 
 private:

@@ -16,7 +16,9 @@
  */
 
 #include "Resolver.h"
+#include "lib/dnssd/minimal_mdns/core/Constants.h"
 
+#include <cstddef>
 #include <limits>
 
 #include <lib/core/CHIPConfig.h>
@@ -283,10 +285,12 @@ public:
     bool IsInitialized() override;
     void Shutdown() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
+
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context) override;
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
@@ -294,6 +298,7 @@ private:
     OperationalResolveDelegate * mOperationalDelegate = nullptr;
     DiscoveryContext * mDiscoveryContext              = nullptr;
     System::Layer * mSystemLayer                      = nullptr;
+
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
 
@@ -440,7 +445,6 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         {
             MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
             ResolvedNodeData nodeData;
-
             CHIP_ERROR err = resolver->Take(nodeData);
             if (err != CHIP_NO_ERROR)
             {
@@ -448,6 +452,12 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
 
             mActiveResolves.Complete(nodeData.operationalData.peerId);
+
+            if (mDiscoveryContext != nullptr)
+            {
+                mDiscoveryContext->OnOperationalNodeDiscovered(nodeData.operationalData);
+            }
+
             if (mOperationalDelegate != nullptr)
             {
                 mOperationalDelegate->OnOperationalNodeResolved(nodeData);
@@ -699,6 +709,15 @@ CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, Discov
     SetDiscoveryContext(&context);
 
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
+}
+
+
+CHIP_ERROR MinMdnsResolver::DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context)
+{
+    // minmdns currently supports only one discovery context at a time so override the previous context
+    SetDiscoveryContext(&context);
+
+    return BrowseNodes(DiscoveryType::kOperational, filter);
 }
 
 CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryContext & context)

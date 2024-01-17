@@ -44,11 +44,17 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
     CHIP_ERROR StopDiscovery(DiscoveryContext & context) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;

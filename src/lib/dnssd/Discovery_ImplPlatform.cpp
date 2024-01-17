@@ -653,6 +653,31 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
     ChipDnssdResolveNoLongerNeeded(name);
 }
 
+CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter, DiscoveryContext & context)
+{
+    ReturnErrorOnFailure(InitImpl());
+    StopDiscovery(context);
+
+    char serviceName[kMaxCommissionerServiceNameSize];
+    ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kOperational));
+
+    intptr_t browseIdentifier;
+    // Increase the reference count of the context to keep it alive until HandleNodeBrowse is called back.
+    CHIP_ERROR error = ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
+                                         Inet::InterfaceId::Null(), HandleNodeBrowse, context.Retain(), &browseIdentifier);
+
+    if (error == CHIP_NO_ERROR)
+    {
+        context.SetBrowseIdentifier(browseIdentifier);
+    }
+    else
+    {
+        context.Release();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
 {
     ReturnErrorOnFailure(InitImpl());
