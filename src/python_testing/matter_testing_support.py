@@ -29,13 +29,13 @@ import re
 import sys
 import typing
 import uuid
+import xml.etree.ElementTree as ET
 from binascii import hexlify, unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import List, Optional, Tuple, Union
-import xml.etree.ElementTree as ET
 
 from chip.tlv import float32, uint
 
