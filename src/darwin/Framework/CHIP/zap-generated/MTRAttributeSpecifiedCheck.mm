@@ -2556,6 +2556,9 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttri
     case Attributes::CookTime::Id: {
         return YES;
     }
+    case Attributes::MaxCookTime::Id: {
+        return YES;
+    }
     case Attributes::PowerSetting::Id: {
         return YES;
     }
@@ -2566,6 +2569,15 @@ static BOOL AttributeIsSpecifiedInMicrowaveOvenControlCluster(AttributeId aAttri
         return YES;
     }
     case Attributes::PowerStep::Id: {
+        return YES;
+    }
+    case Attributes::SupportedWatts::Id: {
+        return YES;
+    }
+    case Attributes::SelectedWattIndex::Id: {
+        return YES;
+    }
+    case Attributes::WattRating::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

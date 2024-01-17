@@ -2988,6 +2988,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCookTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxCookTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePowerSettingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMinPowerWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
@@ -2995,6 +2997,12 @@ MTR_PROVISIONALLY_AVAILABLE
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxPowerWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributePowerStepWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedWattsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSelectedWattIndexWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeWattRatingWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
