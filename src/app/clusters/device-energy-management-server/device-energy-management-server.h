@@ -144,6 +144,7 @@ public:
     virtual int64_t GetAbsMaxPower()                                                 = 0;
     virtual PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()         = 0;
+    virtual OptOutStateEnum GetOptOutState()                                         = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods

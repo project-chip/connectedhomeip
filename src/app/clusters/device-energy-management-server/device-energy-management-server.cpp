@@ -87,6 +87,16 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
         return aEncoder.Encode(mDelegate.GetForecast());
+    case OptOutState::Id:
+        /* PA | STA | PAU | FA | CON */
+        if (!HasFeature(Feature::kPowerAdjustment) && !HasFeature(Feature::kStartTimeAdjustment) &&
+            !HasFeature(Feature::kPausable) && !HasFeature(Feature::kForecastAdjustment) &&
+            !HasFeature(Feature::kConstraintBasedAdjustment))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        return aEncoder.Encode(mDelegate.GetOptOutState());
+
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeature);
@@ -317,9 +327,9 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
         return;
     }
 
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    if (OptOutStateEnum::kOptOut == mDelegate.GetOptOutState())
     {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
+        ChipLogError(Zcl, "DEM: OptOutState = kOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -419,9 +429,9 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    if (OptOutStateEnum::kOptOut == mDelegate.GetOptOutState())
     {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
+        ChipLogError(Zcl, "DEM: OptOutState = kOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -446,15 +456,37 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable)
+    /* We expect that there should be a slotIsPauseable entry (but it is optional) */
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.HasValue())
+    {
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPauseable.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    if (!forecast.Value().slots[activeSlotNumber].minPauseDuration.HasValue())
+    {
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include minPauseDuration.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    if (!forecast.Value().slots[activeSlotNumber].maxPauseDuration.HasValue())
+    {
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include minPauseDuration.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pauseable.", activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration) &&
-        (duration > forecast.Value().slots[activeSlotNumber].maxPauseDuration))
+    if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration.Value()) &&
+        (duration > forecast.Value().slots[activeSlotNumber].maxPauseDuration.Value()))
     {
         ChipLogError(Zcl, "DEM: out of range pause duration %ld", static_cast<long unsigned int>(duration));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -505,9 +537,9 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     uint32_t forecastId = commandData.forecastId;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
 
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    if (OptOutStateEnum::kOptOut == mDelegate.GetOptOutState())
     {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
+        ChipLogError(Zcl, "DEM: OptOutState = kOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -535,9 +567,9 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
 {
     Status status = Status::Success;
 
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    if (OptOutStateEnum::kOptOut == mDelegate.GetOptOutState())
     {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
+        ChipLogError(Zcl, "DEM: OptOutState = kOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }

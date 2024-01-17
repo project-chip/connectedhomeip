@@ -246,6 +246,11 @@ DataModel::Nullable<Structs::ForecastStruct::Type> DeviceEnergyManagementDelegat
     return mForecast;
 }
 
+OptOutStateEnum DeviceEnergyManagementDelegate::GetOptOutState()
+{
+    return mOptOutState;
+}
+
 // ------------------------------------------------------------------
 // Set attribute methods
 

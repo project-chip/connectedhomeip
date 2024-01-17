@@ -56,6 +56,7 @@ public:
     virtual int64_t GetAbsMaxPower() override;
     virtual Attributes::PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() override;
     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast() override;
+    virtual OptOutStateEnum GetOptOutState() override;
 
     // ------------------------------------------------------------------
     // Set attribute methods
@@ -75,6 +76,7 @@ private:
     int64_t mAbsMaxPower;
     Attributes::PowerAdjustmentCapability::TypeInfo::Type mPowerAdjustmentCapability;
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
+    OptOutStateEnum mOptOutState;
 };
 
 } // namespace DeviceEnergyManagement
