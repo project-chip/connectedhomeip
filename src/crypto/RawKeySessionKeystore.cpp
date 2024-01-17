@@ -29,7 +29,8 @@ struct RawHkdfKeyHandle
 {
     ByteSpan Span() const { return ByteSpan(data, size); }
 
-    static constexpr size_t kMaxDataSize = std::min(CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE - 1, UINT8_MAX);
+    // Cap the data size so that the entire structure fits in the opaque context of the HKDF key handle.
+    static constexpr size_t kMaxDataSize = std::min<size_t>(CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE - sizeof(uint8_t), UINT8_MAX);
 
     uint8_t data[kMaxDataSize];
     uint8_t size;
