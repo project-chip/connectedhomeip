@@ -30,30 +30,25 @@ limitations under the License.
     <define>ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="4"/>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
     <description>This cluster provides a mechanism for querying data about the electrical energy imported or provided by the server.</description>
     <!--Attributes-->
-    
-    <attribute code="0x0000" side="server" define="MEASURED" type="boolean" writable="false" optional="false">Measured</attribute>
-    <attribute code="0x0001" side="server" define="ACCURACY" type="MeasurementAccuracyStruct" writable="false" optional="false">Accuracy</attribute>
+    <attribute code="0x0000" side="server" define="ACCURACY" type="MeasurementAccuracyStruct">Accuracy</attribute>
+    <attribute code="0x0001" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" optional="true" isNullable="true">CumulativeEnergyImported</attribute>
     <!--Conformance feature IMPE & CUME - for now optional-->
-    
-    <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">CumulativeEnergyImported</attribute>
+    <attribute code="0x0002" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">CumulativeEnergyExported</attribute>
     <!--Conformance feature EXPE & CUME - for now optional-->
-    
-    <attribute code="0x0003" side="server" define="CUMULATIVE_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">CumulativeEnergyExported</attribute>
+    <attribute code="0x0003" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyImported</attribute>
     <!--Conformance feature IMPE & PERE - for now optional-->
-    
-    <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_IMPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">PeriodicEnergyImported</attribute>
+    <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
-    
     <attribute code="0x0005" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" writable="false" optional="true">PeriodicEnergyExported</attribute>
-    <event code="0x0000" name="CumulativeEnergyMeasured" priority="info" side="server" apiMaturity="provisional" optional="true">
+    <event code="0x0000" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
       <description>CumulativeEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
-    <event code="0x0001" name="PeriodicEnergyMeasured" priority="info" side="server" apiMaturity="provisional" optional="true">
+    <event code="0x0001" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
       <description>PeriodicEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
@@ -79,7 +74,7 @@ limitations under the License.
   </enum>
   <struct name="EnergyMeasurementStruct" apiMaturity="provisional">
     <cluster code="0x0091"/>
-    <item fieldId="0" name="Energy" type="int64s" min="0" max="0x4000000000000000"/>
+    <item fieldId="0" name="Energy" type="energy_mwh" min="0" max="0x4000000000000000"/>
     <item fieldId="1" name="StartTimestamp" type="epoch_s" optional="true"/>
     <item fieldId="2" name="EndTimestamp" type="epoch_s" optional="true"/>
     <item fieldId="3" name="StartSystime" type="systime_ms" optional="true"/>
