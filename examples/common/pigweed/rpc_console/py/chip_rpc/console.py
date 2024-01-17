@@ -41,6 +41,7 @@ import logging
 import re
 import sys
 import threading
+import time
 from collections import namedtuple
 from concurrent.futures import ThreadPoolExecutor
 from inspect import cleandoc
