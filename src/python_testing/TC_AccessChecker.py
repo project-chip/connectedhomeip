@@ -162,10 +162,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
             if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 # not writeable - expect an unsupported write response
-                # Global vars currently return the wrong error code - see #31448
-                ok = (is_global(attribute.attribute_id) and resp[0].Status ==
-                      Status.UnsupportedAttribute) or resp[0].Status == Status.UnsupportedWrite
-                if not ok:
+                if resp[0].Status != Status.UnsupportedWrite:
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing non-writeable attribute - expected Unsupported Write, got {resp[0].Status}")
                     self.success = False
