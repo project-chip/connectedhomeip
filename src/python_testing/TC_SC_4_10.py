@@ -15,28 +15,10 @@
 #    limitations under the License.
 #
 
-import copy
 import logging
-import time
-import asyncio
-
-import chip.clusters as Clusters
-from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters.Attribute import AttributePath, TypedAttributePath
-from chip.exceptions import ChipStackError
-from chip.interaction_model import Status
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
-
-from zeroconf import DNSQuestionType, Zeroconf, ServiceListener, ServiceBrowser, DNSText
-from zeroconf.asyncio import (
-    AsyncZeroconf,
-    AsyncServiceBrowser,
-    AsyncServiceInfo,
-    AsyncZeroconfServiceTypes
-)
-
-from mdns_support import TxtRecordUtil
+from mdns_helper import MdnsHelper
 
 '''
 Category:
@@ -50,20 +32,32 @@ Test Plan:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#tc-sc-4-10-operational-discovery-sit-icd-node-dut_commissionee
 '''
 
+SESSION_IDLE_INTERVAL_MS = 500
+ONE_HOUR_MS = 3600000
+
 class TC_SC_4_10(MatterBaseTest):
-    
+
     @async_test_body
     async def test_TC_SC_4_10(self):
         print("\n" * 10)
-        
-        tru = TxtRecordUtil(self)
-        SAI = await tru.get(key="SAI", refresh=True)
-        SII = await tru.get(key="SII", refresh=True)
-        props = await tru.get(refresh=True)
 
-        print(f"SAI: {SAI}")
-        print(f"SII: {SII}")
-        print(f"props: {props}")
+        self.print_step(1, "DUT is instructed to advertise its service: already done")
+
+        self.print_step(2, "TH scans for DNS-SD advertising, looks for SAI/SII values")
+
+        mh = MdnsHelper(self)
+        SAI_MS = int(await mh.getTxtRecord(key="SAI"))
+        SII_MS = int(await mh.getTxtRecord(key="SII"))        
+
+        logging.info(f"SII: {SII_MS}ms")
+        logging.info(f"SAI: {SAI_MS}ms")
+
+        asserts.assert_greater(SII_MS, SESSION_IDLE_INTERVAL_MS,
+                               f"SII key ({SII_MS}ms) should be greater than the SESSION_IDLE_INTERVAL ({SESSION_IDLE_INTERVAL_MS} ms)")
+        asserts.assert_less(SII_MS, ONE_HOUR_MS,
+                            f"SII key ({SII_MS}ms) should be less than one hour ({ONE_HOUR_MS}ms)")
+        asserts.assert_less(SAI_MS, ONE_HOUR_MS,
+                            f"SAI key ({SAI_MS}ms) should be less than one hour ({ONE_HOUR_MS}ms)")
 
         print("\n" * 10)
 
