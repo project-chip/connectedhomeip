@@ -115,8 +115,8 @@ def show_console(device: str, baudrate: int,
         output=output,
         hdlc_encoding=not raw_serial,
         token_databases=token_databases,
-        logfile="chip_console-logs.txt",
-        device_logfile="chip_console-device-logs.txt",
+        logfile="",
+        device_logfile="",
         channel_id=rpc.DEFAULT_CHANNEL_ID,
 
         # Defaults beyond the original console
