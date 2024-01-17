@@ -211,7 +211,7 @@ class TC_IDM_1_4(MatterBaseTest):
             result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
             asserts.fail("Unexpected success call to sending Batch command when non-path specific error expected")
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.UnsupportedAccess,
+            asserts.assert_equal(e.status, Status.TimedRequestMismatch,
                                  "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
 
         self.print_step(8, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true")
