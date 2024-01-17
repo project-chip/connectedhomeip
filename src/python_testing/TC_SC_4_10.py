@@ -16,9 +16,10 @@
 #
 
 import logging
+
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 from mdns_helper import MdnsHelper
+from mobly import asserts
 
 '''
 Category:
@@ -35,11 +36,11 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 SESSION_IDLE_INTERVAL_MS = 500
 ONE_HOUR_MS = 3600000
 
+
 class TC_SC_4_10(MatterBaseTest):
 
     @async_test_body
     async def test_TC_SC_4_10(self):
-        print("\n" * 10)
 
         self.print_step(1, "DUT is instructed to advertise its service: already done")
 
@@ -47,7 +48,7 @@ class TC_SC_4_10(MatterBaseTest):
 
         mh = MdnsHelper(self)
         SAI_MS = int(await mh.getTxtRecord(key="SAI"))
-        SII_MS = int(await mh.getTxtRecord(key="SII"))        
+        SII_MS = int(await mh.getTxtRecord(key="SII"))
 
         logging.info(f"SII: {SII_MS}ms")
         logging.info(f"SAI: {SAI_MS}ms")
@@ -59,7 +60,6 @@ class TC_SC_4_10(MatterBaseTest):
         asserts.assert_less(SAI_MS, ONE_HOUR_MS,
                             f"SAI key ({SAI_MS}ms) should be less than one hour ({ONE_HOUR_MS}ms)")
 
-        print("\n" * 10)
 
 if __name__ == "__main__":
     default_matter_test_main()

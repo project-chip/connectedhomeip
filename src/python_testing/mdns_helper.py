@@ -16,18 +16,16 @@
 #
 
 from mobly import asserts
-from zeroconf import Zeroconf, ServiceListener
-from zeroconf.asyncio import (
-    AsyncZeroconf,
-    AsyncServiceInfo,
-    AsyncZeroconfServiceTypes
-)
+from zeroconf import ServiceListener, Zeroconf
+from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
 
 MDNS_TYPE_OPERATIONAL = "_matter._tcp.local."
 
 '''
 A service listener for the TXT record data to get populated
 '''
+
+
 class DummyServiceListener(ServiceListener):
 
     def add_service(self, zc: Zeroconf, type: str, name: str) -> None:
@@ -38,6 +36,7 @@ class DummyServiceListener(ServiceListener):
 
     def update_service(self, zc: Zeroconf, type: str, name: str) -> None:
         pass
+
 
 class MdnsHelper:
     def __init__(self, dut):
@@ -93,9 +92,9 @@ class MdnsHelper:
         AssertError: If the service information is not found or the MDNS operational 
                         service type is missing.
     """
-    async def getTxtRecord(self, key: str = None, refresh = False):
+    async def getTxtRecord(self, key: str = None, refresh=False):
 
-        await self.getOperationalServiceInfo(refresh = refresh)
+        await self.getOperationalServiceInfo(refresh=refresh)
 
         if key is None:
             # Return all properties if no key specified
@@ -104,7 +103,7 @@ class MdnsHelper:
             # Return specified value by key
             return self._get_txt_record_key_value(key)
     
-    async def getOperationalServiceInfo(self, refresh = False):
+    async def getOperationalServiceInfo(self, refresh=False):
 
         # Setup service listener
         await self._azc.async_remove_all_service_listeners()
@@ -116,7 +115,7 @@ class MdnsHelper:
             asserts.assert_greater(len(service_types), 0, "No running services found")
             self._service_types = service_types
 
-        asserts.assert_in(MDNS_TYPE_OPERATIONAL, self._service_types, 
+        asserts.assert_in(MDNS_TYPE_OPERATIONAL, self._service_types,
                           f"The MDNS operational service type '{MDNS_TYPE_OPERATIONAL}' was not found")
 
         # Fetch service info and properties (TXT) and cache them
