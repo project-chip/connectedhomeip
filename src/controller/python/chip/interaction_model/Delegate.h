@@ -23,8 +23,45 @@
 
 namespace chip {
 namespace python {
+
 static constexpr ClusterStatus kUndefinedClusterStatus = 0xFF;
-}
+
+// This needs to match the python definition that uses the same name.
+struct PyCommandPath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::CommandId commandId;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyInvokeRequestData
+{
+    PyCommandPath commandPath;
+    void * tlvData;
+    size_t tlvLength;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyAttributePath
+{
+    chip::EndpointId endpointId;
+    chip::ClusterId clusterId;
+    chip::AttributeId attributeId;
+    chip::DataVersion dataVersion;
+    uint8_t hasDataVersion;
+};
+
+// This needs to match the python definition that uses the same name.
+struct PyWriteAttributeData
+{
+    PyAttributePath attributePath;
+    void * tlvData;
+    size_t tlvLength;
+};
+
+} // namespace python
+
 namespace Controller {
 
 // The command status will be used for python script.

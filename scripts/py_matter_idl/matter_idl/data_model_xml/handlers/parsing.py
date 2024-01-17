@@ -102,6 +102,13 @@ _REF_NAME_MAPPING = {
 }
 
 
+# Handle odd casing and naming
+_CASE_RENAMES_MAPPING = {
+    "power_mW": "power_mw",
+    "energy_mWh": "energy_mwh"
+}
+
+
 def ParseType(t: str) -> ParsedType:
     """Parse a data type entry.
 
@@ -122,6 +129,9 @@ def ParseType(t: str) -> ParsedType:
 
     if t in _REF_NAME_MAPPING:
         t = _REF_NAME_MAPPING[t]
+
+    if t in _CASE_RENAMES_MAPPING:
+        t = _CASE_RENAMES_MAPPING[t]
 
     return ParsedType(name=NormalizeDataType(t), is_list=is_list)
 

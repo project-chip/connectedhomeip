@@ -1188,6 +1188,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::OperatingModeEnum val)
+{
+    using EnumType = IcdManagement::OperatingModeEnum;
+    switch (val)
+    {
+    case EnumType::kSit:
+    case EnumType::kLit:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum val)
 {
     using EnumType = Timer::TimerStatusEnum;
@@ -1828,9 +1841,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::CredentialTyp
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(9);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DataOperationTypeEnum val)
@@ -2017,9 +2033,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(11);
+        return static_cast<EnumType>(14);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)
@@ -2082,9 +2101,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSour
     case EnumType::kRemote:
     case EnumType::kRfid:
     case EnumType::kBiometric:
+    case EnumType::kAliro:
         return val;
     default:
-        return static_cast<EnumType>(10);
+        return static_cast<EnumType>(11);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserStatusEnum val)
@@ -2292,6 +2312,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ControlSequ
         return val;
     default:
         return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScenarioEnum val)
+{
+    using EnumType = Thermostat::PresetScenarioEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kOccupied:
+    case EnumType::kUnoccupied:
+    case EnumType::kSleep:
+    case EnumType::kWake:
+    case EnumType::kVacation:
+    case EnumType::kUserDefined:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointChangeSourceEnum val)

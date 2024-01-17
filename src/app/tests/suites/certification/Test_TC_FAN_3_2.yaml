@@ -24,7 +24,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -57,7 +57,9 @@ tests:
               - name: "ms"
                 value: 1000
 
-    - label: "Step 4: TH reads from the DUT the SpeedSetting attribute"
+    - label:
+          "Step 4: After a few seconds, TH reads from the DUT the SpeedSetting
+          attribute"
       PICS: FAN.S.A0005
       command: "readAttribute"
       attribute: "SpeedSetting"

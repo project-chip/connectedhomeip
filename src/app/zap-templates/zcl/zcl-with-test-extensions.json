@@ -178,7 +178,42 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
-        "Device Energy Management": ["Forecast"],
+        "Device Energy Management": [
+            "ESAType",
+            "ESACanGenerate",
+            "ESAState",
+            "AbsMinPower",
+            "AbsMaxPower",
+            "PowerAdjustmentCapability",
+            "Forecast",
+            "FeatureMap"
+        ],
+        "Energy EVSE": [
+            "State",
+            "SupplyState",
+            "FaultState",
+            "ChargingEnabledUntil",
+            "DischargingEnabledUntil",
+            "CircuitCapacity",
+            "MinimumChargeCurrent",
+            "MaximumChargeCurrent",
+            "MaximumDischargeCurrent",
+            "UserMaximumChargeCurrent",
+            "RandomizationDelayWindow",
+            "NextChargeStartTime",
+            "NextChargeTargetTime",
+            "NextChargeRequiredEnergy",
+            "NextChargeTargetSoC",
+            "ApproximateEVEfficiency",
+            "StateOfCharge",
+            "BatteryCapacity",
+            "VehicleID",
+            "SessionID",
+            "SessionDuration",
+            "SessionEnergyCharged",
+            "SessionEnergyDischarged",
+            "FeatureMap"
+        ],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -345,10 +380,15 @@
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Microwave Oven Control": [
             "CookTime",
+            "MaxCookTime",
             "PowerSetting",
             "MinPower",
             "MaxPower",
-            "PowerStep"
+            "PowerStep",
+            "SupportedWatts",
+            "SelectedWattIndex",
+            "WattRating",
+            "FeatureMap"
         ],
         "Laundry Washer Mode": [
             "SupportedModes",
@@ -553,13 +593,16 @@
             "FeatureMap"
         ],
         "Air Quality": ["AirQuality", "FeatureMap"],
+        "Thermostat": ["QueuedPreset"],
         "Electrical Energy Measurement": [
             "Accuracy",
             "CumulativeEnergyImported",
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
             "PeriodicEnergyExported"
-        ]
+        ],
+        "Valve Configuration and Control": ["RemainingDuration"],
+        "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

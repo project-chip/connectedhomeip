@@ -112,6 +112,8 @@ public:
         return serverList;
     }
 
+    void RegisterClusters(std::vector<chip::ClusterId> clusters);
+
     /**
      * @brief Registers a cluster of type T against the passed in clusterId
      * for this Endpoint

@@ -1005,6 +1005,7 @@ cluster RvcRunMode = 84 {
   enum ModeTag : enum16 {
     kIdle = 16384;
     kCleaning = 16385;
+    kMapping = 16386;
   }
 
   enum StatusCode : enum8 {
@@ -1453,6 +1454,8 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command Pause;
+    handle command Stop;
+    handle command Start;
     handle command Resume;
     handle command OperationalCommandResponse;
   }

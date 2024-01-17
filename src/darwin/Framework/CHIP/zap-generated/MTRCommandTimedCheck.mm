@@ -41,15 +41,6 @@ static BOOL CommandNeedsTimedInvokeInGroupsCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInScenesCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::Scenes;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInOnOffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OnOff;
@@ -554,6 +545,15 @@ static BOOL CommandNeedsTimedInvokeInRVCOperationalStateCluster(AttributeId aAtt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ScenesManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -682,6 +682,12 @@ static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
         return YES;
     }
     case Commands::UnboltDoor::Id: {
+        return YES;
+    }
+    case Commands::SetAliroReaderConfig::Id: {
+        return YES;
+    }
+    case Commands::ClearAliroReaderConfig::Id: {
         return YES;
     }
     default: {
@@ -1083,9 +1089,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::Groups::Id: {
         return CommandNeedsTimedInvokeInGroupsCluster(commandID);
     }
-    case Clusters::Scenes::Id: {
-        return CommandNeedsTimedInvokeInScenesCluster(commandID);
-    }
     case Clusters::OnOff::Id: {
         return CommandNeedsTimedInvokeInOnOffCluster(commandID);
     }
@@ -1250,6 +1253,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::RvcOperationalState::Id: {
         return CommandNeedsTimedInvokeInRVCOperationalStateCluster(commandID);
+    }
+    case Clusters::ScenesManagement::Id: {
+        return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
     }
     case Clusters::HepaFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(commandID);

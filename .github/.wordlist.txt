@@ -519,8 +519,10 @@ EthyleneOxideConcentrationMeasurement
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
+EV
 EVB
 evk
+EVSE
 exceptfds
 ExchangeContext
 exe

@@ -1380,6 +1380,11 @@ cluster UserLabel = 65 {
 cluster IcdManagement = 70 {
   revision 2;
 
+  enum OperatingModeEnum : enum8 {
+    kSIT = 0;
+    kLIT = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
@@ -1412,6 +1417,9 @@ cluster IcdManagement = 70 {
     fabric_idx fabricIndex = 254;
   }
 
+  critical event OnTransitionToActiveMode = 0 {
+  }
+
   readonly attribute int32u idleModeDuration = 0;
   readonly attribute int32u activeModeDuration = 1;
   readonly attribute int16u activeModeThreshold = 2;
@@ -1420,6 +1428,7 @@ cluster IcdManagement = 70 {
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
   readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
   readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1734,6 +1743,7 @@ endpoint 0 {
   }
 
   server cluster IcdManagement {
+    emits event OnTransitionToActiveMode;
     callback attribute idleModeDuration;
     callback attribute activeModeDuration;
     callback attribute activeModeThreshold;

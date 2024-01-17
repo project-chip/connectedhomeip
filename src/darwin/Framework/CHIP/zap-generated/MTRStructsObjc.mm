@@ -19,128 +19,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@implementation MTRScenesClusterAttributeValuePair
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _attributeID = @(0);
-
-        _attributeValue = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterAttributeValuePair alloc] init];
-
-    other.attributeID = self.attributeID;
-    other.attributeValue = self.attributeValue;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
-    return descriptionString;
-}
-
-- (void)setAttributeId:(NSNumber * _Nonnull)attributeId
-{
-    self.attributeID = attributeId;
-}
-
-- (NSNumber * _Nonnull)attributeId
-{
-    return self.attributeID;
-}
-
-@end
-
-@implementation MTRScenesClusterExtensionFieldSet
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clusterID = @(0);
-
-        _attributeValueList = [NSArray array];
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterExtensionFieldSet alloc] init];
-
-    other.clusterID = self.clusterID;
-    other.attributeValueList = self.attributeValueList;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >", NSStringFromClass([self class]), _clusterID, _attributeValueList];
-    return descriptionString;
-}
-
-- (void)setClusterId:(NSNumber * _Nonnull)clusterId
-{
-    self.clusterID = clusterId;
-}
-
-- (NSNumber * _Nonnull)clusterId
-{
-    return self.clusterID;
-}
-
-@end
-
-@implementation MTRScenesClusterSceneInfoStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _sceneCount = @(0);
-
-        _currentScene = @(0);
-
-        _currentGroup = @(0);
-
-        _sceneValid = @(0);
-
-        _remainingCapacity = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRScenesClusterSceneInfoStruct alloc] init];
-
-    other.sceneCount = self.sceneCount;
-    other.currentScene = self.currentScene;
-    other.currentGroup = self.currentGroup;
-    other.sceneValid = self.sceneValid;
-    other.remainingCapacity = self.remainingCapacity;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {
@@ -2920,6 +2798,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRICDManagementClusterOnTransitionToActiveModeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRICDManagementClusterOnTransitionToActiveModeEvent alloc] init];
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROvenCavityOperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
@@ -4138,6 +4039,108 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: completionErrorCode:%@; totalOperationalTime:%@; pausedTime:%@; >", NSStringFromClass([self class]), _completionErrorCode, _totalOperationalTime, _pausedTime];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterAttributeValuePair
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _attributeID = @(0);
+
+        _attributeValue = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesManagementClusterAttributeValuePair alloc] init];
+
+    other.attributeID = self.attributeID;
+    other.attributeValue = self.attributeValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeID:%@; attributeValue:%@; >", NSStringFromClass([self class]), _attributeID, _attributeValue];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterExtensionFieldSet
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _clusterID = @(0);
+
+        _attributeValueList = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesManagementClusterExtensionFieldSet alloc] init];
+
+    other.clusterID = self.clusterID;
+    other.attributeValueList = self.attributeValueList;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: clusterID:%@; attributeValueList:%@; >", NSStringFromClass([self class]), _clusterID, _attributeValueList];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRScenesManagementClusterSceneInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sceneCount = @(0);
+
+        _currentScene = @(0);
+
+        _currentGroup = @(0);
+
+        _sceneValid = @(0);
+
+        _remainingCapacity = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesManagementClusterSceneInfoStruct alloc] init];
+
+    other.sceneCount = self.sceneCount;
+    other.currentScene = self.currentScene;
+    other.currentGroup = self.currentGroup;
+    other.sceneValid = self.sceneValid;
+    other.remainingCapacity = self.remainingCapacity;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
     return descriptionString;
 }
 
@@ -6073,6 +6076,228 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleTransitionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayOfWeek = @(0);
+
+        _transitionTime = @(0);
+
+        _presetHandle = nil;
+
+        _systemMode = nil;
+
+        _coolingSetpoint = nil;
+
+        _heatingSetpoint = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleTransitionStruct alloc] init];
+
+    other.dayOfWeek = self.dayOfWeek;
+    other.transitionTime = self.transitionTime;
+    other.presetHandle = self.presetHandle;
+    other.systemMode = self.systemMode;
+    other.coolingSetpoint = self.coolingSetpoint;
+    other.heatingSetpoint = self.heatingSetpoint;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; presetHandle:%@; systemMode:%@; coolingSetpoint:%@; heatingSetpoint:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, [_presetHandle base64EncodedStringWithOptions:0], _systemMode, _coolingSetpoint, _heatingSetpoint];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _scheduleHandle = nil;
+
+        _systemMode = @(0);
+
+        _name = nil;
+
+        _presetHandle = nil;
+
+        _transitions = [NSArray array];
+
+        _builtIn = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleStruct alloc] init];
+
+    other.scheduleHandle = self.scheduleHandle;
+    other.systemMode = self.systemMode;
+    other.name = self.name;
+    other.presetHandle = self.presetHandle;
+    other.transitions = self.transitions;
+    other.builtIn = self.builtIn;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: scheduleHandle:%@; systemMode:%@; name:%@; presetHandle:%@; transitions:%@; builtIn:%@; >", NSStringFromClass([self class]), [_scheduleHandle base64EncodedStringWithOptions:0], _systemMode, _name, [_presetHandle base64EncodedStringWithOptions:0], _transitions, _builtIn];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = nil;
+
+        _presetScenario = @(0);
+
+        _name = nil;
+
+        _coolingSetpoint = nil;
+
+        _heatingSetpoint = nil;
+
+        _builtIn = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterPresetStruct alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.presetScenario = self.presetScenario;
+    other.name = self.name;
+    other.coolingSetpoint = self.coolingSetpoint;
+    other.heatingSetpoint = self.heatingSetpoint;
+    other.builtIn = self.builtIn;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; presetScenario:%@; name:%@; coolingSetpoint:%@; heatingSetpoint:%@; builtIn:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _presetScenario, _name, _coolingSetpoint, _heatingSetpoint, _builtIn];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterPresetTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetScenario = @(0);
+
+        _numberOfPresets = @(0);
+
+        _presetTypeFeatures = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterPresetTypeStruct alloc] init];
+
+    other.presetScenario = self.presetScenario;
+    other.numberOfPresets = self.numberOfPresets;
+    other.presetTypeFeatures = self.presetTypeFeatures;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetScenario:%@; numberOfPresets:%@; presetTypeFeatures:%@; >", NSStringFromClass([self class]), _presetScenario, _numberOfPresets, _presetTypeFeatures];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterQueuedPresetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _presetHandle = nil;
+
+        _transitionTimestamp = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterQueuedPresetStruct alloc] init];
+
+    other.presetHandle = self.presetHandle;
+    other.transitionTimestamp = self.transitionTimestamp;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: presetHandle:%@; transitionTimestamp:%@; >", NSStringFromClass([self class]), [_presetHandle base64EncodedStringWithOptions:0], _transitionTimestamp];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterScheduleTypeStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _systemMode = @(0);
+
+        _numberOfSchedules = @(0);
+
+        _scheduleTypeFeatures = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterScheduleTypeStruct alloc] init];
+
+    other.systemMode = self.systemMode;
+    other.numberOfSchedules = self.numberOfSchedules;
+    other.scheduleTypeFeatures = self.scheduleTypeFeatures;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: systemMode:%@; numberOfSchedules:%@; scheduleTypeFeatures:%@; >", NSStringFromClass([self class]), _systemMode, _numberOfSchedules, _scheduleTypeFeatures];
     return descriptionString;
 }
 
