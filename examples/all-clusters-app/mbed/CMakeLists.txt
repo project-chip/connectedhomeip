@@ -65,6 +65,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON}/src/device-energy-management-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON}/src/oven-modes.cpp
                ${ALL_CLUSTERS_COMMON}/src/resource-monitoring-delegates.cpp
@@ -73,6 +74,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${ALL_CLUSTERS_COMMON}/src/static-supported-temperature-levels.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON}/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON}/src/DeviceEnergyManagementManager.cpp
+
 )
 
 chip_configure_data_model(${APP_TARGET}

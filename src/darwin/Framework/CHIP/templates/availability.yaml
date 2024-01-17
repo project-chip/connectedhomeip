@@ -8271,6 +8271,7 @@
           - DeviceEnergyManagement
           - ElectricalEnergyMeasurement
           - EnergyPreference
+          - ScenesManagement
       attributes:
           NetworkCommissioning:
               # Targeting Spring 2024 Matter release
@@ -8528,6 +8529,11 @@
               Feature:
                   Watermarks: WaterMarks
   removed:
+      clusters:
+          # Should never have been exposed in the shape it was in, and now is
+          # getting renamed and getting a new cluster id, so just removing it
+          # seems like the most sensible thing.
+          - Scenes
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time
