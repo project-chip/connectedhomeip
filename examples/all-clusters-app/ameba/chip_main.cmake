@@ -156,6 +156,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
@@ -175,6 +176,8 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/ManualOperationCommand.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
 
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
     ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
 

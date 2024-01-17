@@ -264,16 +264,16 @@ class MTRSwiftDeviceTests : XCTestCase {
         //     are correctly queued in one batch
         //   - Then read 3 duplicates and expect them to be filtered
         //   - Note that these tests can only be verified via logs
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 0, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 0, params: nil)
 
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 1, params: nil)
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 2, params: nil)
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 3, params: nil)
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 4, params: nil)
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 5, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 1, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 2, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 3, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 4, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 5, params: nil)
 
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 6, params: nil)
-        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.scenesID.rawValue), attributeID: 7, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 6, params: nil)
+        device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.colorControlID.rawValue), attributeID: 7, params: nil)
         device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.levelControlID.rawValue), attributeID: 0, params: nil)
         device.readAttribute(withEndpointID: 1, clusterID: NSNumber(value: MTRClusterIDType.levelControlID.rawValue), attributeID: 1, params: nil)
 
