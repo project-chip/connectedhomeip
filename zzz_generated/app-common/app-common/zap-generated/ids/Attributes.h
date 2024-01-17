@@ -3193,8 +3193,12 @@ namespace MicrowaveOvenControl {
 namespace Attributes {
 
 namespace CookTime {
-static constexpr AttributeId Id = 0x00000001;
+static constexpr AttributeId Id = 0x00000000;
 } // namespace CookTime
+
+namespace MaxCookTime {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace MaxCookTime
 
 namespace PowerSetting {
 static constexpr AttributeId Id = 0x00000002;
@@ -3211,6 +3215,18 @@ static constexpr AttributeId Id = 0x00000004;
 namespace PowerStep {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace PowerStep
+
+namespace SupportedWatts {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace SupportedWatts
+
+namespace SelectedWattIndex {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace SelectedWattIndex
+
+namespace WattRating {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace WattRating
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

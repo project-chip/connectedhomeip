@@ -900,6 +900,185 @@ cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(): KeySetReadAllIndicesResponse = 4;
 }
 
+/** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
+provisional cluster DeviceEnergyManagement = 152 {
+  revision 2;
+
+  enum CauseEnum : enum8 {
+    kNormalCompletion = 0;
+    kOffline = 1;
+    kFault = 2;
+    kUserOptOut = 3;
+  }
+
+  enum CostTypeEnum : enum8 {
+    kFinancial = 0;
+    kGHGEmissions = 1;
+    kComfort = 2;
+    kTemperature = 3;
+  }
+
+  enum ESAStateEnum : enum8 {
+    kOffline = 0;
+    kOnline = 1;
+    kFault = 2;
+    kUserOptOut = 3;
+    kPowerAdjustActive = 4;
+    kPaused = 5;
+  }
+
+  enum ESATypeEnum : enum8 {
+    kEVSE = 0;
+    kSpaceHeating = 1;
+    kWaterHeating = 2;
+    kSpaceCooling = 3;
+    kSpaceHeatingCooling = 4;
+    kBatteryStorage = 5;
+    kSolarPV = 6;
+    kFridgeFreezer = 7;
+    kWashingMachine = 8;
+    kDishwasher = 9;
+    kCooking = 10;
+    kHomeWaterPump = 11;
+    kIrrigationWaterPump = 12;
+    kPoolPump = 13;
+    kOther = 255;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPowerAdjustment = 0x1;
+    kPowerForecastReporting = 0x2;
+    kStateForecastReporting = 0x4;
+    kForecastAdjustment = 0x8;
+  }
+
+  struct CostStruct {
+    CostTypeEnum costType = 0;
+    int32s value = 1;
+    int8u decimalPoints = 2;
+    optional int16u currency = 3;
+  }
+
+  struct SlotStruct {
+    elapsed_s minDuration = 0;
+    elapsed_s maxDuration = 1;
+    elapsed_s defaultDuration = 2;
+    elapsed_s elapsedSlotTime = 3;
+    elapsed_s remainingSlotTime = 4;
+    boolean slotIsPauseable = 5;
+    elapsed_s minPauseDuration = 6;
+    elapsed_s maxPauseDuration = 7;
+    optional int16u manufacturerESAState = 8;
+    optional power_mw nominalPower = 9;
+    optional power_mw minPower = 10;
+    optional power_mw maxPower = 11;
+    optional energy_mwh nominalEnergy = 12;
+    optional CostStruct costs[] = 13;
+    optional power_mw minPowerAdjustment = 14;
+    optional power_mw maxPowerAdjustment = 15;
+    optional elapsed_s minDurationAdjustment = 16;
+    optional elapsed_s maxDurationAdjustment = 17;
+  }
+
+  struct ForecastStruct {
+    int16u forecastId = 0;
+    nullable int16u activeSlotNumber = 1;
+    epoch_s startTime = 2;
+    epoch_s endTime = 3;
+    optional nullable epoch_s earliestStartTime = 4;
+    optional epoch_s latestEndTime = 5;
+    boolean isPauseable = 6;
+    SlotStruct slots[] = 7;
+  }
+
+  struct ConstraintsStruct {
+    epoch_s startTime = 0;
+    elapsed_s duration = 1;
+    optional power_mw nominalPower = 2;
+    optional energy_mwh maximumEnergy = 3;
+    optional int8s loadControl = 4;
+  }
+
+  struct PowerAdjustStruct {
+    power_mw minPower = 0;
+    power_mw maxPower = 1;
+    elapsed_s minDuration = 2;
+    elapsed_s maxDuration = 3;
+  }
+
+  struct SlotAdjustmentStruct {
+    int8u slotIndex = 0;
+    power_mw nominalPower = 1;
+    elapsed_s duration = 2;
+  }
+
+  info event PowerAdjustStart = 0 {
+  }
+
+  info event PowerAdjustEnd = 1 {
+    CauseEnum cause = 0;
+    elapsed_s duration = 1;
+    energy_mwh energyUse = 2;
+  }
+
+  info event Paused = 2 {
+  }
+
+  info event Resumed = 3 {
+  }
+
+  readonly attribute ESATypeEnum ESAType = 0;
+  readonly attribute boolean ESACanGenerate = 1;
+  readonly attribute ESAStateEnum ESAState = 2;
+  readonly attribute power_mw absMinPower = 3;
+  readonly attribute power_mw absMaxPower = 4;
+  readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
+  readonly attribute optional nullable ForecastStruct forecast = 6;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct PowerAdjustRequestRequest {
+    power_mw power = 0;
+    elapsed_s duration = 1;
+  }
+
+  request struct StartTimeAdjustRequestRequest {
+    epoch_s requestedStartTime = 0;
+  }
+
+  request struct PauseRequestRequest {
+    elapsed_s duration = 0;
+  }
+
+  request struct ModifyForecastRequestRequest {
+    int32u forecastId = 0;
+    SlotAdjustmentStruct slotAdjustments[] = 1;
+  }
+
+  request struct RequestConstraintBasedForecastRequest {
+    ConstraintsStruct constraints[] = 0;
+  }
+
+  /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
+  command PowerAdjustRequest(PowerAdjustRequestRequest): DefaultSuccess = 0;
+  /** Allows a client to cancel an ongoing PowerAdjustmentRequest operation. */
+  command CancelPowerAdjustRequest(): DefaultSuccess = 1;
+  /** Allows a client to adjust the start time of a Forecast sequence that has not yet started operation (i.e. where the current Forecast StartTime is in the future). */
+  command StartTimeAdjustRequest(StartTimeAdjustRequestRequest): DefaultSuccess = 2;
+  /** Allows a client to temporarily pause an operation and reduce the ESAs energy demand. */
+  command PauseRequest(PauseRequestRequest): DefaultSuccess = 3;
+  /** Allows a client to cancel the PauseRequest command and enable earlier resumption of operation. */
+  command ResumeRequest(): DefaultSuccess = 4;
+  /** Allows a client to modify a Forecast within the limits allowed by the ESA. */
+  command ModifyForecastRequest(ModifyForecastRequestRequest): DefaultSuccess = 5;
+  /** Allows a client to ask the ESA to recompute its Forecast based on power and time constraints. */
+  command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
+}
+
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
 provisional cluster EnergyEvse = 153 {
   revision 2;
@@ -1290,6 +1469,34 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
+  server cluster DeviceEnergyManagement {
+    emits event PowerAdjustStart;
+    emits event PowerAdjustEnd;
+    emits event Paused;
+    emits event Resumed;
+    callback attribute ESAType;
+    callback attribute ESACanGenerate;
+    callback attribute ESAState;
+    callback attribute absMinPower;
+    callback attribute absMaxPower;
+    callback attribute powerAdjustmentCapability;
+    callback attribute forecast;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 2;
+
+    handle command PowerAdjustRequest;
+    handle command CancelPowerAdjustRequest;
+    handle command StartTimeAdjustRequest;
+    handle command PauseRequest;
+    handle command ResumeRequest;
+    handle command ModifyForecastRequest;
+    handle command RequestConstraintBasedForecast;
+  }
+
   server cluster EnergyEvse {
     emits event EVConnected;
     emits event EVNotDetected;
@@ -1300,33 +1507,33 @@ endpoint 1 {
     callback attribute state;
     callback attribute supplyState;
     callback attribute faultState;
-    callback attribute chargingEnabledUntil default = 0;
-    callback attribute dischargingEnabledUntil default = 0;
-    callback attribute circuitCapacity default = 0;
-    callback attribute minimumChargeCurrent default = 6000;
-    callback attribute maximumChargeCurrent default = 0;
-    callback attribute maximumDischargeCurrent default = 0;
-    callback attribute userMaximumChargeCurrent default = 0;
-    callback attribute randomizationDelayWindow default = 600;
+    callback attribute chargingEnabledUntil;
+    callback attribute dischargingEnabledUntil;
+    callback attribute circuitCapacity;
+    callback attribute minimumChargeCurrent;
+    callback attribute maximumChargeCurrent;
+    callback attribute maximumDischargeCurrent;
+    callback attribute userMaximumChargeCurrent;
+    callback attribute randomizationDelayWindow;
     callback attribute numberOfWeeklyTargets default = 0;
     callback attribute numberOfDailyTargets default = 1;
     callback attribute nextChargeStartTime;
     callback attribute nextChargeTargetTime;
     callback attribute nextChargeRequiredEnergy;
     callback attribute nextChargeTargetSoC;
-    callback attribute approximateEVEfficiency default = 0xFFFF;
+    callback attribute approximateEVEfficiency;
     callback attribute stateOfCharge;
     callback attribute batteryCapacity;
     callback attribute vehicleID;
-    callback attribute sessionID default = 0;
-    callback attribute sessionDuration default = 0;
-    callback attribute sessionEnergyCharged default = 0;
-    callback attribute sessionEnergyDischarged default = 0;
+    callback attribute sessionID;
+    callback attribute sessionDuration;
+    callback attribute sessionEnergyCharged;
+    callback attribute sessionEnergyDischarged;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 2;
 
     handle command GetTargetsResponse;
