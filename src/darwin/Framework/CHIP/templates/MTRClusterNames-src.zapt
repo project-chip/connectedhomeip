@@ -1,8 +1,6 @@
 {{> header excludeZapComment=true}}
 
 
-#import <Foundation/Foundation.h>
-
 #import "MTRClusterNames.h"
 
 // @implementation MTRClusterAttributeIDType
@@ -72,14 +70,14 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
 {{> attributeIDs clusterName=label}}
 
+{{#if (isSupported (asUpperCamelCase label preserveAcronyms=true) isForIds=true)}}
             default:
                 result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
                 break;
         }
-        break;    
+{{/if}}
 
 {{/zcl_clusters}}
-
         default:
            result = [NSString stringWithFormat:@"<Unknown clusterID %d>", clusterID];
            break;
