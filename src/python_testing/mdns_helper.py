@@ -102,7 +102,7 @@ class MdnsHelper:
         else:
             # Return specified value by key
             return self._get_txt_record_key_value(key)
-    
+
     async def getOperationalServiceInfo(self, refresh=False):
 
         # Setup service listener
