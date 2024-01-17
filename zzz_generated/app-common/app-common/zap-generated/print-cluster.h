@@ -38,12 +38,6 @@
 #define CHIP_PRINTCLUSTER_GROUPS_CLUSTER
 #endif
 
-#if defined(ZCL_USING_SCENES_CLUSTER_SERVER) || defined(ZCL_USING_SCENES_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SCENES_CLUSTER { chip::app::Clusters::Scenes::Id, "Scenes" },
-#else
-#define CHIP_PRINTCLUSTER_SCENES_CLUSTER
-#endif
-
 #if defined(ZCL_USING_ON_OFF_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ON_OFF_CLUSTER { chip::app::Clusters::OnOff::Id, "On/Off" },
 #else
@@ -413,6 +407,12 @@
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER
 #endif
 
+#if defined(ZCL_USING_SCENES_CLUSTER_SERVER) || defined(ZCL_USING_SCENES_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SCENES_CLUSTER { chip::app::Clusters::ScenesManagement::Id, "Scenes Management" },
+#else
+#define CHIP_PRINTCLUSTER_SCENES_CLUSTER
+#endif
+
 #if defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                           \
     { chip::app::Clusters::HepaFilterMonitoring::Id, "HEPA Filter Monitoring" },
@@ -768,7 +768,6 @@
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
@@ -827,6 +826,7 @@
     CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER                                                                          \
