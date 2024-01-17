@@ -1,8 +1,0 @@
-{{> header excludeZapComment=true}}
-
-#import <Matter/MTRClusterConstants.h>
-#import <Matter/MTRDefines.h>
-#import <stdint.h>
-
-MTR_EXPORT MTR_NEWLY_AVAILABLE NSString * MTRClusterNameForID(MTRClusterIDType clusterID);
-MTR_EXPORT MTR_NEWLY_AVAILABLE NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType attributeID);
