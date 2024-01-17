@@ -170,8 +170,8 @@ reserved int64_t test event trigger codes.
 By default the test event support is not enabled, and when compiling the example
 app you need to add `chip_enable_energy_evse_trigger=true` to the gn args.
 
-          $ gn gen out/debug
-          $ ninja -C out/debug --args='chip_enable_energy_evse_trigger=true'
+          $ gn gen out/debug --args='chip_enable_energy_evse_trigger=true'
+          $ ninja -C out/debug
 
 Once the application is built you also need to tell it at runtime what the
 chosen enable key is using the `--enable-key` command line option.
