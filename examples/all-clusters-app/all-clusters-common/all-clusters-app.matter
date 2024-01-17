@@ -8114,13 +8114,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
-    handle command SetActiveScheduleRequest;
-    handle command SetActivePresetRequest;
-    handle command StartPresetsSchedulesEditRequest;
-    handle command CancelPresetsSchedulesEditRequest;
-    handle command CommitPresetsSchedulesRequest;
-    handle command CancelSetActivePresetRequest;
-    handle command SetTemperatureSetpointHoldPolicy;
   }
 
   server cluster FanControl {
