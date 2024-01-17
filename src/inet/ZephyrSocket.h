@@ -31,6 +31,7 @@
 #include <zephyr/net/socket.h>
 #endif
 
+#ifndef CONFIG_NET_CONTEXT_RECV_PKTINFO
 static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 {
     // Zephyr doesn't implement recvmsg at all, but if the message vector size is > 0 we can simply
@@ -51,3 +52,4 @@ static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 
     return ret;
 }
+#endif
