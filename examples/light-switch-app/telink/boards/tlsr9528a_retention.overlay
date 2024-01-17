@@ -1,0 +1,82 @@
+/ {
+	aliases {
+		/delete-property/ sw1;
+		/delete-property/ sw2;
+		/delete-property/ sw3;
+		led0 = &led_blue;
+		sw1 = &key_switch;
+		motorsleep = &motor_sleep;
+		motordetect = &motor_detect;
+		pwmmotorin1 = &pwm_motor_1;
+		pwmmotorin2 = &pwm_motor_2;
+	};
+
+	keys {
+		/delete-node/ button_2;
+		/delete-node/ button_3;
+		/delete-node/ button_4;
+
+		key_switch: button_switch {
+			label = "BUTTON SWITCH";
+			gpios = <&gpioa 4 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+		motor_detect: motor_switch {
+			label = "MOTOR SWITCH";
+			gpios = <&gpioc 1 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led_blue: led_0 {
+			gpios = <&gpioc 2 GPIO_ACTIVE_HIGH>;
+			label = "LED Blue";
+		};
+		motor_sleep: io_sleep {
+			gpios = <&gpioa 1 GPIO_ACTIVE_LOW>;
+			label = "Motor sleep";
+		};
+	};
+
+	pwm_leds {
+		compatible = "pwm-leds";
+		pwm_motor_1: pwm_in_0 {
+			pwms = <&pwm0 0 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM motor in1";
+		};
+		pwm_motor_2: pwm_in_1 {
+			pwms = <&pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			label = "PWM motor in2";
+		};
+    };
+};
+
+&pinctrl {
+	pwm_ch0_pa2_default: pwm_ch0_pa2_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_A, B9x_PIN_2, B92_FUNC_PWM0)>;
+	};
+	pwm_ch1_pa3_default: pwm_ch1_pa3_default {
+		pinmux = <B9x_PINMUX_SET(B9x_PORT_A, B9x_PIN_3, B92_FUNC_PWM1)>;
+	};
+};
+
+&pwm0 {
+	status = "okay";
+	pinctrl-0 = <&pwm_ch0_pa2_default &pwm_ch1_pa3_default>;
+};
+
+&gpioc {
+	interrupts = <39 1>;
+	status = "okay";
+};
+
+&gpioa {
+	interrupts = <38 1>;
+	status = "okay";
+};
+
+&gpiof {
+	status = "disabled";
+};
+
+

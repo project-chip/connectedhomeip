@@ -30,12 +30,12 @@ LOG_MODULE_DECLARE(Motor, CONFIG_CHIP_APP_LOG_LEVEL);
 //const struct gpio_dt_spec sMotorSleepDt = GPIO_DT_SPEC_GET(DT_ALIAS(motorsleep), gpios);
 //const struct gpio_dt_spec sMotorIn1Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin1), gpios);
 //const struct gpio_dt_spec sMotorIn2Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin2), gpios);
-static gpio_dt_spec sMotorSleepDt = GPIO_DT_SPEC_GET(DT_ALIAS(motorsleep), gpios);
-static gpio_dt_spec sMotorStallingDt = GPIO_DT_SPEC_GET(DT_ALIAS(motordetect), gpios);
+static const struct gpio_dt_spec sMotorSleepDt = GPIO_DT_SPEC_GET(DT_ALIAS(motorsleep), gpios);
+static const struct gpio_dt_spec sMotorStallingDt = GPIO_DT_SPEC_GET(DT_ALIAS(motordetect), gpios);
 //static gpio_dt_spec sMotorIn1Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin1), gpios);
-static pwm_dt_spec sMotorIn1Dt = PWM_DT_SPEC_GET(DT_ALIAS(pwmmotorin1));
+static const struct pwm_dt_spec sMotorIn1Dt = PWM_DT_SPEC_GET(DT_ALIAS(pwmmotorin1));
 //static gpio_dt_spec sMotorIn2Dt = GPIO_DT_SPEC_GET(DT_ALIAS(motorin2), gpios);
-static pwm_dt_spec sMotorIn2Dt = PWM_DT_SPEC_GET(DT_ALIAS(pwmmotorin2));
+static const struct pwm_dt_spec sMotorIn2Dt = PWM_DT_SPEC_GET(DT_ALIAS(pwmmotorin2));
 
 static MotorWidget::MotorWidgetStateUpdateHandler sStateUpdateCallback;
 static MotorWidget::MotorWidgetStateUpdateHandler sStopCallback;
