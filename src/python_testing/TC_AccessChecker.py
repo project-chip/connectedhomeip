@@ -169,6 +169,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing non-writeable attribute - expected Unsupported Write, got {resp[0].Status}")
                     self.success = False
+            elif is_optional_write and resp[0].Status == Status.UnsupportedWrite:
+                # unsupported optional writeable attribute - this is fine, no error
+                continue
             elif operation_allowed(spec_requires, privilege):
                 # Write the default attribute. We don't care if this fails, as long as it fails with a DIFFERENT error than the access
                 # This is OK because access is required to be checked BEFORE any other thing to avoid leaking device information.
@@ -180,8 +183,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                       problem="Unexpected UnsupportedAccess writing attribute")
                     self.success = False
             else:
-                ok = (is_optional_write and resp[0].Status == Status.UnsupportedWrite) or resp[0].Status == Status.UnsupportedAccess
-                if not ok:
+                if resp[0].Status != Status.UnsupportedAccess:
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing attribute - expected Unsupported Access, got {resp[0].Status}")
                     self.success = False
@@ -192,7 +194,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             await self._setup_acl(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
             wildcard_read = await self.TH2.Read(self.dut_node_id, [()])
 
-        privilege_enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
             await self._setup_acl(privilege=privilege)
