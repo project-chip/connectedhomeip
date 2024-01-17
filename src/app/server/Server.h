@@ -317,6 +317,11 @@ public:
     CHIP_ERROR
     SendUserDirectedCommissioningRequest(chip::Transport::PeerAddress commissioner,
                                          Protocols::UserDirectedCommissioning::IdentificationDeclaration & id);
+
+    Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient * GetUserDirectedCommissioningClient()
+    {
+        return gUDCClient;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
 
     /**
