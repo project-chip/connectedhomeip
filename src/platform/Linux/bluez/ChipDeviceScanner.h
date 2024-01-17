@@ -104,7 +104,7 @@ private:
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
     ChipDeviceScannerState mCurrentState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
-    std::mutex mScannerLock;
+    std::mutex mScannerStoppingLock;
     /// Used to track if timer has already expired and doesn't need to be canceled.
     bool mTimerExpired = false;
 };

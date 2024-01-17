@@ -118,26 +118,11 @@ void ChipDeviceScanner::Shutdown()
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
 {
     assertChipStackLockedByCurrentThread();
-
-    mScannerLock.lock();
-
-    if (mCurrentState != ChipDeviceScannerState::SCANNER_INITIALIZED)
-    {
-        mScannerLock.unlock();
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(mCurrentState == ChipDeviceScannerState::SCANNER_INITIALIZED, CHIP_ERROR_INCORRECT_STATE);
 
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan start.");
-
-        mScannerLock.unlock();
-
-        ChipDeviceScannerDelegate * delegate = this->mDelegate;
-        // callback is explicitly allowed to delete the scanner (hence no more
-        // references to 'self' here)
-        delegate->OnScanComplete();
-
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -151,14 +136,10 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule scan timeout.");
-        // !!! Unlock before StopScan to avoid deadlock
-        mScannerLock.unlock();
         StopScan();
         return err;
     }
     mTimerExpired = false;
-
-    mScannerLock.unlock();
 
     return CHIP_NO_ERROR;
 }
@@ -173,13 +154,9 @@ void ChipDeviceScanner::TimerExpiredCallback(chip::System::Layer * layer, void *
 
 CHIP_ERROR ChipDeviceScanner::StopScan()
 {
-    mScannerLock.lock();
+    std::lock_guard<std::mutex> lock(mScannerStoppingLock);
 
-    if (mCurrentState != ChipDeviceScannerState::SCANNER_SCANNING)
-    {
-        mScannerLock.unlock();
-        return CHIP_NO_ERROR;
-    }
+    VerifyOrReturnError(mCurrentState == ChipDeviceScannerState::SCANNER_SCANNING, CHIP_NO_ERROR);
 
     g_cancellable_cancel(mCancellable); // in case we are currently running a scan
 
@@ -198,14 +175,11 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStopScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan stop.");
-        mScannerLock.unlock();
         return CHIP_ERROR_INTERNAL;
     }
 
     // Stop scanning and return to initialization state
     mCurrentState = ChipDeviceScannerState::SCANNER_INITIALIZED;
-
-    mScannerLock.unlock();
 
     ChipDeviceScannerDelegate * delegate = this->mDelegate;
     // callback is explicitly allowed to delete the scanner (hence no more
@@ -329,6 +303,8 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
+
+        self->mDelegate->OnScanComplete();
         return CHIP_ERROR_INTERNAL;
     }
 
