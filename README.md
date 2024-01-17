@@ -27,12 +27,12 @@ Device: SiWx917 SoC
 This repo contains documentation, demos, examples and all the code needed for Matter Accessory Device development on both Thread and Wi-Fi. The Thread development use cases differs from Wi-Fi because the Thread protocol requires the use of an Open Thread Border Router (OTBR).  
 
 -   To get started with the Thread demo and development see
-    [Matter Thread](https://siliconlabs.github.io/matter/2.2.0-1.2-alpha.1/thread/DEMO_OVERVIEW.html)
+    [Matter Thread](https://siliconlabs.github.io/matter/2.3.0-1.3-alpha.1/thread/DEMO_OVERVIEW.html)
 -   To get started with the Wi-Fi demo and development see
-    [Matter Wi-Fi](https://siliconlabs.github.io/matter/2.2.0-1.2-alpha.1/wifi/DEMO_OVERVIEW.html)
+    [Matter Wi-Fi](https://siliconlabs.github.io/matter/2.3.0-1.3-alpha.1/wifi/DEMO_OVERVIEW.html)
 
 The full documentation set starts here:
-[Silicon Labs Matter GitHub Documentation](https://siliconlabs.github.io/matter/2.2.0-1.2-alpha.1)
+[Silicon Labs Matter GitHub Documentation](https://siliconlabs.github.io/matter/2.3.0-1.3-alpha.1)
 
 ---
 
