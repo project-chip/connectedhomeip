@@ -69,6 +69,9 @@ enum class TimeSyncEventFlag : uint8_t
     kMissingTTSource = 16,
 };
 
+void SetDefaultDelegate(Delegate * delegate);
+Delegate * GetDefaultDelegate();
+
 class TimeSynchronizationServer : public FabricTable::Delegate
 #if TIME_SYNC_ENABLE_TSC_FEATURE
     ,

@@ -46,12 +46,6 @@ IMWriteStatus = Struct(
     "AttributeId" / Int32ul,
 )
 
-CommandPathIBStruct = Struct(
-    "EndpointId" / Int16ul,
-    "ClusterId" / Int32ul,
-    "CommandId" / Int32ul,
-)
-
 # AttributePath should not contain padding
 AttributePathIBstruct = Struct(
     "EndpointId" / Int16ul,
@@ -132,6 +126,77 @@ class SessionParameters:
     interactionModelRevision: typing.Optional[int]
     specficiationVersion: typing.Optional[int]
     maxPathsPerInvoke: int
+
+
+class PyCommandPath(ctypes.Structure):
+    ''' InvokeRequest Path struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of InvokeRequest between Python and C++:
+
+    ```c
+    struct PyCommandPath
+    {
+        chip::EndpointId endpointId;
+        chip::ClusterId clusterId;
+        chip::CommandId commandId;
+    };
+    ```
+    '''
+    _fields_ = [('endpointId', ctypes.c_uint16), ('clusterId', ctypes.c_uint32), ('commandId', ctypes.c_uint32)]
+
+
+class PyInvokeRequestData(ctypes.Structure):
+    ''' InvokeRequest struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of InvokeRequest between Python and C++:
+
+    ```c
+    struct PyInvokeRequestData
+    {
+        PyCommandPath commandPath;
+        void * tlvData;
+        size_t tlvLength;
+    };
+    ```
+    '''
+    _fields_ = [('commandPath', PyCommandPath), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
+
+
+class PyAttributePath(ctypes.Structure):
+    ''' Attributed Path struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of WriteAttributes between Python and C++:
+
+    ```c
+    struct PyAttributePath
+    {
+        chip::EndpointId endpointId;
+        chip::ClusterId clusterId;
+        chip::AttributeId attributeId;
+        chip::DataVersion dataVersion;
+        uint8_t hasDataVersion;
+    };
+    ```
+    '''
+    _fields_ = [('endpointId', ctypes.c_uint16), ('clusterId', ctypes.c_uint32), ('attributeId',
+                                                                                  ctypes.c_uint32), ('dataVersion', ctypes.c_uint32), ('hasDataVersion', ctypes.c_uint8)]
+
+
+class PyWriteAttributeData(ctypes.Structure):
+    ''' WriteAttribute struct that has c++ counterpart for CFFI.
+
+    We are using the following struct for passing the information of WriteAttributes between Python and C++:
+
+    ```c
+    struct PyWriteAttributeData
+    {
+        PyAttributePath attributePath;
+        void * tlvData;
+        size_t tlvLength;
+    };
+    ```
+    '''
+    _fields_ = [('attributePath', PyAttributePath), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
 
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,

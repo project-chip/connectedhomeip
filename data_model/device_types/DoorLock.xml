@@ -72,7 +72,7 @@ Davis, CA 95616, USA
         <condition name="Zigbee"/>
       </optionalConform>
     </cluster>
-    <cluster id="0x0005" name="Scenes" side="server">
+    <cluster id="0x0062" name="Scenes Management" side="server">
       <otherwiseConform>
         <optionalConform>
           <condition name="Zigbee"/>

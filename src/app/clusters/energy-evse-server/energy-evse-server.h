@@ -48,6 +48,7 @@ public:
     virtual ~Delegate() = default;
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
+    EndpointId GetEndpointId() { return mEndpointId; }
 
     /**
      * @brief Delegate should implement a handler to disable the EVSE.
@@ -116,9 +117,9 @@ public:
 
     // ------------------------------------------------------------------
     // Set attribute methods
-    virtual CHIP_ERROR SetUserMaximumChargeCurrent(int64_t aNewValue)  = 0;
-    virtual CHIP_ERROR SetRandomizationDelayWindow(uint32_t aNewValue) = 0;
-    virtual CHIP_ERROR SetApproximateEVEfficiency(uint16_t aNewValue)  = 0;
+    virtual CHIP_ERROR SetUserMaximumChargeCurrent(int64_t aNewValue)                      = 0;
+    virtual CHIP_ERROR SetRandomizationDelayWindow(uint32_t aNewValue)                     = 0;
+    virtual CHIP_ERROR SetApproximateEVEfficiency(DataModel::Nullable<uint16_t> aNewValue) = 0;
 
 protected:
     EndpointId mEndpointId = 0;

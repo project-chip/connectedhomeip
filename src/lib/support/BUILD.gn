@@ -297,7 +297,18 @@ static_library("support") {
   }
 }
 
-static_library("testing") {
+static_library("test_utils") {
+  output_name = "libTestUtils"
+  output_dir = "${root_out_dir}/lib"
+  deps = [ "${chip_root}/src/platform" ]
+
+  sources = [
+    "UnitTestUtils.cpp",
+    "UnitTestUtils.h",
+  ]
+}
+
+static_library("testing_nlunit") {
   output_name = "libSupportTesting"
   output_dir = "${root_out_dir}/lib"
 
@@ -305,8 +316,6 @@ static_library("testing") {
     "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
-    "UnitTestUtils.cpp",
-    "UnitTestUtils.h",
   ]
 
   public_deps = [

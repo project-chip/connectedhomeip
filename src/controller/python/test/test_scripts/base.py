@@ -19,10 +19,12 @@ import asyncio
 import copy
 import ctypes
 import faulthandler
+import hashlib
 import inspect
 import logging
 import os
 import secrets
+import struct
 import sys
 import threading
 import time
@@ -41,6 +43,7 @@ from chip.ChipStack import ChipStack
 from chip.crypto import p256keypair
 from chip.utils import CommissioningBuildingBlocks
 from cirque_restart_remote_device import restartRemoteDevice
+from ecdsa import NIST256p
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -51,6 +54,16 @@ sh.setFormatter(
         '%(asctime)s [%(name)s] %(levelname)s %(message)s'))
 sh.setStream(sys.stdout)
 logger.addHandler(sh)
+
+
+def GenerateVerifier(passcode: int, salt: bytes, iterations: int) -> bytes:
+    ws_len = NIST256p.baselen + 8
+    ws = hashlib.pbkdf2_hmac('sha256', struct.pack('<I', passcode), salt, iterations, ws_len * 2)
+    w0 = int.from_bytes(ws[:ws_len], byteorder='big') % NIST256p.order
+    w1 = int.from_bytes(ws[ws_len:], byteorder='big') % NIST256p.order
+    L = NIST256p.generator * w1
+
+    return w0.to_bytes(NIST256p.baselen, byteorder='big') + L.to_bytes('uncompressed')
 
 
 def TestFail(message, doCrash=False):
@@ -1424,21 +1437,25 @@ class BaseTestHelper:
     controller 1 in container 1 while the Step2 is executed in controller 2 in container 2
     '''
 
-    def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, subscription_capacity: int):
+    def TestSubscriptionResumptionCapacityStep1(self, nodeid: int, endpoint: int, passcode: int, subscription_capacity: int):
         try:
             # BasicInformation Cluster, NodeLabel Attribute
             for i in range(subscription_capacity):
                 self.devCtrl.ZCLSubscribeAttribute(
                     "BasicInformation", "NodeLabel", nodeid, endpoint, 1, 50, keepSubscriptions=True, autoResubscribe=False)
 
-            logger.info("Send OpenBasicCommissioningWindow command on fist controller")
-            asyncio.run(
-                self.devCtrl.SendCommand(
-                    nodeid,
-                    0,
-                    Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180),
-                    timedRequestTimeoutMs=10000
-                ))
+            logger.info("Send OpenCommissioningWindow command on fist controller")
+            discriminator = 3840
+            salt = secrets.token_bytes(16)
+            iterations = 2000
+            verifier = GenerateVerifier(passcode, salt, iterations)
+            asyncio.run(self.devCtrl.SendCommand(
+                nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenCommissioningWindow(
+                    commissioningTimeout=180,
+                    PAKEPasscodeVerifier=verifier,
+                    discriminator=discriminator,
+                    iterations=iterations,
+                    salt=salt), timedRequestTimeoutMs=10000))
             return True
 
         except Exception as ex:
