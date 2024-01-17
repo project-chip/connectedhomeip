@@ -5667,6 +5667,7 @@ private:
 | * Stop                                                              |   0x01 |
 | * Start                                                             |   0x02 |
 | * Resume                                                            |   0x03 |
+| * GoHome                                                            |   0x80 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * PhaseList                                                         | 0x0000 |
@@ -5829,6 +5830,42 @@ public:
 
 private:
     chip::app::Clusters::RvcOperationalState::Commands::Resume::Type mRequest;
+};
+
+/*
+ * Command GoHome
+ */
+class RvcOperationalStateGoHome : public ClusterCommand
+{
+public:
+    RvcOperationalStateGoHome(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("go-home", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::GoHome::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::GoHome::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::RvcOperationalState::Commands::GoHome::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -6846,42 +6883,6 @@ public:
 
 private:
     chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type mRequest;
-};
-
-/*
- * Command GoHome
- */
-class RvcOperationalStateGoHome : public ClusterCommand
-{
-public:
-    RvcOperationalStateGoHome(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("go-home", credsIssuerConfig)
-    {
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::GoHome::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::RvcOperationalState::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::RvcOperationalState::Commands::GoHome::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::RvcOperationalState::Commands::GoHome::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\

@@ -6405,7 +6405,7 @@ void CHIPContentAppObserverClusterContentAppMessageResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, Data, EncodingHint);
 }
 CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback::
-CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(jobject javaCallback) :
+    CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(jobject javaCallback) :
     Callback::Callback<CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -6422,8 +6422,8 @@ CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(jobject ja
     }
 }
 
-CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback::~
-CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback()
+CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback::
+    ~CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6500,7 +6500,7 @@ void CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback::Call
     env->CallVoidMethod(javaCallbackRef, javaMethod, profileCount, profileIntervalPeriod, maxNumberOfIntervals, listOfAttributes);
 }
 CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback::
-CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(jobject javaCallback) :
+    CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(jobject javaCallback) :
     Callback::Callback<CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -6517,8 +6517,8 @@ CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(job
     }
 }
 
-CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback::~
-CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback()
+CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback::
+    ~CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -7456,7 +7456,7 @@ void CHIPUnitTestingClusterTestNullableOptionalResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, wasPresent, wasNull, value, originalValue);
 }
 CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::
-CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback(jobject javaCallback) :
+    CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -7473,8 +7473,8 @@ CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback(jobject javaCa
     }
 }
 
-CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::~
-CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback()
+CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::
+    ~CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -8360,7 +8360,7 @@ void CHIPUnitTestingClusterTestEmitTestEventResponseCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, value);
 }
 CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback::
-CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback(jobject javaCallback) :
+    CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -8377,8 +8377,8 @@ CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback(jobject java
     }
 }
 
-CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback::~
-CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback()
+CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback::
+    ~CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
