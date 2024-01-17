@@ -25,6 +25,7 @@
 #pragma once
 
 #include <access/AccessControl.h>
+#include <app/InteractionModelEngine.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
@@ -59,10 +60,12 @@ public:
     /**
      * Initializes the reporting engine. Should only be called once.
      *
+     * @param[in]    apImEngine       A valid pointer to the IM engine.
+     *
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(InteractionModelEngine * apImEngine);
 
     void Shutdown();
 
@@ -279,6 +282,8 @@ private:
     uint32_t mReservedSize          = 0;
     uint32_t mMaxAttributesPerChunk = UINT32_MAX;
 #endif
+
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 }; // namespace reporting

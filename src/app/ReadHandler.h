@@ -202,10 +202,10 @@ public:
      *
      *  Constructor.
      *
-     *  The callback passed in has to outlive this handler object.
+     *  The InteractionModelEngine and the callback passed in have to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
+    ReadHandler(InteractionModelEngine * apImEngine, ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
                 Observer * observer);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -565,6 +565,8 @@ private:
 
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
+
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 } // namespace app
 } // namespace chip
