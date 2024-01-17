@@ -56,7 +56,7 @@ declare_args() {
   show_qr_code = !disable_lcd
 
   # Enabling BLE on 9116/917 NCP by default
-  chip_enable_ble_rs911x = (use_rs9116 || use_SiWx917)
+  chip_enable_ble_rs911x = use_rs9116 || use_SiWx917
 }
 
 if (silabs_board == "") {
