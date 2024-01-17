@@ -1723,6 +1723,11 @@ enum class StatusCode : uint8_t
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+};
 } // namespace RvcRunMode
 
 namespace RvcCleanMode {
@@ -1749,6 +1754,11 @@ enum class StatusCode : uint8_t
     // cluster. As a result having kUnknownEnumValue in this enum is error
     // prone, and was removed. See
     // src/app/common/templates/config-data.yaml.
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
 };
 } // namespace RvcCleanMode
 

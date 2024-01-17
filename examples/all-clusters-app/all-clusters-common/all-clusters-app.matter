@@ -3055,6 +3055,9 @@ cluster RvcRunMode = 84 {
     kBatteryLow = 72;
   }
 
+  bitmap Feature : bitmap32 {
+  }
+
   struct ModeTagStruct {
     optional vendor_id mfgCode = 0;
     enum16 value = 1;
@@ -3101,6 +3104,9 @@ cluster RvcCleanMode = 85 {
 
   enum StatusCode : enum8 {
     kCleaningInProgress = 64;
+  }
+
+  bitmap Feature : bitmap32 {
   }
 
   struct ModeTagStruct {

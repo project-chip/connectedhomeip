@@ -17435,6 +17435,9 @@ class RvcRunMode(Cluster):
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
 
+    class Bitmaps:
+        class Feature(IntFlag):
+
     class Structs:
         @dataclass
         class ModeTagStruct(ClusterObject):
@@ -17674,6 +17677,9 @@ class RvcCleanMode(Cluster):
             # cluster. As a result having kUnknownEnumValue in this enum is error
             # prone, and was removed. See
             # src/app/common/templates/config-data.yaml.
+
+    class Bitmaps:
+        class Feature(IntFlag):
 
     class Structs:
         @dataclass

@@ -16812,6 +16812,9 @@ typedef NS_ENUM(uint8_t, MTRRVCRunModeStatusCode) {
     MTRRVCRunModeStatusCodeBatteryLow MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x48,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
+typedef NS_OPTIONS(uint32_t, MTRRVCRunModeFeature) {
+} MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+
 typedef NS_ENUM(uint16_t, MTRRVCCleanModeModeTag) {
     MTRRVCCleanModeModeTagDeepClean MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x4000,
     MTRRVCCleanModeModeTagVacuum MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x4001,
@@ -16820,6 +16823,9 @@ typedef NS_ENUM(uint16_t, MTRRVCCleanModeModeTag) {
 
 typedef NS_ENUM(uint8_t, MTRRVCCleanModeStatusCode) {
     MTRRVCCleanModeStatusCodeCleaningInProgress MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x40,
+} MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+
+typedef NS_OPTIONS(uint32_t, MTRRVCCleanModeFeature) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {
