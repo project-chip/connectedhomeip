@@ -76,6 +76,14 @@ void Instant(const char * label, const char * group)
     }
 }
 
+void Counter(const char * label, const char * group)
+{
+    for (auto & backend : gTracingBackends)
+    {
+        backend.TraceCounter(label, group);
+    }
+}
+
 void LogMessageSend(::chip::Tracing::MessageSendInfo & info)
 {
     for (auto & backend : gTracingBackends)
