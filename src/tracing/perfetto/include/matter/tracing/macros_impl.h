@@ -24,9 +24,16 @@
 
 #include <perfetto.h>
 
+
 PERFETTO_DEFINE_CATEGORIES(perfetto::Category("Matter").SetDescription("Matter trace events"));
 
 #define MATTER_TRACE_BEGIN(label, group) TRACE_EVENT_BEGIN("Matter", label, "class_name", group)
 #define MATTER_TRACE_END(label, group) TRACE_EVENT_END("Matter")
 #define MATTER_TRACE_INSTANT(label, group) TRACE_EVENT_INSTANT("Matter", label, "class_name", group)
 #define MATTER_TRACE_SCOPE(label, group) TRACE_EVENT("Matter", label, "class_name", group)
+
+#define MATTER_TRACE_COUNTER(label,group) \
+    do { \
+        static int count##_label = 0; \
+        TRACE_COUNTER("Matter", perfetto::CounterTrack(label), ++count##_label); \
+    } while(0)
