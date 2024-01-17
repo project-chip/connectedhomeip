@@ -17,7 +17,7 @@
 import ctypes
 import threading
 import typing
-from ctypes import CFUNCTYPE, c_uint8, c_uint32, c_uint64, c_void_p
+from ctypes import CFUNCTYPE, POINTER, c_uint8, c_uint32, c_uint64, c_void_p
 from dataclasses import dataclass
 
 import chip.exceptions
@@ -197,6 +197,25 @@ class PyWriteAttributeData(ctypes.Structure):
     ```
     '''
     _fields_ = [('attributePath', PyAttributePath), ('tlvData', ctypes.c_void_p), ('tlvLength', ctypes.c_size_t)]
+
+
+class TestOnlyPyBatchCommandsOverrides(ctypes.Structure):
+    ''' TestOnly struct for overriding aspects of batch command to send invalid commands.
+
+    We are using the following struct for passing the information of TestOnlyPyBatchCommandsOverrides between Python and C++:
+
+    ```c
+    struct TestOnlyPyBatchCommandsOverrides
+    {
+        uint16_t overrideRemoteMaxPathsPerInvoke;
+        bool suppressTimedRequestMessage;
+        uint16_t * overrideCommandRefsList;
+        size_t overrideCommandRefsListLength;
+    };
+    ```
+    '''
+    _fields_ = [('overrideRemoteMaxPathsPerInvoke', ctypes.c_uint16), ('suppressTimedRequestMessage', ctypes.c_bool),
+                ('overrideCommandRefsList', POINTER(ctypes.c_uint16)), ('overrideCommandRefsListLength', ctypes.c_size_t)]
 
 
 # typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
