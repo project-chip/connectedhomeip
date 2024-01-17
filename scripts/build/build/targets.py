@@ -584,6 +584,8 @@ def BuildQorvoTarget():
         TargetPart('light', app=QpgApp.LIGHT),
         TargetPart('shell', app=QpgApp.SHELL),
         TargetPart('persistent-storage', app=QpgApp.PERSISTENT_STORAGE),
+        TargetPart('light-switch', app=QpgApp.LIGHT_SWITCH),
+        TargetPart('thermostat', app=QpgApp.THERMOSTAT),
     ])
 
     target.AppendModifier('updateimage', update_image=True)
