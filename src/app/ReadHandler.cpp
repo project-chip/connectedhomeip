@@ -52,11 +52,13 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 #endif
 }
 
-ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
+ReadHandler::ReadHandler(InteractionModelEngine * apImEngine, ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer) :
     mExchangeCtx(*this),
-    mManagementCallback(apCallback)
+    mManagementCallback(apCallback),
+    mpImEngine(apImEngine)
 {
+    VerifyOrDie(apImEngine != nullptr);
     VerifyOrDie(apExchangeContext != nullptr);
 
     mExchangeCtx.Grab(apExchangeContext);
@@ -68,7 +70,7 @@ ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeCon
 
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
-    mTransactionStartGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    mTransactionStartGeneration = mpImEngine->GetReportingEngine().GetDirtySetGeneration();
     mFlags.ClearAll();
     SetStateFlag(ReadHandlerFlags::PrimingReports);
 
@@ -102,7 +104,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths.AllocatedSize(); i++)
     {
         AttributePathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths[i].GetParams();
-        CHIP_ERROR err             = InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, params);
+        CHIP_ERROR err             = mpImEngine->PushFrontAttributePathList(mpAttributePathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -112,7 +114,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths.AllocatedSize(); i++)
     {
         EventPathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths[i].GetParams();
-        CHIP_ERROR err         = InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, params);
+        CHIP_ERROR err         = mpImEngine->PushFrontEventPathParamsList(mpEventPathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -137,7 +139,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     ObjectList<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(attributePath->mValue);
+        mpImEngine->GetReportingEngine().SetDirty(attributePath->mValue);
         attributePath = attributePath->mpNext;
     }
 }
@@ -156,11 +158,11 @@ ReadHandler::~ReadHandler()
 
     if (IsAwaitingReportResponse())
     {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+        mpImEngine->GetReportingEngine().OnReportConfirm();
     }
-    InteractionModelEngine::GetInstance()->ReleaseAttributePathList(mpAttributePathList);
-    InteractionModelEngine::GetInstance()->ReleaseEventPathList(mpEventPathList);
-    InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
+    mpImEngine->ReleaseAttributePathList(mpAttributePathList);
+    mpImEngine->ReleaseEventPathList(mpEventPathList);
+    mpImEngine->ReleaseDataVersionFilterList(mpDataVersionFilterList);
 }
 
 void ReadHandler::Close(CloseOptions options)
@@ -168,7 +170,7 @@ void ReadHandler::Close(CloseOptions options)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     if (IsType(InteractionType::Subscribe) && options == CloseOptions::kDropPersistedSubscription)
     {
-        auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+        auto * subscriptionResumptionStorage = mpImEngine->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
             subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
@@ -285,7 +287,7 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
 #else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = mpImEngine->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
@@ -310,7 +312,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
 #else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = InteractionModelEngine::GetInstance()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = mpImEngine->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
@@ -320,7 +322,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
     if (!IsReporting())
     {
-        mCurrentReportsBeginGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+        mCurrentReportsBeginGeneration = mpImEngine->GetReportingEngine().GetDirtySetGeneration();
     }
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
@@ -339,7 +341,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         {
             // Make sure we're not treated as an in-flight report waiting for a
             // response by the reporting engine.
-            InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+            mpImEngine->GetReportingEngine().OnReportConfirm();
         }
 
         // If we just finished a non-priming subscription report, notify our observers.
@@ -353,7 +355,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration;
         ClearForceDirtyFlag();
-        InteractionModelEngine::GetInstance()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
+        mpImEngine->ReleaseDataVersionFilterList(mpDataVersionFilterList);
     }
 
     return err;
@@ -489,12 +491,12 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
         AttributePathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
         ReturnErrorOnFailure(path.ParsePath(attribute));
-        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFrontAttributePathList(mpAttributePathList, attribute));
+        ReturnErrorOnFailure(mpImEngine->PushFrontAttributePathList(mpAttributePathList, attribute));
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        InteractionModelEngine::GetInstance()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
+        mpImEngine->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         err                          = CHIP_NO_ERROR;
     }
@@ -522,7 +524,7 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
         ReturnErrorOnFailure(path.GetCluster(&(versionFilter.mClusterId)));
         VerifyOrReturnError(versionFilter.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
         ReturnErrorOnFailure(
-            InteractionModelEngine::GetInstance()->PushFrontDataVersionFilterList(mpDataVersionFilterList, versionFilter));
+            mpImEngine->PushFrontDataVersionFilterList(mpDataVersionFilterList, versionFilter));
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -544,7 +546,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
         ReturnErrorOnFailure(path.ParsePath(event));
-        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFrontEventPathParamsList(mpEventPathList, event));
+        ReturnErrorOnFailure(mpImEngine->PushFrontEventPathParamsList(mpEventPathList, event));
     }
 
     // if we have exhausted this container
@@ -604,7 +606,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
 
     if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
     {
-        InteractionModelEngine::GetInstance()->GetReportingEngine().OnReportConfirm();
+        mpImEngine->GetReportingEngine().OnReportConfirm();
     }
 
     mState = aTargetState;
@@ -618,7 +620,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     {
         if (ShouldReportUnscheduled())
         {
-            InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+            mpImEngine->GetReportingEngine().ScheduleRun();
         }
         else
         {
@@ -814,7 +816,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
 void ReadHandler::PersistSubscription()
 {
-    auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
+    auto * subscriptionResumptionStorage = mpImEngine->GetSubscriptionResumptionStorage();
     VerifyOrReturn(subscriptionResumptionStorage != nullptr);
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
@@ -843,7 +845,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
 {
     ConcreteAttributePath path;
 
-    mDirtyGeneration = InteractionModelEngine::GetInstance()->GetReportingEngine().GetDirtySetGeneration();
+    mDirtyGeneration = mpImEngine->GetReportingEngine().GetDirtySetGeneration();
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.
