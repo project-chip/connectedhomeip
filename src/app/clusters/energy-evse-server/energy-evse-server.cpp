@@ -23,6 +23,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::EnergyEvse::Attributes;
@@ -125,6 +126,10 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         return aEncoder.Encode(mDelegate.GetSessionEnergyCharged());
     case SessionEnergyDischarged::Id:
         return aEncoder.Encode(mDelegate.GetSessionEnergyDischarged());
+
+    /* FeatureMap - is held locally */
+    case FeatureMap::Id:
+        return aEncoder.Encode(mFeature);
     }
     /* Allow all other unhandled attributes to fall through to Ember */
     return CHIP_NO_ERROR;
@@ -166,7 +171,7 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         }
         uint16_t newValue;
         ReturnErrorOnFailure(aDecoder.Decode(newValue));
-        ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(newValue));
+        ReturnErrorOnFailure(mDelegate.SetApproximateEVEfficiency(MakeNullable(newValue)));
         return CHIP_NO_ERROR;
     }
 

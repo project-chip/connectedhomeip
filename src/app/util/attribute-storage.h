@@ -24,7 +24,6 @@
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #include <app/att-storage.h>

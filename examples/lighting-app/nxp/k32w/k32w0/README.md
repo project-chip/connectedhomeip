@@ -192,58 +192,58 @@ effects:
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Start building the application either with Secure Element or without, SDK is
-    downloaded with west tool.
-    -   without Secure Element
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
-```
-
-In case there are local modification to the already installed git NXP SDK: Use
-the below west `forall` command instead of the west init command to reset the
-west workspace. Warning: all local changes will be lost after running this
-command.
+Activate the Matter environment:
 
 ```bash
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
-user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$west forall -c "git reset --hard && git clean -xdf" -a
+user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 ```
 
-Build the application
+To bring the SDK in the environment, the user can:
 
-Prior to building, the user can specify a custom `SDK` path by setting
-`NXP_K32W0_SDK_ROOT`:
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
 
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=$(pwd)/third_party/nxp/k32w0_sdk/repo/core
-```
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
+    ```
 
-If the environment variable `NXP_K32W0_SDK_ROOT` is not set, it will default to
-the `SDK` found in `third_party/nxp/k32w0_sdk/repo/core`.
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
 
-```
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
+    ```
+
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
+
+    ```
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
+    ```
+
+Start building the application:
+
+```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
 ```
 
-    -   with Secure element
+To build with Secure Element, follow the same steps as above but set
+`chip_with_se05x=1 chip_enable_ota_requestor=false` in the `gn gen` command.
 
-```
-        Exactly the same steps as above but set chip_with_se05x=1 in the gn command
-        and add argument chip_enable_ota_requestor=false
-```
-
-Note that option chip_enable_ota_requestor=false are required for building with
-Secure Element. These can be changed if building without Secure Element
+Note that option `chip_enable_ota_requestor=false` is required for building with
+Secure Element due to flash constraints.
 
 -   K32W041AM flavor
 
-    Exactly the same steps as above but set argument build_for_k32w041am=1 in
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
     the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
