@@ -69,30 +69,31 @@ class MdnsHelper:
         # Convert the value from bytes to string
         return value.decode('utf-8')
 
-    """
-    Asynchronously retrieves the TXT record for a given device.
-
-    This method queries the MDNS service to find the TXT record associated with
-    the specified device. It handles the lookup process and extracts specific
-    property values based on the provided key.
-
-    Args:
-        dut: The device under test. It should contain attributes like `dut_node_id` and 
-                `default_controller`.
-        key: An optional string specifying which particular property to extract from 
-                the TXT record. If None, all properties will be returned.
-        refresh: An optional flag that skips returning cached values, it will peform
-                the calls again.
-
-    Returns:
-        The value of the specified key from the device's TXT record. If the key is None,
-        returns all properties. If the service or key is not found, returns None.
-
-    Raises:
-        AssertError: If the service information is not found or the MDNS operational 
-                        service type is missing.
-    """
     async def getTxtRecord(self, key: str = None, refresh=False):
+        """
+        Asynchronously retrieves the TXT record for a given device.
+
+        This method queries the MDNS service to find the TXT record associated with
+        the specified device. It handles the lookup process and extracts specific
+        property values based on the provided key.
+
+        Args:
+            dut: The device under test. It should contain attributes like `dut_node_id` and
+                    `default_controller`.
+            key: An optional string specifying which particular property to extract from
+                    the TXT record. If None, all properties will be returned.
+            refresh (bool): If set to True, the method ignores any cached data and performs
+                            a fresh lookup. If False, it uses cached data if available.
+                            Defaults to False.
+
+        Returns:
+            The value of the specified key from the device's TXT record. If the key is None,
+            returns all properties. If the service or key is not found, returns None.
+
+        Raises:
+            AssertError: If the service information is not found or the MDNS operational
+                            service type is missing.
+        """
 
         await self.getOperationalServiceInfo(refresh=refresh)
 
@@ -104,6 +105,34 @@ class MdnsHelper:
             return self._get_txt_record_key_value(key)
 
     async def getOperationalServiceInfo(self, refresh=False):
+        """
+        Asynchronously retrieves the operational service information for the current device.
+
+        This method performs an MDNS lookup to fetch the operational service information,
+        which typically includes the service's TXT record containing various properties.
+        The method can be configured to either use cached service information or refresh it.
+
+        The process involves fetching available service types, and then specifically
+        querying for the operational service type defined by 'MDNS_TYPE_OPERATIONAL'.
+        The result includes details such as service name, port, addresses, and TXT record
+        properties.
+
+        Args:
+            refresh (bool): If set to True, the method ignores any cached data and performs
+                            a fresh lookup. If False, it uses cached data if available.
+                            Defaults to False.
+
+        Returns:
+            AsyncServiceInfo: An object containing details about the operational service.
+                              This includes TXT record properties and other service-related
+                              information. If the service or required type is not found,
+                              the method asserts a failure.
+
+        Raises:
+            AssertError: If no running services are found, or the specific MDNS operational
+                         service type is not available. Also asserts if the service info
+                         for the given name and type is not found.
+        """
 
         # Setup service listener
         await self._azc.async_remove_all_service_listeners()
