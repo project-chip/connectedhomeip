@@ -18,6 +18,7 @@
 import argparse
 import asyncio
 import builtins
+import glob
 import inspect
 import json
 import logging
@@ -34,6 +35,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import List, Optional, Tuple, Union
+import xml.etree.ElementTree as ET
 
 from chip.tlv import float32, uint
 
@@ -136,7 +138,7 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         return pathlib.Path.cwd()
 
 
-def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
+def parse_pics(lines: typing.List[str]) -> dict[str, bool]:
     pics = {}
     for raw in lines:
         line, _, _ = raw.partition("#")
@@ -154,11 +156,32 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
     return pics
 
 
-def read_pics_from_file(filename: str) -> dict[str, bool]:
-    """ Reads a dictionary of PICS from a file. """
-    with open(filename, 'r') as f:
-        lines = f.readlines()
-        return parse_pics(lines)
+def parse_pics_xml(contents: str) -> dict[str, bool]:
+    pics = {}
+    mytree = ET.fromstring(contents)
+    for pi in mytree.iter('picsItem'):
+        name = pi.find('itemNumber').text
+        support = pi.find('support').text
+        pics[name] = int(json.loads(support.lower())) == 1
+    return pics
+
+
+def read_pics_from_file(path: str) -> dict[str, bool]:
+    """ Reads a dictionary of PICS from a file (ci format) or directory (xml format). """
+    if os.path.isdir(os.path.abspath(path)):
+        pics_dict = {}
+        for filename in glob.glob(f'{path}/*.xml'):
+            with open(filename, 'r') as f:
+                contents = f.read()
+                pics_dict.update(parse_pics_xml(contents))
+        print(pics_dict)
+        return pics_dict
+
+    else:
+        print("notdir")
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            return parse_pics(lines)
 
 
 def type_matches(received_value, desired_type):
