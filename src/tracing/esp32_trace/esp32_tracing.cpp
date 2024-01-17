@@ -18,6 +18,7 @@
 
 #include "esp32_tracing.h"
 #include <algorithm>
+#include "counter.h"
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
 #include <esp_log.h>
@@ -148,6 +149,10 @@ void ESP32Backend::LogNodeDiscovered(NodeDiscoveredInfo & info) {}
 
 void ESP32Backend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
 
+void ESP32Backend::TraceCounter(const char * label, const char * group)
+{
+    ::Insights::ESPInsightsCounter::GetInstance(label, group)->ReportMetrics();
+}
 void ESP32Backend::TraceBegin(const char * label, const char * group)
 {
     HashValue hashValue = MurmurHash(group);
