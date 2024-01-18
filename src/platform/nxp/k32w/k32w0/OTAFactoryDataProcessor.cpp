@@ -73,7 +73,8 @@ CHIP_ERROR OTAFactoryDataProcessor::ProcessInternal(ByteSpan & block)
 
 CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error           = CHIP_NO_ERROR;
+    FactoryProvider * provider = nullptr;
 
     ReturnErrorOnFailure(Read());
     ReturnErrorOnFailure(Backup());
@@ -83,7 +84,16 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
     SuccessOrExit(error = Update((uint8_t) Tags::kPaiCertificateId, mPayload.mCertPai));
     SuccessOrExit(error = Update((uint8_t) Tags::kCertDeclarationId, mPayload.mCertDeclaration));
 
-    error = FactoryProviderImpl::UpdateData(mFactoryData);
+    SuccessOrExit(error = FactoryProviderImpl::UpdateData(mFactoryData));
+
+    /* Check integrity of freshly copied data. If validation fails, OTA will be aborted
+     * and factory data will be restored to the previous version. Use device instance info
+     * provider getter to access the factory data provider instance. The instance is created
+     * by the application, so it's easier to access it this way.*/
+    provider = static_cast<FactoryProvider *>(DeviceLayer::GetDeviceInstanceInfoProvider());
+    SuccessOrExit(error = ((provider != nullptr) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ADDRESS));
+
+    error = provider->Validate();
 
 exit:
     if (error != CHIP_NO_ERROR)

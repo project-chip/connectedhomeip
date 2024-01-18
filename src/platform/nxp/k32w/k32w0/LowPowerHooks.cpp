@@ -34,9 +34,6 @@
 #include "app_dual_mode_low_power.h"
 #include "app_dual_mode_switch.h"
 #include "k32w0-chip-mbedtls-config.h"
-#include <AppTask.h> // nogncheck
-
-#include "app_config.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -105,22 +102,6 @@ extern "C" bool isThreadInitialized()
 uint32_t dm_switch_get15_4InitWakeUpTime(void)
 {
     return dualModeStates.threadWarmBootInitTime;
-}
-
-extern "C" bleResult_t App_PostCallbackMessage(appCallbackHandler_t handler, appCallbackParam_t param)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_Lp;
-    event.Handler = handler;
-    event.param   = param;
-
-#if ENABLE_LOW_POWER_LOGS
-    K32W_LOG("App_PostCallbackMessage %d", (uint32_t) param);
-#endif
-
-    GetAppTask().PostEvent(&event);
-
-    return gBleSuccess_c;
 }
 
 WEAK void dm_switch_wakeupCallBack(void)

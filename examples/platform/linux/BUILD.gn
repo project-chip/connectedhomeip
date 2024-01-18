@@ -21,6 +21,8 @@ import("${chip_root}/src/tracing/tracing_args.gni")
 
 declare_args() {
   chip_enable_smoke_co_trigger = false
+  chip_enable_boolean_state_configuration_trigger = false
+  chip_enable_energy_evse_trigger = false
 }
 
 config("app-main-config") {
@@ -35,6 +37,14 @@ source_set("ota-test-event-trigger") {
 
 source_set("smco-test-event-trigger") {
   sources = [ "${chip_root}/src/app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h" ]
+}
+
+source_set("boolean-state-configuration-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerDelegate.h" ]
+}
+
+source_set("energy-evse-test-event-trigger") {
+  sources = [ "${chip_root}/src/app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h" ]
 }
 
 source_set("app-main") {
@@ -59,6 +69,8 @@ source_set("app-main") {
   ]
 
   public_deps = [
+    ":boolean-state-configuration-test-event-trigger",
+    ":energy-evse-test-event-trigger",
     ":smco-test-event-trigger",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:force_stdio",
@@ -94,7 +106,11 @@ source_set("app-main") {
     ]
   }
 
-  defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}" ]
+  defines += [
+    "CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER=${chip_enable_smoke_co_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER=${chip_enable_boolean_state_configuration_trigger}",
+    "CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER=${chip_enable_energy_evse_trigger}",
+  ]
 
   public_configs = [ ":app-main-config" ]
 }

@@ -52,10 +52,6 @@
 
 #include <lib/support/BytesToHex.h>
 
-#if CHIP_CRYPTO_MBEDTLS
-#include <mbedtls/memory_buffer_alloc.h>
-#endif
-
 #include <credentials/CHIPCert.h>
 #include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
@@ -70,6 +66,10 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#if CHIP_CRYPTO_MBEDTLS || CHIP_CRYPTO_PSA
+#include <mbedtls/memory_buffer_alloc.h>
+#endif
 
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
@@ -88,7 +88,7 @@ using TestHKDF_sha                      = HKDF_sha;
 using TestHMAC_sha                      = HMAC_sha;
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
-#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
+#if defined(MBEDTLS_MEMORY_DEBUG)
 class HeapChecker
 {
 public:

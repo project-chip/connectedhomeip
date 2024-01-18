@@ -23,7 +23,6 @@
 typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIdentifyID MTR_DEPRECATED("Please use MTRClusterIDTypeIdentifyID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000003,
     MTRClusterGroupsID MTR_DEPRECATED("Please use MTRClusterIDTypeGroupsID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000004,
-    MTRClusterScenesID MTR_DEPRECATED("Please use MTRClusterIDTypeScenesID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000005,
     MTRClusterOnOffID MTR_DEPRECATED("Please use MTRClusterIDTypeOnOffID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000006,
     MTRClusterOnOffSwitchConfigurationID MTR_DEPRECATED("Please use MTRClusterIDTypeOnOffSwitchConfigurationID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000007,
     MTRClusterLevelControlID MTR_DEPRECATED("Please use MTRClusterIDTypeLevelControlID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00000008,
@@ -90,7 +89,6 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterTestClusterID MTR_DEPRECATED("Please use MTRClusterIDTypeUnitTestingID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0xFFF1FC05,
     MTRClusterIDTypeIdentifyID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
     MTRClusterIDTypeGroupsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
-    MTRClusterIDTypeScenesID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000005,
     MTRClusterIDTypeOnOffID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000006,
     MTRClusterIDTypeOnOffSwitchConfigurationID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000007,
     MTRClusterIDTypeLevelControlID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000008,
@@ -146,6 +144,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeMicrowaveOvenControlID MTR_PROVISIONALLY_AVAILABLE = 0x0000005F,
     MTRClusterIDTypeOperationalStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000060,
     MTRClusterIDTypeRVCOperationalStateID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000061,
+    MTRClusterIDTypeScenesManagementID MTR_PROVISIONALLY_AVAILABLE = 0x00000062,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000071,
     MTRClusterIDTypeActivatedCarbonFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000072,
     MTRClusterIDTypeBooleanStateConfigurationID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
@@ -288,57 +287,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterGroupsAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterGroupsAttributeFeatureMapID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterGroupsAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
-
-    // Cluster Scenes deprecated attribute names
-    MTRClusterScenesAttributeSceneCountID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeSceneCountID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000000,
-    MTRClusterScenesAttributeCurrentSceneID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeCurrentSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000001,
-    MTRClusterScenesAttributeCurrentGroupID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeCurrentGroupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000002,
-    MTRClusterScenesAttributeSceneValidID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeSceneValidID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000003,
-    MTRClusterScenesAttributeNameSupportID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeNameSupportID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000004,
-    MTRClusterScenesAttributeLastConfiguredByID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeLastConfiguredByID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000005,
-    MTRClusterScenesAttributeGeneratedCommandListID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeGeneratedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeGeneratedCommandListID,
-    MTRClusterScenesAttributeAcceptedCommandListID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeAcceptedCommandListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAcceptedCommandListID,
-    MTRClusterScenesAttributeAttributeListID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeAttributeListID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeAttributeListID,
-    MTRClusterScenesAttributeFeatureMapID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeFeatureMapID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeFeatureMapID,
-    MTRClusterScenesAttributeClusterRevisionID
-        MTR_DEPRECATED("Please use MTRAttributeIDTypeClusterScenesAttributeClusterRevisionID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = MTRClusterGlobalAttributeClusterRevisionID,
-
-    // Cluster Scenes attributes
-    MTRAttributeIDTypeClusterScenesAttributeSceneCountID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
-    MTRAttributeIDTypeClusterScenesAttributeCurrentSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
-    MTRAttributeIDTypeClusterScenesAttributeCurrentGroupID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
-    MTRAttributeIDTypeClusterScenesAttributeSceneValidID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
-    MTRAttributeIDTypeClusterScenesAttributeNameSupportID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
-    MTRAttributeIDTypeClusterScenesAttributeLastConfiguredByID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000005,
-    MTRAttributeIDTypeClusterScenesAttributeSceneTableSizeID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterScenesAttributeFabricSceneInfoID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
-    MTRAttributeIDTypeClusterScenesAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
-    MTRAttributeIDTypeClusterScenesAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
-    MTRAttributeIDTypeClusterScenesAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
-    MTRAttributeIDTypeClusterScenesAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
-    MTRAttributeIDTypeClusterScenesAttributeFeatureMapID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
-    MTRAttributeIDTypeClusterScenesAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OnOff deprecated attribute names
     MTRClusterOnOffAttributeOnOffID
@@ -2510,11 +2458,15 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster MicrowaveOvenControl attributes
-    MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeCookTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeCookTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMaxCookTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributePowerSettingID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMinPowerID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeMaxPowerID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributePowerStepID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeSupportedWattsID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeSelectedWattIndexID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeWattRatingID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterMicrowaveOvenControlAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -2549,6 +2501,22 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterRVCOperationalStateAttributeAttributeListID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterRVCOperationalStateAttributeFeatureMapID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterRVCOperationalStateAttributeClusterRevisionID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster ScenesManagement attributes
+    MTRAttributeIDTypeClusterScenesManagementAttributeSceneCountID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterScenesManagementAttributeCurrentSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterScenesManagementAttributeCurrentGroupID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterScenesManagementAttributeSceneValidID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterScenesManagementAttributeNameSupportID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterScenesManagementAttributeSceneTableSizeID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterScenesManagementAttributeFabricSceneInfoID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRAttributeIDTypeClusterScenesManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterScenesManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterScenesManagementAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterScenesManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterScenesManagementAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterScenesManagementAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster HEPAFilterMonitoring attributes
     MTRAttributeIDTypeClusterHEPAFilterMonitoringAttributeConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -3390,6 +3358,20 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterThermostatAttributeACLouverPositionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000045,
     MTRAttributeIDTypeClusterThermostatAttributeACCoilTemperatureID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000046,
     MTRAttributeIDTypeClusterThermostatAttributeACCapacityformatID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000047,
+    MTRAttributeIDTypeClusterThermostatAttributePresetTypesID MTR_PROVISIONALLY_AVAILABLE = 0x00000048,
+    MTRAttributeIDTypeClusterThermostatAttributeScheduleTypesID MTR_PROVISIONALLY_AVAILABLE = 0x00000049,
+    MTRAttributeIDTypeClusterThermostatAttributeNumberOfPresetsID MTR_PROVISIONALLY_AVAILABLE = 0x0000004A,
+    MTRAttributeIDTypeClusterThermostatAttributeNumberOfSchedulesID MTR_PROVISIONALLY_AVAILABLE = 0x0000004B,
+    MTRAttributeIDTypeClusterThermostatAttributeNumberOfScheduleTransitionsID MTR_PROVISIONALLY_AVAILABLE = 0x0000004C,
+    MTRAttributeIDTypeClusterThermostatAttributeNumberOfScheduleTransitionPerDayID MTR_PROVISIONALLY_AVAILABLE = 0x0000004D,
+    MTRAttributeIDTypeClusterThermostatAttributeActivePresetHandleID MTR_PROVISIONALLY_AVAILABLE = 0x0000004E,
+    MTRAttributeIDTypeClusterThermostatAttributeActiveScheduleHandleID MTR_PROVISIONALLY_AVAILABLE = 0x0000004F,
+    MTRAttributeIDTypeClusterThermostatAttributePresetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000050,
+    MTRAttributeIDTypeClusterThermostatAttributeSchedulesID MTR_PROVISIONALLY_AVAILABLE = 0x00000051,
+    MTRAttributeIDTypeClusterThermostatAttributePresetsSchedulesEditableID MTR_PROVISIONALLY_AVAILABLE = 0x00000052,
+    MTRAttributeIDTypeClusterThermostatAttributeTemperatureSetpointHoldPolicyID MTR_PROVISIONALLY_AVAILABLE = 0x00000053,
+    MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID MTR_PROVISIONALLY_AVAILABLE = 0x00000054,
+    MTRAttributeIDTypeClusterThermostatAttributeQueuedPresetID MTR_PROVISIONALLY_AVAILABLE = 0x00000055,
     MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeAcceptedCommandListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterThermostatAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -5716,86 +5698,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
     MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000005,
 
-    // Cluster Scenes deprecated command id names
-    MTRClusterScenesCommandAddSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandAddSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000000,
-    MTRClusterScenesCommandAddSceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandAddSceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000000,
-    MTRClusterScenesCommandViewSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandViewSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000001,
-    MTRClusterScenesCommandViewSceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandViewSceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000001,
-    MTRClusterScenesCommandRemoveSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000002,
-    MTRClusterScenesCommandRemoveSceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveSceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000002,
-    MTRClusterScenesCommandRemoveAllScenesID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000003,
-    MTRClusterScenesCommandRemoveAllScenesResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRemoveAllScenesResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000003,
-    MTRClusterScenesCommandStoreSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandStoreSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000004,
-    MTRClusterScenesCommandStoreSceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandStoreSceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000004,
-    MTRClusterScenesCommandRecallSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandRecallSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000005,
-    MTRClusterScenesCommandGetSceneMembershipID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000006,
-    MTRClusterScenesCommandGetSceneMembershipResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandGetSceneMembershipResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000006,
-    MTRClusterScenesCommandEnhancedAddSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000040,
-    MTRClusterScenesCommandEnhancedAddSceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000040,
-    MTRClusterScenesCommandEnhancedViewSceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000041,
-    MTRClusterScenesCommandEnhancedViewSceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000041,
-    MTRClusterScenesCommandCopySceneID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandCopySceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000042,
-    MTRClusterScenesCommandCopySceneResponseID
-        MTR_DEPRECATED("Please use MTRCommandIDTypeClusterScenesCommandCopySceneResponseID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
-    = 0x00000042,
-
-    // Cluster Scenes commands
-    MTRCommandIDTypeClusterScenesCommandAddSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
-    MTRCommandIDTypeClusterScenesCommandAddSceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
-    MTRCommandIDTypeClusterScenesCommandViewSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
-    MTRCommandIDTypeClusterScenesCommandViewSceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
-    MTRCommandIDTypeClusterScenesCommandRemoveSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
-    MTRCommandIDTypeClusterScenesCommandRemoveSceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
-    MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
-    MTRCommandIDTypeClusterScenesCommandRemoveAllScenesResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
-    MTRCommandIDTypeClusterScenesCommandStoreSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
-    MTRCommandIDTypeClusterScenesCommandStoreSceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000004,
-    MTRCommandIDTypeClusterScenesCommandRecallSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000005,
-    MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000006,
-    MTRCommandIDTypeClusterScenesCommandGetSceneMembershipResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000006,
-    MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000040,
-    MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000040,
-    MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000041,
-    MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000041,
-    MTRCommandIDTypeClusterScenesCommandCopySceneID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000042,
-    MTRCommandIDTypeClusterScenesCommandCopySceneResponseID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000042,
-
     // Cluster OnOff deprecated command id names
     MTRClusterOnOffCommandOffID
         MTR_DEPRECATED("Please use MTRCommandIDTypeClusterOnOffCommandOffID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
@@ -6269,6 +6171,27 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000003,
     MTRCommandIDTypeClusterRVCOperationalStateCommandOperationalCommandResponseID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000004,
 
+    // Cluster ScenesManagement commands
+    MTRCommandIDTypeClusterScenesManagementCommandAddSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterScenesManagementCommandAddSceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterScenesManagementCommandViewSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterScenesManagementCommandViewSceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRCommandIDTypeClusterScenesManagementCommandRemoveSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterScenesManagementCommandRemoveSceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRCommandIDTypeClusterScenesManagementCommandRemoveAllScenesID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterScenesManagementCommandRemoveAllScenesResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterScenesManagementCommandStoreSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterScenesManagementCommandStoreSceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterScenesManagementCommandRecallSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterScenesManagementCommandGetSceneMembershipID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterScenesManagementCommandGetSceneMembershipResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterScenesManagementCommandEnhancedAddSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000040,
+    MTRCommandIDTypeClusterScenesManagementCommandEnhancedAddSceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000040,
+    MTRCommandIDTypeClusterScenesManagementCommandEnhancedViewSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000041,
+    MTRCommandIDTypeClusterScenesManagementCommandEnhancedViewSceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000041,
+    MTRCommandIDTypeClusterScenesManagementCommandCopySceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000042,
+    MTRCommandIDTypeClusterScenesManagementCommandCopySceneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000042,
+
     // Cluster HEPAFilterMonitoring commands
     MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
@@ -6479,6 +6402,13 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
     MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000003,
+    MTRCommandIDTypeClusterThermostatCommandSetActiveScheduleRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterThermostatCommandSetActivePresetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterThermostatCommandStartPresetsSchedulesEditRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterThermostatCommandCancelPresetsSchedulesEditRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
+    MTRCommandIDTypeClusterThermostatCommandCommitPresetsSchedulesRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
+    MTRCommandIDTypeClusterThermostatCommandCancelSetActivePresetRequestID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
+    MTRCommandIDTypeClusterThermostatCommandSetTemperatureSetpointHoldPolicyID MTR_PROVISIONALLY_AVAILABLE = 0x0000000B,
 
     // Cluster FanControl deprecated command id names
 

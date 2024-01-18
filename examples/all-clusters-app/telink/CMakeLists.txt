@@ -72,10 +72,6 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
                src/AppTask.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/smco-stub.cpp
@@ -86,10 +82,13 @@ target_sources(app PRIVATE
                ${ALL_CLUSTERS_COMMON_DIR}/src/air-quality-instance.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/concentration-measurement-instances.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/fan-stub.cpp
+               ${ALL_CLUSTERS_COMMON_DIR}/src/device-energy-management-stub.cpp               
                ${ALL_CLUSTERS_COMMON_DIR}/src/energy-evse-stub.cpp
                ${ALL_CLUSTERS_COMMON_DIR}/src/resource-monitoring-delegates.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseDelegateImpl.cpp
                ${ENERGY_MANAGEMENT_COMMON_DIR}/src/EnergyEvseManager.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementDelegateImpl.cpp
+               ${ENERGY_MANAGEMENT_COMMON_DIR}/src/DeviceEnergyManagementManager.cpp                  
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
@@ -101,3 +100,7 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${ALL_CLUSTERS_COMMON_DIR}/all-clusters-app.zap
 )
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
