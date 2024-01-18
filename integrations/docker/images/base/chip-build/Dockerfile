@@ -153,6 +153,7 @@ RUN set -x \
     pygit \
     PyGithub \
     tabulate \
+    zeroconf \
     && : # last line
 
 # build and install gn
