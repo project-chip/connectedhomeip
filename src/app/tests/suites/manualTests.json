@@ -282,7 +282,7 @@
     "TimeSynchronization": [],
     "UnitLocalization": [],
     "Binding": ["Test_TC_BIND_2_1", "Test_TC_BIND_2_2", "Test_TC_BIND_2_3"],
-    "ScenesManagement": ["Test_TC_S_2_5", "Test_TC_S_2_6"],
+    "ScenesManagement": ["Test_TC_S_2_5", "Test_TC_S_2_6", "Test_TC_S_3_1"],
     "PumpConfigurationControl": [],
     "AccessControl": [],
     "UserLabel": [],
