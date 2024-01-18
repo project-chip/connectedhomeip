@@ -124,10 +124,13 @@ public:
     }
 
     /**
-     * @brief Sets final non-path specific StatusResponse error after sending all InvokeResponseMessages
+     * @brief Queues a single, non-path-specific, error to be sent after all queued InvokeRequestMessages.
      *
-     * Intended to be used for sending a single, non-path specific, error after we send all
+     * Sends a single non-path-specific error to the client following the transmission of all queued
      * InvokeRequestMessages.
+     * 
+     * Behavior: If invoked multiple times, only the error set by the final call will be relayed
+     * to the client.
      *
      * @param aStatus InteractionModel Status. Cannot be success status.
      * @return CHIP_NO_ERROR Successfully set IM failure status to send as final StatusResponse.
