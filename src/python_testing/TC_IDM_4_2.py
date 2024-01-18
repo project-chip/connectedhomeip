@@ -31,11 +31,14 @@ from mobly import asserts
 Category:
 Functional
 
-Purpose:
-This test case will verify that the response messages returned by
-subscription requests are according to specification.
+Description:
+Validates Interaction Data Model (IDM), specifically subscription responses. Some example of tests run:
+  - Subscriptions with varying MaxIntervalCeiling
+  - Checks for `InvalidAction` results when subscribing to clusters and attributes without access rights
+  - Checks that subscription is not established for invalid MinIntervalFloor
+  - Validates that only correctly filtered data is received when a subscription is established
 
-Test Plan:
+Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interactiondatamodel.adoc#tc-idm-4-2-subscription-response-messages-from-dut-test-cases-dut_server
 '''
 
@@ -157,11 +160,7 @@ class TC_IDM_4_2(MatterBaseTest):
         logging.info(
             f"Set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC to {SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC} seconds")
 
-        '''
-        ##########
-        Step 1
-        ##########
-        '''
+        ########## Step 1 ##########
         self.print_step(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = 1
         max_interval_ceiling_sec = SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC + 5
@@ -198,11 +197,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step1.Shutdown()
 
-        '''
-        ##########
-        Step 2
-        ##########
-        '''
+        ########## Step 2 ##########
         self.print_step(2, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value less than SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC. DUT sends a report data action to the CR1. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.")
         min_interval_floor_sec = 1
         max_interval_ceiling_sec = max(2, SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC - 5)
@@ -239,11 +234,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step2.Shutdown()
 
-        '''
-        ##########
-        Step 3
-        ##########
-        '''
+        ########## Step 3 ##########
         self.print_step(3, "Setup CR2 such that it does not have access to a specific cluster. CR2 sends a subscription message to subscribe to an attribute on that cluster for which it does not have access.")
 
         # Limited ACE for controller 2 with single cluster access
@@ -273,11 +264,7 @@ class TC_IDM_4_2(MatterBaseTest):
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed cluster")
 
-        '''
-        ##########
-        Step 4
-        ##########
-        '''
+        ########## Step 4 ##########
         self.print_step(4, "Setup CR2 such that it does not have access to all attributes on a specific cluster and endpoint. CR2 sends a subscription request to subscribe to all attributes for which it does not have access.")
 
         # Limited ACE for controller 2 with single cluster access and specific endpoint
@@ -309,11 +296,7 @@ class TC_IDM_4_2(MatterBaseTest):
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed cluster")
 
-        '''
-        ##########
-        Step 5
-        ##########
-        '''
+        ########## Step 5 ##########
         self.print_step(5, "Setup CR2 such that it does not have access to an Endpoint. CR2 sends a subscription request to subscribe to all attributes on all clusters on a specific Endpoint for which it does not have access.")
 
         # Limited ACE for controller 2 with endpoint 1 access only to all clusters and all attributes
@@ -343,11 +326,7 @@ class TC_IDM_4_2(MatterBaseTest):
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed endpoint")
 
-        '''
-        ##########
-        Step 6
-        ##########
-        '''
+        ########## Step 6 ##########
         self.print_step(6, "Setup CR2 such that it does not have access to the Node. CR2 sends a subscription request to subscribe to all attributes on all clusters on all endpoints on a Node for which it does not have access.")
 
         # Skip setting an ACE for controller 2 so
@@ -375,11 +354,7 @@ class TC_IDM_4_2(MatterBaseTest):
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed node")
 
-        '''
-        ##########
-        Step 7
-        ##########
-        '''
+        ########## Step 7 ##########
         self.print_step(7, "CR1 sends a subscription request action for an attribute with an empty DataVersionFilters field. DUT sends a report data action with the data of the attribute along with the data version. Tear down the subscription for that attribute. Start another subscription with the DataVersionFilter field set to the data version received above.")
 
         # Subscribe to attribute with empty dataVersionFilters
@@ -414,11 +389,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_provided_dvf.Shutdown()
 
-        '''
-        ##########
-        Step 8
-        ##########
-        '''
+        ########## Step 8 ##########
         self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor value to be same as MaxIntervalCeiling. Activate the Subscription between CR1 and DUT. Modify the attribute which has been subscribed to on the DUT.")
 
         # Subscribe to attribute
@@ -446,11 +417,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_update_value.Shutdown()
 
-        '''
-        ##########
-        Step 9
-        ##########
-        '''
+        ########## Step 9 ##########
         self.print_step(
             9, "CR1 sends a subscription request action for an attribute and set the MinIntervalFloor value to be greater than MaxIntervalCeiling.")
 
@@ -467,12 +434,10 @@ class TC_IDM_4_2(MatterBaseTest):
             # Verify no subscription is established
             with asserts.assert_raises(AttributeError):
                 sub_cr1_invalid_intervals.subscriptionId
+        except Exception:
+            asserts.fail("Expected exception was not thrown")
 
-        '''
-        ##########
-        Step 10
-        ##########
-        '''
+        ########## Step 10 ##########
         self.print_step(
             10, "CR1 sends a subscription request to subscribe to a specific global attribute from all clusters on all endpoints.")
 
@@ -508,11 +473,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step10.Shutdown()
 
-        '''
-        ##########
-        Step 11
-        ##########
-        '''
+        ########## Step 11 ##########
         self.print_step(11, "CR1 sends a subscription request to subscribe to a global attribute on an endpoint on all clusters.")
 
         # Specifying single endpoint 0
@@ -551,11 +512,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_step11.Shutdown()
 
-        '''
-        ##########
-        Step 12
-        ##########
-        '''
+        ########## Step 12 ##########
         self.print_step(12, "CR1 sends a subscription request to the DUT with both AttributeRequests and EventRequests as empty.")
 
         # Attempt a subscription with both AttributeRequests and EventRequests as empty
@@ -576,6 +533,8 @@ class TC_IDM_4_2(MatterBaseTest):
             # Verify no subscription is established
             with asserts.assert_raises(AttributeError):
                 sub_cr1_step12.subscriptionId
+        except Exception:
+            asserts.fail("Expected exception was not thrown")
 
 
 if __name__ == "__main__":
