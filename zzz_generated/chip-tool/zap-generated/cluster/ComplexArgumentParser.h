@@ -378,6 +378,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyEvse::Str
 
 static void Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request,
                         Json::Value & value);
 

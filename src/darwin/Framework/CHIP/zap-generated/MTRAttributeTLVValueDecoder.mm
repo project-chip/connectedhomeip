@@ -8703,28 +8703,6 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
         value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
-    case Attributes::NumberOfWeeklyTargets::Id: {
-        using TypeInfo = Attributes::NumberOfWeeklyTargets::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
-    case Attributes::NumberOfDailyTargets::Id: {
-        using TypeInfo = Attributes::NumberOfDailyTargets::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
     case Attributes::NextChargeStartTime::Id: {
         using TypeInfo = Attributes::NextChargeStartTime::TypeInfo;
         TypeInfo::DecodableType cppValue;

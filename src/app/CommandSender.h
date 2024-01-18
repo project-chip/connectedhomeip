@@ -461,7 +461,7 @@ private:
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
         AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
-        CommandSent,         ///< The command has been sent successfully.
+        AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
@@ -499,7 +499,7 @@ private:
      */
     void Abort();
 
-    CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
+    CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready

@@ -3263,6 +3263,39 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::C
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetScheduleStruct.dayOfWeekForSequence",
+                                                                  "dayOfWeekForSequence", value.isMember("dayOfWeekForSequence")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ChargingTargetScheduleStruct.chargingTargets", "chargingTargets",
+                                                                  value.isMember("chargingTargets")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "dayOfWeekForSequence");
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::Setup(labelWithMember, request.dayOfWeekForSequence, value["dayOfWeekForSequence"]));
+    valueCopy.removeMember("dayOfWeekForSequence");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chargingTargets");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chargingTargets, value["chargingTargets"]));
+    valueCopy.removeMember("chargingTargets");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.dayOfWeekForSequence);
+    ComplexArgumentParser::Finalize(request.chargingTargets);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request,
                                         Json::Value & value)
 {
