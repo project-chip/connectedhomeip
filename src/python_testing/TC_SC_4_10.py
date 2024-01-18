@@ -54,11 +54,11 @@ class TC_SC_4_10(MatterBaseTest):
         logging.info(f"SAI: {SAI_MS}ms")
 
         asserts.assert_greater(SII_MS, SESSION_IDLE_INTERVAL_MS,
-                               f"SII key ({SII_MS}ms) should be greater than the SESSION_IDLE_INTERVAL ({SESSION_IDLE_INTERVAL_MS} ms)")
+                               f"SII value ({SII_MS}ms) must be greater than SESSION_IDLE_INTERVAL ({SESSION_IDLE_INTERVAL_MS} ms)")
         asserts.assert_less(SII_MS, ONE_HOUR_MS,
-                            f"SII key ({SII_MS}ms) should be less than one hour ({ONE_HOUR_MS}ms)")
+                            f"SII value ({SII_MS}ms) must be less than one hour ({ONE_HOUR_MS}ms)")
         asserts.assert_less(SAI_MS, ONE_HOUR_MS,
-                            f"SAI key ({SAI_MS}ms) should be less than one hour ({ONE_HOUR_MS}ms)")
+                            f"SAI value ({SAI_MS}ms) must be less than one hour ({ONE_HOUR_MS}ms)")
 
 
 if __name__ == "__main__":
