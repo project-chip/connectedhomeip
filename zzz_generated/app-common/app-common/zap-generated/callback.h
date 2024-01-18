@@ -5625,18 +5625,6 @@ bool emberAfDemandResponseLoadControlClusterClearLoadControlEventsRequestCallbac
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::DecodableType & commandData);
 /**
- * @brief Energy EVSE Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfEnergyEvseModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
- * @brief Device Energy Management Mode Cluster ChangeToMode Command callback (from client)
- */
-bool emberAfDeviceEnergyManagementModeClusterChangeToModeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::DecodableType & commandData);
-/**
  * @brief Door Lock Cluster LockDoor Command callback (from client)
  */
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
