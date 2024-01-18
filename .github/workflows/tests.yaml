@@ -114,6 +114,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/content-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/device-energy-management-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/device-energy-management-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml \
@@ -121,6 +122,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/energy-evse-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fault-injection-cluster.xml \
