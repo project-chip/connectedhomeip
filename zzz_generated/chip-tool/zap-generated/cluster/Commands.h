@@ -7217,8 +7217,6 @@ private:
 | * MaximumDischargeCurrent                                           | 0x0008 |
 | * UserMaximumChargeCurrent                                          | 0x0009 |
 | * RandomizationDelayWindow                                          | 0x000A |
-| * NumberOfWeeklyTargets                                             | 0x0021 |
-| * NumberOfDailyTargets                                              | 0x0022 |
 | * NextChargeStartTime                                               | 0x0023 |
 | * NextChargeTargetTime                                              | 0x0024 |
 | * NextChargeRequiredEnergy                                          | 0x0025 |
@@ -7405,10 +7403,9 @@ class EnergyEvseSetTargets : public ClusterCommand
 {
 public:
     EnergyEvseSetTargets(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("set-targets", credsIssuerConfig), mComplex_ChargingTargets(&mRequest.chargingTargets)
+        ClusterCommand("set-targets", credsIssuerConfig), mComplex_ChargingTargetSchedules(&mRequest.chargingTargetSchedules)
     {
-        AddArgument("DayOfWeekforSequence", 0, UINT8_MAX, &mRequest.dayOfWeekforSequence);
-        AddArgument("ChargingTargets", &mComplex_ChargingTargets);
+        AddArgument("ChargingTargetSchedules", &mComplex_ChargingTargetSchedules);
         ClusterCommand::AddArguments();
     }
 
@@ -7435,8 +7432,9 @@ public:
 
 private:
     chip::app::Clusters::EnergyEvse::Commands::SetTargets::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type>>
-        mComplex_ChargingTargets;
+    TypedComplexArgument<
+        chip::app::DataModel::List<const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type>>
+        mComplex_ChargingTargetSchedules;
 };
 
 /*
@@ -7447,7 +7445,6 @@ class EnergyEvseGetTargets : public ClusterCommand
 public:
     EnergyEvseGetTargets(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("get-targets", credsIssuerConfig)
     {
-        AddArgument("DaysToReturn", 0, UINT8_MAX, &mRequest.daysToReturn);
         ClusterCommand::AddArguments();
     }
 
@@ -20253,11 +20250,9 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<ReadAttribute>(Id, "user-maximum-charge-current", Attributes::UserMaximumChargeCurrent::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "randomization-delay-window", Attributes::RandomizationDelayWindow::Id,
-                                   credsIssuerConfig),                                                                        //
-        make_unique<ReadAttribute>(Id, "number-of-weekly-targets", Attributes::NumberOfWeeklyTargets::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "number-of-daily-targets", Attributes::NumberOfDailyTargets::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "next-charge-start-time", Attributes::NextChargeStartTime::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "next-charge-target-time", Attributes::NextChargeTargetTime::Id, credsIssuerConfig),   //
+                                   credsIssuerConfig),                                                                      //
+        make_unique<ReadAttribute>(Id, "next-charge-start-time", Attributes::NextChargeStartTime::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "next-charge-target-time", Attributes::NextChargeTargetTime::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "next-charge-required-energy", Attributes::NextChargeRequiredEnergy::Id,
                                    credsIssuerConfig),                                                                           //
         make_unique<ReadAttribute>(Id, "next-charge-target-so-c", Attributes::NextChargeTargetSoC::Id, credsIssuerConfig),       //
@@ -20305,10 +20300,6 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<uint32_t>>(Id, "randomization-delay-window", 0, UINT32_MAX,
                                               Attributes::RandomizationDelayWindow::Id, WriteCommandType::kWrite,
                                               credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "number-of-weekly-targets", 0, UINT8_MAX, Attributes::NumberOfWeeklyTargets::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint8_t>>(Id, "number-of-daily-targets", 0, UINT8_MAX, Attributes::NumberOfDailyTargets::Id,
-                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "next-charge-start-time", 0, UINT32_MAX,
                                                                               Attributes::NextChargeStartTime::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -20371,10 +20362,7 @@ void registerClusterEnergyEvse(Commands & commands, CredentialIssuerCommands * c
         make_unique<SubscribeAttribute>(Id, "user-maximum-charge-current", Attributes::UserMaximumChargeCurrent::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "randomization-delay-window", Attributes::RandomizationDelayWindow::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "number-of-weekly-targets", Attributes::NumberOfWeeklyTargets::Id,
                                         credsIssuerConfig),                                                                      //
-        make_unique<SubscribeAttribute>(Id, "number-of-daily-targets", Attributes::NumberOfDailyTargets::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "next-charge-start-time", Attributes::NextChargeStartTime::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "next-charge-target-time", Attributes::NextChargeTargetTime::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "next-charge-required-energy", Attributes::NextChargeRequiredEnergy::Id,
