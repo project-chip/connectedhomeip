@@ -230,7 +230,8 @@ JNI_METHOD(jint, onNOCChainGeneration)
 
         if (jByteArrayIpk.byteSpan().size() != sizeof(ipkValue))
         {
-            ChipLogError(Controller, "Invalid IPK size %ld and expect %ld", jByteArrayIpk.byteSpan().size(), sizeof(ipkValue));
+            ChipLogError(Controller, "Invalid IPK size %u and expect %u", static_cast<unsigned>(jByteArrayIpk.byteSpan().size()),
+                         static_cast<unsigned>(sizeof(ipkValue)));
             return CHIP_ERROR_INVALID_IPK.AsInteger();
         }
         memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
