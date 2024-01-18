@@ -31,12 +31,12 @@ void TestScopedVariableChange(nlTestSuite * inSuite, void * inContext)
     int x = 123;
 
     {
-        ScopedChange<int> change1(x, 10);
+        ScopedChange change1(x, 10);
         NL_TEST_ASSERT(inSuite, x == 10);
 
         x = 15;
         {
-            ScopedChange<int> change2(x, 20);
+            ScopedChange change2(x, 20);
             NL_TEST_ASSERT(inSuite, x == 20);
         }
         NL_TEST_ASSERT(inSuite, x == 15);
@@ -46,25 +46,25 @@ void TestScopedVariableChange(nlTestSuite * inSuite, void * inContext)
 
 void TestScopedChangeOnly(nlTestSuite * inSuite, void * inContext)
 {
-    ScopedChangeOnly<int> intValue(123);
-    ScopedChangeOnly<const char *> strValue("abc");
+    ScopedChangeOnly intValue(123);
+    ScopedChangeOnly strValue("abc");
 
     NL_TEST_ASSERT(inSuite, intValue == 123);
     NL_TEST_ASSERT(inSuite, strcmp(strValue, "abc") == 0);
 
     {
-        ScopedChange<int> change1(intValue, 234);
+        ScopedChange change1(intValue, 234);
 
         NL_TEST_ASSERT(inSuite, intValue == 234);
         NL_TEST_ASSERT(inSuite, strcmp(strValue, "abc") == 0);
 
-        ScopedChange<const char *> change2(strValue, "xyz");
+        ScopedChange change2(strValue, "xyz");
         NL_TEST_ASSERT(inSuite, intValue == 234);
         NL_TEST_ASSERT(inSuite, strcmp(strValue, "xyz") == 0);
 
         {
-            ScopedChange<int> change3(intValue, 10);
-            ScopedChange<const char *> change4(strValue, "test");
+            ScopedChange change3(intValue, 10);
+            ScopedChange change4(strValue, "test");
 
             NL_TEST_ASSERT(inSuite, intValue == 10);
             NL_TEST_ASSERT(inSuite, strcmp(strValue, "test") == 0);

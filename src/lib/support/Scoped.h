@@ -19,6 +19,9 @@
 
 namespace chip {
 
+template <typename T>
+class ScopedChange;
+
 /// Allows a value to only be changed within a scope.
 ///
 /// Generally used to force determinism for unit test execution.
@@ -32,12 +35,12 @@ public:
     explicit ScopedChangeOnly(T initial) : mValue(initial) {}
     operator T() const { return mValue; }
 
-    // DO NOT use directly.
-    // Expected to be used only by ScopedChange.
-    T & InternalMutableValue() { return mValue; }
-
-private:
+  private:
     T mValue;
+
+    // Expected to be used only by ScopedChange<T> only
+    T & InternalMutableValue() { return mValue; }
+    friend class ScopedChange<T>;
 };
 
 /// Allows a scoped mutation to occur on a variable.
