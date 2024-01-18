@@ -475,7 +475,7 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status  = Status::InvalidAction;
-    VerifyOrExit(!IsIdle(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!IsIdle() && !IsInactiveICDSubscription(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
@@ -682,14 +682,11 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     Close(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR ReadClient::ReadICDOperationModeFromAttributeDataIB(const TLV::TLVReader & aReader, PeerType & aType)
+CHIP_ERROR ReadClient::ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType)
 {
-    TLV::TLVReader reader;
-    reader.Init(aReader);
-
     Clusters::IcdManagement::Attributes::OperatingMode::TypeInfo::DecodableType operatingMode;
 
-    CHIP_ERROR err = DataModel::Decode(reader, operatingMode);
+    CHIP_ERROR err = DataModel::Decode(aReader, operatingMode);
     ReturnErrorOnFailure(err);
 
     switch (operatingMode)
@@ -807,10 +804,12 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
                                           Clusters::IcdManagement::Attributes::OperatingMode::Id))
             {
                 PeerType peerType;
-                if (CHIP_NO_ERROR == ReadICDOperationModeFromAttributeDataIB(dataReader, peerType))
+                TLV::TLVReader operatingModeTlvReader;
+                operatingModeTlvReader.Init(dataReader);
+                if (CHIP_NO_ERROR == ReadICDOperatingModeFromAttributeDataIB(std::move(operatingModeTlvReader), peerType))
                 {
-                    // Since we are in the middle of parsing the attribute data, it is safe to call `OnPeerTypeChange`
-                    // As it will only update the LIT / SIT bit for us without triggerring resubscription on this read client.
+                    // It is safe to call `OnPeerTypeChange` since we are in the middle of parsing the attribute data, And
+                    // the subscription should be active so `OnActiveModeNotification` is a no-op in this case.
                     InteractionModelEngine::GetInstance()->OnPeerTypeChange(mPeer, peerType);
                 }
                 else

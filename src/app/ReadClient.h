@@ -559,7 +559,7 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
-    CHIP_ERROR ReadICDOperationModeFromAttributeDataIB(const TLV::TLVReader & aReader, PeerType & aType);
+    CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
