@@ -110,7 +110,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(step_number, instruction)
         input("Press Enter when done.\n")
 
-
     @async_test_body
     async def test_TC_RVCOPSTATE_2_4(self):
 
