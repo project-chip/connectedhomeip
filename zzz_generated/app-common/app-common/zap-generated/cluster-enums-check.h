@@ -1799,35 +1799,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::Energ
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvseMode::ModeTag val)
-{
-    using EnumType = EnergyEvseMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kManual:
-    case EnumType::kTimeOfUse:
-    case EnumType::kSolarCharging:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagementMode::ModeTag val)
-{
-    using EnumType = DeviceEnergyManagementMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kNoOptimization:
-    case EnumType::kDeviceOptimization:
-    case EnumType::kLocalOptimization:
-    case EnumType::kGridOptimization:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

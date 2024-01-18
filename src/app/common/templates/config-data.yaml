@@ -12,6 +12,8 @@ EnumsNotUsedAsTypeInXML:
     - "RvcCleanMode::StatusCode"
     - "RvcOperationalState::OperationalStateEnum"
     - "RvcOperationalState::ErrorStateEnum"
+    - "EnergyEvseMode::ModeTag"
+    - "DeviceEnergyManagementMode::ModeTag"
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
