@@ -268,7 +268,7 @@ public:
         for (size_t i = 0; i < kNumMaxReadHandlers; i++)
         {
             ReadHandler * readHandler =
-                readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+                readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
             sScheduler.OnSubscriptionEstablished(readHandler);
             NL_TEST_ASSERT(aSuite, nullptr != readHandler);
             VerifyOrReturn(nullptr != readHandler);
@@ -333,18 +333,18 @@ public:
         // Dirty read handler, will be triggered at min interval
         // Test OnReadHandler created
         ReadHandler * readHandler1 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler1, &sScheduler, 1, 2));
         readHandler1->ForceDirtyState();
 
         // Clean read handler, will be triggered at max interval
         ReadHandler * readHandler2 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler2, &sScheduler, 0, 3));
 
         // Clean read handler, will be triggered at max interval, but will be cancelled before
         ReadHandler * readHandler3 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler3, &sScheduler, 0, 3));
 
         // Confirms that none of the ReadHandlers are currently reportable
@@ -398,7 +398,7 @@ public:
         sTestTimerDelegate.SetMockSystemTimestamp(Milliseconds64(0));
 
         ReadHandler * readHandler =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &sScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler, &sScheduler, 1, 2));
 
         // Verifies OnSubscriptionEstablished registered the ReadHandler in the scheduler
@@ -474,12 +474,12 @@ public:
         sTestTimerSynchronizedDelegate.SetMockSystemTimestamp(System::Clock::Milliseconds64(0));
 
         ReadHandler * readHandler1 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler1, &syncScheduler, 0, 2));
         ReadHandlerNode * node1 = syncScheduler.FindReadHandlerNode(readHandler1);
 
         ReadHandler * readHandler2 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler2, &syncScheduler, 1, 3));
         ReadHandlerNode * node2 = syncScheduler.FindReadHandlerNode(readHandler2);
 
@@ -606,7 +606,7 @@ public:
         sTestTimerSynchronizedDelegate.IncrementMockTimestamp(System::Clock::Milliseconds64(1000));
 
         ReadHandler * readHandler3 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler3, &syncScheduler, 2, 3));
         ReadHandlerNode * node3 = syncScheduler.FindReadHandlerNode(readHandler3);
 
@@ -659,7 +659,7 @@ public:
 
         // Now simulate a new readHandler being added with a max forcing a conflict
         ReadHandler * readHandler4 =
-            readHandlerPool.CreateObject(nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
+            readHandlerPool.CreateObject(InteractionModelEngine::GetInstance(), nullCallback, exchangeCtx, ReadHandler::InteractionType::Subscribe, &syncScheduler);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == MockReadHandlerSubscriptionTransaction(readHandler4, &syncScheduler, 0, 1));
         ReadHandlerNode * node4 = syncScheduler.FindReadHandlerNode(readHandler4);
 
