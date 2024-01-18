@@ -240,6 +240,22 @@ public:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
+     *  Activate the idle subscriptions.
+     *
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
+     * resubscription can be triggered via OnActiveModeNotification().
+     */
+    void OnActiveModeNotification(ScopedNodeId aPeer);
+
+    /**
+     *  Used to notify when a peer becomes LIT ICD or vice versa.
+     *
+     *  ReadClient will call this function when it finds any updates of the OperatingMode attribute from ICD management
+     * cluster. The application doesn't need to call this function, usually.
+     */
+    void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
+
+    /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
      */
