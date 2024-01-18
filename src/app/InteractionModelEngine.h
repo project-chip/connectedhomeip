@@ -248,7 +248,7 @@ public:
     void OnActiveModeNotification(ScopedNodeId aPeer);
 
     /**
-     *  Used to notify whether a peer becomes LIT ICD or vice versa.
+     *  Used to notify when a peer becomes LIT ICD or vice versa.
      *
      *  The read client will call this function when it found any updates of the OperationMode attribute from ICD management
      * cluster. The application don't need to call this function usually.
