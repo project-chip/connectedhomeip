@@ -301,20 +301,26 @@ public:
 
     /**
      * @brief Best effort to add InvokeResponse to InvokeResponseMessage.
-     * 
+     *
      * Tries to add response using lambda. Upon failure to add response, attempts
      * to rollback the InvokeResponseMessage to a known good state. If failure is due
      * to insufficient space in the current InvokeResponseMessage:
      *  - Finalizes the current InvokeResponseMessage.
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
-     * 
+     *
      * @param addResponseFunction: A lambda function responsible for adding the
      *      response to the current InvokeResponseMessage.
      */
     template <typename Function>
     CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
     {
+        // Invalidate any existing rollback backups. The addResponseFunction is
+        // expected to create a new backup during either PrepareInvokeResponseCommand
+        // or PrepareStatus execution. Direct invocation of
+        // CreateBackupForResponseRollback is avoided since the buffer used by
+        // InvokeResponseMessage might not be allocated until a Prepare* function
+        // is called.
         mRollbackBackupValid = false;
         CHIP_ERROR err       = addResponseFunction();
         if (err == CHIP_NO_ERROR)
@@ -330,7 +336,6 @@ public:
             return err;
         }
         ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndReadyNext());
-        mRollbackBackupValid = false;
         err                  = addResponseFunction();
         if (err != CHIP_NO_ERROR)
         {

@@ -128,7 +128,7 @@ public:
      *
      * Sends a single non-path-specific error to the client following the transmission of all queued
      * InvokeRequestMessages.
-     * 
+     *
      * Behavior: If invoked multiple times, only the error set by the final call will be relayed
      * to the client.
      *

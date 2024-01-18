@@ -865,7 +865,8 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
     mResponseSender.AddInvokeResponseToSend(std::move(packet));
-    mBufferAllocated = false;
+    mBufferAllocated     = false;
+    mRollbackBackupValid = false;
     return CHIP_NO_ERROR;
 }
 
