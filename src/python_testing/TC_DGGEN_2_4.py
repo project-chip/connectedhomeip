@@ -90,7 +90,8 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("1c", "Read current time from DUT")
             testvar_UTCTime1 = await self.read_timesync_attribute_expect_success(Clusters.TimeSynchronization.Attributes.UTCTime)
-            asserts.assert_true(testvar_UTCTime1 != NullValue, "UTCTime1 readback must not be null after SetUTCTime (per Time Synchronization cluster spec)")
+            asserts.assert_true(testvar_UTCTime1 != NullValue,
+                                "UTCTime1 readback must not be null after SetUTCTime (per Time Synchronization cluster spec)")
 
             testvar_TimeSyncSupported = True
 
