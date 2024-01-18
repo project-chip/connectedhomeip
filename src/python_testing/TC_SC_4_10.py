@@ -46,10 +46,10 @@ class TC_SC_4_10(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_4_10(self):
 
-        ########## Step 1 ##########
+        # *** Step 1 ***
         self.print_step(1, "DUT is instructed to advertise its service: already done")
 
-        ########## Step 2 ##########
+        # *** Step 2 ***
         self.print_step(2, "TH scans for DNS-SD advertising, looks for SAI/SII values")
 
         # Get SAI/SII values
