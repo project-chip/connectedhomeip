@@ -18,10 +18,6 @@ class AccessTestType(Enum):
     WRITE = auto()
 
 
-def is_global(id: int) -> bool:
-    return id >= 0xF000 and id <= 0xFFFE
-
-
 def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
                       acl_set_to: Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]) -> bool:
     ''' Determines if the action is allowed on the device based on the spec_requirements and the current ACL privilege granted.
@@ -184,6 +180,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing attribute - expected Unsupported Access, got {resp[0].Status}")
                     self.success = False
+
+            if resp[0].Status == Status.Success and isinstance(val, list):
+                # Reset the value to the original if we managed to write an empty list
+                val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+                await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
 
     async def run_access_test(self, test_type: AccessTestType):
         # Read all the attributes on TH2 using admin access
