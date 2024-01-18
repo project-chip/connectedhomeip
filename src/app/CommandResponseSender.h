@@ -126,7 +126,7 @@ public:
     /**
      * @brief Sets final non-path specific StatusResponse error after sending all InvokeResponseMessages
      *
-     * Intended to be use for sending a single, non-path specific, error after we send all
+     * Intended to be used for sending a single, non-path specific, error after we send all
      * InvokeRequestMessages.
      *
      * @param aStatus InteractionModel Status. Cannot be success status.

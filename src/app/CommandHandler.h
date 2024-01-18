@@ -308,7 +308,6 @@ public:
      *  - Finalizes the current InvokeResponseMessage.
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
-     *    the new InvokeResponseMessage.
      * 
      * @param addResponseFunction: A lambda function responsible for adding the
      *      response to the current InvokeResponseMessage.
@@ -323,7 +322,7 @@ public:
             return CHIP_NO_ERROR;
         }
         ReturnErrorOnFailure(RollbackResponse());
-        // If we failed to an additional command due to lack of space in the
+        // If we failed to add a command due to lack of space in the
         // packet, we will make another attempt to add the response using
         // an additional InvokeResponseMessage.
         if (mState != State::AddedCommand || err != CHIP_ERROR_NO_MEMORY)
@@ -611,7 +610,7 @@ private:
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
     // TODO(#30453): We should introduce breaking change where calls to add CommandData
-    // needs to use AddResponse, and not CommandHandler primatives directly using
+    // need to use AddResponse, and not CommandHandler primatives directly using
     // GetCommandDataIBTLVWriter.
     bool mInternalCallToAddResponseData = false;
     bool mRollbackBackupValid           = false;
