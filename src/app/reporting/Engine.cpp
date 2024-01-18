@@ -37,6 +37,7 @@ namespace reporting {
 CHIP_ERROR Engine::Init(InteractionModelEngine * apImEngine)
 {
     VerifyOrReturnError(apImEngine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mpImEngine = apImEngine;
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     return CHIP_NO_ERROR;
