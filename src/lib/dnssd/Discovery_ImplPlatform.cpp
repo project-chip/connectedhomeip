@@ -251,6 +251,9 @@ CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const
         return CopyTextRecordValue(buffer, bufferLen, params.GetPairingHint());
     case TxtFieldKey::kCommissioningMode:
         return CopyTextRecordValue(buffer, bufferLen, params.GetCommissioningMode());
+    case TxtFieldKey::kCommissionerPasscode:
+        return CopyTextRecordValue(buffer, bufferLen,
+                                   static_cast<uint16_t>(params.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0));
     default:
         return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
     }
@@ -580,6 +583,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioner)
     {
+        ADD_TXT_RECORD(CommissionerPasscode);
         PUBLISH_RECORDS(Commissioner);
         return CHIP_NO_ERROR;
     }
