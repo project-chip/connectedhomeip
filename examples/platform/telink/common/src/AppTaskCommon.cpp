@@ -30,6 +30,10 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#if CONFIG_BOOTLOADER_MCUBOOT
+#include <OTAUtil.h>
+#endif
+
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
@@ -245,6 +249,14 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 #if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     StartThreadButtonEventHandler();
 #endif
+
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("Confirm image.");
+        OtaConfirmNewImage();
+    }
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     while (true)
     {

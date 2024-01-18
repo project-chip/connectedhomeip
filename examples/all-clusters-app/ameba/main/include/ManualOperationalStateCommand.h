@@ -18,7 +18,8 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <OperationalStateManager.h>
+#include "operational-state-delegate-impl.h"
+#include "rvc-operational-state-delegate-impl.h"
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"

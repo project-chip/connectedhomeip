@@ -185,6 +185,14 @@ protected:
      */
     virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; };
 
+    /**
+     * Handles the invocation of derived cluster commands.
+     * If a derived cluster defines its own commands, this method SHALL be implemented by the derived cluster's class
+     * to handle the derived cluster's specific commands.
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) { return; };
+
 private:
     Delegate * mDelegate;
 
@@ -196,7 +204,13 @@ private:
     uint8_t mOperationalState                 = 0; // assume 0 for now.
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
 
-    // Inherited from CommandHandlerInterface
+    /**
+     * This method is inherited from CommandHandlerInterface.
+     * This reimplementation does not check that the cluster ID in the HandlerContext (the cluster the command relates to)
+     * matches the cluster ID of the RequestT type.
+     * These cluster IDs may be different in the case where a command defined in the base cluster is intended for a
+     * derived cluster.
+     */
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
@@ -324,6 +338,15 @@ protected:
 
 namespace RvcOperationalState {
 
+class Delegate : public OperationalState::Delegate
+{
+public:
+    virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+};
+
 class Instance : public OperationalState::Instance
 {
 public:
@@ -336,8 +359,8 @@ public:
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
      */
-    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId) :
-        OperationalState::Instance(aDelegate, aEndpointId, Id)
+    Instance(Delegate * aDelegate, EndpointId aEndpointId) :
+        OperationalState::Instance(aDelegate, aEndpointId, Id), mDelegate(aDelegate)
     {}
 
 protected:
@@ -356,6 +379,20 @@ protected:
      * @return true if aState is pause-compatible, false otherwise.
      */
     bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override;
+
+    /**
+     * Handles the invocation of RvcOperationalState specific commands
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    void InvokeDerivedClusterCommand(HandlerContext & handlerContext) override;
+
+private:
+    Delegate * mDelegate;
+
+    /**
+     * Handle Command: GoHome
+     */
+    void HandleGoHomeCommand(HandlerContext & ctx, const Commands::GoHome::DecodableType & req);
 };
 
 } // namespace RvcOperationalState

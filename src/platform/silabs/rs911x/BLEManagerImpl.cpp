@@ -107,16 +107,15 @@ void sl_ble_init()
                                    NULL, NULL, NULL);
 
     // registering the GATT call back functions
-    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL, NULL,
-                                    rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                                    rsi_ble_on_event_indication_confirmation, NULL);
+    rsi_ble_gatt_register_callbacks(NULL, NULL, NULL, NULL, NULL, NULL, NULL, rsi_ble_on_gatt_write_event, NULL, NULL,
+                                    rsi_ble_on_read_req_event, rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+                                    NULL, rsi_ble_on_event_indication_confirmation, NULL);
 
     //  Exchange of GATT info with BLE stack
 
     rsi_ble_add_matter_service();
     //  initializing the application events map
     rsi_ble_app_init_events();
-
     rsi_ble_set_random_address_with_value(randomAddrBLE);
     chip::DeviceLayer::Internal::BLEMgrImpl().HandleBootEvent();
 }
@@ -165,6 +164,17 @@ void sl_ble_event_handling_task(void)
             BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
+        }
+        break;
+        case RSI_BLE_EVENT_GATT_RD: {
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            if (event_msg.rsi_ble_read_req->type == 0)
+            {
+                BLEMgrImpl().HandleC3ReadRequest(event_msg.rsi_ble_read_req);
+            }
+#endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+       // clear the served event
+            rsi_ble_app_clear_event(RSI_BLE_EVENT_GATT_RD);
         }
         break;
         case RSI_BLE_GATT_WRITE_EVENT: {
@@ -646,7 +656,7 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int32_t status = 0;
 
     ChipLogProgress(DeviceLayer, "StartAdvertising start");
@@ -665,8 +675,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         ChipLogDetail(DeviceLayer, "Start BLE advertissement");
     }
 
-    err = ConfigureAdvertisingData();
-    SuccessOrExit(err);
+    if (!(mFlags.Has(Flags::kAdvertising)))
+    {
+        err = ConfigureAdvertisingData();
+        SuccessOrExit(err);
+    }
 
     mFlags.Clear(Flags::kRestartAdvertising);
 
@@ -1011,8 +1024,16 @@ exit:
     return err;
 }
 
-// TODO:: Need to do the correct implementation
-void BLEManagerImpl::HandleC3ReadRequest(void) {}
+void BLEManagerImpl::HandleC3ReadRequest(rsi_ble_read_req_t * rsi_ble_read_req)
+{
+    sl_status_t ret = rsi_ble_gatt_read_response(rsi_ble_read_req->dev_addr, GATT_READ_RESP, rsi_ble_read_req->handle,
+                                                 GATT_READ_ZERO_OFFSET, sInstance.c3AdditionalDataBufferHandle->DataLength(),
+                                                 sInstance.c3AdditionalDataBufferHandle->Start());
+    if (ret != SL_STATUS_OK)
+    {
+        ChipLogDetail(DeviceLayer, "Failed to send read response, err:%ld", ret);
+    }
+}
 
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 
