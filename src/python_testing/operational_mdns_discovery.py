@@ -15,42 +15,70 @@
 #    limitations under the License.
 #
 
+import time
+from typing import Union, Dict
 from mobly import asserts
 from zeroconf import ServiceListener, Zeroconf
 from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
 
 MDNS_TYPE_OPERATIONAL = "_matter._tcp.local."
 
-'''
-A service listener for the TXT record data to get populated
-'''
-
-
-class DummyServiceListener(ServiceListener):
+class EmptyServiceListener(ServiceListener):
+    '''
+    A service listener for the TXT record data to get populated
+    '''
 
     def add_service(self, zc: Zeroconf, type: str, name: str) -> None:
+        time.sleep(1)
         pass
 
     def remove_service(self, zc: Zeroconf, type: str, name: str) -> None:
+        time.sleep(1)
         pass
 
     def update_service(self, zc: Zeroconf, type: str, name: str) -> None:
+        time.sleep(1)
         pass
 
 
-class MdnsHelper:
-    def __init__(self, dut):
-        self._listener = DummyServiceListener()
+class OperationalMdnsDiscovery:
+    """
+    A helper class for managing operational mDNS tasks within test cases.
+
+    This class provides utilities for mDNS-related operations needed in tests,
+    such as discovering services, registering listeners, and querying service information.
+    It's designed to work closely with a specific test case, using its context
+    or functionalities for network service interactions.
+
+    Attributes:
+        _listener (EmptyServiceListener): A listener for mDNS service events.
+        _azc (AsyncZeroconf): An instance of AsyncZeroconf for asynchronous network discovery.
+        _tc: The test case with which this helper is associated.
+        _service_types: Stores the types of services discovered via mDNS.
+        _service_info: Stores detailed information about discovered services.
+        _name (str): The name of the service constructed for mDNS operations.
+
+    Args:
+        tc: An instance of a test case.
+    """
+    def __init__(self, tc):
+        """
+        Initializes the OperationalMdnsHelper instance with a given test case.
+
+        Args:
+            tc: An instance of the test case that requires mDNS functionality.
+        """
+        self._listener = EmptyServiceListener()
         self._azc: AsyncZeroconf = AsyncZeroconf()
-        self._dut = dut
+        self._tc = tc
         self._service_types = None
         self._service_info = None
         self._name = f"{self._get_service_name()}.{MDNS_TYPE_OPERATIONAL}"
 
     def _get_service_name(self):
-        node_id = self._dut.dut_node_id
+        node_id = self._tc.dut_node_id
         node_id_hex = str(hex(int(node_id))[2:].upper()).zfill(16)
-        compressed_fabricid = self._dut.default_controller.GetCompressedFabricId()
+        compressed_fabricid = self._tc.default_controller.GetCompressedFabricId()
         compressed_fabricid_hex = hex(int(compressed_fabricid))[2:].upper()
         service_name = f"{compressed_fabricid_hex}-{node_id_hex}"
         return service_name
@@ -63,13 +91,10 @@ class MdnsHelper:
         asserts.assert_in(byte_key, self._service_info.properties, f"Property '{key}' not found")
         value = self._service_info.properties[byte_key]
 
-        # Check if the value is not None
-        asserts.assert_is_not_none(value, f"Value for property '{key}' not present")
-
         # Convert the value from bytes to string
-        return value.decode('utf-8')
+        return None if value is None else value.decode('utf-8')
 
-    async def getTxtRecord(self, key: str = None, refresh=False):
+    async def getTxtRecord(self, key: str = None, refresh=False) -> Union[Dict[str, str], str, None]:
         """
         Asynchronously retrieves the TXT record for a given device.
 
@@ -78,8 +103,6 @@ class MdnsHelper:
         property values based on the provided key.
 
         Args:
-            dut: The device under test. It should contain attributes like `dut_node_id` and
-                    `default_controller`.
             key: An optional string specifying which particular property to extract from
                     the TXT record. If None, all properties will be returned.
             refresh (bool): If set to True, the method ignores any cached data and performs
@@ -148,12 +171,12 @@ class MdnsHelper:
                           f"The MDNS operational service type '{MDNS_TYPE_OPERATIONAL}' was not found")
 
         # Fetch service info and properties (TXT) and cache them
+        service_info = None
         if self._service_info is None or refresh:
             service_info: AsyncServiceInfo = await self._azc.async_get_service_info(
                 name=self._name,
                 type_=MDNS_TYPE_OPERATIONAL
             )
-            asserts.assert_is_not_none(service_info, f"Service info for {self._name} not found")
             self._service_info = service_info
 
-        return self._service_info
+        return None if service_info is None else self._service_info

@@ -18,7 +18,7 @@
 import logging
 
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mdns_helper import MdnsHelper
+from operational_mdns_discovery import OperationalMdnsDiscovery
 from mobly import asserts
 
 '''
@@ -39,6 +39,8 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securecha
 
 SESSION_IDLE_INTERVAL_MS = 500
 ONE_HOUR_MS = 3600000
+SAI_KEY = "SAI"
+SII_KEY = "SII"
 
 
 class TC_SC_4_10(MatterBaseTest):
@@ -46,26 +48,33 @@ class TC_SC_4_10(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_4_10(self):
 
+        omd = OperationalMdnsDiscovery(tc=self)
+
         # *** Step 1 ***
         self.print_step(1, "DUT is instructed to advertise its service: already done")
 
         # *** Step 2 ***
         self.print_step(2, "TH scans for DNS-SD advertising, looks for SAI/SII values")
 
-        # Get SAI/SII values
-        mh = MdnsHelper(self)
-        SAI_MS = int(await mh.getTxtRecord(key="SAI"))
-        SII_MS = int(await mh.getTxtRecord(key="SII"))
+        # Get SAI value
+        sai_value = await omd.getTxtRecord(key=SAI_KEY)
+        asserts.assert_is_not_none(sai_value, f"Value for '{SAI_KEY}' not found")
+        sai_ms = int(sai_value)
 
-        logging.info(f"SII: {SII_MS}ms")
-        logging.info(f"SAI: {SAI_MS}ms")
+        # Get SII value
+        sii_value = await omd.getTxtRecord(key=SII_KEY)
+        asserts.assert_is_not_none(sii_value, f"Value for '{SII_KEY}' not found")
+        sii_ms = int(sii_value)
 
-        asserts.assert_greater(SII_MS, SESSION_IDLE_INTERVAL_MS,
-                               f"SII value ({SII_MS}ms) must be greater than SESSION_IDLE_INTERVAL ({SESSION_IDLE_INTERVAL_MS} ms)")
-        asserts.assert_less(SII_MS, ONE_HOUR_MS,
-                            f"SII value ({SII_MS}ms) must be less than one hour ({ONE_HOUR_MS}ms)")
-        asserts.assert_less(SAI_MS, ONE_HOUR_MS,
-                            f"SAI value ({SAI_MS}ms) must be less than one hour ({ONE_HOUR_MS}ms)")
+        logging.info(f"{SAI_KEY}: {sai_ms}ms")
+        logging.info(f"{SII_KEY}: {sii_ms}ms")
+
+        asserts.assert_greater(sii_ms, SESSION_IDLE_INTERVAL_MS,
+                               f"SII value ({sii_ms}ms) must be greater than SESSION_IDLE_INTERVAL ({SESSION_IDLE_INTERVAL_MS} ms)")
+        asserts.assert_less(sii_ms, ONE_HOUR_MS,
+                            f"SII value ({sii_ms}ms) must be less than one hour ({ONE_HOUR_MS}ms)")
+        asserts.assert_less(sai_ms, ONE_HOUR_MS,
+                            f"SAI value ({sai_ms}ms) must be less than one hour ({ONE_HOUR_MS}ms)")
 
 
 if __name__ == "__main__":
