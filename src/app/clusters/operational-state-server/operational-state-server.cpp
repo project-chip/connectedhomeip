@@ -263,6 +263,10 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         HandleCommand<Commands::Stop::DecodableType>(handlerContext,
                                                      [this](HandlerContext & ctx, const auto & req) { HandleStopState(ctx, req); });
         break;
+    default:
+        ChipLogDetail(Zcl, "OperationalState: Entering handling derived cluster commands");
+
+        InvokeDerivedClusterCommand(handlerContext);
     }
 }
 
@@ -291,7 +295,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     break;
 
     case OperationalState::Attributes::OperationalState::Id: {
-        ChipLogError(Zcl, "OperationalState: H1");
         ReturnErrorOnFailure(aEncoder.Encode(GetCurrentOperationalState()));
     }
     break;
@@ -459,4 +462,43 @@ bool RvcOperationalState::Instance::IsDerivedClusterStateResumeCompatible(uint8_
 {
     return (aState == to_underlying(RvcOperationalState::OperationalStateEnum::kCharging) ||
             aState == to_underlying(RvcOperationalState::OperationalStateEnum::kDocked));
+}
+
+// This function is called by the base operational state cluster when a command in the derived cluster number-space is received.
+void RvcOperationalState::Instance::InvokeDerivedClusterCommand(chip::app::CommandHandlerInterface::HandlerContext & handlerContext)
+{
+    ChipLogDetail(Zcl, "RvcOperationalState: InvokeDerivedClusterCommand");
+    switch (handlerContext.mRequestPath.mCommandId)
+    {
+    case RvcOperationalState::Commands::GoHome::Id:
+        ChipLogDetail(Zcl, "RvcOperationalState: Entering handling GoHome command");
+
+        CommandHandlerInterface::HandleCommand<Commands::GoHome::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & req) { HandleGoHomeCommand(ctx, req); });
+        break;
+    }
+}
+
+void RvcOperationalState::Instance::HandleGoHomeCommand(HandlerContext & ctx, const Commands::GoHome::DecodableType & req)
+{
+    ChipLogDetail(Zcl, "RvcOperationalState: HandleGoHomeCommand");
+
+    GenericOperationalError err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
+    uint8_t opState = GetCurrentOperationalState();
+
+    // Handle the case of the device being in an invalid state
+    if (opState == to_underlying(OperationalStateEnum::kCharging) || opState == to_underlying(OperationalStateEnum::kDocked))
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+    }
+
+    if (err.errorStateID == 0 && opState != to_underlying(OperationalStateEnum::kSeekingCharger))
+    {
+        mDelegate->HandleGoHomeCommandCallback(err);
+    }
+
+    Commands::OperationalCommandResponse::Type response;
+    response.commandResponseState = err;
+
+    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }

@@ -5812,7 +5812,8 @@ internal cluster UnitTesting = 4294048773 {
     int8u fillCharacter = 2;
   }
 
-  /** Simple command without any parameters and without a specific response */
+  /** Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults. */
   command Test(): DefaultSuccess = 0;
   /** Simple command without any parameters and without a specific response not handled by the server */
   command TestNotHandled(): DefaultSuccess = 1;

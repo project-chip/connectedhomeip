@@ -681,7 +681,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
-// AVAILABLE: 0x1d
+/**
+ *  @def CHIP_ERROR_INVALID_IPK
+ *
+ *  @brief
+ *    The IPK is invalid
+ *
+ */
+#define CHIP_ERROR_INVALID_IPK                                 CHIP_CORE_ERROR(0x1d)
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH

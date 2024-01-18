@@ -2891,6 +2891,32 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayOfWeekForSequence'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChargingTargets", indent + 1, value.chargingTargets);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChargingTargets'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType & value)
 {
@@ -7228,8 +7254,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const EnergyEvse::Commands::GetTargetsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekforSequence", indent + 1, value.dayOfWeekforSequence));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("chargingTargets", indent + 1, value.chargingTargets));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("chargingTargetSchedules", indent + 1, value.chargingTargetSchedules));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -12346,16 +12371,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RandomizationDelayWindow", 1, value);
-        }
-        case EnergyEvse::Attributes::NumberOfWeeklyTargets::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfWeeklyTargets", 1, value);
-        }
-        case EnergyEvse::Attributes::NumberOfDailyTargets::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfDailyTargets", 1, value);
         }
         case EnergyEvse::Attributes::NextChargeStartTime::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;

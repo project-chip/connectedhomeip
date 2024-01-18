@@ -8227,7 +8227,8 @@ public class ClusterIDMapping {
             Pause(0L),
             Stop(1L),
             Start(2L),
-            Resume(3L),;
+            Resume(3L),
+            GoHome(128L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9565,8 +9566,6 @@ public class ClusterIDMapping {
             MaximumDischargeCurrent(8L),
             UserMaximumChargeCurrent(9L),
             RandomizationDelayWindow(10L),
-            NumberOfWeeklyTargets(33L),
-            NumberOfDailyTargets(34L),
             NextChargeStartTime(35L),
             NextChargeTargetTime(36L),
             NextChargeRequiredEnergy(37L),
@@ -9689,7 +9688,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetTargetsCommandField {DayOfWeekforSequence(0),ChargingTargets(1),;
+                }public enum SetTargetsCommandField {ChargingTargetSchedules(0),;
                     private final int id;
                     SetTargetsCommandField(int id) {
                         this.id = id;
@@ -9700,23 +9699,6 @@ public class ClusterIDMapping {
                     }
                     public static SetTargetsCommandField value(int id) throws NoSuchFieldError {
                         for (SetTargetsCommandField field : SetTargetsCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GetTargetsCommandField {DaysToReturn(0),;
-                    private final int id;
-                    GetTargetsCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetTargetsCommandField value(int id) throws NoSuchFieldError {
-                        for (GetTargetsCommandField field : GetTargetsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
