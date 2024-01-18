@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import logging
 import time
 from typing import Dict, Union
 
@@ -89,12 +90,18 @@ class OperationalMdnsDiscovery:
     def _get_txt_record_key_value(self, key: str):
         # Convert the key from string to bytes, as the dictionary uses bytes
         byte_key = key.encode('utf-8')
-
+        
+        if self._service_info is None:
+            logging.info("Service info not found")
+            return None
+        
         # Check if the key exists in the dictionary
-        asserts.assert_in(byte_key, self._service_info.properties, f"Property '{key}' not found")
+        if byte_key not in self._service_info.properties:
+            logging.info("Key '{key}' not found")
+            return None
+            
         value = self._service_info.properties[byte_key]
 
-        # Convert the value from bytes to string
         return None if value is None else value.decode('utf-8')
 
     async def getTxtRecord(self, key: str = None, refresh=False) -> Union[Dict[str, str], str, None]:
