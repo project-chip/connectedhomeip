@@ -25,11 +25,15 @@ from mobly import asserts
 Category:
 Functional conformance
 
-Purpose:
+Description:
 The purpose of this test case is to verify that a Short Idle Time ICD node properly advertises SAI/SII
-values. This verification is in addition any other operational/commissionable discovery test cases.
+values.
 
-Test Plan:
+Verifies:
+  - SII key is higher than the SESSION_IDLE_INTERVAL default value (500 milliseconds)
+  - SII key and SAI key is less than 1 hour (3600000 milliseconds)
+
+Full test plan link for details:
 https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/securechannel.adoc#tc-sc-4-10-operational-discovery-sit-icd-node-dut_commissionee
 '''
 
@@ -42,10 +46,13 @@ class TC_SC_4_10(MatterBaseTest):
     @async_test_body
     async def test_TC_SC_4_10(self):
 
+        ########## Step 1 ##########
         self.print_step(1, "DUT is instructed to advertise its service: already done")
 
+        ########## Step 2 ##########
         self.print_step(2, "TH scans for DNS-SD advertising, looks for SAI/SII values")
 
+        # Get SAI/SII values
         mh = MdnsHelper(self)
         SAI_MS = int(await mh.getTxtRecord(key="SAI"))
         SII_MS = int(await mh.getTxtRecord(key="SII"))
