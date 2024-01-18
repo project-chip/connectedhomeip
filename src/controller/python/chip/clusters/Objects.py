@@ -20068,6 +20068,19 @@ class RvcOperationalState(Cluster):
 
             commandResponseState: 'RvcOperationalState.Structs.ErrorStateStruct' = field(default_factory=lambda: RvcOperationalState.Structs.ErrorStateStruct())
 
+        @dataclass
+        class GoHome(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000061
+            command_id: typing.ClassVar[int] = 0x00000080
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'OperationalCommandResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
     class Attributes:
         @dataclass
         class PhaseList(ClusterAttributeDescriptor):
