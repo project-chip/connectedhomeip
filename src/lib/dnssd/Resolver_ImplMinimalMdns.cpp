@@ -471,7 +471,7 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
 {
     MATTER_TRACE_SCOPE("Received MDNS Packet", "MinMdnsResolver");
 
-    MATTER_TRACE_COUNTER("MDNSCount","MinMdnsResolver");
+    MATTER_TRACE_COUNTER("MDNSCount", "MinMdnsResolver");
     // Fill up any relevant data
     mPacketParser.ParseSrvRecords(data);
     mPacketParser.ParseNonSrvRecords(info->Interface, data);

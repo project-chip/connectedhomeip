@@ -649,7 +649,7 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
-    MATTER_TRACE_COUNTER("Sendsigmacnt","CASESession");
+    MATTER_TRACE_COUNTER("Sendsigmacnt", "CASESession");
     size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,          // initiatorRandom
                                                   sizeof(uint16_t),                     // initiatorSessionId,
                                                   kSHA256_Hash_Length,                  // destinationId

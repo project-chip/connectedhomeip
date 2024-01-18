@@ -25,9 +25,7 @@ config("tracing") {
 source_set("perfetto_tracing") {
   public = [ "include/matter/tracing/macros_impl.h" ]
 
-  public_deps = [
-    "${chip_root}/third_party/perfetto:sdk",
-  ]
+  public_deps = [ "${chip_root}/third_party/perfetto:sdk" ]
 
   public_configs = [ ":tracing" ]
 }

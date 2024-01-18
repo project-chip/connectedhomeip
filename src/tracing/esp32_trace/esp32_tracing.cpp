@@ -17,8 +17,8 @@
  */
 
 #include "esp32_tracing.h"
-#include <algorithm>
 #include "counter.h"
+#include <algorithm>
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
 #include <esp_log.h>
