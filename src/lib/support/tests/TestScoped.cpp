@@ -90,7 +90,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()                        //
 };
 
-int TestScopedBuffer()
+int TestScoped()
 {
     nlTestSuite theSuite = { "CHIP Scoped tests", &sTests[0], nullptr, nullptr };
 
@@ -99,4 +99,4 @@ int TestScopedBuffer()
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestScopedBuffer)
+CHIP_REGISTER_TEST_SUITE(TestScoped)
