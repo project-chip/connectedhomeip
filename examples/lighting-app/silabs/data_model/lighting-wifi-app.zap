@@ -1429,6 +1429,22 @@
               "reportableChange": 0
             },
             {
+              "name": "SupportedWiFiBands",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "FeatureMap",
               "code": 65532,
               "mfgCode": null,
@@ -3142,8 +3158,8 @@
           ]
         },
         {
-          "name": "Scenes",
-          "code": 5,
+          "name": "Scenes Management",
+          "code": 98,
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
