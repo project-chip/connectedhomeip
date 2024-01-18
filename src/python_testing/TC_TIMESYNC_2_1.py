@@ -164,7 +164,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             asserts.assert_true(False, "NTPServerAvailable is mandatory if the NTPS (TIMESYNC.S.F02) feature is supported")
 
         self.print_step(12, "Read TimeZoneListMaxSize")
-        if self.check_pics("TIMESYNC.S.A000A"):
+        if self.check_pics("TIMESYNC.S.A000a"):
             size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeZoneListMaxSize)
             asserts.assert_greater_equal(size, 1, "TimeZoneListMaxSize must be at least 1")
             asserts.assert_less_equal(size, 2, "TimeZoneListMaxSize must be max 2")
@@ -172,7 +172,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
             asserts.assert_true(False, "TimeZoneListMaxSize is mandatory if the TZ (TIMESYNC.S.F00) feature is supported")
 
         self.print_step(13, "Read DSTOffsetListMaxSize")
-        if self.check_pics("TIMESYNC.S.A000B"):
+        if self.check_pics("TIMESYNC.S.A000b"):
             size = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.DSTOffsetListMaxSize)
             asserts.assert_greater_equal(size, 1, "DSTOffsetListMaxSize must be at least 1")
         elif self.check_pics("TIMESYNC.S.F00"):

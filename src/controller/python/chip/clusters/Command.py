@@ -27,7 +27,7 @@ from typing import List, Optional, Type, Union
 
 import chip.exceptions
 import chip.interaction_model
-from chip.interaction_model import PyInvokeRequestData
+from chip.interaction_model import PyInvokeRequestData, TestOnlyPyBatchCommandsOverrides
 from chip.native import PyChipError
 
 from .ClusterObjects import ClusterCommand
@@ -204,7 +204,9 @@ class AsyncBatchCommandsTransaction:
         )
 
     def _handleDone(self):
-        self._future.set_result(self._responses)
+        # Future might already be set with exception from `handleError`
+        if not self._future.done():
+            self._future.set_result(self._responses)
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
@@ -296,24 +298,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
         ))
 
 
-def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
-                      timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
-                      suppressResponse: Optional[bool] = None) -> PyChipError:
-    ''' Send a cluster-object encapsulated command to a device and does the following:
-            - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
-            - None (on a successful response containing no data)
-            - Raises an exception if any errors are encountered.
-
-        If no response type is provided above, the type will be automatically deduced.
-
-        If a valid timedRequestTimeoutMs is provided, a timed interaction will be initiated instead.
-        If a valid interactionTimeoutMs is provided, the interaction will terminate with a CHIP_ERROR_TIMEOUT if a response
-        has not been received within that timeout. If it isn't provided, a sensible value will be automatically computed that
-        accounts for the underlying characteristics of both the transport and the responsiveness of the receiver.
-    '''
-    handle = chip.native.GetLibraryHandle()
-
-    responseTypes = []
+def _BuildPyInvokeRequestData(commands: List[InvokeRequestInfo], timedRequestTimeoutMs: Optional[int], responseTypes, suppressTimedRequestMessage: bool = False) -> List[PyInvokeRequestData]:
     numberOfCommands = len(commands)
     pyBatchCommandsDataArrayType = PyInvokeRequestData * numberOfCommands
     pyBatchCommandsData = pyBatchCommandsDataArrayType()
@@ -323,7 +308,8 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
         if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
             raise ValueError("responseType must be a ClusterCommand or None")
         if clusterCommand.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
-            raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
+            if not suppressTimedRequestMessage:
+                raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
 
         payloadTLV = clusterCommand.ToTLV()
 
@@ -335,6 +321,41 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
 
         responseTypes.append(responseType)
 
+    return pyBatchCommandsData
+
+
+def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
+                      timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
+                      suppressResponse: Optional[bool] = None) -> PyChipError:
+    ''' Initiates an InvokeInteraction with the batch commands provided.
+
+    Arguments:
+        - timedRequestTimeoutMs: If a valid value is provided, a timed interaction will be initiated.
+        - interactionTimeoutMs: If a valid value is provided, the interaction will terminate with a
+          CHIP_ERROR_TIMEOUT if a response is not received within the specified timeout. If not provided,
+          a suitable value will be automatically computed based on transport characteristics and
+          receiver responsiveness.
+
+    Returns:
+        - PyChipError: Indicates the outcome of initiating the InvokeRequest. Upon success the caller
+          is expected to await on `future` to get result of the InvokeInteraction.
+
+    Results passed via the provided future:
+        - Successful InvokeInteraction with path-specific responses (including path-specific errors):
+            - A list of responses is returned in the same order as the `commands` argument.
+            - Possible response elements:
+                - `None`: Successful command execution without additional cluster data.
+                - Encapsulated cluster-object: Successful command with response data.
+                - interaction_model.Status.*: Command failure with IM Status.
+                - interaction_model.Status.NoCommandResponse: No response from the server for
+                  a specific command.
+        - Non-path-specific error: An `InteractionModelError` exception is raised through the future.
+    '''
+    handle = chip.native.GetLibraryHandle()
+
+    responseTypes = []
+    pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs, responseTypes)
+
     transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
 
@@ -345,7 +366,50 @@ def SendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRe
             c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             c_uint16(0 if busyWaitMs is None else busyWaitMs),
             c_bool(False if suppressResponse is None else suppressResponse),
-            pyBatchCommandsData, c_size_t(numberOfCommands))
+            pyBatchCommandsData, c_size_t(len(pyBatchCommandsData)))
+    )
+
+
+def TestOnlySendBatchCommands(future: Future, eventLoop, device, commands: List[InvokeRequestInfo],
+                              timedRequestTimeoutMs: Optional[int] = None, interactionTimeoutMs: Optional[int] = None, busyWaitMs: Optional[int] = None,
+                              suppressResponse: Optional[bool] = None, remoteMaxPathsPerInvoke: Optional[int] = None,
+                              suppressTimedRequestMessage: bool = False, commandRefsOverride: Optional[List[int]] = None) -> PyChipError:
+    ''' ONLY TO BE USED FOR TEST: Send batch commands using various overrides.
+    '''
+    if suppressTimedRequestMessage and timedRequestTimeoutMs is not None:
+        raise ValueError("timedRequestTimeoutMs has non-None value while suppressTimedRequestMessage")
+
+    overrideCommandRefs = None
+    if commandRefsOverride is not None:
+        if len(commandRefsOverride) != len(commands):
+            raise ValueError("Mismatch in the number of elements provided in commandRefsOverride")
+        overrideCommandRefsType = c_uint16 * len(commandRefsOverride)
+        overrideCommandRefs = overrideCommandRefsType()
+
+    handle = chip.native.GetLibraryHandle()
+
+    responseTypes = []
+    pyBatchCommandsData = _BuildPyInvokeRequestData(commands, timedRequestTimeoutMs,
+                                                    responseTypes, suppressTimedRequestMessage=suppressTimedRequestMessage)
+
+    transaction = AsyncBatchCommandsTransaction(future, eventLoop, responseTypes)
+    ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+
+    testOnlyOverrides = TestOnlyPyBatchCommandsOverrides()
+    testOnlyOverrides.suppressTimedRequestMessage = suppressTimedRequestMessage
+    testOnlyOverrides.overrideRemoteMaxPathsPerInvoke = 0 if remoteMaxPathsPerInvoke is None else c_uint16(remoteMaxPathsPerInvoke)
+    testOnlyOverrides.overrideCommandRefsList = overrideCommandRefs
+    testOnlyOverrides.overrideCommandRefsListLength = 0 if overrideCommandRefs is None else c_size_t(len(overrideCommandRefs))
+
+    return builtins.chipStack.Call(
+        lambda: handle.pychip_CommandSender_TestOnlySendBatchCommands(
+            py_object(transaction), device,
+            c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs),
+            c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
+            c_uint16(0 if busyWaitMs is None else busyWaitMs),
+            c_bool(False if suppressResponse is None else suppressResponse),
+            testOnlyOverrides,
+            pyBatchCommandsData, c_size_t(len(pyBatchCommandsData)))
     )
 
 
@@ -377,6 +441,8 @@ def Init():
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendBatchCommands',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t])
+        setter.Set('pychip_CommandSender_TestOnlySendBatchCommands',
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, TestOnlyPyBatchCommandsOverrides, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke',
                    PyChipError, [py_object, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_bool])
         setter.Set('pychip_CommandSender_SendGroupCommand',
