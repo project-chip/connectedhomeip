@@ -3457,6 +3457,52 @@ public static class ValveConfigurationAndControlClusterValveFaultEvent {
     return output.toString();
   }
 }
+public static class ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {
+  public ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> ranges;
+  private static final long RANGES_ID = 0L;
+
+  public ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
+    ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> ranges
+  ) {
+    this.ranges = ranges;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(RANGES_ID, ArrayType.generateArrayType(ranges, (elementranges) -> elementranges.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    ArrayList<ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct> ranges = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == RANGES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          ranges = castingValue.map((elementcastingValue) -> ChipStructs.ElectricalPowerMeasurementClusterMeasurementRangeStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent(
+      ranges
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalPowerMeasurementClusterMeasurementPeriodRangesEvent {\n");
+    output.append("\tranges: ");
+    output.append(ranges);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ElectricalEnergyMeasurementClusterCumulativeEnergyMeasuredEvent {
   public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyImported;
   public Optional<ChipStructs.ElectricalEnergyMeasurementClusterEnergyMeasurementStruct> energyExported;

@@ -48,6 +48,7 @@ using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionE
 using ErrorStateEnum            = Clusters::detail::Enums::ErrorStateEnum;
 using LevelValueEnum            = Clusters::detail::Enums::LevelValueEnum;
 using MeasurementMediumEnum     = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementTypeEnum       = Clusters::detail::Enums::MeasurementTypeEnum;
 using MeasurementUnitEnum       = Clusters::detail::Enums::MeasurementUnitEnum;
 using OperationalStateEnum      = Clusters::detail::Enums::OperationalStateEnum;
 using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
@@ -108,6 +109,80 @@ public:
 };
 
 } // namespace ModeOptionStruct
+namespace MeasurementAccuracyRangeStruct {
+enum class Fields : uint8_t
+{
+    kRangeMin       = 0,
+    kRangeMax       = 1,
+    kPercentMax     = 2,
+    kPercentMin     = 3,
+    kPercentTypical = 4,
+    kFixedMax       = 5,
+    kFixedMin       = 6,
+    kFixedTypical   = 7,
+};
+
+struct Type
+{
+public:
+    int64_t rangeMin = static_cast<int64_t>(0);
+    int64_t rangeMax = static_cast<int64_t>(0);
+    Optional<chip::Percent100ths> percentMax;
+    Optional<chip::Percent100ths> percentMin;
+    Optional<chip::Percent100ths> percentTypical;
+    Optional<uint64_t> fixedMax;
+    Optional<uint64_t> fixedMin;
+    Optional<uint64_t> fixedTypical;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MeasurementAccuracyRangeStruct
+namespace MeasurementAccuracyStruct {
+enum class Fields : uint8_t
+{
+    kMeasurementType  = 0,
+    kMeasured         = 1,
+    kMinMeasuredValue = 2,
+    kMaxMeasuredValue = 3,
+    kAccuracyRanges   = 4,
+};
+
+struct Type
+{
+public:
+    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
+    bool measured                       = static_cast<bool>(0);
+    int64_t minMeasuredValue            = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
+    bool measured                       = static_cast<bool>(0);
+    int64_t minMeasuredValue            = static_cast<int64_t>(0);
+    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
+    DataModel::DecodableList<Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
+
+} // namespace MeasurementAccuracyStruct
 namespace ApplicationStruct {
 enum class Fields : uint8_t
 {
@@ -20061,32 +20136,23 @@ public:
 } // namespace ValveFault
 } // namespace Events
 } // namespace ValveConfigurationAndControl
-namespace ElectricalEnergyMeasurement {
+namespace ElectricalPowerMeasurement {
+using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
 namespace Structs {
-namespace MeasurementAccuracyRangeStruct {
+namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
+namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
+namespace HarmonicMeasurementStruct {
 enum class Fields : uint8_t
 {
-    kRangeMin       = 0,
-    kRangeMax       = 1,
-    kPercentMax     = 2,
-    kPercentMin     = 3,
-    kPercentTypical = 4,
-    kFixedMax       = 5,
-    kFixedMin       = 6,
-    kFixedTypical   = 7,
+    kOrder       = 0,
+    kMeasurement = 1,
 };
 
 struct Type
 {
 public:
-    int64_t rangeMin = static_cast<int64_t>(0);
-    int64_t rangeMax = static_cast<int64_t>(0);
-    Optional<chip::Percent100ths> percentMax;
-    Optional<chip::Percent100ths> percentMin;
-    Optional<chip::Percent100ths> percentTypical;
-    Optional<uint64_t> fixedMax;
-    Optional<uint64_t> fixedMin;
-    Optional<uint64_t> fixedTypical;
+    uint8_t order = static_cast<uint8_t>(0);
+    DataModel::Nullable<int64_t> measurement;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -20097,27 +20163,384 @@ public:
 
 using DecodableType = Type;
 
-} // namespace MeasurementAccuracyRangeStruct
-namespace MeasurementAccuracyStruct {
+} // namespace HarmonicMeasurementStruct
+namespace MeasurementRangeStruct {
 enum class Fields : uint8_t
 {
-    kMeasurementType  = 0,
-    kMeasured         = 1,
-    kMinMeasuredValue = 2,
-    kMaxMeasuredValue = 3,
-    kAccuracyRanges   = 4,
+    kMeasurementType = 0,
+    kMin             = 1,
+    kMax             = 2,
+    kStartTimestamp  = 3,
+    kEndTimestamp    = 4,
+    kMinTimestamp    = 5,
+    kMaxTimestamp    = 6,
+    kStartSystime    = 7,
+    kEndSystime      = 8,
+    kMinSystime      = 9,
+    kMaxSystime      = 10,
 };
 
 struct Type
 {
 public:
     MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
-    DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
+    int64_t min                         = static_cast<int64_t>(0);
+    int64_t max                         = static_cast<int64_t>(0);
+    Optional<uint32_t> startTimestamp;
+    Optional<uint32_t> endTimestamp;
+    Optional<uint32_t> minTimestamp;
+    Optional<uint32_t> maxTimestamp;
+    Optional<uint64_t> startSystime;
+    Optional<uint64_t> endSystime;
+    Optional<uint64_t> minSystime;
+    Optional<uint64_t> maxSystime;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace MeasurementRangeStruct
+} // namespace Structs
+
+namespace Attributes {
+
+namespace PowerMode {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum;
+    using DecodableType    = chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum;
+    using DecodableArgType = chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerMode
+namespace NumberOfMeasurementTypes {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfMeasurementTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfMeasurementTypes
+namespace Accuracy {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Accuracy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Accuracy
+namespace Ranges {
+struct TypeInfo
+{
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Ranges::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Ranges
+namespace Voltage {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Voltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Voltage
+namespace ActiveCurrent {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveCurrent
+namespace ReactiveCurrent {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReactiveCurrent
+namespace ApparentCurrent {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ApparentCurrent
+namespace ActivePower {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActivePower
+namespace ReactivePower {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ReactivePower
+namespace ApparentPower {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ApparentPower
+namespace RMSVoltage {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RMSVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RMSVoltage
+namespace RMSCurrent {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RMSCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RMSCurrent
+namespace RMSPower {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RMSPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace RMSPower
+namespace Frequency {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Frequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Frequency
+namespace HarmonicCurrents {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
+                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicCurrents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HarmonicCurrents
+namespace HarmonicPhases {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<
+                    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::Type>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+           chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicPhases::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HarmonicPhases
+namespace PowerFactor {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerFactor
+namespace NeutralCurrent {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NeutralCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NeutralCurrent
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::PowerMode::TypeInfo::DecodableType powerMode =
+            static_cast<chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum>(0);
+        Attributes::NumberOfMeasurementTypes::TypeInfo::DecodableType numberOfMeasurementTypes = static_cast<uint8_t>(0);
+        Attributes::Accuracy::TypeInfo::DecodableType accuracy;
+        Attributes::Ranges::TypeInfo::DecodableType ranges;
+        Attributes::Voltage::TypeInfo::DecodableType voltage;
+        Attributes::ActiveCurrent::TypeInfo::DecodableType activeCurrent;
+        Attributes::ReactiveCurrent::TypeInfo::DecodableType reactiveCurrent;
+        Attributes::ApparentCurrent::TypeInfo::DecodableType apparentCurrent;
+        Attributes::ActivePower::TypeInfo::DecodableType activePower;
+        Attributes::ReactivePower::TypeInfo::DecodableType reactivePower;
+        Attributes::ApparentPower::TypeInfo::DecodableType apparentPower;
+        Attributes::RMSVoltage::TypeInfo::DecodableType RMSVoltage;
+        Attributes::RMSCurrent::TypeInfo::DecodableType RMSCurrent;
+        Attributes::RMSPower::TypeInfo::DecodableType RMSPower;
+        Attributes::Frequency::TypeInfo::DecodableType frequency;
+        Attributes::HarmonicCurrents::TypeInfo::DecodableType harmonicCurrents;
+        Attributes::HarmonicPhases::TypeInfo::DecodableType harmonicPhases;
+        Attributes::PowerFactor::TypeInfo::DecodableType powerFactor;
+        Attributes::NeutralCurrent::TypeInfo::DecodableType neutralCurrent;
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+namespace Events {
+namespace MeasurementPeriodRanges {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kRanges = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MeasurementPeriodRanges::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    DataModel::List<const Structs::MeasurementRangeStruct::Type> ranges;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -20125,18 +20548,22 @@ public:
 struct DecodableType
 {
 public:
-    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
-    DataModel::DecodableList<Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::MeasurementPeriodRanges::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalPowerMeasurement::Id; }
+
+    DataModel::DecodableList<Structs::MeasurementRangeStruct::DecodableType> ranges;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
 };
-
-} // namespace MeasurementAccuracyStruct
+} // namespace MeasurementPeriodRanges
+} // namespace Events
+} // namespace ElectricalPowerMeasurement
+namespace ElectricalEnergyMeasurement {
+using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
+namespace Structs {
+namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
+namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
 namespace EnergyMeasurementStruct {
 enum class Fields : uint8_t
 {
@@ -38572,1928 +38999,6 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace ContentAppObserver
-namespace ElectricalMeasurement {
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace GetProfileInfoResponseCommand {
-struct Type;
-struct DecodableType;
-} // namespace GetProfileInfoResponseCommand
-
-namespace GetProfileInfoCommand {
-struct Type;
-struct DecodableType;
-} // namespace GetProfileInfoCommand
-
-namespace GetMeasurementProfileResponseCommand {
-struct Type;
-struct DecodableType;
-} // namespace GetMeasurementProfileResponseCommand
-
-namespace GetMeasurementProfileCommand {
-struct Type;
-struct DecodableType;
-} // namespace GetMeasurementProfileCommand
-
-} // namespace Commands
-
-namespace Commands {
-namespace GetProfileInfoResponseCommand {
-enum class Fields : uint8_t
-{
-    kProfileCount          = 0,
-    kProfileIntervalPeriod = 1,
-    kMaxNumberOfIntervals  = 2,
-    kListOfAttributes      = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    uint8_t profileCount          = static_cast<uint8_t>(0);
-    uint8_t profileIntervalPeriod = static_cast<uint8_t>(0);
-    uint8_t maxNumberOfIntervals  = static_cast<uint8_t>(0);
-    DataModel::List<const uint16_t> listOfAttributes;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    uint8_t profileCount          = static_cast<uint8_t>(0);
-    uint8_t profileIntervalPeriod = static_cast<uint8_t>(0);
-    uint8_t maxNumberOfIntervals  = static_cast<uint8_t>(0);
-    DataModel::DecodableList<uint16_t> listOfAttributes;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetProfileInfoResponseCommand
-namespace GetProfileInfoCommand {
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetProfileInfoCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetProfileInfoCommand
-namespace GetMeasurementProfileResponseCommand {
-enum class Fields : uint8_t
-{
-    kStartTime                  = 0,
-    kStatus                     = 1,
-    kProfileIntervalPeriod      = 2,
-    kNumberOfIntervalsDelivered = 3,
-    kAttributeId                = 4,
-    kIntervals                  = 5,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    uint32_t startTime                 = static_cast<uint32_t>(0);
-    uint8_t status                     = static_cast<uint8_t>(0);
-    uint8_t profileIntervalPeriod      = static_cast<uint8_t>(0);
-    uint8_t numberOfIntervalsDelivered = static_cast<uint8_t>(0);
-    uint16_t attributeId               = static_cast<uint16_t>(0);
-    DataModel::List<const uint8_t> intervals;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileResponseCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    uint32_t startTime                 = static_cast<uint32_t>(0);
-    uint8_t status                     = static_cast<uint8_t>(0);
-    uint8_t profileIntervalPeriod      = static_cast<uint8_t>(0);
-    uint8_t numberOfIntervalsDelivered = static_cast<uint8_t>(0);
-    uint16_t attributeId               = static_cast<uint16_t>(0);
-    DataModel::DecodableList<uint8_t> intervals;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetMeasurementProfileResponseCommand
-namespace GetMeasurementProfileCommand {
-enum class Fields : uint8_t
-{
-    kAttributeId       = 0,
-    kStartTime         = 1,
-    kNumberOfIntervals = 2,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    uint16_t attributeId      = static_cast<uint16_t>(0);
-    uint32_t startTime        = static_cast<uint32_t>(0);
-    uint8_t numberOfIntervals = static_cast<uint8_t>(0);
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetMeasurementProfileCommand::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-    uint16_t attributeId      = static_cast<uint16_t>(0);
-    uint32_t startTime        = static_cast<uint32_t>(0);
-    uint8_t numberOfIntervals = static_cast<uint8_t>(0);
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetMeasurementProfileCommand
-} // namespace Commands
-
-namespace Attributes {
-
-namespace MeasurementType {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasurementType
-namespace DcVoltage {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcVoltage
-namespace DcVoltageMin {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcVoltageMin
-namespace DcVoltageMax {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcVoltageMax
-namespace DcCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcCurrent
-namespace DcCurrentMin {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcCurrentMin
-namespace DcCurrentMax {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcCurrentMax
-namespace DcPower {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcPower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcPower
-namespace DcPowerMin {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcPowerMin
-namespace DcPowerMax {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcPowerMax
-namespace DcVoltageMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcVoltageMultiplier
-namespace DcVoltageDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcVoltageDivisor
-namespace DcCurrentMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcCurrentMultiplier
-namespace DcCurrentDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcCurrentDivisor
-namespace DcPowerMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcPowerMultiplier
-namespace DcPowerDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DcPowerDivisor
-namespace AcFrequency {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequency::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcFrequency
-namespace AcFrequencyMin {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcFrequencyMin
-namespace AcFrequencyMax {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcFrequencyMax
-namespace NeutralCurrent {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NeutralCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace NeutralCurrent
-namespace TotalActivePower {
-struct TypeInfo
-{
-    using Type             = int32_t;
-    using DecodableType    = int32_t;
-    using DecodableArgType = int32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TotalActivePower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TotalActivePower
-namespace TotalReactivePower {
-struct TypeInfo
-{
-    using Type             = int32_t;
-    using DecodableType    = int32_t;
-    using DecodableArgType = int32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TotalReactivePower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TotalReactivePower
-namespace TotalApparentPower {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TotalApparentPower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TotalApparentPower
-namespace Measured1stHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured1stHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured1stHarmonicCurrent
-namespace Measured3rdHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured3rdHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured3rdHarmonicCurrent
-namespace Measured5thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured5thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured5thHarmonicCurrent
-namespace Measured7thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured7thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured7thHarmonicCurrent
-namespace Measured9thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured9thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured9thHarmonicCurrent
-namespace Measured11thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Measured11thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Measured11thHarmonicCurrent
-namespace MeasuredPhase1stHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase1stHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasuredPhase1stHarmonicCurrent
-namespace MeasuredPhase3rdHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase3rdHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasuredPhase3rdHarmonicCurrent
-namespace MeasuredPhase5thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase5thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasuredPhase5thHarmonicCurrent
-namespace MeasuredPhase7thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase7thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasuredPhase7thHarmonicCurrent
-namespace MeasuredPhase9thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase9thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasuredPhase9thHarmonicCurrent
-namespace MeasuredPhase11thHarmonicCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase11thHarmonicCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MeasuredPhase11thHarmonicCurrent
-namespace AcFrequencyMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcFrequencyMultiplier
-namespace AcFrequencyDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcFrequencyDivisor
-namespace PowerMultiplier {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerMultiplier
-namespace PowerDivisor {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerDivisor
-namespace HarmonicCurrentMultiplier {
-struct TypeInfo
-{
-    using Type             = int8_t;
-    using DecodableType    = int8_t;
-    using DecodableArgType = int8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicCurrentMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace HarmonicCurrentMultiplier
-namespace PhaseHarmonicCurrentMultiplier {
-struct TypeInfo
-{
-    using Type             = int8_t;
-    using DecodableType    = int8_t;
-    using DecodableArgType = int8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PhaseHarmonicCurrentMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PhaseHarmonicCurrentMultiplier
-namespace InstantaneousVoltage {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstantaneousVoltage
-namespace InstantaneousLineCurrent {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousLineCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstantaneousLineCurrent
-namespace InstantaneousActiveCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousActiveCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstantaneousActiveCurrent
-namespace InstantaneousReactiveCurrent {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousReactiveCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstantaneousReactiveCurrent
-namespace InstantaneousPower {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousPower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace InstantaneousPower
-namespace RmsVoltage {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltage
-namespace RmsVoltageMin {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageMin
-namespace RmsVoltageMax {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageMax
-namespace RmsCurrent {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrent::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrent
-namespace RmsCurrentMin {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentMin
-namespace RmsCurrentMax {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentMax
-namespace ActivePower {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePower
-namespace ActivePowerMin {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMin::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerMin
-namespace ActivePowerMax {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMax::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerMax
-namespace ReactivePower {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ReactivePower
-namespace ApparentPower {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPower::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ApparentPower
-namespace PowerFactor {
-struct TypeInfo
-{
-    using Type             = int8_t;
-    using DecodableType    = int8_t;
-    using DecodableArgType = int8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerFactor
-namespace AverageRmsVoltageMeasurementPeriod {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriod::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsVoltageMeasurementPeriod
-namespace AverageRmsUnderVoltageCounter {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounter::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsUnderVoltageCounter
-namespace RmsExtremeOverVoltagePeriod {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriod::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeOverVoltagePeriod
-namespace RmsExtremeUnderVoltagePeriod {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriod::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeUnderVoltagePeriod
-namespace RmsVoltageSagPeriod {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriod::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSagPeriod
-namespace RmsVoltageSwellPeriod {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriod::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSwellPeriod
-namespace AcVoltageMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcVoltageMultiplier
-namespace AcVoltageDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcVoltageDivisor
-namespace AcCurrentMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcCurrentMultiplier
-namespace AcCurrentDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcCurrentDivisor
-namespace AcPowerMultiplier {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerMultiplier::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcPowerMultiplier
-namespace AcPowerDivisor {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerDivisor::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcPowerDivisor
-namespace OverloadAlarmsMask {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::OverloadAlarmsMask::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace OverloadAlarmsMask
-namespace VoltageOverload {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::VoltageOverload::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace VoltageOverload
-namespace CurrentOverload {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentOverload::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentOverload
-namespace AcOverloadAlarmsMask {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcOverloadAlarmsMask::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcOverloadAlarmsMask
-namespace AcVoltageOverload {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageOverload::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcVoltageOverload
-namespace AcCurrentOverload {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentOverload::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcCurrentOverload
-namespace AcActivePowerOverload {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcActivePowerOverload::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcActivePowerOverload
-namespace AcReactivePowerOverload {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcReactivePowerOverload::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AcReactivePowerOverload
-namespace AverageRmsOverVoltage {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsOverVoltage
-namespace AverageRmsUnderVoltage {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsUnderVoltage
-namespace RmsExtremeOverVoltage {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeOverVoltage
-namespace RmsExtremeUnderVoltage {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltage::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeUnderVoltage
-namespace RmsVoltageSag {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSag::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSag
-namespace RmsVoltageSwell {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwell::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSwell
-namespace LineCurrentPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace LineCurrentPhaseB
-namespace ActiveCurrentPhaseB {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActiveCurrentPhaseB
-namespace ReactiveCurrentPhaseB {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ReactiveCurrentPhaseB
-namespace RmsVoltagePhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltagePhaseB
-namespace RmsVoltageMinPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageMinPhaseB
-namespace RmsVoltageMaxPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageMaxPhaseB
-namespace RmsCurrentPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentPhaseB
-namespace RmsCurrentMinPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentMinPhaseB
-namespace RmsCurrentMaxPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentMaxPhaseB
-namespace ActivePowerPhaseB {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerPhaseB
-namespace ActivePowerMinPhaseB {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerMinPhaseB
-namespace ActivePowerMaxPhaseB {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerMaxPhaseB
-namespace ReactivePowerPhaseB {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ReactivePowerPhaseB
-namespace ApparentPowerPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ApparentPowerPhaseB
-namespace PowerFactorPhaseB {
-struct TypeInfo
-{
-    using Type             = int8_t;
-    using DecodableType    = int8_t;
-    using DecodableArgType = int8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerFactorPhaseB
-namespace AverageRmsVoltageMeasurementPeriodPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsVoltageMeasurementPeriodPhaseB
-namespace AverageRmsOverVoltageCounterPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsOverVoltageCounterPhaseB
-namespace AverageRmsUnderVoltageCounterPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsUnderVoltageCounterPhaseB
-namespace RmsExtremeOverVoltagePeriodPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeOverVoltagePeriodPhaseB
-namespace RmsExtremeUnderVoltagePeriodPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeUnderVoltagePeriodPhaseB
-namespace RmsVoltageSagPeriodPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSagPeriodPhaseB
-namespace RmsVoltageSwellPeriodPhaseB {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseB::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSwellPeriodPhaseB
-namespace LineCurrentPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace LineCurrentPhaseC
-namespace ActiveCurrentPhaseC {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActiveCurrentPhaseC
-namespace ReactiveCurrentPhaseC {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ReactiveCurrentPhaseC
-namespace RmsVoltagePhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltagePhaseC
-namespace RmsVoltageMinPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageMinPhaseC
-namespace RmsVoltageMaxPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageMaxPhaseC
-namespace RmsCurrentPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentPhaseC
-namespace RmsCurrentMinPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentMinPhaseC
-namespace RmsCurrentMaxPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsCurrentMaxPhaseC
-namespace ActivePowerPhaseC {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerPhaseC
-namespace ActivePowerMinPhaseC {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerMinPhaseC
-namespace ActivePowerMaxPhaseC {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ActivePowerMaxPhaseC
-namespace ReactivePowerPhaseC {
-struct TypeInfo
-{
-    using Type             = int16_t;
-    using DecodableType    = int16_t;
-    using DecodableArgType = int16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ReactivePowerPhaseC
-namespace ApparentPowerPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ApparentPowerPhaseC
-namespace PowerFactorPhaseC {
-struct TypeInfo
-{
-    using Type             = int8_t;
-    using DecodableType    = int8_t;
-    using DecodableArgType = int8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PowerFactorPhaseC
-namespace AverageRmsVoltageMeasurementPeriodPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsVoltageMeasurementPeriodPhaseC
-namespace AverageRmsOverVoltageCounterPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsOverVoltageCounterPhaseC
-namespace AverageRmsUnderVoltageCounterPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AverageRmsUnderVoltageCounterPhaseC
-namespace RmsExtremeOverVoltagePeriodPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeOverVoltagePeriodPhaseC
-namespace RmsExtremeUnderVoltagePeriodPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsExtremeUnderVoltagePeriodPhaseC
-namespace RmsVoltageSagPeriodPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSagPeriodPhaseC
-namespace RmsVoltageSwellPeriodPhaseC {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseC::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace RmsVoltageSwellPeriodPhaseC
-namespace GeneratedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace GeneratedCommandList
-namespace AcceptedCommandList {
-struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace AcceptedCommandList
-namespace EventList {
-struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace EventList
-namespace AttributeList {
-struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
-{
-    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::MeasurementType::TypeInfo::DecodableType measurementType                         = static_cast<uint32_t>(0);
-        Attributes::DcVoltage::TypeInfo::DecodableType dcVoltage                                     = static_cast<int16_t>(0);
-        Attributes::DcVoltageMin::TypeInfo::DecodableType dcVoltageMin                               = static_cast<int16_t>(0);
-        Attributes::DcVoltageMax::TypeInfo::DecodableType dcVoltageMax                               = static_cast<int16_t>(0);
-        Attributes::DcCurrent::TypeInfo::DecodableType dcCurrent                                     = static_cast<int16_t>(0);
-        Attributes::DcCurrentMin::TypeInfo::DecodableType dcCurrentMin                               = static_cast<int16_t>(0);
-        Attributes::DcCurrentMax::TypeInfo::DecodableType dcCurrentMax                               = static_cast<int16_t>(0);
-        Attributes::DcPower::TypeInfo::DecodableType dcPower                                         = static_cast<int16_t>(0);
-        Attributes::DcPowerMin::TypeInfo::DecodableType dcPowerMin                                   = static_cast<int16_t>(0);
-        Attributes::DcPowerMax::TypeInfo::DecodableType dcPowerMax                                   = static_cast<int16_t>(0);
-        Attributes::DcVoltageMultiplier::TypeInfo::DecodableType dcVoltageMultiplier                 = static_cast<uint16_t>(0);
-        Attributes::DcVoltageDivisor::TypeInfo::DecodableType dcVoltageDivisor                       = static_cast<uint16_t>(0);
-        Attributes::DcCurrentMultiplier::TypeInfo::DecodableType dcCurrentMultiplier                 = static_cast<uint16_t>(0);
-        Attributes::DcCurrentDivisor::TypeInfo::DecodableType dcCurrentDivisor                       = static_cast<uint16_t>(0);
-        Attributes::DcPowerMultiplier::TypeInfo::DecodableType dcPowerMultiplier                     = static_cast<uint16_t>(0);
-        Attributes::DcPowerDivisor::TypeInfo::DecodableType dcPowerDivisor                           = static_cast<uint16_t>(0);
-        Attributes::AcFrequency::TypeInfo::DecodableType acFrequency                                 = static_cast<uint16_t>(0);
-        Attributes::AcFrequencyMin::TypeInfo::DecodableType acFrequencyMin                           = static_cast<uint16_t>(0);
-        Attributes::AcFrequencyMax::TypeInfo::DecodableType acFrequencyMax                           = static_cast<uint16_t>(0);
-        Attributes::NeutralCurrent::TypeInfo::DecodableType neutralCurrent                           = static_cast<uint16_t>(0);
-        Attributes::TotalActivePower::TypeInfo::DecodableType totalActivePower                       = static_cast<int32_t>(0);
-        Attributes::TotalReactivePower::TypeInfo::DecodableType totalReactivePower                   = static_cast<int32_t>(0);
-        Attributes::TotalApparentPower::TypeInfo::DecodableType totalApparentPower                   = static_cast<uint32_t>(0);
-        Attributes::Measured1stHarmonicCurrent::TypeInfo::DecodableType measured1stHarmonicCurrent   = static_cast<int16_t>(0);
-        Attributes::Measured3rdHarmonicCurrent::TypeInfo::DecodableType measured3rdHarmonicCurrent   = static_cast<int16_t>(0);
-        Attributes::Measured5thHarmonicCurrent::TypeInfo::DecodableType measured5thHarmonicCurrent   = static_cast<int16_t>(0);
-        Attributes::Measured7thHarmonicCurrent::TypeInfo::DecodableType measured7thHarmonicCurrent   = static_cast<int16_t>(0);
-        Attributes::Measured9thHarmonicCurrent::TypeInfo::DecodableType measured9thHarmonicCurrent   = static_cast<int16_t>(0);
-        Attributes::Measured11thHarmonicCurrent::TypeInfo::DecodableType measured11thHarmonicCurrent = static_cast<int16_t>(0);
-        Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo::DecodableType measuredPhase1stHarmonicCurrent =
-            static_cast<int16_t>(0);
-        Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo::DecodableType measuredPhase3rdHarmonicCurrent =
-            static_cast<int16_t>(0);
-        Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo::DecodableType measuredPhase5thHarmonicCurrent =
-            static_cast<int16_t>(0);
-        Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo::DecodableType measuredPhase7thHarmonicCurrent =
-            static_cast<int16_t>(0);
-        Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo::DecodableType measuredPhase9thHarmonicCurrent =
-            static_cast<int16_t>(0);
-        Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo::DecodableType measuredPhase11thHarmonicCurrent =
-            static_cast<int16_t>(0);
-        Attributes::AcFrequencyMultiplier::TypeInfo::DecodableType acFrequencyMultiplier         = static_cast<uint16_t>(0);
-        Attributes::AcFrequencyDivisor::TypeInfo::DecodableType acFrequencyDivisor               = static_cast<uint16_t>(0);
-        Attributes::PowerMultiplier::TypeInfo::DecodableType powerMultiplier                     = static_cast<uint32_t>(0);
-        Attributes::PowerDivisor::TypeInfo::DecodableType powerDivisor                           = static_cast<uint32_t>(0);
-        Attributes::HarmonicCurrentMultiplier::TypeInfo::DecodableType harmonicCurrentMultiplier = static_cast<int8_t>(0);
-        Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo::DecodableType phaseHarmonicCurrentMultiplier = static_cast<int8_t>(0);
-        Attributes::InstantaneousVoltage::TypeInfo::DecodableType instantaneousVoltage                 = static_cast<int16_t>(0);
-        Attributes::InstantaneousLineCurrent::TypeInfo::DecodableType instantaneousLineCurrent         = static_cast<uint16_t>(0);
-        Attributes::InstantaneousActiveCurrent::TypeInfo::DecodableType instantaneousActiveCurrent     = static_cast<int16_t>(0);
-        Attributes::InstantaneousReactiveCurrent::TypeInfo::DecodableType instantaneousReactiveCurrent = static_cast<int16_t>(0);
-        Attributes::InstantaneousPower::TypeInfo::DecodableType instantaneousPower                     = static_cast<int16_t>(0);
-        Attributes::RmsVoltage::TypeInfo::DecodableType rmsVoltage                                     = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMin::TypeInfo::DecodableType rmsVoltageMin                               = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMax::TypeInfo::DecodableType rmsVoltageMax                               = static_cast<uint16_t>(0);
-        Attributes::RmsCurrent::TypeInfo::DecodableType rmsCurrent                                     = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMin::TypeInfo::DecodableType rmsCurrentMin                               = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMax::TypeInfo::DecodableType rmsCurrentMax                               = static_cast<uint16_t>(0);
-        Attributes::ActivePower::TypeInfo::DecodableType activePower                                   = static_cast<int16_t>(0);
-        Attributes::ActivePowerMin::TypeInfo::DecodableType activePowerMin                             = static_cast<int16_t>(0);
-        Attributes::ActivePowerMax::TypeInfo::DecodableType activePowerMax                             = static_cast<int16_t>(0);
-        Attributes::ReactivePower::TypeInfo::DecodableType reactivePower                               = static_cast<int16_t>(0);
-        Attributes::ApparentPower::TypeInfo::DecodableType apparentPower                               = static_cast<uint16_t>(0);
-        Attributes::PowerFactor::TypeInfo::DecodableType powerFactor                                   = static_cast<int8_t>(0);
-        Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo::DecodableType averageRmsVoltageMeasurementPeriod =
-            static_cast<uint16_t>(0);
-        Attributes::AverageRmsUnderVoltageCounter::TypeInfo::DecodableType averageRmsUnderVoltageCounter = static_cast<uint16_t>(0);
-        Attributes::RmsExtremeOverVoltagePeriod::TypeInfo::DecodableType rmsExtremeOverVoltagePeriod     = static_cast<uint16_t>(0);
-        Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo::DecodableType rmsExtremeUnderVoltagePeriod   = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageSagPeriod::TypeInfo::DecodableType rmsVoltageSagPeriod                     = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageSwellPeriod::TypeInfo::DecodableType rmsVoltageSwellPeriod                 = static_cast<uint16_t>(0);
-        Attributes::AcVoltageMultiplier::TypeInfo::DecodableType acVoltageMultiplier                     = static_cast<uint16_t>(0);
-        Attributes::AcVoltageDivisor::TypeInfo::DecodableType acVoltageDivisor                           = static_cast<uint16_t>(0);
-        Attributes::AcCurrentMultiplier::TypeInfo::DecodableType acCurrentMultiplier                     = static_cast<uint16_t>(0);
-        Attributes::AcCurrentDivisor::TypeInfo::DecodableType acCurrentDivisor                           = static_cast<uint16_t>(0);
-        Attributes::AcPowerMultiplier::TypeInfo::DecodableType acPowerMultiplier                         = static_cast<uint16_t>(0);
-        Attributes::AcPowerDivisor::TypeInfo::DecodableType acPowerDivisor                               = static_cast<uint16_t>(0);
-        Attributes::OverloadAlarmsMask::TypeInfo::DecodableType overloadAlarmsMask                       = static_cast<uint8_t>(0);
-        Attributes::VoltageOverload::TypeInfo::DecodableType voltageOverload                             = static_cast<int16_t>(0);
-        Attributes::CurrentOverload::TypeInfo::DecodableType currentOverload                             = static_cast<int16_t>(0);
-        Attributes::AcOverloadAlarmsMask::TypeInfo::DecodableType acOverloadAlarmsMask                   = static_cast<uint16_t>(0);
-        Attributes::AcVoltageOverload::TypeInfo::DecodableType acVoltageOverload                         = static_cast<int16_t>(0);
-        Attributes::AcCurrentOverload::TypeInfo::DecodableType acCurrentOverload                         = static_cast<int16_t>(0);
-        Attributes::AcActivePowerOverload::TypeInfo::DecodableType acActivePowerOverload                 = static_cast<int16_t>(0);
-        Attributes::AcReactivePowerOverload::TypeInfo::DecodableType acReactivePowerOverload             = static_cast<int16_t>(0);
-        Attributes::AverageRmsOverVoltage::TypeInfo::DecodableType averageRmsOverVoltage                 = static_cast<int16_t>(0);
-        Attributes::AverageRmsUnderVoltage::TypeInfo::DecodableType averageRmsUnderVoltage               = static_cast<int16_t>(0);
-        Attributes::RmsExtremeOverVoltage::TypeInfo::DecodableType rmsExtremeOverVoltage                 = static_cast<int16_t>(0);
-        Attributes::RmsExtremeUnderVoltage::TypeInfo::DecodableType rmsExtremeUnderVoltage               = static_cast<int16_t>(0);
-        Attributes::RmsVoltageSag::TypeInfo::DecodableType rmsVoltageSag                                 = static_cast<int16_t>(0);
-        Attributes::RmsVoltageSwell::TypeInfo::DecodableType rmsVoltageSwell                             = static_cast<int16_t>(0);
-        Attributes::LineCurrentPhaseB::TypeInfo::DecodableType lineCurrentPhaseB                         = static_cast<uint16_t>(0);
-        Attributes::ActiveCurrentPhaseB::TypeInfo::DecodableType activeCurrentPhaseB                     = static_cast<int16_t>(0);
-        Attributes::ReactiveCurrentPhaseB::TypeInfo::DecodableType reactiveCurrentPhaseB                 = static_cast<int16_t>(0);
-        Attributes::RmsVoltagePhaseB::TypeInfo::DecodableType rmsVoltagePhaseB                           = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMinPhaseB::TypeInfo::DecodableType rmsVoltageMinPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMaxPhaseB::TypeInfo::DecodableType rmsVoltageMaxPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentPhaseB::TypeInfo::DecodableType rmsCurrentPhaseB                           = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMinPhaseB::TypeInfo::DecodableType rmsCurrentMinPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMaxPhaseB::TypeInfo::DecodableType rmsCurrentMaxPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::ActivePowerPhaseB::TypeInfo::DecodableType activePowerPhaseB                         = static_cast<int16_t>(0);
-        Attributes::ActivePowerMinPhaseB::TypeInfo::DecodableType activePowerMinPhaseB                   = static_cast<int16_t>(0);
-        Attributes::ActivePowerMaxPhaseB::TypeInfo::DecodableType activePowerMaxPhaseB                   = static_cast<int16_t>(0);
-        Attributes::ReactivePowerPhaseB::TypeInfo::DecodableType reactivePowerPhaseB                     = static_cast<int16_t>(0);
-        Attributes::ApparentPowerPhaseB::TypeInfo::DecodableType apparentPowerPhaseB                     = static_cast<uint16_t>(0);
-        Attributes::PowerFactorPhaseB::TypeInfo::DecodableType powerFactorPhaseB                         = static_cast<int8_t>(0);
-        Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::DecodableType averageRmsVoltageMeasurementPeriodPhaseB =
-            static_cast<uint16_t>(0);
-        Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo::DecodableType averageRmsOverVoltageCounterPhaseB =
-            static_cast<uint16_t>(0);
-        Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::DecodableType averageRmsUnderVoltageCounterPhaseB =
-            static_cast<uint16_t>(0);
-        Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::DecodableType rmsExtremeOverVoltagePeriodPhaseB =
-            static_cast<uint16_t>(0);
-        Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::DecodableType rmsExtremeUnderVoltagePeriodPhaseB =
-            static_cast<uint16_t>(0);
-        Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo::DecodableType rmsVoltageSagPeriodPhaseB     = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo::DecodableType rmsVoltageSwellPeriodPhaseB = static_cast<uint16_t>(0);
-        Attributes::LineCurrentPhaseC::TypeInfo::DecodableType lineCurrentPhaseC                     = static_cast<uint16_t>(0);
-        Attributes::ActiveCurrentPhaseC::TypeInfo::DecodableType activeCurrentPhaseC                 = static_cast<int16_t>(0);
-        Attributes::ReactiveCurrentPhaseC::TypeInfo::DecodableType reactiveCurrentPhaseC             = static_cast<int16_t>(0);
-        Attributes::RmsVoltagePhaseC::TypeInfo::DecodableType rmsVoltagePhaseC                       = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMinPhaseC::TypeInfo::DecodableType rmsVoltageMinPhaseC                 = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageMaxPhaseC::TypeInfo::DecodableType rmsVoltageMaxPhaseC                 = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentPhaseC::TypeInfo::DecodableType rmsCurrentPhaseC                       = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMinPhaseC::TypeInfo::DecodableType rmsCurrentMinPhaseC                 = static_cast<uint16_t>(0);
-        Attributes::RmsCurrentMaxPhaseC::TypeInfo::DecodableType rmsCurrentMaxPhaseC                 = static_cast<uint16_t>(0);
-        Attributes::ActivePowerPhaseC::TypeInfo::DecodableType activePowerPhaseC                     = static_cast<int16_t>(0);
-        Attributes::ActivePowerMinPhaseC::TypeInfo::DecodableType activePowerMinPhaseC               = static_cast<int16_t>(0);
-        Attributes::ActivePowerMaxPhaseC::TypeInfo::DecodableType activePowerMaxPhaseC               = static_cast<int16_t>(0);
-        Attributes::ReactivePowerPhaseC::TypeInfo::DecodableType reactivePowerPhaseC                 = static_cast<int16_t>(0);
-        Attributes::ApparentPowerPhaseC::TypeInfo::DecodableType apparentPowerPhaseC                 = static_cast<uint16_t>(0);
-        Attributes::PowerFactorPhaseC::TypeInfo::DecodableType powerFactorPhaseC                     = static_cast<int8_t>(0);
-        Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::DecodableType averageRmsVoltageMeasurementPeriodPhaseC =
-            static_cast<uint16_t>(0);
-        Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo::DecodableType averageRmsOverVoltageCounterPhaseC =
-            static_cast<uint16_t>(0);
-        Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::DecodableType averageRmsUnderVoltageCounterPhaseC =
-            static_cast<uint16_t>(0);
-        Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::DecodableType rmsExtremeOverVoltagePeriodPhaseC =
-            static_cast<uint16_t>(0);
-        Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::DecodableType rmsExtremeUnderVoltagePeriodPhaseC =
-            static_cast<uint16_t>(0);
-        Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo::DecodableType rmsVoltageSagPeriodPhaseC     = static_cast<uint16_t>(0);
-        Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo::DecodableType rmsVoltageSwellPeriodPhaseC = static_cast<uint16_t>(0);
-        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
-        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
-        Attributes::EventList::TypeInfo::DecodableType eventList;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
-    };
-};
-} // namespace Attributes
-} // namespace ElectricalMeasurement
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {

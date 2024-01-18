@@ -79,6 +79,129 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::detail::Structs::MeasurementAccuracyRangeStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("RangeMin", indent + 1, value.rangeMin);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RangeMin'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RangeMax", indent + 1, value.rangeMax);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RangeMax'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PercentMax", indent + 1, value.percentMax);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PercentMax'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PercentMin", indent + 1, value.percentMin);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PercentMin'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PercentTypical", indent + 1, value.percentTypical);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PercentTypical'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FixedMax", indent + 1, value.fixedMax);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FixedMax'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FixedMin", indent + 1, value.fixedMin);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FixedMin'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FixedTypical", indent + 1, value.fixedTypical);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FixedTypical'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::detail::Structs::MeasurementAccuracyStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MeasurementType", indent + 1, value.measurementType);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MeasurementType'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Measured", indent + 1, value.measured);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Measured'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MinMeasuredValue", indent + 1, value.minMeasuredValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinMeasuredValue'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxMeasuredValue", indent + 1, value.maxMeasuredValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxMeasuredValue'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AccuracyRanges", indent + 1, value.accuracyRanges);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AccuracyRanges'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::detail::Structs::ApplicationStruct::DecodableType & value)
 {
@@ -1988,70 +2111,22 @@ CHIP_ERROR DataModelLogger::LogValue(
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
-    const chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::DecodableType & value)
+    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("RangeMin", indent + 1, value.rangeMin);
+        CHIP_ERROR err = LogValue("Order", indent + 1, value.order);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RangeMin'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Order'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("RangeMax", indent + 1, value.rangeMax);
+        CHIP_ERROR err = LogValue("Measurement", indent + 1, value.measurement);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RangeMax'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PercentMax", indent + 1, value.percentMax);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PercentMax'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PercentMin", indent + 1, value.percentMin);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PercentMin'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PercentTypical", indent + 1, value.percentTypical);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PercentTypical'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FixedMax", indent + 1, value.fixedMax);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FixedMax'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FixedMin", indent + 1, value.fixedMin);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FixedMin'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FixedTypical", indent + 1, value.fixedTypical);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FixedTypical'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Measurement'");
             return err;
         }
     }
@@ -2062,7 +2137,7 @@ CHIP_ERROR DataModelLogger::LogValue(
 
 CHIP_ERROR DataModelLogger::LogValue(
     const char * label, size_t indent,
-    const chip::app::Clusters::ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::DecodableType & value)
+    const chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -2074,34 +2149,82 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("Measured", indent + 1, value.measured);
+        CHIP_ERROR err = LogValue("Min", indent + 1, value.min);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Measured'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Min'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("MinMeasuredValue", indent + 1, value.minMeasuredValue);
+        CHIP_ERROR err = LogValue("Max", indent + 1, value.max);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinMeasuredValue'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Max'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("MaxMeasuredValue", indent + 1, value.maxMeasuredValue);
+        CHIP_ERROR err = LogValue("StartTimestamp", indent + 1, value.startTimestamp);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxMeasuredValue'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StartTimestamp'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("AccuracyRanges", indent + 1, value.accuracyRanges);
+        CHIP_ERROR err = LogValue("EndTimestamp", indent + 1, value.endTimestamp);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AccuracyRanges'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndTimestamp'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MinTimestamp", indent + 1, value.minTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinTimestamp'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxTimestamp", indent + 1, value.maxTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxTimestamp'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StartSystime", indent + 1, value.startSystime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StartSystime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EndSystime", indent + 1, value.endSystime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EndSystime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MinSystime", indent + 1, value.minSystime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinSystime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MaxSystime", indent + 1, value.maxSystime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxSystime'");
             return err;
         }
     }
@@ -5884,6 +6007,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ElectricalPowerMeasurement::Events::MeasurementPeriodRanges::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Ranges", indent + 1, value.ranges);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Ranges'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -7452,31 +7591,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     ReturnErrorOnFailure(DataModelLogger::LogValue("data", indent + 1, value.data));
     ReturnErrorOnFailure(DataModelLogger::LogValue("encodingHint", indent + 1, value.encodingHint));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("profileCount", indent + 1, value.profileCount));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("profileIntervalPeriod", indent + 1, value.profileIntervalPeriod));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("maxNumberOfIntervals", indent + 1, value.maxNumberOfIntervals));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("listOfAttributes", indent + 1, value.listOfAttributes));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
-                          const ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("startTime", indent + 1, value.startTime));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("profileIntervalPeriod", indent + 1, value.profileIntervalPeriod));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("numberOfIntervalsDelivered", indent + 1, value.numberOfIntervalsDelivered));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("attributeId", indent + 1, value.attributeId));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("intervals", indent + 1, value.intervals));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -12092,6 +12206,145 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ElectricalPowerMeasurement::Id: {
+        switch (path.mAttributeId)
+        {
+        case ElectricalPowerMeasurement::Attributes::PowerMode::Id: {
+            chip::app::Clusters::ElectricalPowerMeasurement::PowerModeEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PowerMode", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::NumberOfMeasurementTypes::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfMeasurementTypes", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::Accuracy::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Accuracy", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::Ranges::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ElectricalPowerMeasurement::Structs::MeasurementRangeStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Ranges", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::Voltage::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Voltage", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveCurrent", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ReactiveCurrent::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReactiveCurrent", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ApparentCurrent::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ApparentCurrent", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ActivePower::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActivePower", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ReactivePower::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ReactivePower", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ApparentPower::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ApparentPower", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::RMSVoltage::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RMSVoltage", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::RMSCurrent::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RMSCurrent", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::RMSPower::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RMSPower", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::Frequency::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Frequency", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::HarmonicCurrents::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HarmonicCurrents", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::HarmonicPhases::Id: {
+            chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                chip::app::Clusters::ElectricalPowerMeasurement::Structs::HarmonicMeasurementStruct::DecodableType>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("HarmonicPhases", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::PowerFactor::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PowerFactor", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id: {
+            chip::app::DataModel::Nullable<int64_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NeutralCurrent", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ElectricalPowerMeasurement::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case ElectricalEnergyMeasurement::Id: {
         switch (path.mAttributeId)
         {
@@ -16232,682 +16485,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
-    case ElectricalMeasurement::Id: {
-        switch (path.mAttributeId)
-        {
-        case ElectricalMeasurement::Attributes::MeasurementType::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measurement type", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcVoltage::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcVoltageMin::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc voltage min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcVoltageMax::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc voltage max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcCurrentMin::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc current min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcCurrentMax::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc current max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcPower::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcPowerMin::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc power min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcPowerMax::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc power max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcVoltageMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc voltage multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcVoltageDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc voltage divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcCurrentMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc current multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcCurrentDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc current divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcPowerMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc power multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::DcPowerDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("dc power divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcFrequency::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac frequency", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcFrequencyMin::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac frequency min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcFrequencyMax::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac frequency max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::NeutralCurrent::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("neutral current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::TotalActivePower::Id: {
-            int32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("total active power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::TotalReactivePower::Id: {
-            int32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("total reactive power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::TotalApparentPower::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("total apparent power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::Measured1stHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured 1st harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::Measured3rdHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured 3rd harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::Measured5thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured 5th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::Measured7thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured 7th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::Measured9thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured 9th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::Measured11thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured 11th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::MeasuredPhase1stHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured phase 1st harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::MeasuredPhase3rdHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured phase 3rd harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::MeasuredPhase5thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured phase 5th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::MeasuredPhase7thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured phase 7th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::MeasuredPhase9thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured phase 9th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::MeasuredPhase11thHarmonicCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("measured phase 11th harmonic current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcFrequencyMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac frequency multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcFrequencyDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac frequency divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::PowerMultiplier::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("power multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::PowerDivisor::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("power divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::HarmonicCurrentMultiplier::Id: {
-            int8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("harmonic current multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::PhaseHarmonicCurrentMultiplier::Id: {
-            int8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("phase harmonic current multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::InstantaneousVoltage::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("instantaneous voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::InstantaneousLineCurrent::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("instantaneous line current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::InstantaneousActiveCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("instantaneous active current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::InstantaneousReactiveCurrent::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("instantaneous reactive current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::InstantaneousPower::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("instantaneous power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltage::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageMin::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageMax::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrent::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentMin::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentMax::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePower::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerMin::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power min", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerMax::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power max", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ReactivePower::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("reactive power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ApparentPower::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("apparent power", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::PowerFactor::Id: {
-            int8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("power factor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriod::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms voltage measurement period", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounter::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms under voltage counter", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriod::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme over voltage period", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriod::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme under voltage period", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSagPeriod::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage sag period", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSwellPeriod::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage swell period", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcVoltageMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac voltage multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcVoltageDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac voltage divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcCurrentMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac current multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcCurrentDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac current divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcPowerMultiplier::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac power multiplier", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcPowerDivisor::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac power divisor", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::OverloadAlarmsMask::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("overload alarms mask", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::VoltageOverload::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("voltage overload", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::CurrentOverload::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("current overload", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcOverloadAlarmsMask::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac overload alarms mask", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcVoltageOverload::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac voltage overload", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcCurrentOverload::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac current overload", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcActivePowerOverload::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac active power overload", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcReactivePowerOverload::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ac reactive power overload", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsOverVoltage::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms over voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsUnderVoltage::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms under voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeOverVoltage::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme over voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeUnderVoltage::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme under voltage", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSag::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage sag", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSwell::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage swell", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::LineCurrentPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("line current phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActiveCurrentPhaseB::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active current phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ReactiveCurrentPhaseB::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("reactive current phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltagePhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageMinPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage min phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage max phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentMinPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current min phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current max phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerPhaseB::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerMinPhaseB::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power min phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerMaxPhaseB::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power max phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ReactivePowerPhaseB::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("reactive power phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ApparentPowerPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("apparent power phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::PowerFactorPhaseB::Id: {
-            int8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("power factor phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms voltage measurement period phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms over voltage counter phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms under voltage counter phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme over voltage period phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme under voltage period phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage sag period phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseB::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage swell period phase b", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::LineCurrentPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("line current phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActiveCurrentPhaseC::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active current phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ReactiveCurrentPhaseC::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("reactive current phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltagePhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageMinPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage min phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageMaxPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage max phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentMinPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current min phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsCurrentMaxPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms current max phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerPhaseC::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerMinPhaseC::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power min phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ActivePowerMaxPhaseC::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("active power max phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ReactivePowerPhaseC::Id: {
-            int16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("reactive power phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ApparentPowerPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("apparent power phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::PowerFactorPhaseC::Id: {
-            int8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("power factor phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms voltage measurement period phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsOverVoltageCounterPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms over voltage counter phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AverageRmsUnderVoltageCounterPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("average rms under voltage counter phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme over voltage period phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms extreme under voltage period phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSagPeriodPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage sag period phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::RmsVoltageSwellPeriodPhaseC::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("rms voltage swell period phase c", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case ElectricalMeasurement::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
     case UnitTesting::Id: {
         switch (path.mAttributeId)
         {
@@ -17957,22 +17534,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
-    case ElectricalMeasurement::Id: {
-        switch (path.mCommandId)
-        {
-        case ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::Id: {
-            ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetProfileInfoResponseCommand", 1, value);
-        }
-        case ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::Id: {
-            ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetMeasurementProfileResponseCommand", 1, value);
-        }
-        }
-        break;
-    }
     case UnitTesting::Id: {
         switch (path.mCommandId)
         {
@@ -18537,6 +18098,17 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::ValveConfigurationAndControl::Events::ValveFault::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ValveFault", 1, value);
+        }
+        }
+        break;
+    }
+    case ElectricalPowerMeasurement::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case ElectricalPowerMeasurement::Events::MeasurementPeriodRanges::Id: {
+            chip::app::Clusters::ElectricalPowerMeasurement::Events::MeasurementPeriodRanges::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MeasurementPeriodRanges", 1, value);
         }
         }
         break;

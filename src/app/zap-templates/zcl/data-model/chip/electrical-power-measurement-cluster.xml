@@ -18,10 +18,10 @@ limitations under the License.
   <domain name="CHIP"/>
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0090"/>
-    <field name="DirectCurrent" mask="0x1"/>
-    <field name="AlternatingCurrent" mask="0x2"/>
-    <field name="PolyphasePower" mask="0x4"/>
-    <field name="Harmonics" mask="0x8"/>
+    <field name="DirectCurrent" mask="0x01"/>
+    <field name="AlternatingCurrent" mask="0x02"/>
+    <field name="PolyphasePower" mask="0x04"/>
+    <field name="Harmonics" mask="0x08"/>
     <field name="PowerQuality" mask="0x10"/>
   </bitmap>
   <cluster apiMaturity="provisional">
