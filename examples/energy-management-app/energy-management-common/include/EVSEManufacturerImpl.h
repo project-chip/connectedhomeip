@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <DeviceEnergyManagementManager.h>
 #include <EnergyEvseManager.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -33,15 +34,26 @@ namespace EnergyEvse {
 class EVSEManufacturer
 {
 public:
+    EVSEManufacturer(EnergyEvseManager * aInstance) { mInstance = aInstance; }
+    EnergyEvseManager * GetInstance() { return mInstance; }
+    EnergyEvseDelegate * GetDelegate()
+    {
+        if (mInstance)
+        {
+            return mInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
     /**
      * @brief   Called at start up to apply hardware settings
      */
-    CHIP_ERROR Init(EnergyEvseManager * aInstance);
+    CHIP_ERROR Init();
 
     /**
      * @brief   Called at shutdown
      */
-    CHIP_ERROR Shutdown(EnergyEvseManager * aInstance);
+    CHIP_ERROR Shutdown();
 
     /**
      * @brief   Main Callback handler from delegate to user code
@@ -49,7 +61,22 @@ public:
     static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
 
 private:
+    EnergyEvseManager * mInstance;
+
+    int64_t mLastChargingEnergyMeter    = 0;
+    int64_t mLastDischargingEnergyMeter = 0;
 };
+
+/** @brief Helper function to return the singleton EVSEManufacturer instance
+ *
+ * This is needed by the EVSEManufacturer class to support TestEventTriggers
+ * which are called outside of any class context. This allows the EVSEManufacturer
+ * class to return the relevant Delegate instance in which to invoke the test
+ * events on.
+ *
+ * This function is typically found in main.cpp or wherever the singleton is created.
+ */
+EVSEManufacturer * GetEvseManufacturer();
 
 } // namespace EnergyEvse
 } // namespace Clusters

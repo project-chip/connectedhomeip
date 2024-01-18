@@ -6771,6 +6771,399 @@ JNI_METHOD(void, ThermostatCluster, writeACCapacityformatAttribute)
     onFailure.release();
 }
 
+JNI_METHOD(void, ThermostatCluster, writePresetsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::Presets::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (jint i_0 = 0; i_0 < valueSize; ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
+                jobject element_0_presetHandleItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "presetHandle", "[B", element_0_presetHandleItem_1);
+                if (element_0_presetHandleItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].presetHandle.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].presetHandle.SetNonNull();
+                    cleanupByteArrays.push_back(
+                        chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_presetHandleItem_1)));
+                    nonNullValue_2 = cleanupByteArrays.back()->byteSpan();
+                }
+                jobject element_0_presetScenarioItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "presetScenario", "Ljava/lang/Integer;",
+                                                                  element_0_presetScenarioItem_1);
+                listHolder_0->mList[i_0].presetScenario =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].presetScenario)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_presetScenarioItem_1));
+                jobject element_0_nameItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "name", "Ljava/util/Optional;", element_0_nameItem_1);
+                if (element_0_nameItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nameItem_1, optionalValue_2);
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
+                        if (optionalValue_2 == nullptr)
+                        {
+                            definedValue_2.SetNull();
+                        }
+                        else
+                        {
+                            auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                            cleanupStrings.push_back(
+                                chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2)));
+                            nonNullValue_3 = cleanupStrings.back()->charSpan();
+                        }
+                    }
+                }
+                jobject element_0_coolingSetpointItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "coolingSetpoint", "Ljava/util/Optional;",
+                                                                  element_0_coolingSetpointItem_1);
+                if (element_0_coolingSetpointItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_coolingSetpointItem_1, optionalValue_2);
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].coolingSetpoint.Emplace();
+                        definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                    }
+                }
+                jobject element_0_heatingSetpointItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "heatingSetpoint", "Ljava/util/Optional;",
+                                                                  element_0_heatingSetpointItem_1);
+                if (element_0_heatingSetpointItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_heatingSetpointItem_1, optionalValue_2);
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].heatingSetpoint.Emplace();
+                        definedValue_2        = static_cast<std::remove_reference_t<decltype(definedValue_2)>>(
+                            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_2));
+                    }
+                }
+                jobject element_0_builtInItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "builtIn", "Ljava/lang/Boolean;",
+                                                                  element_0_builtInItem_1);
+                if (element_0_builtInItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].builtIn.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].builtIn.SetNonNull();
+                    nonNullValue_2        = static_cast<std::remove_reference_t<decltype(nonNullValue_2)>>(
+                        chip::JniReferences::GetInstance().BooleanToPrimitive(element_0_builtInItem_1));
+                }
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    ThermostatCluster * cppCluster = reinterpret_cast<ThermostatCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, ThermostatCluster, writeSchedulesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::Schedules::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
+    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
+
+    {
+        using ListType_0       = std::remove_reference_t<decltype(cppValue)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint valueSize;
+        chip::JniReferences::GetInstance().GetListSize(value, valueSize);
+        if (valueSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(valueSize);
+            listFreer.add(listHolder_0);
+
+            for (jint i_0 = 0; i_0 < valueSize; ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetListItem(value, i_0, element_0);
+                jobject element_0_scheduleHandleItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "scheduleHandle", "[B",
+                                                                  element_0_scheduleHandleItem_1);
+                if (element_0_scheduleHandleItem_1 == nullptr)
+                {
+                    listHolder_0->mList[i_0].scheduleHandle.SetNull();
+                }
+                else
+                {
+                    auto & nonNullValue_2 = listHolder_0->mList[i_0].scheduleHandle.SetNonNull();
+                    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(
+                        env, static_cast<jbyteArray>(element_0_scheduleHandleItem_1)));
+                    nonNullValue_2 = cleanupByteArrays.back()->byteSpan();
+                }
+                jobject element_0_systemModeItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "systemMode", "Ljava/lang/Integer;",
+                                                                  element_0_systemModeItem_1);
+                listHolder_0->mList[i_0].systemMode =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].systemMode)>>(
+                        chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_systemModeItem_1));
+                jobject element_0_nameItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "name", "Ljava/util/Optional;", element_0_nameItem_1);
+                if (element_0_nameItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_nameItem_1, optionalValue_2);
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].name.Emplace();
+                        cleanupStrings.push_back(
+                            chip::Platform::MakeUnique<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_2)));
+                        definedValue_2 = cleanupStrings.back()->charSpan();
+                    }
+                }
+                jobject element_0_presetHandleItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "presetHandle", "Ljava/util/Optional;",
+                                                                  element_0_presetHandleItem_1);
+                if (element_0_presetHandleItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_presetHandleItem_1, optionalValue_2);
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].presetHandle.Emplace();
+                        cleanupByteArrays.push_back(
+                            chip::Platform::MakeUnique<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_2)));
+                        definedValue_2 = cleanupByteArrays.back()->byteSpan();
+                    }
+                }
+                jobject element_0_transitionsItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "transitions", "Ljava/util/ArrayList;",
+                                                                  element_0_transitionsItem_1);
+                {
+                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].transitions)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    jint element_0_transitionsItem_1Size;
+                    chip::JniReferences::GetInstance().GetListSize(element_0_transitionsItem_1, element_0_transitionsItem_1Size);
+                    if (element_0_transitionsItem_1Size != 0)
+                    {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_transitionsItem_1Size);
+                        listFreer.add(listHolder_2);
+
+                        for (jint i_2 = 0; i_2 < element_0_transitionsItem_1Size; ++i_2)
+                        {
+                            jobject element_2;
+                            chip::JniReferences::GetInstance().GetListItem(element_0_transitionsItem_1, i_2, element_2);
+                            jobject element_2_dayOfWeekItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "dayOfWeek", "Ljava/lang/Integer;",
+                                                                              element_2_dayOfWeekItem_3);
+                            listHolder_2->mList[i_2].dayOfWeek.SetRaw(
+                                static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].dayOfWeek)>::IntegerType>(
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_dayOfWeekItem_3)));
+                            jobject element_2_transitionTimeItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "transitionTime", "Ljava/lang/Integer;",
+                                                                              element_2_transitionTimeItem_3);
+                            listHolder_2->mList[i_2].transitionTime =
+                                static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].transitionTime)>>(
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_transitionTimeItem_3));
+                            jobject element_2_presetHandleItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "presetHandle", "Ljava/util/Optional;",
+                                                                              element_2_presetHandleItem_3);
+                            if (element_2_presetHandleItem_3 != nullptr)
+                            {
+                                jobject optionalValue_4;
+                                chip::JniReferences::GetInstance().GetOptionalValue(element_2_presetHandleItem_3, optionalValue_4);
+                                if (optionalValue_4 != nullptr)
+                                {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].presetHandle.Emplace();
+                                    cleanupByteArrays.push_back(chip::Platform::MakeUnique<chip::JniByteArray>(
+                                        env, static_cast<jbyteArray>(optionalValue_4)));
+                                    definedValue_4 = cleanupByteArrays.back()->byteSpan();
+                                }
+                            }
+                            jobject element_2_systemModeItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "systemMode", "Ljava/util/Optional;",
+                                                                              element_2_systemModeItem_3);
+                            if (element_2_systemModeItem_3 != nullptr)
+                            {
+                                jobject optionalValue_4;
+                                chip::JniReferences::GetInstance().GetOptionalValue(element_2_systemModeItem_3, optionalValue_4);
+                                if (optionalValue_4 != nullptr)
+                                {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].systemMode.Emplace();
+                                    definedValue_4        = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4));
+                                }
+                            }
+                            jobject element_2_coolingSetpointItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "coolingSetpoint", "Ljava/util/Optional;",
+                                                                              element_2_coolingSetpointItem_3);
+                            if (element_2_coolingSetpointItem_3 != nullptr)
+                            {
+                                jobject optionalValue_4;
+                                chip::JniReferences::GetInstance().GetOptionalValue(element_2_coolingSetpointItem_3,
+                                                                                    optionalValue_4);
+                                if (optionalValue_4 != nullptr)
+                                {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].coolingSetpoint.Emplace();
+                                    definedValue_4        = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4));
+                                }
+                            }
+                            jobject element_2_heatingSetpointItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "heatingSetpoint", "Ljava/util/Optional;",
+                                                                              element_2_heatingSetpointItem_3);
+                            if (element_2_heatingSetpointItem_3 != nullptr)
+                            {
+                                jobject optionalValue_4;
+                                chip::JniReferences::GetInstance().GetOptionalValue(element_2_heatingSetpointItem_3,
+                                                                                    optionalValue_4);
+                                if (optionalValue_4 != nullptr)
+                                {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].heatingSetpoint.Emplace();
+                                    definedValue_4        = static_cast<std::remove_reference_t<decltype(definedValue_4)>>(
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_4));
+                                }
+                            }
+                        }
+                        listHolder_0->mList[i_0].transitions = ListType_2(listHolder_2->mList, element_0_transitionsItem_1Size);
+                    }
+                    else
+                    {
+                        listHolder_0->mList[i_0].transitions = ListType_2();
+                    }
+                }
+                jobject element_0_builtInItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "builtIn", "Ljava/util/Optional;",
+                                                                  element_0_builtInItem_1);
+                if (element_0_builtInItem_1 != nullptr)
+                {
+                    jobject optionalValue_2;
+                    chip::JniReferences::GetInstance().GetOptionalValue(element_0_builtInItem_1, optionalValue_2);
+                    if (optionalValue_2 != nullptr)
+                    {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].builtIn.Emplace();
+                        if (optionalValue_2 == nullptr)
+                        {
+                            definedValue_2.SetNull();
+                        }
+                        else
+                        {
+                            auto & nonNullValue_3 = definedValue_2.SetNonNull();
+                            nonNullValue_3        = static_cast<std::remove_reference_t<decltype(nonNullValue_3)>>(
+                                chip::JniReferences::GetInstance().BooleanToPrimitive(optionalValue_2));
+                        }
+                    }
+                }
+            }
+            cppValue = ListType_0(listHolder_0->mList, valueSize);
+        }
+        else
+        {
+            cppValue = ListType_0();
+        }
+    }
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    ThermostatCluster * cppCluster = reinterpret_cast<ThermostatCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
 JNI_METHOD(void, FanControlCluster, writeFanModeAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {

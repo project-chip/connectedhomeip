@@ -54,3 +54,11 @@ class CppApplicationGenerator(CodeGenerator):
                 'clusters': server_side_clusters(self.idl)
             }
         )
+
+        self.internal_render_one_output(
+            template_path="ClusterInitCallbackSource.jinja",
+            output_file_name="app/cluster-init-callback.cpp",
+            vars={
+                'clusters': server_side_clusters(self.idl)
+            }
+        )

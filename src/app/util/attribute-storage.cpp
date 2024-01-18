@@ -56,6 +56,15 @@ EmberAfDefinedEndpoint emAfEndpoints[MAX_ENDPOINT_COUNT];
 
 uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 
+// ----- internal-only methods, not part of the external API -----
+
+// Loads the attributes from built-in default and storage.
+static void emAfLoadAttributeDefaults(chip::EndpointId endpoint, chip::Optional<chip::ClusterId> = chip::NullOptional);
+
+static bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttributeSearchRecord * attRecord);
+static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
+                               const EmberAfAttributeSearchRecord * attRecord);
+
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
@@ -536,7 +545,7 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
  *   1. Cluster ids match AND
  *   2. Cluster is a server cluster (because there are no client attributes).
  */
-bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord)
+bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttributeSearchRecord * attRecord)
 {
     return (cluster->clusterId == attRecord->clusterId && (cluster->mask & CLUSTER_MASK_SERVER));
 }
@@ -549,7 +558,7 @@ bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchReco
  * Attributes match if attr ids match.
  */
 bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                        EmberAfAttributeSearchRecord * attRecord)
+                        const EmberAfAttributeSearchRecord * attRecord)
 {
     return (am->attributeId == attRecord->attributeId);
 }
@@ -567,7 +576,7 @@ bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMe
 // type.  For strings, the function will copy as many bytes as will fit in the
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write)
 {
     assertChipStackLockedByCurrentThread();
@@ -1187,15 +1196,10 @@ uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterL
 
 void emberAfInitializeAttributes(EndpointId endpoint)
 {
-    emAfLoadAttributeDefaults(endpoint, false);
+    emAfLoadAttributeDefaults(endpoint);
 }
 
-void emberAfResetAttributes(EndpointId endpoint)
-{
-    emAfLoadAttributeDefaults(endpoint, true);
-}
-
-void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional<ClusterId> clusterId)
+void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterId)
 {
     uint16_t ep;
     uint8_t clusterI;
@@ -1203,7 +1207,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
     uint8_t * ptr;
     uint16_t epCount = emberAfEndpointCount();
     uint8_t attrData[ATTRIBUTE_LARGEST];
-    auto * attrStorage = ignoreStorage ? nullptr : app::GetAttributePersistenceProvider();
+    auto * attrStorage = app::GetAttributePersistenceProvider();
     // Don't check whether we actually have an attrStorage here, because it's OK
     // to have one if none of our attributes have NVM storage.
 
@@ -1245,9 +1249,9 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                 ptr                                 = nullptr; // Will get set to the value to write, as needed.
 
                 // First check for a persisted value.
-                if (!ignoreStorage && am->IsAutomaticallyPersisted())
+                if (am->IsAutomaticallyPersisted())
                 {
-                    VerifyOrDie(attrStorage && "Attribute persistence needs a persistence provider");
+                    VerifyOrDieWithMsg(attrStorage != nullptr, Zcl, "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err = attrStorage->ReadValue(
                         app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
@@ -1328,10 +1332,6 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                                              ptr,
                                              0,     // buffer size - unused
                                              true); // write?
-                    if (ignoreStorage)
-                    {
-                        emAfSaveAttributeToStorageIfNeeded(ptr, de->endpoint, record.clusterId, am);
-                    }
                 }
             }
         }

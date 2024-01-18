@@ -11,6 +11,8 @@ VSCODE_DEVELOPMENT
 api/index
 ci-cd/index
 discussion/index
+getting_started/index
+cluster_and_device_type_dev/index
 guides/index
 style/index
 examples/index

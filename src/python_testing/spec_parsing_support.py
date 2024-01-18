@@ -100,6 +100,7 @@ class XmlCluster:
     accepted_commands: dict[uint, XmlCommand]
     generated_commands: dict[uint, XmlCommand]
     events: dict[uint, XmlEvent]
+    pics: str
 
 
 class CommandType(Enum):
@@ -123,6 +124,12 @@ class ClusterParser:
                 self._derived = classification.attrib['baseCluster']
         except (KeyError, StopIteration):
             self._derived = None
+
+        try:
+            classification = next(cluster.iter('classification'))
+            self._pics = classification.attrib['picsCode']
+        except (KeyError, StopIteration):
+            self._pics = None
 
         self.feature_elements = self.get_all_feature_elements()
         self.attribute_elements = self.get_all_attribute_elements()
@@ -348,7 +355,7 @@ class ClusterParser:
                           attributes=self.parse_attributes(),
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
-                          events=self.parse_events())
+                          events=self.parse_events(), pics=self._pics)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -356,23 +363,21 @@ class ClusterParser:
 
 def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-    conc_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
-                     0x040D: 'Carbon Dioxide Concentration Measurement',
-                     0x0413: 'Nitrogen Dioxide Concentration Measurement',
-                     0x0415: 'Ozone Concentration Measurement',
-                     0x042A: 'PM2.5 Concentration Measurement',
-                     0x042B: 'Formaldehyde Concentration Measurement',
-                     0x042C: 'PM1 Concentration Measurement',
-                     0x042D: 'PM10 Concentration Measurement',
-                     0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
-                     0x042F: 'Radon Concentration Measurement'}
+    conc_clusters = {0x040C: ('Carbon Monoxide Concentration Measurement', 'CMOCONC'),
+                     0x040D: ('Carbon Dioxide Concentration Measurement', 'CDOCONC'),
+                     0x0413: ('Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
+                     0x0415: ('Ozone Concentration Measurement', 'OZCONC'),
+                     0x042A: ('PM2.5 Concentration Measurement', 'PMICONC'),
+                     0x042B: ('Formaldehyde Concentration Measurement', 'FLDCONC'),
+                     0x042C: ('PM1 Concentration Measurement', 'PMHCONC'),
+                     0x042D: ('PM10 Concentration Measurement', 'PMKCONC'),
+                     0x042E: ('Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
+                     0x042F: ('Radon Concentration Measurement', 'RNCONC')}
     conc_base_name = 'Concentration Measurement Clusters'
-    resource_clusters = {0x0071: 'HEPA Filter Monitoring',
-                         0x0072: 'Activated Carbon Filter Monitoring'}
+    resource_clusters = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
+                         0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
     resource_base_name = 'Resource Monitoring Clusters'
-    water_clusters = {0x0405: 'Relative Humidity Measurement',
-                      0x0407: 'Leaf Wetness Measurement',
-                      0x0408: 'Soil Moisture Measurement'}
+    water_clusters = {0x0405: ('Relative Humidity Measurement', 'RH')}
     water_base_name = 'Water Content Measurement Clusters'
     aliases = {conc_base_name: conc_clusters, resource_base_name: resource_clusters, water_base_name: water_clusters}
 
@@ -482,15 +487,16 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
-                             generated_commands=generated_commands, events=events)
+                             generated_commands=generated_commands, events=events, pics=c.pics)
             clusters[id] = new
 
     for alias_base_name, aliased_clusters in aliases.items():
-        for id, alias_name in aliased_clusters.items():
+        for id, (alias_name, pics) in aliased_clusters.items():
             base = derived_clusters[alias_base_name]
             new = deepcopy(base)
             new.derived = alias_base_name
             new.name = alias_name
+            new.pics = pics
             clusters[id] = new
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible

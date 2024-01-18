@@ -18,12 +18,13 @@ CommandHandlerInterfaceOnlyClusters:
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
     - Network Commissioning
-    - Scenes
+    - Scenes Management
     - RVC Run Mode
     - RVC Clean Mode
     - Dishwasher Mode
     - Laundry Washer Mode
     - Oven Mode
+    - Oven Cavity Operational State
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Operational State
     - Activated Carbon Filter Monitoring
@@ -49,7 +50,7 @@ ClustersWithInitFunctions:
     - Thermostat
     - Mode Select
     - Sample MEI
-    - Scenes
+    - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -66,7 +67,7 @@ ClustersWithShutdownFunctions:
     - Level Control
     - Color Control
     - Sample MEI
-    - Scenes
+    - Scenes Management
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
