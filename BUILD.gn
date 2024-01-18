@@ -41,6 +41,18 @@ if (chip_with_lwip) {
   import("//build_overrides/lwip.gni")
 }
 
+config("pigweed_wno_errors_config") {
+  cflags = [
+    "-Wno-error=undef",
+    "-Wno-error=sign-compare",
+    "-Wno-error=sign-conversion",
+  ]
+}
+
+group("pigweed_wno_errors") {
+  public_configs = [ ":pigweed_wno_errors_config" ]
+}
+
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =

@@ -36,6 +36,7 @@ default_args = {
   pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
   pw_assert_BACKEND = "$dir_pw_assert_log"
   pw_log_BACKEND = "$dir_pw_log_basic"
+  pw_build_DEFAULT_MODULE_CONFIG = "//:pigweed_wno_errors"
 
   # TODO: Make sure only unit tests link against this
   pw_build_LINK_DEPS = [
