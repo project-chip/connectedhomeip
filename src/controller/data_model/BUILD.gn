@@ -126,6 +126,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/DoorLockClient-ReadImpl.cpp",
       "jni/ElectricalEnergyMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/ElectricalEnergyMeasurementClient-ReadImpl.cpp",
+      "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
+      "jni/ElectricalMeasurementClient-ReadImpl.cpp",
       "jni/ElectricalPowerMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/ElectricalPowerMeasurementClient-ReadImpl.cpp",
       "jni/EthernetNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
