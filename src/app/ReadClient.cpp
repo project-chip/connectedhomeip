@@ -463,7 +463,7 @@ void ReadClient::OnPeerTypeChange(PeerType aType)
 
     ChipLogProgress(DataManagement, "Peer is now %s LIT ICD.", mIsPeerLIT ? "a" : "not a");
 
-    // If the peer is no longer LIT, try to wake up the subscription and do resubsribe when necessary.
+    // If the peer is no longer LIT, try to wake up the subscription and do resubscribe when necessary.
     if (!mIsPeerLIT)
     {
         OnActiveModeNotification();
