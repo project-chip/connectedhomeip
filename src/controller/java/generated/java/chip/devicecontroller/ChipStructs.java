@@ -7351,6 +7351,67 @@ public static class EnergyEvseClusterChargingTargetStruct {
     return output.toString();
   }
 }
+public static class EnergyEvseClusterChargingTargetScheduleStruct {
+  public Integer dayOfWeekForSequence;
+  public ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets;
+  private static final long DAY_OF_WEEK_FOR_SEQUENCE_ID = 0L;
+  private static final long CHARGING_TARGETS_ID = 1L;
+
+  public EnergyEvseClusterChargingTargetScheduleStruct(
+    Integer dayOfWeekForSequence,
+    ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets
+  ) {
+    this.dayOfWeekForSequence = dayOfWeekForSequence;
+    this.chargingTargets = chargingTargets;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(DAY_OF_WEEK_FOR_SEQUENCE_ID, new UIntType(dayOfWeekForSequence)));
+    values.add(new StructElement(CHARGING_TARGETS_ID, ArrayType.generateArrayType(chargingTargets, (elementchargingTargets) -> elementchargingTargets.encodeTlv())));
+
+    return new StructType(values);
+  }
+
+  public static EnergyEvseClusterChargingTargetScheduleStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer dayOfWeekForSequence = null;
+    ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == DAY_OF_WEEK_FOR_SEQUENCE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          dayOfWeekForSequence = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == CHARGING_TARGETS_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          chargingTargets = castingValue.map((elementcastingValue) -> ChipStructs.EnergyEvseClusterChargingTargetStruct.decodeTlv(elementcastingValue));
+        }
+      }
+    }
+    return new EnergyEvseClusterChargingTargetScheduleStruct(
+      dayOfWeekForSequence,
+      chargingTargets
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("EnergyEvseClusterChargingTargetScheduleStruct {\n");
+    output.append("\tdayOfWeekForSequence: ");
+    output.append(dayOfWeekForSequence);
+    output.append("\n");
+    output.append("\tchargingTargets: ");
+    output.append(chargingTargets);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class EnergyPreferenceClusterBalanceStruct {
   public Integer step;
   public Optional<String> label;

@@ -31,6 +31,7 @@
 #pragma once
 
 #include "CommandPathRegistry.h"
+#include "CommandResponseSender.h"
 
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
@@ -54,7 +55,7 @@
 namespace chip {
 namespace app {
 
-class CommandHandler : public Messaging::ExchangeDelegate
+class CommandHandler
 {
 public:
     class Callback
@@ -374,14 +375,14 @@ public:
      * Gets the inner exchange context object, without ownership.
      *
      * WARNING: This is dangerous, since it is directly interacting with the
-     *          exchange being managed automatically by mExchangeCtx and
+     *          exchange being managed automatically by mResponseSender and
      *          if not done carefully, may end up with use-after-free errors.
      *
      * @return The inner exchange context, might be nullptr if no
      *         exchange context has been assigned or the context
      *         has been released.
      */
-    Messaging::ExchangeContext * GetExchangeContext() const { return mExchangeCtx.Get(); }
+    Messaging::ExchangeContext * GetExchangeContext() const { return mResponseSender.GetExchangeContext(); }
 
     /**
      * @brief Flush acks right away for a slow command
@@ -394,13 +395,7 @@ public:
      * execution.
      *
      */
-    void FlushAcksRightAwayOnSlowCommand()
-    {
-        VerifyOrReturn(mExchangeCtx);
-        auto * msgContext = mExchangeCtx->GetReliableMessageContext();
-        VerifyOrReturn(msgContext != nullptr);
-        msgContext->FlushAcks();
-    }
+    void FlushAcksRightAwayOnSlowCommand() { mResponseSender.FlushAcksRightNow(); }
 
     /**
      * GetSubjectDescriptor() may only be called during synchronous command
@@ -411,23 +406,12 @@ public:
     Access::SubjectDescriptor GetSubjectDescriptor() const
     {
         VerifyOrDie(!mGoneAsync);
-        return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+        return mResponseSender.GetSubjectDescriptor();
     }
 
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
-
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && payload) override;
-
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override
-    {
-        //
-        // We're not expecting responses to any messages we send out on this EC.
-        //
-        VerifyOrDie(false);
-    }
 
     enum class State : uint8_t
     {
@@ -435,7 +419,7 @@ private:
         Preparing,           ///< We are prepaing the command or status header.
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
-        CommandSent,         ///< The command has been sent successfully.
+        DispatchResponses,   ///< The command response(s) are being dispatched.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
@@ -480,7 +464,11 @@ private:
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
-    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+    CHIP_ERROR FinalizeLastInvokeResponseMessage() { return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false); }
+
+    CHIP_ERROR FinalizeIntermediateInvokeResponseMessage() { return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true); }
+
+    CHIP_ERROR FinalizeInvokeResponseMessage(bool aHasMoreChunks);
 
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
@@ -488,6 +476,11 @@ private:
      * safe to release this object.
      */
     void Close();
+
+    /**
+     * @brief Callback method invoked when CommandResponseSender has finished sending all messages.
+     */
+    static void HandleOnResponseSenderDone(void * context);
 
     /**
      * ProcessCommandDataIB is only called when a unicast invoke command request is received
@@ -500,7 +493,8 @@ private:
      * It doesn't need the endpointId in it's command path since it uses the GroupId in message metadata to find it
      */
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
-    CHIP_ERROR SendCommandResponse();
+    CHIP_ERROR StartSendingCommandResponses();
+
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
@@ -544,7 +538,6 @@ private:
 
     size_t MaxPathsPerInvoke() const { return mMaxPathsPerInvoke; }
 
-    Messaging::ExchangeHolder mExchangeCtx;
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
@@ -559,13 +552,17 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
+    chip::Callback::Callback<OnResponseSenderDone> mResponseSenderDone;
+    CommandResponseSender mResponseSender;
+
     State mState = State::Idle;
     State mBackupState;
-    bool mSuppressResponse   = false;
-    bool mTimedRequest       = false;
-    bool mSentStatusResponse = false;
-    bool mGroupRequest       = false;
-    bool mBufferAllocated    = false;
+    bool mSuppressResponse                 = false;
+    bool mTimedRequest                     = false;
+    bool mSentStatusResponse               = false;
+    bool mGroupRequest                     = false;
+    bool mBufferAllocated                  = false;
+    bool mReserveSpaceForMoreChunkMessages = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any
     // time.

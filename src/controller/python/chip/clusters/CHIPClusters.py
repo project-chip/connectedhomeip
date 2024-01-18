@@ -5737,6 +5737,12 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000080: {
+                "commandId": 0x00000080,
+                "commandName": "GoHome",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -6775,15 +6781,13 @@ class ChipClusters:
                 "commandId": 0x00000005,
                 "commandName": "SetTargets",
                 "args": {
-                    "dayOfWeekforSequence": "int",
-                    "chargingTargets": "ChargingTargetStruct",
+                    "chargingTargetSchedules": "ChargingTargetScheduleStruct",
                 },
             },
             0x00000006: {
                 "commandId": 0x00000006,
                 "commandName": "GetTargets",
                 "args": {
-                    "daysToReturn": "int",
                 },
             },
             0x00000007: {
@@ -6861,18 +6865,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
                 "writable": True,
-            },
-            0x00000021: {
-                "attributeName": "NumberOfWeeklyTargets",
-                "attributeId": 0x00000021,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000022: {
-                "attributeName": "NumberOfDailyTargets",
-                "attributeId": 0x00000022,
-                "type": "int",
-                "reportable": True,
             },
             0x00000023: {
                 "attributeName": "NextChargeStartTime",

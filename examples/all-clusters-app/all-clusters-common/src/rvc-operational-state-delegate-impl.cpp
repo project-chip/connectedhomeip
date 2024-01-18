@@ -15,15 +15,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <OperationalStateManager.h>
+#include <rvc-operational-state-delegate-impl.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
+                                                                   OperationalState::GenericOperationalState & operationalState)
 {
     if (index >= mOperationalStateList.size())
     {
@@ -33,7 +33,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
+CHIP_ERROR RvcOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     if (index >= mOperationalPhaseList.size())
     {
@@ -42,97 +42,75 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
     return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
-void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::GenericOperationalError & err)
 {
+    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    // placeholder implementation
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
 {
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+    // placeholder implementation
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
+void RvcOperationalStateDelegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
 {
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    // placeholder implementation
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
     {
-        err.Set(to_underlying(ErrorStateEnum::kNoError));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
     else
     {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
 
-// Init Operational State cluster
-
-static OperationalState::Instance * gOperationalStateInstance = nullptr;
-static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
-
-void OperationalState::Shutdown()
+void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
 {
-    if (gOperationalStateInstance != nullptr)
+    // placeholder implementation
+    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kSeekingCharger));
+    if (error == CHIP_NO_ERROR)
     {
-        delete gOperationalStateInstance;
-        gOperationalStateInstance = nullptr;
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
     }
-    if (gOperationalStateDelegate != nullptr)
+    else
     {
-        delete gOperationalStateDelegate;
-        gOperationalStateDelegate = nullptr;
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
     }
 }
-
-OperationalState::Instance * OperationalState::GetOperationalStateInstance()
-{
-    return gOperationalStateInstance;
-}
-
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gOperationalStateInstance == nullptr && gOperationalStateDelegate == nullptr);
-
-    gOperationalStateDelegate           = new OperationalStateDelegate;
-    EndpointId operationalStateEndpoint = 0x01;
-    gOperationalStateInstance           = new OperationalState::Instance(gOperationalStateDelegate, operationalStateEndpoint);
-
-    gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-
-    gOperationalStateInstance->Init();
-}
-
-// Init RVC Operational State cluster
 
 static RvcOperationalState::Instance * gRvcOperationalStateInstance = nullptr;
 static RvcOperationalStateDelegate * gRvcOperationalStateDelegate   = nullptr;

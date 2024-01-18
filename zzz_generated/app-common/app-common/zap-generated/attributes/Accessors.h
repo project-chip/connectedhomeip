@@ -2033,16 +2033,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace EnergyEvse {
 namespace Attributes {
 
-namespace NumberOfWeeklyTargets {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumberOfWeeklyTargets
-
-namespace NumberOfDailyTargets {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumberOfDailyTargets
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);

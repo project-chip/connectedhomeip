@@ -5241,6 +5241,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTREnergyEVSEClusterChargingTargetScheduleStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayOfWeekForSequence = @(0);
+
+        _chargingTargets = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyEVSEClusterChargingTargetScheduleStruct alloc] init];
+
+    other.dayOfWeekForSequence = self.dayOfWeekForSequence;
+    other.chargingTargets = self.chargingTargets;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekForSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekForSequence, _chargingTargets];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTREnergyEVSEClusterEVConnectedEvent
 - (instancetype)init
 {
