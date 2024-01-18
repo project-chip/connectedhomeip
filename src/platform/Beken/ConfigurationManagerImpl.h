@@ -45,7 +45,7 @@ private:
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf);
     bool CanFactoryReset(void);
     void InitiateFactoryReset(void);
-    void InitiateMatterDataReset() override {};
+    void InitiateMatterDataReset() override{};
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value);
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value);
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount);

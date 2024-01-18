@@ -50,7 +50,7 @@ private:
     CHIP_ERROR Init(void) override;
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
-    void InitiateMatterDataReset() override {};
+    void InitiateMatterDataReset() override{};
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
 
