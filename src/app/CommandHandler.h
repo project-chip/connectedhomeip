@@ -336,7 +336,7 @@ public:
             return err;
         }
         ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndReadyNext());
-        err                  = addResponseFunction();
+        err = addResponseFunction();
         if (err != CHIP_NO_ERROR)
         {
             // The return value of RollbackResponse is ignored, as we prioritize
