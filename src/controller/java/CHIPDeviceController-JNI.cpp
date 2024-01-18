@@ -228,7 +228,11 @@ JNI_METHOD(jint, onNOCChainGeneration)
     {
         JniByteArray jByteArrayIpk(env, ipk);
 
-        VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+        if (jByteArrayIpk.byteSpan().size() != sizeof(ipkValue))
+        {
+            ChipLogError(Controller, "Invalid IPK size %ld and expect %ld", jByteArrayIpk.byteSpan().size(), sizeof(ipkValue));
+            return CHIP_ERROR_INVALID_IPK.AsInteger();
+        }
         memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
 
         ipkOptional.SetValue(ipkTempSpan);
