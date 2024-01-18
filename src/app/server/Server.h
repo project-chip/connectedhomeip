@@ -374,6 +374,8 @@ public:
 
     void ScheduleFactoryReset();
 
+    void ScheduleMatterDataReset();
+
     System::Clock::Microseconds64 TimeSinceInit() const
     {
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;

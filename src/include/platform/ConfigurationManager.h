@@ -129,8 +129,9 @@ public:
     virtual void RunUnitTests() = 0;
 #endif
 
-    virtual bool IsFullyProvisioned()   = 0;
-    virtual void InitiateFactoryReset() = 0;
+    virtual bool IsFullyProvisioned()      = 0;
+    virtual void InitiateFactoryReset()    = 0;
+    virtual void InitiateMatterDataReset() = 0;
 
     // Gets called when starting BLE/DNS-SD advertisement
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING

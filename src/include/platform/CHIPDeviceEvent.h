@@ -258,7 +258,7 @@ enum PublicEventTypes
     kFactoryReset,
 
     /**
-     * Signals the application that device is going to reset matter data.
+     * Signals the application that device is going to reset matter data (on last fabric removed).
      */
     kMatterDataReset,
 };

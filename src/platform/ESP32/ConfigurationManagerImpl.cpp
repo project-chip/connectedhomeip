@@ -330,7 +330,7 @@ void ConfigurationManagerImpl::DoMatterDataReset(intptr_t arg)
 {
     CHIP_ERROR err;
 
-    ChipLogProgress(DeviceLayer, "Performing factory reset without erasing network credentials");
+    ChipLogProgress(DeviceLayer, "Performing matter data reset");
 
     // Erase all values in the chip-config NVS namespace.
     err = ESP32Config::ClearNamespace(ESP32Config::kConfigNamespace_ChipConfig);
@@ -383,25 +383,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 void ConfigurationManagerImpl::InitiateMatterDataReset()
 {
-    ChipDeviceEvent event;
-    event.Type     = DeviceEventType::PublicEventTypes::kMatterDataReset;
-    CHIP_ERROR err = PlatformMgr().PostEvent(&event);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post matter data reset event");
-    }
     PlatformMgr().ScheduleWork(DoMatterDataReset);
 }
 
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
-    ChipDeviceEvent event;
-    event.Type     = DeviceEventType::PublicEventTypes::kFactoryReset;
-    CHIP_ERROR err = PlatformMgr().PostEvent(&event);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post factory reset event");
-    }
     PlatformMgr().ScheduleWork(DoFactoryReset);
 }
 

@@ -515,8 +515,37 @@ void Server::ScheduleFactoryReset()
     PlatformMgr().ScheduleWork([](intptr_t) {
         // Delete all fabrics and emit Leave event.
         GetInstance().GetFabricTable().DeleteAllFabrics();
+        if (GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipDeviceEvent event;
+            event.Type     = DeviceEventType::PublicEventTypes::kFactoryReset;
+            CHIP_ERROR err = PlatformMgr().PostEvent(&event);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post factory reset event");
+            }
+        }
         PlatformMgr().HandleServerShuttingDown();
         ConfigurationMgr().InitiateFactoryReset();
+    });
+}
+
+void Server::ScheduleMatterDataReset()
+{
+    PlatformMgr().ScheduleWork([](intptr_t) {
+        // Delete all fabrics and emit Leave event.
+        GetInstance().GetFabricTable().DeleteAllFabrics();
+        if (GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipDeviceEvent event;
+            event.Type     = DeviceEventType::PublicEventTypes::kMatterDataReset;
+            CHIP_ERROR err = PlatformMgr().PostEvent(&event);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to post matter data reset event");
+            }
+        }
+        ConfigurationMgr().InitiateMatterDataReset();
     });
 }
 

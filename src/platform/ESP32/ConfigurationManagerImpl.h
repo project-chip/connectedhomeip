@@ -78,7 +78,7 @@ private:
     void InitiateFactoryReset(void) override;
 
     // InitiateMatterDataReset erases matter data only (chip config, counters, kvs namespaces).
-    void InitiateMatterDataReset(void);
+    void InitiateMatterDataReset(void) override;
 
     CHIP_ERROR MapConfigError(esp_err_t error);
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
