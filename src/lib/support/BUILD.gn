@@ -209,6 +209,7 @@ static_library("support") {
     "TimeUtils.cpp",
     "TimeUtils.h",
     "Variant.h",
+    "Scoped.h",
     "ZclString.cpp",
     "ZclString.h",
     "logging/BinaryLogging.cpp",
