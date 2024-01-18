@@ -568,7 +568,7 @@ private:
 
         ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
                                              CommandData::GetCommandId() };
-        ScopedChange internalCallToAddResponse(mInternalCallToAddResponseData, true);
+        ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
         ReturnErrorOnFailure(PrepareInvokeResponseCommand(responsePath, prepareParams));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
