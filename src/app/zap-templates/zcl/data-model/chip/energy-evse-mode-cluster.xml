@@ -53,7 +53,7 @@ limitations under the License.
         This command is sent by the device on receipt of the ChangeToModeWithStatus command.
       </description>
       <arg name="Status"     type="enum8"                   optional="false"/>
-      <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
+      <arg name="StatusText" type="char_string" length="64" optional="true"/>
     </command>
   </cluster>
 </configurator>
