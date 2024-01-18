@@ -250,7 +250,7 @@ public:
     /**
      *  Used to notify when a peer becomes LIT ICD or vice versa.
      *
-     *  The read client will call this function when it found any updates of the OperationMode attribute from ICD management
+     *  ReadClient will call this function when it finds any updates of the OperationMode attribute from ICD management
      * cluster. The application don't need to call this function usually.
      */
     void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
