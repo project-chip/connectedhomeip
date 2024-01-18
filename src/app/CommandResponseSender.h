@@ -124,6 +124,26 @@ public:
     }
 
     /**
+     * @brief Sets final non-path specific StatusResponse error after sending all InvokeResponseMessages
+     *
+     * Intended to be use for sending a single, non-path specific, error after we send all
+     * InvokeRequestMessages.
+     *
+     * @param aStatus InteractionModel Status. Cannot be success status.
+     * @return CHIP_NO_ERROR Successfully set IM failure status to send as final StatusResponse.
+     * @return CHIP_ERROR_INVALID_ARGUMENT provided with status that is success.
+     * @return CHIP_ERROR_INCORRECT_STATE
+     */
+    CHIP_ERROR SetFinalStatusResponseFailure(Protocols::InteractionModel::Status aStatus)
+    {
+        VerifyOrReturnError(aStatus != Protocols::InteractionModel::Status::Success, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mState != State::AllInvokeResponsesSent, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mChunks.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+        mFinalFailureStatus.SetValue(aStatus);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
      * @brief Registers a callback to be invoked when CommandResponseSender has finished sending responses.
      */
     void RegisterOnResponseSenderDoneCallback(Callback::Callback<OnResponseSenderDone> * aResponseSenderDoneCallback)
@@ -144,11 +164,14 @@ private:
     const char * GetStateStr() const;
 
     CHIP_ERROR SendCommandResponse();
+    bool HasMoreToSend() { return !mChunks.IsNull() || mFinalFailureStatus.HasValue(); }
     void Close();
 
     // A list of InvokeResponseMessages to be sent out by CommandResponseSender.
     System::PacketBufferHandle mChunks;
 
+    // When final status is set, we will send out this status as the final message in the interaction.
+    Optional<Protocols::InteractionModel::Status> mFinalFailureStatus;
     chip::Callback::Callback<OnResponseSenderDone> * mResponseSenderDoneCallback = nullptr;
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;

@@ -86,6 +86,7 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
 
         mBufferAllocated = true;
+        MoveToState(State::NewResponseMessage);
     }
 
     return CHIP_NO_ERROR;
@@ -572,7 +573,7 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     return Status::Success;
 }
 
-CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus)
+CHIP_ERROR CommandHandler::TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus)
 {
     ReturnErrorOnFailure(PrepareStatus(aCommandPath));
     CommandStatusIB::Builder & commandStatus = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus();
@@ -581,6 +582,11 @@ CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aComman
     statusIBBuilder.EncodeStatusIB(aStatus);
     ReturnErrorOnFailure(statusIBBuilder.GetError());
     return FinishStatus();
+}
+
+CHIP_ERROR CommandHandler::AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus)
+{
+    return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddStatusInternal(aCommandPath, aStatus); });
 }
 
 void CommandHandler::AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
@@ -655,12 +661,22 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistr
 {
     ReturnErrorOnFailure(AllocateBuffer());
 
-    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
-    mBackupState = mState;
+    if (!mInternalCallToAddResponseData && mState == State::AddedCommand)
+    {
+        // An attempt is being made to add CommandData InvokeResponse using primitive
+        // CommandHandler APIs. While not recommended, as this potentially leaves the
+        // CommandHandler in an incorrect state upon failure, this approach is permitted
+        // for legacy reasons. To maximize the likelihood of success, particularly when
+        // handling large amounts of data, we try to obtain a new, completely empty
+        // InvokeResponseMessage, as the existing one already has space occupied.
+        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndReadyNext());
+    }
+
+    CreateBackupForResponseRollback();
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::NewResponseMessage || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO(#30453): See if we can pass this back up the stack so caller can provide this instead of taking up
     // space in CommandHanlder.
@@ -711,7 +727,11 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == State::Idle || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::NewResponseMessage || mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    if (mState == State::AddedCommand)
+    {
+        CreateBackupForResponseRollback();
+    }
 
     auto commandPathRegistryEntry = GetCommandPathRegistry().Find(aCommandPath);
     VerifyOrReturnError(commandPathRegistryEntry.HasValue(), CHIP_ERROR_INCORRECT_STATE);
@@ -746,11 +766,24 @@ CHIP_ERROR CommandHandler::FinishStatus()
     return CHIP_NO_ERROR;
 }
 
+void CommandHandler::CreateBackupForResponseRollback()
+{
+    if (mState != State::NewResponseMessage && mState != State::AddedCommand)
+    {
+        return;
+    }
+    mInvokeResponseBuilder.Checkpoint(mBackupWriter);
+    mBackupState         = mState;
+    mRollbackBackupValid = true;
+}
+
 CHIP_ERROR CommandHandler::RollbackResponse()
 {
+    VerifyOrReturnError(mRollbackBackupValid, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     mInvokeResponseBuilder.Rollback(mBackupWriter);
     MoveToState(mBackupState);
+    mRollbackBackupValid = false;
     return CHIP_NO_ERROR;
 }
 
@@ -801,6 +834,21 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
+CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndReadyNext()
+{
+    ReturnErrorOnFailure(FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true));
+    CHIP_ERROR err = AllocateBuffer();
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrDie(mState == State::NewResponseMessage);
+    }
+    else
+    {
+        mResponseSender.SetFinalStatusResponseFailure(Protocols::InteractionModel::Status::ResourceExhausted);
+    }
+    return err;
+}
+
 CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
 {
     System::PacketBufferHandle packet;
@@ -817,6 +865,7 @@ CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
     ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
     mResponseSender.AddInvokeResponseToSend(std::move(packet));
+    mBufferAllocated = false;
     return CHIP_NO_ERROR;
 }
 
@@ -827,6 +876,9 @@ const char * CommandHandler::GetStateStr() const
     {
     case State::Idle:
         return "Idle";
+
+    case State::NewResponseMessage:
+        return "NewResponseMessage";
 
     case State::Preparing:
         return "Preparing";

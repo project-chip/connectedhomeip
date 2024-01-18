@@ -41,6 +41,7 @@
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Scoped.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/Flags.h>
@@ -288,27 +289,6 @@ public:
     // This will be completed in a follow up PR.
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
 
-    /**
-     * This will add a new CommandStatusIB element into InvokeResponses. It will put the
-     * aCommandPath into the CommandPath element within CommandStatusIB.
-     *
-     * This call will fail if CommandHandler is already in the middle of building a
-     * CommandStatusIB or CommandDataIB (i.e. something has called Prepare*, without
-     * calling Finish*), or is already sending InvokeResponseMessage.
-     *
-     * Upon success, the caller is expected to call `FinishStatus` once they have encoded
-     * StatusIB.
-     *
-     * @param [in] aCommandPath the concrete path of the command we are responding to.
-     */
-    CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
-
-    /**
-     * Finishes the CommandStatusIB element within the InvokeResponses.
-     *
-     * Caller must have first successfully called `PrepareStatus`.
-     */
-    CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
 
     /**
@@ -318,6 +298,48 @@ public:
      * it will not work right if the session we're using was evicted.
      */
     FabricIndex GetAccessingFabricIndex() const;
+
+    /**
+     * @brief Best effort to add InvokeResponse to InvokeResponseMessage.
+     * 
+     * Tries to add response using lambda. Upon failure to add response, attempts
+     * to rollback the InvokeResponseMessage to a known good state. If failure is due
+     * to insufficient space in the current InvokeResponseMessage:
+     *  - Finalizes the current InvokeResponseMessage.
+     *  - Allocates a new InvokeResponseMessage.
+     *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
+     *    the new InvokeResponseMessage.
+     * 
+     * @param addResponseFunction: A lambda function responsible for adding the
+     *      response to the current InvokeResponseMessage.
+     */
+    template <typename Function>
+    CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
+    {
+        mRollbackBackupValid = false;
+        CHIP_ERROR err       = addResponseFunction();
+        if (err == CHIP_NO_ERROR)
+        {
+            return CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(RollbackResponse());
+        // If we failed to an additional command due to lack of space in the
+        // packet, we will make another attempt to add the response using
+        // an additional InvokeResponseMessage.
+        if (mState != State::AddedCommand || err != CHIP_ERROR_NO_MEMORY)
+        {
+            return err;
+        }
+        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndReadyNext());
+        err                  = addResponseFunction();
+        mRollbackBackupValid = false;
+        if (err != CHIP_NO_ERROR)
+        {
+            // Over here we don't care about the return
+            RollbackResponse();
+        }
+        return err;
+    }
 
     /**
      * API for adding a data response.  The template parameter T is generally
@@ -332,15 +354,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        // TryAddResponseData will ensure we are in the correct state when calling AddResponseData.
-        CHIP_ERROR err = TryAddResponseData(aRequestCommandPath, aData);
-        if (err != CHIP_NO_ERROR)
-        {
-            // The state guarantees that either we can rollback or we don't have to rollback the buffer, so we don't care about the
-            // return value of RollbackResponse.
-            RollbackResponse();
-        }
-        return err;
+        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
     }
 
     /**
@@ -416,6 +430,7 @@ private:
     enum class State : uint8_t
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
+        NewResponseMessage,  ///< mInvokeResponseBuilder is ready, with no responses added.
         Preparing,           ///< We are prepaing the command or status header.
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
@@ -427,7 +442,14 @@ private:
     const char * GetStateStr() const;
 
     /**
-     * Rollback the state to before encoding the current ResponseData (before calling PrepareCommand / PrepareStatus)
+     * Create a backup to enable rolling back to the state prior to ResponseData encoding in the event of failure.
+     */
+    void CreateBackupForResponseRollback();
+
+    /**
+     * Rollback the state to before encoding the current ResponseData (before calling PrepareInvokeResponseCommand / PrepareStatus)
+     *
+     * Requires CreateBackupForResponseRollback to called at the start of PrepareInvokeResponseCommand / PrepareStatus
      */
     CHIP_ERROR RollbackResponse();
 
@@ -461,12 +483,34 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
+    /**
+     * This will add a new CommandStatusIB element into InvokeResponses. It will put the
+     * aCommandPath into the CommandPath element within CommandStatusIB.
+     *
+     * This call will fail if CommandHandler is already in the middle of building a
+     * CommandStatusIB or CommandDataIB (i.e. something has called Prepare*, without
+     * calling Finish*), or is already sending InvokeResponseMessage.
+     *
+     * Upon success, the caller is expected to call `FinishStatus` once they have encoded
+     * StatusIB.
+     *
+     * @param [in] aCommandPath the concrete path of the command we are responding to.
+     */
+    CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
+
+    /**
+     * Finishes the CommandStatusIB element within the InvokeResponses.
+     *
+     * Caller must have first successfully called `PrepareStatus`.
+     */
+    CHIP_ERROR FinishStatus();
+
     CHIP_ERROR PrepareInvokeResponseCommand(const CommandPathRegistryEntry & apCommandPathRegistryEntry,
                                             const ConcreteCommandPath & aCommandPath, bool aStartDataStruct);
 
     CHIP_ERROR FinalizeLastInvokeResponseMessage() { return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false); }
 
-    CHIP_ERROR FinalizeIntermediateInvokeResponseMessage() { return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true); }
+    CHIP_ERROR FinalizeInvokeResponseMessageAndReadyNext();
 
     CHIP_ERROR FinalizeInvokeResponseMessage(bool aHasMoreChunks);
 
@@ -495,6 +539,8 @@ private:
     Protocols::InteractionModel::Status ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR StartSendingCommandResponses();
 
+    CHIP_ERROR TryAddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
+
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
@@ -516,6 +562,7 @@ private:
 
         ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
                                              CommandData::GetCommandId() };
+        ScopedChange internalCallToAddResponse(mInternalCallToAddResponseData, true);
         ReturnErrorOnFailure(PrepareInvokeResponseCommand(responsePath, prepareParams));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -563,6 +610,11 @@ private:
     bool mGroupRequest                     = false;
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
+    // TODO(#30453): We should introduce breaking change where calls to add CommandData
+    // needs to use AddResponse, and not CommandHandler primatives directly using
+    // GetCommandDataIBTLVWriter.
+    bool mInternalCallToAddResponseData = false;
+    bool mRollbackBackupValid           = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any
     // time.
