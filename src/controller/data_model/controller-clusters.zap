@@ -3236,6 +3236,24 @@
           "side": "client",
           "enabled": 1,
           "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3279,6 +3297,24 @@
           "side": "client",
           "enabled": 1,
           "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 1,
+              "isEnabled": 1
+            }
+          ],
           "attributes": [
             {
               "name": "FeatureMap",
