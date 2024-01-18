@@ -90,16 +90,15 @@ class OperationalMdnsDiscovery:
     def _get_txt_record_key_value(self, key: str):
         # Convert the key from string to bytes, as the dictionary uses bytes
         byte_key = key.encode('utf-8')
-        
+
         if self._service_info is None:
-            logging.info("Service info not found")
             return None
-        
+
         # Check if the key exists in the dictionary
         if byte_key not in self._service_info.properties:
             logging.info("Key '{key}' not found")
             return None
-            
+
         value = self._service_info.properties[byte_key]
 
         return None if value is None else value.decode('utf-8')
@@ -187,6 +186,8 @@ class OperationalMdnsDiscovery:
                 name=self._name,
                 type_=MDNS_TYPE_OPERATIONAL
             )
+            if service_info is None:
+                logging.info("Service info for '{self._name}' is unavailable")
             self._service_info = service_info
 
         return None if service_info is None else self._service_info
