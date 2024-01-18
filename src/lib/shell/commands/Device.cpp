@@ -20,6 +20,7 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
+#include <app/server/Server.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -42,7 +43,7 @@ int DeviceHelpHandler(int argc, char ** argv)
 static CHIP_ERROR FactoryResetHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Performing factory reset ... \r\n");
-    DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
+    chip::Server::GetInstance().ScheduleFactoryReset();
     return CHIP_NO_ERROR;
 }
 
