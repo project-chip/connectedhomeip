@@ -187,31 +187,11 @@ tests:
           constraints:
               type: int32s
 
-    # Issue: https://github.com/project-chip/connectedhomeip/issues/30081
     - label: "Step 14: TH reads the SupportedWiFiBands attribute from the DUT"
-      verification: |
-          ./chip-tool networkcommissioning read supported-wi-fi-bands 1 0
-
-          Via the TH (chip-tool), Verify the SupportedWiFiBands attribute that contains 1 or more entries is in the ange of WiFiBandEnum.
-
-          [1702545427.038887][1881:1883] CHIP:DMG:                                 StatusIB =
-          [1702545427.038936][1881:1883] CHIP:DMG:                                 {
-          [1702545427.039055][1881:1883] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1702545427.039096][1881:1883] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && CNET.S.A0008
-      arguments:
-          values:
-              - name: "message"
-                value: enter 'y' after successfull Commission"
-              - name: "expectedValue"
-                value: "y"
-    # - label: "Step 14: TH reads the SupportedWiFiBands attribute from the DUT"
-    #   PICS: CNET.S.A0008
-    #   command: "readAttribute"
-    #   attribute: "SupportedWiFiBands"
-    #   response:
-    #       constraints:
-    #           type: enum8
-    #           minLength: 1
+      PICS: CNET.S.A0008
+      command: "readAttribute"
+      attribute: "SupportedWiFiBands"
+      response:
+          constraints:
+              type: enum8
+              minLength: 1

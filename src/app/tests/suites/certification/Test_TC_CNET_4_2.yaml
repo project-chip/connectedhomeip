@@ -194,44 +194,25 @@ tests:
           constraints:
               type: int32s
 
-    # Issue: https://github.com/project-chip/connectedhomeip/issues/30081
+    #Possibilites if Bit 4 (IsSynchronizedSleepyEndDeviceCapable) is only set if bit 2 (IsSleepyEndDeviceCapable) is also set expects value 20
+    #Verify that Bit 0 (IsBorderRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 9
+    #Verify that Bit 1 (IsRouterCapable) is only set if bit 3 (IsFullThreadDevice) is also set expected value 10
+    #So the possibilites of value here are in the range of 0-20 expected value as per test-plan [0, 4, 8, 9, 10, 16, 20]
     - label:
           "Step 14: TH reads the SupportedThreadFeatures attribute from the DUT"
-      verification: |
-          ./chip-tool networkcommissioning read supported-thread-features 54 0
-
-          Via the TH (chip-tool), Verify the SupportedThreadFeatures attribute that contains value is an empty bitmap (value 0).
-
-          [1702545740.403752][1890:1893] CHIP:DMG:                                 StatusIB =
-          [1702545740.403824][1890:1893] CHIP:DMG:                                 {
-          [1702545740.403883][1890:1893] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1702545740.403953][1890:1893] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && CNET.S.A0009
-      arguments:
-          values:
-              - name: "message"
-                value: enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CNET.S.A0009
+      command: "readAttribute"
+      attribute: "SupportedThreadFeatures"
+      response:
+          constraints:
+              type: bitmap16
+              anyOf: [0, 4, 8, 9, 10, 16, 20]
 
     - label: "Step 15:TH reads the ThreadVersion attribute from the DUT"
-      verification: |
-          ./chip-tool networkcommissioning read thread-version 54 0
-
-          Via the TH (chip-tool), Verify the ThreadVersion attribute that contains value is greater than or equal to 4.
-
-          [1702545740.403752][1890:1893] CHIP:DMG:                                 StatusIB =
-          [1702545740.403824][1890:1893] CHIP:DMG:                                 {
-          [1702545740.403883][1890:1893] CHIP:DMG:                                         status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1702545740.403953][1890:1893] CHIP:DMG:                                 },
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && CNET.S.A000A
-      arguments:
-          values:
-              - name: "message"
-                value: enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: CNET.S.A000A
+      command: "readAttribute"
+      attribute: "ThreadVersion"
+      response:
+          constraints:
+              type: int16u
+              minValue: 4
