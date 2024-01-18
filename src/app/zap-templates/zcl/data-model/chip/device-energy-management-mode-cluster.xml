@@ -19,8 +19,10 @@ limitations under the License.
 
   <enum name="ModeTag" type="enum16">
     <cluster code="0x009F"/>
-    <item value="0x4000" name="Local Optimization"/>
-    <item value="0x4001" name="Grid Optimization"/>
+    <item value="0x4000" name="No Optimization"/>
+    <item value="0x4001" name="Device Optimization"/>    
+    <item value="0x4002" name="Local Optimization"/>
+    <item value="0x4003" name="Grid Optimization"/>
   </enum>
 
   <cluster apiMaturity="provisional">
