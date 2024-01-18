@@ -4280,6 +4280,105 @@ provisional cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster EnergyEvseMode = 157 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kManual = 16384;
+    kTimeOfUse = 16385;
+    kSolarCharging = 16386;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster DeviceEnergyManagementMode = 159 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kLocalOptimization = 16384;
+    kGridOptimization = 16385;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
 /** Provides an interface for controlling and adjusting automatic window coverings. */
 cluster WindowCovering = 258 {
   revision 5;
@@ -7987,6 +8086,38 @@ endpoint 1 {
     handle command ClearTargets;
   }
 
+  server cluster EnergyEvseMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster DeviceEnergyManagementMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    ram      attribute startUpMode;
+    ram      attribute onMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
   server cluster WindowCovering {
     ram      attribute type default = 0x08;
     ram      attribute physicalClosedLimitLift default = 0xFFFF;
@@ -8101,13 +8232,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
-    handle command SetActiveScheduleRequest;
-    handle command SetActivePresetRequest;
-    handle command StartPresetsSchedulesEditRequest;
-    handle command CancelPresetsSchedulesEditRequest;
-    handle command CommitPresetsSchedulesRequest;
-    handle command CancelSetActivePresetRequest;
-    handle command SetTemperatureSetpointHoldPolicy;
   }
 
   server cluster FanControl {

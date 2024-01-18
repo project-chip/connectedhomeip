@@ -105,6 +105,8 @@
 | DeviceEnergyManagement                                              | 0x0098 |
 | EnergyEvse                                                          | 0x0099 |
 | EnergyPreference                                                    | 0x009B |
+| EnergyEvseMode                                                      | 0x009D |
+| DeviceEnergyManagementMode                                          | 0x009F |
 | DoorLock                                                            | 0x0101 |
 | WindowCovering                                                      | 0x0102 |
 | BarrierControl                                                      | 0x0103 |
@@ -7495,6 +7497,123 @@ private:
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*\
+| Cluster EnergyEvseMode                                              | 0x009D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeToMode                                                      |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ChangeToMode
+ */
+class EnergyEvseModeChangeToMode : public ClusterCommand
+{
+public:
+    EnergyEvseModeChangeToMode(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("change-to-mode", credsIssuerConfig)
+    {
+        AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::EnergyEvseMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::EnergyEvseMode::Commands::ChangeToMode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::EnergyEvseMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::EnergyEvseMode::Commands::ChangeToMode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::EnergyEvseMode::Commands::ChangeToMode::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster DeviceEnergyManagementMode                                  | 0x009F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeToMode                                                      |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * SupportedModes                                                    | 0x0000 |
+| * CurrentMode                                                       | 0x0001 |
+| * StartUpMode                                                       | 0x0002 |
+| * OnMode                                                            | 0x0003 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ChangeToMode
+ */
+class DeviceEnergyManagementModeChangeToMode : public ClusterCommand
+{
+public:
+    DeviceEnergyManagementModeChangeToMode(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("change-to-mode", credsIssuerConfig)
+    {
+        AddArgument("NewMode", 0, UINT8_MAX, &mRequest.newMode);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagementMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagementMode::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToMode::Type mRequest;
+};
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -20459,6 +20578,144 @@ void registerClusterEnergyPreference(Commands & commands, CredentialIssuerComman
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterEnergyEvseMode(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::EnergyEvseMode;
+
+    const char * clusterName = "EnergyEvseMode";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),         //
+        make_unique<EnergyEvseModeChangeToMode>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::EnergyEvseMode::Structs::ModeOptionStruct::Type>>>(
+            Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+            Id, "start-up-mode", 0, UINT8_MAX, Attributes::StartUpMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "on-mode", 0, UINT8_MAX, Attributes::OnMode::Id,
+                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
+void registerClusterDeviceEnergyManagementMode(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::DeviceEnergyManagementMode;
+
+    const char * clusterName = "DeviceEnergyManagementMode";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                     //
+        make_unique<DeviceEnergyManagementModeChangeToMode>(credsIssuerConfig), //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                              //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagementMode::Structs::ModeOptionStruct::Type>>>(
+            Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "current-mode", 0, UINT8_MAX, Attributes::CurrentMode::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(
+            Id, "start-up-mode", 0, UINT8_MAX, Attributes::StartUpMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint8_t>>>(Id, "on-mode", 0, UINT8_MAX, Attributes::OnMode::Id,
+                                                                             WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "current-mode", Attributes::CurrentMode::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "start-up-mode", Attributes::StartUpMode::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "on-mode", Attributes::OnMode::Id, credsIssuerConfig),                              //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterDoorLock(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::DoorLock;
@@ -26161,6 +26418,8 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterDeviceEnergyManagement(commands, credsIssuerConfig);
     registerClusterEnergyEvse(commands, credsIssuerConfig);
     registerClusterEnergyPreference(commands, credsIssuerConfig);
+    registerClusterEnergyEvseMode(commands, credsIssuerConfig);
+    registerClusterDeviceEnergyManagementMode(commands, credsIssuerConfig);
     registerClusterDoorLock(commands, credsIssuerConfig);
     registerClusterWindowCovering(commands, credsIssuerConfig);
     registerClusterBarrierControl(commands, credsIssuerConfig);

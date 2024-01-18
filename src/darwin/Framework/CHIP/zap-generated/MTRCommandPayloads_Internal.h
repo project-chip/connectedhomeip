@@ -1138,6 +1138,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTREnergyEVSEModeClusterChangeToModeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTREnergyEVSEModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
+@interface MTRDeviceEnergyManagementModeClusterChangeToModeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementModeClusterChangeToModeResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRDoorLockClusterLockDoorParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

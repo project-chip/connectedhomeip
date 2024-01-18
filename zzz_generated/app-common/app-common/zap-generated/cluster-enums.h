@@ -2580,6 +2580,49 @@ enum class Feature : uint32_t
 };
 } // namespace EnergyPreference
 
+namespace EnergyEvseMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kManual        = 0x4000,
+    kTimeOfUse     = 0x4001,
+    kSolarCharging = 0x4002,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace EnergyEvseMode
+
+namespace DeviceEnergyManagementMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kLocalOptimization = 0x4000,
+    kGridOptimization  = 0x4001,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace DeviceEnergyManagementMode
+
 namespace DoorLock {
 
 // Enum for AlarmCodeEnum

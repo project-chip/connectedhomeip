@@ -7234,6 +7234,24 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -12511,6 +12529,121 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case EnergyEvseMode::Id: {
+        switch (path.mAttributeId)
+        {
+        case EnergyEvseMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyEvseMode::Structs::ModeOptionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
+        case EnergyEvseMode::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case EnergyEvseMode::Attributes::StartUpMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case EnergyEvseMode::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case EnergyEvseMode::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case EnergyEvseMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case DeviceEnergyManagementMode::Id: {
+        switch (path.mAttributeId)
+        {
+        case DeviceEnergyManagementMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::DeviceEnergyManagementMode::Structs::ModeOptionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::StartUpMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case DoorLock::Id: {
         switch (path.mAttributeId)
         {
@@ -17647,6 +17780,28 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             EnergyEvse::Commands::GetTargetsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetTargetsResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case EnergyEvseMode::Id: {
+        switch (path.mCommandId)
+        {
+        case EnergyEvseMode::Commands::ChangeToModeResponse::Id: {
+            EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case DeviceEnergyManagementMode::Id: {
+        switch (path.mCommandId)
+        {
+        case DeviceEnergyManagementMode::Commands::ChangeToModeResponse::Id: {
+            DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
