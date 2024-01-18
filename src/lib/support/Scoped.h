@@ -35,7 +35,7 @@ public:
     explicit ScopedChangeOnly(T initial) : mValue(initial) {}
     operator T() const { return mValue; }
 
-  private:
+private:
     T mValue;
 
     // Expected to be used only by ScopedChange<T> only
