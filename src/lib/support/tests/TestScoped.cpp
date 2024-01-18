@@ -36,7 +36,7 @@ void TestScopedVariableChange(nlTestSuite * inSuite, void * inContext)
 
         x = 15;
         {
-            ScopedChange<int> change1(x, 20);
+            ScopedChange<int> change2(x, 20);
             NL_TEST_ASSERT(inSuite, x == 20);
         }
         NL_TEST_ASSERT(inSuite, x == 15);
