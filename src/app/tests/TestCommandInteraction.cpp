@@ -312,9 +312,12 @@ public:
     static void TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
+                                                                                                 void * apContext);
+    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite,
+                                                                                                        void * apContext);
+    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
+                                                                                               void * apContext);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     static void TestCommandHandlerReleaseWithExchangeClosed(nlTestSuite * apSuite, void * apContext);
@@ -370,7 +373,8 @@ private:
     static void AddInvalidInvokeRequestData(nlTestSuite * apSuite, void * apContext, CommandSender * apCommandSender,
                                             CommandId aCommandId = kTestCommandIdWithData);
     static void AddInvokeResponseData(nlTestSuite * apSuite, void * apContext, CommandHandler * apCommandHandler,
-                                      bool aNeedStatusCode, CommandId aResponseCommandId = kTestCommandIdWithData, CommandId aRequestCommandId = kTestCommandIdWithData);
+                                      bool aNeedStatusCode, CommandId aResponseCommandId = kTestCommandIdWithData,
+                                      CommandId aRequestCommandId = kTestCommandIdWithData);
     static void FillCurrentInvokeResponseBuffer(nlTestSuite * apSuite, CommandHandler * apCommandHandler,
                                                 const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer);
     static void ValidateCommandHandlerEncodeInvokeResponseMessage(nlTestSuite * apSuite, void * apContext, bool aNeedStatusCode);
@@ -545,9 +549,9 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    constexpr EndpointId kTestEndpointId       = 1;
-    constexpr ClusterId kTestClusterId         = 3;
-    ConcreteCommandPath requestCommandPath     = { kTestEndpointId, kTestClusterId, aRequestCommandId };
+    constexpr EndpointId kTestEndpointId   = 1;
+    constexpr ClusterId kTestClusterId     = 3;
+    ConcreteCommandPath requestCommandPath = { kTestEndpointId, kTestClusterId, aRequestCommandId };
     if (aNeedStatusCode)
     {
         apCommandHandler->AddStatus(requestCommandPath, Protocols::InteractionModel::Status::Success);
@@ -570,7 +574,8 @@ void TestCommandInteraction::AddInvokeResponseData(nlTestSuite * apSuite, void *
 }
 
 void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSuite, CommandHandler * apCommandHandler,
-                                                             const ConcreteCommandPath & aRequestCommandPath, uint32_t aSizeToLeaveInBuffer)
+                                                             const ConcreteCommandPath & aRequestCommandPath,
+                                                             uint32_t aSizeToLeaveInBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1740,13 +1745,14 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     exchange->Close();
 }
 
-void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
+                                                                                                              void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
-    ConcreteCommandPath requestCommandPath1 = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage};
-    ConcreteCommandPath requestCommandPath2 = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse};
+    ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
+    ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     Optional<uint16_t> commandRef;
     commandRef.SetValue(1);
     mBasicCommandPathRegistry.Add(requestCommandPath1, commandRef);
@@ -1758,19 +1764,21 @@ void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereS
     uint32_t remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     NL_TEST_ASSERT(apSuite, remainingSize == sizeToLeave);
 
-    AddInvokeResponseData(apSuite, apContext, &commandHandler, /* aNeedStatusCode = */ true, kTestCommandIdCommandSpecificResponse, kTestCommandIdCommandSpecificResponse);
+    AddInvokeResponseData(apSuite, apContext, &commandHandler, /* aNeedStatusCode = */ true, kTestCommandIdCommandSpecificResponse,
+                          kTestCommandIdCommandSpecificResponse);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     NL_TEST_ASSERT(apSuite, remainingSize > sizeToLeave);
 }
 
-void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(
+    nlTestSuite * apSuite, void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
-    ConcreteCommandPath requestCommandPath1 = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage};
-    ConcreteCommandPath requestCommandPath2 = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse};
+    ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
+    ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     Optional<uint16_t> commandRef;
     commandRef.SetValue(1);
     mBasicCommandPathRegistry.Add(requestCommandPath1, commandRef);
@@ -1782,19 +1790,21 @@ void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereS
     uint32_t remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     NL_TEST_ASSERT(apSuite, remainingSize == sizeToLeave);
 
-    AddInvokeResponseData(apSuite, apContext, &commandHandler, /* aNeedStatusCode = */ false, kTestCommandIdCommandSpecificResponse, kTestCommandIdCommandSpecificResponse);
+    AddInvokeResponseData(apSuite, apContext, &commandHandler, /* aNeedStatusCode = */ false, kTestCommandIdCommandSpecificResponse,
+                          kTestCommandIdCommandSpecificResponse);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
     NL_TEST_ASSERT(apSuite, remainingSize > sizeToLeave);
 }
 
-void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite, void * apContext)
+void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
+                                                                                                            void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
     commandHandler.mReserveSpaceForMoreChunkMessages = true;
-    ConcreteCommandPath requestCommandPath1 = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage};
-    ConcreteCommandPath requestCommandPath2 = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse};
+    ConcreteCommandPath requestCommandPath1          = { kTestEndpointId, kTestClusterId, kTestCommandIdFillResponseMessage };
+    ConcreteCommandPath requestCommandPath2          = { kTestEndpointId, kTestClusterId, kTestCommandIdCommandSpecificResponse };
     Optional<uint16_t> commandRef;
     commandRef.SetValue(1);
     mBasicCommandPathRegistry.Add(requestCommandPath1, commandRef);
@@ -1807,7 +1817,7 @@ void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereS
     NL_TEST_ASSERT(apSuite, remainingSize == sizeToLeave);
 
     uint32_t sizeToFill = 50;
-    CHIP_ERROR err = commandHandler.AddResponseData(requestCommandPath2, ForcedSizeBuffer(sizeToFill));
+    CHIP_ERROR err      = commandHandler.AddResponseData(requestCommandPath2, ForcedSizeBuffer(sizeToFill));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     remainingSize = commandHandler.mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
