@@ -552,7 +552,7 @@ private:
     CommandPathRegistry * mCommandPathRegistry = &mBasicCommandPathRegistry;
     Optional<uint16_t> mRefForResponse;
 
-    Callback::Callback<OnResponseSenderDone> mResponseSenderDone;
+    chip::Callback::Callback<OnResponseSenderDone> mResponseSenderDone;
     CommandResponseSender mResponseSender;
 
     State mState = State::Idle;

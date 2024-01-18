@@ -26,20 +26,24 @@ using Status = Protocols::InteractionModel::Status;
 CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext,
                                                     const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    bool sendStatusResponseWithFailure = false;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Optional<Status> failureStatusToSend;
 
     if (mState == State::AwaitingStatusResponse &&
         aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         CHIP_ERROR statusError = CHIP_NO_ERROR;
         err                    = StatusResponse::ProcessStatusResponse(std::move(aPayload), statusError);
-        VerifyOrExit(err == CHIP_NO_ERROR, sendStatusResponseWithFailure = true);
+        VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
         err = statusError;
-        VerifyOrExit(err == CHIP_NO_ERROR, sendStatusResponseWithFailure = true);
+        VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
+        // If SendCommandResponse() fails, we are responsible for closing the exchange,
+        // as stipulated by the API contract. We fulfill this obligation by setting
+        // `failureStatusToSend` to a value that triggers the transmission of a final
+        // StatusResponse, which does not expect a response.
         err = SendCommandResponse();
-        VerifyOrExit(err == CHIP_NO_ERROR, sendStatusResponseWithFailure = true);
+        VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
 
         bool moreToSend = !mChunks.IsNull();
         if (!moreToSend)
@@ -55,15 +59,15 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
     err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     if (mState != State::AllInvokeResponsesSent)
     {
-        sendStatusResponseWithFailure = true;
+        failureStatusToSend.SetValue(Status::Failure);
         ExitNow();
     }
     StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
     return err;
 exit:
-    if (sendStatusResponseWithFailure)
+    if (failureStatusToSend.HasValue())
     {
-        StatusResponse::Send(Status::Failure, mExchangeCtx.Get(), false /*aExpectResponse*/);
+        StatusResponse::Send(failureStatusToSend.Value(), mExchangeCtx.Get(), false /*aExpectResponse*/);
     }
     Close();
     return err;
@@ -79,6 +83,9 @@ void CommandResponseSender::OnResponseTimeout(Messaging::ExchangeContext * apExc
 CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
 {
     VerifyOrReturnError(mState == State::ReadyForInvokeResponses, CHIP_ERROR_INCORRECT_STATE);
+    // If SendCommandResponse() fails, we are obligated to close the exchange as per the API
+    // contract. However, this method's contract also stipulates that in the event of our
+    // failure, the caller bears the responsibility of closing the exchange.
     ReturnErrorOnFailure(SendCommandResponse());
 
     bool moreToSend = !mChunks.IsNull();
@@ -104,10 +111,6 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     if (moreToSend)
     {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
-    }
-
-    if (moreToSend)
-    {
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
     }
 
