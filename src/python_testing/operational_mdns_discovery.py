@@ -16,12 +16,14 @@
 #
 
 import time
-from typing import Union, Dict
+from typing import Dict, Union
+
 from mobly import asserts
 from zeroconf import ServiceListener, Zeroconf
 from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
 
 MDNS_TYPE_OPERATIONAL = "_matter._tcp.local."
+
 
 class EmptyServiceListener(ServiceListener):
     '''
@@ -61,6 +63,7 @@ class OperationalMdnsDiscovery:
     Args:
         tc: An instance of a test case.
     """
+
     def __init__(self, tc):
         """
         Initializes the OperationalMdnsHelper instance with a given test case.

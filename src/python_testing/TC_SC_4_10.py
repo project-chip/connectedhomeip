@@ -18,8 +18,8 @@
 import logging
 
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from operational_mdns_discovery import OperationalMdnsDiscovery
 from mobly import asserts
+from operational_mdns_discovery import OperationalMdnsDiscovery
 
 '''
 Category:
