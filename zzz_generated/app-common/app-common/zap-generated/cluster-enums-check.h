@@ -1818,6 +1818,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagementM
     using EnumType = DeviceEnergyManagementMode::ModeTag;
     switch (val)
     {
+    case EnumType::kNoOptimization:
+    case EnumType::kDeviceOptimization:
     case EnumType::kLocalOptimization:
     case EnumType::kGridOptimization:
         return val;

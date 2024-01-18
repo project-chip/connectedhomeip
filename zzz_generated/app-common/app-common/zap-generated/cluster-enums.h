@@ -2607,8 +2607,10 @@ namespace DeviceEnergyManagementMode {
 // Enum for ModeTag
 enum class ModeTag : uint16_t
 {
-    kLocalOptimization = 0x4000,
-    kGridOptimization  = 0x4001,
+    kNoOptimization     = 0x4000,
+    kDeviceOptimization = 0x4001,
+    kLocalOptimization  = 0x4002,
+    kGridOptimization   = 0x4003,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown

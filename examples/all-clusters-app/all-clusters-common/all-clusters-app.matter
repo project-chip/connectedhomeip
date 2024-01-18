@@ -4322,7 +4322,7 @@ provisional cluster EnergyEvseMode = 157 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.
@@ -4335,8 +4335,10 @@ provisional cluster DeviceEnergyManagementMode = 159 {
   revision 1;
 
   enum ModeTag : enum16 {
-    kLocalOptimization = 16384;
-    kGridOptimization = 16385;
+    kNoOptimization = 16384;
+    kDeviceOptimization = 16385;
+    kLocalOptimization = 16386;
+    kGridOptimization = 16387;
   }
 
   bitmap Feature : bitmap32 {
@@ -4371,7 +4373,7 @@ provisional cluster DeviceEnergyManagementMode = 159 {
 
   response struct ChangeToModeResponse = 1 {
     enum8 status = 0;
-    optional char_string statusText = 1;
+    optional char_string<64> statusText = 1;
   }
 
   /** This command is used to change device modes.

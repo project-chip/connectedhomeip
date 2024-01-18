@@ -17685,8 +17685,10 @@ typedef NS_OPTIONS(uint32_t, MTREnergyEVSEModeFeature) {
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRDeviceEnergyManagementModeModeTag) {
-    MTRDeviceEnergyManagementModeModeTagLocalOptimization MTR_PROVISIONALLY_AVAILABLE = 0x4000,
-    MTRDeviceEnergyManagementModeModeTagGridOptimization MTR_PROVISIONALLY_AVAILABLE = 0x4001,
+    MTRDeviceEnergyManagementModeModeTagNoOptimization MTR_PROVISIONALLY_AVAILABLE = 0x4000,
+    MTRDeviceEnergyManagementModeModeTagDeviceOptimization MTR_PROVISIONALLY_AVAILABLE = 0x4001,
+    MTRDeviceEnergyManagementModeModeTagLocalOptimization MTR_PROVISIONALLY_AVAILABLE = 0x4002,
+    MTRDeviceEnergyManagementModeModeTagGridOptimization MTR_PROVISIONALLY_AVAILABLE = 0x4003,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRDeviceEnergyManagementModeFeature) {
