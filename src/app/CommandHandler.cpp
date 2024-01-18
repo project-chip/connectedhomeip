@@ -772,6 +772,10 @@ void CommandHandler::CreateBackupForResponseRollback()
     {
         return;
     }
+    if (mInvokeResponseBuilder.GetInvokeResponses().GetError() != CHIP_NO_ERROR || mInvokeResponseBuilder.GetError() != CHIP_NO_ERROR)
+    {
+        return;
+    }
     mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     mBackupState         = mState;
     mRollbackBackupValid = true;
