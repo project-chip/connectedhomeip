@@ -80,6 +80,12 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerDelegate.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
@@ -552,6 +558,19 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     };
     otherDelegate = &smokeCOTestEventTriggerDelegate;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+    static BooleanStateConfigurationTestEventTriggerDelegate booleanStateConfigurationTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &booleanStateConfigurationTestEventTriggerDelegate;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+    static EnergyEvseTestEventTriggerDelegate energyEvseTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &energyEvseTestEventTriggerDelegate;
+#endif
+
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SampleTestEventTriggerDelegate testEventTriggerDelegate;
     VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),

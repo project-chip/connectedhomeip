@@ -618,7 +618,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
 
-// AVAILABLE: 0x16
+/**
+ *  @def CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT
+ *
+ *  @brief
+ *    Subscription timeout caused by LIT ICD device inactive mode
+ *
+ */
+#define CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT              CHIP_CORE_ERROR(0x16)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE
@@ -674,7 +681,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
-// AVAILABLE: 0x1d
+/**
+ *  @def CHIP_ERROR_INVALID_IPK
+ *
+ *  @brief
+ *    The IPK is invalid
+ *
+ */
+#define CHIP_ERROR_INVALID_IPK                                 CHIP_CORE_ERROR(0x1d)
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH
