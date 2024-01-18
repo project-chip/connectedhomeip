@@ -33,7 +33,7 @@ namespace OvenCavityOperationalState {
 class OvenCavityOperationalStateDelegate : public OperationalState::Delegate
 {
 private:
-    const Clusters::OperationalState::GenericOperationalState mOperationalStateList[] = {
+    inline static const Clusters::OperationalState::GenericOperationalState mOperationalStateList[] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
