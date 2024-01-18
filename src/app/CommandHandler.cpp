@@ -781,6 +781,8 @@ CHIP_ERROR CommandHandler::RollbackResponse()
 {
     VerifyOrReturnError(mRollbackBackupValid, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    mInvokeResponseBuilder.GetInvokeResponses().ResetError();
+    mInvokeResponseBuilder.ResetError();
     mInvokeResponseBuilder.Rollback(mBackupWriter);
     MoveToState(mBackupState);
     mRollbackBackupValid = false;

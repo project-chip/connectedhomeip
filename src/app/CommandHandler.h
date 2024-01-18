@@ -309,8 +309,8 @@ public:
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
      *
-     * @param addResponseFunction: A lambda function responsible for adding the
-     *      response to the current InvokeResponseMessage.
+     * addResponseFunction: A lambda function responsible for adding the response
+     *    to the current InvokeResponseMessage.
      */
     template <typename Function>
     CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
