@@ -24009,8 +24009,6 @@ class EnergyEvse(Cluster):
                 ClusterObjectFieldDescriptor(Label="maximumDischargeCurrent", Tag=0x00000008, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="userMaximumChargeCurrent", Tag=0x00000009, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="randomizationDelayWindow", Tag=0x0000000A, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfWeeklyTargets", Tag=0x00000021, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfDailyTargets", Tag=0x00000022, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="nextChargeStartTime", Tag=0x00000023, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="nextChargeTargetTime", Tag=0x00000024, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="nextChargeRequiredEnergy", Tag=0x00000025, Type=typing.Union[None, Nullable, int]),
@@ -24042,8 +24040,6 @@ class EnergyEvse(Cluster):
     maximumDischargeCurrent: 'typing.Optional[int]' = None
     userMaximumChargeCurrent: 'typing.Optional[int]' = None
     randomizationDelayWindow: 'typing.Optional[uint]' = None
-    numberOfWeeklyTargets: 'typing.Optional[uint]' = None
-    numberOfDailyTargets: 'typing.Optional[uint]' = None
     nextChargeStartTime: 'typing.Union[None, Nullable, uint]' = None
     nextChargeTargetTime: 'typing.Union[None, Nullable, uint]' = None
     nextChargeRequiredEnergy: 'typing.Union[None, Nullable, int]' = None
@@ -24157,6 +24153,19 @@ class EnergyEvse(Cluster):
             targetSoC: 'typing.Optional[uint]' = None
             addedEnergy: 'typing.Optional[int]' = None
 
+        @dataclass
+        class ChargingTargetScheduleStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="dayOfWeekForSequence", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="chargingTargets", Tag=1, Type=typing.List[EnergyEvse.Structs.ChargingTargetStruct]),
+                    ])
+
+            dayOfWeekForSequence: 'uint' = 0
+            chargingTargets: 'typing.List[EnergyEvse.Structs.ChargingTargetStruct]' = field(default_factory=lambda: [])
+
     class Commands:
         @dataclass
         class GetTargetsResponse(ClusterCommand):
@@ -24169,12 +24178,10 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="chargingTargets", Tag=1, Type=typing.List[EnergyEvse.Structs.ChargingTargetStruct]),
+                        ClusterObjectFieldDescriptor(Label="chargingTargetSchedules", Tag=0, Type=typing.List[EnergyEvse.Structs.ChargingTargetScheduleStruct]),
                     ])
 
-            dayOfWeekforSequence: 'uint' = 0
-            chargingTargets: 'typing.List[EnergyEvse.Structs.ChargingTargetStruct]' = field(default_factory=lambda: [])
+            chargingTargetSchedules: 'typing.List[EnergyEvse.Structs.ChargingTargetScheduleStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class Disable(ClusterCommand):
@@ -24267,16 +24274,14 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="dayOfWeekforSequence", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="chargingTargets", Tag=1, Type=typing.List[EnergyEvse.Structs.ChargingTargetStruct]),
+                        ClusterObjectFieldDescriptor(Label="chargingTargetSchedules", Tag=0, Type=typing.List[EnergyEvse.Structs.ChargingTargetScheduleStruct]),
                     ])
 
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
 
-            dayOfWeekforSequence: 'uint' = 0
-            chargingTargets: 'typing.List[EnergyEvse.Structs.ChargingTargetStruct]' = field(default_factory=lambda: [])
+            chargingTargetSchedules: 'typing.List[EnergyEvse.Structs.ChargingTargetScheduleStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class GetTargets(ClusterCommand):
@@ -24289,14 +24294,11 @@ class EnergyEvse(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="daysToReturn", Tag=0, Type=uint),
                     ])
 
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
-
-            daysToReturn: 'uint' = 0
 
         @dataclass
         class ClearTargets(ClusterCommand):
@@ -24485,38 +24487,6 @@ class EnergyEvse(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x0000000A
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class NumberOfWeeklyTargets(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000099
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000021
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class NumberOfDailyTargets(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000099
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000022
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

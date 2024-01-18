@@ -208,8 +208,6 @@ public:
     CHIP_ERROR SetRandomizationDelayWindow(uint32_t) override;
 
     /* PREF attributes */
-    uint8_t GetNumberOfWeeklyTargets() override;
-    uint8_t GetNumberOfDailyTargets() override;
     DataModel::Nullable<uint32_t> GetNextChargeStartTime() override;
     DataModel::Nullable<uint32_t> GetNextChargeTargetTime() override;
     DataModel::Nullable<int64_t> GetNextChargeRequiredEnergy() override;
@@ -293,8 +291,6 @@ private:
     int64_t mUserMaximumChargeCurrent  = kDefaultUserMaximumChargeCurrent; // TODO update spec
     uint32_t mRandomizationDelayWindow = kDefaultRandomizationDelayWindow;
     /* PREF attributes */
-    uint8_t mNumberOfWeeklyTargets = 0;
-    uint8_t mNumberOfDailyTargets  = 1;
     DataModel::Nullable<uint32_t> mNextChargeStartTime;
     DataModel::Nullable<uint32_t> mNextChargeTargetTime;
     DataModel::Nullable<int64_t> mNextChargeRequiredEnergy;
