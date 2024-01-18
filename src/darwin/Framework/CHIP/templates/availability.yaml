@@ -8534,28 +8534,6 @@
           # getting renamed and getting a new cluster id, so just removing it
           # seems like the most sensible thing.
           - Scenes
-      bitmap values:
-          ScenesManagement:
-              Feature:
-                  # Targeting Spring 2024 Matter release
-                  - Explicit
-                  - TableSize
-                  - FabricScenes
-      attributes:
-          ScenesManagement:
-              # Targeting Spring 2024 Matter release
-              - SceneCount
-              - CurrentScene
-              - CurrentGroup
-              - SceneValid
-              - NameSupport
-      commands:
-          ScenesManagement:
-              # Targeting Spring 2024 Matter release
-              - EnhancedAddScene
-              - EnhancedAddSceneResponse
-              - EnhancedViewScene
-              - EnhancedViewSceneResponse
       enum values:
           ContentLauncher:
               # The URLNotAvailable value got renamed at the same time

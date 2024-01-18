@@ -496,6 +496,34 @@ tests:
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 60 000 000 (60 000s) and no extension field sets. This should fail and return
+          a status of 0x85 (INVALID_COMMAND) because we exceed the max TransitionTime"
+      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 60000000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+  
+    - label:
+          "Step 8b: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 1000 (1s) and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
@@ -533,7 +561,7 @@ tests:
                 value: 0x01
 
     - label:
-          "Step 8a: TH sends a AddScene command to DUT with the GroupID field
+          "Step 8b: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
@@ -595,7 +623,7 @@ tests:
                 value: "y"
 
     - label:
-          "Step 8b: TH sends a GetSceneMembership command to DUT with the
+          "Step 8c: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
