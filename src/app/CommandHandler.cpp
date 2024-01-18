@@ -772,7 +772,8 @@ void CommandHandler::CreateBackupForResponseRollback()
     {
         return;
     }
-    if (mInvokeResponseBuilder.GetInvokeResponses().GetError() != CHIP_NO_ERROR || mInvokeResponseBuilder.GetError() != CHIP_NO_ERROR)
+    if (mInvokeResponseBuilder.GetInvokeResponses().GetError() != CHIP_NO_ERROR ||
+        mInvokeResponseBuilder.GetError() != CHIP_NO_ERROR)
     {
         return;
     }
