@@ -221,7 +221,7 @@ class SelectActionFragment : Fragment() {
   }
 
   private fun handleOTAProviderClicked() {
-    showFragment(OtaProviderClientFragment.newInstance(), false)
+    showFragment(OtaProviderClientFragment.newInstance())
   }
 
   /** Notifies listener of provision-WiFi-credentials button click. */
