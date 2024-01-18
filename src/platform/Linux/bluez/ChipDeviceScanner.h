@@ -20,7 +20,6 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <glib.h>
-#include <mutex>
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
@@ -54,7 +53,7 @@ class ChipDeviceScanner
 {
 public:
     ChipDeviceScanner()                                      = default;
-    ChipDeviceScanner(ChipDeviceScanner &&)                  = delete;
+    ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
@@ -82,6 +81,14 @@ private:
         SCANNER_INITIALIZED,
         SCANNER_SCANNING
     };
+
+    enum ScannerTimerState
+    {
+        TIMER_CANCELED,
+        TIMER_STARTED,
+        TIMER_EXPIRED
+    };
+
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
     static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
     static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
@@ -103,10 +110,9 @@ private:
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
-    ChipDeviceScannerState mCurrentState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
-    std::mutex mScannerStoppingLock;
+    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
-    bool mTimerExpired = false;
+    ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
 };
 
 } // namespace Internal
