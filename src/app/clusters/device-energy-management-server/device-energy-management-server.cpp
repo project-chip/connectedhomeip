@@ -255,7 +255,7 @@ Status Instance::CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause)
 {
     OptOutStateEnum optOutState = mDelegate.GetOptOutState();
 
-    if (adjustmentCause >= AdjustmentCauseEnum::kUnknownEnumValue)
+    if (adjustmentCause == AdjustmentCauseEnum::kUnknownEnumValue)
     {
         ChipLogError(Zcl, "DEM: adjustment cause is invalid (%d)", static_cast<int>(adjustmentCause));
         return Status::InvalidValue;
