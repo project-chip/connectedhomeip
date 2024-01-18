@@ -45,13 +45,13 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 
 class TC_IDM_4_2(MatterBaseTest):
 
-    ADMIN_ENDPOINT_ID = 0
+    ROOT_NODE_ENDPOINT_ID = 0
 
-    async def write_acl(self, ctrl, acl, ep=ADMIN_ENDPOINT_ID):
+    async def write_acl(self, ctrl, acl, ep=ROOT_NODE_ENDPOINT_ID):
         result = await ctrl.WriteAttribute(self.dut_node_id, [(ep, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[ep].Status, Status.Success, "ACL write failed")
 
-    async def get_descriptor_server_list(self, ctrl, ep=ADMIN_ENDPOINT_ID):
+    async def get_descriptor_server_list(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
@@ -59,7 +59,7 @@ class TC_IDM_4_2(MatterBaseTest):
             attribute=Clusters.Descriptor.Attributes.ServerList
         )
 
-    async def get_idle_mode_duration_sec(self, ctrl, ep=ADMIN_ENDPOINT_ID):
+    async def get_idle_mode_duration_sec(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
         return await self.read_single_attribute_check_success(
             endpoint=ep,
             dev_ctrl=ctrl,
@@ -68,7 +68,7 @@ class TC_IDM_4_2(MatterBaseTest):
         )
 
     @staticmethod
-    def verify_attribute_exists(sub, cluster, attribute, ep=ADMIN_ENDPOINT_ID):
+    def verify_attribute_exists(sub, cluster, attribute, ep=ROOT_NODE_ENDPOINT_ID):
         sub_attrs = sub
         if isinstance(sub, Clusters.Attribute.SubscriptionTransaction):
             sub_attrs = sub.GetAttributes()
@@ -79,7 +79,7 @@ class TC_IDM_4_2(MatterBaseTest):
                             "Must have read back attribute %s" % attribute.__name__)
 
     @staticmethod
-    def get_typed_attribute_path(attribute, ep=ADMIN_ENDPOINT_ID):
+    def get_typed_attribute_path(attribute, ep=ROOT_NODE_ENDPOINT_ID):
         return TypedAttributePath(
             Path=AttributePath(
                 EndpointId=ep,
@@ -87,7 +87,7 @@ class TC_IDM_4_2(MatterBaseTest):
             )
         )
 
-    async def get_dut_acl(self, ep=ADMIN_ENDPOINT_ID):
+    async def get_dut_acl(self, ep=ROOT_NODE_ENDPOINT_ID):
         sub = await self.default_controller.ReadAttribute(
             nodeid=self.dut_node_id,
             attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
@@ -258,7 +258,7 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=[3, 3],
                 autoResubscribe=False
             )
-            raise ValueError("Expected exception not thrown")
+            asserts.fail("Expected exception not thrown")
         except ChipStackError as e:
             # Verify that the DUT returns an "INVALID_ACTION" status response
             asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
