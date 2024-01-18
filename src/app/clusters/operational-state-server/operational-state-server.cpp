@@ -264,9 +264,6 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
                                                      [this](HandlerContext & ctx, const auto & req) { HandleStopState(ctx, req); });
         break;
     default:
-        // Should we check if the command is in the base cluster's number-space and if so respond with an error?
-        // Is this not possible due to the data model knowing what commands are available
-
         ChipLogDetail(Zcl, "OperationalState: Entering handling derived cluster commands");
 
         InvokeDerivedClusterCommand(handlerContext);
