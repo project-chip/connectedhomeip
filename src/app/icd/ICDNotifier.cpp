@@ -100,5 +100,16 @@ void ICDNotifier::BroadcastICDManagementEvent(ICDListener::ICDManagementEvents e
     }
 }
 
+void ICDNotifier::BroadcastSubscriptionReport()
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnSubscriptionReport();
+        }
+    }
+}
+
 } // namespace app
 } // namespace chip

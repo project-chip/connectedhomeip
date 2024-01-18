@@ -58,13 +58,13 @@ public:
     virtual ~ICDListener() {}
 
     /**
-     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastNetworkActivityNotification
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastNetworkActivityNotification.
      * It notifies the subscriber that a NetworkActivity occurred. For example, a message sent or received.
      */
     virtual void OnNetworkActivity() = 0;
 
     /**
-     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastActiveRequestNotification
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastActiveRequestNotification.
      * It informs the subscriber that there is a need to place and keep the ICD in its Active Mode.
      *
      * @param request : Identity the request source
@@ -72,7 +72,7 @@ public:
     virtual void OnKeepActiveRequest(KeepActiveFlags request) = 0;
 
     /**
-     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastActiveRequestWithdrawal
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastActiveRequestWithdrawal.
      * It informs the subscriber that a previous request no longer needs ICD to maintain its Active Mode.
      *
      * @param request : The request source
@@ -80,12 +80,18 @@ public:
     virtual void OnActiveRequestWithdrawal(KeepActiveFlags request) = 0;
 
     /**
-     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastICDManagementEvent
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastICDManagementEvent.
      * It informs the subscriber that an ICD Management action has happened and needs to be processed
      *
      * @param event : The event type
      */
-    virtual void OnICDManagementServerEvent(ICDManagementEvents event){};
+    virtual void OnICDManagementServerEvent(ICDManagementEvents event) = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNoitifier when it calls BroadcastSubscriptionReport.
+     * It informs the subscriber that a subscription report data is being sent.
+     */
+    virtual void OnSubscriptionReport() = 0;
 };
 
 class ICDNotifier
@@ -104,6 +110,7 @@ public:
     void BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request);
     void BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
     void BroadcastICDManagementEvent(ICDListener::ICDManagementEvents event);
+    void BroadcastSubscriptionReport();
 
     inline void BroadcastActiveRequest(ICDListener::KeepActiveFlags request, bool notify)
     {

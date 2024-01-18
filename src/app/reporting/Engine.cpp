@@ -23,6 +23,10 @@
  *
  */
 
+#include <app/icd/ICDConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
@@ -642,6 +646,10 @@ void Engine::Run()
 
         if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+            app::ICDNotifier::GetInstance().BroadcastSubscriptionReport();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
             mRunningReadHandler = nullptr;

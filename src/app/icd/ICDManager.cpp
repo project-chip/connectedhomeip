@@ -468,11 +468,14 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 
 void ICDManager::OnNetworkActivity()
 {
+    assertChipStackLockedByCurrentThread();
     this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
 void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
 {
+    assertChipStackLockedByCurrentThread();
+
     switch (event)
     {
     case ICDManagementEvents::kTableUpdated:
@@ -486,6 +489,17 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     default:
         break;
     }
+}
+
+void ICDManager::OnSubscriptionReport()
+{
+    assertChipStackLockedByCurrentThread();
+
+    // If the device is already in ActiveMode, that means that all active subscriptions have already been marked dirty.
+    // Since we only mark them dirty when we enter ActiveMode, it is not necessary to update the operational state a second time.
+    // Doing so will only add an ActiveModeThreshold to the active time which we don't want to do here.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+    this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
