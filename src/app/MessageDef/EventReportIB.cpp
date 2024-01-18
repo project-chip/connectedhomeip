@@ -118,10 +118,10 @@ EventDataIB::Builder & EventReportIB::Builder::CreateEventData()
     return mEventData;
 }
 
-EventReportIB::Builder & EventReportIB::Builder::EndOfEventReportIB()
+CHIP_ERROR EventReportIB::Builder::EndOfEventReportIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 
 CHIP_ERROR EventReportIB::ConstructEventStatusIB(TLV::TLVWriter & aWriter, const ConcreteEventPath & aEvent, StatusIB aStatus)
@@ -132,16 +132,13 @@ CHIP_ERROR EventReportIB::ConstructEventStatusIB(TLV::TLVWriter & aWriter, const
     ReturnErrorOnFailure(eventReportIBBuilder.GetError());
     EventPathIB::Builder & eventPathIBBuilder = eventStatusIBBuilder.CreatePath();
     ReturnErrorOnFailure(eventStatusIBBuilder.GetError());
-    ReturnErrorOnFailure(eventPathIBBuilder.Endpoint(aEvent.mEndpointId)
-                             .Cluster(aEvent.mClusterId)
-                             .Event(aEvent.mEventId)
-                             .EndOfEventPathIB()
-                             .GetError());
+    ReturnErrorOnFailure(
+        eventPathIBBuilder.Endpoint(aEvent.mEndpointId).Cluster(aEvent.mClusterId).Event(aEvent.mEventId).EndOfEventPathIB());
 
     ReturnErrorOnFailure(eventStatusIBBuilder.CreateErrorStatus().EncodeStatusIB(aStatus).GetError());
 
-    ReturnErrorOnFailure(eventStatusIBBuilder.EndOfEventStatusIB().GetError());
-    ReturnErrorOnFailure(eventReportIBBuilder.EndOfEventReportIB().GetError());
+    ReturnErrorOnFailure(eventStatusIBBuilder.EndOfEventStatusIB());
+    ReturnErrorOnFailure(eventReportIBBuilder.EndOfEventReportIB());
     ReturnErrorOnFailure(aWriter.Finalize());
     return CHIP_NO_ERROR;
 }

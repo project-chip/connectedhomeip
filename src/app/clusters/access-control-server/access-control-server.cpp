@@ -18,7 +18,6 @@
 #include <access/AccessControl.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -177,7 +176,7 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
         {
             auto fabric = info.GetFabricIndex();
             ReturnErrorOnFailure(GetAccessControl().Entries(fabric, iterator));
-            CHIP_ERROR err;
+            CHIP_ERROR err = CHIP_NO_ERROR;
             while ((err = iterator.Next(entry)) == CHIP_NO_ERROR)
             {
                 ReturnErrorOnFailure(encoder.Encode(encodableEntry));

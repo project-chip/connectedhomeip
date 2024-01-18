@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="itemHandler"
+            type="com.matter.virtual.device.app.feature.main.MenuAdapter.ItemHandler" />
+
+        <variable
+            name="item"
+            type="com.matter.virtual.device.app.feature.main.model.Menu" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="@{item.isDim == true ? 0.4f : 1f}"
+        android:background="@drawable/menu_item_bg"
+        android:clickable="@{item.isDim == true ? false : true}"
+        android:focusable="true"
+        android:onClick="@{() -> itemHandler.onClick(item)}">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/menu_item_type_image"
+                android:layout_width="@dimen/menu_item_image_width"
+                android:layout_height="@dimen/menu_item_image_height"
+                android:layout_marginStart="@dimen/menu_item_image_margin_start"
+                android:layout_marginTop="@dimen/menu_item_image_margin_top"
+                android:layout_marginBottom="@dimen/menu_item_image_margin_bottom"
+                android:tint="@color/device_image_tint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:imageSrc="@{item.iconResId}" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/menu_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="@dimen/menu_item_text_margin_vertical"
+                android:layout_marginStart="@dimen/menu_item_text_margin_start"
+                android:layout_marginEnd="@dimen/menu_item_text_margin_end"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@{item.titleResId}"
+                android:textAlignment="viewStart"
+                android:textSize="@dimen/menu_item_title_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/menu_item_type_image"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
+</layout>
+

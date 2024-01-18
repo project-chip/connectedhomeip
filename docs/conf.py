@@ -64,11 +64,14 @@ myst_enable_extensions = ["html_image"]
 
 external_content_contents = [
     (MATTER_BASE / "docs", "[!_R]*"),
+    (MATTER_BASE, "data_model/**/*.md"),
     (MATTER_BASE, "README.md"),
     (MATTER_BASE, "examples/**/*.md"),
     (MATTER_BASE, "examples/**/*.png"),
     (MATTER_BASE, "examples/**/*.jpg"),
     (MATTER_BASE, "examples/**/*.JPG"),
+    (MATTER_BASE, "src/tools/**/*.md"),
+    (MATTER_BASE, "scripts/tools/**/*.md"),
 ]
 external_content_link_prefixes = [
     "src/",
@@ -77,5 +80,6 @@ external_content_link_prefixes = [
     "README",  # cannot detect README.md
     "scripts/",
     "examples/android/",
+    "data_model/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]

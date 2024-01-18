@@ -47,8 +47,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
@@ -161,20 +161,31 @@ void ShutdownTestInetCommon()
 
 void InitSystemLayer()
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP implementation uses the event loop for servicing events.
+    // The CHIP stack initialization is required then.
+    chip::DeviceLayer::PlatformMgr().InitChipStack();
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     AcquireLwIP();
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     gSystemLayer.Init();
 }
 
 void ShutdownSystemLayer()
 {
+
     gSystemLayer.Shutdown();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // LwIP implementation uses the event loop for servicing events.
+    // The CHIP stack shutdown is required then.
+    chip::DeviceLayer::PlatformMgr().Shutdown();
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
     ReleaseLwIP();
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
+#endif // !CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
@@ -458,7 +469,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
-#if defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
+#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             // We need to terminate event loop after performance single step.
             // Event loop processing work items until StopEventLoopTask is called.
             // Scheduling StopEventLoop task guarantees correct operation of the loop.

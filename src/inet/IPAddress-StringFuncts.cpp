@@ -34,7 +34,7 @@
 #include <inet/IPAddress.h>
 #include <lib/support/CodeUtils.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 #include <arpa/inet.h>
 #endif
 

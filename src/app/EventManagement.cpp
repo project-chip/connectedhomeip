@@ -173,7 +173,7 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace, P
 
     // Check that we have this much space in all our event buffers that might
     // hold the event. If we do not, that will prevent the event from being
-    // properly evicted into higher-priority bufers.  We want to discover
+    // properly evicted into higher-priority buffers. We want to discover
     // this early, so that testing surfaces the need to make those buffers
     // larger.
     for (auto * currentBuffer = mpEventBuffer; currentBuffer; currentBuffer = currentBuffer->GetNextCircularEventBuffer())
@@ -184,6 +184,8 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace, P
             break;
         }
     }
+
+    VerifyOrExit(eventBuffer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     // check whether we actually need to do anything, exit if we don't
     VerifyOrExit(requiredSpace > eventBuffer->AvailableDataLength(), err = CHIP_NO_ERROR);
@@ -299,11 +301,11 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     EventPathIB::Builder & eventPathBuilder = eventDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
-    eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
-        .Cluster(apOptions->mPath.mClusterId)
-        .Event(apOptions->mPath.mEventId)
-        .EndOfEventPathIB();
-    ReturnErrorOnFailure(eventPathBuilder.GetError());
+    CHIP_ERROR err = eventPathBuilder.Endpoint(apOptions->mPath.mEndpointId)
+                         .Cluster(apOptions->mPath.mClusterId)
+                         .Event(apOptions->mPath.mEventId)
+                         .EndOfEventPathIB();
+    ReturnErrorOnFailure(err);
     eventDataIBBuilder.EventNumber(apContext->mCurrentEventNumber).Priority(chip::to_underlying(apContext->mPriority));
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
@@ -328,10 +330,8 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
     {
         apContext->mWriter.Put(TLV::ProfileTag(kEventManagementProfile, kFabricIndexTag), apOptions->mFabricIndex);
     }
-    eventDataIBBuilder.EndOfEventDataIB();
-    ReturnErrorOnFailure(eventDataIBBuilder.GetError());
-    eventReportBuilder.EndOfEventReportIB();
-    ReturnErrorOnFailure(eventReportBuilder.GetError());
+    ReturnErrorOnFailure(eventDataIBBuilder.EndOfEventDataIB());
+    ReturnErrorOnFailure(eventReportBuilder.EndOfEventReportIB());
     ReturnErrorOnFailure(apContext->mWriter.Finalize());
     apContext->mFirst = false;
     return CHIP_NO_ERROR;

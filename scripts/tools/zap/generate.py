@@ -23,7 +23,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import urllib.request
+import traceback
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -33,7 +33,7 @@ from zap_execution import ZapTool
 
 @dataclass
 class CmdLineArgs:
-    zapFile: str
+    zapFile: Optional[str]
     zclFile: str
     templateFile: str
     outputDir: str
@@ -43,6 +43,7 @@ class CmdLineArgs:
     version_check: bool = True
     lock_file: Optional[str] = None
     delete_output_dir: bool = False
+    matter_file_name: Optional[str] = None
 
 
 CHIP_ROOT_DIR = os.path.realpath(
@@ -113,17 +114,19 @@ def runArgumentsParser() -> CmdLineArgs:
     #
     # All the rest of the files (app-templates.json) are generally built at
     # compile time.
-    default_templates = 'src/app/zap-templates/matter-idl.json'
+    default_templates = 'src/app/zap-templates/matter-idl-server.json'
 
     parser = argparse.ArgumentParser(
         description='Generate artifacts from .zapt templates')
-    parser.add_argument('zap', help='Path to the application .zap file')
+    parser.add_argument('zap', nargs="?", default=None, help='Path to the application .zap file')
     parser.add_argument('-t', '--templates', default=default_templates,
                         help='Path to the .zapt templates records to use for generating artifacts (default: "' + default_templates + '")')
     parser.add_argument('-z', '--zcl',
                         help='Path to the zcl templates records to use for generating artifacts (default: autodetect read from zap file)')
     parser.add_argument('-o', '--output-dir', default=None,
                         help='Output directory for the generated files (default: a temporary directory in out)')
+    parser.add_argument('-m', '--matter-file-name', default=None,
+                        help='Where to copy any generated .matter file')
     parser.add_argument('--run-bootstrap', default=None, action='store_true',
                         help='Automatically run ZAP bootstrap. By default the bootstrap is not triggered')
     parser.add_argument('--parallel', action='store_true')
@@ -142,6 +145,7 @@ def runArgumentsParser() -> CmdLineArgs:
     parser.set_defaults(version_check=True)
     parser.set_defaults(lock_file=None)
     parser.set_defaults(keep_output_dir=False)
+    parser.set_defaults(matter_file_name=None)
     args = parser.parse_args()
 
     delete_output_dir = False
@@ -153,7 +157,10 @@ def runArgumentsParser() -> CmdLineArgs:
     else:
         output_dir = ''
 
-    zap_file = getFilePath(args.zap)
+    if args.zap:
+        zap_file = getFilePath(args.zap)
+    else:
+        zap_file = None
 
     if args.zcl:
         zcl_file = getFilePath(args.zcl)
@@ -163,6 +170,11 @@ def runArgumentsParser() -> CmdLineArgs:
     templates_file = getFilePath(args.templates)
     output_dir = getDirPath(output_dir)
 
+    if args.matter_file_name:
+        matter_file_name = getFilePath(args.matter_file_name)
+    else:
+        matter_file_name = None
+
     return CmdLineArgs(
         zap_file, zcl_file, templates_file, output_dir, args.run_bootstrap,
         parallel=args.parallel,
@@ -170,10 +182,24 @@ def runArgumentsParser() -> CmdLineArgs:
         version_check=args.version_check,
         lock_file=args.lock_file,
         delete_output_dir=delete_output_dir,
+        matter_file_name=matter_file_name,
     )
 
 
-def extractGeneratedIdl(output_dir, zap_config_path):
+def matterPathFromZapPath(zap_config_path):
+    if not zap_config_path:
+        return None
+
+    target_path = zap_config_path.replace(".zap", ".matter")
+    if not target_path.endswith(".matter"):
+        # We expect "something.zap" and don't handle corner cases of
+        # multiple extensions. This is to work with existing codebase only
+        raise Exception("Unexpected input zap file  %s" % zap_config_path)
+
+    return target_path
+
+
+def extractGeneratedIdl(output_dir, matter_name):
     """Find a file Clusters.matter in the output directory and
        place it along with the input zap file.
 
@@ -183,13 +209,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
     if not os.path.exists(idl_path):
         return
 
-    target_path = zap_config_path.replace(".zap", ".matter")
-    if not target_path.endswith(".matter"):
-        # We expect "something.zap" and don't handle corner cases of
-        # multiple extensions. This is to work with existing codebase only
-        raise Error("Unexpected input zap file  %s" % self.zap_config)
-
-    shutil.move(idl_path, target_path)
+    shutil.move(idl_path, matter_name)
 
 
 def runGeneration(cmdLineArgs):
@@ -204,8 +224,11 @@ def runGeneration(cmdLineArgs):
     if cmdLineArgs.version_check:
         tool.version_check()
 
-    args = ['-z', zcl_file, '-g', templates_file,
-            '-i', zap_file, '-o', output_dir]
+    args = ['-z', zcl_file, '-g', templates_file, '-o', output_dir]
+
+    if zap_file:
+        args.append('-i')
+        args.append(zap_file)
 
     if parallel:
         # Parallel-compatible runs will need separate state
@@ -213,7 +236,66 @@ def runGeneration(cmdLineArgs):
 
     tool.run('generate', *args)
 
-    extractGeneratedIdl(output_dir, zap_file)
+    if cmdLineArgs.matter_file_name:
+        matter_name = cmdLineArgs.matter_file_name
+    else:
+        matter_name = matterPathFromZapPath(zap_file)
+
+    if matter_name:
+        extractGeneratedIdl(output_dir, matter_name)
+
+
+def getClangFormatBinaryChoices():
+    """
+    Returns an ordered list of paths that may be suitable clang-format versions
+    """
+    PW_CLANG_FORMAT_PATH = 'cipd/packages/pigweed/bin/clang-format'
+
+    if 'PW_ENVIRONMENT_ROOT' in os.environ:
+        yield os.path.join(os.environ["PW_ENVIRONMENT_ROOT"], PW_CLANG_FORMAT_PATH)
+
+    dot_name = os.path.join(CHIP_ROOT_DIR, '.environment', PW_CLANG_FORMAT_PATH)
+    if os.path.exists(dot_name):
+        yield dot_name
+
+    os_name = shutil.which('clang-format')
+    if os_name:
+        yield os_name
+
+
+def getClangFormatBinary():
+    """Fetches the clang-format binary that is to be used for formatting.
+
+    Tries to figure out where the pigweed-provided binary is (via cipd)
+    """
+    for binary in getClangFormatBinaryChoices():
+        # Running the binary with `--version` yields a string of the form:
+        # "Fuchsia clang-format version 17.0.0 (https://llvm.googlesource.com/llvm-project 6d667d4b261e81f325756fdfd5bb43b3b3d2451d)"
+        #
+        # the SHA at the end generally should match pigweed version
+
+        try:
+            version_string = subprocess.check_output([binary, '--version']).decode('utf8')
+
+            pigweed_config = json.load(
+                open(os.path.join(CHIP_ROOT_DIR, 'third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json')))
+            clang_config = [p for p in pigweed_config['packages'] if p['path'].startswith('fuchsia/third_party/clang/')][0]
+
+            # Tags should be like:
+            #   ['git_revision:895b55537870cdaf6e4c304a09f4bf01954ccbd6']
+            prefix, sha = clang_config['tags'][0].split(':')
+
+            if sha not in version_string:
+                print('WARNING: clang-format may not be the right version:')
+                print('   PIGWEED TAG:    %s' % clang_config['tags'][0])
+                print('   ACTUAL VERSION: %s' % version_string)
+        except Exception:
+            print("Failed to validate clang version.")
+            traceback.print_last()
+
+        return binary
+
+    raise Exception('Could not find a suitable clang-format')
 
 
 def runClangPrettifier(templates_file, output_dir):
@@ -228,57 +310,18 @@ def runClangPrettifier(templates_file, output_dir):
             filepath)[1] in listOfSupportedFileExtensions, outputs))
 
         if len(clangOutputs) > 0:
-            # NOTE: clang-format may differ in time. Currently pigweed comes
-            #       with clang-format 15. CI may have clang-format-10 installed
-            #       on linux.
-            #
-            #       We generally want consistent formatting, so
-            #       at this point attempt to use clang-format 15.
-            clang_formats = ['clang-format-15', 'clang-format']
-            for clang_format in clang_formats:
-                args = [clang_format, '-i']
-                args.extend(clangOutputs)
-                try:
-                    subprocess.check_call(args)
-                    err = None
-                    print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
-                    for outputName in clangOutputs:
-                        print('  - %s' % outputName)
-                    break
-                except Exception as thrown:
-                    err = thrown
-                    # Press on to the next binary name
-            if err is not None:
-                raise err
-    except Exception as err:
-        print('clang-format error:', err)
-
-
-def runJavaPrettifier(templates_file, output_dir):
-    try:
-        jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output']))
-                   for template in jsonData['templates']]
-        javaOutputs = list(
-            filter(lambda filepath: os.path.splitext(filepath)[1] == ".java", outputs))
-
-        if len(javaOutputs) > 0:
-            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
-            google_java_format_version = "1.6"
-            google_java_format_url = 'https://github.com/google/google-java-format/releases/download/google-java-format-' + \
-                google_java_format_version + '/'
-            google_java_format_jar = 'google-java-format-' + \
-                google_java_format_version + '-all-deps.jar'
-            jar_url = google_java_format_url + google_java_format_jar
-
-            home = str(Path.home())
-            path, http_message = urllib.request.urlretrieve(
-                jar_url, home + '/' + google_java_format_jar)
-            args = ['java', '-jar', path, '--replace']
-            args.extend(javaOutputs)
+            # NOTE: clang-format differs output in time. We generally would be
+            #       compatible only with pigweed provided clang-format (which is
+            #       tracking non-released clang).
+            clang_format = getClangFormatBinary()
+            args = [clang_format, '-i']
+            args.extend(clangOutputs)
             subprocess.check_call(args)
-    except Exception as err:
-        print('google-java-format error:', err)
+            print('Formatted using %s (%s)' % (clang_format, subprocess.check_output([clang_format, '--version'])))
+            for outputName in clangOutputs:
+                print('  - %s' % outputName)
+    except subprocess.CalledProcessError as err:
+        print('clang-format error: %s', err)
 
 
 class LockFileSerializer:
@@ -306,7 +349,7 @@ def main():
     checkPythonVersion()
     cmdLineArgs = runArgumentsParser()
 
-    with LockFileSerializer(cmdLineArgs.lock_file) as lock:
+    with LockFileSerializer(cmdLineArgs.lock_file) as _:
         if cmdLineArgs.runBootstrap:
             subprocess.check_call(getFilePath("scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
@@ -329,7 +372,6 @@ def main():
     if cmdLineArgs.prettify_output:
         prettifiers = [
             runClangPrettifier,
-            runJavaPrettifier,
         ]
 
         for prettifier in prettifiers:

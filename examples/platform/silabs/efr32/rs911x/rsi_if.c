@@ -31,6 +31,8 @@
 #include "event_groups.h"
 #include "task.h"
 
+#include "silabs_utils.h"
+
 #include "wfx_host_events.h"
 
 #include "rsi_driver.h"
@@ -48,8 +50,14 @@
 #include "rsi_wlan_config.h"
 
 #include "dhcp_client.h"
+#include "lwip/nd6.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
+
+// TODO convert this file to cpp and use CodeUtils.h
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
 
 /* Rsi driver Task will use as its stack */
 StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
@@ -181,6 +189,7 @@ int32_t wfx_rsi_disconnect()
     return status;
 }
 
+#if SL_ICD_ENABLED
 /******************************************************************
  * @fn   wfx_rsi_power_save()
  * @brief
@@ -190,16 +199,29 @@ int32_t wfx_rsi_disconnect()
  * @return
  *        None
  *********************************************************************/
-void wfx_rsi_power_save()
+int32_t wfx_rsi_power_save()
 {
-    int32_t status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    int32_t status;
+#ifdef RSI_BLE_ENABLE
+    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
+        return status;
+    }
+#endif /* RSI_BLE_ENABLE */
+
+    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     if (status != RSI_SUCCESS)
     {
         SILABS_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
+        return status;
     }
     SILABS_LOG("Powersave Config Success");
+    return status;
 }
+#endif /* SL_ICD_ENABLED */
+
 /******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief
@@ -403,20 +425,17 @@ static void wfx_rsi_save_ap_info() // translation
         /*
          * Scan is done - failed
          */
-#if WIFI_ENABLE_SECURITY_WPA3
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
-#else  /* !WIFI_ENABLE_SECURITY_WPA3 */
+#else  /* !WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
-#endif /* WIFI_ENABLE_SECURITY_WPA3 */
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         SILABS_LOG("%s: warn: failed with status: %02x", __func__, status);
         return;
     }
-    else
-    {
-        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
-        wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
-        memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
-    }
+    wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+    wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
+    memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
 
     switch (rsp.scan_info->security_mode)
     {
@@ -434,9 +453,13 @@ static void wfx_rsi_save_ap_info() // translation
     case SME_WEP:
         wfx_rsi.sec.security = WFX_SEC_WEP;
         break;
-    case SME_WPA3:
     case SME_WPA3_TRANSITION:
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
+    case SME_WPA3:
         wfx_rsi.sec.security = WFX_SEC_WPA3;
+#else
+        wfx_rsi.sec.security = WFX_SEC_WPA2;
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
         break;
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
@@ -475,9 +498,11 @@ static void wfx_rsi_do_join(void)
         case WFX_SEC_WPA2:
             connect_security_mode = RSI_WPA_WPA2_MIXED;
             break;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_WPA3:
-            connect_security_mode = RSI_WPA3;
+            connect_security_mode = RSI_WPA3_TRANSITION;
             break;
+#endif // WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         case WFX_SEC_NONE:
             connect_security_mode = RSI_OPEN;
             break;
@@ -596,13 +621,6 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     hasNotifiedIPV4 = true;
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-#ifndef RSI_BLE_ENABLE
-                    // enabling the power save mode for RS9116 if sleepy device is enabled
-                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
-                    wfx_rsi_power_save();
-#endif /* RSI_BLE_ENABLE */
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
@@ -615,20 +633,14 @@ void wfx_rsi_task(void * arg)
                     hasNotifiedIPV4 = false;
                 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
-                /* Checks if the assigned IPv6 address is preferred by evaluating
+                /*
+                 * Checks if the assigned IPv6 address is preferred by evaluating
                  * the first block of IPv6 address ( block 0)
                  */
                 if ((ip6_addr_ispreferred(netif_ip6_addr_state(sta_netif, 0))) && !hasNotifiedIPV6)
                 {
                     wfx_ipv6_notify(GET_IPV6_SUCCESS);
                     hasNotifiedIPV6 = true;
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-#ifndef RSI_BLE_ENABLE
-                    // enabling the power save mode for RS9116 if sleepy device is enabled
-                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
-                    wfx_rsi_power_save();
-#endif /* RSI_BLE_ENABLE */
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
@@ -684,50 +696,40 @@ void wfx_rsi_task(void * arg)
         {
             if (!(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED))
             {
-                SILABS_LOG("%s: start SSID scan", __func__);
-                int x;
-                wfx_wifi_scan_result_t ap;
-                rsi_scan_info_t * scan;
-                int32_t status;
-                uint8_t bgscan_results[BG_SCAN_RES_SIZE] = { 0 };
-                status = rsi_wlan_bgscan_profile(1, (rsi_rsp_scan_t *) bgscan_results, BG_SCAN_RES_SIZE);
+                rsi_rsp_scan_t scan_rsp = { 0 };
+                int32_t status          = rsi_wlan_bgscan_profile(1, &scan_rsp, sizeof(scan_rsp));
 
-                SILABS_LOG("%s: status: %02x size = %d", __func__, status, BG_SCAN_RES_SIZE);
-                rsi_rsp_scan_t * rsp = (rsi_rsp_scan_t *) bgscan_results;
                 if (status)
                 {
-                    /*
-                     * Scan is done - failed
-                     */
+                    SILABS_LOG("SSID scan failed: %02x ", status);
                 }
                 else
-                    for (x = 0; x < rsp->scan_count[0]; x++)
+                {
+                    rsi_scan_info_t * scan;
+                    wfx_wifi_scan_result_t ap;
+                    for (int x = 0; x < scan_rsp.scan_count[0]; x++)
                     {
-                        scan = &rsp->scan_info[x];
-                        strcpy(&ap.ssid[0], (char *) &scan->ssid[0]);
-                        if (wfx_rsi.scan_ssid)
+                        scan = &scan_rsp.scan_info[x];
+                        // is it a scan all or target scan
+                        if (!wfx_rsi.scan_ssid ||
+                            (wfx_rsi.scan_ssid && strcmp(wfx_rsi.scan_ssid, (char *) scan->ssid) == CMP_SUCCESS))
                         {
-                            SILABS_LOG("Inside scan_ssid");
-                            SILABS_LOG("SCAN SSID: %s , ap scan: %s", wfx_rsi.scan_ssid, ap.ssid);
-                            if (strcmp(wfx_rsi.scan_ssid, ap.ssid) == CMP_SUCCESS)
-                            {
-                                SILABS_LOG("Inside ap details");
-                                ap.security = scan->security_mode;
-                                ap.rssi     = (-1) * scan->rssi_val;
-                                memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
-                                (*wfx_rsi.scan_cb)(&ap);
-                            }
-                        }
-                        else
-                        {
-                            SILABS_LOG("Inside else");
+                            strncpy(ap.ssid, (char *) scan->ssid, MIN(sizeof(ap.ssid), sizeof(scan->ssid)));
                             ap.security = scan->security_mode;
                             ap.rssi     = (-1) * scan->rssi_val;
-                            ap.chan     = scan->rf_channel;
-                            memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
+                            configASSERT(sizeof(ap.bssid) >= BSSID_MAX_STR_LEN);
+                            configASSERT(sizeof(scan->bssid) >= BSSID_MAX_STR_LEN);
+                            memcpy(ap.bssid, scan->bssid, BSSID_MAX_STR_LEN);
                             (*wfx_rsi.scan_cb)(&ap);
+
+                            if (wfx_rsi.scan_ssid)
+                            {
+                                break; // we found the targeted ssid.
+                            }
                         }
                     }
+                }
+
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_SCANSTARTED;
                 /* Terminate with end of scan which is no ap sent back */
                 (*wfx_rsi.scan_cb)((wfx_wifi_scan_result_t *) 0);

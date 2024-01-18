@@ -29,7 +29,6 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/PlatformManager.h>
 #include <platform/android/DeviceInstanceInfoProviderImpl.h>
-#include <platform/android/DiagnosticDataProviderImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 #include <thread>

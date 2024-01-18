@@ -1,0 +1,157 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.3.9. [TC-CC-4.5] Saturation functionality with client as DUT
+
+PICS:
+    - CC.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    endpoint: 1
+    timeout: 500
+    ConfigTransitionTime:
+        type: int16u
+        defaultValue: 3000
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "PreCondition: Set TH OnOff to On"
+      cluster: "On/Off"
+      wait: "On"
+
+    - label: "DUT sends MoveToSaturation command to TH"
+      PICS: CC.C.C03.Tx && CC.C.F00
+      wait: "MoveToSaturation"
+
+    - label: "DUT reads CurrentSaturation attribute from TH periodically"
+      PICS: CC.C.C03.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "Wait for ConfigTransitionTime"
+      PICS: CC.C.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT reads CurrentSaturation attribute from TH periodically"
+      PICS: CC.C.C03.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "DUT sends MoveSaturation command to TH"
+      PICS: CC.C.C04.Tx && CC.C.F00
+      wait: "MoveSaturation"
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      PICS: CC.C.C04.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "Wait for ConfigTransitionTime"
+      PICS: CC.C.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      PICS: CC.C.C04.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "DUT sends StepSaturation command to TH"
+      PICS: CC.C.C05.Tx && CC.C.F00
+      wait: "StepSaturation"
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      PICS: CC.C.C05.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "Wait for ConfigTransitionTime"
+      PICS: CC.C.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      PICS: CC.C.C05.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "DUT sends MoveToHueAndSaturation command to TH"
+      PICS: CC.C.C06.Tx && CC.C.F00
+      wait: "MoveToHueAndSaturation"
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      PICS: CC.C.C06.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "DUT reads CurrentHue attribute from TH periodically"
+      PICS: CC.C.C06.Tx && CC.C.A0000 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentHue"
+
+    - label: "Wait for ConfigTransitionTime"
+      PICS: CC.C.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label: "DUT reads CurrentSaturation attribute from TH several times."
+      PICS: CC.C.C06.Tx && CC.C.A0001 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "DUT reads CurrentHue attribute from TH periodically"
+      PICS: CC.C.C06.Tx && CC.C.A0000 && CC.C.F00
+      wait: "readAttribute"
+      attribute: "CurrentHue"
+
+    - label: "DUT sends StopMoveStep command to TH"
+      PICS: CC.C.C47.Tx && CC.C.F00
+      wait: "StopMoveStep"
+
+    - label: "Wait for ConfigTransitionTime"
+      PICS: CC.C.F00
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "Over TransitionTime, DUT reads CurrentSaturation attribute from TH"
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+      PICS: CC.C.C47.Tx && CC.C.A0001 && CC.C.F00

@@ -33,7 +33,7 @@ namespace chip {
 const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
 
 // The largest supported value for sleepy idle interval and sleepy active interval
-constexpr uint32_t kMaxSleepyInterval = 3600000;
+inline constexpr uint32_t kMaxSleepyInterval = 3600000;
 
 class RendezvousParameters
 {

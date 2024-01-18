@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 43.2.1. [TC-DGSW-2.1] Attributes with server as DUT
+name: 3.2.1. [TC-DGSW-2.1] Attributes [DUT_Sever]
 
 PICS:
     - DGSW.S
@@ -29,15 +29,17 @@ tests:
 
       disabled: true
 
-    - label: "TH reads a list of ThreadMetrics struct attribute from DUT."
+    - label:
+          "Step 2: TH reads a list of ThreadMetrics struct attribute from DUT."
       PICS: DGSW.S.A0000
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool softwarediagnostics read thread-metrics 1 0
 
-          Verify the thread-metrics attribute has entries with ThreadMetrics Struct.
-          Verify in TH(chip-tool) Log
+          Via the TH (chip-tool), verify:
+          -that ThreadMetrics attribute contains entries with ThreadMetrics Struct.
+          -that the entries Id is in the range of uint64 and name is in vendor specific string format.
 
           [1654697032.107109][7037:7042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 1044289564
           [1654697032.107255][7037:7042] CHIP:TOO:   ThreadMetrics: 6 entries
@@ -67,41 +69,38 @@ tests:
           [1654697032.108154][7037:7042] CHIP:TOO:      }
       disabled: true
 
-    - label: "TH reads an attribute value from DUT."
+    - label: "Step 3: TH reads an attribute value from DUT."
       PICS: DGSW.S.A0001
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool softwarediagnostics read current-heap-free 1 0
 
-          Verify the value of CurrentHeapFree is in range uint64
-          Verify in TH(chip-tool) Log
+          Via the TH (chip-tool), verify that CurrentHeapFree attribute contains value is in the range of uint64.
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0001 DataVersion: 3412237516
           [1649662648.863327][8004:8009] CHIP:TOO:   CurrentHeapFree: 590864
       disabled: true
 
-    - label: "TH reads an attribute value from DUT."
+    - label: "Step 4: TH reads an attribute value from DUT."
       PICS: DGSW.S.A0002
       verification: |
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
-          Verify the value of CurrentHeapUsed is in range uint64
-          Verify in TH(chip-tool) Log
+          Via the TH (chip-tool), verify that CurrentHeapUsed attribute contains value is in the range of uint64.
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 3412237516
           [1649662811.289909][8018:8023] CHIP:TOO:   CurrentHeapUsed: 1098368
       disabled: true
 
-    - label: "TH reads an attribute value from DUT."
+    - label: "Step 5: TH reads an attribute value from DUT."
       PICS: DGSW.S.A0003
       verification: |
           ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
 
-          Verify the value of CurrentHeapHighWatermark is in range uint64
-          Verify in TH(chip-tool) Log
+          Via the TH (chip-tool), verify that CurrentHeapHighWatermark attribute contains value is in the range of uint64.
 
           CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 3412237516
           [1649662865.831203][8025:8030] CHIP:TOO:   CurrentHeapHighWatermark: 1099312

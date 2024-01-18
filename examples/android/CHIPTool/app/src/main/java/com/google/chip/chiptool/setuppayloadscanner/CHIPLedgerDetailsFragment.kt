@@ -38,7 +38,8 @@ import com.google.gson.Gson
 class CHIPLedgerDetailsFragment : Fragment() {
   private lateinit var deviceInfo: CHIPDeviceInfo
   private var _binding: ChipLedgerInfoFragmentBinding? = null
-  private val binding get() = _binding!!
+  private val binding
+    get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -53,50 +54,61 @@ class CHIPLedgerDetailsFragment : Fragment() {
     binding.productIdTv.text = "${deviceInfo.productId}"
 
     // Ledger api url
-    val url = Uri.parse(context!!.getString(R.string.dcl_api_root_url))
-      .buildUpon()
-      .appendPath("${deviceInfo.vendorId}")
-      .appendPath("${deviceInfo.productId}")
-      .build().toString()
+    val url =
+      Uri.parse(context!!.getString(R.string.dcl_api_root_url))
+        .buildUpon()
+        .appendPath("${deviceInfo.vendorId}")
+        .appendPath("${deviceInfo.productId}")
+        .build()
+        .toString()
     Log.d(TAG, "Dcl request Url: $url")
 
     // Ledger API call
-    val jsonObjectRequest = JsonObjectRequest(
-      Request.Method.GET, url, null,
-      { response ->
-        Log.d(TAG, "Response from dcl $response")
+    val jsonObjectRequest =
+      JsonObjectRequest(
+        Request.Method.GET,
+        url,
+        null,
+        { response ->
+          Log.d(TAG, "Response from dcl $response")
 
-        // parse redirect Url
-        val responseJson = response.getJSONObject(context!!.getString(R.string.dcl_response_key))
-        val redirectUrl = responseJson.getString(context!!.getString(R.string.dcl_custom_flow_url_key))
-        Log.d(TAG, "Redirect Url from Ledger: $redirectUrl")
-        binding.commissioningFlowUrlTv.text = redirectUrl
+          // parse redirect Url
+          val responseJson = response.getJSONObject(context!!.getString(R.string.dcl_response_key))
+          val redirectUrl =
+            responseJson.getString(context!!.getString(R.string.dcl_custom_flow_url_key))
+          Log.d(TAG, "Redirect Url from Ledger: $redirectUrl")
+          binding.commissioningFlowUrlTv.text = redirectUrl
 
-        // generate redirect payload
-        val gson = Gson()
-        val payloadJson = gson.toJson(deviceInfo)
-        val payloadBase64 = Base64.encodeToString(payloadJson.toByteArray(), Base64.DEFAULT)
-        val redirectUrlWithPayload= Uri.parse(redirectUrl)
-          .buildUpon()
-          .appendQueryParameter("payload", payloadBase64)
-          .appendQueryParameter("returnUrl", context!!.getString(R.string.custom_flow_return_url))
-          .build()
-          .toString()
+          // generate redirect payload
+          val gson = Gson()
+          val payloadJson = gson.toJson(deviceInfo)
+          val payloadBase64 = Base64.encodeToString(payloadJson.toByteArray(), Base64.DEFAULT)
+          val redirectUrlWithPayload =
+            Uri.parse(redirectUrl)
+              .buildUpon()
+              .appendQueryParameter("payload", payloadBase64)
+              .appendQueryParameter(
+                "returnUrl",
+                context!!.getString(R.string.custom_flow_return_url)
+              )
+              .build()
+              .toString()
 
-        Log.d(TAG, "Redirect Url with Payload: $redirectUrlWithPayload")
-        binding.redirectBtn.setOnClickListener {
-          FragmentUtil.getHost(this@CHIPLedgerDetailsFragment, Callback::class.java)
-            ?.handleCustomFlowRedirectClicked(redirectUrlWithPayload)
+          Log.d(TAG, "Redirect Url with Payload: $redirectUrlWithPayload")
+          binding.redirectBtn.setOnClickListener {
+            FragmentUtil.getHost(this@CHIPLedgerDetailsFragment, Callback::class.java)
+              ?.handleCustomFlowRedirectClicked(redirectUrlWithPayload)
+          }
+
+          // enable redirect button
+          binding.redirectBtn.visibility = View.VISIBLE
+        },
+        { error ->
+          Log.e(TAG, "Dcl request failed: $error")
+          binding.commissioningFlowUrlTv.text =
+            context!!.getString(R.string.chip_ledger_info_commissioning_flow_url_not_available)
         }
-
-        // enable redirect button
-        binding.redirectBtn.visibility = View.VISIBLE
-      },
-      { error ->
-        Log.e(TAG, "Dcl request failed: $error")
-        binding.commissioningFlowUrlTv.text = context!!.getString(R.string.chip_ledger_info_commissioning_flow_url_not_available)
-      }
-    )
+      )
     queue.add(jsonObjectRequest)
 
     return binding.root

@@ -22,19 +22,23 @@ import com.matter.controller.commands.common.CredentialsIssuer
 
 private const val MATTER_PORT = 5540
 
-class PairOnNetworkLongCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
-  controller,
-  "onnetwork-long",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.LONG_DISCRIMINATOR
-) {
+class PairOnNetworkLongCommand(
+  val controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-long",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.LONG_DISCRIMINATOR
+  ) {
   override fun runCommand() {
     currentCommissioner()
       .pairDeviceWithAddress(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),
@@ -42,5 +46,7 @@ class PairOnNetworkLongCommand(controller: ChipDeviceController, credsIssue: Cre
       )
     currentCommissioner().setCompletionListener(this)
     waitCompleteMs(getTimeoutMillis())
+
+    println("Commissioner Node ID : ${controller.getControllerNodeId()}")
   }
 }

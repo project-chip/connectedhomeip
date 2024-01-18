@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -22,14 +22,18 @@
 include(FetchContent)
 
 get_filename_component(OPEN_IOT_SDK_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/sdk REALPATH)
-get_filename_component(OPEN_IOT_SDK_STORAGE_SOURCE ${CHIP_ROOT}/third_party/open-iot-sdk/storage REALPATH)
 
 # Open IoT SDK targets passed to CHIP build
 list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS)
 
-# Additional Open IoT SDK build configuration 
-set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
+# Additional Open IoT SDK build configuration
 set(TFM_NS_APP_VERSION "0.0.0" CACHE STRING "TF-M non-secure application version (in the x.x.x format)")
+set(CONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG NO CACHE BOOL "Enable LwIP debug logs")
+
+# Default LwIP options directory (should contain user_lwipopts.h file)
+if (NOT LWIP_PROJECT_OPTS_DIR)  
+    set(LWIP_PROJECT_OPTS_DIR ${OPEN_IOT_SDK_CONFIG}/lwip)
+endif()
 
 # Overwrite versions of Open IoT SDK components
 
@@ -42,6 +46,22 @@ FetchContent_Declare(
     GIT_PROGRESS   ON
 )
 
+# Apply a patch to TF-M to support GCC 12
+FetchContent_Declare(
+    trusted-firmware-m
+    GIT_REPOSITORY  https://git.trustedfirmware.org/TF-M/trusted-firmware-m.git
+    GIT_TAG         d0c0a67f1b412e89d09b0987091c12998c4e4660
+    GIT_SHALLOW     OFF
+    GIT_PROGRESS    ON
+    # Note: This prevents FetchContent_MakeAvailable() from calling
+    # add_subdirectory() on the fetched repository. TF-M needs a
+    # standalone build because it relies on functions defined in its
+    # own toolchain files and contains paths that reference the
+    # top-level project instead of its own project.
+    SOURCE_SUBDIR   NONE
+    PATCH_COMMAND   git reset --hard --quiet && git clean --force -dx --quiet && git apply ${CMAKE_CURRENT_LIST_DIR}/tf-m.patch
+)
+
 # Open IoT SDK configuration
 set(IOTSDK_FETCH_LIST
     mcu-driver-reference-platforms-for-arm
@@ -50,26 +70,23 @@ set(IOTSDK_FETCH_LIST
     mbedtls
     lwip
     cmsis-sockets-api
+    trusted-firmware-m
 )
 
 set(MDH_PLATFORM ARM_AN552_MPS3)
 set(VARIANT "FVP")
 set(FETCHCONTENT_QUIET OFF)
-if(TFM_SUPPORT)
-    list(APPEND IOTSDK_FETCH_LIST trusted-firmware-m)
-    set(TFM_PLATFORM ${OPEN_IOT_SDK_EXAMPLE_COMMON}/tf-m/targets/an552)
-    set(TFM_PSA_FIRMWARE_UPDATE ON)
-    set(MCUBOOT_IMAGE_VERSION_NS ${TFM_NS_APP_VERSION})
-    set(TFM_CMAKE_ARGS "-DCONFIG_TFM_ENABLE_FP=ON;-DTFM_PROFILE=profile_medium")
-    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-        set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=INFO;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_INFO;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_INFO")
-    else()
-        set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=ERROR;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_ERROR;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_ERROR")
-    endif()
-    if(TFM_PROJECT_CONFIG_HEADER_FILE)
-        set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DPROJECT_CONFIG_HEADER_FILE=${TFM_PROJECT_CONFIG_HEADER_FILE}")
-    endif()
-    set(LINKER_SCRIPT ${OPEN_IOT_SDK_CONFIG}/ld/cs300_gcc_tfm.ld)
+set(TFM_PLATFORM ${OPEN_IOT_SDK_EXAMPLE_COMMON}/tf-m/targets/an552)
+set(TFM_PSA_FIRMWARE_UPDATE ON)
+set(MCUBOOT_IMAGE_VERSION_NS ${TFM_NS_APP_VERSION})
+set(TFM_CMAKE_ARGS "-DCONFIG_TFM_ENABLE_FP=ON;-DTFM_PROFILE=profile_medium;-DTFM_EXCEPTION_INFO_DUMP=ON;-DCONFIG_TFM_HALT_ON_CORE_PANIC=ON;-DTFM_ISOLATION_LEVEL=1;-DTFM_MBEDCRYPTO_PLATFORM_EXTRA_CONFIG_PATH=${OPEN_IOT_SDK_CONFIG}/mbedtls/mbedtls_config_psa.h;-DMBEDCRYPTO_BUILD_TYPE=${CMAKE_BUILD_TYPE};-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=INFO;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_INFO")
+else()
+    set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DMCUBOOT_LOG_LEVEL=ERROR;-DTFM_SPM_LOG_LEVEL=TFM_SPM_LOG_LEVEL_DEBUG;-DTFM_PARTITION_LOG_LEVEL=TFM_PARTITION_LOG_LEVEL_ERROR")
+endif()
+if(TFM_PROJECT_CONFIG_HEADER_FILE)
+    set(TFM_CMAKE_ARGS "${TFM_CMAKE_ARGS};-DPROJECT_CONFIG_HEADER_FILE=${TFM_PROJECT_CONFIG_HEADER_FILE}")
 endif()
 
 # Add Open IoT SDK source
@@ -95,36 +112,30 @@ endif()
 # Add RTOS configuration headers
 # Link cmsis-rtos-api against a concrete implementation
 if(TARGET cmsis-rtos-api)
-    target_include_directories(cmsis-core 
-        INTERFACE 
+    target_include_directories(cmsis-core
+        INTERFACE
             cmsis-config
     )
-    
+
     target_compile_definitions(cmsis-rtos-api
         PUBLIC
-            DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
+            DOMAIN_NS=1
     )
 
     if(TARGET freertos-kernel)
-        target_include_directories(freertos-kernel 
-            PUBLIC 
+        target_include_directories(freertos-kernel
+            PUBLIC
                 freertos-config
         )
 
-        target_link_libraries(freertos-kernel 
-            PUBLIC 
+        target_link_libraries(freertos-kernel
+            PUBLIC
                 cmsis-core
         )
 
         target_link_libraries(cmsis-rtos-api
             PUBLIC
                 freertos-cmsis-rtos
-                freertos-kernel-heap-3
-        )
-
-        target_compile_definitions(cmsis-rtos-api
-            INTERFACE
-                CONFIG_RUN_FREERTOS_SECURE_ONLY=$<IF:$<BOOL:${TFM_SUPPORT}>,0,1>
         )
     elseif(TARGET cmsis-rtx)
         target_link_libraries(cmsis-rtos-api
@@ -146,12 +157,17 @@ if(TARGET lwip-cmsis-port)
     target_compile_definitions(lwipopts
         INTERFACE
             DEBUG_PRINT=printf
+            $<$<BOOL:${CONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG}>:LWIP_DEBUG>
+            $<$<BOOL:${CONFIG_CHIP_LIB_TESTS}>:CHIP_LIB_TESTS>
     )
 
-    if(TARGET lwip-cmsis-port)
-        # Link the emac factory to LwIP port
-        target_link_libraries(lwip-cmsis-port PUBLIC iotsdk-emac-factory)
-    endif()
+    target_include_directories(lwipopts
+        INTERFACE
+            ${LWIP_PROJECT_OPTS_DIR}
+    )
+
+    # Link the emac factory to LwIP port
+    target_link_libraries(lwip-cmsis-port PUBLIC iotsdk-emac-factory)
 endif()
 
 # MDH configuration
@@ -165,8 +181,17 @@ endif()
 if(TARGET mcu-driver-hal)
     target_compile_definitions(mcu-driver-hal
         INTERFACE
-            DOMAIN_NS=$<IF:$<BOOL:${TFM_SUPPORT}>,1,0>
+            DOMAIN_NS=1
     )
+
+    # Fixing the optimization issue for mcu-driver-hal target in the release build.
+    # The default -Os optimization causes performance issues for the application.
+    # We need to replace it with -O2 which is suitable for performance.
+    # This fix can be removed in the future when the issue will be fixed in SDK directly.
+    if ("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
+        target_compile_options(mcu-driver-hal INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-O2>)
+        target_compile_options(mcu-driver-hal INTERFACE $<$<COMPILE_LANGUAGE:C>:-O2>)
+    endif()
 endif()
 
 # Mbedtls config
@@ -215,14 +240,6 @@ if("cmsis-freertos" IN_LIST IOTSDK_FETCH_LIST)
     )
 endif()
 
-if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
-    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-        mbedtls
-        mbedtls-config
-        mbedtls-threading-cmsis-rtos 
-    )
-endif()
-
 if("lwip" IN_LIST IOTSDK_FETCH_LIST)
     list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
         lwipcore
@@ -247,83 +264,105 @@ if("trusted-firmware-m" IN_LIST IOTSDK_FETCH_LIST)
     )
 endif()
 
-# Additional Open IoT SDK port components
-
-# Add Open IoT SDK storage source
-add_subdirectory(${OPEN_IOT_SDK_STORAGE_SOURCE} ./sdk_storage_build)
-list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-    iotsdk-blockdevice
-    iotsdk-tdbstore
-)
-
-# Add custom storage library
-add_subdirectory(${OPEN_IOT_SDK_CONFIG}/storage storage_build)
-list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
-    openiotsdk-storage
-)
+# Note: Mbed TLS must appear after TF-M otherwise psa from mbed TLS is used
+if("mbedtls" IN_LIST IOTSDK_FETCH_LIST)
+    list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS
+        mbedtls
+        mbedtls-config
+        mbedtls-threading-cmsis-rtos
+    )
+endif()
 
 function(sdk_post_build target)
-    string(REPLACE "_ns" "" APP_NAME ${APP_TARGET})
-if(TFM_SUPPORT)
+    string(REPLACE "_ns" "" APP_NAME ${target})
     include(ConvertElfToBin)
     include(SignTfmImage)
-    target_elf_to_bin(${APP_TARGET})
-    iotsdk_tf_m_sign_image(${APP_TARGET})
-    iotsdk_tf_m_merge_images(${APP_TARGET} 0x10000000 0x38000000 0x28060000)
     ExternalProject_Get_Property(trusted-firmware-m-build BINARY_DIR)
+    target_elf_to_bin(${target})
+    add_custom_command(
+        TARGET
+            ${target}
+        POST_BUILD
+        DEPENDS
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+        COMMAND
+            # Sign the non-secure (application) image for TF-M bootloader (BL2)"
+            python3 ${BINARY_DIR}/install/image_signing/scripts/wrapper/wrapper.py
+                --layout ${BINARY_DIR}/install/image_signing/layout_files/signing_layout_ns.o
+                -v ${MCUBOOT_IMAGE_VERSION_NS}
+                -k ${BINARY_DIR}/install/image_signing/keys/root-RSA-3072_1.pem
+                --public-key-format full
+                --align 1 --pad --pad-header -H 0x400 -s auto -d "(0, 0.0.0+0)"
+                $<TARGET_FILE_DIR:${target}>/${target}.bin
+                --overwrite-only
+                --measured-boot-record
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.bin
+        VERBATIM
+    )
+    iotsdk_tf_m_merge_images(${target} 0x10000000 0x38000000 0x28060000)
+if(CONFIG_CHIP_OPEN_IOT_SDK_OTA_ENABLE)
+    add_custom_command(
+        TARGET
+            ${target}
+        POST_BUILD
+        DEPENDS
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+        COMMAND
+            # Sign the update image
+            python3 ${BINARY_DIR}/install/image_signing/scripts/wrapper/wrapper.py
+                --layout ${BINARY_DIR}/install/image_signing/layout_files/signing_layout_ns.o
+                -v ${MCUBOOT_IMAGE_VERSION_NS}
+                -k ${BINARY_DIR}/install/image_signing/keys/root-RSA-3072_1.pem
+                --public-key-format full
+                --align 1 --pad-header -H 0x400 -s auto -d "(0, 0.0.0+0)"
+                $<TARGET_FILE_DIR:${target}>/${target}.bin
+                --overwrite-only
+                --measured-boot-record
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.ota
+        COMMAND
+            # Create OTA udpate file
+            ${CHIP_ROOT}/src/app/ota_image_tool.py
+                create
+                -v 0xfff1 -p 0x8001
+                -vn ${CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION}
+                -vs "${CONFIG_CHIP_OPEN_IOT_SDK_SOFTWARE_VERSION_STRING}"
+                -da sha256
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.ota
+                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.ota
+        # Cleanup
+        COMMAND rm
+        ARGS -Rf
+                $<TARGET_FILE_DIR:${target}>/${target}_signed.ota
+        VERBATIM
+    )
+endif()
     # Cleanup
     add_custom_command(
         TARGET
-            ${APP_TARGET}
+            ${target}
         POST_BUILD
         DEPENDS
-            $<TARGET_FILE_DIR:${APP_TARGET}>/tfm_s_signed.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_signed.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.hex
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+            $<TARGET_FILE_DIR:${target}>/${target}_signed.bin
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.hex
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
         COMMAND
-            # Copy the TF-M secure elf image
+            # Copy the bootloader and TF-M secure image for debugging purposes
             ${CMAKE_COMMAND} -E copy
+                ${BINARY_DIR}/install/outputs/bl2.elf
                 ${BINARY_DIR}/install/outputs/tfm_s.elf
-                $<TARGET_FILE_DIR:${APP_TARGET}>/
+                $<TARGET_FILE_DIR:${target}>/
         COMMAND
             # Rename output file
             ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.elf
+                $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
+                $<TARGET_FILE_DIR:${target}>/${APP_NAME}.elf
         COMMAND rm
         ARGS -Rf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/tfm_s_signed.bin 
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.bin
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_signed.bin 
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.hex
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}_merged.elf
+            $<TARGET_FILE_DIR:${target}>/${target}.bin
+            $<TARGET_FILE_DIR:${target}>/${target}_signed.bin 
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.hex
+            $<TARGET_FILE_DIR:${target}>/${target}_merged.elf
         VERBATIM
     )
-else()
-    add_custom_command(
-        TARGET
-            ${APP_TARGET}
-        POST_BUILD
-        DEPENDS
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.elf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map
-        COMMAND
-            # Rename output elf file
-            ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.elf
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.elf
-        COMMAND
-            # Rename output map file
-            ${CMAKE_COMMAND} -E copy
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map
-                $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_NAME}.map
-        COMMAND rm
-        ARGS -Rf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.elf
-            $<TARGET_FILE_DIR:${APP_TARGET}>/${APP_TARGET}.map
-        VERBATIM
-    )
-endif() #TFM_SUPPORT
 endfunction()

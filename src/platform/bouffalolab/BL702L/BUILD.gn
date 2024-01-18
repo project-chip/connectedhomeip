@@ -1,0 +1,95 @@
+# Copyright (c) 2022 Project CHIP Authors
+# All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+import("${chip_root}/src/platform/bouffalolab/common/args.gni")
+
+assert(chip_device_platform == "bl702l")
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+}
+
+static_library("BL702L") {
+  sources = [
+    "DiagnosticDataProviderImpl.cpp",
+    "PlatformManagerImpl.cpp",
+  ]
+
+  sources += [
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "../common/BLConfig.cpp",
+    "../common/ConfigurationManagerImpl.cpp",
+    "../common/ConnectivityManagerImpl.cpp",
+    "../common/DiagnosticDataProviderImpl.cpp",
+    "../common/KeyValueStoreManagerImpl.cpp",
+    "../common/Logging.cpp",
+    "../common/PlatformManagerImpl.cpp",
+  ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_ble) {
+    sources += [
+      "../common/BLEManagerImpl.cpp",
+      "../common/BLEManagerImpl.h",
+    ]
+  }
+
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  defines =
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  if (chip_enable_factory_data || chip_enable_factory_data_test) {
+    sources += [
+      "../common/FactoryDataProvider.cpp",
+      "../common/FactoryDataProvider.h",
+    ]
+  }
+
+  if (chip_enable_openthread) {
+    # needed for MTD/FTD
+
+    import("//build_overrides/bouffalolab_iot_sdk.gni")
+    import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
+    deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
+
+    sources += [
+      "../../OpenThread/OpenThreadUtils.cpp",
+      "ThreadStackManagerImpl.cpp",
+    ]
+
+    if (chip_mdns == "platform") {
+      sources += [
+        "../../OpenThread/DnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.cpp",
+        "../../OpenThread/OpenThreadDnssdImpl.h",
+      ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+  }
+
+  deps += [ "${chip_root}/src/credentials:credentials_header" ]
+  public_deps = [ "${chip_root}/src/platform:platform_base" ]
+}

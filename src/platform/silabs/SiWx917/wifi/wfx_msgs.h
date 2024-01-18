@@ -17,6 +17,8 @@
 
 #ifndef _WFX_MSGS_H_
 #define _WFX_MSGS_H_
+
+#include <stdint.h>
 /*
  * Taken from sl_wfx firmware - so I can re-use.
  * I need to do a better job than to use this stuff

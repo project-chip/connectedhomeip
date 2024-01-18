@@ -37,7 +37,7 @@
 #include <string.h>
 
 #include <ble/BleError.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -118,14 +118,14 @@ int TestBleErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "Ble-Error-Strings",
+        "Test BLE range error strings conversions",
         &sTests[0],
         nullptr,
         nullptr
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);

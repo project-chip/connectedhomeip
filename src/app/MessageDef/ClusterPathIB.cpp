@@ -53,7 +53,7 @@ CHIP_ERROR ClusterPathIB::Parser::PrettyPrint() const
             {
                 NodeId node;
                 reader.Get(node);
-                PRETTY_PRINT("\tNode = 0x%" PRIx64 ",", node);
+                PRETTY_PRINT("\tNode = 0x" ChipLogFormatX64 ",", ChipLogValueX64(node));
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -142,10 +142,10 @@ ClusterPathIB::Builder & ClusterPathIB::Builder::Cluster(const ClusterId aCluste
     return *this;
 }
 
-ClusterPathIB::Builder & ClusterPathIB::Builder::EndOfClusterPathIB()
+CHIP_ERROR ClusterPathIB::Builder::EndOfClusterPathIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

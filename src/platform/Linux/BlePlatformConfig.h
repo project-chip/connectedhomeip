@@ -27,13 +27,15 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-struct BluezConnection;
+class BluezConnection;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
 
 // ==================== Platform Adaptations ====================
+#define BLE_CONNECTION_OBJECT chip::DeviceLayer::Internal::BluezConnection *
 #define BLE_CONNECTION_UNINITIALIZED nullptr
+
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */

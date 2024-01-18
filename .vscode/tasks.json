@@ -110,19 +110,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Build nRF Connect Pigweed Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/pigweed-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
             "label": "Build i.MX Linux examples",
             "type": "shell",
             "command": "./scripts/examples/imxlinux_example.sh ${input:imxExampleTarget} out/aarch64",
@@ -244,12 +231,27 @@
             }
         },
         {
+            "label": "Setup Open IoT SDK network",
+            "type": "shell",
+            "command": "sudo scripts/setup/openiotsdk/network_setup.sh -n${input:openiotsdkNetworkSetupName} ${input:openiotsdkNetworkSetupCmd}",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
             "label": "Build Open IoT SDK example",
             "type": "shell",
             "command": "scripts/examples/openiotsdk_example.sh",
             "args": [
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
+                "-b${input:openiotsdkCryptoBackend}",
                 "${input:openiotsdkExample}"
             ],
             "group": "build",
@@ -266,7 +268,13 @@
             "label": "Build Open IoT SDK unit-tests",
             "type": "shell",
             "command": "scripts/examples/openiotsdk_example.sh",
-            "args": ["-Cbuild", "-d${input:openiotsdkDebugMode}", "unit-tests"],
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
+                "-b${input:openiotsdkCryptoBackend}",
+                "unit-tests"
+            ],
             "group": "build",
             "problemMatcher": {
                 "pattern": {
@@ -324,6 +332,21 @@
                 "-n${input:openiotsdkNetworkInterface}",
                 "${input:openiotsdkExample}"
             ],
+            "group": "test",
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test Open IoT SDK unit-tests",
+            "type": "shell",
+            "command": "scripts/examples/openiotsdk_example.sh",
+            "args": ["-Ctest", "unit-tests", "${input:openiotsdkUnitTest}"],
             "group": "test",
             "problemMatcher": {
                 "pattern": {
@@ -434,6 +457,19 @@
         },
         {
             "type": "pickString",
+            "id": "openiotsdkNetworkSetupCmd",
+            "description": "Which command do you wish to use?",
+            "options": ["up", "down", "restart"],
+            "default": "up"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkNetworkSetupName",
+            "description": "Type the network namespace name that you want to use.",
+            "default": "ARM"
+        },
+        {
+            "type": "pickString",
             "id": "openiotsdkDebugMode",
             "description": "Do you want to use debug mode?",
             "options": ["false", "true"],
@@ -441,44 +477,35 @@
         },
         {
             "type": "pickString",
-            "id": "openiotsdkExample",
-            "description": "What Open IoT SDK example application do you want to use?",
-            "options": ["shell", "lock-app"],
-            "default": "shell"
+            "id": "openiotsdkLwipDebug",
+            "description": "Do you want to use LwIP debug logs?",
+            "options": ["false", "true"],
+            "default": "false"
         },
         {
             "type": "pickString",
+            "id": "openiotsdkCryptoBackend",
+            "description": "Which Crypto algorithm do you wish to use?",
+            "options": ["mbedtls", "psa"],
+            "default": "mbedtls"
+        },
+        {
+            "type": "command",
+            "id": "openiotsdkExample",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat examples/platform/openiotsdk/supported_examples.txt",
+                "description": "What Open IoT SDK example application do you want to use?"
+            }
+        },
+        {
+            "type": "command",
             "id": "openiotsdkUnitTest",
-            "description": "What unit test do you want to use?",
-            "options": [
-                "all",
-                "accesstest",
-                "AppTests",
-                "ASN1Tests",
-                "BDXTests",
-                "ChipCryptoTests",
-                "ControllerTests",
-                "CoreTests",
-                "CredentialsTest",
-                "DataModelTests",
-                "InetLayerTests",
-                "MdnsTests",
-                "MessagingLayerTests",
-                "MinimalMdnsCoreTests",
-                "MinimalMdnsRecordsTests",
-                "MinimalMdnsRespondersTests",
-                "PlatformTests",
-                "RawTransportTests",
-                "RetransmitTests",
-                "SecureChannelTests",
-                "SetupPayloadTests",
-                "SupportTests",
-                "SystemLayerTests",
-                "TestShell",
-                "TransportLayerTests",
-                "UserDirectedCommissioningTests"
-            ],
-            "default": "all"
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "cat src/test_driver/openiotsdk/unit-tests/test_components.txt",
+                "description": "What Open IoT SDK unit test application do you want to use?"
+            }
         },
         {
             "type": "promptString",
@@ -578,6 +605,7 @@
                 "efr32-brd4186a-window-covering",
                 "efr32-brd4187a-window-covering",
                 "efr32-brd4304a-window-covering",
+                "efr32-brd4338a-light-wifi-917_soc-skip_rps_generation",
                 "esp32-c3devkit-all-clusters",
                 "esp32-devkitc-all-clusters",
                 "esp32-devkitc-all-clusters-ipv6only",
@@ -627,15 +655,16 @@
                 "nrf-nrf52840dk-pump",
                 "nrf-nrf52840dk-pump-controller",
                 "nrf-nrf52840dk-shell",
-                "nrf-nrf5340-light",
-                "nrf-nrf5340-light-rpc",
-                "nrf-nrf5340-lock",
-                "nrf-nrf5340-pump",
-                "nrf-nrf5340-pump-controller",
-                "nrf-nrf5340-shell",
+                "nrf-nrf5340dk-light",
+                "nrf-nrf5340dk-light-rpc",
+                "nrf-nrf5340dk-lock",
+                "nrf-nrf5340dk-pump",
+                "nrf-nrf5340dk-pump-controller",
+                "nrf-nrf5340dk-shell",
                 "openiotsdk-lock",
                 "openiotsdk-shell",
                 "qpg-qpg6100-lock",
+                "telink-tlsr9518adk80d-air-quality-sensor",
                 "telink-tlsr9518adk80d-all-clusters",
                 "telink-tlsr9518adk80d-all-clusters-minimal",
                 "telink-tlsr9518adk80d-bridge",
@@ -646,6 +675,9 @@
                 "telink-tlsr9518adk80d-ota-requestor",
                 "telink-tlsr9518adk80d-pump-app",
                 "telink-tlsr9518adk80d-pump-controller-app",
+                "telink-tlsr9518adk80d-resource-monitoring-app",
+                "telink-tlsr9518adk80d-shell",
+                "telink-tlsr9518adk80d-smoke-co-alarm-app",
                 "telink-tlsr9518adk80d-temperature-measurement",
                 "telink-tlsr9518adk80d-thermostat",
                 "telink-tlsr9518adk80d-window-covering",

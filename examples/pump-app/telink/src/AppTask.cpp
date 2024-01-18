@@ -42,19 +42,12 @@ CHIP_ERROR AppTask::Init(void)
     InitCommonParts();
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    sPumpStateLED.Init(PUMP_STATE_LED);
+    sPumpStateLED.Init(GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios));
     sPumpStateLED.Set(!PumpMgr().IsStopped());
 #endif
 
     PumpMgr().Init();
     PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
-    CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("Telink Pump");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
 
     return CHIP_NO_ERROR;
 }

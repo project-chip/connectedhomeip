@@ -1,0 +1,5 @@
+west>=0.12.0
+intelhex
+cbor
+cbor2
+jsonschema

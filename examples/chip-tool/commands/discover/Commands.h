@@ -54,6 +54,7 @@ public:
         ChipLogProgress(chipTool, "   MRP retry interval (active): %" PRIu32 "ms",
                         result.mrpRemoteConfig.mActiveRetransTimeout.count());
         ChipLogProgress(chipTool, "   Supports TCP: %s", result.supportsTcp ? "yes" : "no");
+        ChipLogProgress(chipTool, "   ICD is operating as: %s", result.isICDOperatingAsLIT ? "LIT" : "SIT");
         SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
@@ -85,5 +86,5 @@ void registerCommandsDiscover(Commands & commands, CredentialIssuerCommands * cr
         make_unique<DiscoverCommissionersCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for device discovery.");
 }

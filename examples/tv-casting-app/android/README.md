@@ -20,10 +20,17 @@ the TV.
 
 ## Requirements for building
 
-You need Android SDK 21 & NDK 23.2.8568313 downloaded to your machine. Set the
-`$ANDROID_HOME` environment variable to where the SDK is downloaded and the
-`$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
-downloaded.
+Refer to
+[this file](../../../docs/guides/android_building.md#requirements-for-building)
+to download the recommended version for the Android SDK and NDK for your
+machine. Set the `$ANDROID_HOME` environment variable to where the SDK is
+downloaded and the `$ANDROID_NDK_HOME` environment variable to point to where
+the NDK package is downloaded.
+
+```
+export ANDROID_HOME=~/Library/Android/sdk
+export ANDROID_NDK_HOME=~/Library/Android/sdk/ndk/{NDK_VERSION_NUMBER}
+```
 
 ### ABIs and TARGET_CPU
 

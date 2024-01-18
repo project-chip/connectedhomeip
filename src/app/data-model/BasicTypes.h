@@ -57,7 +57,19 @@ struct IsBasicType<ByteSpan>
 };
 
 template <>
+struct IsBasicType<MutableByteSpan>
+{
+    static constexpr bool value = true;
+};
+
+template <>
 struct IsBasicType<CharSpan>
+{
+    static constexpr bool value = true;
+};
+
+template <>
+struct IsBasicType<MutableCharSpan>
 {
     static constexpr bool value = true;
 };

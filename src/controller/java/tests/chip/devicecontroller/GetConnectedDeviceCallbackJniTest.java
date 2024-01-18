@@ -48,10 +48,10 @@ public final class GetConnectedDeviceCallbackJniTest {
   public void connectionFailure() {
     var callback = new FakeGetConnectedDeviceCallback();
     var jniCallback = new GetConnectedDeviceCallbackJni(callback);
-    callbackTestUtil.onDeviceConnectionFailure(jniCallback, 100);
+    callbackTestUtil.onDeviceConnectionFailure(jniCallback, 100L);
 
     assertThat(callback.error).isInstanceOf(ChipDeviceControllerException.class);
-    assertThat(((ChipDeviceControllerException) callback.error).errorCode).isEqualTo(100);
+    assertThat(((ChipDeviceControllerException) callback.error).errorCode).isEqualTo(100L);
   }
 
   class FakeGetConnectedDeviceCallback implements GetConnectedDeviceCallback {

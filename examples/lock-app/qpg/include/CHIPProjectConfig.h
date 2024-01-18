@@ -42,7 +42,7 @@
  * A uint32_t identifying the software version running on the device.
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0002
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0003
 #endif
 
 /**
@@ -53,7 +53,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.1"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -115,6 +115,20 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1
 #endif
 
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_SSED
+ *
+ * @brief Defines if a matter device is acting as a Synchronized Sleepy End Device(SSED)
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_SSED
+#define CHIP_DEVICE_CONFIG_ENABLE_SSED 0
+#endif
+
+/**
+ * @def CHIP_DEVICE_CONFIG_THREAD_FTD
+ *
+ * @brief Defines if a matter device is acting as Full Thread Device (FTD)
+ */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 #endif

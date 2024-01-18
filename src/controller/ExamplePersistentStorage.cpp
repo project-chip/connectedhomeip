@@ -32,44 +32,57 @@ using namespace ::chip::Controller;
 using namespace ::chip::IniEscaping;
 using namespace ::chip::Logging;
 
-constexpr const char kDefaultSectionName[]  = "Default";
-constexpr const char kPortKey[]             = "ListenPort";
-constexpr const char kLoggingKey[]          = "LoggingLevel";
-constexpr const char kLocalNodeIdKey[]      = "LocalNodeId";
-constexpr const char kCommissionerCATsKey[] = "CommissionerCATs";
-constexpr LogCategory kDefaultLoggingLevel  = kLogCategory_Automation;
+constexpr char kDefaultSectionName[]       = "Default";
+constexpr char kPortKey[]                  = "ListenPort";
+constexpr char kLoggingKey[]               = "LoggingLevel";
+constexpr char kLocalNodeIdKey[]           = "LocalNodeId";
+constexpr char kCommissionerCATsKey[]      = "CommissionerCATs";
+constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Automation;
 
-std::string GetFilename(const char * name)
+const char * GetUsedDirectory(const char * directory)
 {
-    const char * tmpdir = getenv("TMPDIR");
+    const char * dir = directory;
 
-    if (tmpdir == nullptr)
+    if (dir == nullptr)
     {
-        tmpdir = "/tmp";
+        dir = getenv("TMPDIR");
     }
+
+    if (dir == nullptr)
+    {
+        dir = "/tmp";
+    }
+
+    return dir;
+}
+
+std::string GetFilename(const char * directory, const char * name)
+{
+    const char * dir = GetUsedDirectory(directory);
 
     if (name == nullptr)
     {
-        return std::string(tmpdir) + "/chip_tool_config.ini";
+        return std::string(dir) + "/chip_tool_config.ini";
     }
 
-    return std::string(tmpdir) + "/chip_tool_config." + std::string(name) + ".ini";
+    return std::string(dir) + "/chip_tool_config." + std::string(name) + ".ini";
 }
 
-CHIP_ERROR PersistentStorage::Init(const char * name)
+CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::ifstream ifs;
-    ifs.open(GetFilename(name), std::ifstream::in);
+    ifs.open(GetFilename(directory, name), std::ifstream::in);
     if (!ifs.good())
     {
-        CommitConfig(name);
-        ifs.open(GetFilename(name), std::ifstream::in);
+        CommitConfig(directory, name);
+        ifs.open(GetFilename(directory, name), std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
 
-    mName = name;
+    mName      = name;
+    mDirectory = directory;
     mConfig.parse(ifs);
     ifs.close();
 
@@ -125,7 +138,7 @@ CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * val
     }
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig(mName);
+    return CommitConfig(mDirectory, mName);
 }
 
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
@@ -138,7 +151,7 @@ CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
     section.erase(escapedKey);
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig(mName);
+    return CommitConfig(mDirectory, mName);
 }
 
 bool PersistentStorage::SyncDoesKeyExist(const char * key)
@@ -173,15 +186,20 @@ CHIP_ERROR PersistentStorage::SyncClearAll()
     auto section = mConfig.sections[kDefaultSectionName];
     section.clear();
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig(mName);
+    return CommitConfig(mDirectory, mName);
 }
 
-CHIP_ERROR PersistentStorage::CommitConfig(const char * name)
+const char * PersistentStorage::GetDirectory() const
+{
+    return GetUsedDirectory(mDirectory);
+}
+
+CHIP_ERROR PersistentStorage::CommitConfig(const char * directory, const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::ofstream ofs;
-    std::string tmpPath = GetFilename(name) + ".tmp";
+    std::string tmpPath = GetFilename(directory, name) + ".tmp";
     ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
@@ -189,7 +207,7 @@ CHIP_ERROR PersistentStorage::CommitConfig(const char * name)
     ofs.close();
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
-    VerifyOrExit(rename(tmpPath.c_str(), GetFilename(name).c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
+    VerifyOrExit(rename(tmpPath.c_str(), GetFilename(directory, name).c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
 
 exit:
     return err;

@@ -25,20 +25,21 @@ import chip.devicecontroller.model.ChipAttributePath
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvWriter
 
 class PairOnNetworkLongImWriteCommand(
-  controller: ChipDeviceController, credsIssue: CredentialsIssuer?
-) : PairingCommand(
-  controller,
-  "onnetwork-long-im-write",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.LONG_DISCRIMINATOR
-) {
+  controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-long-im-write",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.LONG_DISCRIMINATOR
+  ) {
   private var devicePointer: Long = 0
 
   private inner class InternalWriteAttributesCallback : WriteAttributesCallback {
@@ -51,7 +52,7 @@ class PairOnNetworkLongImWriteCommand(
     }
 
     override fun onResponse(attributePath: ChipAttributePath?) {
-      logger.log(Level.INFO, "Write receve OnResponse on ")
+      logger.log(Level.INFO, "Write receive OnResponse on ")
       if (attributePath != null) {
         logger.log(Level.INFO, attributePath.toString())
       }
@@ -71,21 +72,32 @@ class PairOnNetworkLongImWriteCommand(
   }
 
   override fun runCommand() {
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, true)
-    val attributeList = listOf(
-      AttributeWriteRequest.newInstance(
-        /* endpointId= */ 0,
-        CLUSTER_ID_BASIC,
-        ATTR_ID_LOCAL_CONFIG_DISABLED,
-        tlvWriter.getEncoded(),
+    val tlvWriter1 = TlvWriter()
+    tlvWriter1.put(AnonymousTag, true)
+    val attributeList1 =
+      listOf(
+        AttributeWriteRequest.newInstance(
+          /* endpointId= */ 0,
+          CLUSTER_ID_BASIC,
+          ATTR_ID_LOCAL_CONFIG_DISABLED,
+          tlvWriter1.getEncoded()
+        )
       )
-    )
+
+    val attributeList2 =
+      listOf(
+        AttributeWriteRequest.newInstance(
+          /* endpointId= */ 0,
+          CLUSTER_ID_BASIC,
+          ATTR_ID_LOCAL_CONFIG_DISABLED,
+          """{"40:BOOL":false}"""
+        )
+      )
 
     currentCommissioner()
       .pairDeviceWithAddress(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),
@@ -97,14 +109,16 @@ class PairOnNetworkLongImWriteCommand(
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
     currentCommissioner()
-      .write(InternalWriteAttributesCallback(), devicePointer, attributeList, 0, 0)
+      .write(InternalWriteAttributesCallback(), devicePointer, attributeList1, 0, 0)
+    waitCompleteMs(getTimeoutMillis())
+    clear()
+    currentCommissioner()
+      .write(InternalWriteAttributesCallback(), devicePointer, attributeList2, 0, 0)
     waitCompleteMs(getTimeoutMillis())
   }
 
   companion object {
-    private val logger = Logger.getLogger(
-      PairOnNetworkLongImWriteCommand::class.java.name
-    )
+    private val logger = Logger.getLogger(PairOnNetworkLongImWriteCommand::class.java.name)
 
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_BASIC = 0x0028L

@@ -28,7 +28,10 @@ inline EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
     return static_cast<EmberAfStatus>(code);
 }
 
-Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code);
+inline Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
+{
+    return static_cast<Protocols::InteractionModel::Status>(code);
+}
 
 } // namespace app
 } // namespace chip

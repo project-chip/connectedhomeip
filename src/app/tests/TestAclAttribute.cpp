@@ -19,19 +19,22 @@
 #include "lib/support/CHIPMem.h"
 #include <access/examples/PermissiveAccessControlDelegate.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/EventDataIB.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/basic-types.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -79,24 +82,14 @@ public:
 class TestAccessContext : public chip::Test::AppContext
 {
 public:
-    static int Initialize(void * context)
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override
     {
-        if (AppContext::Initialize(context) != SUCCESS)
-            return FAILURE;
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
         Access::GetAccessControl().Finish();
         Access::GetAccessControl().Init(GetTestAccessControlDelegate(), gDeviceTypeResolver);
-        return SUCCESS;
+        return CHIP_NO_ERROR;
     }
-
-    static int Finalize(void * context)
-    {
-        if (AppContext::Finalize(context) != SUCCESS)
-            return FAILURE;
-        return SUCCESS;
-    }
-
-private:
-    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 };
 
 class MockInteractionModelApp : public chip::app::ReadClient::Callback
@@ -140,6 +133,16 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
     return aPath.mClusterId != kTestDeniedClusterId1;
 }
 
+Protocols::InteractionModel::Status CheckEventSupportStatus(const ConcreteEventPath & aPath)
+{
+    if (aPath.mClusterId == kTestDeniedClusterId1)
+    {
+        return Protocols::InteractionModel::Status::UnsupportedCluster;
+    }
+
+    return Protocols::InteractionModel::Status::Success;
+}
+
 class TestAclAttribute
 {
 public:
@@ -158,7 +161,7 @@ void TestAclAttribute::TestACLDeniedAttribute(nlTestSuite * apSuite, void * apCo
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     {
@@ -251,27 +254,19 @@ void TestAclAttribute::TestACLDeniedAttribute(nlTestSuite * apSuite, void * apCo
 
 namespace {
 
-/**
- *   Test Suite. It lists all the test functions.
- */
-
-// clang-format off
-const nlTest sTests[] =
-{
+const nlTest sTests[] = {
     NL_TEST_DEF("TestACLDeniedAttribute", chip::app::TestAclAttribute::TestACLDeniedAttribute),
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL(),
 };
-// clang-format on
 
-// clang-format off
-nlTestSuite sSuite =
-{
+nlTestSuite sSuite = {
     "TestAclAttribute",
     &sTests[0],
-    TestAccessContext::Initialize,
-    TestAccessContext::Finalize
+    TestAccessContext::nlTestSetUpTestSuite,
+    TestAccessContext::nlTestTearDownTestSuite,
+    TestAccessContext::nlTestSetUp,
+    TestAccessContext::nlTestTearDown,
 };
-// clang-format on
 
 } // namespace
 

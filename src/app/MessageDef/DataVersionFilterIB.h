@@ -20,7 +20,7 @@
 #include "ClusterPathIB.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -89,9 +89,9 @@ public:
     /**
      *  @brief Mark the end of this DataVersionFilterIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    DataVersionFilterIB::Builder & EndOfDataVersionFilterIB();
+    CHIP_ERROR EndOfDataVersionFilterIB();
 
 private:
     ClusterPathIB::Builder mPath;

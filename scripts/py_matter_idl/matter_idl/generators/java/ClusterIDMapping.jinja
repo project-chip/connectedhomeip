@@ -1,0 +1,173 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package chip.devicecontroller;
+
+public class ClusterIDMapping {
+    public interface BaseCluster {
+        long getID();
+        String getAttributeName(long id) throws NoSuchFieldError;
+        String getEventName(long id) throws NoSuchFieldError;
+        String getCommandName(long id) throws NoSuchFieldError;
+        long getAttributeID(String name) throws IllegalArgumentException;
+        long getEventID(String name) throws IllegalArgumentException;
+        long getCommandID(String name) throws IllegalArgumentException;
+    }
+
+    public static BaseCluster getCluster(long clusterId) {
+        {%- for cluster in clientClusters | sort(attribute='code') %}
+        if (clusterId == {{cluster.name}}.ID) {
+            return new {{cluster.name}}();
+        }
+        {%- endfor -%}
+        return null;
+    }
+
+    {%- for cluster in clientClusters | sort(attribute='code') %}
+    public static class {{cluster.name}} implements BaseCluster {
+        public static final long ID = {{cluster.code}}L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+        {%- for attribute in cluster.attributes | sort(attribute='code') %}
+            {{attribute.definition.name | upfirst}}({{attribute.definition.code}}L),
+        {%- endfor -%}
+        ;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+        {%- for event in cluster.events | sort(attribute='code') %}
+            {{event.name | upfirst}}({{event.code}}L),
+        {%- endfor -%}
+        ;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+        {%- for command in cluster.commands | sort(attribute='code') %}
+            {{command.name | upfirst}}({{command.code}}L),
+        {%- endfor -%}
+        ;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        {%- for command in cluster.commands | sort(attribute='code') %}
+            {%- if command.input_param -%}
+                public enum {{command.name | upfirst}}CommandField {
+                    {%- for field in (cluster.structs | named(command.input_param)).fields -%} {{field.name | upfirst}}({{field.code}}), {%- endfor -%};
+                    private final int id;
+                    {{command.name | upfirst}}CommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static {{command.name | upfirst}}CommandField value(int id) throws NoSuchFieldError {
+                        for ({{command.name | upfirst}}CommandField field : {{command.name | upfirst}}CommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }
+            {%- endif -%}
+        {%- endfor -%}
+
+        @Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    {%- endfor -%}
+}

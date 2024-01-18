@@ -57,11 +57,16 @@ static_library("Tizen") {
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
     "PosixConfig.h",
+    "SystemInfo.cpp",
+    "SystemInfo.h",
     "SystemPlatformConfig.h",
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
     "${chip_root}/src/platform:platform_base",

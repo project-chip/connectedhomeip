@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="description_button" translatable="false">button</string>
+    <string name="description_seekbar" translatable="false">seekbar</string>
+
+    <string name="more_menu_reset" translatable="false">Reset</string>
+
+    <string name="dialog_factory_reset_message">"The Matter device app will be reset and closed. Continue?"</string>
+    <string name="dialog_user_factory_reset_message">"The commissioning was not completed. The Matter device app will be reset and closed. Continue?"</string>
+    <string name="dialog_fabric_removed_factory_reset_message">"The fabric was removed. The Matter device app will be reset and closed."</string>
+
+    <string name="battery">Battery</string>
+    <string name="battery_format" translatable="false">%d &lt;small>&lt;small>%%&lt;/small>&lt;/small></string>
+
+    <string name="cancel">Cancel</string>
+    <string name="on_off_switch_power_on">On</string>
+    <string name="on_off_switch_power_off">Off</string>
+</resources>

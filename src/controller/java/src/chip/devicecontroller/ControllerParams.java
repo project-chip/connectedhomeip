@@ -23,8 +23,6 @@ public final class ControllerParams {
   @Nullable private final byte[] ipk;
   private final long adminSubject;
 
-  private static final int LEGACY_GLOBAL_CHIP_PORT = 5540;
-
   /** @param udpListenPort the UDP listening port, or 0 to pick any available port. */
   private ControllerParams(Builder builder) {
     this.fabricId = builder.fabricId;
@@ -132,7 +130,7 @@ public final class ControllerParams {
   /** Builder for {@link ControllerParams}. */
   public static class Builder {
     private long fabricId = 1;
-    private int udpListenPort = LEGACY_GLOBAL_CHIP_PORT + 1;
+    private int udpListenPort = 0;
     private int controllerVendorId = 0xFFFF;
     private int failsafeTimerSeconds = 30;
     private int caseFailsafeTimerSeconds = 0;
@@ -151,9 +149,6 @@ public final class ControllerParams {
     private Builder() {}
 
     public Builder setFabricId(long fabricId) {
-      if (fabricId < 1) {
-        throw new IllegalArgumentException("fabricId must be > 0");
-      }
       this.fabricId = fabricId;
       return this;
     }
@@ -288,15 +283,15 @@ public final class ControllerParams {
      * <p>Setting the regulatory location type will set the NewRegulatoryConfig when the
      * SetRegulatoryConfig command is sent by this ChipDeviceCommissioner.
      *
-     * @param regulatoryLocation an app::Clusters::GeneralCommissioning::RegulatoryLocationType enum
-     *     value
+     * @param regulatoryLocation an app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum
+     *     enum value
      * @return
      */
     public Builder setRegulatoryLocation(int regulatoryLocation) {
       if ((regulatoryLocation < 0) || (regulatoryLocation > 2)) {
         throw new IllegalArgumentException(
-            "regulatoryLocation value must be between RegulatoryLocationType::kIndoor and "
-                + "RegulatoryLocationType::kIndoorOutdoor");
+            "regulatoryLocation value must be between RegulatoryLocationTypeEnum::kIndoor and "
+                + "RegulatoryLocationTypeEnum::kIndoorOutdoor");
       }
       this.regulatoryLocationType = Optional.of(regulatoryLocation);
       return this;

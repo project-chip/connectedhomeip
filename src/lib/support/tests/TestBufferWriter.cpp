@@ -196,6 +196,42 @@ void TestPutLittleEndian(nlTestSuite * inSuite, void * inContext)
         bb.EndianPut(0x0102030405060708u, 3);
         NL_TEST_ASSERT(inSuite, bb.expect("\x08\x07\x06", 3, 0));
     }
+
+    {
+        BWTest<LittleEndian::BufferWriter> bb(4);
+        bb.PutSigned8(static_cast<int8_t>(-6));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xfa", 1, 3));
+    }
+
+    {
+        BWTest<LittleEndian::BufferWriter> bb(4);
+        bb.PutSigned16(static_cast<int16_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xfe\xff", 2, 2));
+    }
+
+    {
+        BWTest<LittleEndian::BufferWriter> bb(4);
+        bb.PutSigned32(static_cast<int32_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xfe\xff\xff\xff", 4, 0));
+    }
+
+    {
+        BWTest<LittleEndian::BufferWriter> bb(8);
+        bb.PutSigned64(static_cast<int64_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xfe\xff\xff\xff\xff\xff\xff\xff", 8, 0));
+    }
+
+    {
+        BWTest<LittleEndian::BufferWriter> bb(7);
+        bb.PutSigned64(static_cast<int64_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xfe\xff\xff\xff\xff\xff\xff", 8, 0));
+    }
+
+    {
+        BWTest<LittleEndian::BufferWriter> bb(9);
+        bb.PutSigned64(static_cast<int64_t>(9223372036854775807LL));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xff\xff\xff\xff\xff\xff\xff\x7f", 8, 1));
+    }
 }
 
 void TestPutBigEndian(nlTestSuite * inSuite, void * inContext)
@@ -222,6 +258,42 @@ void TestPutBigEndian(nlTestSuite * inSuite, void * inContext)
         BWTest<BigEndian::BufferWriter> bb(3);
         bb.EndianPut(0x0102030405060708u, 3);
         NL_TEST_ASSERT(inSuite, bb.expect("\x06\x07\x08", 3, 0));
+    }
+
+    {
+        BWTest<BigEndian::BufferWriter> bb(4);
+        bb.PutSigned8(static_cast<int8_t>(-6));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xfa", 1, 3));
+    }
+
+    {
+        BWTest<BigEndian::BufferWriter> bb(4);
+        bb.PutSigned16(static_cast<int16_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xff\xfe", 2, 2));
+    }
+
+    {
+        BWTest<BigEndian::BufferWriter> bb(4);
+        bb.PutSigned32(static_cast<int32_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xff\xff\xff\xfe", 4, 0));
+    }
+
+    {
+        BWTest<BigEndian::BufferWriter> bb(8);
+        bb.PutSigned64(static_cast<int64_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xff\xff\xff\xff\xff\xff\xff\xfe", 8, 0));
+    }
+
+    {
+        BWTest<BigEndian::BufferWriter> bb(7);
+        bb.PutSigned64(static_cast<int64_t>(-2));
+        NL_TEST_ASSERT(inSuite, bb.expect("\xff\xff\xff\xff\xff\xff\xff", 8, 0));
+    }
+
+    {
+        BWTest<BigEndian::BufferWriter> bb(9);
+        bb.PutSigned64(static_cast<int64_t>(9223372036854775807LL));
+        NL_TEST_ASSERT(inSuite, bb.expect("\x7f\xff\xff\xff\xff\xff\xff\xff", 8, 1));
     }
 }
 

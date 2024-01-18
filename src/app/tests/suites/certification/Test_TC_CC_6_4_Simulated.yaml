@@ -1,0 +1,151 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.3.17. [TC-CC-6.4] Color Temperature functionality with client as DUT
+
+PICS:
+    - CC.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    timeout: 500
+    endpoint: 1
+    ConfigTransitionTime:
+        type: int16u
+        defaultValue: 3000
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "PreCondition: Set TH OnOff to On"
+      cluster: "On/Off"
+      wait: "On"
+
+    - label:
+          "* TH provides a server implementation of Color Control with
+          F04(CT)=true and reasonable values of ColorTempPhysicalMinMireds (e.g.
+          153 (6500K), ColorTempPhysicalMaxMireds (e.g. 454 (2200K)) DUT read
+          attribute ColorTempPhysicalMinMireds from TH"
+      PICS: CC.C.A400b && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTempPhysicalMinMireds"
+
+    - label:
+          "* TH provides a server implementation of Color Control with
+          F04(CT)=true and reasonable values of ColorTempPhysicalMinMireds (e.g.
+          153 (6500K), ColorTempPhysicalMaxMireds (e.g. 454 (2200K)) DUT read
+          attribute ColorTempPhysicalMaxMireds from TH"
+      PICS: CC.C.A400c && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTempPhysicalMaxMireds"
+
+    - label: "DUT sends MoveToColorTemperature command to TH"
+      PICS: CC.C.C0a.Tx && CC.C.F04
+      wait: "MoveToColorTemperature"
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C0a.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C0a.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "DUT sends MoveColorTemperatureMireds command to TH"
+      PICS: CC.C.C4b.Tx && CC.C.F04
+      wait: "MoveColorTemperature"
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C4b.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C4b.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "DUT sends StepColorTemperature command to TH"
+      PICS: CC.C.C4c.Tx && CC.C.F04
+      wait: "StepColorTemperature"
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C4c.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C4c.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"
+
+    - label: "DUT sends StopMoveStep command to TH"
+      PICS: CC.C.C47.Tx && CC.C.F04
+      wait: "StopMoveStep"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads CurrentColorTemperatureMireds attribute from TH
+          (potentially multiple times)"
+      PICS: CC.C.C47.Tx && CC.C.A0007 && CC.C.F04
+      wait: "readAttribute"
+      attribute: "ColorTemperatureMireds"

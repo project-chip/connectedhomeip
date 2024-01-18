@@ -26,9 +26,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH1s Fabric"
+    - label: "Step 1: Commission DUT to TH1s Fabric"
       verification: |
-          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+          Execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
            ./chip-all-clusters-app
 
           Once DUT reach the  commissionable state pls send below mentioned command on TH2. Pls use equivalent command on the respective DUT
@@ -39,12 +39,12 @@ tests:
       disabled: true
 
     - label:
-          "TH1 does a non-fabric filtered read of the NOCs attribute from the
-          Node Operational Credentials cluster and saves the returned list as
-          noc_th1"
+          "Step 2a: TH1 does a non-fabric filtered read of the NOCs attribute
+          from the Node Operational Credentials cluster and saves the returned
+          list as noc_th1"
       verification: |
+          TH1(Chip-tool) does a non-fabric filtered read of the NOCs attribute from the Node Operational Credentials cluster and saves the returned list as noc_th1 AND Verify that there is a single entry in the list
           ./chip-tool operationalcredentials read nocs 1  0 --fabric-filtered 0
-          On TH1, Verify that there is a single entry in the list
           [1662389708.822977][17489:17494] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 4085201480
           [1662389708.823012][17489:17494] CHIP:TOO:   NOCs: 1 entries
           [1662389708.823044][17489:17494] CHIP:TOO:     [1]: {
@@ -56,8 +56,8 @@ tests:
       disabled: true
 
     - label:
-          "TH1 does a non-fabric-filtered read of the Fabrics attribute from the
-          Node Operational Credentials cluster"
+          "Step 2b: TH1 does a non-fabric-filtered read of the Fabrics attribute
+          from the Node Operational Credentials cluster"
       verification: |
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
@@ -76,22 +76,22 @@ tests:
       disabled: true
 
     - label:
-          "Factory reset DUT and perform the necessary actions to put the DUT
-          into a commissionable state"
+          "Step 3: Factory reset DUT and perform the necessary actions to put
+          the DUT into a commissionable state"
       PICS: MCORE.UI.FACTORYRESET
       verification: |
           To perform Factory reset on DUT  follow the below commands in RPI, And use equivalent command on the respective DUT
           sudo rm -rf /tmp/chip_*
 
           After factory reset put the DUT into commissionable state and verify commissionable state.
-          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use "chiptool discover commissionables"  to discover mDNS adv and provision the device using "chip-tool pairing code node-id payload".
-          otherwise if your DUT is advertising over BLE , pls use the "/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1" command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
+          This step is same in couple of other cases (like DD) so use the same verification method here too i.e. if your DUT is discoverable over mDNS then use 'chiptool discover commissionables'  to discover mDNS adv and provision the device using 'chip-tool pairing code node-id payload'.
+          otherwise if your DUT is advertising over BLE , pls use the '/chip-tool pairing ble-wifi 1 zigbeehome matter123 20202021 3841 --trace_decode 1' command to discover and provision the device (BTW the SSID , passwd, descriminator ..etc are configurable parameters for your DUT)
 
           Using RPI, executed the below command to verify this step, Pls use equivalent command on the respective DUT
           ./chip-all-clusters-app
       disabled: true
 
-    - label: "Commission DUT to TH2s Fabric"
+    - label: "Step 4: Commission DUT to TH2s Fabric"
       verification: |
           Once DUT reach the  commissionable state as explaiend in step 3, send below mentioned command on TH2 to commission the DUT.  And use equivalent command on the respective DUT (Refer step 3)
 
@@ -101,12 +101,12 @@ tests:
       disabled: true
 
     - label:
-          "TH2 does a non-fabric-filtered read of Fabrics attribute list from
-          DUT"
+          "Step 5: TH2 does a non-fabric-filtered read of Fabrics attribute list
+          from DUT"
       verification: |
           ./chip-tool operationalcredentials read fabrics 2 0   --commissioner-name beta  --fabric-filtered 0
 
-          On TH2(chip-tool) Verify that there is only one entry in the "Fabrics" List and Verify that the FabricID is the same as the TH2’s Fabric ID and Verify that the entry saved in Step 2 for TH1" Fabric does not appear in the list
+          On TH2(chip-tool) Verify that there is only one entry in the 'Fabrics' List and Verify that the FabricID is the same as the TH2’s Fabric ID and Verify that the entry saved in Step 2 for TH1' Fabric does not appear in the list
 
 
           [1662390246.660954][17644:17649] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0001 DataVersion: 2805160061
@@ -123,11 +123,12 @@ tests:
       disabled: true
 
     - label:
-          "TH2 does a non-fabric-filtered read of NOCs attribute list from DUT"
+          "Step 6: TH2 does a non-fabric-filtered read of NOCs attribute list
+          from DUT"
       verification: |
           ./chip-tool operationalcredentials read nocs 2  0  --commissioner-name beta --fabric-filtered 0
 
-          On TH2(chip-tool) Verify that there is only one entry in the "NOCs" List and the NOC for that entry is different than the NOC entry in noc_th1
+          On TH2(chip-tool) Verify that there is only one entry in the 'NOCs' List and the NOC for that entry is different than the NOC entry in noc_th1
 
           [1662390133.555554][17626:17631] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_003E Attribute 0x0000_0000 DataVersion: 2805160061
           [1662390133.555588][17626:17631] CHIP:TOO:   NOCs: 1 entries

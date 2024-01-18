@@ -23,7 +23,6 @@
 #include <lib/dnssd/ActiveResolveAttempts.h>
 #include <lib/dnssd/IncrementalResolve.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
-#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/minimal_mdns/Logging.h>
 #include <lib/dnssd/minimal_mdns/Parser.h>
@@ -32,6 +31,7 @@
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <tracing/macros.h>
 
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common
@@ -237,6 +237,8 @@ void PacketParser::ParseSRVResource(const ResourceData & data)
 
 void PacketParser::ParseSrvRecords(const BytesRange & packet)
 {
+    MATTER_TRACE_SCOPE("Searching SRV Records", "PacketParser");
+
     mParsingState = RecordParsingState::kSrvInitialization;
     mPacketRange  = packet;
 
@@ -250,6 +252,8 @@ void PacketParser::ParseSrvRecords(const BytesRange & packet)
 
 void PacketParser::ParseNonSrvRecords(Inet::InterfaceId interface, const BytesRange & packet)
 {
+    MATTER_TRACE_SCOPE("Searching NON-SRV Records", "PacketParser");
+
     mParsingState = RecordParsingState::kRecordParsing;
     mPacketRange  = packet;
     mInterfaceId  = interface;
@@ -269,6 +273,7 @@ public:
     {
         GlobalMinimalMdnsServer::Instance().SetResponseDelegate(this);
     }
+    ~MinMdnsResolver() { SetDiscoveryContext(nullptr); }
 
     //// MdnsPacketDelegate implementation
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -278,21 +283,21 @@ public:
     bool IsInitialized() override;
     void Shutdown() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
-    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
-    CHIP_ERROR StopDiscovery() override;
+    CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) override;
+    CHIP_ERROR StopDiscovery(DiscoveryContext & context) override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
 private:
-    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
-    System::Layer * mSystemLayer                          = nullptr;
+    OperationalResolveDelegate * mOperationalDelegate = nullptr;
+    DiscoveryContext * mDiscoveryContext              = nullptr;
+    System::Layer * mSystemLayer                      = nullptr;
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
 
+    void SetDiscoveryContext(DiscoveryContext * context);
     void ScheduleIpAddressResolve(SerializedQNameIterator hostName);
 
     CHIP_ERROR SendAllPendingQueries();
@@ -327,6 +332,21 @@ private:
     char qnameStorage[kMaxQnameSize];
 };
 
+void MinMdnsResolver::SetDiscoveryContext(DiscoveryContext * context)
+{
+    if (mDiscoveryContext != nullptr)
+    {
+        mDiscoveryContext->Release();
+    }
+
+    if (context != nullptr)
+    {
+        context->Retain();
+    }
+
+    mDiscoveryContext = context;
+}
+
 void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 {
     HeapQName target(hostName);
@@ -340,6 +360,8 @@ void MinMdnsResolver::ScheduleIpAddressResolve(SerializedQNameIterator hostName)
 
 void MinMdnsResolver::AdvancePendingResolverStates()
 {
+    MATTER_TRACE_SCOPE("Advance pending resolve states", "MinMdnsResolver");
+
     for (IncrementalResolver * resolver = mPacketParser.ResolverBegin(); resolver != mPacketParser.ResolverEnd(); resolver++)
     {
         if (!resolver->IsActive())
@@ -366,28 +388,57 @@ void MinMdnsResolver::AdvancePendingResolverStates()
         // SUCCESS. Call the delegates
         if (resolver->IsActiveCommissionParse())
         {
+            MATTER_TRACE_SCOPE("Active commissioning delegate call", "MinMdnsResolver");
             DiscoveredNodeData nodeData;
 
             CHIP_ERROR err = resolver->Take(nodeData);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to take discovery result: %" CHIP_ERROR_FORMAT, err.Format());
+                continue;
             }
 
-            mActiveResolves.Complete(nodeData);
-            if (mCommissioningDelegate != nullptr)
+            // TODO: Ideally commissioning delegates should be aware of the
+            //       node types they receive, however they are currently not
+            //       so try to help out by only calling the delegate when an
+            //       active browse exists.
+            //
+            // This is NOT ok and probably we should have separate comissioner
+            // or commissionable delegates or pass in a node type argument.
+            bool discoveredNodeIsRelevant = false;
+
+            switch (resolver->GetCurrentType())
             {
-                mCommissioningDelegate->OnNodeDiscovered(nodeData);
+            case IncrementalResolver::ServiceNameType::kCommissioner:
+                discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionerNode);
+                mActiveResolves.CompleteCommissioner(nodeData);
+                break;
+            case IncrementalResolver::ServiceNameType::kCommissionable:
+                discoveredNodeIsRelevant = mActiveResolves.HasBrowseFor(chip::Dnssd::DiscoveryType::kCommissionableNode);
+                mActiveResolves.CompleteCommissionable(nodeData);
+                break;
+            default:
+                ChipLogError(Discovery, "Unexpected type for commission data parsing");
+                continue;
             }
-            else
+
+            if (discoveredNodeIsRelevant)
             {
+                if (mDiscoveryContext != nullptr)
+                {
+                    mDiscoveryContext->OnNodeDiscovered(nodeData);
+                }
+                else
+                {
 #if CHIP_MINMDNS_HIGH_VERBOSITY
-                ChipLogError(Discovery, "No delegate to report commissioning node discovery");
+                    ChipLogError(Discovery, "No delegate to report commissioning node discovery");
 #endif
+                }
             }
         }
         else if (resolver->IsActiveOperationalParse())
         {
+            MATTER_TRACE_SCOPE("Active operational delegate call", "MinMdnsResolver");
             ResolvedNodeData nodeData;
 
             CHIP_ERROR err = resolver->Take(nodeData);
@@ -418,6 +469,8 @@ void MinMdnsResolver::AdvancePendingResolverStates()
 
 void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+    MATTER_TRACE_SCOPE("Received MDNS Packet", "MinMdnsResolver");
+
     // Fill up any relevant data
     mPacketParser.ParseSrvRecords(data);
     mPacketParser.ParseNonSrvRecords(info->Interface, data);
@@ -632,18 +685,26 @@ void MinMdnsResolver::ExpireIncrementalResolvers()
     }
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context)
 {
+    // minmdns currently supports only one discovery context at a time so override the previous context
+    SetDiscoveryContext(&context);
+
     return BrowseNodes(DiscoveryType::kCommissionableNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter)
+CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context)
 {
+    // minmdns currently supports only one discovery context at a time so override the previous context
+    SetDiscoveryContext(&context);
+
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
 
-CHIP_ERROR MinMdnsResolver::StopDiscovery()
+CHIP_ERROR MinMdnsResolver::StopDiscovery(DiscoveryContext & context)
 {
+    SetDiscoveryContext(nullptr);
+
     return mActiveResolves.CompleteAllBrowses();
 }
 
@@ -673,6 +734,8 @@ void MinMdnsResolver::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 
 CHIP_ERROR MinMdnsResolver::ScheduleRetries()
 {
+    MATTER_TRACE_SCOPE("Schedule retries", "MinMdnsResolver");
+
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&RetryCallback, this);
 
@@ -698,57 +761,6 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
-}
-
-ResolverProxy::~ResolverProxy()
-{
-    // TODO: this is a hack: resolver proxies used for commissionable discovery
-    //       and they don't interact well with each other.
-    gResolver.SetCommissioningDelegate(nullptr);
-    Shutdown();
-}
-
-// Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
-// updating the delegate that ends up being used by the server by calling 'SetOperationalDelegate'.
-// This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
-// it won't work well if requests are issued in parallel.
-CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId)
-{
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    ChipLogProgress(Discovery, "Resolving " ChipLogFormatX64 ":" ChipLogFormatX64 " ...",
-                    ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()));
-    chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId);
-}
-
-void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
-{
-    return chip::Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
-{
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().DiscoverCommissionableNodes(filter);
-}
-
-CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
-{
-    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
-    return chip::Dnssd::Resolver::Instance().DiscoverCommissioners(filter);
-}
-
-CHIP_ERROR ResolverProxy::StopDiscovery()
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-
-CHIP_ERROR ResolverProxy::ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId)
-{
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd

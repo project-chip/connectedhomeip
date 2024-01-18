@@ -115,7 +115,9 @@
         "condition_variable": "cpp",
         "numeric": "cpp",
         "random": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "variant": "cpp",
+        "any": "cpp"
     },
     // Configure paths or glob patterns to exclude from file watching.
     "files.watcherExclude": {
@@ -166,8 +168,12 @@
     ],
     "clang-format.fallbackStyle": "WebKit",
     "files.trimFinalNewlines": true,
-    "C_Cpp.default.cppStandard": "gnu++14",
+    "C_Cpp.default.cppStandard": "gnu++17",
     "C_Cpp.default.cStandard": "gnu11",
     "cmake.configureOnOpen": false,
-    "search.followSymlinks": false
+    "search.followSymlinks": false,
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
 }

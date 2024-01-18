@@ -16,6 +16,7 @@
 import copy
 import time
 from dataclasses import dataclass, field
+from typing import List
 
 from .hooks import TestParserHooks
 from .parser import TestParser, TestParserConfig
@@ -50,7 +51,7 @@ class TestParserBuilderConfig:
            parsing. It may may allow the callers to gain insights about the
            current parsing state.
     """
-    tests: list[str] = field(default_factory=list)
+    tests: List[str] = field(default_factory=list)
     parser_config: TestParserConfig = field(default_factory=TestParserConfig)
     hooks: TestParserHooks = TestParserHooks()
     options: TestParserBuilderOptions = field(
@@ -66,19 +67,19 @@ class TestParserBuilder:
         self.__tests = copy.copy(config.tests)
         self.__config = config
         self.__duration = 0
-        self.__done = False
+        self.done = False
 
     def __iter__(self):
-        self.__config.hooks.start(len(self.__tests))
+        self.__config.hooks.parsing_start(len(self.__tests))
         return self
 
     def __next__(self):
         if len(self.__tests):
             return self.__get_test_parser(self.__tests.pop(0))
 
-        if not self.__done:
-            self.__config.hooks.stop(round(self.__duration))
-        self.__done = True
+        if not self.done:
+            self.__config.hooks.parsing_stop(round(self.__duration))
+        self.done = True
 
         raise StopIteration
 
@@ -88,7 +89,7 @@ class TestParserBuilder:
         parser = None
         exception = None
         try:
-            self.__config.hooks.test_start(test_file)
+            self.__config.hooks.test_parsing_start(test_file)
             parser = TestParser(test_file, self.__config.parser_config)
         except Exception as e:
             exception = e
@@ -96,10 +97,10 @@ class TestParserBuilder:
         duration = round((time.time() - start) * 1000, 0)
         self.__duration += duration
         if exception:
-            self.__config.hooks.test_failure(exception, duration)
+            self.__config.hooks.test_parsing_failure(exception, duration)
             if self.__config.options.stop_on_error:
                 raise StopIteration
             return None
 
-        self.__config.hooks.test_success(duration)
+        self.__config.hooks.test_parsing_success(duration)
         return parser

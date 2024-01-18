@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="setup_network_notification_title">동일한 Wi-Fi에 연결하세요</string>
+    <string name="setup_network_notification_message">휴대폰/허브/디바이스 앱이 동일한 Wi-Fi 네크워크에 연결되어 있는지 확인해 주세요.</string>
+    <string name="save">저장</string>
+    <string name="cancel">취소</string>
+    <string name="start">시작</string>
+</resources>

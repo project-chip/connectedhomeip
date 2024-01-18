@@ -29,9 +29,17 @@ from cryptography.x509 import AuthorityKeyIdentifier, Certificate, SubjectKeyIde
 from matter_testing_support import MatterBaseTest, async_test_body, bytes_from_hex, default_matter_test_main, hex_from_bytes
 from mobly import asserts
 
+# Those are SDK samples that are known to be non-production.
 FORBIDDEN_AKID = [
     bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),
     bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
+]
+
+# List of certificate names that are known to have some issues, but not yet
+# updated in DCL. They will fail the test at runtime if seen, but not in CI.
+ALLOWED_SKIPPED_FILENAMES = [
+    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
+    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
 ]
 
 
@@ -41,15 +49,22 @@ def load_all_paa(paa_path: Path) -> dict:
     paa_by_skid = {}
     for filename in glob(str(paa_path.joinpath("*.der"))):
         with open(filename, "rb") as derfile:
-            # Load cert
-            paa_der = derfile.read()
-            paa_cert = load_der_x509_certificate(paa_der)
+            logging.info(f"Loading PAA: {filename}")
+            try:
+                # Load cert
+                paa_der = derfile.read()
+                paa_cert = load_der_x509_certificate(paa_der)
 
-            # Find the subject key identifier (if present), and record it
-            for extension in paa_cert.extensions:
-                if extension.oid == SubjectKeyIdentifier.oid:
-                    skid = extension.value.key_identifier
-                    paa_by_skid[skid] = (Path(filename).name, paa_cert)
+                # Find the subject key identifier (if present), and record it
+                for extension in paa_cert.extensions:
+                    if extension.oid == SubjectKeyIdentifier.oid:
+                        skid = extension.value.key_identifier
+                        paa_by_skid[skid] = (Path(filename).name, paa_cert)
+            except (ValueError, IOError) as e:
+                logging.error(f"Failed to load {filename}: {str(e)}")
+                if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
+                    logging.error(f"Re-raising error and failing: found new invalid PAA: {filename}")
+                    raise
 
     return paa_by_skid
 
@@ -64,6 +79,34 @@ def extract_akid(cert: Certificate) -> Optional[bytes]:
 
 
 class TC_DA_1_7(MatterBaseTest):
+    ''' TC-DA-1.7
+
+        This test requires two instances of the DUT with the same PID/VID to confirm that the individual
+        devices are provisioned with different device attestation keys even in the same product line.
+
+        In order to fully test this locally, it requires two separate instances of the example app
+        with different keys, different discrimimators, different ports, and different KVSs.
+        The example apps use the SDK authority key, so the script needs the allow_sdk_dac arg set.
+
+        One suggested method of testing:
+
+        Terminal 1: (first DUT - default port 5540)
+        rm kvs1
+        ${PATH_TO_ALL_CLUSTERS}/chip-all-clusters-app --dac_provider \
+            credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count1_valid/test_case_vector.json \
+            --product-id 32768 --KVS kvs1 --discriminator 12
+
+        Terminal 2: (second DUT - port 5541)
+        rm kvs2
+        ${PATH_TO_ALL_CLUSTERS}/chip-all-clusters-app --dac_provider \
+            credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count2_valid/test_case_vector.json \
+            --product-id 32768 --KVS kvs2 --discriminator 34 --secured-device-port 5541
+
+        Terminal 3: (test application)
+        ./scripts/tests/run_python_test.py --script "src/python_testing/TC_DA_1_7.py" \
+            --script-args "--storage-path admin_storage.json --commissioning-method on-network \
+                --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
+    '''
     @async_test_body
     async def test_TC_DA_1_7(self):
         # For real tests, we require more than one DUT
@@ -71,12 +114,12 @@ class TC_DA_1_7(MatterBaseTest):
         # To specify more than 1 DUT, use a list of discriminators and passcodes
         allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
         if allow_sdk_dac:
-            asserts.assert_equal(len(self.matter_test_config.discriminator), 1, "Only one device can be tested with SDK DAC")
+            asserts.assert_equal(len(self.matter_test_config.discriminators), 1, "Only one device can be tested with SDK DAC")
         if not allow_sdk_dac:
-            asserts.assert_equal(len(self.matter_test_config.discriminator), 2, "This test requires 2 DUTs")
+            asserts.assert_equal(len(self.matter_test_config.discriminators), 2, "This test requires 2 DUTs")
         pk = []
-        for i in range(len(self.matter_test_config.dut_node_id)):
-            pk.append(await self.single_DUT(i, self.matter_test_config.dut_node_id[i]))
+        for i in range(len(self.matter_test_config.dut_node_ids)):
+            pk.append(await self.single_DUT(i, self.matter_test_config.dut_node_ids[i]))
 
         asserts.assert_equal(len(pk), len(set(pk)), "Found matching public keys in different DUTs")
 

@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 #include <lib/dnssd/Advertiser.h>
@@ -92,6 +94,10 @@ void InitializeChip(nlTestSuite * suite)
     chip::DeviceLayer::SetCommissionableDataProvider(&commissionableDataProvider);
 
     static chip::CommonCaseDeviceServerInitParams initParams;
+    // Report scheduler and timer delegate instance
+    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    initParams.reportScheduler = &sReportScheduler;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     err = chip::Server::GetInstance().Init(initParams);
 
@@ -131,7 +137,7 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
 
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
     CHIP_ERROR err                             = commissionMgr.OpenBasicCommissioningWindow(commissionMgr.MaxCommissioningTimeout(),
-                                                                CommissioningWindowAdvertisement::kDnssdOnly);
+                                                                                            CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
     NL_TEST_ASSERT(suite,

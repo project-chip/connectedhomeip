@@ -21,11 +21,35 @@ import("${chip_root}/src/platform/device.gni")
 
 source_set("chip-all-clusters-common") {
   sources = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/boolcfg-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp",
     "AllClustersCommandDelegate.cpp",
     "AppOptions.cpp",
+    "ValveControlDelegate.cpp",
     "WindowCoveringManager.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",
@@ -40,8 +64,10 @@ source_set("chip-all-clusters-common") {
     "${chip_root}/third_party/jsoncpp",
   ]
 
-  include_dirs =
-      [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+  include_dirs = [
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
+    "${chip_root}/examples/energy-management-app/energy-management-common/include",
+  ]
 
   cflags = [ "-Wconversion" ]
 
@@ -52,14 +78,16 @@ source_set("chip-all-clusters-common") {
 
 source_set("chip-lock-app-common") {
   sources = [
-    "${chip_root}/examples/lock-app/linux/src/LockEndpoint.cpp",
-    "${chip_root}/examples/lock-app/linux/src/LockManager.cpp",
-    "${chip_root}/examples/lock-app/linux/src/ZCLDoorLockCallbacks.cpp",
+    "${chip_root}/examples/lock-app/lock-common/include/LockEndpoint.h",
+    "${chip_root}/examples/lock-app/lock-common/include/LockManager.h",
+    "${chip_root}/examples/lock-app/lock-common/src/LockEndpoint.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/LockManager.cpp",
+    "${chip_root}/examples/lock-app/lock-common/src/ZCLDoorLockCallbacks.cpp",
   ]
 
   deps = [ "${chip_root}/examples/all-clusters-app/all-clusters-common" ]
 
-  include_dirs = [ "${chip_root}/examples/lock-app/linux/include" ]
+  include_dirs = [ "${chip_root}/examples/lock-app/lock-common/include" ]
 
   cflags = [ "-Wconversion" ]
 }
@@ -70,7 +98,6 @@ if (is_libfuzzer) {
 
     deps = [
       ":chip-all-clusters-common",
-      ":chip-lock-app-common",
       "${chip_root}/examples/platform/linux:app-main",
     ]
 
@@ -84,7 +111,6 @@ if (is_libfuzzer) {
 
     deps = [
       ":chip-all-clusters-common",
-      ":chip-lock-app-common",
       "${chip_root}/examples/platform/linux:app-main",
     ]
 

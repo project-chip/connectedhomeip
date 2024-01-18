@@ -274,7 +274,7 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     {
         uint16_t size = 0;
         auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
-                                          nullptr, size);
+                                                nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
 }

@@ -1,0 +1,106 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 178.2.1. [TC-TCTL-2.1] Attributes with DUT as Server
+
+PICS:
+    - TCTL.S
+    - TCTL.S.F02
+    - TCTL.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Temperature Control"
+    endpoint: 1
+
+tests:
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the MinTemperature attribute"
+      PICS: TCTL.S.A0001
+      command: "readAttribute"
+      attribute: "MinTemperature"
+      response:
+          saveAs: MinTemperatureValue
+          constraints:
+              type: temperature
+
+    - label: "Step 3: TH reads from the DUT the MaxTemperature attribute"
+      PICS: TCTL.S.A0002
+      command: "readAttribute"
+      attribute: "MaxTemperature"
+      response:
+          saveAs: MaxTemperatureValue
+          constraints:
+              type: temperature
+
+    - label: "Step 4: TH reads from the DUT the Step attribute"
+      PICS: TCTL.S.A0003
+      command: "readAttribute"
+      attribute: "Step"
+      response:
+          saveAs: StepValue
+          constraints:
+              type: temperature
+              maxValue: MaxTemperatureValue - MinTemperatureValue
+
+    - label:
+          "Verify that the DUT response (maxTemperature - minTemperature) % the
+          received value of the Step attribute == 0."
+      PICS: TCTL.S.A0003 && TCTL.S.A0002 && TCTL.S.A0001
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ( MaxTemperatureValue - MinTemperatureValue ) % StepValue
+              - name: "Value2"
+                value: 0
+      response:
+          - values:
+                - name: "Equals"
+                  value: true
+
+    - label: "Step 5: TH reads from the DUT the TemperatureSetpoint attribute"
+      PICS: TCTL.S.A0000
+      command: "readAttribute"
+      attribute: "TemperatureSetpoint"
+      response:
+          saveAs: temperatureValue
+          constraints:
+              minValue: MinTemperatureValue
+              maxValue: MaxTemperatureValue
+
+    - label:
+          "Verify that the DUT response (temperature value - minTemperature) %
+          the received value of the Step attribute from step 4 == 0."
+      PICS: TCTL.S.A0000 && TCTL.S.A0001
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: ( temperatureValue - MinTemperatureValue ) % StepValue
+              - name: "Value2"
+                value: 0
+      response:
+          - values:
+                - name: "Equals"
+                  value: true

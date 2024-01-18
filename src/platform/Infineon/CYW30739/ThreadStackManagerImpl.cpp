@@ -24,7 +24,7 @@
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
 #include <openthread-system.h>

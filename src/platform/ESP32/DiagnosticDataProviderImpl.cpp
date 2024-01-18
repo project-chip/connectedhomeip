@@ -23,7 +23,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/enums.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CHIPMemString.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -53,12 +52,12 @@ namespace {
 InterfaceTypeEnum GetInterfaceType(const char * if_desc)
 {
     if (strncmp(if_desc, "ap", strnlen(if_desc, 2)) == 0 || strncmp(if_desc, "sta", strnlen(if_desc, 3)) == 0)
-        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+        return InterfaceTypeEnum::kWiFi;
     if (strncmp(if_desc, "openthread", strnlen(if_desc, 10)) == 0)
-        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+        return InterfaceTypeEnum::kThread;
     if (strncmp(if_desc, "eth", strnlen(if_desc, 3)) == 0)
-        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
-    return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+        return InterfaceTypeEnum::kEthernet;
+    return InterfaceTypeEnum::kUnspecified;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -231,12 +230,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
+#if !CONFIG_DISABLE_IPV4
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);
                 ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
                 ifp->IPv4Addresses       = app::DataModel::List<ByteSpan>(ifp->Ipv4AddressSpans, 1);
             }
+#endif
 
             static_assert(kMaxIPv6AddrCount <= UINT8_MAX, "Count might not fit in ipv6_addr_count");
             static_assert(ArraySize(ip6_addr) >= LWIP_IPV6_NUM_ADDRESSES, "Not enough space for our addresses.");

@@ -18,6 +18,7 @@
 #if LWIP_IPV4 && LWIP_DHCP
 
 #pragma once
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif

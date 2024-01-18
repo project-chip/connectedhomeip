@@ -23,7 +23,9 @@
 #include <app/DataModelRevision.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
+#include <app/SpecificationVersion.h>
 #include <app/util/attribute-storage.h>
+#include <lib/core/CHIPConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -58,6 +60,9 @@ private:
     CHIP_ERROR ReadDataModelRevision(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadLocation(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteLocation(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder);
 };
 
 BasicAttrAccess gAttrAccess;
@@ -281,6 +286,21 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         break;
     }
 
+    case ProductAppearance::Id: {
+        status = ReadProductAppearance(aEncoder);
+        break;
+    }
+
+    case SpecificationVersion::Id: {
+        status = ReadSpecificationVersion(aEncoder);
+        break;
+    }
+
+    case MaxPathsPerInvoke::Id: {
+        status = ReadMaxPathsPerInvoke(aEncoder);
+        break;
+    }
+
     default:
         // We did not find a processing path, the caller will delegate elsewhere.
         break;
@@ -338,9 +358,52 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     ReturnErrorOnFailure(aDecoder.Decode(location));
 
     bool isValidLength = location.size() == DeviceLayer::ConfigurationManager::kMaxLocationLength;
-    VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::InvalidValue).ToChipError());
+    if (!isValidLength)
+    {
+        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(location.size()), location.data());
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
 
     return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
+}
+
+CHIP_ERROR BasicAttrAccess::ReadProductAppearance(AttributeValueEncoder & aEncoder)
+{
+    auto * provider = GetDeviceInstanceInfoProvider();
+    ProductFinishEnum finish;
+    ReturnErrorOnFailure(provider->GetProductFinish(&finish));
+
+    ColorEnum color;
+    CHIP_ERROR colorStatus = provider->GetProductPrimaryColor(&color);
+    if (colorStatus != CHIP_NO_ERROR && colorStatus != CHIP_ERROR_NOT_IMPLEMENTED)
+    {
+        return colorStatus;
+    }
+
+    Structs::ProductAppearanceStruct::Type productAppearance;
+    productAppearance.finish = finish;
+    if (colorStatus == CHIP_NO_ERROR)
+    {
+        productAppearance.primaryColor.SetNonNull(color);
+    }
+    else
+    {
+        productAppearance.primaryColor.SetNull();
+    }
+
+    return aEncoder.Encode(productAppearance);
+}
+
+CHIP_ERROR BasicAttrAccess::ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
+{
+    uint32_t specification_version = CHIP_DEVICE_SPECIFICATION_VERSION;
+    return aEncoder.Encode(specification_version);
+}
+
+CHIP_ERROR BasicAttrAccess::ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
+{
+    uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
+    return aEncoder.Encode(max_path_per_invoke);
 }
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
@@ -405,8 +468,6 @@ bool IsLocalConfigDisabled()
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint) {}
 
 void MatterBasicInformationPluginServerInitCallback()
 {

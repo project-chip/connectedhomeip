@@ -52,10 +52,13 @@ tests:
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     - label:
-          "Step 2:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 2:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 1 element
+          1.Struct :  a)Privilege field: Manage (4) b)AuthMode field: CASE (2)
+          c)Subjects field: [N1] d)Targets field: null"
       PICS: ACL.S.A0000
       command: "writeAttribute"
       attribute: "ACL"
@@ -67,7 +70,7 @@ tests:
                       AuthMode: "2",
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
 
@@ -80,7 +83,10 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "Step 4:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute"
+          "Step 4:TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute,
+          value is list of AccessControlEntryStruct containing 1 element
+          1.Struct : a)Privilege field: Administer (5) b)AuthMode field: CASE
+          (2) c)Subjects field: [N1] d)argets field: null"
       PICS: ACL.S.A0000
       command: "writeAttribute"
       attribute: "ACL"
@@ -92,7 +98,7 @@ tests:
                       AuthMode: "2",
                       Subjects: [CommissionerNodeId],
                       Targets: null,
-                      FabricIndex: CurrentFabricIndex,
+                      FabricIndex: CurrentFabricIndexValue,
                   },
               ]
       response:
@@ -109,7 +115,7 @@ tests:
 
     - label:
           "Step 6:TH1 writes DUT Endpoint 0 AccessControl cluster Extension
-          attribute"
+          attribute, value is an empty list"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
@@ -146,10 +152,10 @@ tests:
       attribute: "AccessControlEntriesPerFabric"
       response:
           constraints:
-              minValue: 3
+              minValue: 4
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          "Step 10:TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       command: "readEvent"
@@ -158,7 +164,7 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster
+          "Step 11:TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlExtensionChanged event"
       PICS: ACL.S.E01
       command: "readEvent"

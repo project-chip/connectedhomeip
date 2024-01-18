@@ -10,6 +10,7 @@ and features.
 
 *
 esp32/README
+ti/ti_platform_overview
 ```
 
 ## Build Guides
@@ -20,6 +21,7 @@ esp32/README
 
 -   [Android - Building](./android_building.md)
 -   [Apple - Testing with iPhone, iPad, macOS, Apple TV, HomePod, Watch, etc](./darwin.md)
+-   [ASR - Getting Started Guide](./asr_getting_started_guide.md)
 -   [Espressif (ESP32) - Getting Started Guide](./esp32/README.md)
 -   [Infineon PSoC6 - Software Update](./infineon_psoc6_software_update.md)
 -   [Linux - Simulated Devices](./simulated_device_linux.md)
@@ -34,10 +36,12 @@ esp32/README
 -   [nRF Connect - Software Update](./nrfconnect_examples_software_update.md)
 -   [NXP - Android Commissioning](./nxp_k32w_android_commissioning.md)
 -   [NXP - Linux Examples](./nxp_imx8m_linux_examples.md)
--   [Silicon Labs - Documentation](https://github.com/SiliconLabs/matter#readme)
--   [Silicon Labs - Building](./silabs_efr32_building.md)
+-   [NXP - Manufacturing Data](./nxp_manufacturing_flow.md)
+-   [Silicon Labs - Documentation](https://siliconlabs.github.io/matter/latest/index.html)
+-   [Silicon Labs - Getting Started](./silabs_getting_started.md)
 -   [Silicon Labs - Software Update](./silabs_efr32_software_update.md)
--   [TI - Platform Overview](./ti_platform_overview.md)
+-   [Silicon Labs - CLI Guide](./silabs_cli_guide.md)
+-   [TI - Platform Overview](./ti/ti_platform_overview.md)
 
 ## Tool Guides
 
@@ -45,11 +49,14 @@ esp32/README
 -   [Python Matter-Repl](./matter-repl.md)
 -   [python-chip-controller - Advanced](./python_chip_controller_advanced_usage.md)
 -   [python-chip-controller - Building](./python_chip_controller_building.md)
+-   [CHEF test devices](../../examples/chef/README.md)
+    -   [New device type adding](../../examples/chef/NEW_CHEF_DEVICES.md)
 
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)
 -   [IP Commissioning](./ip_commissioning.md)
+-   [Matter IDL tooling and validation](./matter_idl_tooling.md)
 
 ## Setup Guides
 

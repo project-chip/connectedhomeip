@@ -82,7 +82,7 @@ class Efr32Button final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        AppTask::GetAppTask().ButtonEventHandler(SL_SIMPLE_BUTTON_INSTANCE(request.idx) /* PB 0 or PB 1 */, request.pushed);
+        AppTask::GetAppTask().ButtonEventHandler(request.idx /* PB 0 or PB 1 */, request.pushed);
         return pw::OkStatus();
     }
 };
@@ -92,15 +92,25 @@ public:
 class Efr32Device final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
-        mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
-        xTimerStart(mRebootTimer, pdMS_TO_TICKS(0));
+        TickType_t delayMs = kRebootTimerPeriodMs;
+        if (request.delay_ms != 0)
+        {
+            delayMs = request.delay_ms;
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms",
+                            static_cast<int>(kRebootTimerPeriodMs));
+        }
+        mRebootTimer = xTimerCreateStatic("Reboot", pdMS_TO_TICKS(delayMs), false, nullptr, RebootHandler, &mRebootTimerBuffer);
+        xTimerStart(mRebootTimer, 0);
         return pw::OkStatus();
     }
 
 private:
-    static constexpr TickType_t kRebootTimerPeriodTicks = 1000;
+    static constexpr uint32_t kRebootTimerPeriodMs = 1000;
     TimerHandle_t mRebootTimer;
     StaticTimer_t mRebootTimerBuffer;
 
@@ -149,7 +159,7 @@ Thread thread;
 #endif // defined(PW_RPC_THREAD_SERVICE) && PW_RPC_THREAD_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-pw::trace::TraceService trace_service;
+pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
 void RegisterServices(pw::rpc::Server & server)

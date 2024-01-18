@@ -23,10 +23,11 @@
 class LEDWidget
 {
 public:
-    void Init(void);
-    void SetOnoff(bool state);
+    virtual void Init(void)           = 0;
+    virtual void SetOnoff(bool state) = 0;
     bool GetOnoff(void);
-    void Toggle(void);
+    virtual void Toggle(void) = 0;
+    virtual ~LEDWidget(void){};
 
     uint8_t mOnoff;
     uint8_t mPin;
@@ -35,10 +36,11 @@ public:
 class DimmableLEDWidget : public LEDWidget
 {
 public:
-    void Init(void);
-    void Toggle(void);
-    void SetOnoff(bool state);
+    void Init(void) override;
+    void Toggle(void) override;
+    void SetOnoff(bool state) override;
     void SetLevel(uint8_t level);
+    ~DimmableLEDWidget(void) {}
 
     uint8_t light_v;
 };
@@ -46,11 +48,12 @@ public:
 class ColorLEDWidget : public DimmableLEDWidget
 {
 public:
-    void Init(void);
-    void Toggle(void);
-    void SetOnoff(bool state);
+    void Init(void) override;
+    void Toggle(void) override;
+    void SetOnoff(bool state) override;
     void SetLevel(uint8_t level);
     void SetColor(uint8_t level, uint8_t hue, uint8_t sat);
+    ~ColorLEDWidget(void) {}
 
     uint8_t light_h;
     uint8_t light_s;

@@ -17,6 +17,7 @@ ables
 AccessControl
 AccessControlEntry
 accessor
+Accessors
 AccountLogin
 acdbc
 ack
@@ -31,7 +32,9 @@ AddNOC
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddResponse
 AddThreadNetwork
+AddStatus
 adk
 AdministratorCommissioning
 adoc
@@ -44,6 +47,7 @@ AdvSendAdvert
 AE
 aef
 AES
+AIDL
 AlarmCode
 algs
 alloc
@@ -87,6 +91,7 @@ ARMmbed
 armv
 ASAN
 asdk
+ASR
 AssertionError
 AST
 ASYNC
@@ -95,6 +100,7 @@ att
 attId
 attr
 attrib
+AttributeAccessInterface
 attributeValue
 attrListName
 attrMask
@@ -120,6 +126,7 @@ AXXXF
 AYNJV
 babaf
 backend
+backends
 backticks
 backtrace
 BallastConfiguration
@@ -127,6 +134,7 @@ BarrierControl
 BasicCHIPRegression
 BasicInformation
 baudrate
+BCM
 BD
 BDX
 BDXDownloader
@@ -151,6 +159,7 @@ blocklist
 blockquote
 bluetoothd
 bluez
+BOOL
 BooleanState
 bootable
 Bootloader
@@ -162,6 +171,7 @@ bredr
 BridgedDeviceBasicInformation
 bridgedLightEndpoint
 bringup
+BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -243,12 +253,14 @@ CKIT
 CLA
 clapre
 CLI
+CLIs
 cloudbuild
 CLRF
 clusterAttrs
 clusterId
 clusterList
 clusterListName
+ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
@@ -259,6 +271,7 @@ CMS
 CMSIS
 CMVH
 cn
+COAP
 codeaurora
 codebase
 codegen
@@ -268,6 +281,8 @@ codelabs
 ColorControl
 Comcast
 Commandline
+CommandHandlerInterface
+CommandName
 Commissionable
 CommissionableDataProvider
 commissionables
@@ -281,6 +296,7 @@ configs
 configTOTAL
 ConfigurationManager
 ConfigurationManagerImpl
+conformant
 connectedhomeip
 ConnectionData
 ConnectIP
@@ -355,6 +371,8 @@ DCONF
 DCONFIG
 debianutils
 debugText
+decrypt
+decrypted
 DEDEDEDE
 deepnote
 DefaultOTAProviders
@@ -470,16 +488,21 @@ edaf
 edc
 EDR
 ee
+eea
 EEE
 eef
 ef
 EFR
+efuse
 eg
 EjQ
 elftools
 elock
+emberAf
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EmberAfInitializeAttributes
+emberAfSetDynamicEndpoint
 EnableNetwork
 EnableWiFiNetwork
 endian
@@ -507,8 +530,11 @@ EthyleneOxideConcentrationMeasurement
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
+EV
 EVB
+EventLogging
 evk
+EVSE
 exceptfds
 ExchangeContext
 exe
@@ -563,6 +589,7 @@ FW
 gbl
 gcloud
 GDB
+gdbgui
 gdbserver
 GeneralCommissioning
 GeneralDiagnostics
@@ -579,9 +606,11 @@ GetDeviceInfo
 GetDns
 GetIP
 getManualTests
+GetSafeAttributePersistenceProvider
 getstarted
 getTests
 GH
+ghcr
 ghp
 githubusercontent
 gitignore
@@ -606,12 +635,14 @@ GroupKeyManagement
 groupKeySecurityPolicy
 groupKeySetID
 groupsettings
+gsdk
 gtk
 GUA
 Gv
 gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
+HandleCommand
 hardcoded
 hardknott
 hardwarever
@@ -622,6 +653,7 @@ hci
 hciattach
 hciconfig
 hdlc
+HEPA
 HKDF
 HMAC
 hoc
@@ -641,11 +673,14 @@ IasWd
 iaszone
 ibb
 ICA
+ICD
+ICDs
 iCloud
 ICMP
 IDF
 IDL
 IDLs
+idt
 idx
 ifconfig
 ifdef
@@ -679,6 +714,7 @@ installDebug
 instantiation
 integrations
 IntelliSense
+InteractionModelEngine
 InteractionModelVersion
 Interoperable
 introvideos
@@ -717,6 +753,7 @@ Jupyter
 jupyterlab
 KA
 kAdminister
+kbd
 kBusy
 kCase
 Kconfig
@@ -775,12 +812,14 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+lladdr
 LocalConfigDisabled
 localedef
 localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+LogEvent
 loopback
 LowPower
 LPC
@@ -809,6 +848,7 @@ matterc
 MatterCustomTrace
 matterd
 MatterLock
+MatterReportingAttributeChangeCallback
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
@@ -835,6 +875,7 @@ MDNS
 MediaInput
 MediaPlayback
 MediaTek
+MEI
 mem
 memdf
 MemMonitoring
@@ -894,6 +935,7 @@ namespacing
 nano
 natively
 navpad
+NCP
 ncs
 nding
 NDK
@@ -911,6 +953,7 @@ nl
 NLUnitTest
 NLUnitTests
 nmcli
+nmtui
 noc
 NodeId
 nongnu
@@ -946,7 +989,9 @@ OnOff
 OnOffClusterTest
 OnOffSwitchConfiguration
 OnPlatformEvent
+onwards
 OO
+openiotsdk
 openjdk
 OpenOCD
 OpenSSL
@@ -972,6 +1017,7 @@ otaissues
 OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
+otaproviders
 OTAProviderSerialPort
 OTARequesterImpl
 OTARequestorDriver
@@ -997,17 +1043,21 @@ PairDevice
 PAIs
 PAKE
 palletsprojects
+PANID
 pankore
 param
 params
 PartNumber
 PASE
 Passcode
+passRetained
+passwd
 PBKDF
 pbuf
 pbufs
 pbxproj
 PCA
+pcap
 pcaps
 PDFs
 PDK
@@ -1017,6 +1067,7 @@ peerNodeId
 peerSessionId
 pem
 percentageLiftValue
+perfetto
 periodicQueryTimeout
 pexpect
 pickString
@@ -1024,13 +1075,16 @@ PID
 Pigweed
 PinCode
 pinrequest
+PIXIT
 pkgconfig
 PKI
 plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+PluginServerCallback
 png
+Podman
 PollControl
 pollInterval
 polymorphism
@@ -1062,6 +1116,7 @@ ProxyDiscovery
 ProxyValid
 ProxyView
 PRs
+PSA
 PSCAN
 PSECT
 PSK
@@ -1106,6 +1161,7 @@ ReadConfigValue
 readelf
 readfds
 README
+READMEs
 readonly
 readthedocs
 Reag
@@ -1114,6 +1170,8 @@ recommand
 recommanded
 recurse
 regen
+registerAttributeAccessOverride
+RegisterCommandHandler
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1123,6 +1181,7 @@ RendezvousParameters
 RendezVousTest
 REPL
 repo
+repos
 req
 Requestor
 Requestor's
@@ -1145,7 +1204,9 @@ rootfs
 RPC
 RPCs
 RPi
+RPi's
 RPis
+RSA
 rsn
 RSSI
 RST
@@ -1157,9 +1218,11 @@ rtld
 RTOS
 RTT
 RTX
+runArgs
 RUNAS
 RunMain
 runtime
+RVC
 rw
 RXD
 sandboxed
@@ -1191,6 +1254,7 @@ SendNewInputEvent
 sendto
 seqdiag
 SERIALDEVICE
+serialno
 SerialNumber
 ServiceId
 SetDns
@@ -1238,6 +1302,7 @@ SoftwareVersion
 softwareVersionStr
 SoftwareVersionString
 softwareVersionValid
+SparkFun
 sphinxcontrib
 SPI
 spiflash
@@ -1254,6 +1319,9 @@ StatusCode
 stderr
 stdout
 sterm
+stlink
+stm
+stmicroelectronics
 storagepath
 str
 strcpy
@@ -1296,12 +1364,14 @@ systime
 sysv
 TargetNavigator
 TBD
+tbody
 tcl
 TCP
 teardown
 Telink
 TemperatureMeasurement
 templating
+Tera
 testability
 TestArray
 TestCluster
@@ -1326,6 +1396,7 @@ textboxes
 TFT
 ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
+thread
 ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
@@ -1347,6 +1418,7 @@ tmp
 tngvndl
 TODO
 toJson
+tokenization
 tokenized
 tokenizer
 toolchain
@@ -1402,6 +1474,7 @@ UnitLocalization
 unpair
 unprovisioned
 Unsecure
+Unselect
 untrusted
 updateAvailable
 updateNotAvailable
@@ -1427,6 +1500,7 @@ utils
 UUID
 ux
 validator
+vcom
 VCP
 Vectorcall
 VendorID
@@ -1454,6 +1528,7 @@ WantedBy
 watchdogTimeout
 watchOS
 webpage
+wf
 wg
 wget
 whde

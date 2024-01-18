@@ -9,7 +9,7 @@ import chip.FabricAdmin
 import chip.logging
 import chip.native
 import coloredlogs
-from chip.ChipStack import *
+from chip.ChipStack import ChipStack
 from rich import inspect, pretty
 from rich.console import Console
 
@@ -81,9 +81,14 @@ console = Console()
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default="/tmp/repl-storage.json")
+    "-p", "--storagepath",
+    help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
+    action="store",
+    default="/tmp/repl-storage.json")
 parser.add_argument(
     "-d", "--debug", help="Set default logging level to debug.", action="store_true")
+parser.add_argument(
+    "-t", "--trust-store", help="Path to the PAA trust store.", action="store", default="./credentials/development/paa-root-certs")
 args = parser.parse_args()
 
 chip.native.Init()
@@ -102,7 +107,7 @@ elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
 
 caList = certificateAuthorityManager.activeCaList
 
-devCtrl = caList[0].adminList[0].NewController()
+devCtrl = caList[0].adminList[0].NewController(paaTrustStorePath=args.trust_store)
 builtins.devCtrl = devCtrl
 
 atexit.register(StackShutdown)
@@ -113,7 +118,9 @@ console.print(
 console.print(
     '''\t[red]certificateAuthorityManager[blue]:\tManages a list of CertificateAuthority instances.
 \t[red]caList[blue]:\t\t\t\tThe list of CertificateAuthority instances.
-\t[red]caList\[n]\[m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
+\t[red]caList[n][m][blue]:\t\t\tA specific FabricAdmin object at index m for the nth CertificateAuthority instance.''')
 
 console.print(
-    f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), and is available as [bold red]devCtrl')
+    f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
+    f'has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), '
+    'and is available as [bold red]devCtrl')

@@ -22,6 +22,9 @@ config:
     nodeId: 0x12344321
     cluster: "Color Control"
     endpoint: 1
+    ConfigWait:
+        type: int16u
+        defaultValue: 5000
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -32,19 +35,19 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes 0 to the Options attribute"
+    - label: "Step 0a: TH writes 0 to the Options attribute"
       PICS: CC.S.F04 && CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 0b: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
-    - label: "TH reads ColorTempPhysicalMinMireds attribute from DUT"
+    - label: "Step 1a: TH reads ColorTempPhysicalMinMireds attribute from DUT"
       PICS: CC.S.F04 && CC.S.A400b
       command: "readAttribute"
       attribute: "ColorTempPhysicalMinMireds"
@@ -55,7 +58,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorTempPhysicalMaxMireds attribute from DUT."
+    - label: "Step 1b: TH reads ColorTempPhysicalMaxMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A400c
       command: "readAttribute"
       attribute: "ColorTempPhysicalMaxMireds"
@@ -66,7 +69,7 @@ tests:
               minValue: 0
               maxValue: 65279
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 1c: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -77,7 +80,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
-          "TH sends MoveToColorTemperature command to DUT with
+          "Step 2a: TH sends MoveToColorTemperature command to DUT with
           ColorTemperatureMireds=(ColorTempPhysicalMinMireds +
           ColorTempPhysicalMaxMireds)/2 and TransitionTime=0 (immediately)."
       PICS: CC.S.F04 && CC.S.C0a.Rsp
@@ -105,8 +108,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveColorTemperature command to DUT with MoveMode = 0x01
-          (up), Rate = (ColorTempPhysicalMaxMireds -
+          "Step 2b: TH sends MoveColorTemperature command to DUT with MoveMode =
+          0x01 (up), Rate = (ColorTempPhysicalMaxMireds -
           ColorTempPhysicalMinMireds)/40"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature
@@ -136,7 +139,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 2c: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -154,7 +157,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 2d: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -172,7 +175,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 2e: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -183,7 +186,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
-          "TH sends MoveColorTemperature command to DUT with MoveMode =
+          "Step 3a: TH sends MoveColorTemperature command to DUT with MoveMode =
           0x03(down), Rate = (ColorTempPhysicalMaxMireds -
           ColorTempPhysicalMinMireds)/20"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
@@ -214,7 +217,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 3b: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -232,7 +235,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 3c: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -250,7 +253,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 3d: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -261,7 +264,7 @@ tests:
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:
-          "TH sends MoveColorTemperature command to DUT with MoveMode =
+          "Step 4a: TH sends MoveColorTemperature command to DUT with MoveMode =
           0x01(up), Rate = (ColorTempPhysicalMaxMireds -
           ColorTempPhysicalMinMireds)/20"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
@@ -293,8 +296,8 @@ tests:
                 value: 10000
 
     - label:
-          "After 10 seconds, TH sends MoveColorTemperature command to DUT with
-          MoveMode = 0x00(stop), Rate = (ColorTempPhysicalMaxMireds -
+          "Step 4b: After 10 seconds, TH sends MoveColorTemperature command to
+          DUT with MoveMode = 0x00(stop), Rate = (ColorTempPhysicalMaxMireds -
           ColorTempPhysicalMinMireds)/20"
       PICS: CC.S.F04 && CC.S.C4b.Rsp
       command: MoveColorTemperature
@@ -315,7 +318,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 4c: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -333,7 +336,7 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label: "TH reads ColorTemperatureMireds attribute from DUT."
+    - label: "Step 4d: TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4b.Rsp
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
@@ -342,7 +345,7 @@ tests:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
 
-    - label: "TH reads ColorMode attribute from DUT"
+    - label: "Step 5a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -352,7 +355,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 5b: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"
@@ -366,6 +369,14 @@ tests:
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
       command: "Off"
+
+    - label: "Wait to turn Off light"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigWait
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

@@ -28,7 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 
-constexpr uint8_t kMaxAllowedPaths = 10;
+inline constexpr uint8_t kMaxAllowedPaths = 64;
 
 namespace chip {
 namespace test_utils {
@@ -90,11 +90,18 @@ protected:
                            std::vector<chip::ClusterId> clusterIds, std::vector<chip::EventId> eventIds,
                            chip::app::ReadClient::InteractionType interactionType);
 
+    CHIP_ERROR ReadNone(chip::DeviceProxy * device) { return ReportNone(device, chip::app::ReadClient::InteractionType::Read); }
+
     CHIP_ERROR ReadAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                        std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
                        std::vector<chip::EventId> eventIds)
     {
         return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds, chip::app::ReadClient::InteractionType::Read);
+    }
+
+    CHIP_ERROR SubscribeNone(chip::DeviceProxy * device)
+    {
+        return ReportNone(device, chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     CHIP_ERROR SubscribeAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
@@ -104,6 +111,8 @@ protected:
         return ReportAll(device, endpointIds, clusterIds, attributeIds, eventIds,
                          chip::app::ReadClient::InteractionType::Subscribe);
     }
+
+    CHIP_ERROR ReportNone(chip::DeviceProxy * device, chip::app::ReadClient::InteractionType interactionType);
 
     CHIP_ERROR ReportAll(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds,
                          std::vector<chip::ClusterId> clusterIds, std::vector<chip::AttributeId> attributeIds,
@@ -234,12 +243,11 @@ protected:
 
             chip::app::CommandPathParams commandPath = { endpointId, clusterId, commandId,
                                                          (chip::app::CommandPathFlags::kEndpointIdValid) };
-            auto commandSender = std::make_unique<chip::app::CommandSender>(mCallback, device->GetExchangeManager(),
-                                                                            mTimedInteractionTimeoutMs.HasValue());
+            auto commandSender                       = std::make_unique<chip::app::CommandSender>(
+                mCallback, device->GetExchangeManager(), mTimedInteractionTimeoutMs.HasValue(), mSuppressResponse.ValueOr(false));
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs,
-                                                                           mSuppressResponse.ValueOr(false)));
+            ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, value, mTimedInteractionTimeoutMs));
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 

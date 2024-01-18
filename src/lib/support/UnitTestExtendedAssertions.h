@@ -50,17 +50,16 @@
     } while (0)
 
 /**
- *  @def NL_TEST_ASSERT_SUCCESS(inSuite, expression)
+ *  @def NL_TEST_ASSERT_EQUALS(inSuite, inExpr1,, inExpr2)
  *
  *  @brief
- *    This is used to assert that an expression is equal to CHIP_NO_ERROR
- *    throughout a test in a test suite.
+ *    This is used to assert that two expressions are equal, and to print both sides on failure. This
+ *    does not attempt to print the value of variables. It only prints the expressions.
  *
  *  @param[in]    inSuite       A pointer to the test suite the assertion
  *                              should be accounted against.
- *  @param[in]    inExpression  Expression to be checked for equality to CHIP_NO_ERROR.
- *                              If the expression is different than CHIP_NO_ERROR, the
- *                              assertion fails.
+ *  @param[in]    inExpr1       Left hand-side to check
+ *  @param[in]    inExpr2       Right hand-side to check
  *
  */
 #define NL_TEST_ASSERT_EQUALS(inSuite, inExpr1, inExpr2)                                                                           \
@@ -68,7 +67,7 @@
     {                                                                                                                              \
         (inSuite)->performedAssertions += 1;                                                                                       \
                                                                                                                                    \
-        if ((inExpr1) != (inExpr2))                                                                                                \
+        if (!((inExpr1) == (inExpr2)))                                                                                             \
         {                                                                                                                          \
             printf("%s:%u: assertion failed: %s == %s\n", __FILE__, __LINE__, #inExpr1, #inExpr2);                                 \
             (inSuite)->failedAssertions += 1;                                                                                      \

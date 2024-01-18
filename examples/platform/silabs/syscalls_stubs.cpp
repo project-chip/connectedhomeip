@@ -174,7 +174,7 @@ int __attribute__((weak)) _read(int file, char * ptr, int len)
 {
     (void) file;
 #if SILABS_LOG_OUT_UART
-    return = uartConsoleRead(ptr, len);
+    return uartConsoleRead(ptr, len);
 #else
     (void) ptr;
     (void) len;

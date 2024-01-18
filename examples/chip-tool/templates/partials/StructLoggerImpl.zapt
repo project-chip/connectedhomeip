@@ -1,0 +1,18 @@
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, const chip::app::Clusters::{{namespace}}::Structs::{{name}}::DecodableType & value)
+{
+  DataModelLogger::LogString(label, indent, "{");
+{{#zcl_struct_items}}
+  {
+      CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
+      if (err != CHIP_NO_ERROR)
+      {
+          DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for '{{asUpperCamelCase label}}'");
+          return err;
+      }
+  }
+{{/zcl_struct_items}}
+  DataModelLogger::LogString(indent, "}");
+
+  return CHIP_NO_ERROR;
+}
+

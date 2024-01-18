@@ -25,14 +25,15 @@ config:
 
 tests:
     - label:
-          "OTA-R/TH sends a QueryImage Command to the DUT. UserConsentNeeded
-          field is set to False."
+          "Step 1: OTA-R/TH sends a QueryImage Command to the DUT.
+          UserConsentNeeded field is set to False."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
-          where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
+          Where 321 is OTA Requestor node ID and 123 is OTA Provider node ID
 
-          Verify on the OTA Requestor logs receives QueryImageResponse
+          On OTA Requestor logs,
+          Verify that the DUT is able to query the server where the software update image is located. DUT should obtain the User Consent from the user. DUT should respond with the QueryImageResponse to the OTA-R/TH
 
           [1673337981.104652][28428:28428] CHIP:SWU: QueryImageResponse:
           [1673337981.104695][28428:28428] CHIP:SWU:   status: 0

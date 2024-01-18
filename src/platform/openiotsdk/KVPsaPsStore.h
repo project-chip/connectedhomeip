@@ -44,7 +44,7 @@ using namespace chip::Platform::PersistedStorage;
 // '01' = Matter region
 // '02' = the sub region group base offset (Factory, Config, Counter or KVS)
 // '14' = the id offset inside the group.
-constexpr Key kMatterPsaPaKeyRegion = 0x010000U;
+inline constexpr Key kMatterPsaPaKeyRegion = 0x010000U;
 constexpr inline Key GetPsaPaKey(Key group, uint8_t id)
 {
     return kMatterPsaPaKeyRegion | (group) << 8 | id;
@@ -122,6 +122,7 @@ public:
     static const Key kMaxMatterPsaPaKeyRegion;
 
     static CHIP_ERROR Init(void);
+    static CHIP_ERROR Shutdown(void);
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);

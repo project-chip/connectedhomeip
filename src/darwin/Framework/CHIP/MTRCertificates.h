@@ -44,14 +44,30 @@ NS_ASSUME_NONNULL_BEGIN
  * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
  *
+ * validityPeriod specifies when the certificate will be valid. Note that
+ * there is currently no mechanism available in Matter to update or rotate
+ * the root certificate of a fabric installed on a device. A certificate with
+ * no expiration time can be created by specifying [NSDate distantFuture] for
+ * the end of the period.
+ *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
 + (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
                                                  issuerID:(NSNumber * _Nullable)issuerID
                                                  fabricID:(NSNumber * _Nullable)fabricID
+                                           validityPeriod:(NSDateInterval *)validityPeriod
                                                     error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+
+/**
+ * As above, but defaults to no expiration time.
+ */
++ (MTRCertificateDERBytes _Nullable)createRootCertificate:(id<MTRKeypair>)keypair
+                                                 issuerID:(NSNumber * _Nullable)issuerID
+                                                 fabricID:(NSNumber * _Nullable)fabricID
+                                                    error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an intermediate X.509 DER encoded certificate that has the
@@ -66,6 +82,10 @@ NS_ASSUME_NONNULL_BEGIN
  * If fabricID is not nil, it will be included in the subject DN of the
  * certificate.  In this case it must be a valid Matter fabric id.
  *
+ * validityPeriod specifies when the certificate will be valid. A certificate
+ * with no expiration time can be created by specifying [NSDate distantFuture]
+ * for the end of the period.
+ *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
@@ -74,8 +94,20 @@ NS_ASSUME_NONNULL_BEGIN
                                             intermediatePublicKey:(SecKeyRef)intermediatePublicKey
                                                          issuerID:(NSNumber * _Nullable)issuerID
                                                          fabricID:(NSNumber * _Nullable)fabricID
+                                                   validityPeriod:(NSDateInterval *)validityPeriod
                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+
+/**
+ * As above, but defaults to no expiration time.
+ */
++ (MTRCertificateDERBytes _Nullable)createIntermediateCertificate:(id<MTRKeypair>)rootKeypair
+                                                  rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                            intermediatePublicKey:(SecKeyRef)intermediatePublicKey
+                                                         issuerID:(NSNumber * _Nullable)issuerID
+                                                         fabricID:(NSNumber * _Nullable)fabricID
+                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an X.509 DER encoded certificate that has the
@@ -95,6 +127,10 @@ NS_ASSUME_NONNULL_BEGIN
  * 3 numbers, which are expected to be 32-bit unsigned Case Authenticated Tag
  * values.
  *
+ * validityPeriod specifies when the certificate will be valid. A certificate
+ * with no expiration time can be created by specifying [NSDate distantFuture]
+ * for the end of the period.
+ *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
  */
@@ -104,8 +140,21 @@ NS_ASSUME_NONNULL_BEGIN
                                                         fabricID:(NSNumber *)fabricID
                                                           nodeID:(NSNumber *)nodeID
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                                  validityPeriod:(NSDateInterval *)validityPeriod
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+
+/**
+ * As above, but defaults to no expiration time.
+ */
++ (MTRCertificateDERBytes _Nullable)createOperationalCertificate:(id<MTRKeypair>)signingKeypair
+                                              signingCertificate:(MTRCertificateDERBytes)signingCertificate
+                                            operationalPublicKey:(SecKeyRef)operationalPublicKey
+                                                        fabricID:(NSNumber *)fabricID
+                                                          nodeID:(NSNumber *)nodeID
+                                           caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
+                                                           error:(NSError * __autoreleasing _Nullable * _Nullable)error
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Check whether the given keypair's public key matches the given certificate's
@@ -158,7 +207,7 @@ NS_ASSUME_NONNULL_BEGIN
  * represented in the X.509v3 DER format).
  */
 + (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Extract the public key from the given PKCS#10 certificate signing request.
@@ -167,7 +216,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSData * _Nullable)publicKeyFromCSR:(MTRCSRDERBytes)csr
                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 

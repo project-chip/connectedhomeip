@@ -20,7 +20,7 @@ import logging
 import os
 import sys
 import time
-from optparse import OptionParser, OptionValueError
+from optparse import OptionParser
 
 from helper.CHIPTestBase import CHIPVirtualHome
 

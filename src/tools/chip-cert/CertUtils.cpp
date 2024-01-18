@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -216,38 +216,53 @@ void ToolChipDN::PrintDN(FILE * file, const char * name) const
 
 namespace {
 
+template <size_t N>
+bool HasRawPrefix(const uint8_t * buffer, size_t len, const uint8_t (&prefix)[N])
+{
+    return len >= N && memcmp(buffer, prefix, N) == 0;
+}
+
+bool HasStringPrefix(const uint8_t * buffer, size_t len, const char * prefix)
+{
+    size_t prefixLen = strlen(prefix);
+    return len >= prefixLen && memcmp(buffer, prefix, prefixLen) == 0;
+}
+
 CertFormat DetectCertFormat(const uint8_t * cert, uint32_t certLen)
 {
-    static const uint8_t chipRawPrefix[] = { 0x15, 0x30, 0x01 };
-    static const char * chipHexPrefix    = "153001";
-    static const char * chipB64Prefix    = "FTAB";
-    static const uint8_t derRawPrefix[]  = { 0x30, 0x82 };
-    static const char * derHexPrefix     = "30820";
-    static const char * pemMarker        = "-----BEGIN CERTIFICATE-----";
+    static const uint8_t chipRawPrefix[]           = { 0x15, 0x30, 0x01 };
+    static const char chipHexPrefix[]              = "153001";
+    static const char chipB64Prefix[]              = "FTAB";
+    static const uint8_t chipCompactPdcRawPrefix[] = { 0x15, 0x30, 0x09 };
+    static const char chipCompactPdcHexPrefix[]    = "153009";
+    static const char chipCompactPdcB64Prefix[]    = "FTAJ";
+    static const uint8_t derRawPrefix[]            = { 0x30, 0x82 };
+    static const char derHexPrefix[]               = "30820";
+    static const char pemMarker[]                  = "-----BEGIN CERTIFICATE-----";
 
     VerifyOrReturnError(cert != nullptr, kCertFormat_Unknown);
 
-    if ((certLen > sizeof(chipRawPrefix)) && (memcmp(cert, chipRawPrefix, sizeof(chipRawPrefix)) == 0))
+    if (HasRawPrefix(cert, certLen, chipRawPrefix) || HasRawPrefix(cert, certLen, chipCompactPdcRawPrefix))
     {
         return kCertFormat_Chip_Raw;
     }
 
-    if ((certLen > strlen(chipHexPrefix)) && (memcmp(cert, chipHexPrefix, strlen(chipHexPrefix)) == 0))
+    if (HasStringPrefix(cert, certLen, chipHexPrefix) || HasStringPrefix(cert, certLen, chipCompactPdcHexPrefix))
     {
         return kCertFormat_Chip_Hex;
     }
 
-    if ((certLen > strlen(chipB64Prefix)) && (memcmp(cert, chipB64Prefix, strlen(chipB64Prefix)) == 0))
+    if (HasStringPrefix(cert, certLen, chipB64Prefix) || HasStringPrefix(cert, certLen, chipCompactPdcB64Prefix))
     {
         return kCertFormat_Chip_Base64;
     }
 
-    if ((certLen > sizeof(derRawPrefix)) && (memcmp(cert, derRawPrefix, sizeof(derRawPrefix)) == 0))
+    if (HasRawPrefix(cert, certLen, derRawPrefix))
     {
         return kCertFormat_X509_DER;
     }
 
-    if ((certLen > strlen(derHexPrefix)) && (memcmp(cert, derHexPrefix, strlen(derHexPrefix)) == 0))
+    if (HasStringPrefix(cert, certLen, derHexPrefix))
     {
         return kCertFormat_X509_Hex;
     }
@@ -260,23 +275,26 @@ CertFormat DetectCertFormat(const uint8_t * cert, uint32_t certLen)
     return kCertFormat_Unknown;
 }
 
-bool SetCertSerialNumber(X509 * cert)
+bool SetCertSerialNumber(X509 * cert, uint64_t value = kUseRandomSerialNumber)
 {
     bool res = true;
     uint64_t rnd;
     ASN1_INTEGER * snInt = X509_get_serialNumber(cert);
 
-    // Generate a random value to be used as the serial number.
-    if (!RAND_bytes(reinterpret_cast<uint8_t *>(&rnd), sizeof(rnd)))
+    if (value == kUseRandomSerialNumber)
     {
-        ReportOpenSSLErrorAndExit("RAND_bytes", res = false);
+        // Generate a random value to be used as the serial number.
+        if (!RAND_bytes(reinterpret_cast<uint8_t *>(&rnd), sizeof(rnd)))
+        {
+            ReportOpenSSLErrorAndExit("RAND_bytes", res = false);
+        }
+
+        // Avoid negative numbers.
+        value = rnd & 0x7FFFFFFFFFFFFFFFULL;
     }
 
-    // Avoid negative numbers.
-    rnd &= 0x7FFFFFFFFFFFFFFF;
-
     // Store the serial number as an ASN1 integer value within the certificate.
-    if (ASN1_INTEGER_set_uint64(snInt, rnd) == 0)
+    if (ASN1_INTEGER_set_uint64(snInt, value) == 0)
     {
         ReportOpenSSLErrorAndExit("ASN1_INTEGER_set_uint64", res = false);
     }
@@ -290,8 +308,8 @@ bool SetCertTimeField(ASN1_TIME * asn1Time, const struct tm & value)
     char timeStr[ASN1UniversalTime::kASN1TimeStringMaxLength + 1];
     MutableCharSpan timeSpan(timeStr);
     ASN1UniversalTime val = { .Year   = static_cast<uint16_t>((value.tm_year == kX509NoWellDefinedExpirationDateYear)
-                                                                ? kX509NoWellDefinedExpirationDateYear
-                                                                : (value.tm_year + 1900)),
+                                                                  ? kX509NoWellDefinedExpirationDateYear
+                                                                  : (value.tm_year + 1900)),
                               .Month  = static_cast<uint8_t>(value.tm_mon + 1),
                               .Day    = static_cast<uint8_t>(value.tm_mday),
                               .Hour   = static_cast<uint8_t>(value.tm_hour),
@@ -837,12 +855,12 @@ bool WriteChipCert(const char * fileName, const ByteSpan & chipCert, CertFormat 
     return WriteDataIntoFile(fileName, chipCert.data(), static_cast<uint32_t>(chipCert.size()), dataFormat);
 }
 
-bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
+bool MakeCert(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
               uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount, X509 * newCert,
               EVP_PKEY * newKey, CertStructConfig & certConfig)
 {
     bool res  = true;
-    bool isCA = (certType != kCertType_Node);
+    bool isCA = (certType == CertType::kRoot || certType == CertType::kICA);
 
     VerifyOrExit(subjectDN != nullptr, res = false);
     VerifyOrExit(caCert != nullptr, res = false);
@@ -859,7 +877,7 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
     // Generate a serial number for the cert.
     if (certConfig.IsSerialNumberPresent())
     {
-        res = SetCertSerialNumber(newCert);
+        res = SetCertSerialNumber(newCert, (certType == CertType::kNetworkIdentity ? 1 : kUseRandomSerialNumber));
         VerifyTrueOrExit(res);
     }
 
@@ -867,7 +885,7 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
     // the new cert's subject name.
     if (certConfig.IsIssuerPresent())
     {
-        if (certType == kCertType_Root)
+        if (certType == CertType::kRoot)
         {
             res = subjectDN->SetCertIssuerDN(newCert);
             VerifyTrueOrExit(res);
@@ -920,20 +938,25 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
     // Add extended key usage certificate extensions.
     if (!certConfig.IsExtensionExtendedKeyUsageMissing())
     {
-        if (certType == kCertType_Node)
+        if (certType == CertType::kNode)
         {
             res = AddExtension(newCert, NID_ext_key_usage, "critical,clientAuth,serverAuth");
             VerifyTrueOrExit(res);
         }
-        else if (certType == kCertType_FirmwareSigning)
+        else if (certType == CertType::kFirmwareSigning)
         {
             res = AddExtension(newCert, NID_ext_key_usage, "critical,codeSigning");
+            VerifyTrueOrExit(res);
+        }
+        else if (certType == CertType::kNetworkIdentity)
+        {
+            res = AddExtension(newCert, NID_ext_key_usage, "critical,clientAuth,serverAuth");
             VerifyTrueOrExit(res);
         }
     }
 
     // Add a subject key id extension for the certificate.
-    if (certConfig.IsExtensionSKIDPresent())
+    if (certType != CertType::kNetworkIdentity && certConfig.IsExtensionSKIDPresent())
     {
         res = AddSubjectKeyId(newCert, certConfig.IsExtensionSKIDLengthValid());
         VerifyTrueOrExit(res);
@@ -941,9 +964,9 @@ bool MakeCert(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP
 
     // Add the authority key id extension from the signing certificate. For self-signed cert's this will
     // be the same as new cert's subject key id extension.
-    if (certConfig.IsExtensionAKIDPresent())
+    if (certType != CertType::kNetworkIdentity && certConfig.IsExtensionAKIDPresent())
     {
-        if ((certType == kCertType_Root) && !certConfig.IsExtensionSKIDPresent())
+        if ((certType == CertType::kRoot) && !certConfig.IsExtensionSKIDPresent())
         {
             res = AddSubjectKeyId(newCert, certConfig.IsExtensionSKIDLengthValid());
             VerifyTrueOrExit(res);
@@ -990,9 +1013,10 @@ exit:
     return res;
 }
 
-CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom,
-                       uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts, uint8_t futureExtsCount,
-                       X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig, MutableByteSpan & chipCert)
+CHIP_ERROR MakeCertTLV(CertType certType, const ToolChipDN * subjectDN, X509 * caCert, EVP_PKEY * caKey,
+                       const struct tm & validFrom, uint32_t validDays, int pathLen, const FutureExtensionWithNID * futureExts,
+                       uint8_t futureExtsCount, X509 * x509Cert, EVP_PKEY * newKey, CertStructConfig & certConfig,
+                       MutableByteSpan & chipCert)
 {
     TLVWriter writer;
     TLVType containerType;
@@ -1009,7 +1033,11 @@ CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * ca
     VerifyOrReturnError(x509Cert != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(newKey != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    isCA = (certType == kCertType_ICA || certType == kCertType_Root);
+    isCA = (certType == CertType::kICA || certType == CertType::kRoot);
+
+    // If error testing is enabled, let field inclusion be controlled that way,
+    // otherwise use compact identity format for Network (Client) Identities.
+    bool useCompactIdentityFormat = (!certConfig.IsErrorTestCaseEnabled() && certType == CertType::kNetworkIdentity);
 
     uint8_t * p = subjectPubkey;
     VerifyOrReturnError(i2o_ECPublicKey(EVP_PKEY_get0_EC_KEY(newKey), &p) == chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES,
@@ -1023,84 +1051,89 @@ CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * ca
 
     ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
 
-    // serial number
-    if (certConfig.IsSerialNumberPresent())
+    if (!useCompactIdentityFormat)
     {
-        ASN1_INTEGER * asn1Integer = X509_get_serialNumber(x509Cert);
-        uint64_t serialNumber;
-        uint8_t serialNumberArray[sizeof(uint64_t)];
-        VerifyOrReturnError(1 == ASN1_INTEGER_get_uint64(&serialNumber, asn1Integer), CHIP_ERROR_INVALID_ARGUMENT);
-        Encoding::BigEndian::Put64(serialNumberArray, serialNumber);
-        ReturnErrorOnFailure(writer.PutBytes(ContextTag(kTag_SerialNumber), serialNumberArray, sizeof(serialNumberArray)));
-    }
-
-    // signature algorithm
-    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SignatureAlgorithm), certConfig.GetSignatureAlgorithmTLVEnum()));
-
-    // issuer Name
-    if (certConfig.IsIssuerPresent())
-    {
-        if (certType == kCertType_Root)
+        // serial number
+        if (certConfig.IsSerialNumberPresent())
         {
-            ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            ASN1_INTEGER * asn1Integer = X509_get_serialNumber(x509Cert);
+            uint64_t serialNumber;
+            uint8_t serialNumberArray[sizeof(uint64_t)];
+            VerifyOrReturnError(1 == ASN1_INTEGER_get_uint64(&serialNumber, asn1Integer), CHIP_ERROR_INVALID_ARGUMENT);
+            Encoding::BigEndian::Put64(serialNumberArray, serialNumber);
+            ReturnErrorOnFailure(writer.PutBytes(ContextTag(kTag_SerialNumber), serialNumberArray, sizeof(serialNumberArray)));
+        }
+
+        // signature algorithm
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SignatureAlgorithm), certConfig.GetSignatureAlgorithmTLVEnum()));
+
+        // issuer Name
+        if (certConfig.IsIssuerPresent())
+        {
+            if (certType == CertType::kRoot)
+            {
+                ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            }
+            else
+            {
+                uint8_t caChipCertBuf[kMaxCHIPCertLength];
+                MutableByteSpan caChipCert(caChipCertBuf);
+                VerifyOrReturnError(true == X509ToChipCert(caCert, caChipCert), CHIP_ERROR_INVALID_ARGUMENT);
+                ChipDN issuerDN;
+                ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(caChipCert, issuerDN));
+                ReturnErrorOnFailure(issuerDN.EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            }
+        }
+
+        // validity
+        uint32_t validFromChipEpoch;
+        uint32_t validToChipEpoch;
+
+        VerifyOrReturnError(
+            true ==
+                CalendarToChipEpochTime(static_cast<uint16_t>(validFrom.tm_year + 1900), static_cast<uint8_t>(validFrom.tm_mon + 1),
+                                        static_cast<uint8_t>(validFrom.tm_mday), static_cast<uint8_t>(validFrom.tm_hour),
+                                        static_cast<uint8_t>(validFrom.tm_min), static_cast<uint8_t>(validFrom.tm_sec),
+                                        validFromChipEpoch),
+            CHIP_ERROR_INVALID_ARGUMENT);
+        if (validDays == kCertValidDays_NoWellDefinedExpiration)
+        {
+            validToChipEpoch = 0;
         }
         else
         {
-            uint8_t caChipCertBuf[kMaxCHIPCertLength];
-            MutableByteSpan caChipCert(caChipCertBuf);
-            VerifyOrReturnError(true == X509ToChipCert(caCert, caChipCert), CHIP_ERROR_INVALID_ARGUMENT);
-            ChipDN issuerDN;
-            ReturnErrorOnFailure(ExtractSubjectDNFromChipCert(caChipCert, issuerDN));
-            ReturnErrorOnFailure(issuerDN.EncodeToTLV(writer, ContextTag(kTag_Issuer)));
+            VerifyOrReturnError(CanCastTo<uint32_t>(validFromChipEpoch + validDays * kSecondsPerDay - 1),
+                                CHIP_ERROR_INVALID_ARGUMENT);
+            validToChipEpoch = validFromChipEpoch + validDays * kSecondsPerDay - 1;
         }
-    }
+        if (!certConfig.IsValidityCorrect())
+        {
+            uint32_t validTemp = validFromChipEpoch;
+            validFromChipEpoch = validToChipEpoch;
+            validToChipEpoch   = validTemp;
+        }
+        if (certConfig.IsValidityNotBeforePresent())
+        {
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotBefore), validFromChipEpoch));
+        }
+        if (certConfig.IsValidityNotAfterPresent())
+        {
+            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotAfter), validToChipEpoch));
+        }
 
-    // validity
-    uint32_t validFromChipEpoch;
-    uint32_t validToChipEpoch;
+        // subject Name
+        if (certConfig.IsSubjectPresent())
+        {
+            ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Subject)));
+        }
 
-    VerifyOrReturnError(true ==
-                            CalendarToChipEpochTime(
-                                static_cast<uint16_t>(validFrom.tm_year + 1900), static_cast<uint8_t>(validFrom.tm_mon + 1),
-                                static_cast<uint8_t>(validFrom.tm_mday), static_cast<uint8_t>(validFrom.tm_hour),
-                                static_cast<uint8_t>(validFrom.tm_min), static_cast<uint8_t>(validFrom.tm_sec), validFromChipEpoch),
-                        CHIP_ERROR_INVALID_ARGUMENT);
-    if (validDays == kCertValidDays_NoWellDefinedExpiration)
-    {
-        validToChipEpoch = 0;
-    }
-    else
-    {
-        VerifyOrReturnError(CanCastTo<uint32_t>(validFromChipEpoch + validDays * kSecondsPerDay - 1), CHIP_ERROR_INVALID_ARGUMENT);
-        validToChipEpoch = validFromChipEpoch + validDays * kSecondsPerDay - 1;
-    }
-    if (!certConfig.IsValidityCorrect())
-    {
-        uint32_t validTemp = validFromChipEpoch;
-        validFromChipEpoch = validToChipEpoch;
-        validToChipEpoch   = validTemp;
-    }
-    if (certConfig.IsValidityNotBeforePresent())
-    {
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotBefore), validFromChipEpoch));
-    }
-    if (certConfig.IsValidityNotAfterPresent())
-    {
-        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_NotAfter), validToChipEpoch));
-    }
+        // public key algorithm
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_PublicKeyAlgorithm), GetOIDEnum(kOID_PubKeyAlgo_ECPublicKey)));
 
-    // subject Name
-    if (certConfig.IsSubjectPresent())
-    {
-        ReturnErrorOnFailure(subjectDN->EncodeToTLV(writer, ContextTag(kTag_Subject)));
+        // public key curve Id
+        uint8_t ecCurveEnum = certConfig.IsSigCurveWrong() ? 0x02 : GetOIDEnum(kOID_EllipticCurve_prime256v1);
+        ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurveIdentifier), ecCurveEnum));
     }
-
-    // public key algorithm
-    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_PublicKeyAlgorithm), GetOIDEnum(kOID_PubKeyAlgo_ECPublicKey)));
-
-    // public key curve Id
-    uint8_t ecCurveEnum = certConfig.IsSigCurveWrong() ? 0x02 : GetOIDEnum(kOID_EllipticCurve_prime256v1);
-    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_EllipticCurveIdentifier), ecCurveEnum));
 
     // public key
     if (certConfig.IsPublicKeyError())
@@ -1111,121 +1144,125 @@ CHIP_ERROR MakeCertTLV(uint8_t certType, const ToolChipDN * subjectDN, X509 * ca
         writer.PutBytes(ContextTag(kTag_EllipticCurvePublicKey), subjectPubkey, chip::Crypto::CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES));
 
     // extensions
-    ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_Extensions), kTLVType_List, containerType2));
+    if (!useCompactIdentityFormat)
     {
-        if (isCA)
+        ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_Extensions), kTLVType_List, containerType2));
         {
-            // basic constraints
-            if (certConfig.IsExtensionBasicPresent())
+            if (isCA)
             {
-                ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_BasicConstraints), kTLVType_Structure, containerType3));
-                if (certConfig.IsExtensionBasicCAPresent())
-                {
-                    ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
-                                                           certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
-                }
-                // TODO
-                if (pathLen != kPathLength_NotSpecified)
+                // basic constraints
+                if (certConfig.IsExtensionBasicPresent())
                 {
                     ReturnErrorOnFailure(
-                        writer.Put(ContextTag(kTag_BasicConstraints_PathLenConstraint), static_cast<uint8_t>(pathLen)));
+                        writer.StartContainer(ContextTag(kTag_BasicConstraints), kTLVType_Structure, containerType3));
+                    if (certConfig.IsExtensionBasicCAPresent())
+                    {
+                        ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
+                                                               certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
+                    }
+                    if (pathLen != kPathLength_NotSpecified)
+                    {
+                        ReturnErrorOnFailure(
+                            writer.Put(ContextTag(kTag_BasicConstraints_PathLenConstraint), static_cast<uint8_t>(pathLen)));
+                    }
+                    ReturnErrorOnFailure(writer.EndContainer(containerType3));
                 }
-                ReturnErrorOnFailure(writer.EndContainer(containerType3));
-            }
 
-            // key usage
-            if (certConfig.IsExtensionKeyUsagePresent())
+                // key usage
+                if (certConfig.IsExtensionKeyUsagePresent())
+                {
+                    BitFlags<KeyUsageFlags> keyUsage;
+                    if (!certConfig.IsExtensionKeyUsageDigitalSigCorrect())
+                    {
+                        keyUsage.Set(KeyUsageFlags::kDigitalSignature);
+                    }
+                    if (certConfig.IsExtensionKeyUsageKeyCertSignCorrect())
+                    {
+                        keyUsage.Set(KeyUsageFlags::kKeyCertSign);
+                    }
+                    if (certConfig.IsExtensionKeyUsageCRLSignCorrect())
+                    {
+                        keyUsage.Set(KeyUsageFlags::kCRLSign);
+                    }
+                    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_KeyUsage), keyUsage.Raw()));
+                }
+            }
+            else
             {
-                BitFlags<KeyUsageFlags> keyUsage;
-                if (!certConfig.IsExtensionKeyUsageDigitalSigCorrect())
+                // basic constraints
+                if (certConfig.IsExtensionBasicPresent())
                 {
-                    keyUsage.Set(KeyUsageFlags::kDigitalSignature);
+                    ReturnErrorOnFailure(
+                        writer.StartContainer(ContextTag(kTag_BasicConstraints), kTLVType_Structure, containerType3));
+                    if (certConfig.IsExtensionBasicCAPresent())
+                    {
+                        ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
+                                                               certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
+                    }
+                    ReturnErrorOnFailure(writer.EndContainer(containerType3));
                 }
-                if (certConfig.IsExtensionKeyUsageKeyCertSignCorrect())
+
+                // key usage
+                if (certConfig.IsExtensionKeyUsagePresent())
                 {
-                    keyUsage.Set(KeyUsageFlags::kKeyCertSign);
+                    BitFlags<KeyUsageFlags> keyUsage;
+                    if (certConfig.IsExtensionKeyUsageDigitalSigCorrect())
+                    {
+                        keyUsage.Set(KeyUsageFlags::kDigitalSignature);
+                    }
+                    if (!certConfig.IsExtensionKeyUsageKeyCertSignCorrect())
+                    {
+                        keyUsage.Set(KeyUsageFlags::kKeyCertSign);
+                    }
+                    if (!certConfig.IsExtensionKeyUsageCRLSignCorrect())
+                    {
+                        keyUsage.Set(KeyUsageFlags::kCRLSign);
+                    }
+                    ReturnErrorOnFailure(writer.Put(ContextTag(kTag_KeyUsage), keyUsage));
                 }
-                if (certConfig.IsExtensionKeyUsageCRLSignCorrect())
+
+                // extended key usage
+                if (!certConfig.IsExtensionExtendedKeyUsageMissing() && (certType == CertType::kNode))
                 {
-                    keyUsage.Set(KeyUsageFlags::kCRLSign);
+                    ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_ExtendedKeyUsage), kTLVType_Array, containerType3));
+                    if (certType == CertType::kNode)
+                    {
+                        ReturnErrorOnFailure(writer.Put(AnonymousTag(), GetOIDEnum(kOID_KeyPurpose_ClientAuth)));
+                        ReturnErrorOnFailure(writer.Put(AnonymousTag(), GetOIDEnum(kOID_KeyPurpose_ServerAuth)));
+                    }
+                    else if (certType == CertType::kFirmwareSigning)
+                    {
+                        ReturnErrorOnFailure(writer.Put(AnonymousTag(), GetOIDEnum(kOID_KeyPurpose_CodeSigning)));
+                    }
+                    ReturnErrorOnFailure(writer.EndContainer(containerType3));
                 }
-                ReturnErrorOnFailure(writer.Put(ContextTag(kTag_KeyUsage), keyUsage.Raw()));
             }
-        }
-        else
-        {
-            // basic constraints
-            if (certConfig.IsExtensionBasicPresent())
+
+            // subject key identifier
+            if (certConfig.IsExtensionSKIDPresent())
             {
-                ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_BasicConstraints), kTLVType_Structure, containerType3));
-                if (certConfig.IsExtensionBasicCAPresent())
-                {
-                    ReturnErrorOnFailure(writer.PutBoolean(ContextTag(kTag_BasicConstraints_IsCA),
-                                                           certConfig.IsExtensionBasicCACorrect() ? isCA : !isCA));
-                }
-                ReturnErrorOnFailure(writer.EndContainer(containerType3));
+                ReturnErrorOnFailure(Crypto::Hash_SHA1(subjectPubkey, sizeof(subjectPubkey), keyid));
+                size_t keyIdLen = certConfig.IsExtensionSKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
+                ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SubjectKeyIdentifier), ByteSpan(keyid, keyIdLen)));
             }
 
-            // key usage
-            if (certConfig.IsExtensionKeyUsagePresent())
+            // authority key identifier
+            if (certConfig.IsExtensionAKIDPresent())
             {
-                BitFlags<KeyUsageFlags> keyUsage;
-                if (certConfig.IsExtensionKeyUsageDigitalSigCorrect())
-                {
-                    keyUsage.Set(KeyUsageFlags::kDigitalSignature);
-                }
-                if (!certConfig.IsExtensionKeyUsageKeyCertSignCorrect())
-                {
-                    keyUsage.Set(KeyUsageFlags::kKeyCertSign);
-                }
-                if (!certConfig.IsExtensionKeyUsageCRLSignCorrect())
-                {
-                    keyUsage.Set(KeyUsageFlags::kCRLSign);
-                }
-                ReturnErrorOnFailure(writer.Put(ContextTag(kTag_KeyUsage), keyUsage));
+                ReturnErrorOnFailure(Crypto::Hash_SHA1(issuerPubkey, sizeof(issuerPubkey), keyid));
+                size_t keyIdLen = certConfig.IsExtensionAKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
+                ReturnErrorOnFailure(writer.Put(ContextTag(kTag_AuthorityKeyIdentifier), ByteSpan(keyid, keyIdLen)));
             }
 
-            // extended key usage
-            if (!certConfig.IsExtensionExtendedKeyUsageMissing() && (certType == kCertType_Node))
+            for (uint8_t i = 0; i < futureExtsCount; i++)
             {
-                ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_ExtendedKeyUsage), kTLVType_Array, containerType3));
-                if (certType == kCertType_Node)
-                {
-                    ReturnErrorOnFailure(writer.Put(AnonymousTag(), GetOIDEnum(kOID_KeyPurpose_ClientAuth)));
-                    ReturnErrorOnFailure(writer.Put(AnonymousTag(), GetOIDEnum(kOID_KeyPurpose_ServerAuth)));
-                }
-                else if (certType == kCertType_FirmwareSigning)
-                {
-                    ReturnErrorOnFailure(writer.Put(AnonymousTag(), GetOIDEnum(kOID_KeyPurpose_CodeSigning)));
-                }
-                ReturnErrorOnFailure(writer.EndContainer(containerType3));
+                ReturnErrorOnFailure(
+                    writer.Put(ContextTag(kTag_FutureExtension),
+                               ByteSpan(reinterpret_cast<const uint8_t *>(futureExts[i].info), strlen(futureExts[i].info))));
             }
         }
-
-        // subject key identifier
-        if (certConfig.IsExtensionSKIDPresent())
-        {
-            ReturnErrorOnFailure(Crypto::Hash_SHA1(subjectPubkey, sizeof(subjectPubkey), keyid));
-            size_t keyIdLen = certConfig.IsExtensionSKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
-            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_SubjectKeyIdentifier), ByteSpan(keyid, keyIdLen)));
-        }
-
-        // authority key identifier
-        if (certConfig.IsExtensionAKIDPresent())
-        {
-            ReturnErrorOnFailure(Crypto::Hash_SHA1(issuerPubkey, sizeof(issuerPubkey), keyid));
-            size_t keyIdLen = certConfig.IsExtensionAKIDLengthValid() ? sizeof(keyid) : sizeof(keyid) - 1;
-            ReturnErrorOnFailure(writer.Put(ContextTag(kTag_AuthorityKeyIdentifier), ByteSpan(keyid, keyIdLen)));
-        }
-
-        for (uint8_t i = 0; i < futureExtsCount; i++)
-        {
-            ReturnErrorOnFailure(
-                writer.Put(ContextTag(kTag_FutureExtension),
-                           ByteSpan(reinterpret_cast<const uint8_t *>(futureExts[i].info), strlen(futureExts[i].info))));
-        }
+        ReturnErrorOnFailure(writer.EndContainer(containerType2));
     }
-    ReturnErrorOnFailure(writer.EndContainer(containerType2));
 
     // signature
     const ASN1_BIT_STRING * asn1Signature = nullptr;
@@ -1284,7 +1321,7 @@ exit:
 
 bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subjectVID, uint16_t subjectPID,
                  bool encodeVIDandPIDasCN, X509 * caCert, EVP_PKEY * caKey, const struct tm & validFrom, uint32_t validDays,
-                 X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig)
+                 X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, X509_EXTENSION * cdpExt)
 {
     bool res     = true;
     uint16_t vid = certConfig.IsSubjectVIDMismatch() ? static_cast<uint16_t>(subjectVID + 1) : subjectVID;
@@ -1465,6 +1502,19 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     {
         // Add optional Subject Alternative Name extentsion.
         res = AddExtension(newCert, NID_subject_alt_name, "DNS:test.com");
+        VerifyTrueOrExit(res);
+    }
+
+    if (cdpExt != nullptr)
+    {
+        int result = X509_add_ext(newCert, cdpExt, -1);
+        VerifyTrueOrExit(result == 1);
+    }
+
+    if (certConfig.IsExtensionCDPPresent())
+    {
+        // Add second CDP extension.
+        res = AddExtension(newCert, NID_crl_distribution_points, "URI:http://example.com/test_crl.pem");
         VerifyTrueOrExit(res);
     }
 

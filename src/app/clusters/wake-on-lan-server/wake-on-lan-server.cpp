@@ -39,6 +39,7 @@ using namespace chip::app::Clusters::WakeOnLan;
 
 static constexpr size_t kWakeOnLanDelegateTableSize =
     EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static_assert(kWakeOnLanDelegateTableSize <= kEmberInvalidEndpointIndex, "WakeOnLan Delegate table size error");
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -51,8 +52,8 @@ Delegate * gDelegateTable[kWakeOnLanDelegateTableSize] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::WakeOnLan::Id);
-    return (ep == 0xFFFF ? nullptr : gDelegateTable[ep]);
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, WakeOnLan::Id, EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kWakeOnLanDelegateTableSize ? nullptr : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -73,8 +74,8 @@ namespace WakeOnLan {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::WakeOnLan::Id);
-    if (ep != 0xFFFF)
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, WakeOnLan::Id, EMBER_AF_WAKE_ON_LAN_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (ep < kWakeOnLanDelegateTableSize)
     {
         gDelegateTable[ep] = delegate;
     }

@@ -85,7 +85,9 @@ class CommissionableNode():
     pairingHint: int = None
     mrpRetryIntervalIdle: int = None
     mrpRetryIntervalActive: int = None
+    mrpRetryActiveThreshold: int = None
     supportsTcp: bool = None
+    isICDOperatingAsLIT: bool = None
     addresses: List[str] = None
     rotatingId: Optional[str] = None
 
@@ -142,7 +144,7 @@ class _PendingDiscoveries:
                     if self.NeedsCallback(item):
                         try:
                             item.callback(item.result)
-                        except:
+                        except Exception:
                             logging.exception("Node discovery callback failed")
                     else:
                         updatedDiscoveries.append(item)

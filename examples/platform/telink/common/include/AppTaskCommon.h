@@ -25,8 +25,12 @@
 #include "LEDWidget.h"
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 #include "PWMDevice.h"
+#endif
+
+#ifdef CONFIG_WS2812_STRIP
+#include "WS2812Device.h"
 #endif
 
 #include <zephyr/drivers/gpio.h>
@@ -39,6 +43,10 @@
 #include <platform/telink/FactoryDataProvider.h>
 #endif
 
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #include <cstdint>
@@ -49,20 +57,37 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr EndpointId kExampleEndpointId = 1;
-constexpr uint8_t kDefaultMinLevel      = 0;
-constexpr uint8_t kDefaultMaxLevel      = 254;
-constexpr uint8_t kButtonPushEvent      = 1;
-constexpr uint8_t kButtonReleaseEvent   = 0;
+inline constexpr EndpointId kExampleEndpointId = 1;
+inline constexpr uint8_t kDefaultMinLevel      = 0;
+inline constexpr uint8_t kDefaultMaxLevel      = 254;
+inline constexpr uint8_t kButtonPushEvent      = 1;
+inline constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
 class AppTaskCommon
 {
 public:
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+    void PowerOnFactoryReset(void);
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
     CHIP_ERROR StartApp();
     void PostEvent(AppEvent * event);
 
-    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
+    static void IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect);
+
+#ifdef CONFIG_CHIP_PW_RPC
+    enum ButtonId_t
+    {
+        kButtonId_ExampleAction = 1,
+        kButtonId_FactoryReset,
+#if APP_USE_THREAD_START_BUTTON
+        kButtonId_StartThread,
+#endif
+#if APP_USE_BLE_START_BUTTON
+        kButtonId_StartBleAdv
+#endif
+    } ButtonId;
+#endif
 
 protected:
     CHIP_ERROR InitCommonParts(void);
@@ -77,10 +102,12 @@ protected:
     static void FactoryResetButtonEventHandler(void);
     static void FactoryResetHandler(AppEvent * aEvent);
 
+#if APP_USE_BLE_START_BUTTON
     static void StartBleAdvButtonEventHandler(void);
     static void StartBleAdvHandler(AppEvent * aEvent);
+#endif
 
-#if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     static void StartThreadButtonEventHandler(void);
     static void StartThreadHandler(AppEvent * aEvent);
 #endif
@@ -94,7 +121,7 @@ protected:
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
     PWMDevice mPwmIdentifyLed;
 
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);
@@ -109,5 +136,10 @@ protected:
 
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
+#endif
+
+#ifdef CONFIG_CHIP_PW_RPC
+    friend class chip::rpc::TelinkButton;
+    static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
 #endif
 };

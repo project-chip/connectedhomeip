@@ -31,10 +31,14 @@ tests:
       disabled: true
 
     - label:
-          "TH sends a ReceiveInit message to DUT + DUT sends a ReceiveAccept
-          message back to TH"
+          "Step 1: TH sends a ReceiveInit message to DUT + DUT sends a
+          ReceiveAccept message back to TH."
       verification: |
-          1. Verify that the OTA Reference Requester App logs show ReceiveAccept message from DUT and compare field values against ReceiveInit
+          On OTA Reference Requester App logs, Verify that the ReceiveAccept message has the following mandatory fields.
+          - Transfer Control
+          - Range Control
+          - Max Block Size
+          - Length
 
           [1636410922200] [59208:62970584] CHIP: [ATM] Handling received BDX Message
           [1636410922200] [59208:62970584] CHIP: [ATM] ReceiveAccept

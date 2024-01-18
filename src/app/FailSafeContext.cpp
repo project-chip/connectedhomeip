@@ -19,11 +19,15 @@
  *    @file
  *          Provides the implementation of the FailSafeContext object.
  */
-
-#include <lib/support/SafeInt.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
 #include "FailSafeContext.h"
+#include <app/icd/ICDConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
+#include <lib/support/SafeInt.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 using namespace chip::DeviceLayer;
 
@@ -48,6 +52,17 @@ void FailSafeContext::HandleDisarmFailSafe(intptr_t arg)
     failSafeContext->DisarmFailSafe();
 }
 
+void FailSafeContext::SetFailSafeArmed(bool armed)
+{
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (IsFailSafeArmed() != armed)
+    {
+        ICDNotifier::GetInstance().BroadcastActiveRequest(ICDListener::KeepActiveFlag::kFailSafeArmed, armed);
+    }
+#endif
+    mFailSafeArmed = armed;
+}
+
 void FailSafeContext::FailSafeTimerExpired()
 {
     if (!IsFailSafeArmed())
@@ -66,8 +81,9 @@ void FailSafeContext::ScheduleFailSafeCleanup(FabricIndex fabricIndex, bool addN
     // Not armed, but busy so cannot rearm (via General Commissioning cluster) until the flushing
     // via `HandleDisarmFailSafe` path is complete.
     // TODO: This is hacky and we need to remove all this event pushing business, to keep all fail-safe logic-only.
-    mFailSafeBusy  = true;
-    mFailSafeArmed = false;
+    mFailSafeBusy = true;
+
+    SetFailSafeArmed(false);
 
     ChipDeviceEvent event;
     event.Type                                                = DeviceEventType::kFailSafeTimerExpired;
@@ -90,7 +106,7 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
 
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool cancelTimersIfError = false;
-    if (!mFailSafeArmed)
+    if (!IsFailSafeArmed())
     {
         System::Clock::Timeout maxCumulativeTimeout = System::Clock::Seconds32(CHIP_DEVICE_CONFIG_MAX_CUMULATIVE_FAILSAFE_SEC);
         SuccessOrExit(err = DeviceLayer::SystemLayer().StartTimer(maxCumulativeTimeout, HandleMaxCumulativeFailSafeTimer, this));
@@ -100,8 +116,8 @@ CHIP_ERROR FailSafeContext::ArmFailSafe(FabricIndex accessingFabricIndex, System
     SuccessOrExit(
         err = DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds16(expiryLengthSeconds), HandleArmFailSafeTimer, this));
 
-    mFailSafeArmed = true;
-    mFabricIndex   = accessingFabricIndex;
+    SetFailSafeArmed(true);
+    mFabricIndex = accessingFabricIndex;
 
 exit:
 

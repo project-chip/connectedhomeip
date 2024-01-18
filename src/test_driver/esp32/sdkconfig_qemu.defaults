@@ -49,3 +49,9 @@ CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
 # Crypto tests generally take long enough for the watchdog to trigger
 # otherwise.
 CONFIG_ESP_TASK_WDT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Build chip tests
+CONFIG_BUILD_CHIP_TESTS=y

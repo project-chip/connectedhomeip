@@ -15,11 +15,15 @@
  *    limitations under the License.
  */
 
+// NOTE: This class was not intended to be part of the public Matter API;
+// internally this class has been replaced by MTRAsyncWorkQueue. This code
+// remains here simply to preserve API/ABI compatibility.
+
 #import <dispatch/dispatch.h>
 #import <os/lock.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
 #import "MTRLogging_Internal.h"
+#import <Matter/MTRAsyncCallbackWorkQueue.h>
 
 #pragma mark - Class extensions
 
@@ -41,10 +45,13 @@
 @end
 
 @interface MTRAsyncCallbackQueueWorkItem ()
+@property (nonatomic, readonly) os_unfair_lock lock;
 @property (nonatomic, strong, readonly) dispatch_queue_t queue;
 @property (nonatomic, readwrite) NSUInteger retryCount;
 @property (nonatomic, strong) MTRAsyncCallbackWorkQueue * workQueue;
+@property (nonatomic, readonly) BOOL enqueued;
 // Called by the queue
+- (void)markEnqueued;
 - (void)callReadyHandlerWithContext:(id)context;
 - (void)cancel;
 @end
@@ -59,19 +66,31 @@
         _context = context;
         _queue = queue;
         _items = [NSMutableArray array];
-        MTR_LOG_INFO("MTRAsyncCallbackWorkQueue init for context %@", context);
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString
+    os_unfair_lock_lock(&_lock);
+
+    auto * desc = [NSString
         stringWithFormat:@"MTRAsyncCallbackWorkQueue context: %@ items count: %lu", self.context, (unsigned long) self.items.count];
+
+    os_unfair_lock_unlock(&_lock);
+
+    return desc;
 }
 
 - (void)enqueueWorkItem:(MTRAsyncCallbackQueueWorkItem *)item
 {
+    if (item.enqueued) {
+        MTR_LOG_ERROR("MTRAsyncCallbackWorkQueue enqueueWorkItem: item cannot be enqueued twice");
+        return;
+    }
+
+    [item markEnqueued];
+
     os_unfair_lock_lock(&_lock);
     item.workQueue = self;
     [self.items addObject:item];
@@ -87,8 +106,6 @@
     _items = nil;
     os_unfair_lock_unlock(&_lock);
 
-    MTR_LOG_INFO(
-        "MTRAsyncCallbackWorkQueue invalidate for context %@ items count: %lu", _context, (unsigned long) invalidateItems.count);
     for (MTRAsyncCallbackQueueWorkItem * item in invalidateItems) {
         [item cancel];
     }
@@ -156,6 +173,7 @@
         [workItem callReadyHandlerWithContext:self.context];
     }
 }
+
 @end
 
 @implementation MTRAsyncCallbackQueueWorkItem
@@ -163,12 +181,14 @@
 - (instancetype)initWithQueue:(dispatch_queue_t)queue
 {
     if (self = [super init]) {
+        _lock = OS_UNFAIR_LOCK_INIT;
         _queue = queue;
     }
     return self;
 }
 
-- (void)invalidate
+// assume lock is held
+- (void)_invalidate
 {
     // Make sure we don't leak via handlers that close over us, as ours must.
     // This is a bit odd, since these are supposed to be non-nullable
@@ -179,6 +199,38 @@
     // Setting the attributes to nil will not compile; set the ivars directly.
     _readyHandler = nil;
     _cancelHandler = nil;
+}
+
+- (void)invalidate
+{
+    os_unfair_lock_lock(&_lock);
+    [self _invalidate];
+    os_unfair_lock_unlock(&_lock);
+}
+
+- (void)markEnqueued
+{
+    os_unfair_lock_lock(&_lock);
+    _enqueued = YES;
+    os_unfair_lock_unlock(&_lock);
+}
+
+- (void)setReadyHandler:(MTRAsyncCallbackReadyHandler)readyHandler
+{
+    os_unfair_lock_lock(&_lock);
+    if (!_enqueued) {
+        _readyHandler = readyHandler;
+    }
+    os_unfair_lock_unlock(&_lock);
+}
+
+- (void)setCancelHandler:(dispatch_block_t)cancelHandler
+{
+    os_unfair_lock_lock(&_lock);
+    if (!_enqueued) {
+        _cancelHandler = cancelHandler;
+    }
+    os_unfair_lock_unlock(&_lock);
 }
 
 - (void)endWork
@@ -196,12 +248,19 @@
 - (void)callReadyHandlerWithContext:(id)context
 {
     dispatch_async(self.queue, ^{
-        if (self.readyHandler == nil) {
+        os_unfair_lock_lock(&self->_lock);
+        MTRAsyncCallbackReadyHandler readyHandler = self->_readyHandler;
+        NSUInteger retryCount = self->_retryCount;
+        if (readyHandler) {
+            self->_retryCount++;
+        }
+        os_unfair_lock_unlock(&self->_lock);
+
+        if (readyHandler == nil) {
             // Nothing to do here.
             [self endWork];
         } else {
-            self.readyHandler(context, self.retryCount);
-            self.retryCount++;
+            readyHandler(context, retryCount);
         }
     });
 }
@@ -209,11 +268,16 @@
 // Called by the work queue
 - (void)cancel
 {
-    dispatch_async(self.queue, ^{
-        if (self.cancelHandler != nil) {
-            self.cancelHandler();
-        }
-        [self invalidate];
-    });
+    os_unfair_lock_lock(&self->_lock);
+    dispatch_block_t cancelHandler = self->_cancelHandler;
+    [self _invalidate];
+    os_unfair_lock_unlock(&self->_lock);
+
+    if (cancelHandler) {
+        dispatch_async(self.queue, ^{
+            cancelHandler();
+        });
+    }
 }
+
 @end

@@ -91,12 +91,12 @@ const uint8_t UUID_PrimaryService[]       = { 0x00, 0x28 };
 const uint8_t UUID_CharDecl[]             = { 0x03, 0x28 };
 const uint8_t UUID_ClientCharConfigDesc[] = { 0x02, 0x29 };
 const uint8_t UUID_CHIPoBLEService[]      = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-                                         0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
+                                              0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 };
 const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
 const uint8_t UUID_CHIPoBLEChar_RX[]      = { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95,
-                                         0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 };
+                                              0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 };
 const uint8_t UUID_CHIPoBLEChar_TX[]      = { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95,
-                                         0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 };
+                                              0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 };
 #if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 const uint8_t ShortUUID_CHIPoBLE_CharTx_Desc[] = { 0x02, 0x29 };
 #endif
@@ -196,6 +196,7 @@ static struct gattc_profile_inst gl_profile_tab[PROFILE_NUM] = {
         .gattc_if = ESP_GATT_IF_NONE,       /* Not get the gatt_if, so initial is ESP_GATT_IF_NONE */
     },
 };
+static esp_gatt_if_t chip_ctrl_gattc_if = 0;
 #endif
 
 CHIP_ERROR BLEManagerImpl::_Init()
@@ -210,7 +211,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 #endif
     SuccessOrExit(err);
 
-    memset(mCons, 0, sizeof(mCons));
+    memset(reinterpret_cast<void *>(mCons), 0, sizeof(mCons));
     mServiceMode          = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mAppIf                = ESP_GATT_IF_NONE;
     mServiceAttrHandle    = 0;
@@ -432,6 +433,15 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
     switch (event)
     {
     case ESP_GATTC_REG_EVT:
+        if (param->reg.status == ESP_GATT_OK)
+        {
+            chip_ctrl_gattc_if = gattc_if;
+        }
+        else
+        {
+            ChipLogProgress(Ble, "Reg app failed, app_id %04x, status 0x%x", param->reg.app_id, param->reg.status);
+            return;
+        }
         break;
     case ESP_GATTC_CONNECT_EVT:
         err = sInstance.HandleGAPConnect(*p_data);
@@ -452,8 +462,7 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
             break;
         }
         ChipLogProgress(Ble, "discover service complete conn_id %d", param->dis_srvc_cmpl.conn_id);
-        esp_ble_gattc_search_service(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, param->cfg_mtu.conn_id,
-                                     &remote_filter_service_uuid);
+        esp_ble_gattc_search_service(gattc_if, param->cfg_mtu.conn_id, &remote_filter_service_uuid);
         break;
     case ESP_GATTC_CFG_MTU_EVT:
         if (param->cfg_mtu.status != ESP_GATT_OK)
@@ -502,8 +511,8 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
             uint16_t count  = 0;
             uint16_t offset = 0;
             esp_gatt_status_t status =
-                esp_ble_gattc_get_attr_count(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, p_data->search_cmpl.conn_id,
-                                             ESP_GATT_DB_CHARACTERISTIC, gl_profile_tab[PROFILE_A_APP_ID].service_start_handle,
+                esp_ble_gattc_get_attr_count(gattc_if, p_data->search_cmpl.conn_id, ESP_GATT_DB_CHARACTERISTIC,
+                                             gl_profile_tab[PROFILE_A_APP_ID].service_start_handle,
                                              gl_profile_tab[PROFILE_A_APP_ID].service_end_handle, INVALID_HANDLE, &count);
             if (status != ESP_GATT_OK)
             {
@@ -522,10 +531,9 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
                 }
                 else
                 {
-                    status = esp_ble_gattc_get_all_char(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, p_data->search_cmpl.conn_id,
-                                                        gl_profile_tab[PROFILE_A_APP_ID].service_start_handle,
-                                                        gl_profile_tab[PROFILE_A_APP_ID].service_end_handle, char_elem_result,
-                                                        &count, offset);
+                    status = esp_ble_gattc_get_all_char(
+                        gattc_if, p_data->search_cmpl.conn_id, gl_profile_tab[PROFILE_A_APP_ID].service_start_handle,
+                        gl_profile_tab[PROFILE_A_APP_ID].service_end_handle, char_elem_result, &count, offset);
                     if (status != 0)
                     {
                         ChipLogProgress(Ble, "esp_ble_gattc_get_char_by_uuid error");
@@ -547,8 +555,7 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
                         else if (char_elem_result[i].properties & CharProps_ReadNotify)
                         {
                             gl_profile_tab[PROFILE_A_APP_ID].notify_char_handle = char_elem_result[i].char_handle;
-                            esp_ble_gattc_register_for_notify(gl_profile_tab[PROFILE_A_APP_ID].gattc_if,
-                                                              gl_profile_tab[PROFILE_A_APP_ID].remote_bda,
+                            esp_ble_gattc_register_for_notify(gattc_if, gl_profile_tab[PROFILE_A_APP_ID].remote_bda,
                                                               char_elem_result[i].char_handle);
                         }
                     }
@@ -572,7 +579,7 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
         {
             uint16_t count               = 0;
             esp_gatt_status_t ret_status = esp_ble_gattc_get_attr_count(
-                gl_profile_tab[PROFILE_A_APP_ID].gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id, ESP_GATT_DB_DESCRIPTOR,
+                gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id, ESP_GATT_DB_DESCRIPTOR,
                 gl_profile_tab[PROFILE_A_APP_ID].service_start_handle, gl_profile_tab[PROFILE_A_APP_ID].service_end_handle,
                 gl_profile_tab[PROFILE_A_APP_ID].notify_char_handle, &count);
             if (ret_status != ESP_GATT_OK)
@@ -589,9 +596,9 @@ void BLEManagerImpl::gattc_profile_event_handler(esp_gattc_cb_event_t event, esp
                 else
                 {
                     memcpy(&notify_descr_uuid.uuid.uuid16, ShortUUID_CHIPoBLE_CharTx_Desc, 2);
-                    ret_status = esp_ble_gattc_get_descr_by_char_handle(
-                        gl_profile_tab[PROFILE_A_APP_ID].gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
-                        p_data->reg_for_notify.handle, notify_descr_uuid, descr_elem_result, &count);
+                    ret_status = esp_ble_gattc_get_descr_by_char_handle(gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
+                                                                        p_data->reg_for_notify.handle, notify_descr_uuid,
+                                                                        descr_elem_result, &count);
                     ChipLogProgress(Ble, "discoverd all chars and discr.........\n\n");
 
                     ChipDeviceEvent chipEvent;
@@ -722,14 +729,14 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
 
 void BLEManagerImpl::CancelConnect(void)
 {
-    int rc = esp_ble_gattc_close(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, connId);
+    int rc = esp_ble_gattc_close(chip_ctrl_gattc_if, connId);
     VerifyOrReturn(rc == 0, ChipLogError(Ble, "Failed to cancel connection rc=%d", rc));
 }
 
 void BLEManagerImpl::ConnectDevice(esp_bd_addr_t & addr, esp_ble_addr_type_t addr_type, uint16_t timeout)
 {
     int rc;
-    rc = esp_ble_gattc_open(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, addr, addr_type, true);
+    rc = esp_ble_gattc_open(chip_ctrl_gattc_if, addr, addr_type, true);
     if (rc != 0)
     {
         ChipLogError(Ble, "Failed to connect to rc=%d", rc);
@@ -751,13 +758,12 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     value[0] = 0x02;
     value[1] = 0x00;
 
-    rc = esp_ble_gattc_write_char_descr(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
-                                        descr_elem_result[0].handle, sizeof(value), value, ESP_GATT_WRITE_TYPE_RSP,
-                                        ESP_GATT_AUTH_REQ_NONE);
+    rc = esp_ble_gattc_write_char_descr(chip_ctrl_gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id, descr_elem_result[0].handle,
+                                        sizeof(value), value, ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
     if (rc != 0)
     {
         ChipLogError(Ble, "esp_ble_gattc_get_descr_by_char_handle failed: %d", rc);
-        esp_ble_gattc_close(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, conId);
+        esp_ble_gattc_close(chip_ctrl_gattc_if, conId);
         return false;
     }
     ChipDeviceEvent event;
@@ -780,13 +786,12 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     value[0] = 0x00;
     value[1] = 0x00;
 
-    rc = esp_ble_gattc_write_char_descr(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
-                                        descr_elem_result[0].handle, sizeof(value), value, ESP_GATT_WRITE_TYPE_RSP,
-                                        ESP_GATT_AUTH_REQ_NONE);
+    rc = esp_ble_gattc_write_char_descr(chip_ctrl_gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id, descr_elem_result[0].handle,
+                                        sizeof(value), value, ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
     if (rc != 0)
     {
         ChipLogError(Ble, "ble_gattc_write_flat failed: %d", rc);
-        esp_ble_gattc_close(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, conId);
+        esp_ble_gattc_close(chip_ctrl_gattc_if, conId);
         return false;
     }
     ChipDeviceEvent event;
@@ -847,7 +852,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     ChipLogDetail(Ble, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, data->DataLength());
 #endif
 
-    err = MapBLEError(esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), false));
+    // Set param need_confirm as false will send notification, otherwise indication.
+    err = MapBLEError(
+        esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), true /* need_confirm */));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "esp_ble_gatts_send_indicate() failed: %s", ErrorStr(err));
@@ -874,7 +881,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBle
     ChipLogProgress(Ble, "In send write request\n");
     int rc;
 
-    rc = esp_ble_gattc_write_char(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
+    rc = esp_ble_gattc_write_char(chip_ctrl_gattc_if, gl_profile_tab[PROFILE_A_APP_ID].conn_id,
                                   gl_profile_tab[PROFILE_A_APP_ID].write_char_handle, pBuf->DataLength(), pBuf->Start(),
                                   ESP_GATT_WRITE_TYPE_RSP, ESP_GATT_AUTH_REQ_NONE);
     if (rc != 0)
@@ -1915,7 +1922,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPCentralConnect(esp_ble_gattc_cb_param_t p_da
             memcpy(gl_profile_tab[PROFILE_A_APP_ID].remote_bda, p_data.connect.remote_bda, sizeof(esp_bd_addr_t));
 
             // Start the GATT discovery process
-            int rc = esp_ble_gattc_search_service(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, connId, &remote_filter_service_uuid);
+            int rc = esp_ble_gattc_search_service(chip_ctrl_gattc_if, connId, &remote_filter_service_uuid);
             if (rc != 0)
             {
                 HandleGAPConnectionFailed();
@@ -1935,7 +1942,7 @@ CHIP_ERROR BLEManagerImpl::HandleGAPConnect(esp_ble_gattc_cb_param_t p_data)
         gl_profile_tab[PROFILE_A_APP_ID].conn_id = p_data.connect.conn_id;
         connId                                   = p_data.connect.conn_id;
         memcpy(gl_profile_tab[PROFILE_A_APP_ID].remote_bda, p_data.connect.remote_bda, sizeof(esp_bd_addr_t));
-        rc = esp_ble_gattc_send_mtu_req(gl_profile_tab[PROFILE_A_APP_ID].gattc_if, p_data.connect.conn_id);
+        rc = esp_ble_gattc_send_mtu_req(chip_ctrl_gattc_if, p_data.connect.conn_id);
 
         if (rc != 0)
         {

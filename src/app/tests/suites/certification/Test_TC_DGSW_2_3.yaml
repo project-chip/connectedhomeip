@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 43.2.3. [TC-DGSW-2.3] Command received functionality with server as DUT
+name: 3.2.3. [TC-DGSW-2.3] Command Received [DUT Sever]
 
 PICS:
     - DGSW.S
@@ -29,12 +29,12 @@ tests:
 
       disabled: true
 
-    - label: "TH sends ResetWatermarks to DUT."
+    - label: "Step 2a: TH sends ResetWatermarks to DUT."
       PICS: DGSW.S.C00.Rsp
       verification: |
           ./chip-tool softwarediagnostics  reset-watermarks 1 0
 
-          Verify the success response in TH(chip-tool) Log
+          Via the TH (chip-tool), verify the success response for sending ResetWatermarks command.
 
           [1657022305.316864][7266:7271] CHIP:DMG: InvokeResponseMessage =
           [1657022305.316900][7266:7271] CHIP:DMG: {
@@ -69,13 +69,15 @@ tests:
           [1657022305.318359][7266:7271] CHIP:DMG: ICR moving to [AwaitingDe]
       disabled: true
 
-    - label: "TH reads a list of ThreadMetrics struct attributes from DUT."
+    - label:
+          "Step 2b: TH reads a list of ThreadMetrics struct attributes from DUT."
       PICS: DGSW.S.A0000
       verification: |
           ./chip-tool softwarediagnostics read thread-metrics 1 0
 
-          Verify the thread-metrics attribute has entries with ThreadMetrics Struct in TH(chip-tool) Log
-
+          Via the TH (chip-tool), verify:
+          -that ThreadMetrics attribute contains entries with ThreadMetrics Struct.
+          -that the entries are matched with StackFreeMinimum and StackFreeCurrent values of ThreadMetrics.
 
           [1654697032.107109][7037:7042] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0000 DataVersion: 1044289564
           [1654697032.107255][7037:7042] CHIP:TOO:   ThreadMetrics: 6 entries
@@ -105,10 +107,12 @@ tests:
           [1654697032.108154][7037:7042] CHIP:TOO:      }
       disabled: true
 
-    - label: "TH reads CurrentHeapHighWatermark attribute from DUT."
+    - label: "Step 2c: TH reads CurrentHeapHighWatermark attribute from DUT."
       PICS: DGSW.S.A0003
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
+
+          Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
 
           [1663066847.710531][4064:4069] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
           [1663066847.714122][4064:4069] CHIP:TOO:   CurrentHeapUsed: 1389168
@@ -116,18 +120,20 @@ tests:
 
           ./chip-tool softwarediagnostics read current-heap-high-watermark 1 0
 
-          Verify the value of CurrentHeapHighWatermark is in range uint64  and the CurrentHeapUsed is less than or equal to the CurrentHeapHighWatermark in TH(chip-tool) Log
+          Via the TH (chip-tool), verify:
+          -that CurrentHeapHighWatermark attribute value with in the range of uint64.
+          -that the value is higher than or equal to CurrentHeapUsed.
 
           [1663066925.496916][4072:4077] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0003 DataVersion: 2808275719
           [1663066925.496999][4072:4077] CHIP:TOO:   CurrentHeapHighWatermark: 1389328
       disabled: true
 
-    - label: "TH reads a CurrentHeapUsed attribute value from DUT."
+    - label: "Step 2d: TH reads a CurrentHeapUsed attribute value from DUT."
       PICS: DGSW.S.A0002
       verification: |
           ./chip-tool  softwarediagnostics  read current-heap-used 1 0
 
-          Verify the value of CurrentHeapUsed is in range uint64 in TH(chip-tool) Log
+          Via the TH (chip-tool), verify that CurrentHeapUsed attribute value with in the range of uint64.
 
           [1663066954.656376][4079:4084] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0034 Attribute 0x0000_0002 DataVersion: 2808275719
           [1663066954.656505][4079:4084] CHIP:TOO:   CurrentHeapUsed: 1389360

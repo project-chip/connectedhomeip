@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <cluster>
+    <name>Temperature Control</name>
+    <domain>Appliances</domain>
+    <description>Attributes and commands for configuring the temperature control, and reporting temperature.</description>
+    <code>0x0056</code>
+    <define>TEMPERATURE_CONTROL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <attribute side="server" code="0x0000" define="TEMP_SETPOINT" type="temperature" writable="false" optional="true">TemperatureSetpoint</attribute>
+    <attribute side="server" code="0x0001" define="MIN_TEMP" type="temperature" writable="false" optional="true">MinTemperature</attribute>
+    <attribute side="server" code="0x0002" define="MAX_TEMP" type="temperature" writable="false" optional="true">MaxTemperature</attribute>
+    <attribute side="server" code="0x0003" define="STEP" type="temperature" writable="false" optional="true">Step</attribute>
+    <attribute side="server" code="0x0004" define="SELECTED_TEMP_LEVEL" type="int8u" writable="false" optional="true">SelectedTemperatureLevel</attribute>
+    <attribute side="server" code="0x0005" define="SUPPORTED_TEMP_LEVELS" type="array" entryType="char_string" writable="false" optional="true">SupportedTemperatureLevels</attribute>
+
+    <command source="client" code="0x00" name="SetTemperature" optional="false">
+        <description>Set Temperature</description>
+        <arg name="TargetTemperature" type="temperature" min="MIN_TEMP" max="MAX_TEMP" optional="true"/>
+        <arg name="TargetTemperatureLevel" type="int8u" optional="true"/>
+    </command>
+  </cluster>
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0056"/>
+    <field mask="0x01" name="TemperatureNumber" />
+    <field mask="0x02" name="TemperatureLevel" />
+    <field mask="0x04" name="TemperatureStep" />
+  </bitmap>
+</configurator>

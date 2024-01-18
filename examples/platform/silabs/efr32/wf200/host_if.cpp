@@ -289,7 +289,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
     struct scan_result_holder * ap;
 
     SILABS_LOG("# %2d %2d  %03d %02X:%02X:%02X:%02X:%02X:%02X  %s", scan_count, scan_result->channel,
-               ((int16_t)(scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
+               ((int16_t) (scan_result->rcpi - 220) / 2), scan_result->mac[0], scan_result->mac[1], scan_result->mac[2],
                scan_result->mac[3], scan_result->mac[4], scan_result->mac[5], scan_result->ssid_def.ssid);
     /*Report one AP information*/
     SILABS_LOG("\r\n");
@@ -602,7 +602,7 @@ static void wfx_events_task(void * p_arg)
             retryJoin     = 0;
             retryInterval = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
-#ifdef SLEEP_ENABLED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
             {
                 // Enable the power save
@@ -610,7 +610,7 @@ static void wfx_events_task(void * p_arg)
                 sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1);
                 sl_wfx_enable_device_power_save();
             }
-#endif // SLEEP_ENABLED
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
         }
 
         if (flags & SL_WFX_DISCONNECT)

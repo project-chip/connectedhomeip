@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2022-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,11 +26,15 @@ java_prebuilt("json") {
 }
 
 java_prebuilt("kotlin-stdlib") {
-  jar_path = "artifacts/kotlin-stdlib-1.8.10.jar"
+  jar_path = "artifacts/kotlin-stdlib-1.8.20.jar"
 }
 
 java_prebuilt("kotlin-test") {
-  jar_path = "artifacts/kotlin-test-1.8.10.jar"
+  jar_path = "artifacts/kotlin-test-1.8.20.jar"
+}
+
+java_prebuilt("kotlinx-coroutines-core-jvm") {
+  jar_path = "artifacts/kotlinx-coroutines-core-jvm-1.7.3.jar"
 }
 
 java_prebuilt("protobuf-java") {
@@ -43,4 +47,8 @@ java_prebuilt("truth") {
 
 java_prebuilt("junit-4") {
   jar_path = "artifacts/junit-4.13.2.jar"
+}
+
+java_prebuilt("gson") {
+  jar_path = "artifacts/gson-2.9.1.jar"
 }

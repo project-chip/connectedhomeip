@@ -1,0 +1,173 @@
+# stm32wb5_sdk.gn_helper
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("//build_overrides/freertos.gni")
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/lwip.gni")
+
+declare_args() {
+
+  # CSMSIS PATHS #
+  cmsis = "${chip_root}/third_party/st/STM32CubeWB/Drivers/CMSIS"
+
+  ## PATHS FOR STM32WB FAMILY ##
+  stm32_wb_sdk = "${chip_root}/third_party/st/STM32CubeWB/Drivers"
+  stm32_wb_hal = "${chip_root}/third_party/st/STM32CubeWB/Drivers/STM32WBxx_HAL_Driver"
+  cmsis_device_wb = "${chip_root}/third_party/st/STM32CubeWB/Drivers/CMSIS/Device/ST/STM32WBxx"
+  stm32_wpan_sdk = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/ST/STM32_WPAN"
+  stm32_config_files = "${chip_root}/examples/platform/stm32/config_files/STM32WB5"
+
+  ## PATHS FOR FREERTOS ##  
+  freertos_st = "${chip_root}/third_party/st/STM32CubeWB/Middlewares/Third_Party/FreeRTOS/Source"
+  
+}
+
+SOURCES = [
+  #HAL DRIVERS
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_cortex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_dma.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_exti.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_flash_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_flash.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_gpio.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_ipcc.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_pwr_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_pwr.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_qspi.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_rcc_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_rcc.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_rng.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_rtc_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_rtc.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_spi_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_spi.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_tim_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_tim.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_uart_ex.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal_uart.c",
+  "${stm32_wb_hal}/Src/stm32wbxx_hal.c",
+  
+  #WPAN 
+  "${stm32_wpan_sdk}/ble/core/auto/ble_events.c",
+  "${stm32_wpan_sdk}/ble/core/auto/ble_gap_aci.c",
+  "${stm32_wpan_sdk}/ble/core/auto/ble_gatt_aci.c",
+  "${stm32_wpan_sdk}/ble/core/auto/ble_hal_aci.c",
+  "${stm32_wpan_sdk}/ble/core/auto/ble_hci_le.c",
+  "${stm32_wpan_sdk}/ble/core/auto/ble_l2cap_aci.c",
+  "${stm32_wpan_sdk}/ble/core/template/osal.c",
+  "${stm32_wpan_sdk}/ble/svc/Src/svc_ctl.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/shci/shci.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/hci_tl_if.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/hci_tl.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/shci_tl_if.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/shci_tl.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/tl_mbox.c",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/tl_thread_hci.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/channel_manager.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/channel_monitor.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/child_supervision.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/coap.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/commissioner.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/crypto.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/dataset_ftd.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/dataset.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/diag.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/dns.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/dns_server.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/errors.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/icmp6.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/instance.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/ip6.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/jam_detection.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/joiner.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/link_raw.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/link.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/message.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/netdata.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/network_time.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/openthread_api_config_ftd.h",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/openthread_api_wb.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/openthread.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/radio.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/server.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/srp_client.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/tasklet.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/thread_ftd.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/thread.c",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/udp.c",
+  "${stm32_wpan_sdk}/utilities/dbg_trace.c",
+  "${stm32_wpan_sdk}/utilities/stm_list.c",
+  "${stm32_wpan_sdk}/utilities/stm_queue.c",
+
+  #FREERTOS
+  "${stm32_config_files}/FreeRTOSConfig.h",
+  "${freertos_st}/CMSIS_RTOS_V2/cmsis_os2.c",
+  "${freertos_st}/croutine.c",
+  "${freertos_st}/event_groups.c",
+  "${freertos_st}/list.c",
+  "${freertos_st}/portable/GCC/ARM_CM4F/port.c",
+  "${freertos_st}/portable/MemMang/heap_4.c",
+  "${freertos_st}/queue.c",
+  "${freertos_st}/stream_buffer.c",
+  "${freertos_st}/tasks.c",
+  "${freertos_st}/timers.c",
+]
+  
+INCLUDE_DIRS = [
+  "${chip_root}/examples/platform/stm32/config_files/STM32WB5/",
+  "${chip_root}/src/include/",
+  "${cmsis}/Include",
+  "${cmsis_device_wb}/Include",
+  "${stm32_wb_hal}/Inc",
+  "${stm32_wb_hal}/Inc/Legacy",
+  "${chip_root}/src/platform/stm32",
+  "${chip_root}/src/include/",
+
+  #WPAN
+  "${stm32_wpan_sdk}/",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/tl/",
+  "${stm32_wpan_sdk}/interface/patterns/ble_thread/shci/",
+  "${stm32_wpan_sdk}/ble/core/",
+  "${stm32_wpan_sdk}/ble/core/auto/",
+  "${stm32_wpan_sdk}/ble/core/template/",
+  "${stm32_wpan_sdk}/ble/svc/Inc/",
+  "${stm32_wpan_sdk}/ble/svc/Src/",
+  "${stm32_wpan_sdk}/ble/",
+  "${stm32_wpan_sdk}/thread/openthread/stack/include/openthread/",
+  "${stm32_wpan_sdk}/thread/openthread/stack/src/core/",
+  "${stm32_wpan_sdk}/thread/openthread/stack/src/core/config/",
+  "${stm32_wpan_sdk}/thread/openthread/stack/include/",
+  "${stm32_wpan_sdk}/thread/openthread/core/openthread_api/",
+  "${stm32_wpan_sdk}/thread/openthread/",
+  "${stm32_wpan_sdk}/interface/patterns/ble-thread/tl/",
+  "${stm32_wpan_sdk}/utilities/",
+  
+  #FREERTOS INCLUDES
+  "${freertos_st}/include",
+  "${stm32_config_files}/",
+  "${freertos_st}/portable/GCC/ARM_CM4F",
+  "${freertos_st}/portable",
+  "${freertos_st}/CMSIS_RTOS_V2",
+
+]
+
+DEFINES = [
+  "CHIP_PROJECT_CONFIG_INCLUDE=<CHIPProjectConfig.h>",
+  "CHIP_HAVE_CONFIG_H",
+  "OPENTHREAD_CONFIG_FILE=<openthread_api_config_ftd.h>",
+  "MBEDTLS_CONFIG_FILE=<matter_config.h>",
+  "CORE_CM4",
+  "THREAD_WB",
+  "STM32WB55xx",
+  "USE_STM32WB5M_DK",
+]
+
+LIBS = [
+  # add any .o/.a library here
+]
+  
+FLAGS = [ 
+]

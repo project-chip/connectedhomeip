@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0053"/>
+    <field mask="0x01" name="Spin"/>
+    <field mask="0x02" name="Rinse"/>
+  </bitmap>
+
+  <enum name="NumberOfRinsesEnum" type="enum8">
+    <cluster code="0x0053"/>
+    <item name="None" value="0x0"/>
+    <item name="Normal" value="0x1"/>
+    <item name="Extra" value="0x2"/>
+    <item name="Max" value="0x3"/>
+  </enum>
+
+  <cluster>
+    <domain>Appliances</domain>
+    <name>Laundry Washer Controls</name>
+    <code>0x0053</code>
+    <define>LAUNDRY_WASHER_CONTROLS_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine.</description>
+
+    <globalAttribute side="either" code="0xFFFD" value="1" />
+
+    <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="array" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
+    <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="int8u"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
+    <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="NumberOfRinsesEnum"                                           writable="true"  isNullable="false"  optional="true">NumberOfRinses</attribute>
+    <attribute side="server" code="0x0003" define="SUPPORTED_RINSES"          type="array" entryType="NumberOfRinsesEnum"                      writable="false"  isNullable="false"  optional="true">SupportedRinses</attribute>
+  </cluster>
+</configurator>
+ 

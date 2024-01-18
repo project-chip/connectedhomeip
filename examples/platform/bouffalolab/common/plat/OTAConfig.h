@@ -22,7 +22,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/bouffalolab/BL702/OTAImageProcessorImpl.h>
 
 class OTAConfig
 {

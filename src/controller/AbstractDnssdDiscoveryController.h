@@ -39,10 +39,10 @@ namespace Controller {
 class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::CommissioningResolveDelegate
 {
 public:
-    AbstractDnssdDiscoveryController() {}
-    ~AbstractDnssdDiscoveryController() override { mDNSResolver.Shutdown(); }
+    explicit AbstractDnssdDiscoveryController(Dnssd::Resolver * resolver = nullptr) : mDNSResolver(resolver) {}
 
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    CHIP_ERROR StopDiscovery() { return mDNSResolver.StopDiscovery(); };
 
 protected:
     using DiscoveredNodeList = FixedSpan<Dnssd::DiscoveredNodeData, CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES>;

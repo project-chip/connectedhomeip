@@ -32,7 +32,7 @@ import requests
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except ImportError:
     _has_coloredlogs = False
 
 # Supported log levels, mapping string values required for argument
@@ -58,10 +58,10 @@ def _GetDefaultExtractRoot():
 
 
 def _LogPipeLines(pipe, prefix):
-    l = logging.getLogger().getChild(prefix)
+    log = logging.getLogger().getChild(prefix)
     for line in iter(pipe.readline, b''):
         line = line.strip().decode('utf-8', errors="ignore")
-        l.info('%s' % line)
+        log.info('%s' % line)
 
 
 def _ExecuteProcess(cmd, cwd):
@@ -93,7 +93,7 @@ def _SetupSourceZap(install_directory: str, zap_version: str):
         install_directory
     )
 
-    _ExecuteProcess(f"npm ci".split(), install_directory)
+    _ExecuteProcess("npm ci".split(), install_directory)
 
 
 def _SetupReleaseZap(install_directory: str, zap_version: str):
@@ -110,7 +110,15 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     else:
         raise Exception('Unknown platform - do not know what zip file to download.')
 
-    url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}.zip"
+    arch = os.uname().machine
+    if arch == 'arm64':
+        zap_arch = 'arm64'
+    elif arch == 'x86_64':
+        zap_arch = 'x64'
+    else:
+        raise Exception(f'Unknown architecture "${arch}" - do not know what zip file to download.')
+
+    url = f"https://github.com/project-chip/zap/releases/download/{zap_version}/zap-{zap_platform}-{zap_arch}.zip"
 
     logging.info("Fetching: %s", url)
 
@@ -118,7 +126,10 @@ def _SetupReleaseZap(install_directory: str, zap_version: str):
     z = zipfile.ZipFile(io.BytesIO(r.content))
 
     logging.info("Data downloaded, extracting ...")
-    z.extractall(install_directory)
+    # extractall() does not preserve permissions (https://github.com/python/cpython/issues/59999)
+    for entry in z.filelist:
+        path = z.extract(entry, install_directory)
+        os.chmod(path, (entry.external_attr >> 16) & 0o777)
     logging.info("Done extracting.")
 
 

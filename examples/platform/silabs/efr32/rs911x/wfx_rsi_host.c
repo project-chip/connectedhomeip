@@ -26,10 +26,11 @@
 #include "em_usart.h"
 #include "sl_status.h"
 
+#include "silabs_utils.h"
+
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
-
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
@@ -52,11 +53,9 @@ sl_status_t wfx_wifi_start(void)
 {
     if (wfx_rsi.dev_state & WFX_RSI_ST_STARTED)
     {
-        SILABS_LOG("%s: already started.", __func__);
         return SL_STATUS_OK;
     }
     wfx_rsi.dev_state |= WFX_RSI_ST_STARTED;
-    SILABS_LOG("%s: starting..", __func__);
     /*
      * Create the Wifi driver task
      */
@@ -65,7 +64,6 @@ sl_status_t wfx_wifi_start(void)
 
     if (NULL == wfx_rsi.wlan_task)
     {
-        SILABS_LOG("%s: error: failed to create task.", __func__);
         return SL_STATUS_FAIL;
     }
     return SL_STATUS_OK;
@@ -94,7 +92,6 @@ bool wfx_is_sta_mode_enabled(void)
 {
     bool mode;
     mode = !!(wfx_rsi.dev_state & WFX_RSI_ST_STA_MODE);
-    // SILABS_LOG("%s: %d", __func__, (mode ? "yes" : "no"));
     return mode;
 }
 
@@ -169,7 +166,6 @@ void wfx_clear_wifi_provision(void)
 {
     memset(&wfx_rsi.sec, 0, sizeof(wfx_rsi.sec));
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_PROVISIONED;
-    SILABS_LOG("%s: completed.", __func__);
 }
 
 /*************************************************************************
@@ -195,6 +191,21 @@ sl_status_t wfx_connect_to_ap(void)
     return SL_STATUS_OK;
 }
 
+#if SL_ICD_ENABLED
+/*********************************************************************
+ * @fn  sl_status_t wfx_power_save()
+ * @brief
+ *      Implements the power save in sleepy application
+ * @param[in]  None
+ * @return  SL_STATUS_OK if successful,
+ *          SL_STATUS_FAIL otherwise
+ ***********************************************************************/
+sl_status_t wfx_power_save()
+{
+    return (wfx_rsi_power_save() ? SL_STATUS_FAIL : SL_STATUS_OK);
+}
+#endif /* SL_ICD_ENABLED */
+
 /*********************************************************************
  * @fn  void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
  * @brief
@@ -208,7 +219,6 @@ void wfx_setup_ip6_link_local(sl_wfx_interface_t whichif)
      * TODO: Implement IPV6 setup, currently in wfx_rsi_task()
      * This is hooked with MATTER code.
      */
-    SILABS_LOG("%s: warning: not implemented.", __func__);
 }
 
 /*********************************************************************
@@ -223,7 +233,6 @@ bool wfx_is_sta_connected(void)
 {
     bool status;
     status = (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED) ? true : false;
-    SILABS_LOG("%s: status: %s", __func__, (status ? "connected" : "not connected"));
     return status;
 }
 
@@ -252,11 +261,9 @@ wifi_mode_t wfx_get_wifi_mode()
  ***********************************************************************/
 sl_status_t wfx_sta_discon(void)
 {
-    SILABS_LOG("%s: started.", __func__);
     int32_t status;
     status = wfx_rsi_disconnect();
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTED;
-    SILABS_LOG("%s: completed.", __func__);
     return status;
 }
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
@@ -279,7 +286,6 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t which_if)
     {
         status = false; /* TODO */
     }
-    SILABS_LOG("%s: status: %d", __func__, status);
     return status;
 }
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -303,7 +309,6 @@ bool wfx_have_ipv6_addr(sl_wfx_interface_t which_if)
     {
         status = false; /* TODO */
     }
-    SILABS_LOG("%s: status: %d", __func__, status);
     return status;
 }
 
@@ -400,6 +405,5 @@ bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
 void wfx_cancel_scan(void)
 {
     /* Not possible */
-    SILABS_LOG("%s: cannot cancel scan", __func__);
 }
 #endif /* SL_WFX_CONFIG_SCAN */

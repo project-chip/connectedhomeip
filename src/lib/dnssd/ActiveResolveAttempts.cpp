@@ -55,16 +55,46 @@ void ActiveResolveAttempts::Complete(const PeerId & peerId)
 #endif
 }
 
-void ActiveResolveAttempts::Complete(const chip::Dnssd::DiscoveredNodeData & data)
+void ActiveResolveAttempts::CompleteCommissioner(const chip::Dnssd::DiscoveredNodeData & data)
 {
     for (auto & item : mRetryQueue)
     {
-        if (item.attempt.Matches(data))
+        if (item.attempt.Matches(data, chip::Dnssd::DiscoveryType::kCommissionerNode))
         {
             item.attempt.Clear();
             return;
         }
     }
+}
+
+void ActiveResolveAttempts::CompleteCommissionable(const chip::Dnssd::DiscoveredNodeData & data)
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (item.attempt.Matches(data, chip::Dnssd::DiscoveryType::kCommissionableNode))
+        {
+            item.attempt.Clear();
+            return;
+        }
+    }
+}
+
+bool ActiveResolveAttempts::HasBrowseFor(chip::Dnssd::DiscoveryType type) const
+{
+    for (auto & item : mRetryQueue)
+    {
+        if (!item.attempt.IsBrowse())
+        {
+            continue;
+        }
+
+        if (item.attempt.BrowseData().type == type)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void ActiveResolveAttempts::CompleteIpResolution(SerializedQNameIterator targetHostName)

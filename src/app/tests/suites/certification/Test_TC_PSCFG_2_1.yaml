@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Commission DUT to TH"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the Sources attribute from the DUT"
+    - label: "Step 2: TH reads the Sources attribute from the DUT"
       PICS: PSCFG.S.A0000
       command: "readAttribute"
       attribute: "Sources"

@@ -26,9 +26,9 @@
 #include <platform/DiagnosticDataProvider.h>
 
 namespace {
-constexpr int offPremiseServicesReachableUnknown = 0;
-constexpr int offPremiseServicesReachableYes     = 1;
-constexpr int offPremiseServicesReachableNo      = 2;
+inline constexpr int offPremiseServicesReachableUnknown = 0;
+inline constexpr int offPremiseServicesReachableYes     = 1;
+inline constexpr int offPremiseServicesReachableNo      = 2;
 } // namespace
 
 namespace chip {

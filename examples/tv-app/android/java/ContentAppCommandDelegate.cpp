@@ -73,7 +73,7 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
 
         jstring resp = (jstring) env->CallObjectMethod(
             mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(handlerContext.mRequestPath.mEndpointId),
-            static_cast<jint>(handlerContext.mRequestPath.mClusterId), static_cast<jint>(handlerContext.mRequestPath.mCommandId),
+            static_cast<jlong>(handlerContext.mRequestPath.mClusterId), static_cast<jlong>(handlerContext.mRequestPath.mCommandId),
             jsonString.jniValue());
         if (env->ExceptionCheck())
         {
@@ -108,7 +108,7 @@ Status ContentAppCommandDelegate::InvokeCommand(EndpointId epId, ClusterId clust
 
         jstring resp =
             (jstring) env->CallObjectMethod(mContentAppEndpointManager, mSendCommandMethod, static_cast<jint>(epId),
-                                            static_cast<jint>(clusterId), static_cast<jint>(commandId), jsonString.jniValue());
+                                            static_cast<jlong>(clusterId), static_cast<jlong>(commandId), jsonString.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentAppCommandDelegate::sendCommand");
@@ -253,7 +253,7 @@ LaunchResponseType ContentAppCommandDelegate::FormatContentLauncherResponse(Json
     }
     else
     {
-        launchResponse.status = static_cast<app::Clusters::ContentLauncher::ContentLaunchStatusEnum>(value[statusFieldId].asInt());
+        launchResponse.status = static_cast<app::Clusters::ContentLauncher::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::ContentLauncher::Commands::LauncherResponse::Fields::kData));
         if (!value[dataFieldId].empty())
@@ -277,8 +277,7 @@ NavigateTargetResponseType ContentAppCommandDelegate::FormatNavigateTargetRespon
     }
     else
     {
-        navigateTargetResponse.status =
-            static_cast<app::Clusters::TargetNavigator::TargetNavigatorStatusEnum>(value[statusFieldId].asInt());
+        navigateTargetResponse.status = static_cast<app::Clusters::TargetNavigator::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Fields::kData));
         if (!value[dataFieldId].empty())
@@ -302,7 +301,7 @@ PlaybackResponseType ContentAppCommandDelegate::FormatMediaPlaybackResponse(Json
     }
     else
     {
-        playbackResponse.status = static_cast<app::Clusters::MediaPlayback::MediaPlaybackStatusEnum>(value[statusFieldId].asInt());
+        playbackResponse.status = static_cast<app::Clusters::MediaPlayback::StatusEnum>(value[statusFieldId].asInt());
         std::string dataFieldId =
             std::to_string(to_underlying(app::Clusters::MediaPlayback::Commands::PlaybackResponse::Fields::kData));
         if (!value[dataFieldId].empty())

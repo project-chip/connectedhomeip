@@ -73,7 +73,7 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
             return Status::Success;
         }
     }
-    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", mode);
+    ChipLogProgress(Zcl, "Cannot find the mode %u", mode);
     return Status::InvalidCommand;
 }
 

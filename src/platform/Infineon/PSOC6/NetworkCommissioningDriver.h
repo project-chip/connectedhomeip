@@ -26,10 +26,10 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
-constexpr uint8_t kWiFiMaxNetworks                  = 15;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kWiFiMaxNetworks                  = 15;
 } // namespace
 
 class P6ScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -51,7 +51,7 @@ public:
         item.wiFiBand = (mpScanResults[mIternum].band == CY_WCM_WIFI_BAND_2_4GHZ)
             ? chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4
             : chip::DeviceLayer::NetworkCommissioning::WiFiBand::k5g;
-        item.rssi = mpScanResults[mIternum].signal_strength;
+        item.rssi     = mpScanResults[mIternum].signal_strength;
         memcpy(item.ssid, mpScanResults[mIternum].SSID, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID, 6);
 
@@ -116,7 +116,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     static void scan_result_callback(cy_wcm_scan_result_t * result_ptr, void * user_data, cy_wcm_scan_status_t status);
-    BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurity> ConvertSecuritytype(cy_wcm_security_t security);
+    BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> ConvertSecuritytype(cy_wcm_security_t security);
 
     void OnConnectWiFiNetwork();
     void OnScanWiFiNetworkDone();

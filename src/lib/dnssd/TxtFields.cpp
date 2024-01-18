@@ -105,6 +105,16 @@ bool MakeBoolFromAsciiDecimal(const ByteSpan & val)
     return val.size() == 1 && static_cast<char>(*val.data()) == '1';
 }
 
+Optional<bool> MakeOptionalBoolFromAsciiDecimal(const ByteSpan & val)
+{
+    char character = static_cast<char>(*val.data());
+    if (val.size() == 1 && ((character == '1') || (character == '0')))
+    {
+        return MakeOptional(character == '1');
+    }
+    return NullOptional;
+}
+
 size_t GetPlusSignIdx(const ByteSpan & value)
 {
     // First value is the vendor id, second (after the +) is the product.
@@ -184,6 +194,18 @@ Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
     return NullOptional;
 }
 
+Optional<System::Clock::Milliseconds16> GetRetryActiveThreshold(const ByteSpan & value)
+{
+    const auto retryInterval = MakeU16FromAsciiDecimal(value);
+
+    if (retryInterval == 0)
+    {
+        return NullOptional;
+    }
+
+    return MakeOptional(System::Clock::Milliseconds16(retryInterval));
+}
+
 TxtFieldKey GetTxtFieldKey(const ByteSpan & key)
 {
     for (auto & info : txtFieldInfo)
@@ -237,14 +259,20 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
 {
     switch (Internal::GetTxtFieldKey(key))
     {
-    case TxtFieldKey::kSleepyIdleInterval:
+    case TxtFieldKey::kSessionIdleInterval:
         nodeData.mrpRetryIntervalIdle = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kSleepyActiveInterval:
+    case TxtFieldKey::kSessionActiveInterval:
         nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(value);
+        break;
+    case TxtFieldKey::kSessionActiveThreshold:
+        nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
     case TxtFieldKey::kTcpSupported:
         nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
+        break;
+    case TxtFieldKey::kLongIdleTimeICD:
+        nodeData.isICDOperatingAsLIT = Internal::MakeOptionalBoolFromAsciiDecimal(value);
         break;
     default:
         break;

@@ -23,7 +23,7 @@
 #include "EventPathIB.h"
 #include "EventPathIBs.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -54,9 +54,9 @@ public:
     /**
      *  @brief Mark the end of this EventPathIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventPathIBs::Builder & EndOfEventPaths();
+    CHIP_ERROR EndOfEventPaths();
 
 private:
     EventPathIB::Builder mEventPath;

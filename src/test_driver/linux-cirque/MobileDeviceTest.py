@@ -17,9 +17,7 @@ limitations under the License.
 
 import logging
 import os
-import pprint
 import sys
-import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -44,7 +42,7 @@ MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 DEVICE_CONFIG = {
     'device0': {
         'type': 'MobileDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -53,7 +51,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -83,8 +81,11 @@ class TestPythonController(CHIPVirtualHome):
                    if device['type'] == 'MobileDevice']
 
         for server in server_ids:
-            self.execute_device_cmd(server, "CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" -ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {}".format(
-                os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
+            self.execute_device_cmd(
+                server,
+                ("CHIPCirqueDaemon.py -- run gdb -batch -return-child-result -q -ex \"set pagination off\" "
+                 "-ex run -ex \"thread apply all bt\" --args {} --thread --discriminator {}").format(
+                    os.path.join(CHIP_REPO, "out/debug/standalone/chip-all-clusters-app"), TEST_DISCRIMINATOR))
 
         self.reset_thread_devices(server_ids)
 
@@ -97,7 +98,8 @@ class TestPythonController(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip_repl-0.0-py3-none-any.whl")))
 
-        command = "gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" --args python3 {} -t 240 -a {} --paa-trust-store-path {}".format(
+        command = ("gdb -batch -return-child-result -q -ex run -ex \"thread apply all bt\" "
+                   "--args python3 {} -t 300 -a {} --paa-trust-store-path {}").format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"), ethernet_ip,
             os.path.join(CHIP_REPO, MATTER_DEVELOPMENT_PAA_ROOT_CERTS))

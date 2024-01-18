@@ -17,20 +17,21 @@
 
 #include "groups-server.h"
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
+#include <app/att-storage.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
 #include <lib/support/CodeUtils.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/scenes-server.h>
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 
 using namespace chip;
 using namespace app::Clusters;
@@ -76,6 +77,7 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
     VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
+    VerifyOrReturnError(groupName.size() <= GroupDataProvider::GroupInfo::kGroupNameMax, Status::ConstraintError);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, Status::NotFound);
@@ -89,6 +91,8 @@ static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId g
     }
     if (CHIP_NO_ERROR == err)
     {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
+                                               GroupKeyManagement::Attributes::GroupTable::Id);
         return Status::Success;
     }
 
@@ -108,6 +112,8 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
     CHIP_ERROR err = provider->RemoveEndpoint(fabricIndex, groupId, endpointId);
     if (CHIP_NO_ERROR == err)
     {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
+                                               GroupKeyManagement::Attributes::GroupTable::Id);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
@@ -118,18 +124,14 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
 
 void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 {
-    // The most significant bit of the NameSupport attribute indicates whether or not group names are supported
-    //
-    // According to spec, highest bit (Group Names supported) MUST match feature bit 0 (Group Names supported)
-    static constexpr uint8_t kNameSuppportFlagGroupNamesSupported = 0x80;
-
-    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, kNameSuppportFlagGroupNamesSupported);
+    // According to spec, highest bit (Group Names) MUST match feature bit 0 (Group Names)
+    EmberAfStatus status = Attributes::NameSupport::Set(endpointId, NameSupportBitmap::kGroupNames);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
-    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupsFeature::kGroupNames));
+    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(Feature::kGroupNames));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing group feature map %x", status);
@@ -285,9 +287,9 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::RemoveGroupResponse::Type response;
 
-#ifdef EMBER_AF_PLUGIN_SCENES
-    // If a group is, removed the scenes associated with that group SHOULD be removed.
-    emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, commandData.groupID);
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    // If a group is removed the scenes associated with that group SHOULD be removed.
+    ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
     response.groupID = commandData.groupID;
     response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
@@ -305,7 +307,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
 
     VerifyOrExit(nullptr != provider, status = Status::Failure);
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     {
         GroupDataProvider::EndpointIterator * iter = provider->IterateEndpoints(fabricIndex);
         GroupDataProvider::GroupEndpoint mapping;
@@ -315,17 +317,18 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         {
             if (commandPath.mEndpointId == mapping.endpoint_id)
             {
-                emberAfScenesClusterRemoveScenesInGroupCallback(mapping.endpoint_id, mapping.group_id);
+                ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, mapping.endpoint_id, mapping.group_id);
             }
         }
         iter->Release();
-        emberAfScenesClusterRemoveScenesInGroupCallback(commandPath.mEndpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+        ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId,
+                                                                      ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
     }
 #endif
 
     provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
     status = Status::Success;
-
+    MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
 exit:
     commandObj->AddStatus(commandPath, status);
     if (Status::Success != status)
@@ -355,11 +358,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
         status = GroupAdd(fabricIndex, endpointId, groupId, groupName);
     }
 
-    CHIP_ERROR sendErr = commandObj->AddStatus(commandPath, status);
-    if (CHIP_NO_ERROR != sendErr)
-    {
-        ChipLogDetail(Zcl, "Groups: failed to send %s: %" CHIP_ERROR_FORMAT, "status_response", sendErr.Format());
-    }
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 

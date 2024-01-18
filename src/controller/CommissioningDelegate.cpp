@@ -37,6 +37,10 @@ const char * StageToString(CommissioningStage stage)
         return "ReadCommissioningInfo";
         break;
 
+    case kReadCommissioningInfo2:
+        return "ReadCommissioningInfo2";
+        break;
+
     case kArmFailsafe:
         return "ArmFailSafe";
         break;
@@ -47,6 +51,22 @@ const char * StageToString(CommissioningStage stage)
 
     case kConfigRegulatory:
         return "ConfigRegulatory";
+        break;
+
+    case kConfigureUTCTime:
+        return "ConfigureUTCTime";
+        break;
+
+    case kConfigureTimeZone:
+        return "ConfigureTimeZone";
+        break;
+
+    case kConfigureDSTOffset:
+        return "ConfigureDSTOffset";
+        break;
+
+    case kConfigureDefaultNTP:
+        return "ConfigureDefaultNTP";
         break;
 
     case kSendPAICertificateRequest:
@@ -83,6 +103,22 @@ const char * StageToString(CommissioningStage stage)
 
     case kSendNOC:
         return "SendNOC";
+        break;
+
+    case kConfigureTrustedTimeSource:
+        return "ConfigureTrustedTimeSource";
+        break;
+
+    case kICDGetRegistrationInfo:
+        return "ICDGetRegistrationInfo";
+        break;
+
+    case kICDRegistration:
+        return "ICDRegistration";
+        break;
+
+    case kICDSendStayActive:
+        return "ICDSendStayActive";
         break;
 
     case kWiFiNetworkSetup:

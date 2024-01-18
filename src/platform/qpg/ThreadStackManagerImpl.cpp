@@ -25,8 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
@@ -113,13 +113,3 @@ extern "C" void otPlatFree(void * aPtr)
 {
     CHIPPlatformMemoryFree(aPtr);
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-CHIP_ERROR ThreadStackManagerImpl::_RequestSEDFastPollingMode(bool onOff)
-{
-    (void) onOff;
-
-    ChipLogError(DeviceLayer, "Polling config is not supported on this platform");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-}
-#endif

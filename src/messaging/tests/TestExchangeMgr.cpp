@@ -105,14 +105,13 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
-    NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     NL_TEST_ASSERT(inSuite, ec1->GetSessionHandle() == ctx.GetSessionAliceToBob());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec2 != nullptr);
+    NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     NL_TEST_ASSERT(inSuite, ec2->GetSessionHandle() == ctx.GetSessionBobToAlice());
 
@@ -180,16 +179,19 @@ void CheckSessionExpirationDuringTimeout(nlTestSuite * inSuite, void * inContext
     ExpireSessionFromTimeoutDelegate sendDelegate;
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
-    ec1->SetResponseTimeout(System::Clock::Timeout(100));
+    auto timeout = System::Clock::Timeout(100);
+    ec1->SetResponseTimeout(timeout);
+
+    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
-
     ctx.DrainAndServiceIO();
-    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
-    // Wait for our timeout to elapse. Give it an extra 100ms.
-    ctx.GetIOContext().DriveIOUntil(200_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
+    // Wait for our timeout to elapse. Give it an extra 1000ms of slack,
+    // because if we lose the timeslice for longer than the slack we could end
+    // up breaking out of the loop before the timeout timer has actually fired.
+    ctx.GetIOContext().DriveIOUntil(timeout + 1000_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
 
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 
@@ -283,8 +285,10 @@ nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 

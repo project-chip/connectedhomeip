@@ -17,9 +17,14 @@
 
 #pragma once
 
-#include "Types.h"
+#include <string>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <gio/gio.h>
+
+#include <lib/core/CHIPError.h>
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
+
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -60,7 +65,7 @@ public:
 
 private:
     /// Sets up the DBUS manager and loads the list
-    void Initialize();
+    static CHIP_ERROR Initialize(AdapterIterator * self);
 
     /// Loads the next value in the list.
     ///
@@ -90,5 +95,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

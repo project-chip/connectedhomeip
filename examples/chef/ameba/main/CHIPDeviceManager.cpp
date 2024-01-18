@@ -28,9 +28,9 @@
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <core/ErrorStr.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 using namespace ::chip;
 

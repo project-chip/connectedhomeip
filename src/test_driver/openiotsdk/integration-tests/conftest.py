@@ -34,3 +34,9 @@ def pytest_addoption(parser):
                      help='Telnet terminal port number.', default="5000")
     parser.addoption('--networkInterface', action='store',
                      help='FVP network interface name')
+    parser.addoption('--updateBinaryPath', action='store',
+                     help='Application update binary path')
+    parser.addoption('--otaProvider', action='store',
+                     help='Path to OTA provider application')
+    parser.addoption('--softwareVersion', action='store',
+                     help='Software version of update image in the format <number>:<x.x.x> eg. 1:0.0.01')

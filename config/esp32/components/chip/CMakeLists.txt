@@ -31,19 +31,16 @@ endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
-set(CHIP_REQUIRE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
+set(CHIP_REQUIRE_COMPONENTS esp_eth freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
 if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
-    if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
+    if (CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
         set(is_debug TRUE)
     else()
-        if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
-            message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
-        endif()
         set(is_debug FALSE)
     endif()
 endif()
@@ -85,11 +82,34 @@ chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
 chip_gn_arg_bool("is_debug"                ${is_debug})
 
+if (CONFIG_CHIP_CONFIG_IM_PRETTY_PRINT)
+    chip_gn_arg_bool("enable_im_pretty_print" "true")
+endif()
+
 # Config the chip log level by IDF menuconfig
-chip_gn_arg_bool  ("chip_error_logging"        CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
-chip_gn_arg_bool  ("chip_progress_logging"     CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
-chip_gn_arg_bool  ("chip_detail_logging"       CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
-chip_gn_arg_bool  ("chip_automation_logging"   CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 1)
+    chip_gn_arg_bool  ("chip_error_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_error_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 3)
+    chip_gn_arg_bool  ("chip_progress_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_progress_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 4)
+    chip_gn_arg_bool  ("chip_detail_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_detail_logging" "false")
+endif()
+
+if (CONFIG_LOG_DEFAULT_LEVEL GREATER_EQUAL 5)
+    chip_gn_arg_bool  ("chip_automation_logging" "true")
+else()
+    chip_gn_arg_bool  ("chip_automation_logging" "false")
+endif()
 
 if(CONFIG_ENABLE_CHIPOBLE)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
@@ -101,19 +121,25 @@ if(CONFIG_DISABLE_IPV4)
     chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
 endif()
 
+if(CONFIG_DISABLE_READ_CLIENT)
+    chip_gn_arg_append("chip_enable_read_client"             "false")
+endif()
+
 if(CHIP_CODEGEN_PREGEN_DIR)
     chip_gn_arg_append("chip_code_pre_generated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
+endif()
+
+if(CONFIG_ENABLE_ICD_SERVER)
+    chip_gn_arg_append("chip_enable_icd_server"               "true")
 endif()
 
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
-    chip_gn_arg_append("chip_build_pw_trace_lib"            "true")
     chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
     chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log:check_backend\"")
     chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
-    chip_gn_arg_append("pw_trace_BACKEND"                   "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
     chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
     chip_gn_arg_append("pw_rpc_CONFIG"                      "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_rpc:disable_global_mutex\"")
@@ -137,6 +163,10 @@ if (CONFIG_ENABLE_CHIP_SHELL)
     chip_gn_arg_append("chip_build_libshell"                "true")
 endif()
 
+if (CONFIG_ENABLE_CHIP_CONTROLLER_BUILD)
+    chip_gn_arg_append("chip_build_controller"              "true")
+endif()
+
 if (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP)
     chip_gn_arg_append("chip_enable_wifi"                       "true")
 else()
@@ -153,6 +183,14 @@ if ((CONFIG_BT_ENABLED) AND (CONFIG_ENABLE_CHIPOBLE))
         else()
           chip_gn_arg_append("chip_bt_bluedroid_enabled"                "true")
         endif()
+endif()
+
+if (CONFIG_ENABLE_ESP32_BLE_CONTROLLER)
+    chip_gn_arg_append("chip_enable_ble_controller"             "true")
+endif()
+
+if (CONFIG_ENABLE_ETHERNET_TELEMETRY)
+    chip_gn_arg_append("chip_enable_ethernet"                   "true")
 endif()
 
 if (CONFIG_ENABLE_MATTER_OVER_THREAD)
@@ -176,12 +214,17 @@ if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
     chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
 endif()
 
+if (CONFIG_ENABLE_ROUTE_HOOK)
+    chip_gn_arg_append("chip_enable_route_hook"   "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
     if (CONFIG_ENABLE_CHIP_SHELL)
         chip_gn_arg_append("chip_shell_platform"    "\"esp32\"")
     endif()
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
+    chip_gn_arg_append("chip_external_platform_include_dir" "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_INCLUDE_DIR}\"")
 endif()
 
 # Set up CHIP project configuration file
@@ -215,6 +258,26 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     chip_gn_arg_append("chip_use_secure_cert_dac_provider"                 "true")
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+  chip_gn_arg_bool("matter_enable_tracing_support"  "true")
+  chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_SYSTEM_STATS)
+     chip_gn_arg_append("matter_enable_esp_insights_system_stats"            "true")
+endif()
+
+if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
+    chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+   target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
+endif()
+
+if (CONFIG_ENABLE_MATTER_EVENT_LIST)
+    chip_gn_arg_append  ("enable_eventlist_attribute" "true")
+endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
@@ -266,14 +329,28 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
 if(CONFIG_ENABLE_PW_RPC)
-    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
 endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
+endif()
+
+# When using the pregenerated files, there is a edge case where an error appears for
+# undeclared argument chip_code_pre_generated_directory. To get around with it we are
+# disabling the --fail-on-unused-args flag.
+# For more, see: https://github.com/project-chip/connectedhomeip/issues/27636
+if (CHIP_CODEGEN_PREGEN_DIR)
+    set(GN_CONFIGURE_COMMAND ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check ${CMAKE_CURRENT_BINARY_DIR})
+else ()
+    set(GN_CONFIGURE_COMMAND ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR})
+endif ()
 
 externalproject_add(
     chip_gn
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
-    CONFIGURE_COMMAND       ${GN_EXECUTABLE} --root=${GN_ROOT_TARGET} gen --check --fail-on-unused-args ${CMAKE_CURRENT_BINARY_DIR}
+    CONFIGURE_COMMAND       ${GN_CONFIGURE_COMMAND}
     BUILD_COMMAND           ninja "esp32"
     INSTALL_COMMAND         ""
     BUILD_BYPRODUCTS        ${chip_libraries}
@@ -309,22 +386,17 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
 
-idf_component_get_property(esp32_mbedtls_lib esp32_mbedtls COMPONENT_LIB)
+idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
+
+idf_build_get_property(idf_target IDF_TARGET)
+set(target_name "${idf_target}")
 
 if(CONFIG_BT_ENABLED)
     idf_component_get_property(bt_lib bt COMPONENT_LIB)
-    if("${CONFIG_IDF_TARGET}" STREQUAL "esp32h2")
+    if((target_name STREQUAL "esp32h2") OR (target_name STREQUAL "esp32c2") OR (target_name STREQUAL "esp32c6"))
         idf_component_get_property(bt_dir bt COMPONENT_DIR)
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32h2/esp32h2-bt-lib/libble_app.a)
-    elseif("${CONFIG_IDF_TARGET}" STREQUAL "esp32c2")
-        idf_component_get_property(bt_dir bt COMPONENT_DIR)
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32c2/esp32c2-bt-lib/libble_app.a)
-    elseif("${CONFIG_IDF_TARGET}" STREQUAL "esp32c6")
-        idf_component_get_property(bt_dir bt COMPONENT_DIR)
-        list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}>)
-        list(APPEND chip_libraries ${bt_dir}/controller/lib_esp32c6/esp32c6-bt-lib/libble_app.a)
+        list(APPEND chip_libraries "${bt_dir}/controller/lib_${target_name}/${target_name}-bt-lib/libble_app.a")
     else()
         list(APPEND chip_libraries $<TARGET_FILE:${bt_lib}> -lbtdm_app)
     endif()
@@ -338,6 +410,10 @@ endif()
 if(CONFIG_OPENTHREAD_ENABLED)
     idf_component_get_property(openthread_lib openthread COMPONENT_LIB)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
+    if (CONFIG_IEEE802154_ENABLED)
+        idf_component_get_property(ieee802154_lib ieee802154 COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${ieee802154_lib}>)
+    endif()
 endif()
 
 if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABLE_WIFI_AP))
@@ -352,6 +428,11 @@ if((NOT CONFIG_USE_MINIMAL_MDNS) AND (CONFIG_ENABLE_WIFI_STATION OR CONFIG_ENABL
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
+if (CONFIG_ENABLE_ENCRYPTED_OTA)
+    idf_component_get_property(esp_encrypted_img_lib espressif__esp_encrypted_img COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_encrypted_img_lib}>)
+endif()
+
 idf_component_get_property(main_lib main COMPONENT_LIB)
 list(APPEND chip_libraries $<TARGET_FILE:${main_lib}>)
 
@@ -360,17 +441,84 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
     list(APPEND chip_libraries $<TARGET_FILE:${esp32_secure_cert_mgr_lib}>)
 endif()
 
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+    idf_component_get_property(esp_insights_lib espressif__esp_insights COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_insights_lib}>)
+endif()
+
+idf_component_get_property(lwip_lib lwip COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${lwip_lib}>)
+
+
+if (CONFIG_ESP32_WIFI_ENABLED)
+    idf_component_get_property(esp_wifi_lib esp_wifi COMPONENT_LIB)
+    idf_component_get_property(esp_wifi_dir esp_wifi COMPONENT_DIR)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_wifi_lib}>)
+    if (CONFIG_IDF_TARGET_ESP32C2)
+        set(blobs core net80211 pp)
+    else()
+        set(blobs core mesh net80211 pp)
+    endif()
+
+    foreach(blob ${blobs})
+    list(APPEND chip_libraries "${esp_wifi_dir}/lib/${target_name}/lib${blob}.a")
+    endforeach()
+
+    idf_component_get_property(wpa_supplicant_lib wpa_supplicant COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${wpa_supplicant_lib}>)
+endif()
+
+if (CONFIG_ETH_ENABLED)
+    idf_component_get_property(esp_eth_lib esp_eth COMPONENT_LIB)
+    list(APPEND chip_libraries $<TARGET_FILE:${esp_eth_lib}>)
+endif()
+
+idf_component_get_property(esp_netif_lib esp_netif COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_netif_lib}>)
+
+idf_component_get_property(esp_hw_support_lib esp_hw_support COMPONENT_LIB)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_hw_support_lib}>)
+
+idf_component_get_property(esp_phy_lib esp_phy COMPONENT_LIB)
+idf_component_get_property(esp_phy_dir esp_phy COMPONENT_DIR)
+list(APPEND chip_libraries $<TARGET_FILE:${esp_phy_lib}>)
+
+if (CONFIG_IDF_TARGET_ESP32)
+    set(phy_blobs phy rtc)
+elseif (CONFIG_IDF_TARGET_ESP32S2)
+    set(phy_blobs phy)
+else()
+    set(phy_blobs phy btbb)
+endif()
+foreach(phy_blob ${phy_blobs})
+    list(APPEND chip_libraries "${esp_phy_dir}/lib/${target_name}/lib${phy_blob}.a")
+endforeach()
+
+set(components_to_link esp_event hal esp_system soc efuse vfs driver esp_coex freertos esp_timer)
+idf_build_get_property(build_components BUILD_COMPONENTS)
+foreach(component ${components_to_link})
+    # Some of the components are not present in IDF v4.x
+    # So, Check if the component is in the list of build components
+    if("${component}" IN_LIST build_components)
+        idf_component_get_property(lib_name ${component} COMPONENT_LIB)
+        list(APPEND chip_libraries $<TARGET_FILE:${lib_name}>)
+    endif()
+endforeach()
+
 target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
                                                 ${chip_libraries}
-                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:${esp32_mbedtls_lib}>
+                                                $<TARGET_FILE:mbedcrypto> $<TARGET_FILE:mbedx509>
+                                                $<TARGET_FILE:${mbedtls_lib}>
                                                 -Wl,--end-group)
 
 # Make the component dependent on our CHIP build
 add_dependencies(${COMPONENT_LIB} chip_gn)
 
 if(CONFIG_ENABLE_PW_RPC)
-    set(WRAP_FUNCTIONS esp_log_write)
-    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+    set(WRAP_FUNCTIONS esp_log_write esp_log_writev)
+    foreach(func ${WRAP_FUNCTIONS})
+        target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${func}")
+    endforeach()
 endif()
 
 # Build Matter OTA image

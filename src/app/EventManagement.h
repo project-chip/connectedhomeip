@@ -70,9 +70,9 @@
 
 namespace chip {
 namespace app {
-constexpr const uint32_t kEventManagementProfile = 0x1;
-constexpr const uint32_t kFabricIndexTag         = 0x1;
-constexpr size_t kMaxEventSizeReserve            = 512;
+inline constexpr const uint32_t kEventManagementProfile = 0x1;
+inline constexpr const uint32_t kFabricIndexTag         = 0x1;
+inline constexpr size_t kMaxEventSizeReserve            = 512;
 constexpr uint16_t kRequiredEventField =
     (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
@@ -399,9 +399,9 @@ private:
         int mFieldsToRead = 0;
         /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
 #if CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
-        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
-#else  // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
         Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
+#else  // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
 #endif // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
         PriorityLevel mPriority  = PriorityLevel::First;
         ClusterId mClusterId     = 0;

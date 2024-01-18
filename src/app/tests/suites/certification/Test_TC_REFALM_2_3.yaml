@@ -1,0 +1,144 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    217.2.3. [TC-REFALM-2.3] Local suppression of the door alarm with DUT as
+    Server
+
+PICS:
+    - REFALM.S
+    - REFALM.S.M.LocalSuppress
+
+config:
+    nodeId: 0x12344321
+    cluster: "Refrigerator Alarm"
+    endpoint: 1
+    PIXIT.REFALM.AlarmThreshold:
+        type: int16u
+        defaultValue: 5
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: Ensure that the door on the DUT is closed"
+      verification: |
+          Ensure that the door on the DUT is closed
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 3:TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label: "Step 4:TH reads from the DUT the Mask attribute"
+      command: "readAttribute"
+      attribute: "Mask"
+      PICS: REFALM.S.A0000
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label: "Step 5: Manually open the door on the DUT"
+      verification: |
+          Manually open the door on the DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 6: Wait for the time defined in PIXIT.REFALM.AlarmThreshold"
+      cluster: "DelayCommands"
+      PICS: PICS_USER_PROMPT
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: PIXIT.REFALM.AlarmThreshold * 1000
+
+    - label: "Step 7:TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 8: Invoke the on DUT sequence to suppress the alarm, do not
+          close the door"
+      verification: |
+          Invoke the on DUT sequence to suppress the alarm, do not close the door
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 9:TH reads from the DUT the State attribute"
+      command: "readAttribute"
+      attribute: "State"
+      PICS: REFALM.S.A0002 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label: "Step 10:TH reads from the DUT the Mask attribute"
+      command: "readAttribute"
+      attribute: "Mask"
+      PICS: REFALM.S.A0000 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksClear: [0x1]
+
+    - label: "Step 11:TH reads from the DUT the Supported attribute"
+      command: "readAttribute"
+      attribute: "Supported"
+      PICS: REFALM.S.A0003 && PICS_USER_PROMPT
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]

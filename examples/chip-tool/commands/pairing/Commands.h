@@ -19,7 +19,6 @@
 #pragma once
 
 #include "commands/common/Commands.h"
-#include "commands/pairing/CloseSessionCommand.h"
 #include "commands/pairing/GetCommissionerNodeIdCommand.h"
 #include "commands/pairing/GetCommissionerRootCertificateCommand.h"
 #include "commands/pairing/IssueNOCChainCommand.h"
@@ -200,6 +199,15 @@ public:
     {}
 };
 
+class PairAlreadyDiscoveredByIndexWithCode : public PairingCommand
+{
+public:
+    PairAlreadyDiscoveredByIndexWithCode(CredentialIssuerCommands * credsIssuerConfig) :
+        PairingCommand("already-discovered-by-index-with-code", PairingMode::AlreadyDiscoveredByIndexWithCode,
+                       PairingNetworkType::None, credsIssuerConfig)
+    {}
+};
+
 class StartUdcServerCommand : public CHIPCommand
 {
 public:
@@ -229,6 +237,7 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         make_unique<PairAlreadyDiscovered>(credsIssuerConfig),
         make_unique<PairAlreadyDiscoveredByIndex>(credsIssuerConfig),
         make_unique<PairAlreadyDiscoveredByIndexWithWiFi>(credsIssuerConfig),
+        make_unique<PairAlreadyDiscoveredByIndexWithCode>(credsIssuerConfig),
         make_unique<PairOnNetwork>(credsIssuerConfig),
         make_unique<PairOnNetworkShort>(credsIssuerConfig),
         make_unique<PairOnNetworkLong>(credsIssuerConfig),
@@ -241,11 +250,10 @@ void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * cre
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(credsIssuerConfig),
         make_unique<OpenCommissioningWindowCommand>(credsIssuerConfig),
-        make_unique<CloseSessionCommand>(credsIssuerConfig),
         make_unique<GetCommissionerNodeIdCommand>(credsIssuerConfig),
         make_unique<GetCommissionerRootCertificateCommand>(credsIssuerConfig),
         make_unique<IssueNOCChainCommand>(credsIssuerConfig),
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for commissioning devices.");
 }

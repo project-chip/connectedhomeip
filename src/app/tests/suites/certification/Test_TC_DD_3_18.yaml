@@ -39,8 +39,8 @@ tests:
       disabled: true
 
     - label:
-          "Place TH1 into commissioning mode using the TH manufacturers means to
-          be discovered by a commissioner"
+          "Step 1a: Place TH1 into commissioning mode using the TH manufacturers
+          means to be discovered by a commissioner"
       verification: |
           1. After launching all-clusters-app using discriminator 3841 using below command
           ./chip-all-clusters-app --wifi --discriminator 3841
@@ -55,8 +55,8 @@ tests:
       disabled: true
 
     - label:
-          "Place TH2 into commissioning mode using the TH manufacturers means to
-          be discovered by a commissioner"
+          "Step 1b: Place TH2 into commissioning mode using the TH manufacturers
+          means to be discovered by a commissioner"
       verification: |
           1. After launching all-clusters-app using discriminator 3844 using below command
           ./chip-all-clusters-app --wifi --discriminator 3844
@@ -70,7 +70,7 @@ tests:
           17:40:17.959  Add        2   7 local.               _matterc._udp.       8F1FEB734CE46129
       disabled: true
 
-    - label: "Scan TH1s QR code using the DUT Commissioner."
+    - label: "Step 2a: Scan TH1s QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
@@ -78,7 +78,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT parses TH1s QR code. Follow any steps needed for the
+          "Step 2b: DUT parses TH1s QR code. Follow any steps needed for the
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
@@ -89,11 +89,11 @@ tests:
           Verify in DUT (Chip-tool):
            ./chip-tool pairing code 1 MT:-24J0IRV01KA0648G00
 
-          [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1657240914764] [32262:16895870] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1657240914764] [32262:16895870] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
-    - label: "Scan TH2s QR code using the DUT Commissioner."
+    - label: "Step 3a: Scan TH2s QR code using the DUT Commissioner."
       PICS: MCORE.DD.SCAN_QR_CODE
       verification: |
           1. Verify the QR code is scanned by DUT
@@ -101,7 +101,7 @@ tests:
       disabled: true
 
     - label:
-          "DUT parses TH2s QR code. Follow any steps needed for the
+          "Step 3b: DUT parses TH2s QR code. Follow any steps needed for the
           Commissioner/Commissionee to complete the commissioning process over
           the TH Commissionees method of device discovery"
       verification: |
@@ -112,13 +112,13 @@ tests:
           Verify in DUT (Chip-tool):
            ./chip-tool pairing code 2 MT:-24J04QI14KA0648G00
 
-          [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step "Cleanup"
+          [1657240985682] [32264:16896797] CHIP: [CTL] Successfully finished commissioning step 'Cleanup'
           [1657240985682] [32264:16896797] CHIP: [TOO] Device commissioning completed with success
       disabled: true
 
     - label:
-          "Verify the Commissioner can still interact with TH1 (ex: Read any
-          clusters attribute from TH1)"
+          "Step 4a: Verify the Commissioner can still interact with TH1 (ex:
+          Read any clusters attribute from TH1)"
       verification: |
           ./chip-tool  basicinformation read reachable 1 0
 
@@ -129,8 +129,8 @@ tests:
       disabled: true
 
     - label:
-          "Verify the Commissioner can still interact with TH2 (ex: Read any
-          clusters attribute from TH2)"
+          "Step 4b: Verify the Commissioner can still interact with TH2 (ex:
+          Read any clusters attribute from TH2)"
       verification: |
           ./chip-tool  basicinformation read reachable 2 0
 

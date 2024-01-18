@@ -19,6 +19,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "BoardUtil.h"
+#include "FabricTableDelegate.h"
 #include "LEDUtil.h"
 #include "LightSwitch.h"
 
@@ -42,10 +43,6 @@
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
-#endif
-
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include <app/InteractionModelEngine.h>
 #endif
 
 #include <dk_buttons_and_leds.h>
@@ -73,7 +70,7 @@ constexpr size_t kAppEventQueueSize                 = 10;
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 
 Identify sIdentify = { kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
-                       EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED };
+                       Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 // If CONFIG_CHIP_FACTORY_DATA is enabled, this value is read from the factory data.
@@ -179,6 +176,11 @@ CHIP_ERROR AppTask::Init()
         return System::MapErrorZephyr(ret);
     }
 
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
+    /* OTA image confirmation must be done before the factory data init. */
+    OtaConfirmNewImage();
+#endif
+
     // Initialize Timers
     k_timer_init(&sFunctionTimer, AppTask::FunctionTimerTimeoutCallback, nullptr);
     k_timer_init(&sDimmerPressKeyTimer, AppTask::FunctionTimerTimeoutCallback, nullptr);
@@ -188,7 +190,7 @@ CHIP_ERROR AppTask::Init()
     k_timer_user_data_set(&sFunctionTimer, this);
 
     // Initialize DFU
-#ifdef CONFIG_MCUMGR_SMP_BT
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
     GetDFUOverSMP().Init();
     GetDFUOverSMP().ConfirmNewImage();
 #endif
@@ -208,6 +210,7 @@ CHIP_ERROR AppTask::Init()
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
 #else
+    SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
@@ -216,16 +219,13 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+    AppFabricTableDelegate::Init();
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
-
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
-#endif
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point
@@ -299,7 +299,7 @@ void AppTask::ButtonReleaseHandler(const AppEvent & event)
                 Instance().CancelTimer(Timer::Function);
                 Instance().mFunction = FunctionEvent::NoneSelected;
 
-#ifdef CONFIG_MCUMGR_SMP_BT
+#ifdef CONFIG_MCUMGR_TRANSPORT_BT
                 GetDFUOverSMP().StartServer();
                 UpdateStatusLED();
 #else

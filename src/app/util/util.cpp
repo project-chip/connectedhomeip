@@ -23,6 +23,7 @@
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
+#include <lib/core/CHIPConfig.h>
 
 // TODO: figure out a clear path for compile-time codegen
 #include <app/PluginApplicationCallbacks.h>
@@ -79,7 +80,7 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
     for (i = 0; i < dataSize; i++)
     {
         value2 = value2 << 8;
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
         value2 += pData[i];
 #else  // BIGENDIAN
         value2 += pData[dataSize - i - 1];
@@ -132,12 +133,33 @@ void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
 void MatterUnitLocalizationPluginServerInitCallback() {}
-void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
-
+void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
+void MatterHepaFilterMonitoringPluginServerInitCallback() {}
+void MatterAirQualityPluginServerInitCallback() {}
+void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterFormaldehydeConcentrationMeasurementPluginServerInitCallback() {}
+void MatterNitrogenDioxideConcentrationMeasurementPluginServerInitCallback() {}
+void MatterOzoneConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm10ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
+void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
+void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
+void MatterRvcRunModePluginServerInitCallback() {}
+void MatterRvcCleanModePluginServerInitCallback() {}
+void MatterDishwasherModePluginServerInitCallback() {}
+void MatterLaundryWasherModePluginServerInitCallback() {}
+void MatterRefrigeratorAndTemperatureControlledCabinetModePluginServerInitCallback() {}
+void MatterOperationalStatePluginServerInitCallback() {}
+void MatterRvcOperationalStatePluginServerInitCallback() {}
+void MatterOvenModePluginServerInitCallback() {}
+void MatterDishwasherAlarmPluginServerInitCallback() {}
+void MatterMicrowaveOvenModePluginServerInitCallback() {}
 // ****************************************
 // Print out information about each cluster
 // ****************************************
@@ -155,12 +177,6 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
         index++;
     }
     return 0xFFFF;
-}
-
-void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
-{
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
@@ -211,7 +227,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
     }
 }
 
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
 #define EM_BIG_ENDIAN true
 #else
 #define EM_BIG_ENDIAN false

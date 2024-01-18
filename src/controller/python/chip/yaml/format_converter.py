@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import enum
 import typing
 from dataclasses import dataclass
 
@@ -157,7 +156,9 @@ def convert_to_data_model_type(field_value, field_type):
 
         for t in typing.get_args(field_type):
             # Comparison below explicitly not using 'isinstance' as that doesn't do what we want.
-            if t != Nullable and t != type(None):
+            # type_none is simple hack for Flake8 E721
+            type_none = type(None)
+            if t != Nullable and t != type_none:
                 underlying_field_type = t
                 break
 
@@ -178,7 +179,7 @@ def convert_to_data_model_type(field_value, field_type):
                 field_descriptor = next(
                     x for x in field_descriptors.Fields if x.Label.lower() ==
                     item.lower())
-            except StopIteration as exc:
+            except StopIteration:
                 raise ValidationError(
                     f'Did not find field "{item}" in {str(field_type)}') from None
 

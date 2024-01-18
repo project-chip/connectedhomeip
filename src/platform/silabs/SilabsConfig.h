@@ -25,6 +25,7 @@
 #pragma once
 
 #include <functional>
+#include <platform/CHIPDeviceError.h>
 
 #include "nvm3.h"
 #include "nvm3_hal_flash.h"
@@ -62,11 +63,11 @@ namespace Internal {
 // '08' = Matter nvm3 region
 // '72' = the sub region group base offset (Factory, Config, Counter or KVS)
 // '01' = the id offset inside the group.
-constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
-constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
-constexpr uint32_t kMatterNvm3KeyDomain      = 0x080000U;
-constexpr uint32_t kMatterNvm3KeyLoLimit     = 0x087200U; // Do not modify without Silabs GSDK team approval
-constexpr uint32_t kMatterNvm3KeyHiLimit     = 0x087FFFU; // Do not modify without Silabs GSDK team approval
+inline constexpr uint32_t kUserNvm3KeyDomainLoLimit = 0x000000U; // User Domain NVM3 Key Range lower limit
+inline constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Key Range Maximum limit
+inline constexpr uint32_t kMatterNvm3KeyDomain      = 0x080000U;
+inline constexpr uint32_t kMatterNvm3KeyLoLimit     = 0x087200U; // Do not modify without Silabs GSDK team approval
+inline constexpr uint32_t kMatterNvm3KeyHiLimit     = 0x087FFFU; // Do not modify without Silabs GSDK team approval
 constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
     return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
@@ -112,6 +113,14 @@ public:
     static constexpr Key kConfigKey_ProductURL            = SilabsConfigKey(kMatterFactory_KeyBase, 0x11);
     static constexpr Key kConfigKey_PartNumber            = SilabsConfigKey(kMatterFactory_KeyBase, 0x12);
     static constexpr Key kConfigKey_UniqueId              = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
+    static constexpr Key kConfigKey_Creds_KeyId           = SilabsConfigKey(kMatterFactory_KeyBase, 0x20);
+    static constexpr Key kConfigKey_Creds_Base_Addr       = SilabsConfigKey(kMatterFactory_KeyBase, 0x21);
+    static constexpr Key kConfigKey_Creds_DAC_Offset      = SilabsConfigKey(kMatterFactory_KeyBase, 0x22);
+    static constexpr Key kConfigKey_Creds_DAC_Size        = SilabsConfigKey(kMatterFactory_KeyBase, 0x23);
+    static constexpr Key kConfigKey_Creds_PAI_Offset      = SilabsConfigKey(kMatterFactory_KeyBase, 0x24);
+    static constexpr Key kConfigKey_Creds_PAI_Size        = SilabsConfigKey(kMatterFactory_KeyBase, 0x25);
+    static constexpr Key kConfigKey_Creds_CD_Offset       = SilabsConfigKey(kMatterFactory_KeyBase, 0x26);
+    static constexpr Key kConfigKey_Creds_CD_Size         = SilabsConfigKey(kMatterFactory_KeyBase, 0x27);
     // Matter Config Keys
     static constexpr Key kConfigKey_ServiceConfig      = SilabsConfigKey(kMatterConfig_KeyBase, 0x01);
     static constexpr Key kConfigKey_PairedAccountId    = SilabsConfigKey(kMatterConfig_KeyBase, 0x02);
@@ -135,14 +144,6 @@ public:
     static constexpr Key kConfigKey_YearDaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x16);
     static constexpr Key kConfigKey_HolidaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x17);
     static constexpr Key kConfigKey_OpKeyMap           = SilabsConfigKey(kMatterConfig_KeyBase, 0x20);
-    static constexpr Key kConfigKey_Creds_KeyId        = SilabsConfigKey(kMatterConfig_KeyBase, 0x21);
-    static constexpr Key kConfigKey_Creds_Base_Addr    = SilabsConfigKey(kMatterConfig_KeyBase, 0x22);
-    static constexpr Key kConfigKey_Creds_DAC_Offset   = SilabsConfigKey(kMatterConfig_KeyBase, 0x23);
-    static constexpr Key kConfigKey_Creds_DAC_Size     = SilabsConfigKey(kMatterConfig_KeyBase, 0x24);
-    static constexpr Key kConfigKey_Creds_PAI_Offset   = SilabsConfigKey(kMatterConfig_KeyBase, 0x25);
-    static constexpr Key kConfigKey_Creds_PAI_Size     = SilabsConfigKey(kMatterConfig_KeyBase, 0x26);
-    static constexpr Key kConfigKey_Creds_CD_Offset    = SilabsConfigKey(kMatterConfig_KeyBase, 0x27);
-    static constexpr Key kConfigKey_Creds_CD_Size      = SilabsConfigKey(kMatterConfig_KeyBase, 0x28);
 
     static constexpr Key kConfigKey_GroupKeyMax =
         SilabsConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
@@ -160,7 +161,7 @@ public:
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
+    static constexpr Key kMaxConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x2F);
     static constexpr Key kMinConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x00);
     static constexpr Key kMaxConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x20);
 
@@ -176,6 +177,7 @@ public:
 
     // Configuration methods used by the GenericConfigurationManagerImpl<> template.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);
+    static CHIP_ERROR ReadConfigValue(Key key, uint16_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint32_t & val);
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
@@ -183,6 +185,7 @@ public:
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen, size_t offset);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
+    static CHIP_ERROR WriteConfigValue(Key key, uint16_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
     static CHIP_ERROR WriteConfigValue(Key key, uint64_t val);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- appbar -->
+        <include
+            android:id="@+id/appbar"
+            layout="@layout/layout_appbar" />
+        <!-- appbar -->
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?attr/actionBarSize">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include
+                    android:id="@+id/on_off_switch_on_off_layout"
+                    layout="@layout/layout_item_value_on_off_button" />
+
+                <!-- Bottom Space -->
+                <include layout="@layout/layout_bottom_space" />
+                <!-- Bottom Space -->
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

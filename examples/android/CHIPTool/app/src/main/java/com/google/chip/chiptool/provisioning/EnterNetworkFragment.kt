@@ -25,18 +25,19 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.google.chip.chiptool.NetworkCredentialsParcelable
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.util.FragmentUtil
-import com.google.chip.chiptool.NetworkCredentialsParcelable
 
 /**
  * Fragment to collect Wi-Fi network information from user and send it to device being provisioned.
  */
 class EnterNetworkFragment : Fragment() {
   private val networkType: ProvisionNetworkType
-    get() = requireNotNull(
-      ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
-    )
+    get() =
+      requireNotNull(
+        ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
+      )
 
   interface Callback {
     fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentialsParcelable)
@@ -47,10 +48,11 @@ class EnterNetworkFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View? {
-    val layoutRes = when (networkType) {
-      ProvisionNetworkType.WIFI -> R.layout.enter_wifi_network_fragment
-      ProvisionNetworkType.THREAD -> R.layout.enter_thread_network_fragment
-    }
+    val layoutRes =
+      when (networkType) {
+        ProvisionNetworkType.WIFI -> R.layout.enter_wifi_network_fragment
+        ProvisionNetworkType.THREAD -> R.layout.enter_thread_network_fragment
+      }
 
     return inflater.inflate(layoutRes, container, false).apply {
       val saveNetworkBtn: Button = findViewById(R.id.saveNetworkBtn)
@@ -77,9 +79,10 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    val networkCredentials = NetworkCredentialsParcelable.forWiFi(
-      NetworkCredentialsParcelable.WiFiCredentials(ssid.toString(), pwd.toString())
-    )
+    val networkCredentials =
+      NetworkCredentialsParcelable.forWiFi(
+        NetworkCredentialsParcelable.WiFiCredentials(ssid.toString(), pwd.toString())
+      )
     FragmentUtil.getHost(this, Callback::class.java)
       ?.onNetworkCredentialsEntered(networkCredentials)
   }
@@ -124,15 +127,18 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    val operationalDataset = makeThreadOperationalDataset(
-      channelStr.toString().toInt(),
-      panIdStr.toString().toInt(16),
-      xpanIdStr.hexToByteArray(),
-      masterKeyStr.hexToByteArray()
-    )
+    val operationalDataset =
+      makeThreadOperationalDataset(
+        channelStr.toString().toInt(),
+        panIdStr.toString().toInt(16),
+        xpanIdStr.hexToByteArray(),
+        masterKeyStr.hexToByteArray()
+      )
 
     val networkCredentials =
-      NetworkCredentialsParcelable.forThread(NetworkCredentialsParcelable.ThreadCredentials(operationalDataset))
+      NetworkCredentialsParcelable.forThread(
+        NetworkCredentialsParcelable.ThreadCredentials(operationalDataset)
+      )
     FragmentUtil.getHost(this, Callback::class.java)
       ?.onNetworkCredentialsEntered(networkCredentials)
   }
@@ -188,11 +194,9 @@ class EnterNetworkFragment : Fragment() {
 
     fun newInstance(provisionNetworkType: ProvisionNetworkType): EnterNetworkFragment {
       return EnterNetworkFragment().apply {
-        arguments = Bundle(1).apply {
-          putString(ARG_PROVISION_NETWORK_TYPE, provisionNetworkType.name)
-        }
+        arguments =
+          Bundle(1).apply { putString(ARG_PROVISION_NETWORK_TYPE, provisionNetworkType.name) }
       }
     }
   }
-
 }

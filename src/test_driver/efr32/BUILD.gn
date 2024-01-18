@@ -45,7 +45,7 @@ pw_proto_library("nl_test_service") {
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
-    "${examples_plat_dir}/FreeRTOSConfig.h",
+    "${examples_common_plat_dir}/FreeRTOSConfig.h",
   ]
 
   include_dirs = [
@@ -64,7 +64,7 @@ efr32_sdk("sdk") {
 }
 
 silabs_executable("efr32_device_tests") {
-  output_name = "chip-efr32-device_tests.out"
+  output_name = "matter-silabs-device_tests.out"
 
   defines = [ "PW_RPC_ENABLED" ]
   sources = [
@@ -72,7 +72,7 @@ silabs_executable("efr32_device_tests") {
     "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
     "${examples_common_plat_dir}/PigweedLogger.cpp",
     "${examples_common_plat_dir}/heap_4_silabs.c",
-    "${examples_plat_dir}/init_efrPlatform.cpp",
+    "${examples_common_plat_dir}/syscalls_stubs.cpp",
     "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
@@ -84,8 +84,8 @@ silabs_executable("efr32_device_tests") {
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src:tests",
     "${chip_root}/src/lib",
-    "${chip_root}/src/lib/support:testing",
-    "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+    "${chip_root}/src/lib/support:testing_nlunit",
+    "${examples_common_plat_dir}/pw_sys_io:pw_sys_io_silabs",
     "${nlunit_test_root}:nlunit-test",
   ]
 
@@ -98,6 +98,9 @@ silabs_executable("efr32_device_tests") {
     ]
   }
 
+  # Attestation Credentials
+  deps += [ "${examples_plat_dir}:efr32-attestation-credentials" ]
+
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
     deps += [ "${examples_plat_dir}:silabs-factory-data-provider" ]
@@ -107,11 +110,14 @@ silabs_executable("efr32_device_tests") {
 
   include_dirs = [ "${chip_root}/examples/common/pigweed/efr32" ]
 
-  ldscript = "${examples_plat_dir}/ldscripts/${silabs_family}.ld"
+  ldscript = "${examples_common_plat_dir}/ldscripts/${silabs_family}.ld"
 
   inputs = [ ldscript ]
 
-  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-T" + rebase_path(ldscript, root_build_dir),
+    "-Wl,--no-warn-rwx-segment",
+  ]
 
   output_dir = root_out_dir
 }

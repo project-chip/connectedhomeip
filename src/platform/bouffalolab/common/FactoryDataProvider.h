@@ -62,14 +62,6 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
-
-private:
-#if !CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
-    uint8_t mSpake2pSalt[32];
-    uint32_t mSpake2pSaltLen;
-    uint8_t mSpake2pVerifier[100];
-    uint32_t mSpake2pVerifierLen;
-#endif
 };
 
 } // namespace DeviceLayer

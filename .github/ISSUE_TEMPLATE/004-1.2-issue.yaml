@@ -1,0 +1,98 @@
+name: "\u0032\u20e3 1.2 Issue"
+description: Create an issue that is required for Matter 1.2 release
+title: "[1.2] "
+labels: [bug, "V1.2", "needs triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue against the Matter SDK! We need information about the bug report to follow up, so please help us out by filling out this information.
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction steps
+      description: "How do you trigger this bug? Please walk us through it step by step."
+      placeholder: |
+        Please list reproduction steps step by step.
+        Place shell commands between ```.
+        Attach logs as files instead of pasting them in.
+        1.
+        2.
+        3.
+        ...
+    validations:
+      required: true
+  - type: input
+    id: prevalence
+    attributes:
+      label: Bug prevalence
+      description: "How often do you or others encounter this bug?"
+      placeholder: "Example: Whenever I do this, 1-2 times a week, day, hour, etc"
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: GitHub hash of the SDK that was being used
+      description: Hash of the GitHub SDK used
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Platform
+      description: What platforms are affected?
+      multiple: true
+      options:
+        - ameba
+        - android
+        - cc13x2_cc26x2
+        - darwin
+        - efr32
+        - esp32
+        - freeRTOS
+        - IMX8
+        - k32w
+        - nrf connect
+        - nrf
+        - python
+        - raspi
+        - vscode
+        - windows
+        - other
+        - core
+    validations:
+      required: true
+  - type: input
+    id: platform-versions
+    attributes:
+      label: Platform Version(s)
+      description: "What platform version(s) are affected [optional]"
+      placeholder: "eg: 1.2, N/A"
+  - type: dropdown
+    attributes:
+      label: Type
+      description: What type of issue is this?
+      multiple: true
+      options:
+        - Test Improvement
+        - Common Cluster Logic
+        - Spec Compliance Issue
+        - Security Issue
+        - Platform Issue
+        - Core SDK Memory Issue
+        - Core SDK Crash
+        - Core SDK Performance Improvement
+        - Core SDK Interopability Issue
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Links? References? Anything that will give us more context about the issue you are encountering!
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: "Thanks for helping us get to 1.2!"

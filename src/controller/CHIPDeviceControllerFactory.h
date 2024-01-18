@@ -34,6 +34,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <protocols/secure_channel/SessionResumptionStorage.h>
 
 namespace chip {
 
@@ -106,20 +107,22 @@ struct SetupParams
 };
 
 // TODO everything other than the fabric storage, group data provider, OperationalKeystore,
-// OperationalCertificateStore and SessionKeystore here should be removed. We're blocked
-// because of the need to support !CHIP_DEVICE_LAYER
+// OperationalCertificateStore, SessionKeystore, and SessionResumptionStorage here should
+// be removed. We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                        = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
+    app::reporting::ReportScheduler::TimerDelegate * timerDelegate     = nullptr;
     Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;
     OperationalKeystore * operationalKeystore                          = nullptr;
     Credentials::OperationalCertificateStore * opCertStore             = nullptr;
+    SessionResumptionStorage * sessionResumptionStorage                = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -166,7 +169,7 @@ public:
 
     ~DeviceControllerFactory();
     DeviceControllerFactory(DeviceControllerFactory const &) = delete;
-    void operator=(DeviceControllerFactory const &) = delete;
+    void operator=(DeviceControllerFactory const &)          = delete;
 
     //
     // Some clients do not prefer a complete shutdown of the stack being initiated if
@@ -249,13 +252,16 @@ private:
     void PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params);
     CHIP_ERROR InitSystemState(FactoryInitParams params);
     CHIP_ERROR InitSystemState();
+    void ControllerInitialized(const DeviceController & controller);
 
     uint16_t mListenPort;
-    DeviceControllerSystemState * mSystemState              = nullptr;
-    PersistentStorageDelegate * mFabricIndependentStorage   = nullptr;
-    Crypto::OperationalKeystore * mOperationalKeystore      = nullptr;
-    Credentials::OperationalCertificateStore * mOpCertStore = nullptr;
-    bool mEnableServerInteractions                          = false;
+    DeviceControllerSystemState * mSystemState                          = nullptr;
+    PersistentStorageDelegate * mFabricIndependentStorage               = nullptr;
+    Crypto::OperationalKeystore * mOperationalKeystore                  = nullptr;
+    Credentials::OperationalCertificateStore * mOpCertStore             = nullptr;
+    Credentials::CertificateValidityPolicy * mCertificateValidityPolicy = nullptr;
+    SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
+    bool mEnableServerInteractions                                      = false;
 };
 
 } // namespace Controller

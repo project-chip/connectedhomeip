@@ -36,11 +36,19 @@ declare_args() {
   use_SiWx917 = false
   chip_enable_ble_rs911x = false
 
+  wifi_soc = false
+
   #Disable MQTT by default
   enable_dic = false
 
+  # Disable AWS SDK OTA by default
+  aws_sdk_ota = false
+
   # Disable UART log forwarding by default
   sl_uart_log_output = false
+
+  # Self-provision enabled
+  use_provision_channel = false
 }
 
 declare_args() {
@@ -71,6 +79,9 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P432F1024GM48"
   enable_fem = true
+
+  # Board does not support LEDs and Buttons at the same time
+  use_wstk_leds = false
   board_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
 } else if (silabs_board == "BRD4161A") {
   silabs_family = "efr32mg12"
@@ -94,11 +105,10 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4170A") {
   silabs_family = "efr32mg12"
   silabs_mcu = "EFR32MG12P433F1024GM68"
-} else if (silabs_board == "BRD4325B") {
-  silabs_family = "SiWx917"
-  silabs_mcu = "EFR32MG12P432F1024GL125"
-  disable_lcd = true
-  show_qr_code = false
+} else if (silabs_board == "BRD4338A") {
+  silabs_family = "SiWx917-common"
+  silabs_mcu = "SiWG917M111MGTBA"
+  wifi_soc = true
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
@@ -106,7 +116,9 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg21"
   silabs_mcu = "EFR32MG21A020F1024IM32"
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
-  print("RevA is deprecated, We suggest using BRD4186C (rev C)")
+  variant = string_replace(silabs_board, "A", "C")
+  print(
+      "${silabs_board} is deprecated. It is recommended to use the 'C' variant of this board (${variant})")
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24A010F1536GM48"
 } else if (silabs_board == "BRD4186C") {
@@ -165,15 +177,18 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4318A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
-
-  use_wstk_leds = false
-  use_external_flash = false
-  show_qr_code = false
-  disable_lcd = true
 } else {
-  print(
-      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")
-  assert(false, "The board ${silabs_board} is unsupported")
+  assert(
+      false,
+      "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
+}
+
+declare_args() {
+  # Wifi SoC Board require a .rps file to be flashed to the device to run
+  # this rps file is created from the built binary but it requires Silabs Commander tool
+  # User can set this arg to false to skip the rps creation for WiFi SoCs.
+  # e.g. for CI
+  use_rps_extension = wifi_soc
 }
 
 # qr code cannot be true if lcd is disabled

@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+  <cluster>
+    <name>HEPA Filter Monitoring</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes and commands for monitoring HEPA filters in a device</description>
+    <code>0x0071</code>
+    <define>HEPA_FILTER_MONITORING_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
+    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x00" name="ResetCondition" optional="true">
+      <description>Reset the condition of the replaceable to the non degraded state</description>
+    </command>
+  </cluster>
+
+  <cluster>
+    <name>Activated Carbon Filter Monitoring</name>
+    <domain>Measurement &amp; Sensing</domain>
+    <description>Attributes and commands for monitoring activated carbon filters in a device</description>
+    <code>0x0072</code>
+    <define>ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="CONDITION" type="percent" min="0" max="100" writable="false" isNullable="false" optional="true">Condition</attribute>
+    <attribute side="server" code="0x0001" define="DEGRADATION_DIRECTION" type="DegradationDirectionEnum" min="0" max="1" writable="false" isNullable="false" optional="true">DegradationDirection</attribute>
+    <attribute side="server" code="0x0002" define="CHANGE_INDICATION" type="ChangeIndicationEnum" min="0" max="2" writable="false" isNullable="false" default="0" optional="false">ChangeIndication</attribute>
+    <attribute side="server" code="0x0003" define="IN_PLACE_INDICATOR" type="boolean" writable="false" isNullable="false" optional="true">InPlaceIndicator</attribute>
+    <attribute side="server" code="0x0004" define="LAST_CHANGED_TIME" type="epoch_s" writable="true" isNullable="true" optional="true">LastChangedTime</attribute>
+    <attribute side="server" code="0x0005" define="REPLACEMENT_PRODUCT_LIST" type="array" entryType="ReplacementProductStruct" length="5" writable="false" isNullable="false" optional="true">ReplacementProductList</attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x00" name="ResetCondition" optional="true">
+      <description>Reset the condition of the replaceable to the non degraded state</description>
+    </command>
+  </cluster>
+
+  <!-- Feature Map -->
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0071" />
+    <cluster code="0x0072" />
+    <field name="Condition" mask="0x01" />
+    <field name="Warning" mask="0x02" />
+    <field name="ReplacementProductList" mask="0x04" />
+  </bitmap>
+
+  <!-- Cluster Data Types -->
+  <enum name="DegradationDirectionEnum" type="enum8">
+    <cluster code="0x0071" />
+    <cluster code="0x0072" />
+    <item value="0" name="Up" />
+    <item value="1" name="Down" />
+  </enum>
+
+  <enum name="ChangeIndicationEnum" type="enum8">
+    <cluster code="0x0071" />
+    <cluster code="0x0072" />
+    <item value="0" name="OK" />
+    <item value="1" name="Warning" />
+    <item value="2" name="Critical" />
+  </enum>
+
+  <enum name="ProductIdentifierTypeEnum" type="enum8">
+    <cluster code="0x0071" />
+    <cluster code="0x0072" />
+    <item value="0" name="UPC" />
+    <item value="1" name="GTIN-8" />
+    <item value="2" name="EAN" />
+    <item value="3" name="GTIN-14" />
+    <item value="4" name="OEM" />
+  </enum>
+
+  <!-- Unfortunately due to the way these aliased clusters are generated, we need to declare separate
+       ReplacementProductStructs for each cluster. This is because they refer to the ProductIdentifierTypeEnum
+       which is scoped to each implementation. Duplicate this struct definition for now until we can
+       create either a global enum that these can refer to, or create an alternative
+       solution that can help us better address shared structs for aliased clusters. -->
+  <struct name="ReplacementProductStruct">
+    <cluster code="0x0071" />
+    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
+    <item name="ProductIdentifierValue" type="char_string" length="20" optional="false"/>
+  </struct>
+
+  <struct name="ReplacementProductStruct">
+    <cluster code="0x0072" />
+    <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
+    <item name="ProductIdentifierValue" type="char_string" length="20" optional="false"/>
+  </struct>
+</configurator>

@@ -71,8 +71,8 @@ protected:
     ~BLEManager() = default;
 
     // No copy, move or assignment.
-    BLEManager(const BLEManager &)  = delete;
-    BLEManager(const BLEManager &&) = delete;
+    BLEManager(const BLEManager &)             = delete;
+    BLEManager(const BLEManager &&)            = delete;
     BLEManager & operator=(const BLEManager &) = delete;
 };
 

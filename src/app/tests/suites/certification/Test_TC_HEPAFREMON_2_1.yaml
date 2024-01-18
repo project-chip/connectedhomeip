@@ -1,0 +1,90 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 165.2.1. [TC-HEPAFREMON-2.1] Attributes with DUT as Server
+
+PICS:
+    - HEPAFREMON.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "HEPA Filter Monitoring"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the Condition attribute."
+      PICS: HEPAFREMON.S.A0000
+      command: "readAttribute"
+      attribute: "Condition"
+      response:
+          constraints:
+              type: percent
+              minValue: 0
+              maxValue: 100
+
+    - label:
+          "Step 3: TH reads from the DUT the DegradationDirection attribute.."
+      PICS: HEPAFREMON.S.A0001
+      command: "readAttribute"
+      attribute: "DegradationDirection"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
+    - label: "Step 4: TH reads from the DUT the ChangeIndication attribute."
+      PICS: HEPAFREMON.S.A0002
+      command: "readAttribute"
+      attribute: "ChangeIndication"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Step 5: TH reads from the DUT the InPlaceIndicator attribute"
+      PICS: HEPAFREMON.S.A0003
+      command: "readAttribute"
+      attribute: "InPlaceIndicator"
+      response:
+          constraints:
+              type: boolean
+
+    - label: "Step 6: TH reads from the DUT the LastChangedTime attribute"
+      PICS: HEPAFREMON.S.A0004
+      command: "readAttribute"
+      attribute: "LastChangedTime"
+      response:
+          constraints:
+              type: epoch_s
+
+    - label:
+          "Step 7: TH reads from the DUT the ReplacementProductList attribute"
+      PICS: HEPAFREMON.S.A0005
+      command: "readAttribute"
+      attribute: "ReplacementProductList"
+      response:
+          constraints:
+              type: list

@@ -34,34 +34,19 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen:0.7.0
+            image: ghcr.io/project-chip/chip-build-tizen:32
             options: --user root
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.36
-              name: Checkout
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  action: actions/checkout@v3
-                  with: |
-                      token: ${{ github.token }}
-                  attempt_limit: 3
-                  attempt_delay: 2000
-            - name: Checkout submodules
-              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform tizen
-
-            - name: Bootstrap cache
-              uses: actions/cache@v3
-              timeout-minutes: 10
-              with:
-                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
-                  path: |
-                      .environment
-                      build_overrides/pigweed_environment.gni
-            - name: Bootstrap
-              run: scripts/build/gn_bootstrap.sh
+                platform: tizen
 
             - name: Build Tizen examples
               run: |
@@ -69,10 +54,8 @@ jobs:
                       "./scripts/build/build_examples.py \
                           --enable-flashbundle \
                           --target tizen-arm-all-clusters \
-                          --target tizen-arm-all-clusters-minimal-no-wifi \
                           --target tizen-arm-chip-tool-ubsan \
-                          --target tizen-arm-light \
-                          --target tizen-arm-light-no-ble-no-wifi \
+                          --target tizen-arm-light-with-ui \
                           build \
                           --copy-artifacts-to out/artifacts \
                       "

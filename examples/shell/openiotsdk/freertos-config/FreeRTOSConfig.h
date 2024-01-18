@@ -40,7 +40,7 @@ extern uint32_t SystemCoreClock;
 //  <o>Minimal stack size [words] <0-65535>
 //  <i> Stack for idle task and default task stack in words.
 //  <i> Default: 128
-#define configMINIMAL_STACK_SIZE ((uint16_t)(4 * 1024))
+#define configMINIMAL_STACK_SIZE ((uint16_t) (4 * 1024))
 
 //  <o>Total heap size [bytes] <0-0xFFFFFFFF>
 //  <i> Heap memory size in bytes.
@@ -190,7 +190,7 @@ extern uint32_t SystemCoreClock;
 //  <q> Use TrustZone Secure Side Only
 //  <i> This settings prevents FreeRTOS contex switch to Non-Secure side.
 //  <i> Enable this setting when FreeRTOS runs on the Secure side only.
-#define configRUN_FREERTOS_SECURE_ONLY CONFIG_RUN_FREERTOS_SECURE_ONLY
+#define configRUN_FREERTOS_SECURE_ONLY 0
 
 //  <q>Use TrustZone Security Extension
 //  <i> Using TrustZone affects context handling.

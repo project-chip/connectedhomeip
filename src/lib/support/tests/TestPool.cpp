@@ -239,6 +239,11 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     size_t sum   = 0;
     pool.ForEachActiveObject([&](S * object) {
         NL_TEST_ASSERT(inSuite, object != nullptr);
+        if (object == nullptr)
+        {
+            // NL_TEST_ASSERT doesn't stop running the test and we want to avoid nullptr dereference.
+            return Loop::Continue;
+        }
         NL_TEST_ASSERT(inSuite, objIds.count(object->mId) == 1);
         objIds.erase(object->mId);
         ++count;
@@ -446,7 +451,7 @@ int TestPool()
 {
     nlTestSuite theSuite = { "CHIP Pool tests", &sTests[0], Setup, Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

@@ -17,8 +17,6 @@
  * under the License.
  */
 
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
-
 #include "blecent.h"
 #include "host/ble_hs.h"
 #include <assert.h>
@@ -259,7 +257,8 @@ uint16_t chr_end_handle(const struct peer_svc * svc, const struct peer_chr * chr
     next_chr = SLIST_NEXT(chr, next);
     if (next_chr != NULL)
     {
-        return next_chr->chr.def_handle - 1;
+        int result = next_chr->chr.def_handle - 1;
+        return (uint16_t) result;
     }
     else
     {
@@ -763,56 +762,56 @@ int peer_init(int max_peers, int max_svcs, int max_chrs, int max_dscs)
     /* Free memory first in case this function gets called more than once. */
     peer_free_mem();
 
-    peer_mem = malloc(OS_MEMPOOL_BYTES(max_peers, sizeof(struct peer)));
+    peer_mem = malloc(OS_MEMPOOL_BYTES((uint16_t) max_peers, sizeof(struct peer)));
     if (peer_mem == NULL)
     {
         rc = BLE_HS_ENOMEM;
         goto err;
     }
 
-    rc = os_mempool_init(&peer_pool, max_peers, sizeof(struct peer), peer_mem, "peer_pool");
+    rc = os_mempool_init(&peer_pool, (uint16_t) max_peers, sizeof(struct peer), peer_mem, "peer_pool");
     if (rc != 0)
     {
         rc = BLE_HS_EOS;
         goto err;
     }
 
-    peer_svc_mem = malloc(OS_MEMPOOL_BYTES(max_svcs, sizeof(struct peer_svc)));
+    peer_svc_mem = malloc(OS_MEMPOOL_BYTES((uint16_t) max_svcs, sizeof(struct peer_svc)));
     if (peer_svc_mem == NULL)
     {
         rc = BLE_HS_ENOMEM;
         goto err;
     }
 
-    rc = os_mempool_init(&peer_svc_pool, max_svcs, sizeof(struct peer_svc), peer_svc_mem, "peer_svc_pool");
+    rc = os_mempool_init(&peer_svc_pool, (uint16_t) max_svcs, sizeof(struct peer_svc), peer_svc_mem, "peer_svc_pool");
     if (rc != 0)
     {
         rc = BLE_HS_EOS;
         goto err;
     }
 
-    peer_chr_mem = malloc(OS_MEMPOOL_BYTES(max_chrs, sizeof(struct peer_chr)));
+    peer_chr_mem = malloc(OS_MEMPOOL_BYTES((uint16_t) max_chrs, sizeof(struct peer_chr)));
     if (peer_chr_mem == NULL)
     {
         rc = BLE_HS_ENOMEM;
         goto err;
     }
 
-    rc = os_mempool_init(&peer_chr_pool, max_chrs, sizeof(struct peer_chr), peer_chr_mem, "peer_chr_pool");
+    rc = os_mempool_init(&peer_chr_pool, (uint16_t) max_chrs, sizeof(struct peer_chr), peer_chr_mem, "peer_chr_pool");
     if (rc != 0)
     {
         rc = BLE_HS_EOS;
         goto err;
     }
 
-    peer_dsc_mem = malloc(OS_MEMPOOL_BYTES(max_dscs, sizeof(struct peer_dsc)));
+    peer_dsc_mem = malloc(OS_MEMPOOL_BYTES((uint16_t) max_dscs, sizeof(struct peer_dsc)));
     if (peer_dsc_mem == NULL)
     {
         rc = BLE_HS_ENOMEM;
         goto err;
     }
 
-    rc = os_mempool_init(&peer_dsc_pool, max_dscs, sizeof(struct peer_dsc), peer_dsc_mem, "peer_dsc_pool");
+    rc = os_mempool_init(&peer_dsc_pool, (uint16_t) max_dscs, sizeof(struct peer_dsc), peer_dsc_mem, "peer_dsc_pool");
     if (rc != 0)
     {
         rc = BLE_HS_EOS;
@@ -825,4 +824,3 @@ err:
     peer_free_mem();
     return rc;
 }
-#endif

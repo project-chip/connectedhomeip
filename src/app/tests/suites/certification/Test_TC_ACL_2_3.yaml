@@ -54,7 +54,7 @@ config:
         defaultValue: ""
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -63,16 +63,17 @@ tests:
                 value: nodeId
 
     - label:
-          "TH1 reads DUT Endpoint 0 OperationalCredentials cluster
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       cluster: "Operational Credentials"
       command: "readAttribute"
       attribute: "CurrentFabricIndex"
       response:
-          saveAs: CurrentFabricIndex
+          saveAs: CurrentFabricIndexValue
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
@@ -80,156 +81,161 @@ tests:
           value: []
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1.
-          struct: Data field: D_OK_EMPTY : 1718"
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1. struct: Data field: D_OK_EMPTY : 1718"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
       response:
-          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element
-          1.struct Data field: D_OK_SINGLE
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1.struct Data field: D_OK_SINGLE
           :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
       response:
-          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element
-          1.struct Data field: D_OK_FULL
+          "Step 8: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1.struct Data field: D_OK_FULL
           :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003148656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E0018"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_OK_FULL, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_FULL, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+          "Step 9: TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
       response:
-          value: [{ Data: D_OK_FULL, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_FULL, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1
-          .struct Data field: D_BAD_LENGTH
+          "Step 10: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1 .struct Data field: D_BAD_LENGTH
           :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700D00000F1FF02003248656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E7420616761696E2E2E2E2E2E2E0018"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_LENGTH, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_BAD_LENGTH, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1.
-          struct Data field: D_BAD_STRUCT : 1518"
+          "Step 11: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1. struct Data field: D_BAD_STRUCT : 1518"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_STRUCT, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_BAD_STRUCT, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1.
-          struct Data field: D_BAD_LIST
+          "Step 12: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1. struct Data field: D_BAD_LIST
           :3701D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_LIST, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_BAD_LIST, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1.
-          struct Data field: D_BAD_ELEM
+          "Step 13: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1. struct Data field: D_BAD_ELEM
           :17103D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_ELEM, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_BAD_ELEM, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1
-          .struct Data field: D_BAD_OVERFLOW :
+          "Step 14: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1 .struct Data field: D_BAD_OVERFLOW :
           17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018FF"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_OVERFLOW, FabricIndex: CurrentFabricIndex }]
+          value:
+              [{ Data: D_BAD_OVERFLOW, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element 1.
-          struct Data field: D_BAD_UNDERFLOW
+          "Step 15: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1. struct Data field: D_BAD_UNDERFLOW
           :17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E6700"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_UNDERFLOW, FabricIndex: CurrentFabricIndex }]
+          value:
+              [{ Data: D_BAD_UNDERFLOW, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 1 element
-          1.struct Data field: D_BAD_NONE"
+          "Step 16: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 1
+          element 1.struct Data field: D_BAD_NONE"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
       arguments:
-          value: [{ Data: D_BAD_NONE, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_BAD_NONE, FabricIndex: CurrentFabricIndexValue }]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is list of AccessControlExtensionStruct containing 2 elements .
-          value is list of AccessControlExtensionStruct containing 2 elements .
-          first element contains Data field: D_OK_EMPTY 1718 . second element
-          contains Data field: D_OK_SINGLE
+          "Step 17: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is list of AccessControlExtensionStruct containing 2
+          elements . value is list of AccessControlExtensionStruct containing 2
+          elements . first element contains Data field: D_OK_EMPTY 1718 . second
+          element contains Data field: D_OK_SINGLE
           17D00000F1FF01003D48656C6C6F20576F726C642E205468697320697320612073696E676C6520656C656D656E74206C6976696E6720617320612063686172737472696E670018"
       PICS: ACL.S.A0001
       command: "writeAttribute"
@@ -237,23 +243,24 @@ tests:
       arguments:
           value:
               [
-                  { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex },
-                  { Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndex },
+                  { Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue },
+                  { Data: D_OK_SINGLE, FabricIndex: CurrentFabricIndexValue },
               ]
       response:
           error: CONSTRAINT_ERROR
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+          "Step 18: TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"
       response:
-          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndex }]
+          value: [{ Data: D_OK_EMPTY, FabricIndex: CurrentFabricIndexValue }]
 
     - label:
-          "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute,
-          value is an empty list"
+          "Step 19: TH1 writes DUT Endpoint 0 AccessControl cluster Extension
+          attribute, value is an empty list"
       PICS: ACL.S.A0001
       command: "writeAttribute"
       attribute: "Extension"
@@ -261,7 +268,8 @@ tests:
           value: []
 
     - label:
-          "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute"
+          "Step 20: TH1 reads DUT Endpoint 0 AccessControl cluster Extension
+          attribute"
       PICS: ACL.S.A0001
       command: "readAttribute"
       attribute: "Extension"

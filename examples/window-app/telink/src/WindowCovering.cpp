@@ -31,8 +31,8 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
-static const struct pwm_dt_spec sLiftPwmDevice = LIGHTING_PWM_SPEC_RGB_BLUE;
-static const struct pwm_dt_spec sTiltPwmDevice = LIGHTING_PWM_SPEC_RGB_GREEN;
+static const struct pwm_dt_spec sLiftPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
+static const struct pwm_dt_spec sTiltPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
 
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
 constexpr uint16_t sPercentDelta   = 500;

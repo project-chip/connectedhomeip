@@ -21,6 +21,7 @@
  *        implements PICS condition parsing for YAML tests.
  */
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>

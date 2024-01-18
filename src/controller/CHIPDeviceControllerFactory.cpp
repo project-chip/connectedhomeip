@@ -25,8 +25,10 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 
 #include <app/OperationalSessionSetup.h>
+#include <app/TimerDelegates.h>
+#include <app/reporting/ReportSchedulerImpl.h>
 #include <app/util/DataModelHandler.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 #if CONFIG_DEVICE_LAYER
@@ -58,11 +60,13 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
 
     // Save our initialization state that we can't recover later from a
     // created-but-shut-down system state.
-    mListenPort               = params.listenPort;
-    mFabricIndependentStorage = params.fabricIndependentStorage;
-    mOperationalKeystore      = params.operationalKeystore;
-    mOpCertStore              = params.opCertStore;
-    mEnableServerInteractions = params.enableServerInteractions;
+    mListenPort                = params.listenPort;
+    mFabricIndependentStorage  = params.fabricIndependentStorage;
+    mOperationalKeystore       = params.operationalKeystore;
+    mOpCertStore               = params.opCertStore;
+    mCertificateValidityPolicy = params.certificateValidityPolicy;
+    mSessionResumptionStorage  = params.sessionResumptionStorage;
+    mEnableServerInteractions  = params.enableServerInteractions;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -82,14 +86,16 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
-        params.listenPort               = mListenPort;
-        params.fabricIndependentStorage = mFabricIndependentStorage;
-        params.enableServerInteractions = mEnableServerInteractions;
-        params.groupDataProvider        = mSystemState->GetGroupDataProvider();
-        params.sessionKeystore          = mSystemState->GetSessionKeystore();
-        params.fabricTable              = mSystemState->Fabrics();
-        params.operationalKeystore      = mOperationalKeystore;
-        params.opCertStore              = mOpCertStore;
+        params.listenPort                = mListenPort;
+        params.fabricIndependentStorage  = mFabricIndependentStorage;
+        params.enableServerInteractions  = mEnableServerInteractions;
+        params.groupDataProvider         = mSystemState->GetGroupDataProvider();
+        params.sessionKeystore           = mSystemState->GetSessionKeystore();
+        params.fabricTable               = mSystemState->Fabrics();
+        params.operationalKeystore       = mOperationalKeystore;
+        params.opCertStore               = mOpCertStore;
+        params.certificateValidityPolicy = mCertificateValidityPolicy;
+        params.sessionResumptionStorage  = mSessionResumptionStorage;
     }
 
     return InitSystemState(params);
@@ -168,6 +174,8 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr               = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager     = chip::Platform::New<secure_channel::MessageCounterManager>();
     stateParams.groupDataProvider         = params.groupDataProvider;
+    stateParams.timerDelegate             = chip::Platform::New<chip::app::DefaultTimerDelegate>();
+    stateParams.reportScheduler           = chip::Platform::New<app::reporting::ReportSchedulerImpl>(stateParams.timerDelegate);
     stateParams.sessionKeystore           = params.sessionKeystore;
 
     // if no fabricTable was provided, create one and track it in stateParams for cleanup
@@ -189,12 +197,24 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         tempFabricTable         = stateParams.fabricTable;
     }
 
-    auto sessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
-    ReturnErrorOnFailure(sessionResumptionStorage->Init(params.fabricIndependentStorage));
-    stateParams.sessionResumptionStorage = std::move(sessionResumptionStorage);
+    SessionResumptionStorage * sessionResumptionStorage;
+    if (params.sessionResumptionStorage == nullptr)
+    {
+        auto ownedSessionResumptionStorage = chip::Platform::MakeUnique<SimpleSessionResumptionStorage>();
+        ReturnErrorOnFailure(ownedSessionResumptionStorage->Init(params.fabricIndependentStorage));
+        stateParams.ownedSessionResumptionStorage    = std::move(ownedSessionResumptionStorage);
+        stateParams.externalSessionResumptionStorage = nullptr;
+        sessionResumptionStorage                     = stateParams.ownedSessionResumptionStorage.get();
+    }
+    else
+    {
+        stateParams.ownedSessionResumptionStorage    = nullptr;
+        stateParams.externalSessionResumptionStorage = params.sessionResumptionStorage;
+        sessionResumptionStorage                     = stateParams.externalSessionResumptionStorage;
+    }
 
     auto delegate = chip::Platform::MakeUnique<ControllerFabricDelegate>();
-    ReturnErrorOnFailure(delegate->Init(stateParams.sessionResumptionStorage.get(), stateParams.groupDataProvider));
+    ReturnErrorOnFailure(delegate->Init(sessionResumptionStorage, stateParams.groupDataProvider));
     stateParams.fabricTableDelegate = delegate.get();
     ReturnErrorOnFailure(stateParams.fabricTable->AddFabricDelegate(stateParams.fabricTableDelegate));
     delegate.release();
@@ -216,7 +236,7 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
         // Enable listening for session establishment messages.
         ReturnErrorOnFailure(stateParams.caseServer->ListenForSessionEstablishment(
-            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, stateParams.sessionResumptionStorage.get(),
+            stateParams.exchangeMgr, stateParams.sessionMgr, stateParams.fabricTable, sessionResumptionStorage,
             stateParams.certificateValidityPolicy, stateParams.groupDataProvider));
 
         //
@@ -236,25 +256,19 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
         // Consequently, reach in set the fabric table pointer to point to the right version.
         //
         app::DnssdServer::Instance().SetFabricTable(stateParams.fabricTable);
-
-        //
-        // Start up the DNS-SD server.  We are not giving it a
-        // CommissioningModeProvider, so it will not claim we are in
-        // commissioning mode.
-        //
-        chip::app::DnssdServer::Instance().StartServer();
     }
 
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
     stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
     CASEClientInitParams sessionInitParams = {
-        .sessionManager           = stateParams.sessionMgr,
-        .sessionResumptionStorage = stateParams.sessionResumptionStorage.get(),
-        .exchangeMgr              = stateParams.exchangeMgr,
-        .fabricTable              = stateParams.fabricTable,
-        .groupDataProvider        = stateParams.groupDataProvider,
-        .mrpLocalConfig           = GetLocalMRPConfig(),
+        .sessionManager            = stateParams.sessionMgr,
+        .sessionResumptionStorage  = sessionResumptionStorage,
+        .certificateValidityPolicy = stateParams.certificateValidityPolicy,
+        .exchangeMgr               = stateParams.exchangeMgr,
+        .fabricTable               = stateParams.fabricTable,
+        .groupDataProvider         = stateParams.groupDataProvider,
+        .mrpLocalConfig            = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
@@ -267,12 +281,12 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.caseSessionManager = Platform::New<CASESessionManager>();
     ReturnErrorOnFailure(stateParams.caseSessionManager->Init(stateParams.systemLayer, sessionManagerConfig));
 
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.fabricTable,
-                                                                                stateParams.caseSessionManager));
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(
+        stateParams.exchangeMgr, stateParams.fabricTable, stateParams.reportScheduler, stateParams.caseSessionManager));
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(std::move(stateParams));
-    mSystemState->SetTempFabricTable(tempFabricTable);
+    mSystemState->SetTempFabricTable(tempFabricTable, params.enableServerInteractions);
     ChipLogDetail(Controller, "System State Initialized...");
     return CHIP_NO_ERROR;
 }
@@ -294,6 +308,18 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.enableServerInteractions = params.enableServerInteractions;
 }
 
+void DeviceControllerFactory::ControllerInitialized(const DeviceController & controller)
+{
+    if (mEnableServerInteractions && controller.GetFabricIndex() != kUndefinedFabricIndex)
+    {
+        // Restart DNS-SD advertising, because initialization of this controller could
+        // have modified whether a particular fabric identity should be
+        // advertised.  Just calling AdvertiseOperational() is not good enough
+        // here, since we might be removing advertising.
+        app::DnssdServer::Instance().StartServer();
+    }
+}
+
 CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceController & controller)
 {
     VerifyOrReturnError(mSystemState != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -305,6 +331,12 @@ CHIP_ERROR DeviceControllerFactory::SetupController(SetupParams params, DeviceCo
     PopulateInitParams(controllerParams, params);
 
     CHIP_ERROR err = controller.Init(controllerParams);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ControllerInitialized(controller);
+    }
+
     return err;
 }
 
@@ -326,6 +358,12 @@ CHIP_ERROR DeviceControllerFactory::SetupCommissioner(SetupParams params, Device
     commissionerParams.deviceAttestationVerifier = params.deviceAttestationVerifier;
 
     CHIP_ERROR err = commissioner.Init(commissionerParams);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        ControllerInitialized(commissioner);
+    }
+
     return err;
 }
 
@@ -348,11 +386,6 @@ void DeviceControllerFactory::RetainSystemState()
 void DeviceControllerFactory::ReleaseSystemState()
 {
     mSystemState->Release();
-
-    if (!mSystemState->IsInitialized() && mEnableServerInteractions)
-    {
-        app::DnssdServer::Instance().StopServer();
-    }
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()
@@ -367,9 +400,11 @@ void DeviceControllerFactory::Shutdown()
         Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mFabricIndependentStorage = nullptr;
-    mOperationalKeystore      = nullptr;
-    mOpCertStore              = nullptr;
+    mFabricIndependentStorage  = nullptr;
+    mOperationalKeystore       = nullptr;
+    mOpCertStore               = nullptr;
+    mCertificateValidityPolicy = nullptr;
+    mSessionResumptionStorage  = nullptr;
 }
 
 void DeviceControllerSystemState::Shutdown()
@@ -383,6 +418,14 @@ void DeviceControllerSystemState::Shutdown()
     mHaveShutDown = true;
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
+
+    if (mTempFabricTable && mEnableServerInteractions)
+    {
+        // The DnssdServer is holding a reference to our temp fabric table,
+        // which we are about to destroy.  Stop it, so that it will stop trying
+        // to use it.
+        app::DnssdServer::Instance().StopServer();
+    }
 
     if (mFabricTableDelegate != nullptr)
     {
@@ -478,6 +521,18 @@ void DeviceControllerSystemState::Shutdown()
     {
         chip::Platform::Delete(mSessionMgr);
         mSessionMgr = nullptr;
+    }
+
+    if (mReportScheduler != nullptr)
+    {
+        chip::Platform::Delete(mReportScheduler);
+        mReportScheduler = nullptr;
+    }
+
+    if (mTimerDelegate != nullptr)
+    {
+        chip::Platform::Delete(mTimerDelegate);
+        mTimerDelegate = nullptr;
     }
 
     if (mTempFabricTable != nullptr)

@@ -17,40 +17,46 @@
 
 #include "BufferReader.h"
 
+#include <lib/core/CHIPEncoding.h>
+
 #include <string.h>
+#include <type_traits>
 
 namespace chip {
 namespace Encoding {
 namespace LittleEndian {
 
 namespace {
-// These helper methods return void and put the value being read into an
+
+// This helper methods return void and put the value being read into an
 // outparam because that allows us to easily overload on the type of the
 // thing being read.
-void ReadHelper(const uint8_t *& p, uint8_t * dest)
+void ReadHelper(const uint8_t * p, bool * dest)
 {
-    *dest = Read8(p);
+    *dest = (*p != 0);
 }
-void ReadHelper(const uint8_t *& p, uint16_t * dest)
+
+template <typename T>
+void ReadHelper(const uint8_t * p, T * dest)
 {
-    *dest = Read16(p);
+    std::make_unsigned_t<T> result;
+    memcpy(&result, p, sizeof(result));
+    result = chip::Encoding::LittleEndian::HostSwap(result);
+
+    *dest = static_cast<T>(result);
 }
-void ReadHelper(const uint8_t *& p, uint32_t * dest)
-{
-    *dest = Read32(p);
-}
-void ReadHelper(const uint8_t *& p, uint64_t * dest)
-{
-    *dest = Read64(p);
-}
+
 } // anonymous namespace
 
 template <typename T>
-void Reader::RawRead(T * retval)
+void Reader::RawReadLowLevelBeCareful(T * retval)
 {
     static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
+    static_assert((-1 & 3) == 3, "LittleEndian::BufferReader only works with 2's complement architectures.");
 
-    static constexpr size_t data_size = sizeof(T);
+    VerifyOrReturn(IsSuccess());
+
+    constexpr size_t data_size = sizeof(T);
 
     if (mAvailable < data_size)
     {
@@ -61,6 +67,8 @@ void Reader::RawRead(T * retval)
     }
 
     ReadHelper(mReadPtr, retval);
+    mReadPtr += data_size;
+
     mAvailable = static_cast<uint16_t>(mAvailable - data_size);
 }
 
@@ -84,10 +92,16 @@ Reader & Reader::ReadBytes(uint8_t * dest, size_t size)
 }
 
 // Explicit Read instantiations for the data types we want to support.
-template void Reader::RawRead(uint8_t *);
-template void Reader::RawRead(uint16_t *);
-template void Reader::RawRead(uint32_t *);
-template void Reader::RawRead(uint64_t *);
+template void Reader::RawReadLowLevelBeCareful(char *);
+template void Reader::RawReadLowLevelBeCareful(bool *);
+template void Reader::RawReadLowLevelBeCareful(int8_t *);
+template void Reader::RawReadLowLevelBeCareful(int16_t *);
+template void Reader::RawReadLowLevelBeCareful(int32_t *);
+template void Reader::RawReadLowLevelBeCareful(int64_t *);
+template void Reader::RawReadLowLevelBeCareful(uint8_t *);
+template void Reader::RawReadLowLevelBeCareful(uint16_t *);
+template void Reader::RawReadLowLevelBeCareful(uint32_t *);
+template void Reader::RawReadLowLevelBeCareful(uint64_t *);
 
 } // namespace LittleEndian
 } // namespace Encoding

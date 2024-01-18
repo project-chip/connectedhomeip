@@ -18,14 +18,15 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/InteractionModelEngine.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestContext.h>
@@ -36,8 +37,6 @@
 #include <memory>
 #include <nlunit-test.h>
 #include <utility>
-
-using TestContext = chip::Test::AppContext;
 
 namespace {
 
@@ -52,7 +51,40 @@ chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
+class TestContext : public chip::Test::AppContext
+{
+public:
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override
+    {
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+
+        gTestStorage.ClearStorage();
+        gGroupsProvider.SetStorageDelegate(&gTestStorage);
+        gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
+        ReturnErrorOnFailure(gGroupsProvider.Init());
+        chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        uint8_t buf[sizeof(chip::CompressedFabricId)];
+        chip::MutableByteSpan span(buf);
+        ReturnErrorOnFailure(GetBobFabric()->GetCompressedFabricIdBytes(span));
+        ReturnErrorOnFailure(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span));
+
+        return CHIP_NO_ERROR;
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
+        if (provider != nullptr)
+            provider->Finish();
+        chip::Test::AppContext::TearDown();
+    }
+};
+
 } // namespace
+
 namespace chip {
 namespace app {
 class TestWriteInteraction
@@ -160,13 +192,12 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
     AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.Node(1)
-        .Endpoint(2)
-        .Cluster(3)
-        .Attribute(4)
-        .ListIndex(DataModel::Nullable<ListIndex>())
-        .EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
+    err = attributePathBuilder.Node(1)
+              .Endpoint(2)
+              .Cluster(3)
+              .Attribute(4)
+              .ListIndex(DataModel::Nullable<ListIndex>())
+              .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Construct attribute data
@@ -211,13 +242,12 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
 
     AttributePathIB::Builder & attributePathBuilder = attributeStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder.Node(1)
-        .Endpoint(2)
-        .Cluster(3)
-        .Attribute(4)
-        .ListIndex(DataModel::Nullable<ListIndex>())
-        .EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
+    err = attributePathBuilder.Node(1)
+              .Endpoint(2)
+              .Cluster(3)
+              .Attribute(4)
+              .ListIndex(DataModel::Nullable<ListIndex>())
+              .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
@@ -368,7 +398,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -380,8 +410,8 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
-    const char charSpanData[]    = "a simple test string";
+    const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
+    static const char charSpanData[] = "a simple test string";
 
     app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
     dataTx.a = 12;
@@ -436,7 +466,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMatch(nlTe
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -485,7 +515,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjectsVersionMismatch(n
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -536,7 +566,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -577,11 +607,12 @@ void TestWriteInteraction::TestWriteHandlerReceiveInvalidMessage(nlTestSuite * a
 
     TestWriteClientCallback writeCallback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    // Reserve all except the last 128 bytes, so that we make sure to chunk.
     app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(900) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
 
     ByteSpan list[5];
 
@@ -645,11 +676,12 @@ void TestWriteInteraction::TestWriteHandlerInvalidateFabric(nlTestSuite * apSuit
 
     TestWriteClientCallback writeCallback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    // Reserve all except the last 128 bytes, so that we make sure to chunk.
     app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                 static_cast<uint16_t>(900) /* reserved buffer size */);
+                                 static_cast<uint16_t>(kMaxSecureSduLengthBytes - 128) /* reserved buffer size */);
 
     ByteSpan list[5];
 
@@ -727,7 +759,7 @@ void TestWriteInteraction::TestWriteInvalidMessage1(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -798,7 +830,7 @@ void TestWriteInteraction::TestWriteInvalidMessage2(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -868,7 +900,7 @@ void TestWriteInteraction::TestWriteInvalidMessage3(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -939,7 +971,7 @@ void TestWriteInteraction::TestWriteInvalidMessage4(nlTestSuite * apSuite, void 
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
+    err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing());
@@ -1029,59 +1061,14 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-// clang-format off
-
-/**
- *  Set up the test suite.
- */
-int Test_Setup(void * inContext)
-{
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-
-    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
-
-    TestContext & ctx = *static_cast<TestContext *>(inContext);
-    gTestStorage.ClearStorage();
-    gGroupsProvider.SetStorageDelegate(&gTestStorage);
-    gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
-    VerifyOrReturnError(CHIP_NO_ERROR == gGroupsProvider.Init(), FAILURE);
-    chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
-
-    uint8_t buf[sizeof(chip::CompressedFabricId)];
-    chip::MutableByteSpan span(buf);
-    VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedFabricIdBytes(span), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(&gGroupsProvider, ctx.GetBobFabricIndex(), span), FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int Test_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
-    if (nullptr != provider)
-    {
-        provider->Finish();
-    }
-
-
-    VerifyOrReturnError(TestContext::Finalize(inContext) == SUCCESS, FAILURE);
-
-
-    return SUCCESS;
-}
-
-nlTestSuite sSuite =
-{
+nlTestSuite sSuite = {
     "TestWriteInteraction",
     &sTests[0],
-    &Test_Setup,
-    &Test_Teardown
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
-// clang-format on
 
 } // namespace
 

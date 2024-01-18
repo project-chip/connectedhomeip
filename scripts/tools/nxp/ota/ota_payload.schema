@@ -1,0 +1,67 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "Custom_OTA_TLV_schema",
+    "description": "A representation of custom OTA payload with variable number of TLVs",
+    "type": "object",
+    "required": [
+        "inputs"
+    ],
+    "properties": {
+        "inputs": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "tag",
+                    "path"
+                ],
+                "properties": {
+                    "tag": {
+                        "type": "integer",
+                        "description": "TLV's tag value used to select a parser"
+                    },
+                    "descriptor": {
+                        "type": "array",
+                        "description": "Metadata of the TLV value field (C struct)",
+                        "items": {
+                            "$ref": "#/$defs/field"
+                        }
+                    },
+                    "path": {
+                        "type": "string",
+                        "description": "System path to the binary"
+                    }
+                }
+            }
+        }
+    },
+    "$defs": {
+        "field": {
+            "type": "object",
+            "required": [
+                "name",
+                "length",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "length": {
+                    "type": "integer",
+                    "description": "Number of bytes occupied in memory"
+                },
+                "value": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "integer"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

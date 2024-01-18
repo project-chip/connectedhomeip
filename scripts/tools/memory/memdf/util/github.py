@@ -130,7 +130,7 @@ class Gh:
             page = 0
             for i in ghapi.all.paged(
                     self.ghapi.actions.list_artifacts_for_repo,
-                    per_page):
+                    per_page=per_page):
                 if not i.artifacts:
                     break
                 for a in i.artifacts:

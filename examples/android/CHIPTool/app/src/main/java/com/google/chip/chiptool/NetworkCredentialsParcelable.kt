@@ -17,20 +17,19 @@
  */
 package com.google.chip.chiptool
 
-import android.os.Parcelable
 import android.os.Parcel
+import android.os.Parcelable
 import android.os.Parcelable.Creator
 
-/** Class for holding WiFi or Thread credentials, but not both.  */
+/** Class for holding WiFi or Thread credentials, but not both. */
 class NetworkCredentialsParcelable : Parcelable {
   var wiFiCredentials: WiFiCredentials?
     private set
+
   var threadCredentials: ThreadCredentials?
     private set
 
-  private constructor(
-    wifiCredentials: WiFiCredentials?, threadCredentials: ThreadCredentials?
-  ) {
+  private constructor(wifiCredentials: WiFiCredentials?, threadCredentials: ThreadCredentials?) {
     this.wiFiCredentials = wifiCredentials
     this.threadCredentials = threadCredentials
   }
@@ -136,14 +135,15 @@ class NetworkCredentialsParcelable : Parcelable {
     }
 
     @JvmField
-    val CREATOR = object : Parcelable.Creator<NetworkCredentialsParcelable?> {
-      override fun createFromParcel(parcel: Parcel): NetworkCredentialsParcelable? {
-        return NetworkCredentialsParcelable(parcel)
-      }
+    val CREATOR =
+      object : Parcelable.Creator<NetworkCredentialsParcelable?> {
+        override fun createFromParcel(parcel: Parcel): NetworkCredentialsParcelable? {
+          return NetworkCredentialsParcelable(parcel)
+        }
 
-      override fun newArray(size: Int): Array<NetworkCredentialsParcelable?> {
-        return arrayOfNulls(size)
+        override fun newArray(size: Int): Array<NetworkCredentialsParcelable?> {
+          return arrayOfNulls(size)
+        }
       }
-    }
   }
 }

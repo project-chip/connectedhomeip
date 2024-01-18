@@ -45,13 +45,20 @@ NS_ASSUME_NONNULL_BEGIN
  * If completion is passed a non-nil error, that will be converted into
  * an error response to the client.  Otherwise it must have a non-nil data,
  * which will be returned to the client.
+ *
+ * When providing an OTA image, the imageURI in the
+ * MTROTASoftwareUpdateProviderClusterQueryImageResponseParams must be set to
+ * the file designator of the image.  The completion will create the right BDX
+ * URI from that file designator, as needed.  The file designator returned here
+ * via imageURI will be the same as the file designator passed to
+ * handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:.
  */
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
                            params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
                        completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                       NSError * _Nullable error))completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)handleQueryImageForNodeID:(NSNumber *)nodeID
                        controller:(MTRDeviceController *)controller
@@ -75,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
                                    params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                                completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data,
                                               NSError * _Nullable error))completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)handleApplyUpdateRequestForNodeID:(NSNumber *)nodeID
                                controller:(MTRDeviceController *)controller
@@ -97,7 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 controller:(MTRDeviceController *)controller
                                     params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                                 completion:(MTRStatusCompletion)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)handleNotifyUpdateAppliedForNodeID:(NSNumber *)nodeID
                                 controller:(MTRDeviceController *)controller
@@ -116,7 +123,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 fileDesignator:(NSString *)fileDesignator
                                         offset:(NSNumber *)offset
                                     completion:(MTRStatusCompletion)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)handleBDXTransferSessionBeginForNodeID:(NSNumber *)nodeID
                                     controller:(MTRDeviceController *)controller
@@ -146,7 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
                      blockIndex:(NSNumber *)blockIndex
                     bytesToSkip:(NSNumber *)bytesToSkip
                      completion:(void (^)(NSData * _Nullable data, BOOL isEOF))completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (void)handleBDXQueryForNodeID:(NSNumber *)nodeID
                      controller:(MTRDeviceController *)controller

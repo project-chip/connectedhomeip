@@ -24,6 +24,7 @@
 
 #pragma once
 #include "system/SystemClock.h"
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
@@ -49,6 +50,7 @@
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 
@@ -71,7 +73,24 @@ public:
     class Callback
     {
     public:
+        Callback() = default;
+
+        // Callbacks are not expected to be copyable or movable.
+        Callback(const Callback &)             = delete;
+        Callback(Callback &&)                  = delete;
+        Callback & operator=(const Callback &) = delete;
+        Callback & operator=(Callback &&)      = delete;
+
         virtual ~Callback() = default;
+
+        /**
+         * Used to notify a (maybe empty) report data is received from peer and the subscription and the peer is alive.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         */
+        virtual void NotifySubscriptionStillActive(const ReadClient & apReadClient) {}
 
         /**
          * Used to signal the commencement of processing of the first attribute or event report received in a given exchange.
@@ -145,6 +164,12 @@ public:
          * (see ReadClient::DefaultResubscribePolicy for more details). If the default implementation doesn't suffice, the logic of
          * ReadClient::DefaultResubscribePolicy is broken down into its constituent methods that are publicly available for
          * applications to call and sequence.
+         *
+         * If the peer is LIT ICD, and the timeout is reached, `aTerminationCause` will be
+         * `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT`. In this case, returning `CHIP_NO_ERROR` will still trigger a resubscribe
+         * attempt, while returning `CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT` will put the subscription in the
+         * `InactiveICDSubscription` state.  In the latter case, OnResubscriptionNeeded will be called again when
+         * `OnActiveModeNotification` is called.
          *
          * If the method is over-ridden, it's the application's responsibility to take the appropriate steps needed to eventually
          * call-back into the ReadClient object to schedule a re-subscription (by invoking ReadClient::ScheduleResubscription).
@@ -249,6 +274,16 @@ public:
          * @param[in] apReadClient the ReadClient for the subscription.
          */
         virtual void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) {}
+
+        /**
+         * OnCASESessionEstablished will be called for a subscription ReadClient when
+         * it finishes setting up a CASE session, as part of either automatic
+         * re-subscription or doing an initial subscribe based on ScopedNodeId.
+         *
+         * The callee is allowed to modify the ReadPrepareParams (e.g. to change
+         * things like min/max intervals based on the session parameters).
+         */
+        virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
     };
 
     enum class InteractionType : uint8_t
@@ -267,7 +302,9 @@ public:
      *  this object will cease to function correctly since it depends on the engine for a number of critical functions.
      *
      *  @param[in]    apImEngine       A valid pointer to the IM engine.
-     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object. Allowed to be null
+     *                                 if the version of SendAutoResubscribeRequest that takes a
+     *                                 ScopedNodeId is used.
      *  @param[in]    apCallback       Callback set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)
      *
@@ -300,6 +337,18 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
+
+    /**
+     *  Re-activate an inactive subscription.
+     *
+     *  When subscribing to LIT-ICD and liveness timeout reached and OnResubscriptionNeeded returns
+     * CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT, the read client will move to the InactiveICDSubscription state and
+     * resubscription can be triggered via OnActiveModeNotification().
+     *
+     *  If the subscription is not in the `InactiveICDSubscription` state, this function will do nothing. So it is always safe to
+     * call this function when a check-in message is received.
+     */
+    void OnActiveModeNotification();
 
     void OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
@@ -352,11 +401,21 @@ public:
      *  OnDeallocatePaths. Note: At a given time in the system, you can either have a single subscription with re-sub enabled that
      *  has mKeepSubscriptions = false, OR, multiple subs with re-sub enabled with mKeepSubscriptions = true. You shall not
      *  have a mix of both simultaneously. If SendAutoResubscribeRequest is called at all, it guarantees that it will call
-     *  OnDeallocatePaths when OnDone is called. SendAutoResubscribeRequest is the only case that calls OnDeallocatePaths, since
-     *  that's the only case when the consumer moved a ReadParams into the client.
+     *  OnDeallocatePaths (either befor returning error, or when OnDone is called). SendAutoResubscribeRequest is the only case
+     *  that calls OnDeallocatePaths, since that's the only case when the consumer moved a ReadParams into the client.
      *
      */
     CHIP_ERROR SendAutoResubscribeRequest(ReadPrepareParams && aReadPrepareParams);
+
+    /**
+     * Like SendAutoResubscribeRequest above, but without a session being
+     * available in the ReadPrepareParams.  When this is used, the ReadClient is
+     * responsible for setting up the CASE session itself.
+     *
+     * When using this version of SendAutoResubscribeRequest, any session to
+     * which ReadPrepareParams has a reference will be ignored.
+     */
+    CHIP_ERROR SendAutoResubscribeRequest(const ScopedNodeId & aPublisherId, ReadPrepareParams && aReadPrepareParams);
 
     /**
      *   This provides a standard re-subscription policy implementation that given a termination cause, does the following:
@@ -445,6 +504,15 @@ private:
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
+        InactiveICDSubscription,   ///< The client is waiting to resubscribe for LIT device
+    };
+
+    enum class ReportType
+    {
+        // kUnsolicited reports are the first message in an exchange.
+        kUnsolicited,
+        // kContinuingTransaction reports are responses to a message we sent.
+        kContinuingTransaction
     };
 
     bool IsMatchingSubscriptionId(SubscriptionId aSubscriptionId)
@@ -461,6 +529,7 @@ private:
      *
      */
     bool IsIdle() const { return mState == ClientState::Idle; }
+    bool IsInactiveICDSubscription() const { return mState == ClientState::InactiveICDSubscription; }
     bool IsSubscriptionActive() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
@@ -484,9 +553,10 @@ private:
     CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
+    void TriggerResubscriptionForLivenessTimeout(CHIP_ERROR aReason);
     void MoveToState(const ClientState aTargetState);
     CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
-    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload, ReportType aReportType);
     const char * GetStateStr() const;
 
     /*
@@ -530,6 +600,13 @@ private:
 
     CHIP_ERROR GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin);
 
+    /**
+     * Start setting up a CASE session to our peer, if we can locate a
+     * CASESessionManager.  Returns error if we did not even manage to kick off
+     * a CASE attempt.
+     */
+    CHIP_ERROR EstablishSessionToPeer();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeHolder mExchange;
     Callback & mpCallback;
@@ -565,6 +642,8 @@ private:
 
     System::Clock::Timeout mLivenessTimeoutOverride = System::Clock::kZero;
 
+    bool mIsPeerLIT = false;
+
     // End Of Container (0x18) uses one byte.
     static constexpr uint16_t kReservedSizeForEndOfContainer = 1;
     // Reserved size for the uint8_t InteractionModelRevision flag, which takes up 1 byte for the control tag and 1 byte for the
@@ -576,5 +655,6 @@ private:
         kReservedSizeForEndOfContainer + kReservedSizeForIMRevision + kReservedSizeForEndOfContainer;
 };
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

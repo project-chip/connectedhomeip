@@ -21,7 +21,6 @@
  *          for k32w0 platform.
  */
 
-#include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -35,7 +34,7 @@ extern "C" {
 #include "wlan.h"
 }
 
-//#include <openthread/platform/entropy.h>
+// #include <openthread/platform/entropy.h>
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
@@ -163,7 +162,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
     ifp->name                                          = CharSpan::fromCharString(ifp->Name);
     ifp->isOperational                                 = true;
-    ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+    ifp->type                                          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     if (ConnectivityUtils::GetInterfaceIPv4Addrs("", size, ifp) == CHIP_NO_ERROR)

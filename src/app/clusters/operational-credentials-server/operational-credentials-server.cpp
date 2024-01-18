@@ -23,7 +23,6 @@
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -48,7 +47,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
-#include <trace/trace.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace ::chip::Transport;
@@ -407,7 +406,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
                                                               const app::ConcreteCommandPath & commandPath,
                                                               const Commands::RemoveFabric::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("RemoveFabric", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("RemoveFabric", "OperationalCredentials");
     auto & fabricBeingRemoved = commandData.fabricIndex;
 
     ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
@@ -467,7 +466,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
                                                                    const app::ConcreteCommandPath & commandPath,
                                                                    const Commands::UpdateFabricLabel::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("UpdateFabricLabel", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("UpdateFabricLabel", "OperationalCredentials");
     auto & label        = commandData.label;
     auto ourFabricIndex = commandObj->GetAccessingFabricIndex();
     auto finalStatus    = Status::Failure;
@@ -589,7 +588,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::AddNOC::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AddNOC", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("AddNOC", "OperationalCredentials");
     auto & NOCValue          = commandData.NOCValue;
     auto & ICACValue         = commandData.ICACValue;
     auto & adminVendorId     = commandData.adminVendorId;
@@ -642,6 +641,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
     // missing root. Let's early-bail with InvalidNOC.
     VerifyOrExit(failSafeContext.AddTrustedRootCertHasBeenInvoked(), nocResponse = NodeOperationalCertStatusEnum::kInvalidNOC);
 
+    // Check this explicitly before adding the fabric so we don't need to back out changes if this is an error.
+    VerifyOrExit(IsOperationalNodeId(commandData.caseAdminSubject) || IsCASEAuthTag(commandData.caseAdminSubject),
+                 nocResponse = NodeOperationalCertStatusEnum::kInvalidAdminSubject);
+
     err = fabricTable.AddNewPendingFabricWithOperationalKeystore(NOCValue, ICACValue.ValueOr(ByteSpan{}), adminVendorId,
                                                                  &newFabricIndex);
     VerifyOrExit(err == CHIP_NO_ERROR, nocResponse = ConvertToNOCResponseStatus(err));
@@ -654,9 +657,10 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     // Set the Identity Protection Key (IPK)
     // The IPK SHALL be the operational group key under GroupKeySetID of 0
-    keyset.keyset_id     = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
-    keyset.policy        = GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst;
-    keyset.num_keys_used = 1;
+    keyset.keyset_id                = Credentials::GroupDataProvider::kIdentityProtectionKeySetId;
+    keyset.policy                   = GroupKeyManagement::GroupKeySecurityPolicyEnum::kTrustFirst;
+    keyset.num_keys_used            = 1;
+    keyset.epoch_keys[0].start_time = 0;
     memcpy(keyset.epoch_keys[0].key, ipkValue.data(), Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
 
     err = newFabricInfo->GetCompressedFabricIdBytes(compressed_fabric_id);
@@ -762,7 +766,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::UpdateNOC::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("UpdateNOC", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("UpdateNOC", "OperationalCredentials");
     auto & NOCValue  = commandData.NOCValue;
     auto & ICACValue = commandData.ICACValue;
 
@@ -854,7 +858,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CertificateChainRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CertificateChainRequest", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
     auto & certificateType = commandData.certificateType;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -902,7 +906,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
                                                                     const app::ConcreteCommandPath & commandPath,
                                                                     const Commands::AttestationRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AttestationRequest", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
     auto & attestationNonce = commandData.attestationNonce;
 
     auto finalStatus = Status::Failure;
@@ -998,7 +1002,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::CSRRequest::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("CSRRequest", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
     ChipLogProgress(Zcl, "OpCreds: Received a CSRRequest command");
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> nocsrElements;
@@ -1037,7 +1041,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
     // Prepare NOCSRElements structure
     {
-        constexpr size_t csrLength = Crypto::kMAX_CSR_Length;
+        constexpr size_t csrLength = Crypto::kMIN_CSR_Buffer_Size;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;
         Platform::ScopedMemoryBuffer<uint8_t> csr;
@@ -1059,7 +1063,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
 
         err = fabricTable.AllocatePendingOperationalKey(fabricIndexForCsr, csrSpan);
 
-        if (csrSpan.size() > Crypto::kMAX_CSR_Length)
+        if (csrSpan.size() > csrLength)
         {
             err = CHIP_ERROR_INTERNAL;
         }
@@ -1133,7 +1137,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::AddTrustedRootCertificate::DecodableType & commandData)
 {
-    MATTER_TRACE_EVENT_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
+    MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");
 
     auto & fabricTable = Server::GetInstance().GetFabricTable();
     auto finalStatus   = Status::Failure;

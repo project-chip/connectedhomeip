@@ -1,0 +1,851 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 26.3.2. [TC-GRPKEY-2.2] Primary functionality with DUT as Server
+
+PICS:
+    - GRPKEY.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Group Key Management"
+    endpoint: 0
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label:
+          "Step 1: TH reads MaxGroupKeysPerFabric attribute from
+          GroupKeyManagement cluster on DUT using a fabric-filtered read. Save
+          the value as Max_GrpKey for future use."
+      PICS: GRPKEY.S.A0003
+      command: "readAttribute"
+      attribute: "MaxGroupKeysPerFabric"
+      fabricFiltered: true
+      response:
+          saveAs: Max_GrpKey
+
+    - label:
+          "Step 2: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+
+    - label:
+          "Step 3: TH sends KeySetRead command to GroupKeyManagement cluster
+          with GroupKeySetID as 0x01a"
+      PICS: GRPKEY.S.C01.Rsp && GRPKEY.S.C02.Tx
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: null,
+                        EpochStartTime2: "18446744073709551614",
+                    }
+
+    - label:
+          "Step 4: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as
+          follows:1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst
+          (0) 3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: null 6)EpochStartTime1:null 7)EpochKey2: null
+          8)EpochStartTime2:null"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+
+    - label:
+          "Step 5: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as
+          follows:1)GroupKeySetID: 0x01a 2) GroupKeySecurityPolicy: TrustFirst
+          (0) 3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          6)EpochStartTime1:18446744073709551613 7)EpochKey2: null
+          8)EpochStartTime2:null"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: null,
+                        EpochStartTime2: null,
+                    }
+
+    - label:
+          "Step 6: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with command fields as follows:1)GroupKeySetID:
+          0x01a 2) GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0: null
+          4)EpochStartTime0: 1 5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          6)EpochStartTime1:18446744073709551613 7)EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 7: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: null
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: null,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 8: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 0
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 0,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 9: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: null 6)EpochStartTime1: 18446744073709551613 7)EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 10: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1: null
+          7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2:18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: null,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 11: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0:
+          18446744073709551613 5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          6)EpochStartTime1: 1 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: "18446744073709551613",
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 1,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 12: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: null 6)EpochStartTime1: null 7)EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf 8)EpochStartTime2:
+          18446744073709551614 Note: EpochKey1 and EpochStartTime1 are null when
+          EpochKey2 and EpochStartTime2 are not null"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: null,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 13: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: null 8)EpochStartTime2:
+          18446744073709551614 Note: EpochKey2 is set to null and
+          EpochStartTime2 is not null"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: null,
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 14: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: null Note: EpochKey2 is not null and
+          EpochStartTime2 is null"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: null,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 15: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          6)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 7)EpochStartTime1:
+          18446744073709551613 8)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          9)EpochStartTime2: 1 Note: EpochStartTime2 is earlier than
+          EpochStartTime1"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 16: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields are as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d0 4)EpochStartTime0: 1 5)EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 1 Note1: Repeat the step by sending EpochKey1 and
+          EpochKey2 with 1 byte value (< 16 bytes)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16: Repeat the step by sending EpochKey1 with 1 byte value (< 16
+          bytes)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16: Note: Repeat the step by sending EpochKey2 with 1 byte value
+          (< 16 bytes)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16a: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT. Note: Repeat step 16 by sending KeySetWrite Command
+          with EpochKey0, EpochKey1 and EpochKey2 having 15 bytes value (< 16
+          byte)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcddde",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16a: Repeat step 16a by sending KeySetWrite Command with
+          EpochKey1 having 15 bytes value (< 16 byte)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcddde",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16a: Repeat step 16a by sending KeySetWrite Command with
+          EpochKey2 having 15 bytes value (< 16 byte)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcddde",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16b: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT. Note: Repeat step 16 by sending KeySetWrite Command
+          with EpochKey0, EpochKey1 and EpochKey2 having 17 bytes value (> 16
+          bytes)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedfde",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16b: Repeat step 16 by sending KeySetWrite Command with
+          EpochKey1 having 17 bytes value (> 16 bytes)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedfde",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 16b: Repeat step 16 by sending KeySetWrite Command with
+          EpochKey2 having 17 bytes value (> 16 bytes)"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedfde",
+                        EpochStartTime2: 1,
+                    }
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Step 17: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT on EP0 with GroupKeySet fields as follows:
+          1)GroupKeySetID: 0x01a 2)GroupKeySecurityPolicy: TrustFirst (0)
+          3)EpochKey0: d3d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1
+          5)EpochKey1: d4d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          17446744073709551613 7)EpochKey2: d5d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 17446744073709551614 Note: KeySetWrite command is
+          sent with different EpochKeys,EpochStartTime1 and EpochStartTime2
+          values"
+      PICS: GRPKEY.S.C00.Rsp
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d3d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d4d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "17446744073709551613",
+                        EpochKey2: "hex:d5d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "17446744073709551614",
+                    }
+
+    - label:
+          "Step 18: TH sends KeySetRead command to GroupKeyManagement cluster
+          with GroupKeySetID as 0x01a"
+      PICS: GRPKEY.S.C01.Rsp && GRPKEY.S.C02.Tx
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a
+      response:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: null,
+                        EpochStartTime0: 1,
+                        EpochKey1: null,
+                        EpochStartTime1: "17446744073709551613",
+                        EpochKey2: null,
+                        EpochStartTime2: "17446744073709551614",
+                    }
+
+    - label:
+          "Step 19: TH sends KeySetRead command to GroupKeyManagement cluster
+          with GroupKeySetID as 0x01b that does not exist in the GroupKeyMap
+          attribute list."
+      PICS: GRPKEY.S.C01.Rsp
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01b
+      response:
+          error: NOT_FOUND
+
+    - label:
+          "Step 20: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01a."
+      PICS: GRPKEY.S.C03.Rsp
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01a
+
+    - label:
+          "Step 21: TH sends KeySetWrite command to DUT until size of list for
+          TH’s fabric in GroupKeyMap attribute contains Max_GrpKey entries,
+          starting with GroupKeySetID 1 and incrementing by 1 each time."
+      verification: |
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs:
+
+          [1692341708.962913][8072:8074] CHIP:DMG: InvokeResponseMessage =
+          [1692341708.962924][8072:8074] CHIP:DMG: {
+          [1692341708.962937][8072:8074] CHIP:DMG:         suppressResponse = false,
+          [1692341708.962945][8072:8074] CHIP:DMG:         InvokeResponseIBs =
+          [1692341708.962962][8072:8074] CHIP:DMG:         [
+          [1692341708.962973][8072:8074] CHIP:DMG:                 InvokeResponseIB =
+          [1692341708.963075][8072:8074] CHIP:DMG:                 {
+          [1692341708.963086][8072:8074] CHIP:DMG:                         CommandStatusIB =
+          [1692341708.963103][8072:8074] CHIP:DMG:                         {
+          [1692341708.963114][8072:8074] CHIP:DMG:                                 CommandPathIB =
+          [1692341708.963128][8072:8074] CHIP:DMG:                                 {
+          [1692341708.963143][8072:8074] CHIP:DMG:                                         EndpointId = 0x0,
+          [1692341708.963173][8072:8074] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1692341708.963186][8072:8074] CHIP:DMG:                                         CommandId = 0x3,
+          [1692341708.963199][8072:8074] CHIP:DMG:                                 },
+          [1692341708.963214][8072:8074] CHIP:DMG:
+          [1692341708.963253][8072:8074] CHIP:DMG:                                 StatusIB =
+          [1692341708.963260][8072:8074] CHIP:DMG:                                 {
+          [1692341708.963268][8072:8074] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1692341708.963274][8072:8074] CHIP:DMG:                                 },
+          [1692341708.963281][8072:8074] CHIP:DMG:
+          [1692341708.963286][8072:8074] CHIP:DMG:                         },
+          [1692341708.963294][8072:8074] CHIP:DMG:
+          [1692341708.963299][8072:8074] CHIP:DMG:                 },
+          [1692341708.963308][8072:8074] CHIP:DMG:
+          [1692341708.963313][8072:8074] CHIP:DMG:         ],
+          [1692341708.963323][8072:8074] CHIP:DMG:
+          [1692341708.963328][8072:8074] CHIP:DMG:         InteractionModelRevision = 1
+          [1692341708.963333][8072:8074] CHIP:DMG: },
+
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 2,"groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 1,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 18446744073709551613,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 18446744073709551614 }' 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs:
+
+          [1692341838.536136][8091:8094] CHIP:DMG: InvokeResponseMessage =
+          [1692341838.536144][8091:8094] CHIP:DMG: {
+          [1692341838.536151][8091:8094] CHIP:DMG:         suppressResponse = false,
+          [1692341838.536157][8091:8094] CHIP:DMG:         InvokeResponseIBs =
+          [1692341838.536169][8091:8094] CHIP:DMG:         [
+          [1692341838.536175][8091:8094] CHIP:DMG:                 InvokeResponseIB =
+          [1692341838.536187][8091:8094] CHIP:DMG:                 {
+          [1692341838.536193][8091:8094] CHIP:DMG:                         CommandStatusIB =
+          [1692341838.536201][8091:8094] CHIP:DMG:                         {
+          [1692341838.536207][8091:8094] CHIP:DMG:                                 CommandPathIB =
+          [1692341838.536215][8091:8094] CHIP:DMG:                                 {
+          [1692341838.536227][8091:8094] CHIP:DMG:                                         EndpointId = 0x0,
+          [1692341838.536238][8091:8094] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1692341838.536245][8091:8094] CHIP:DMG:                                         CommandId = 0x0,
+          [1692341838.536252][8091:8094] CHIP:DMG:                                 },
+          [1692341838.536262][8091:8094] CHIP:DMG:
+          [1692341838.536269][8091:8094] CHIP:DMG:                                 StatusIB =
+          [1692341838.536277][8091:8094] CHIP:DMG:                                 {
+          [1692341838.536285][8091:8094] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1692341838.536292][8091:8094] CHIP:DMG:                                 },
+          [1692341838.536300][8091:8094] CHIP:DMG:
+          [1692341838.536306][8091:8094] CHIP:DMG:                         },
+          [1692341838.536316][8091:8094] CHIP:DMG:
+          [1692341838.536322][8091:8094] CHIP:DMG:                 },
+          [1692341838.536331][8091:8094] CHIP:DMG:
+          [1692341838.536337][8091:8094] CHIP:DMG:         ],
+          [1692341838.536348][8091:8094] CHIP:DMG:
+          [1692341838.536353][8091:8094] CHIP:DMG:         InteractionModelRevision = 1
+          [1692341838.536359][8091:8094] CHIP:DMG: }
+      PICS: GRPKEY.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 22: TH again sends KeySetWrite command to DUT with any other
+          GroupKeySetID not used yet."
+      PICS: GRPKEY.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x003,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 1,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: "18446744073709551613",
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: "18446744073709551614",
+                    }
+      response:
+          error: RESOURCE_EXHAUSTED
+
+    - label: "Step 23: TH sends KeySetReadAllIndices command to DUT."
+      verification: |
+          ./chip-tool groupkeymanagement key-set-read-all-indices 1 0
+
+          Verify that DUT sends KeySetReadAllIndicesResponse listing Max_GrpKey number of GroupKeySetID's on TH(chip-tool)  Logs:
+
+          [1692342735.277532][8297:8300] CHIP:TOO:   KeySetReadAllIndicesResponse: {
+          [1692342735.277541][8297:8300] CHIP:TOO:     groupKeySetIDs: 3 entries
+          [1692342735.277546][8297:8300] CHIP:TOO:       [1]: 2
+          [1692342735.277550][8297:8300] CHIP:TOO:       [2]: 1
+          [1692342735.277554][8297:8300] CHIP:TOO:       [3]: 0
+          [1692342735.277557][8297:8300] CHIP:TOO:    }
+      PICS: GRPKEY.S.C04.Rsp && GRPKEY.S.C05.Tx && PICS_SKIP_SAMPLE_APP
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 24: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x0"
+      PICS: GRPKEY.S.C03.Rsp
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x0
+      response:
+          error: INVALID_COMMAND
+
+    - label:
+          "Step 25: TH removes the Group key set that was added by sending a
+          KeySetRemove command to the GroupKeyManagement cluster with the
+          GroupKeySetID field set to 0x01b that does not exist in the
+          GroupKeyMap attribute list."
+      PICS: GRPKEY.S.C03.Rsp
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "GroupKeySetID"
+                value: 0x01b
+      response:
+          error: NOT_FOUND

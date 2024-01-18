@@ -46,21 +46,15 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
     P256Keypair keypair2;
     NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
-    // Test all combinations of invalid parameters
-    NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(nullptr, 10),
-                                           CryptoContext::SessionInfoType::kSessionEstablishment,
-                                           CryptoContext::SessionRole::kInitiator) == CHIP_ERROR_INVALID_ARGUMENT);
-
     // Test the channel is successfully created with valid parameters
     NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(nullptr, 0),
+                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
 
     // Test the channel cannot be reinitialized
     NL_TEST_ASSERT(inSuite,
-                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(nullptr, 0),
+                   channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan(),
                                            CryptoContext::SessionInfoType::kSessionEstablishment,
                                            CryptoContext::SessionRole::kInitiator) == CHIP_ERROR_INCORRECT_STATE);
 

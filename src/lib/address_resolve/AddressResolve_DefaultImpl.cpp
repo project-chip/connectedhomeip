@@ -17,6 +17,9 @@
 
 #include <lib/address_resolve/AddressResolve_DefaultImpl.h>
 
+#include <lib/address_resolve/TracingStructs.h>
+#include <tracing/macros.h>
+
 namespace chip {
 namespace AddressResolve {
 namespace Impl {
@@ -35,6 +38,8 @@ void NodeLookupHandle::ResetForLookup(System::Clock::Timestamp now, const NodeLo
 
 void NodeLookupHandle::LookupResult(const ResolveResult & result)
 {
+    MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kIntermediateResult, &GetRequest().GetPeerId(), &result);
+
     auto score = Dnssd::IPAddressSorter::ScoreIpAddress(result.address.GetIPAddress(), result.address.GetInterface());
     [[maybe_unused]] bool success = mResults.UpdateResults(result, score);
 
@@ -176,6 +181,8 @@ bool NodeLookupResults::UpdateResults(const ResolveResult & result, const Dnssd:
 
 CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLookupHandle & handle)
 {
+    MATTER_LOG_NODE_LOOKUP(&request);
+
     VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     handle.ResetForLookup(mTimeSource.GetMonotonicTimestamp(), request);
@@ -188,11 +195,14 @@ CHIP_ERROR Resolver::LookupNode(const NodeLookupRequest & request, Impl::NodeLoo
 CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
 {
     VerifyOrReturnError(!mActiveLookups.Contains(&handle), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_WELL_EMPTY);
+    VerifyOrReturnError(handle.HasLookupResult(), CHIP_ERROR_NOT_FOUND);
 
     auto listener = handle.GetListener();
     auto peerId   = handle.GetRequest().GetPeerId();
     auto result   = handle.TakeLookupResult();
+
+    MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kRetryDifferent, &peerId, &result);
+
     listener->OnNodeAddressResolved(peerId, result);
     return CHIP_NO_ERROR;
 }
@@ -205,6 +215,8 @@ CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallba
 
     // Adjust any timing updates.
     ReArmTimer();
+
+    MATTER_LOG_NODE_DISCOVERY_FAILED(&handle.GetRequest().GetPeerId(), CHIP_ERROR_CANCELLED);
 
     if (cancel_method == FailureCallback::Call)
     {
@@ -239,6 +251,8 @@ void Resolver::Shutdown()
 
         mActiveLookups.Erase(current);
 
+        MATTER_LOG_NODE_DISCOVERY_FAILED(&peerId, CHIP_ERROR_SHUT_DOWN);
+
         Dnssd::Resolver::Instance().NodeIdResolutionNoLongerNeeded(peerId);
         // Failure callback only called after iterator was cleared:
         // This allows failure handlers to deallocate structures that may
@@ -272,6 +286,11 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
         result.address.SetInterface(nodeData.resolutionData.interfaceId);
         result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
         result.supportsTcp     = nodeData.resolutionData.supportsTcp;
+
+        if (nodeData.resolutionData.isICDOperatingAsLIT.HasValue())
+        {
+            result.isICDOperatingAsLIT = nodeData.resolutionData.isICDOperatingAsLIT.Value();
+        }
 
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
@@ -315,9 +334,11 @@ void Resolver::HandleAction(IntrusiveList<NodeLookupHandle>::Iterator & current)
     switch (action.Type())
     {
     case NodeLookupResult::kLookupError:
+        MATTER_LOG_NODE_DISCOVERY_FAILED(&peerId, action.ErrorResult());
         listener->OnNodeAddressResolutionFailed(peerId, action.ErrorResult());
         break;
     case NodeLookupResult::kLookupSuccess:
+        MATTER_LOG_NODE_DISCOVERED(Tracing::DiscoveryInfoType::kResolutionDone, &peerId, &action.ResolveResult());
         listener->OnNodeAddressResolved(peerId, action.ResolveResult());
         break;
     default:
@@ -384,10 +405,7 @@ void Resolver::ReArmTimer()
 
     if (nextTimeout == kInvalidTimeout)
     {
-#if CHIP_MINMDNS_HIGH_VERBOSITY
         // Generally this is only expected when no active lookups exist
-        ChipLogProgress(Discovery, "Discovery does not require any more timeouts");
-#endif
         return;
     }
 

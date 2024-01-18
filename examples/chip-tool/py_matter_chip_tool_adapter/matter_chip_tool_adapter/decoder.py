@@ -14,6 +14,7 @@
 
 import base64
 import json
+import re
 
 # These constants represent the vocabulary used for the incoming JSON.
 _CLUSTER_ID = 'clusterId'
@@ -34,6 +35,8 @@ _EVENT = 'event'
 _ERROR = 'error'
 _CLUSTER_ERROR = 'clusterError'
 _VALUE = 'value'
+_DATA_VERSION = 'dataVersion'
+_EVENT_NUMBER = 'eventNumber'
 
 # FabricIndex is a special case where the field is added as a struct field by the SDK
 # if needed but is not part of the XML definition of the struct.
@@ -41,6 +44,7 @@ _VALUE = 'value'
 # a field is used for a fabric scoped struct.
 _FABRIC_INDEX_FIELD_CODE = '254'
 _FABRIC_INDEX_FIELD_NAME = 'FabricIndex'
+_FABRIC_INDEX_FIELD_NAME_DARWIN = 'fabricIndex'
 _FABRIC_INDEX_FIELD_TYPE = 'int8u'
 
 
@@ -88,17 +92,20 @@ class Decoder:
                 elif key == _EVENT_ID:
                     key = _EVENT
                     value = specs.get_event_name(payload[_CLUSTER_ID], value)
-                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR:
+                elif key == _VALUE or key == _ERROR or key == _CLUSTER_ERROR or key == _DATA_VERSION or key == _EVENT_NUMBER:
                     pass
                 else:
                     # Raise an error since the other fields probably needs to be translated too.
                     raise KeyError(f'Error: field "{key}" not supported')
 
-                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT):
+                if value is None and (key == _CLUSTER or key == _RESPONSE or key == _ATTRIBUTE or key == _EVENT) and _ERROR not in payload:
                     # If the definition for this cluster/command/attribute/event is missing, there is not
                     # much we can do to convert the response to the proper format. It usually indicates that
                     # the cluster definition is missing something. So we just raise an exception to tell the
                     # user something is wrong and the cluster definition needs to be updated.
+                    # The only exception being when the definition can not be found but the returned payload
+                    # contains an error. It could be because the payload is for an unknown cluster/command/attribute/event
+                    # in which case we obviously don't have a definition for it.
                     cluster_code = hex(payload[_CLUSTER_ID])
                     if key == _CLUSTER:
                         raise KeyError(
@@ -128,7 +135,7 @@ class MatterLog:
         base64_message = log["message"].encode('utf-8')
         decoded_message_bytes = base64.b64decode(base64_message)
         # TODO We do assume utf-8 encoding is used, it may not be true though.
-        self.message = decoded_message_bytes.decode('utf-8')
+        self.message = decoded_message_bytes.decode('utf-8', 'replace')
 
     def decode_logs(logs):
         return list(map(MatterLog, logs))
@@ -254,7 +261,8 @@ class FloatConverter(BaseConverter):
 
     def maybe_convert(self, typename, value):
         if typename == 'single':
-            value = float('%g' % value)
+            float_representation = float("%.16f" % value)
+            value = float('%g' % float_representation)
         return value
 
 
@@ -283,28 +291,60 @@ class StructFieldsNameConverter():
                 field_name = field.name
                 field_type = field.data_type.name
                 field_array = field.is_list
-                # chip-tool returns the field code as an integer but the test suite expects
-                # a field name.
-                # To not confuse the test suite, the field code is replaced by its field name
-                # equivalent and then removed.
+
+                provided_field_name = field_name
+
                 if str(field_code) in value:
+                    # chip-tool returns the field code as an integer but the test suite expects
+                    # a field name.
+                    # To not confuse the test suite, the field code is replaced by its field name
+                    # equivalent and then removed.
+                    provided_field_name = str(field_code)
+                else:
+                    # darwin-framework-tool returns the field name but with a different casing than
+                    # what the test suite expects.
+                    # To not confuse the test suite, the field name is replaced by its field name
+                    # equivalent from the spec and then removed.
+
+                    if field_name == 'Description' and 'descriptionString' in value:
+                        # "Description" is returned as "descriptionString" since 'description' is a reserved keyword
+                        # and can not be exposed in an objc struct.
+                        provided_field_name = 'descriptionString'
+
+                    # If field_name starts with a sequence of capital letters lowercase all but the last one.
+                    provided_field_name = re.sub(
+                        '^([A-Z]+)([A-Z])',
+                        lambda m: m.group(1).lower() + m.group(2),
+                        provided_field_name
+                    )
+
+                    # All field names in darwin-framework-tool start with a lowercase letter.
+                    provided_field_name = provided_field_name[0].lower(
+                    ) + provided_field_name[1:]
+
+                if provided_field_name in value:
                     value[field_name] = self.run(
                         specs,
-                        value[str(field_code)],
+                        value[provided_field_name],
                         cluster_name,
                         field_type,
                         field_array
                     )
-                    del value[str(field_code)]
+                    del value[provided_field_name]
 
             if specs.is_fabric_scoped(struct):
+                if _FABRIC_INDEX_FIELD_CODE in value:
+                    key_name = _FABRIC_INDEX_FIELD_CODE
+                elif _FABRIC_INDEX_FIELD_NAME_DARWIN in value:
+                    key_name = _FABRIC_INDEX_FIELD_NAME_DARWIN
+
                 value[_FABRIC_INDEX_FIELD_NAME] = self.run(
                     specs,
-                    value[_FABRIC_INDEX_FIELD_CODE],
+                    value[key_name],
                     cluster_name,
                     _FABRIC_INDEX_FIELD_TYPE,
                     False)
-                del value[_FABRIC_INDEX_FIELD_CODE]
+                del value[key_name]
 
         elif isinstance(value, list) and array:
             value = [self.run(specs, v, cluster_name, typename, False)

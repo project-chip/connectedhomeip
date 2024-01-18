@@ -115,10 +115,10 @@ CommandStatusIB::Builder & InvokeResponseIB::Builder::CreateStatus()
     return mStatus;
 }
 
-InvokeResponseIB::Builder & InvokeResponseIB::Builder::EndOfInvokeResponseIB()
+CHIP_ERROR InvokeResponseIB::Builder::EndOfInvokeResponseIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

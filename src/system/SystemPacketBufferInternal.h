@@ -27,6 +27,10 @@
 #include <lib/core/CHIPConfig.h>
 #include <system/SystemConfig.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/opt.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 /**
  * CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
  *
@@ -54,10 +58,23 @@
  *
  * True if packet buffers are allocated from an LwIP pool (either standard or custom).
  */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && (CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE == PBUF_POOL)
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
 #define CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL 1
 #else
 #define CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL 0
+#endif
+
+/**
+ * CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE
+ *
+ * LwIP @pbuf_type for System::PacketBuffer allocations.
+ */
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+#define CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE PBUF_RAM
+#else
+#define CHIP_SYSTEM_PACKETBUFFER_LWIP_PBUF_TYPE PBUF_POOL
+#endif
 #endif
 
 /**
@@ -113,4 +130,8 @@
 #if (CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL + CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL) !=                         \
     CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
 #error "Inconsistent PacketBuffer LwIP pool configuration"
+#endif
+
+#if (CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL + CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM) > 1
+#error "Inconsistent PacketBuffer LwIP pbuf_type configuration"
 #endif

@@ -47,6 +47,8 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'NXP_K32W0_SDK_ROOT': 'TEST_NXP_K32W0_SDK_ROOT',
         'IMX_SDK_ROOT': 'IMX_SDK_ROOT',
         'TI_SYSCONFIG_ROOT': 'TEST_TI_SYSCONFIG_ROOT',
+        'JAVA_PATH': 'TEST_JAVA_PATH',
+        'GSDK_ROOT': 'TEST_GSDK_ROOT',
     })
 
     retval = subprocess.run([
@@ -108,8 +110,8 @@ class TestBuilder(unittest.TestCase):
             'android-arm64-chip-tool',
             'nrf-nrf52840dk-pump',
             'efr32-brd4161a-light-rpc-no-version',
-            'openiotsdk-lock',
-            'openiotsdk-shell'
+            'openiotsdk-lock-mbedtls',
+            'openiotsdk-shell-mbedtls'
         ]
 
         for target in TARGETS:

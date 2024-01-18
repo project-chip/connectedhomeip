@@ -1,0 +1,97 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 12.3.3. [TC-BINFO-3.1] Appearance Attribute DUT as Server
+
+PICS:
+    - BINFO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: TH reads ProductAppearance from the DUT."
+      PICS: BINFO.S.A0014
+      verification: |
+          ./chip-tool basicinformation read product-appearance 1 0
+
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully and  the value is in ProductAppearanceStruct  Finish value is in range 0-5
+
+
+          [1685008885.082338][143325:143327] CHIP:DMG: }
+          [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0014 DataVersion: 106877633
+          [1685008885.083153][143325:143327] CHIP:TOO:   ProductAppearance: {
+          [1685008885.083160][143325:143327] CHIP:TOO:     Finish: 2
+          [1685008885.083162][143325:143327] CHIP:TOO:     PrimaryColor: 5
+          [1685008885.083164][143325:143327] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 2: TH reads ProductAppearance from the DUT."
+      PICS: BINFO.S.A0014
+      verification: |
+          ./chip-tool basicinformation read product-appearance 1 0
+
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully and  the value is in ProductAppearanceStruct PrimaryColor is in range 0-20
+
+
+          [1685008885.082338][143325:143327] CHIP:DMG: }
+          [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0014 DataVersion: 106877633
+          [1685008885.083153][143325:143327] CHIP:TOO:   ProductAppearance: {
+          [1685008885.083160][143325:143327] CHIP:TOO:     Finish: 2
+          [1685008885.083162][143325:143327] CHIP:TOO:     PrimaryColor: 5
+          [1685008885.083164][143325:143327] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 3: TH reads ProductAppearance from the DUT."
+      PICS: BINFO.S.A0014
+      verification: |
+          Vendor specific test-step
+
+          Below is an example log (chip-tool) by assuming the PIXIT.BINFO.Finish is satin(2). So This should be verified by the vendor as per the PIXIT values provided.
+
+          ./chip-tool basicinformation read product-appearance 1 0
+
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully
+
+
+          [1685008885.082338][143325:143327] CHIP:DMG: }
+          [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0014 DataVersion: 106877633
+          [1685008885.083153][143325:143327] CHIP:TOO:   ProductAppearance: {
+          [1685008885.083160][143325:143327] CHIP:TOO:     Finish: 2
+          [1685008885.083162][143325:143327] CHIP:TOO:     PrimaryColor: 5
+          [1685008885.083164][143325:143327] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 4: TH reads ProductAppearance from the DUT."
+      PICS: BINFO.S.A0014
+      verification: |
+          Vendor specific test-step
+
+          Below is an example log (chip-tool) by assuming the PIXIT.BINFO.PrimaryColor is purple(5). So This should be verified by the vendor as per the PIXIT values provided.
+
+          ./chip-tool basicinformation read product-appearance 1 0
+
+          On TH Verify that, TH reads ProductAppearance attribute from the DUT successfully
+
+
+          [1685008885.082338][143325:143327] CHIP:DMG: }
+          [1685008885.082831][143325:143327] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0028 Attribute 0x0000_0014 DataVersion: 106877633
+          [1685008885.083153][143325:143327] CHIP:TOO:   ProductAppearance: {
+          [1685008885.083160][143325:143327] CHIP:TOO:     Finish: 2
+          [1685008885.083162][143325:143327] CHIP:TOO:     PrimaryColor: 5
+          [1685008885.083164][143325:143327] CHIP:TOO:    }
+      disabled: true

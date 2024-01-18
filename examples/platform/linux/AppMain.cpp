@@ -19,12 +19,15 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
+#include "app/clusters/network-commissioning/network-commissioning.h"
+#include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/util/endpoint-config-api.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
+#include <lib/core/Optional.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -39,6 +42,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/RuntimeOptionsProvider.h>
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -53,12 +57,12 @@
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <CommissioneeShellCommands.h>
-#include <lib/shell/Engine.h>
+#include <lib/shell/Engine.h> // nogncheck
 #include <thread>
 #endif
 
 #if defined(PW_RPC_ENABLED)
-#include <CommonRpc.h>
+#include <Rpc.h>
 #endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
@@ -66,8 +70,21 @@
 #include "TraceHandlers.h"
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
+#if ENABLE_TRACING
+#include <TracingCommandLineArgument.h> // nogncheck
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerDelegate.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h>
 #endif
 #include <app/TestEventTriggerDelegate.h>
 
@@ -75,6 +92,17 @@
 
 #include "AppMain.h"
 #include "CommissionableInit.h"
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <platform/Darwin/NetworkCommissioningDriver.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -84,19 +112,148 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::app::Clusters;
 
+// Network comissioning implementation
+namespace {
+// If secondaryNetworkCommissioningEndpoint has a value and both Thread and WiFi
+// are enabled, we put the WiFi network commissioning cluster on
+// secondaryNetworkCommissioningEndpoint.
+Optional<EndpointId> sSecondaryNetworkCommissioningEndpoint;
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#define CHIP_APP_MAIN_HAS_THREAD_DRIVER 1
+DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 1
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 1
+DeviceLayer::NetworkCommissioning::LinuxEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 1
+DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 1
+DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+
+#ifndef CHIP_APP_MAIN_HAS_THREAD_DRIVER
+#define CHIP_APP_MAIN_HAS_THREAD_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
+
+#ifndef CHIP_APP_MAIN_HAS_WIFI_DRIVER
+#define CHIP_APP_MAIN_HAS_WIFI_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+#ifndef CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+#define CHIP_APP_MAIN_HAS_ETHERNET_DRIVER 0
+#endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+
+#if CHIP_APP_MAIN_HAS_THREAD_DRIVER
+app::Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kRootEndpointId, &sThreadDriver);
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
+
+#if CHIP_APP_MAIN_HAS_WIFI_DRIVER
+// The WiFi network commissioning instance cannot be constructed until we know
+// whether we have an sSecondaryNetworkCommissioningEndpoint.
+Optional<app::Clusters::NetworkCommissioning::Instance> sWiFiNetworkCommissioningInstance;
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+#if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+app::Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kRootEndpointId, &sEthernetDriver);
+#endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+
+void EnableThreadNetworkCommissioning()
+{
+#if CHIP_APP_MAIN_HAS_THREAD_DRIVER
+    sThreadNetworkCommissioningInstance.Init();
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
+}
+
+void EnableWiFiNetworkCommissioning(EndpointId endpoint)
+{
+#if CHIP_APP_MAIN_HAS_WIFI_DRIVER
+    sWiFiNetworkCommissioningInstance.Emplace(endpoint, &sWiFiDriver);
+    sWiFiNetworkCommissioningInstance.Value().Init();
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+}
+
+void InitNetworkCommissioning()
+{
+    if (sSecondaryNetworkCommissioningEndpoint.HasValue())
+    {
+        // Enable secondary endpoint only when we need it, this should be applied to all platforms.
+        emberAfEndpointEnableDisable(sSecondaryNetworkCommissioningEndpoint.Value(), false);
+    }
+
+    const bool kThreadEnabled = {
+#if CHIP_APP_MAIN_HAS_THREAD_DRIVER
+        LinuxDeviceOptions::GetInstance().mThread
+#else
+        false
+#endif
+    };
+
+    const bool kWiFiEnabled = {
+#if CHIP_APP_MAIN_HAS_WIFI_DRIVER
+        LinuxDeviceOptions::GetInstance().mWiFi
+#else
+        false
+#endif
+    };
+
+    if (kThreadEnabled && kWiFiEnabled)
+    {
+        if (sSecondaryNetworkCommissioningEndpoint.HasValue())
+        {
+            EnableThreadNetworkCommissioning();
+            EnableWiFiNetworkCommissioning(sSecondaryNetworkCommissioningEndpoint.Value());
+            // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
+            emberAfEndpointEnableDisable(sSecondaryNetworkCommissioningEndpoint.Value(), true);
+        }
+        else
+        {
+            // Just use the Thread one.
+            EnableThreadNetworkCommissioning();
+        }
+    }
+    else if (kThreadEnabled)
+    {
+        EnableThreadNetworkCommissioning();
+    }
+    else if (kWiFiEnabled)
+    {
+        EnableWiFiNetworkCommissioning(kRootEndpointId);
+    }
+    else
+    {
+#if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+        sEthernetNetworkCommissioningInstance.Init();
+#endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
+    }
+}
+} // anonymous namespace
+
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 /*
  * The device shall check every kWiFiStartCheckTimeUsec whether Wi-Fi management
  * has been fully initialized. If after kWiFiStartCheckAttempts Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
 #endif
 
 namespace {
@@ -113,6 +270,11 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     if (event->Type == DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
+    }
+    else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
+    {
+        // Restart the server on connectivity change
+        app::DnssdServer::Instance().StartServer();
     }
 }
 
@@ -148,7 +310,7 @@ void StopSignalHandler(int signal)
 
 } // namespace
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 static bool EnsureWiFiIsStarted()
 {
     for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
@@ -212,7 +374,8 @@ private:
     TestEventTriggerDelegate * mOtherDelegate = nullptr;
 };
 
-int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
+int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
+                     const Optional<EndpointId> secondaryNetworkCommissioningEndpoint)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -230,6 +393,8 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
 
     err = ParseArguments(argc, argv, customOptions);
     SuccessOrExit(err);
+
+    sSecondaryNetworkCommissioningEndpoint = secondaryNetworkCommissioningEndpoint;
 
 #ifdef CHIP_CONFIG_KVS_PATH
     if (LinuxDeviceOptions::GetInstance().KVS == nullptr)
@@ -272,7 +437,7 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     }
 
 #if defined(PW_RPC_ENABLED)
-    rpc::Init();
+    rpc::Init(LinuxDeviceOptions::GetInstance().rpcServerPort);
     ChipLogProgress(NotSpecified, "PW_RPC initialized.");
 #endif // defined(PW_RPC_ENABLED)
 
@@ -309,9 +474,10 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions)
     DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
+        // Start WiFi management in Concurrent mode
         DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
         if (!EnsureWiFiIsStarted())
         {
@@ -361,6 +527,15 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     initParams.userDirectedCommissioningPort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+#if ENABLE_TRACING
+    chip::CommandLineApp::TracingSetup tracing_setup;
+
+    for (const auto & trace_destination : LinuxDeviceOptions::GetInstance().traceTo)
+    {
+        tracing_setup.EnableTracingFor(trace_destination.c_str());
+    }
+#endif
+
     initParams.interfaceId = LinuxDeviceOptions::GetInstance().interfaceId;
 
     if (LinuxDeviceOptions::GetInstance().mCSRResponseOptions.csrExistingKeyPair)
@@ -377,6 +552,25 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) };
     otherDelegate = &otaTestEventTriggerDelegate;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
+    static SmokeCOTestEventTriggerDelegate smokeCOTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &smokeCOTestEventTriggerDelegate;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+    static BooleanStateConfigurationTestEventTriggerDelegate booleanStateConfigurationTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &booleanStateConfigurationTestEventTriggerDelegate;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+    static EnergyEvseTestEventTriggerDelegate energyEvseTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &energyEvseTestEventTriggerDelegate;
+#endif
+
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SampleTestEventTriggerDelegate testEventTriggerDelegate;
     VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),
@@ -387,8 +581,18 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // We need to set DeviceInfoProvider before Server::Init to setup the storage of DeviceInfoProvider properly.
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
+    chip::app::RuntimeOptionsProvider::Instance().SetSimulateNoInternalTime(
+        LinuxDeviceOptions::GetInstance().mSimulateNoInternalTime);
+
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Set ReadHandler Capacity for Subscriptions
+    chip::app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity);
+    chip::app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+#endif
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
@@ -411,11 +615,15 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
+    InitNetworkCommissioning();
+
     ApplicationInit();
 
 #if !defined(ENABLE_CHIP_SHELL)
+    // NOLINTBEGIN(bugprone-signal-handler)
     signal(SIGINT, StopSignalHandler);
     signal(SIGTERM, StopSignalHandler);
+    // NOLINTEND(bugprone-signal-handler)
 #endif // !defined(ENABLE_CHIP_SHELL)
 
     if (impl != nullptr)
@@ -428,6 +636,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     }
     gMainLoopImplementation = nullptr;
 
+    ApplicationShutdown();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
@@ -437,6 +647,10 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif
 
     Server::GetInstance().Shutdown();
+
+#if ENABLE_TRACING
+    tracing_setup.StopTracing();
+#endif
 
     DeviceLayer::PlatformMgr().Shutdown();
 

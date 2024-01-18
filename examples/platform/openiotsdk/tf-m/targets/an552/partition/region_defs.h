@@ -101,9 +101,9 @@
 #define NS_CODE_SIZE (IMAGE_NS_CODE_SIZE)
 #define NS_CODE_LIMIT (NS_CODE_START + NS_CODE_SIZE - 1)
 
-/* Non-Secure Data stored in ISRAM0 */
+/* Non-Secure Data stored in ISRAM0 + ISRAM1 */
 #define NS_DATA_START (ISRAM0_BASE_NS)
-#define NS_DATA_SIZE (ISRAM0_SIZE)
+#define NS_DATA_SIZE (ISRAM0_SIZE + ISRAM1_SIZE)
 #define NS_DATA_LIMIT (NS_DATA_START + NS_DATA_SIZE - 1)
 
 /* NS partition information is used for MPC and SAU configuration */

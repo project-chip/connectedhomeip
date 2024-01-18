@@ -18,11 +18,11 @@
 
 #include <app/AttributePathExpandIterator.h>
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventManagement.h>
 #include <app/GlobalAttributes.h>
+#include <app/att-storage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
@@ -140,6 +140,11 @@ void AttributePathExpandIterator::PrepareAttributeIndexRange(const AttributePath
                 }
             }
             mGlobalAttributeEndIndex = static_cast<uint8_t>(mGlobalAttributeIndex + 1);
+        }
+        else
+        {
+            mGlobalAttributeIndex    = UINT8_MAX;
+            mGlobalAttributeEndIndex = 0;
         }
     }
 }

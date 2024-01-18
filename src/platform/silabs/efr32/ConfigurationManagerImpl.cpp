@@ -295,9 +295,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // When called from an RPC, the following reset occurs before the RPC can respond,
     // which breaks tests (because it looks like the RPC hasn't successfully completed).
-    // One way to fix this is to reduce the priority of this task, to allow logging to
-    // complete before the reset occurs.
-    vTaskPrioritySet(NULL, 0);
+    // Block the task for 500 ms before the reset occurs to allow RPC response to be sent
+    vTaskDelay(pdMS_TO_TICKS(500));
 
     NVIC_SystemReset();
 }

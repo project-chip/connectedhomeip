@@ -13,40 +13,31 @@ step.
 
 ### Install Prerequisites
 
--   [Linux](https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32/get-started/linux-setup.html)
--   [macOS](https://docs.espressif.com/projects/esp-idf/en/v4.4.3/esp32/get-started/macos-setup.html)
+-   [Linux](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-linux-users)
+-   [macOS](https://docs.espressif.com/projects/esp-idf/en/v5.1/esp32/get-started/linux-macos-setup.html#for-macos-users)
 
-### Get IDF v4.4.3
+### Get IDF v5.1.1
 
--   Clone ESP-IDF
-    [v4.4.3 release](https://github.com/espressif/esp-idf/releases/tag/v4.4.3)
-
-    ```
-    $ git clone -b v4.4.3 --recursive https://github.com/espressif/esp-idf.git
-    $ cd esp-idf
-    $ ./install.sh
-    ```
-
--   To update an existing esp-idf toolchain to v4.4.3:
+-   Clone ESP-IDF [v5.1.1
+    release](https://github.com/espressif/esp-idf/releases/tag/v5.1.1
 
     ```
-    $ cd path/to/esp-idf
-    $ git fetch origin
-    $ git checkout v4.4.3
-    $ git reset --hard origin/v4.4.3
-    $ git submodule update --recursive --init
-    $ git clean -fdx
-    $ ./install.sh
+    git clone -b v5.1.1 --recursive --depth 1 --shallow-submodule https://github.com/espressif/esp-idf.git
+    cd esp-idf
+    ./install.sh
     ```
 
--   For ESP32C6 & ESP32H2, please use commit
-    [47852846d3](https://github.com/espressif/esp-idf/tree/47852846d3).
+-   To update an existing esp-idf toolchain to v5.1.1:
 
     ```
-    $ cd esp-idf
-    $ git checkout 47852846d3
-    $ git submodule update --init
-    $ ./install.sh
+    cd path/to/esp-idf
+    git fetch --depth 1 origin v5.1.1
+    git reset --hard FETCH_HEAD
+    git submodule update --depth 1 --recursive --init
+
+    # -ff is for cleaning untracked files as well as submodules
+    git clean -ffdx
+    ./install.sh
     ```
 
 ## Setup Matter environment
@@ -69,17 +60,15 @@ source scripts/bootstrap.sh
 Whenever Matter environment is out of date, it can be updated by running above
 command.
 
-For MacOS, `gdbgui` python package will not be installed using `bootstrap.sh`
-script as it is restricted only for x64 Linux platforms. It is restricted
-because, building wheels for `gevent` (dependency of `gdbgui`) fails on MacOS.
+In IDF v4.4.x, `esptool` is part of the esp-idf repository, but in IDF v5.x, it
+is moved out as a Python package which can be installed using pip.
 
-Please run the below commands after every bootstrapping.
-
-Workaround is to install `gdbgui` wheels as binary:
+If you are using IDF v5.x or later, please install `esptool` using the command
+below:
 
 ```
-python3 -m pip install -c scripts/setup/constraints.txt --no-cache --prefer-binary gdbgui==0.13.2.0
-deactivate
+# Please make sure to run this command in the Matter Python environment
+python3 -m pip install esptool
 ```
 
 ---

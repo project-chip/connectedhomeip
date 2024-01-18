@@ -22,13 +22,14 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues-building)
+    -   [Overwrite board config files](#overwrite-board-config-files)
+    -   [Known issues building](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
-    -   [Known issues](#known-issues-tokenizer)
+    -   [Known issues tokenizer](#known-issues-tokenizer)
 -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
 -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
@@ -38,7 +39,7 @@ network.
     -   [Writing the PSECT](#writing-the-psect)
     -   [Writing the application](#writing-the-application)
     -   [OTA Testing](#ota-testing)
-    -   [Known issues](#known-issues-ota)
+    -   [Known issues OTA](#known-issues-ota)
         </hr>
 
 ## Introduction
@@ -191,33 +192,59 @@ effects:
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download
-    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
+Activate the Matter environment:
 
--   Start building the application either with Secure Element or without
-    -   without Secure Element
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
+```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-    -   with Secure element
-        Exactly the same steps as above but set chip_with_se05x=1 in the gn command
-        and add argument chip_enable_ota_requestor=false
+To bring the SDK in the environment, the user can:
 
-Note that option chip_enable_ota_requestor=false are required for building with
-Secure Element. These can be changed if building without Secure Element
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
+
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
+    ```
+
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
+
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
+    ```
+
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
+
+    ```
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
+    ```
+
+Start building the application:
+
+```bash
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
+```
+
+To build with Secure Element, follow the same steps as above but set
+`chip_with_se05x=1 chip_enable_ota_requestor=false` in the `gn gen` command.
+
+Note that option `chip_enable_ota_requestor=false` is required for building with
+Secure Element due to flash constraints.
 
 -   K32W041AM flavor
 
-    Exactly the same steps as above but set argument build_for_k32w041am=1 in
-    the gn command and use
-    [K32W041AMDK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W041AMDK6.zip).
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -231,8 +258,8 @@ running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-install the recommanded packages (python version > 3, pip3, pycrypto,
-pycryptodome):
+(run automatically) install the recommanded packages (python version > 3, pip3,
+pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -246,15 +273,47 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-light-example.
 
+### Overwrite board config files
+
+The example uses template/reference board configuration files.
+
+To overwrite the board configuration files, set `override_is_DK6=false` in the
+`k32w0_sdk` target from the app `BUILD.gn`:
+
+```
+k32w0_sdk("sdk") {
+    override_is_DK6 = false
+    ...
+}
+```
+
+This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6`
+option, thus the reference board configuration files will no longer be used.
+
 ## Known issues building
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
 
+## Rotating device id
+
+This is an optional feature and can be used in multiple ways (please see section
+5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free
+Setup, which leverages the C3 Characteristic (Additional commissioning-related
+data) to offer an easier way to set up the device. The rotating device id will
+be encoded in this additional data and is programmed to rotate at pre-defined
+moments. The algorithm uses a unique per-device identifier that must be
+programmed during factory provisioning.
+
+Please use the following build args:
+
+-   `chip_enable_rotating_device_id=1` - to enable rotating device id.
+-   `chip_enable_additional_data_advertising=1` - to enable C3 characteristic.
+
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
@@ -273,7 +332,7 @@ CHIPProjectConfig.h.
 
 Regarding factory data provider, there are two options:
 
--   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+-   use the default factory data provider: `FactoryDataProviderImpl` by setting
     `chip_with_factory_data=1` in the gn build command.
 -   use a custom factory data provider: please see
     [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).
@@ -388,18 +447,56 @@ application.
 
 ### Writing the SSBL
 
-The SSBL can ge generated from one of the SDK demo examples. The SDK demo
-example needs to be compiled inside MCUXpresso with the define _PDM_EXT_FLASH_.
-The SSBL demo application can be imported from the _Quickstart panel_: _Import
-SDK example(s)_ -> select _wireless->framework->ssbl_ application.
+The SDK already provides an SSBL binary compiled with external flash support:
+`boards/k32w061dk6/wireless_examples/framework/ssbl/binary/ssbl_ext_flash_pdm_support.bin`,
+but it does not offer multi-image OTA support.
+
+Alternatively, the SSBL can ge generated from one of the SDK demo examples. The
+SSBL demo application can be imported from the `Quickstart panel`:
+`Import SDK example(s) -> select wireless -> framework -> ssbl` application.
 
 ![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
 
-The SSBL project must be compiled using the PDM_EXT_FLASH define.
+### Features
 
-![PDM_EXT_FLASH](../../../../platform/nxp/k32w/k32w0/doc/images/pdm_ext_flash.JPG)
+#### Multi image
 
-Once compiled, the required ssbl file is called k32w061dk6_ssbl.bin
+To support multi-image OTA feature, the SSBL project must be compiled using the
+following defines:
+
+-   `PDM_EXT_FLASH=1` - support PDM in external flash.
+-   `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
+-   `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses
+    `OTACustomStorage_ExtFlash` (1) by default.
+-   `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual `SPIFI`
+    flash (e.g. K32W041AM variant).
+
+Optionally, add the following defines:
+
+-   `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
+-   `EXTERNAL_FLASH_DATA_OTA=1` - to support external read only data.
+
+![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
+
+#### Simple hash verification
+
+When secure boot is not used, a simple hash can be appended at the end of the
+image for integrity check. Applications should be built with
+`chip_simple_hash_verification=1`.
+
+To support simple hash verification feature, the SSBL project must be compiled
+with:
+
+-   `gSimpleHashVerification=1`
+
+and update the post-build command to use simple hash verification instead of the
+default options. Go to
+`Project -> Properties -> C/C++ Build -> Settings -> Build steps` and press
+`Edit` under `Post-build steps` subsection. The command should look similar to:
+
+![SSBL_SIMPLE_HASH_VERIFICATION](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_simple_hash.JPG)
+
+Once compiled, the required SSBL file is called `k32w061dk6_ssbl.bin`.
 
 ![SSBL_BIN](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_bin.JPG)
 
@@ -409,7 +506,7 @@ Before writing the SSBL, it it recommanded to fully erase the internal flash:
 DK6Programmer.exe -V 5 -P 1000000 -s <COM_PORT> -e Flash
 ```
 
-k32w061dk6_ssbl.bin must be written at address 0 in the internal flash:
+`k32w061dk6_ssbl.bin` must be written at address 0 in the internal flash:
 
 ```
 DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl.bin"
@@ -417,7 +514,46 @@ DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl
 
 ### Writing the PSECT
 
-First, image directory 0 must be written:
+This is the list of all supported partitions:
+
+```
+0000000010000000 : SSBL partition
+
+    00000000 -----------> Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    00 -----------------> 0x00 Image type (0x00 = SSBL)
+
+004000000f020101: Application partition
+
+    00400000 -----------> 0x00004000 Start Address
+    0f02 ---------------> 0x020f Number of 512-bytes pages
+    01 -----------------> 0x01 Bootable flag
+    01 -----------------> 0x01 Image type (0x01 = Application)
+
+00000010800000fe: Ext Flash text partition
+
+    00000010 -----------> 0x10000000 Start Address (external flash)
+    8000 ---------------> 0x0080 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fe -----------------> 0xFE Image type (0xFE = Ext Flash text)
+
+00000110300200fc : OTA Image partition
+
+    00000110 -----------> 0x10010000 Start Address
+    3002----------------> 0x0230 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fc -----------------> 0xFC Image type (0xFC = OTA partition)
+
+00000510100000fd: NVM partition
+
+    00000510 -----------> 0x10050000 Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fd -----------------> 0xFD Image type (0xFD = NVM partition)
+```
+
+First, image directory 0 (SSBL partition) must be written:
 
 ```
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_0=0000000010000000
@@ -432,7 +568,7 @@ Here is the interpretation of the fields:
 00       -> SSBL Image Type
 ```
 
-Second, image directory 1 must be written:
+Second, image directory 1 (application partition) must be written:
 
 ```
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000C9040101
@@ -442,10 +578,13 @@ Here is the interpretation of the fields:
 
 ```
 00400000 -> start address 0x00004000
-CD04     -> 0x4C9 pages of 512-bytes (= 612,5kB)
+C904     -> 0x4C9 pages of 512-bytes (= 612.5kB)
 01       -> bootable flag
 01       -> image type for the application
 ```
+
+Please note the user can write additional partitions by writing
+`image_dir_2/3/4` with the wanted configuration.
 
 ### Writing the application
 
@@ -513,18 +652,50 @@ Build OTA image:
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
 
--   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py` The tool can be
-    used to generate an OTA image with the following format:
-    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
-    form `|tag|length|value|`
+-   `scripts/tools/nxp/ota/ota_image_tool.py`
+
+The tool can be used to generate an OTA image with the following format:
+
+```
+    | OTA image header | TLV1 | TLV2 | ... | TLVn |
+```
+
+where each TLV is in the form `|tag|length|value|`.
 
 Note that "standard" TLV format is used. Matter TLV format is only used for
-factory data TLV value. A user can enable the default processors by specifying
-`chip_enable_ota_default_processors=1` in the build command. Please see more in
-the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+factory data TLV value.
 
-Here is an example that generate an OTA image with factory data and app TLV:
-`user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
+A user can select which default processors to enable:
+
+-   `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL)
+    update processor (enabled by default).
+-   `chip_enable_ota_factory_data_processor=1` to enable default factory data
+    update processor (disabled by default).
+
+The address for storing the custom OTA entry can also be specified:
+
+-   `ota_custom_entry_address="0x000C1000"` is the default value, where
+    `0x000C1000` is the end address of the PDM area. PDM area ends at
+    `0x00100000` (top of external flash) and has a size of `63 * 4096` bytes.
+    The user should be aware of the external flash configuration and use an
+    address that does not overlap with anything else.
+
+Please see more in the
+[OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generates an OTA image with application update TLV:
+
+```
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
+```
+
+A note regarding OTA image header version (`-vn` option). An application binary
+has its own software version, given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` (`42020` by default), which can be
+overwritten. For having a correct OTA process, the OTA header version should be
+the same as the binary embedded software version. A user can set a custom
+software version in the gn build args by setting `chip_software_version` to the
+wanted version.
 
 Start the OTA Provider Application:
 
@@ -532,13 +703,6 @@ Start the OTA Provider Application:
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
 ```
-
-A note regarding OTA image header version (`-vn` option). An application binary
-has its own software version (given by
-`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
-having a correct OTA process, the OTA header version should be the same as the
-binary embedded software version. A user can set a custom software version in
-the gn build args by setting `chip_software_version` to the wanted version.
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
 entries to allow OTA requestors:
@@ -558,7 +722,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-th
 Start the OTA process:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
 ```
 
 ## Known issues ota

@@ -25,6 +25,7 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   chip_software_version = 0
+  chip_simple_hash_verification = 0
 }
 
 if (chip_pw_tokenizer_logging) {
@@ -56,10 +57,6 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/util/include",
     "${k32w0_platform_dir}/common",
   ]
-
-  if (chip_with_se05x == 1) {
-    include_dirs += [ "${chip_root}/examples/platform/nxp/se05x" ]
-  }
 
   defines = []
   if (is_debug) {
@@ -96,10 +93,7 @@ k32w0_executable("contact_sensor_app") {
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
-    defines = [
-      "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
-    ]
+    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
   }
 
   deps = [
@@ -108,6 +102,7 @@ k32w0_executable("contact_sensor_app") {
     "${chip_root}/examples/contact-sensor-app/contact-sensor-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform:syscalls_stub",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
   ]
@@ -166,9 +161,23 @@ if (chip_pw_tokenizer_logging) {
 }
 
 group("k32w0") {
-  deps = [ ":contact_sensor_app" ]
+  deps = [
+    ":binsign",
+    ":contact_sensor_app",
+  ]
   if (chip_pw_tokenizer_logging) {
     deps += [ ":contact_sensor_app.database" ]
+  }
+}
+
+action("binsign") {
+  deps = [ ":contact_sensor_app" ]
+  script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
+  output_name = "bignsign.log"
+  outputs = [ "${root_build_dir}/${output_name}" ]
+
+  if (chip_simple_hash_verification == 1) {
+    args = [ "--simple-hash" ]
   }
 }
 

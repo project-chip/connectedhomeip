@@ -16,7 +16,8 @@
 import asyncio
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from asyncio import CancelledError
+from dataclasses import dataclass, field
 
 from .adapter import TestAdapter
 from .hooks import TestRunnerHooks
@@ -43,10 +44,14 @@ class TestRunnerOptions:
                     stop running the tests if a step index matches
                     the number. This is mostly useful when running
                     a single test file and for debugging purposes.
+
+    delay_in_ms:  If set to any value that is not zero the runner will
+                  wait for the given time between steps.
     """
     stop_on_error: bool = True
     stop_on_warning: bool = False
     stop_at_number: int = -1
+    delay_in_ms: int = 0
 
 
 @dataclass
@@ -65,11 +70,15 @@ class TestRunnerConfig:
     hooks: A configurable set of hooks to be called at various steps while
            running. It may may allow the callers to gain insights about the
            current running state.
+
+    auto_start_stop: Indicates whether the run method should start and stop
+            the runner of if that will be handled outside of that method.
     """
     adapter: TestAdapter = None
     pseudo_clusters: PseudoClusters = PseudoClusters([])
-    options: TestRunnerOptions = TestRunnerOptions()
+    options: TestRunnerOptions = field(default_factory=TestRunnerOptions)
     hooks: TestRunnerHooks = TestRunnerHooks()
+    auto_start_stop: bool = True
 
 
 class TestRunnerBase(ABC):
@@ -104,7 +113,7 @@ class TestRunnerBase(ABC):
         pass
 
     @abstractmethod
-    def run(self, config: TestRunnerConfig) -> bool:
+    def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig) -> bool:
         """
         This method runs a test suite.
 
@@ -117,9 +126,6 @@ class TestRunnerBase(ABC):
 
 
 class TestRunner(TestRunnerBase):
-    """
-    TestRunner is a default runner implementation.
-    """
     async def start(self):
         return
 
@@ -129,7 +135,7 @@ class TestRunner(TestRunnerBase):
     async def stop(self):
         return
 
-    def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig):
+    async def run(self, parser_builder_config: TestParserBuilderConfig, runner_config: TestRunnerConfig):
         if runner_config and runner_config.hooks:
             start = time.time()
             runner_config.hooks.start(len(parser_builder_config.tests))
@@ -139,8 +145,8 @@ class TestRunner(TestRunnerBase):
             if not parser or not runner_config:
                 continue
 
-            result = asyncio.run(self._run(parser, runner_config))
-            if isinstance(result, Exception):
+            result = await self._run_with_timeout(parser, runner_config)
+            if isinstance(result, Exception) or isinstance(result, CancelledError):
                 raise (result)
             elif not result:
                 return False
@@ -149,31 +155,46 @@ class TestRunner(TestRunnerBase):
             duration = round((time.time() - start) * 1000)
             runner_config.hooks.stop(duration)
 
-        return True
+        return parser_builder.done
+
+    async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
+        status = True
+        try:
+            if config.auto_start_stop:
+                await self.start()
+            status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
+        except (Exception, CancelledError) as exception:
+            status = exception
+        finally:
+            if config.auto_start_stop:
+                await self.stop()
+            return status
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
-            await self.start()
-
             hooks = config.hooks
-            hooks.test_start(parser.name, parser.tests.count)
+            hooks.test_start(parser.filename, parser.name, parser.tests.count)
 
             test_duration = 0
             for idx, request in enumerate(parser.tests):
                 if not request.is_pics_enabled:
-                    hooks.step_skipped(request.label)
+                    hooks.step_skipped(request.label, request.pics)
                     continue
                 elif not config.adapter:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
                     hooks.step_unknown()
                     continue
+                elif config.pseudo_clusters.is_manual_step(request):
+                    hooks.step_start(request)
+                    await hooks.step_manual()
+                    continue
                 else:
-                    hooks.step_start(request.label)
+                    hooks.step_start(request)
 
                 start = time.time()
                 if config.pseudo_clusters.supports(request):
-                    responses, logs = await config.pseudo_clusters.execute(request)
+                    responses, logs = await config.pseudo_clusters.execute(request, parser.definitions)
                 else:
                     encoded_request = config.adapter.encode(request)
                     encoded_response = await self.execute(encoded_request)
@@ -185,9 +206,9 @@ class TestRunner(TestRunnerBase):
 
                 if logger.is_failure():
                     hooks.step_failure(logger, logs, duration,
-                                       request.responses, responses)
+                                       request, responses)
                 else:
-                    hooks.step_success(logger, logs, duration)
+                    hooks.step_success(logger, logs, duration, request)
 
                 if logger.is_failure() and config.options.stop_on_error:
                     status = False
@@ -200,10 +221,12 @@ class TestRunner(TestRunnerBase):
                 if (idx + 1) == config.options.stop_at_number:
                     break
 
+                if config.options.delay_in_ms:
+                    await asyncio.sleep(config.options.delay_in_ms / 1000)
+
             hooks.test_stop(round(test_duration))
 
         except Exception as exception:
             status = exception
         finally:
-            await self.stop()
             return status

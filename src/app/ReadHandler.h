@@ -38,6 +38,7 @@
 #include <app/MessageDef/EventPathIBs.h>
 #include <app/ObjectList.h>
 #include <app/OperationalSessionSetup.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <app/SubscriptionResumptionStorage.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
@@ -52,7 +53,7 @@
 #include <system/SystemPacketBuffer.h>
 
 // https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/61a9d19e6af12fdfb0872bcff26d19de6c680a1a/src/Ch02_Architecture.adoc#1122-subscribe-interaction-limits
-constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // 3600 seconds
+inline constexpr uint16_t kSubscriptionMaxIntervalPublisherLimit = 3600; // seconds (60 minutes)
 
 namespace chip {
 namespace app {
@@ -64,6 +65,8 @@ namespace app {
 namespace reporting {
 class Engine;
 class TestReportingEngine;
+class ReportScheduler;
+class TestReportScheduler;
 } // namespace reporting
 
 class InteractionModelEngine;
@@ -152,6 +155,41 @@ public:
         virtual ApplicationCallback * GetAppCallback() = 0;
     };
 
+    // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify
+    // every
+    /*
+     * Observer class for ReadHandler, meant to allow multiple objects to observe the ReadHandler. Currently only one observer is
+     * supported but all above callbacks should be merged into observer type and an observer pool should be added to allow multiple
+     * objects to observe ReadHandler
+     */
+    class Observer
+    {
+    public:
+        virtual ~Observer() = default;
+
+        /// @brief Callback invoked to notify a subscription was successfully established for the ReadHandler
+        /// @param[in] apReadHandler  ReadHandler that completed its subscription
+        virtual void OnSubscriptionEstablished(ReadHandler * apReadHandler) = 0;
+
+        /// @brief Callback invoked when a ReadHandler went from a non reportable state to a reportable state. Indicates to the
+        /// observer that a report should be emitted when the min interval allows it.
+        ///
+        /// This will only be invoked for subscribe-type ReadHandler objects, and only after
+        /// OnSubscriptionEstablished has been called.
+        ///
+        /// @param[in] apReadHandler  ReadHandler that became dirty and in HandlerState::CanStartReporting state
+        virtual void OnBecameReportable(ReadHandler * apReadHandler) = 0;
+
+        /// @brief Callback invoked when the read handler needs to make sure to send a message to the subscriber within the next
+        /// maxInterval time period.
+        /// @param[in] apReadHandler ReadHandler that has generated a report
+        virtual void OnSubscriptionReportSent(ReadHandler * apReadHandler) = 0;
+
+        /// @brief Callback invoked when a ReadHandler is getting removed so it can be unregistered
+        /// @param[in] apReadHandler  ReadHandler getting destroyed
+        virtual void OnReadHandlerDestroyed(ReadHandler * apReadHandler) = 0;
+    };
+
     /*
      * Destructor - as part of destruction, it will abort the exchange context
      * if a valid one still exists.
@@ -167,7 +205,8 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
+                Observer * observer);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     /**
@@ -177,7 +216,7 @@ public:
      *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(ManagementCallback & apCallback);
+    ReadHandler(ManagementCallback & apCallback, Observer * observer);
 #endif
 
     const ObjectList<AttributePathParams> * GetAttributePathList() const { return mpAttributePathList; }
@@ -190,48 +229,64 @@ public:
         aMaxInterval = mMaxInterval;
     }
 
+    CHIP_ERROR SetMinReportingIntervalForTests(uint16_t aMinInterval)
+    {
+        VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(aMinInterval <= mMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
+        // Ensures the new min interval is higher than the subscriber established one.
+        mMinIntervalFloorSeconds = std::max(mMinIntervalFloorSeconds, aMinInterval);
+        return CHIP_NO_ERROR;
+    }
+
     /*
-     * Set the reporting intervals for the subscription. This SHALL only be called
+     * Set the maximum reporting interval for the subscription. This SHALL only be called
      * from the OnSubscriptionRequested callback above. The restriction is as below
      * MinIntervalFloor ≤ MaxInterval ≤ MAX(SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT, MaxIntervalCeiling)
      * Where SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT is set to 60m in the spec.
      */
-    CHIP_ERROR SetReportingIntervals(uint16_t aMaxInterval)
+    CHIP_ERROR SetMaxReportingInterval(uint16_t aMaxInterval)
     {
         VerifyOrReturnError(IsIdle(), CHIP_ERROR_INCORRECT_STATE);
         VerifyOrReturnError(mMinIntervalFloorSeconds <= aMaxInterval, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(aMaxInterval <= std::max(kSubscriptionMaxIntervalPublisherLimit, mMaxInterval),
+        VerifyOrReturnError(aMaxInterval <= std::max(GetPublisherSelectedIntervalLimit(), mMaxInterval),
                             CHIP_ERROR_INVALID_ARGUMENT);
         mMaxInterval = aMaxInterval;
         return CHIP_NO_ERROR;
     }
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     *
+     *  @brief Initialize a ReadHandler for a resumed subsciption
+     *
+     *  Used after the SubscriptionResumptionSessionEstablisher establishs the CASE session
+     */
+    void OnSubscriptionResumed(const SessionHandle & sessionHandle, SubscriptionResumptionSessionEstablisher & sessionEstablisher);
+#endif
+
 private:
     PriorityLevel GetCurrentPriority() const { return mCurrentPriority; }
     EventNumber & GetEventMin() { return mEventMin; }
 
+    /**
+     * Returns SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT
+     * For an ICD publisher, this SHALL be set to the idle mode interval.
+     * Otherwise, this SHALL be set to 60 minutes.
+     */
+    uint16_t GetPublisherSelectedIntervalLimit();
+
     enum class ReadHandlerFlags : uint8_t
     {
-        // mHoldReport is used to prevent subscription data delivery while we are
-        // waiting for the min reporting interval to elapse.
-        HoldReport = (1 << 0),
-
-        // mHoldSync is used to prevent subscription empty report delivery while we
-        // are waiting for the max reporting interval to elaps.  When mHoldSync
-        // becomes false, we are allowed to send an empty report to keep the
-        // subscription alive on the client.
-        HoldSync = (1 << 1),
-
         // The flag indicating we are in the middle of a series of chunked report messages, this flag will be cleared during
         // sending last chunked message.
-        ChunkedReport = (1 << 2),
+        ChunkedReport = (1 << 0),
 
         // Tracks whether we're in the initial phase of receiving priming
         // reports, which is always true for reads and true for subscriptions
         // prior to receiving a subscribe response.
-        PrimingReports     = (1 << 3),
-        ActiveSubscription = (1 << 4),
-        FabricFiltered     = (1 << 5),
+        PrimingReports     = (1 << 1),
+        ActiveSubscription = (1 << 2),
+        FabricFiltered     = (1 << 3),
         // For subscriptions, we record the dirty set generation when we started to generate the last report.
         // The mCurrentReportsBeginGeneration records the generation at the start of the current report.  This only/
         // has a meaningful value while IsReporting() is true.
@@ -241,10 +296,10 @@ private:
         // mPreviousReportsBeginGeneration has had its value sent to the client.
         // when receiving initial request, it needs mark current handler as dirty.
         // when there is urgent event, it needs mark current handler as dirty.
-        ForceDirty = (1 << 6),
+        ForceDirty = (1 << 4),
 
         // Don't need the response for report data if true
-        SuppressResponse = (1 << 7),
+        SuppressResponse = (1 << 5),
     };
 
     /**
@@ -257,18 +312,6 @@ private:
      *
      */
     void OnInitialRequest(System::PacketBufferHandle && aPayload);
-
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    /**
-     *
-     *  @brief Resume a persisted subscription
-     *
-     *  Used after ReadHandler(ManagementCallback & apCallback). This will start a CASE session
-     *  with the subscriber if one doesn't already exist, and send full priming report when connected.
-     */
-    void ResumeSubscription(CASESessionManager & caseSessionManager,
-                            SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo);
-#endif
 
     /**
      *  Send ReportData to initiator
@@ -290,15 +333,24 @@ private:
     bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext) const;
 
     bool IsIdle() const { return mState == HandlerState::Idle; }
-    bool IsReportable() const
+
+    /// @brief Returns whether the ReadHandler is in a state where it can send a report and there is data to report.
+    bool ShouldStartReporting() const
     {
-        // Important: Anything that changes the state IsReportable depends on in
-        // a way that causes IsReportable to become true must call ScheduleRun
-        // on the reporting engine.
-        return mState == HandlerState::GeneratingReports && !mFlags.Has(ReadHandlerFlags::HoldReport) &&
-            (IsDirty() || !mFlags.Has(ReadHandlerFlags::HoldSync));
+        // Important: Anything that changes ShouldStartReporting() from false to true
+        // (which can only happen for subscriptions) must call
+        // mObserver->OnBecameReportable(this).
+        return CanStartReporting() && (ShouldReportUnscheduled() || IsDirty());
     }
-    bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
+    /// @brief CanStartReporting() is true if the ReadHandler is in a state where it could generate
+    /// a (possibly empty) report if someone asked it to.
+    bool CanStartReporting() const { return mState == HandlerState::CanStartReporting; }
+    /// @brief ShouldReportUnscheduled() is true if the ReadHandler should be asked to generate reports
+    /// without consulting the report scheduler.
+    bool ShouldReportUnscheduled() const
+    {
+        return CanStartReporting() && (IsType(ReadHandler::InteractionType::Read) || IsPriming());
+    }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
 
     // Resets the path iterator to the beginning of the whole report for generating a series of new reports.
@@ -323,10 +375,10 @@ private:
     void GetSubscriptionId(SubscriptionId & aSubscriptionId) const { aSubscriptionId = mSubscriptionId; }
     AttributePathExpandIterator * GetAttributePathExpandIterator() { return &mAttributePathExpandIterator; }
 
-    /**
-     * Notify the read handler that a set of attribute paths has been marked dirty.
-     */
-    void SetDirty(const AttributePathParams & aAttributeChanged);
+    /// @brief Notifies the read handler that a set of attribute paths has been marked dirty. This will schedule a reporting engine
+    /// run if the change to the attribute path makes the ReadHandler reportable.
+    /// @param aAttributeChanged Path to the attribute that was changed.
+    void AttributePathIsDirty(const AttributePathParams & aAttributeChanged);
     bool IsDirty() const
     {
         return (mDirtyGeneration > mPreviousReportsBeginGeneration) || mFlags.Has(ReadHandlerFlags::ForceDirty);
@@ -349,7 +401,10 @@ private:
 
     auto GetTransactionStartGeneration() const { return mTransactionStartGeneration; }
 
-    void UnblockUrgentEventDelivery();
+    /// @brief Forces the read handler into a dirty state, regardless of what's going on with attributes.
+    /// This can lead to scheduling of a reporting run immediately, if the min interval has been reached,
+    /// or after the min interval is reached if it has not yet been reached.
+    void ForceDirtyState();
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
@@ -364,6 +419,7 @@ private:
 
     friend class TestReadInteraction;
     friend class chip::app::reporting::TestReportingEngine;
+    friend class chip::app::reporting::TestReportScheduler;
 
     //
     // The engine needs to be able to Abort/Close a ReadHandler instance upon completion of work for a given read/subscribe
@@ -373,10 +429,14 @@ private:
     friend class chip::app::reporting::Engine;
     friend class chip::app::InteractionModelEngine;
 
+    // The report scheduler needs to be able to access StateFlag private functions ShouldStartReporting(), CanStartReporting(),
+    // ForceDirtyState() and IsDirty() to know when to schedule a run so it is declared as a friend class.
+    friend class chip::app::reporting::ReportScheduler;
+
     enum class HandlerState : uint8_t
     {
         Idle,                   ///< The handler has been initialized and is ready
-        GeneratingReports,      ///< The handler has is now capable of generating reports and may generate one immediately
+        CanStartReporting,      ///< The handler has is now capable of generating reports and may generate one immediately
                                 ///< or later when other criteria are satisfied (e.g hold-off for min reporting interval).
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
         AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
@@ -396,9 +456,6 @@ private:
      */
     void Close(CloseOptions options = CloseOptions::kDropPersistedSubscription);
 
-    static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
-    static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
-    CHIP_ERROR RefreshSubscribeSyncTimer();
     CHIP_ERROR SendSubscribeResponse();
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
@@ -416,14 +473,16 @@ private:
 
     void PersistSubscription();
 
-    // Helpers for managing our state flags properly.
+    /// @brief Modifies a state flag in the read handler. If the read handler went from a
+    /// non-reportable state to a reportable state, schedules a reporting engine run.
+    /// @param aFlag Flag to set
+    /// @param aValue Flag new value
     void SetStateFlag(ReadHandlerFlags aFlag, bool aValue = true);
-    void ClearStateFlag(ReadHandlerFlags aFlag);
 
-    // Helpers for continuing the subscription resumption
-    static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                      const SessionHandle & sessionHandle);
-    static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+    /// @brief This function call SetStateFlag with the flag value set to false, thus possibly emitting a report
+    /// generation.
+    /// @param aFlag Flag to clear
+    void ClearStateFlag(ReadHandlerFlags aFlag);
 
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
 
@@ -436,7 +495,7 @@ private:
     // current generation when we started sending the last set reports that we completed.
     //
     // This allows us to reset the iterator to the beginning of the current
-    // cluster instead of the beginning of the whole report in SetDirty, without
+    // cluster instead of the beginning of the whole report in AttributePathIsDirty, without
     // permanently missing dirty any paths.
     uint64_t mDirtyGeneration = 0;
 
@@ -450,14 +509,14 @@ private:
     /*
      *           (mDirtyGeneration = b > a, this is a dirty read handler)
      *        +- Start Report -> mCurrentReportsBeginGeneration = c
-     *        |      +- SetDirty (Attribute Y) -> mDirtyGeneration = d
+     *        |      +- AttributePathIsDirty (Attribute Y) -> mDirtyGeneration = d
      *        |      |     +- Last Chunk -> mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration = c
      *        |      |     |   +- (mDirtyGeneration = d) > (mPreviousReportsBeginGeneration = c), this is a dirty read handler
      *        |      |     |   |  Attribute X has a dirty generation less than c, Attribute Y has a dirty generation larger than c
      *        |      |     |   |  So Y will be included in the report but X will not be inclued in this report.
      * -a--b--c------d-----e---f---> Generation
      *  |  |
-     *  |  +- SetDirty (Attribute X) (mDirtyGeneration = b)
+     *  |  +- AttributePathIsDirty (Attribute X) (mDirtyGeneration = b)
      *  +- mPreviousReportsBeginGeneration
      * For read handler, if mDirtyGeneration > mPreviousReportsBeginGeneration, then we regard it as a dirty read handler, and it
      * should generate report on timeout reached.
@@ -504,11 +563,8 @@ private:
     BitFlags<ReadHandlerFlags> mFlags;
     InteractionType mInteractionType = InteractionType::Read;
 
-#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    // Callbacks to handle server-initiated session success/failure
-    chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
-    chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-#endif
+    // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
+    Observer * mObserver = nullptr;
 };
 } // namespace app
 } // namespace chip

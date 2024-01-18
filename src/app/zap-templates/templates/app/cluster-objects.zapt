@@ -13,7 +13,6 @@
 #include <lib/core/ClusterEnums.h>
 #include <lib/support/BitMask.h>
 #include <protocols/interaction_model/Constants.h>
-#include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
@@ -101,7 +100,7 @@ public:
     {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
     {{/zcl_command_arguments}}
 
-    CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType =
     {{~#if responseName}}
@@ -189,7 +188,7 @@ public:
     }
     {{/if}}
 
-    CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType {

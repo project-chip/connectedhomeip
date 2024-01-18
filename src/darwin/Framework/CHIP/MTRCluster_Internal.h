@@ -17,22 +17,36 @@
 
 #import <Foundation/Foundation.h>
 
-#import "MTRBaseDevice.h"
-#import "MTRBaseDevice_Internal.h"
-#import "MTRCluster.h"
+#import <Matter/MTRBaseDevice.h>
+#import <Matter/MTRCluster.h>
+#import <Matter/MTRDevice.h>
 
-#import "zap-generated/CHIPClusters.h"
-#import "zap-generated/MTRBaseClusters.h"
+#import "MTRBaseDevice_Internal.h"
 
 #include <app/ReadPrepareParams.h>
+#include <lib/core/DataModelTypes.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRCluster ()
 @property (readonly, nonatomic) dispatch_queue_t callbackQueue;
-- (instancetype _Nullable)initWithQueue:(dispatch_queue_t)queue;
-- (chip::ByteSpan)asByteSpan:(NSData *)value;
-- (chip::CharSpan)asCharSpan:(NSString *)value;
+@property (nonatomic, readonly) chip::EndpointId endpoint;
+
+- (instancetype)initWithEndpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue;
+@end
+
+@interface MTRGenericBaseCluster ()
+- (instancetype)initWithDevice:(MTRBaseDevice *)device
+                    endpointID:(NSNumber *)endpointID
+                         queue:(dispatch_queue_t)queue;
+
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end
+
+@interface MTRGenericCluster ()
+- (instancetype)initWithDevice:(MTRDevice *)device
+                    endpointID:(NSNumber *)endpointID
+                         queue:(dispatch_queue_t)queue;
 @end
 
 @interface MTRReadParams ()

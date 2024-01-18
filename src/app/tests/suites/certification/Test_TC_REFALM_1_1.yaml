@@ -1,0 +1,116 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 223.1.1. [TC-REFALM-1.1] Global attributes with DUT as Server
+
+PICS:
+    - REFALM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Refrigerator Alarm"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0x0000,
+                      0x0002,
+                      0x0003,
+                      0xfff8,
+                      0xfff9,
+                      0xfffa,
+                      0xfffb,
+                      0xfffc,
+                      0xfffd,
+                  ]
+              excludes: [0x0001]
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains:
+                  [
+                      0x0000,
+                      0x0002,
+                      0x0003,
+                      0xfff8,
+                      0xfff9,
+                      0xfffb,
+                      0xfffc,
+                      0xfffd,
+                  ]
+              excludes: [0x0001]
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

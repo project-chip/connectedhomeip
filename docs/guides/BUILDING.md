@@ -31,12 +31,13 @@ To check out the Matter repository, run the following command:
 git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
 ```
 
-## Synchronizing submodules
+## Updating Matter code
 
-If you already have the Matter code checked out, run the following command to
-synchronize submodules:
+If you already have the Matter code checked out, run the following commands to
+update the repository and synchronize submodules:
 
 ```
+git pull
 git submodule update --init
 ```
 
@@ -57,7 +58,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 
 #### UI builds
 
-If building `-with-ui` variant, also install SDL2:
+If building via `build_examples.py` and `-with-ui` variant, also install SDL2:
 
 ```
 sudo apt-get install libsdl2-dev
@@ -169,8 +170,8 @@ The ZAP tool scripting uses the following detection, in order of importance:
     -   Use this if you are developing ZAP locally and would like to run ZAP
         with your changes.
 
--   `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip` or `zap-mac.zip` was
-    unpacked.
+-   `$ZAP_INSTALL_PATH` to point to where `zap-linux-x64.zip`,
+    `zap-linux-arm64.zip` or `zap-mac-x64.zip` was unpacked.
 
     -   This allows you to not need to place `zap` or `zap-cli` (or both) in
         `$PATH`.
@@ -250,6 +251,56 @@ ninja -C out/host src/inet/tests:tests_run
 > ```
 >
 > This means that the tests passed in a previous build.
+
+## Using `build_examples.py`
+
+The script `./scripts/build/build_examples.py` provides a uniform build
+interface into using `gn`, `cmake`, `ninja` and other tools as needed to compile
+various platforms.
+
+Use `./scripts/build/build_examples.py targets` to see a list of supported
+targets.
+
+Example build commands:
+
+```
+# Compiles and runs all tests on the host:
+./scripts/build/build_examples.py --target linux-x64-tests build
+
+# Compiles fuzzing tagets using libfuzzer (fuzzing requires clang)
+./scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
+
+# Compiles a esp32 example
+./scripts/build/build_examples.py --target esp32-m5stack-all-clusters build
+
+# Compiles a nrf example
+./scripts/build/build_examples.py --target nrf-nrf5340dk-pump build
+```
+
+### `libfuzzer` unit tests
+
+`libfuzzer` unit tests tests are only compiled but not executed (you have to
+manually execute them). For best error detection, some form of sanitizer like
+`asan` should be used.
+
+To compile, use:
+
+```
+./scripts/build/build_examples.py --target linux-x64-tests-clang-asan-libfuzzer build
+```
+
+After which tests should be located in
+`out/linux-x64-tests-clang-asan-libfuzzer/tests/`.
+
+#### `ossfuzz` configurations
+
+`ossfuzz` configurations are not stand-alone fuzzing and instead serve as an
+integration point with external fuzzing automated builds.
+
+They pick up environment variables such as `$CFLAGS`, `$CXXFLAGS` and
+`$LIB_FUZZING_ENGINE`.
+
+You likely want `libfuzzer` + `asan` builds instead for local testing.
 
 ## Build custom configuration
 

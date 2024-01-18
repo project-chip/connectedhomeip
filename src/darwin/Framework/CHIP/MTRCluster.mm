@@ -23,23 +23,41 @@
 using namespace ::chip;
 
 @implementation MTRCluster
-- (instancetype)initWithQueue:(dispatch_queue_t)queue
+- (instancetype)initWithEndpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue;
 {
     if (self = [super init]) {
+        // TODO consider range-checking the incoming number to make sure it's
+        // actually in the EndpointId range
+        _endpoint = endpointID.unsignedShortValue;
         _callbackQueue = queue;
     }
     return self;
 }
 
-- (chip::ByteSpan)asByteSpan:(NSData *)value
+@end
+
+@implementation MTRGenericBaseCluster
+
+- (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
-    return AsByteSpan(value);
+    if (self = [super initWithEndpointID:endpointID queue:queue]) {
+        _device = device;
+    }
+    return self;
 }
 
-- (chip::CharSpan)asCharSpan:(NSString *)value
+@end
+
+@implementation MTRGenericCluster
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
 {
-    return AsCharSpan(value);
+    if (self = [super initWithEndpointID:endpointID queue:queue]) {
+        _device = device;
+    }
+    return self;
 }
+
 @end
 
 @implementation MTRWriteParams

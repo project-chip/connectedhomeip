@@ -70,7 +70,7 @@ struct ValidationContext
                                                        validated certificate. */
     BitFlags<KeyPurposeFlags> mRequiredKeyPurposes; /**< Extended Key usage extensions that should be present
                                                        in the validated certificate. */
-    uint8_t mRequiredCertType;                      /**< Required certificate type. */
+    CertType mRequiredCertType;                     /**< Required certificate type. */
 
     CertificateValidityPolicy * mValidityPolicy =
         nullptr; /**< Optional application policy to apply for certificate validity period evaluation. */
@@ -246,14 +246,7 @@ public:
     CHIP_ERROR FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId, ValidationContext & context,
                              const ChipCertificateData ** certData);
 
-    /**
-     * @brief Verify CHIP certificate signature.
-     *
-     * @param cert    Pointer to the CHIP certificate which signature should be validated.
-     * @param caCert  Pointer to the CA certificate of the verified certificate.
-     *
-     * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
-     **/
+    // Deprecated, use the equivalent free function VerifyCertSignature()
     static CHIP_ERROR VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert);
 
 private:

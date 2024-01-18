@@ -29,7 +29,7 @@ public:
     virtual ~DeviceAttestationCredentialsProvider() = default;
 
     // Not copyable
-    DeviceAttestationCredentialsProvider(const DeviceAttestationCredentialsProvider &) = delete;
+    DeviceAttestationCredentialsProvider(const DeviceAttestationCredentialsProvider &)             = delete;
     DeviceAttestationCredentialsProvider & operator=(const DeviceAttestationCredentialsProvider &) = delete;
 
     /**

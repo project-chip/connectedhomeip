@@ -212,7 +212,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::MoreChunkedMessages(con
     return *this;
 }
 
-ReportDataMessage::Builder & ReportDataMessage::Builder::EndOfReportDataMessage()
+CHIP_ERROR ReportDataMessage::Builder::EndOfReportDataMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -222,7 +222,7 @@ ReportDataMessage::Builder & ReportDataMessage::Builder::EndOfReportDataMessage(
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

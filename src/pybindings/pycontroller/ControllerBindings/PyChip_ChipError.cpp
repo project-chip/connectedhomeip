@@ -59,9 +59,9 @@ void bind_PyChip_ChipError(std::function<pybind11::module &(std::string const & 
             .value("kBLE", chip::ChipError::SdkPart::kBLE)
             .value("kApplication", chip::ChipError::SdkPart::kApplication);
 
-        cl.def("__eq__", (bool (chip::ChipError::*)(const class chip::ChipError &) const) & chip::ChipError::operator==,
+        cl.def("__eq__", (bool(chip::ChipError::*)(const class chip::ChipError &) const) & chip::ChipError::operator==,
                "C++: chip::ChipError::operator==(const class chip::ChipError &) const --> bool", pybind11::arg("other"));
-        cl.def("__ne__", (bool (chip::ChipError::*)(const class chip::ChipError &) const) & chip::ChipError::operator!=,
+        cl.def("__ne__", (bool(chip::ChipError::*)(const class chip::ChipError &) const) & chip::ChipError::operator!=,
                "C++: chip::ChipError::operator!=(const class chip::ChipError &) const --> bool", pybind11::arg("other"));
         cl.def_static("IsSuccess", (bool (*)(unsigned int)) & chip::ChipError::IsSuccess,
                       "C++: chip::ChipError::IsSuccess(unsigned int) --> bool", pybind11::arg("error"));

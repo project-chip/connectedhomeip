@@ -27,5 +27,5 @@ void registerCommandsPayload(Commands & commands)
         make_unique<SetupPayloadParseCommand>(), //
     };
 
-    commands.Register(clusterName, clusterCommands);
+    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for parsing and generating setup payloads.");
 }

@@ -20,6 +20,8 @@
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
 
+#import <os/lock.h>
+
 @interface MTRErrorTests : XCTestCase
 
 @end
@@ -67,7 +69,7 @@
         return [error containsString:@".mm:"];
     }] anyObject];
     NSString * frameworkSource = [self sourceFileFromErrorString:frameworkError];
-    XCTAssertTrue([frameworkSource scriptingEndsWith:@".mm"]);
+    XCTAssertTrue([frameworkSource hasSuffix:@".mm"]);
     XCTAssertFalse([frameworkSource containsString:@"/"], @"frameworkSource: %@", frameworkSource);
 }
 

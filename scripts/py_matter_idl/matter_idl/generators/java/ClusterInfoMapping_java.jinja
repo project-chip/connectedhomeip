@@ -1,0 +1,472 @@
+{%- macro encode_value(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    @Nullable {{encode_value(source, encodable.without_nullable(), depth + 1)}}
+  {%- elif encodable.is_optional -%}
+    Optional<{{encode_value(source, encodable.without_optional(), depth + 1)}}>
+  {%- elif encodable.is_list -%}
+    ArrayList<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_remove_generic(source, encodable, depth) -%}
+  {%- if encodable.is_optional -%}
+    Optional
+  {%- elif encodable.is_list -%}
+    ArrayList
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_remove_generic_optional(source, encodable, depth) -%}
+  {%- if encodable.is_list -%}
+    ArrayList
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    @Nullable {{encode_value_without_optional(source, encodable.without_nullable(), depth + 1)}}
+  {%- elif encodable.is_list -%}
+    List<{{encode_value_without_optional(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_nullable_arraylist(source, encodable, depth) -%}
+{%- if encodable.is_optional -%}
+    Optional<{{encode_value_without_nullable_arraylist(source, encodable.without_optional(), depth + 1)}}>
+  {%- elif encodable.is_list -%}
+    ArrayList<{{encode_value_without_nullable_arraylist(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro encode_value_without_optional_nullable(source, encodable, depth) -%}
+  {%- if encodable.is_list -%}
+    List<{{encode_value_without_optional_nullable(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package chip.devicecontroller;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
+import chip.clusterinfo.ClusterInfo;
+import chip.clusterinfo.InteractionInfo;
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.DelegatedClusterCallback;
+import chip.clusterinfo.ClusterCommandCallback;
+import chip.clusterinfo.CommandResponseInfo;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import chip.devicecontroller.ClusterReadMapping;
+import chip.devicecontroller.ClusterWriteMapping;
+
+public class ClusterInfoMapping {
+
+  public static class DelegatedCharStringAttributeCallback implements ChipClusters.CharStringAttributeCallback, DelegatedClusterCallback {
+    /** Indicates a successful read for a CHAR_STRING attribute. */
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(String value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "String");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedOctetStringAttributeCallback implements ChipClusters.OctetStringAttributeCallback, DelegatedClusterCallback {
+    /** Indicates a successful read for an OCTET_STRING attribute. */
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(byte[] value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "byte[]");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedIntegerAttributeCallback implements ChipClusters.IntegerAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(int value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "int");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedLongAttributeCallback implements ChipClusters.LongAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "long");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedBooleanAttributeCallback implements ChipClusters.BooleanAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(boolean value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "boolean");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedFloatAttributeCallback implements ChipClusters.FloatAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "float");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoubleAttributeCallback implements ChipClusters.DoubleAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(double value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "double");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    // Parameters and list-adds here should be generated - refer to the template code that creates each callback interface.
+    @Override
+    public void onSuccess() {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception e) {
+      callback.onFailure(e);
+    }
+  }
+{% for cluster in clientClusters | sort(attribute='code') -%}
+{%- set typeLookup = idl | createLookupContext(cluster) -%}
+{%- set already_handled_command = [] -%}
+{% for command in cluster.commands | sort(attribute='code') -%}
+{% if command | isCommandNotDefaultCallback() -%}
+{% set callbackName = command | javaCommandCallbackName() -%}
+{%- if callbackName not in already_handled_command %}
+
+  public static class Delegated{{cluster.name}}Cluster{{callbackName}}Callback implements ChipClusters.{{cluster.name}}Cluster.{{callbackName}}Callback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+{%- for field in (cluster.structs | named(command.output_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) -%}
+      {{encode_value(cluster, encodable, 0)}} {{field.name}}
+      {%- if loop.index0 < loop.length - 1 -%}{{", "}}{%- endif -%}
+{%- endfor -%}) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+{% for field in (cluster.structs | named(command.output_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) -%}
+{% if encodable.is_list %}
+      // {{field.name}}: {{encodable.data_type.name}}
+      // Conversion from this type to Java is not properly implemented yet
+{% else -%}
+{%- if encodable.is_struct -%}
+{%- set struct = encodable.get_underlying_struct() %}
+      // {{field.name}}: Struct {{struct.name}}
+      // Conversion from this type to Java is not properly implemented yet
+{%- else %}
+      CommandResponseInfo {{field.name}}ResponseValue = new CommandResponseInfo("{{field.name}}", "{{encode_value_without_nullable_arraylist(cluster, encodable, 0)}}");
+      responseValues.put({{field.name}}ResponseValue, {{field.name}});
+{%- endif -%}
+{%- endif -%}
+{% endfor %}
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+{%- if already_handled_command.append(callbackName) -%}
+{# This block does nothing, it only exists to append to already_handled_command. #}
+{%- endif -%}
+{%- endif -%}
+{%- endif -%}
+{% endfor %}
+
+{%- set already_handled_attribute = [] -%}
+{%- for attribute in cluster.attributes | rejectattr('definition', 'is_field_global_name', typeLookup) -%}
+{%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
+{%- set encodable2 = attribute.definition | asEncodable(typeLookup) -%}
+{%- set encodable_check = attribute.definition | asEncodable(typeLookup) -%}
+{%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
+{%- if interfaceName not in already_handled_attribute %}
+  public static class Delegated{{cluster.name}}Cluster{{attribute.definition.name | upfirst}}AttributeCallback implements ChipClusters.{{cluster.name}}Cluster.{{attribute.definition.name | upfirst}}AttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    {# NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to false. -#}
+    @Override
+    public void onSuccess({{encode_value_without_optional(cluster, encodable, 0)}} {% if encodable_check.is_list -%}valueList{%- else -%}value{%- endif -%}) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("{%- if encodable_check.is_list -%}valueList{%- else -%}value{%- endif -%}", "{{encode_value_without_optional_nullable(cluster, encodable2, 0)}}");
+      responseValues.put(commandResponseInfo, {% if encodable_check.is_list -%}valueList{%- else -%}value{%- endif -%});
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+{% if already_handled_attribute.append(interfaceName) -%}
+{# This block does nothing, it only exists to append to already_handled_attribute. #}
+{%- endif -%}
+{%- endif -%}
+{%- endfor -%}
+{%- endfor %}
+
+  public Map<String, ClusterInfo> getClusterMap() {
+    Map<String, ClusterInfo> clusterMap = initializeClusterMap();
+    Map<String, Map<String, InteractionInfo>> commandMap = getCommandMap();
+    combineCommand(clusterMap, commandMap);
+    Map<String, Map<String, InteractionInfo>> readAttributeMap = new ClusterReadMapping().getReadAttributeMap();
+    combineCommand(clusterMap, readAttributeMap);
+    Map<String, Map<String, InteractionInfo>> writeAttributeMap = new ClusterWriteMapping().getWriteAttributeMap();
+    combineCommand(clusterMap, writeAttributeMap);
+    return clusterMap;
+ }
+
+  public Map<String, ClusterInfo> initializeClusterMap() {
+    Map<String, ClusterInfo> clusterMap = new HashMap<>();
+{% for cluster in clientClusters | sort(attribute='code') %}
+    ClusterInfo {{cluster.name | lowfirst}}ClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.{{cluster.name}}Cluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("{{cluster.name | lowfirst}}", {{cluster.name | lowfirst}}ClusterInfo);
+{% endfor %}
+    return clusterMap;
+  }
+
+  public void combineCommand(Map<String, ClusterInfo> destination, Map<String, Map<String, InteractionInfo>> source) {
+{%- for cluster in clientClusters | sort(attribute='code') %}
+    destination.get("{{cluster.name | lowfirst}}").combineCommands(source.get("{{cluster.name | lowfirst}}"));
+{%- endfor %}
+  }
+
+ @SuppressWarnings("unchecked")
+  public Map<String, Map<String, InteractionInfo>> getCommandMap() {
+    Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
+{% for cluster in clientClusters | sort(attribute='code') -%}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+    Map<String, InteractionInfo> {{cluster.name | lowfirst}}ClusterInteractionInfoMap = new LinkedHashMap<>();
+{% for command in cluster.commands | sort(attribute='code') -%}
+{%- set callbackName = command | javaCommandCallbackName() %}
+    Map<String, CommandParameterInfo> {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    {#- TODO: fill out parameter types -#}
+{%- if command.input_param -%}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+{% if not encodable.is_struct %}
+    CommandParameterInfo {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}{{field.name | lowfirst_except_acronym}}CommandParameterInfo = new CommandParameterInfo("{{field.name | lowfirst_except_acronym}}", {{encode_value_remove_generic(cluster, encodable, 0)}}.class, {{encode_value_remove_generic_optional(cluster, encodable, 0)}}.class);
+    {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}CommandParams.put("{{field.name | lowfirst_except_acronym}}",{{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}{{field.name | lowfirst_except_acronym}}CommandParameterInfo);
+{%- endif -%}
+{% endfor -%}
+{%- endif -%}
+
+{% if command | isCommandNotDefaultCallback() %}
+    InteractionInfo {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}InteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.{{cluster.name}}Cluster) cluster)
+          .{{command.name | lowfirst_except_acronym}}((ChipClusters.{{cluster.name}}Cluster.{{callbackName}}Callback) callback
+{%- if command.input_param -%}
+{% for field in (cluster.structs | named(command.input_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+           , ({{encode_value_without_nullable_arraylist(cluster, encodable, 0)}})
+             commandArguments.get("{{field.name | lowfirst_except_acronym}}")
+{% endfor -%}
+{%- endif %}
+            {# TODO: Allow timeout to be passed from client for this and timed write. -#}
+            {%- if command.is_timed_invoke -%}, 10000{%- endif -%}
+          );
+        },
+        () -> new Delegated{{cluster.name}}Cluster{{callbackName}}Callback(),
+        {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}CommandParams
+      );
+{%- else %}
+    InteractionInfo {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}InteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.{{cluster.name}}Cluster) cluster)
+        .{{command.name | lowfirst_except_acronym}}((DefaultClusterCallback) callback
+{%- if command.input_param %}
+{%- for field in (cluster.structs | named(command.input_param)).fields -%}
+{%- set encodable = field | asEncodable(typeLookup) %}
+        , ({{encode_value_without_nullable_arraylist(cluster, encodable, 0)}})
+        commandArguments.get("{{field.name | lowfirst_except_acronym}}")
+{%- endfor -%}
+{%- endif -%}
+        {#- TODO: Allow timeout to be passed from client for this and timed write. -#}
+        {% if command.is_timed_invoke %}, 10000{%- endif %}
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}CommandParams
+    );
+{%- endif %}
+    {{cluster.name | lowfirst}}ClusterInteractionInfoMap.put("{{command.name | lowfirst_except_acronym}}", {{cluster.name | lowfirst}}{{command.name | lowfirst_except_acronym}}InteractionInfo);
+{% endfor %}
+    commandMap.put("{{cluster.name | lowfirst}}", {{cluster.name | lowfirst}}ClusterInteractionInfoMap);
+{% endfor %}
+    return commandMap;
+  }
+}

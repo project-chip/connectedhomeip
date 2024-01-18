@@ -22,7 +22,8 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues-building)
+    -   [Overwrite board config files](#overwrite-board-config-files)
+    -   [Known issues building](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
@@ -35,7 +36,7 @@ network.
     -   [Building steps](#building-steps-1)
 -   [Low power](#low-power)
 
-    -   [Known issues](#known-issues-low-power)
+    -   [Known issues low power](#known-issues-low-power)
 
     </hr>
 
@@ -172,40 +173,71 @@ will be initiated.
 In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
--   Download
-    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
+Activate the Matter environment:
 
--   Start building the application either with Secure Element or without
-
-    -   without Secure Element
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
-user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+```bash
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
-user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-    -   with Secure element
-        Exactly the same steps as above but set chip_with_se05x=1 in the gn command.
+To bring the SDK in the environment, the user can:
+
+-   download it with west tool, in which case it will be handled automatically
+    by gn:
+
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west init -l manifest --mf west.yml
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west update
+    ```
+
+    In case there are local modification to the already installed github NXP
+    SDK, use the below `west forall` command instead of the `west init` command
+    to reset the west workspace. Warning: all local changes will be lost after
+    running this command.
+
+    ```bash
+    user@ubuntu:~/Desktop/git/connectedhomeip$ cd third_party/nxp/k32w0_sdk/repo
+    user@ubuntu:~/Desktop/git/connectedhomeip/third_party/nxp/k32w0_sdk/repo$ west forall -c "git reset --hard && git clean -xdf" -a
+    ```
+
+-   set up a custom path to the SDK, in which case
+    `k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\"` must be added to the `gn gen`
+    command:
+
+    ```
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/custom/path/to/SDK
+    ```
+
+Start building the application:
+
+```bash
+user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
+```
+
+To build with Secure Element, follow the same steps as above but set
+`chip_with_se05x=1` in the `gn gen` command.
+
+-   K32W041AM flavor
+
+    Exactly the same steps as above but set argument `build_for_k32w041am=1` in
+    the gn command.
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
-build argument (chip_with_OM15082) inside the gn build instruction should be set
-to zero. The argument chip_with_OM15082 is set to zero by default.
+build argument (`chip_with_OM15082`) inside the gn build instruction should be
+set to zero. The argument `chip_with_OM15082` is set to zero by default.
 
-In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
+In case that Openthread CLI is needed, `chip_with_ot_cli` build argument must be
 set to 1.
 
 In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
-running oscillator as a clock source. In this case one must set the use_fro_32k
-argument to 1.
+running oscillator as a clock source. In this case one must set the
+`use_fro_32k` argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-install the recommanded packages (python version > 3, pip3, pycrypto,
-pycryptodome):
+(run automatically) install the recommanded packages (python version > 3, pip3,
+pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -219,15 +251,47 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
+### Overwrite board config files
+
+The example uses template/reference board configuration files.
+
+To overwrite the board configuration files, set `override_is_DK6=false` in the
+`k32w0_sdk` target from the app `BUILD.gn`:
+
+```
+k32w0_sdk("sdk") {
+    override_is_DK6 = false
+    ...
+}
+```
+
+This variable will be used by `k32w0_sdk.gni` to overwrite `chip_with_DK6`
+option, thus the reference board configuration files will no longer be used.
+
 ## Known issues building
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
 
+## Rotating device id
+
+This is an optional feature and can be used in multiple ways (please see section
+5.4.2.4.5 from Matter specification). One use case is Amazon Frustration Free
+Setup, which leverages the C3 Characteristic (Additional commissioning-related
+data) to offer an easier way to set up the device. The rotating device id will
+be encoded in this additional data and is programmed to rotate at pre-defined
+moments. The algorithm uses a unique per-device identifier that must be
+programmed during factory provisioning.
+
+Please use the following build args:
+
+-   `chip_enable_rotating_device_id=1` - to enable rotating device id.
+-   `chip_enable_additional_data_advertising=1` - to enable C3 characteristic.
+
 ## Manufacturing data
 
 See
-[Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+[Guide for writing manufacturing data on NXP devices](../../../../../docs/guides/nxp_manufacturing_flow.md).
 
 There are factory data generated binaries available in
 examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
@@ -246,7 +310,7 @@ CHIPProjectConfig.h.
 
 Regarding factory data provider, there are two options:
 
--   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+-   use the default factory data provider: `FactoryDataProviderImpl` by setting
     `chip_with_factory_data=1` in the gn build command.
 -   use a custom factory data provider: please see
     [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).

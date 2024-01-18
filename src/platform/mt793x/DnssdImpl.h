@@ -52,7 +52,7 @@ struct RegisterContext;
 class MdnsContexts
 {
 public:
-    MdnsContexts(const MdnsContexts &) = delete;
+    MdnsContexts(const MdnsContexts &)             = delete;
     MdnsContexts & operator=(const MdnsContexts &) = delete;
     ~MdnsContexts();
     static MdnsContexts & GetInstance() { return sInstance; }

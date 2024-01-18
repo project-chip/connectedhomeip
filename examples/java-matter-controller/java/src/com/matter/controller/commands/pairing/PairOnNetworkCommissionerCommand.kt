@@ -21,14 +21,16 @@ import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairOnNetworkCommissionerCommand(
-  controller: ChipDeviceController, credsIssue: CredentialsIssuer?
-) : PairingCommand(
-  controller,
-  "onnetwork-commissioner",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.COMMISSIONER
-) {
+  controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-commissioner",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.COMMISSIONER
+  ) {
   override fun runCommand() {}
 }

@@ -106,7 +106,7 @@ void CurrentFabricRemover::OnSuccessReadCurrentFabricIndex(void * context, Fabri
     self->mFabricIndex = fabricIndex;
     self->mNextStep    = Step::kSendRemoveFabric;
     CHIP_ERROR err     = self->mController->GetConnectedDevice(self->mRemoteNodeId, &self->mOnDeviceConnectedCallback,
-                                                           &self->mOnDeviceConnectionFailureCallback);
+                                                               &self->mOnDeviceConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         FinishRemoveCurrentFabric(context, err);

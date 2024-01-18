@@ -880,7 +880,7 @@ int TestPersistentStorageOpCertStore()
 {
     nlTestSuite theSuite = { "PersistentStorageOpCertStore tests", &sTests[0], Test_Setup, Test_Teardown };
 
-    // Run test suite againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

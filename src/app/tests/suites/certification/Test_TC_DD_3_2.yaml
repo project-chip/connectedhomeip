@@ -31,19 +31,18 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner and Commissionee discover each other and connect via the
-          discovery mode applicable for the DUT."
+          "Step 1: Commissioner and Commissionee discover each other and connect
+          via the discovery mode applicable for the DUT."
       verification: |
           Verify in DUT(ALL-CLUSTER-APP) start BLE Advertising by specific DUT implementation
 
           Verify in TH (CHIP-TOOL) start commissioning process(need to obtain the Thread dataset first)
 
           ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300000f35060004001fffe0020811111111222222220708fd27e57b1b1e22d9051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f01021234041061e1206d2c2b46e079eb775f41fc72190c0402a0fff8 20202021 3840
-          ,,
       disabled: true
 
     - label:
-          "Establish encryption keys with Password Authenticated Session
+          "Step 2: Establish encryption keys with Password Authenticated Session
           Establishment on the commissioning channel"
       verification: |
           Verify in TH(CHIP-TOOL)
@@ -52,8 +51,9 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL re-arm Fail-safe timer on Commissionee within 60s
-          (the autonomously Fail-safe timer length set by Commissionee)"
+          "Step 3: Commissioner SHALL re-arm Fail-safe timer on Commissionee
+          within 60s (the autonomously Fail-safe timer length set by
+          Commissionee)"
       verification: |
           Verify in TH(CHIP-TOOL)
 
@@ -61,7 +61,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner SHALL configure regulatory information in the
+          "Step 4: Commissioner SHALL configure regulatory information in the
           Commissionee."
       PICS: MCORE.COM.WIRELESS
       verification: |
@@ -71,7 +71,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner requests operational CSR from Commissionee with
+          "Step 5: Commissioner requests operational CSR from Commissionee with
           OperationalCSRRequest command"
       verification: |
           Verify in TH(CHIP-TOOL)
@@ -135,7 +135,7 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational credentials on DUT if not
+          "Step 6: Commissioner configures operational credentials on DUT if not
           previously installed"
       verification: |
           Verify in TH(CHIP-TOOL)
@@ -189,8 +189,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures itself as administrator in ACL on DUT if
-          needed"
+          "Step 7: Commissioner configures itself as administrator in ACL on DUT
+          if needed"
       verification: |
           Verify in TH(CHIP-TOOL)
 
@@ -245,8 +245,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner configures operational network on DUT if DUT both
-          supports and requires"
+          "Step 8: Commissioner configures operational network on DUT if DUT
+          both supports and requires"
       verification: |
           Verify in TH(CHIP-TOOL)
 
@@ -297,8 +297,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner instructs Commissionee to connect to operational network
-          if not already connected"
+          "Step 9: Commissioner instructs Commissionee to connect to operational
+          network if not already connected"
       verification: |
           Verify in TH(CHIP-TOOL)
 
@@ -350,13 +350,15 @@ tests:
       disabled: true
 
     - label:
-          "Commissioning channel between the Commissioner and Commissionee is
-          terminated."
+          "Step 10: Commissioning channel between the Commissioner and
+          Commissionee is terminated."
       verification: |
           1. Terminate the connection between the Commissionee and the Commissioner. (i.e. remove network access or terminate commissioning process)
       disabled: true
 
-    - label: "Commissioner starts discovery of DUT using Operational Discovery"
+    - label:
+          "Step 11: Commissioner starts discovery of DUT using Operational
+          Discovery"
       verification: |
           Verify in TH(CHIP-TOOL)
 
@@ -367,7 +369,8 @@ tests:
       disabled: true
 
     - label:
-          "Commissioner opens a CASE session with DUT over operational network"
+          "Step 12: Commissioner opens a CASE session with DUT over operational
+          network"
       verification: |
           Verify in TH(CHIP-TOOL)
 
@@ -406,7 +409,7 @@ tests:
           CHIP:IN: New secure session created for device 0x0000000000000001, LSID:2 PSID:2!
       disabled: true
 
-    - label: "Commissioner sends CommissioningComplete command"
+    - label: "Step 13: Commissioner sends CommissioningComplete command"
       verification: |
           Verify in TH(CHIP-TOOL)
 

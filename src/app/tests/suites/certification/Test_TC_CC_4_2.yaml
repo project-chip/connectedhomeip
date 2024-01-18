@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,21 +31,21 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH writes 0 to the Options attribute"
+    - label: "Step 1a: TH writes 0 to the Options attribute"
       PICS: CC.S.F00 && CC.S.A000f
       command: "writeAttribute"
       attribute: "Options"
       arguments:
           value: 0
 
-    - label: "TH sends On command to DUT"
+    - label: "Step 1b: TH sends On command to DUT"
       PICS: OO.S.C01.Rsp
       cluster: "On/Off"
       command: "On"
 
     - label:
-          "TH sends MoveToSaturation command to DUT with Saturation=150 and
-          TransitionTime=0 (immediately)"
+          "Step 2a: TH sends MoveToSaturation command to DUT with Saturation=150
+          and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C03.Rsp
       command: "MoveToSaturation"
       arguments:
@@ -69,8 +69,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveSaturation command to DUT with MoveMode=0x01 (up) and
-          Rate=5 (units/s)"
+          "Step 2b: TH sends MoveSaturation command to DUT with MoveMode=0x01
+          (up) and Rate=5 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
@@ -93,7 +93,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 2c: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -111,7 +111,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 2d: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -129,7 +129,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 2e: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -139,8 +139,8 @@ tests:
               maxValue: 254
 
     - label:
-          "TH sends MoveToSaturation command to DUT with Saturation=120 and
-          TransitionTime=0 (immediately)"
+          "Step 3a: TH sends MoveToSaturation command to DUT with Saturation=120
+          and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C03.Rsp
       command: "MoveToSaturation"
       arguments:
@@ -164,8 +164,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveSaturation command to DUT with MoveMode=0x03 (down) and
-          Rate=5 (units/s)"
+          "Step 3b: TH sends MoveSaturation command to DUT with MoveMode=0x03
+          (down) and Rate=5 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
@@ -188,7 +188,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 3c: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -208,7 +208,7 @@ tests:
 
     #Tolerance to be computed from the range
     #Start value 120, expected value 20, 120 - 20 = 100, 100 % 15 = 15 , So 20+/-15
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 3d: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -226,7 +226,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 3e: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -236,8 +236,8 @@ tests:
               maxValue: 10
 
     - label:
-          "TH sends MoveToSaturation command to DUT with Saturation=150 and
-          TransitionTime=0 (immediately)"
+          "Step 4a: TH sends MoveToSaturation command to DUT with Saturation=150
+          and TransitionTime=0 (immediately)"
       PICS: CC.S.F00 && CC.S.C03.Rsp
       command: "MoveToSaturation"
       arguments:
@@ -261,8 +261,8 @@ tests:
                 value: 100
 
     - label:
-          "TH sends MoveSaturation command to DUT with MoveMode=0x01 (up) and
-          Rate=5 (units/s)"
+          "Step 4b: TH sends MoveSaturation command to DUT with MoveMode=0x01
+          (up) and Rate=5 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
@@ -285,7 +285,7 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 4c: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -295,8 +295,8 @@ tests:
               maxValue: 230
 
     - label:
-          "TH sends MoveSaturation command to DUT with MoveMode=0x00 (stop) and
-          Rate=5 (units/s)"
+          "Step 4d: TH sends MoveSaturation command to DUT with MoveMode=0x00
+          (stop) and Rate=5 (units/s)"
       command: "MoveSaturation"
       PICS: CC.S.F00 && CC.S.C04.Rsp
       arguments:
@@ -310,7 +310,7 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 4e: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -328,7 +328,7 @@ tests:
               - name: "ms"
                 value: 2000
 
-    - label: "TH reads CurrentSaturation attribute from DUT"
+    - label: "Step 4f: TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
@@ -337,7 +337,7 @@ tests:
               minValue: 170
               maxValue: 230
 
-    - label: "TH reads ColorMode attribute from DUT"
+    - label: "Step 5a: TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008
       command: "readAttribute"
       attribute: "ColorMode"
@@ -347,7 +347,7 @@ tests:
               minValue: 0
               maxValue: 2
 
-    - label: "TH reads EnhancedColorMode attribute from DUT"
+    - label: "Step 5b: TH reads EnhancedColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A4001
       command: "readAttribute"
       attribute: "EnhancedColorMode"

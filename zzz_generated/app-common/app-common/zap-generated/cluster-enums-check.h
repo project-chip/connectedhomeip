@@ -24,105 +24,77 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyEffectIdentifier val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectIdentifierEnum val)
 {
-    using EnumType = Identify::IdentifyEffectIdentifier;
+    using EnumType = Identify::EffectIdentifierEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kBlink:
     case EnumType::kBreathe:
     case EnumType::kOkay:
     case EnumType::kChannelChange:
     case EnumType::kFinishEffect:
     case EnumType::kStopEffect:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyEffectVariant val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::EffectVariantEnum val)
 {
-    using EnumType = Identify::IdentifyEffectVariant;
+    using EnumType = Identify::EffectVariantEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDefault:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_IDENTIFY_EFFECT_VARIANT_DEFAULT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(1);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyIdentifyType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyTypeEnum val)
 {
-    using EnumType = Identify::IdentifyIdentifyType;
+    using EnumType = Identify::IdentifyTypeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kNone:
-    case EnumType::kVisibleLight:
-    case EnumType::kVisibleLED:
+    case EnumType::kLightOutput:
+    case EnumType::kVisibleIndicator:
     case EnumType::kAudibleBeep:
     case EnumType::kDisplay:
     case EnumType::kActuator:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LIGHT:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_AUDIBLE_BEEP:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_DISPLAY:
-    case EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_ACTUATOR:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(6);
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDelayedAllOffEffectVariant val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::DelayedAllOffEffectVariantEnum val)
 {
-    using EnumType = OnOff::OnOffDelayedAllOffEffectVariant;
+    using EnumType = OnOff::DelayedAllOffEffectVariantEnum;
     switch (val)
     {
-    case EnumType::kFadeToOffIn0p8Seconds:
+    case EnumType::kDelayedOffFastFade:
     case EnumType::kNoFade:
-    case EnumType::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds:
+    case EnumType::kDelayedOffSlowFade:
         return val;
     default:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDyingLightEffectVariant val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::DyingLightEffectVariantEnum val)
 {
-    using EnumType = OnOff::OnOffDyingLightEffectVariant;
+    using EnumType = OnOff::DyingLightEffectVariantEnum;
     switch (val)
     {
-    case EnumType::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second:
+    case EnumType::kDyingLightFadeOff:
         return val;
     default:
         return static_cast<EnumType>(1);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffEffectIdentifier val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::EffectIdentifierEnum val)
 {
-    using EnumType = OnOff::OnOffEffectIdentifier;
+    using EnumType = OnOff::EffectIdentifierEnum;
     switch (val)
     {
     case EnumType::kDelayedAllOff:
@@ -132,53 +104,39 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffEffectIdent
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffStartUpOnOff val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::StartUpOnOffEnum val)
 {
-    using EnumType = OnOff::OnOffStartUpOnOff;
+    using EnumType = OnOff::StartUpOnOffEnum;
     switch (val)
     {
     case EnumType::kOff:
     case EnumType::kOn:
-    case EnumType::kTogglePreviousOnOff:
+    case EnumType::kToggle:
         return val;
     default:
         return static_cast<EnumType>(3);
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::MoveModeEnum val)
 {
-    using EnumType = LevelControl::MoveMode;
+    using EnumType = LevelControl::MoveModeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_MOVE_MODE_UP:
-    case EMBER_ZCL_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(LevelControl::StepModeEnum val)
 {
-    using EnumType = LevelControl::StepMode;
+    using EnumType = LevelControl::StepModeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_STEP_MODE_UP:
-    case EMBER_ZCL_STEP_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -284,9 +242,57 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::EndpointListTy
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTAApplyUpdateAction val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::ColorEnum val)
 {
-    using EnumType = OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
+    using EnumType = BasicInformation::ColorEnum;
+    switch (val)
+    {
+    case EnumType::kBlack:
+    case EnumType::kNavy:
+    case EnumType::kGreen:
+    case EnumType::kTeal:
+    case EnumType::kMaroon:
+    case EnumType::kPurple:
+    case EnumType::kOlive:
+    case EnumType::kGray:
+    case EnumType::kBlue:
+    case EnumType::kLime:
+    case EnumType::kAqua:
+    case EnumType::kRed:
+    case EnumType::kFuchsia:
+    case EnumType::kYellow:
+    case EnumType::kWhite:
+    case EnumType::kNickel:
+    case EnumType::kChrome:
+    case EnumType::kBrass:
+    case EnumType::kCopper:
+    case EnumType::kSilver:
+    case EnumType::kGold:
+        return val;
+    default:
+        return static_cast<EnumType>(21);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::ProductFinishEnum val)
+{
+    using EnumType = BasicInformation::ProductFinishEnum;
+    switch (val)
+    {
+    case EnumType::kOther:
+    case EnumType::kMatte:
+    case EnumType::kSatin:
+    case EnumType::kPolished:
+    case EnumType::kRugged:
+    case EnumType::kFabric:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::ApplyUpdateActionEnum val)
+{
+    using EnumType = OtaSoftwareUpdateProvider::ApplyUpdateActionEnum;
     switch (val)
     {
     case EnumType::kProceed:
@@ -297,9 +303,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvid
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTADownloadProtocol val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::DownloadProtocolEnum val)
 {
-    using EnumType = OtaSoftwareUpdateProvider::OTADownloadProtocol;
+    using EnumType = OtaSoftwareUpdateProvider::DownloadProtocolEnum;
     switch (val)
     {
     case EnumType::kBDXSynchronous:
@@ -311,9 +317,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvid
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTAQueryStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::StatusEnum val)
 {
-    using EnumType = OtaSoftwareUpdateProvider::OTAQueryStatus;
+    using EnumType = OtaSoftwareUpdateProvider::StatusEnum;
     switch (val)
     {
     case EnumType::kUpdateAvailable:
@@ -326,9 +332,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvid
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::OTAAnnouncementReason val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::AnnouncementReasonEnum val)
 {
-    using EnumType = OtaSoftwareUpdateRequestor::OTAAnnouncementReason;
+    using EnumType = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum;
     switch (val)
     {
     case EnumType::kSimpleAnnouncement:
@@ -339,9 +345,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateReques
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::OTAChangeReasonEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::ChangeReasonEnum val)
 {
-    using EnumType = OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
+    using EnumType = OtaSoftwareUpdateRequestor::ChangeReasonEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -354,9 +360,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateReques
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::OTAUpdateStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::UpdateStateEnum val)
 {
-    using EnumType = OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using EnumType = OtaSoftwareUpdateRequestor::UpdateStateEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -391,6 +397,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     case EnumType::kKorean:
     case EnumType::kPersian:
     case EnumType::kTaiwanese:
+    case EnumType::kUseActiveLocale:
         return val;
     default:
         return static_cast<EnumType>(12);
@@ -403,6 +410,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     {
     case EnumType::k12hr:
     case EnumType::k24hr:
+    case EnumType::kUseActiveLocale:
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -672,9 +680,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredFault
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningError val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::CommissioningErrorEnum val)
 {
-    using EnumType = GeneralCommissioning::CommissioningError;
+    using EnumType = GeneralCommissioning::CommissioningErrorEnum;
     switch (val)
     {
     case EnumType::kOk:
@@ -687,9 +695,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::C
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::RegulatoryLocationTypeEnum val)
 {
-    using EnumType = GeneralCommissioning::RegulatoryLocationType;
+    using EnumType = GeneralCommissioning::RegulatoryLocationTypeEnum;
     switch (val)
     {
     case EnumType::kIndoor:
@@ -701,9 +709,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralCommissioning::R
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::NetworkCommissioningStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::NetworkCommissioningStatusEnum val)
 {
-    using EnumType = NetworkCommissioning::NetworkCommissioningStatus;
+    using EnumType = NetworkCommissioning::NetworkCommissioningStatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -724,9 +732,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::N
         return static_cast<EnumType>(13);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::WiFiBand val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::WiFiBandEnum val)
 {
-    using EnumType = NetworkCommissioning::WiFiBand;
+    using EnumType = NetworkCommissioning::WiFiBandEnum;
     switch (val)
     {
     case EnumType::k2g4:
@@ -734,9 +742,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(NetworkCommissioning::W
     case EnumType::k5g:
     case EnumType::k6g:
     case EnumType::k60g:
+    case EnumType::k1g:
         return val;
     default:
-        return static_cast<EnumType>(5);
+        return static_cast<EnumType>(6);
     }
 }
 
@@ -824,21 +833,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Int
     using EnumType = GeneralDiagnostics::InterfaceTypeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kWiFi:
     case EnumType::kEthernet:
     case EnumType::kCellular:
     case EnumType::kThread:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(5);
@@ -849,19 +848,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Net
     using EnumType = GeneralDiagnostics::NetworkFaultEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kHardwareFailure:
     case EnumType::kNetworkJammed:
     case EnumType::kConnectionFailed:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_NETWORK_FAULT_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE:
-    case EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED:
-    case EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(4);
@@ -872,9 +862,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     using EnumType = GeneralDiagnostics::RadioFaultEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kWiFiFault:
     case EnumType::kCellularFault:
@@ -882,15 +869,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     case EnumType::kNFCFault:
     case EnumType::kBLEFault:
     case EnumType::kEthernetFault:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_RADIO_FAULT_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(7);
@@ -909,9 +887,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostic
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::NetworkFault val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::NetworkFaultEnum val)
 {
-    using EnumType = ThreadNetworkDiagnostics::NetworkFault;
+    using EnumType = ThreadNetworkDiagnostics::NetworkFaultEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -923,14 +901,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostic
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::RoutingRole val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostics::RoutingRoleEnum val)
 {
-    using EnumType = ThreadNetworkDiagnostics::RoutingRole;
+    using EnumType = ThreadNetworkDiagnostics::RoutingRoleEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kUnassigned:
     case EnumType::kSleepyEndDevice:
@@ -938,15 +913,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostic
     case EnumType::kReed:
     case EnumType::kRouter:
     case EnumType::kLeader:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ROUTING_ROLE_UNSPECIFIED:
-    case EMBER_ZCL_ROUTING_ROLE_UNASSIGNED:
-    case EMBER_ZCL_ROUTING_ROLE_SLEEPY_END_DEVICE:
-    case EMBER_ZCL_ROUTING_ROLE_END_DEVICE:
-    case EMBER_ZCL_ROUTING_ROLE_REED:
-    case EMBER_ZCL_ROUTING_ROLE_ROUTER:
-    case EMBER_ZCL_ROUTING_ROLE_LEADER:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(7);
@@ -1006,9 +972,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
     case EnumType::kN:
     case EnumType::kAc:
     case EnumType::kAx:
+    case EnumType::kAh:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(7);
     }
 }
 
@@ -1017,9 +984,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     using EnumType = EthernetNetworkDiagnostics::PHYRateEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kRate10M:
     case EnumType::kRate100M:
     case EnumType::kRate1G:
@@ -1030,18 +994,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(EthernetNetworkDiagnost
     case EnumType::kRate100G:
     case EnumType::kRate200G:
     case EnumType::kRate400G:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_M:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE1_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE2_5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE5_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE10_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE40_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE100_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE200_G:
-    case EMBER_ZCL_PHY_RATE_ENUM_RATE400_G:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(10);
@@ -1063,6 +1015,17 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::Gr
         return static_cast<EnumType>(5);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::StatusCode val)
+{
+    using EnumType = TimeSynchronization::StatusCode;
+    switch (val)
+    {
+    case EnumType::kTimeNotAccepted:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::TimeSourceEnum val)
 {
     using EnumType = TimeSynchronization::TimeSourceEnum;
@@ -1072,22 +1035,83 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::Ti
     case EnumType::kUnknown:
     case EnumType::kAdmin:
     case EnumType::kNodeTimeCluster:
-    case EnumType::kNonFabricSntp:
-    case EnumType::kNonFabricNtp:
-    case EnumType::kFabricSntp:
-    case EnumType::kFabricNtp:
-    case EnumType::kMixedNtp:
-    case EnumType::kNonFabricSntpNts:
-    case EnumType::kNonFabricNtpNts:
-    case EnumType::kFabricSntpNts:
-    case EnumType::kFabricNtpNts:
-    case EnumType::kMixedNtpNts:
+    case EnumType::kNonMatterSNTP:
+    case EnumType::kNonMatterNTP:
+    case EnumType::kMatterSNTP:
+    case EnumType::kMatterNTP:
+    case EnumType::kMixedNTP:
+    case EnumType::kNonMatterSNTPNTS:
+    case EnumType::kNonMatterNTPNTS:
+    case EnumType::kMatterSNTPNTS:
+    case EnumType::kMatterNTPNTS:
+    case EnumType::kMixedNTPNTS:
     case EnumType::kCloudSource:
     case EnumType::kPtp:
     case EnumType::kGnss:
         return val;
     default:
         return static_cast<EnumType>(17);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeSynchronization::TimeZoneDatabaseEnum val)
+{
+    using EnumType = TimeSynchronization::TimeZoneDatabaseEnum;
+    switch (val)
+    {
+    case EnumType::kFull:
+    case EnumType::kPartial:
+    case EnumType::kNone:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedDeviceBasicInformation::ColorEnum val)
+{
+    using EnumType = BridgedDeviceBasicInformation::ColorEnum;
+    switch (val)
+    {
+    case EnumType::kBlack:
+    case EnumType::kNavy:
+    case EnumType::kGreen:
+    case EnumType::kTeal:
+    case EnumType::kMaroon:
+    case EnumType::kPurple:
+    case EnumType::kOlive:
+    case EnumType::kGray:
+    case EnumType::kBlue:
+    case EnumType::kLime:
+    case EnumType::kAqua:
+    case EnumType::kRed:
+    case EnumType::kFuchsia:
+    case EnumType::kYellow:
+    case EnumType::kWhite:
+    case EnumType::kNickel:
+    case EnumType::kChrome:
+    case EnumType::kBrass:
+    case EnumType::kCopper:
+    case EnumType::kSilver:
+    case EnumType::kGold:
+        return val;
+    default:
+        return static_cast<EnumType>(21);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(BridgedDeviceBasicInformation::ProductFinishEnum val)
+{
+    using EnumType = BridgedDeviceBasicInformation::ProductFinishEnum;
+    switch (val)
+    {
+    case EnumType::kOther:
+    case EnumType::kMatte:
+    case EnumType::kSatin:
+    case EnumType::kPolished:
+    case EnumType::kRugged:
+    case EnumType::kFabric:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
     }
 }
 
@@ -1164,6 +1188,617 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(IcdManagement::OperatingModeEnum val)
+{
+    using EnumType = IcdManagement::OperatingModeEnum;
+    switch (val)
+    {
+    case EnumType::kSit:
+    case EnumType::kLit:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Timer::TimerStatusEnum val)
+{
+    using EnumType = Timer::TimerStatusEnum;
+    switch (val)
+    {
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kExpired:
+    case EnumType::kReady:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::ErrorStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenCavityOperationalState::OperationalStateEnum val)
+{
+    using EnumType = OvenCavityOperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OvenMode::ModeTag val)
+{
+    using EnumType = OvenMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kBake:
+    case EnumType::kConvection:
+    case EnumType::kGrill:
+    case EnumType::kRoast:
+    case EnumType::kClean:
+    case EnumType::kConvectionBake:
+    case EnumType::kConvectionRoast:
+    case EnumType::kWarming:
+    case EnumType::kProofing:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryDryerControls::DrynessLevelEnum val)
+{
+    using EnumType = LaundryDryerControls::DrynessLevelEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
+{
+    using EnumType = LaundryWasherControls::NumberOfRinsesEnum;
+    switch (val)
+    {
+    case EnumType::kNone:
+    case EnumType::kNormal:
+    case EnumType::kExtra:
+    case EnumType::kMax:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(AirQuality::AirQualityEnum val)
+{
+    using EnumType = AirQuality::AirQualityEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGood:
+    case EnumType::kFair:
+    case EnumType::kModerate:
+    case EnumType::kPoor:
+    case EnumType::kVeryPoor:
+    case EnumType::kExtremelyPoor:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::AlarmStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::AlarmStateEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::ContaminationStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::ContaminationStateEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kLow:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::EndOfServiceEnum val)
+{
+    using EnumType = SmokeCoAlarm::EndOfServiceEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kExpired:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::ExpressedStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::ExpressedStateEnum;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kSmokeAlarm:
+    case EnumType::kCOAlarm:
+    case EnumType::kBatteryAlert:
+    case EnumType::kTesting:
+    case EnumType::kHardwareFault:
+    case EnumType::kEndOfService:
+    case EnumType::kInterconnectSmoke:
+    case EnumType::kInterconnectCO:
+        return val;
+    default:
+        return static_cast<EnumType>(9);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::MuteStateEnum val)
+{
+    using EnumType = SmokeCoAlarm::MuteStateEnum;
+    switch (val)
+    {
+    case EnumType::kNotMuted:
+    case EnumType::kMuted:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(SmokeCoAlarm::SensitivityEnum val)
+{
+    using EnumType = SmokeCoAlarm::SensitivityEnum;
+    switch (val)
+    {
+    case EnumType::kHigh:
+    case EnumType::kStandard:
+    case EnumType::kLow:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(MicrowaveOvenMode::ModeTag val)
+{
+    using EnumType = MicrowaveOvenMode::ModeTag;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kDefrost:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::ErrorStateEnum val)
+{
+    using EnumType = OperationalState::ErrorStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kUnableToStartOrResume:
+    case EnumType::kUnableToCompleteOperation:
+    case EnumType::kCommandInvalidInState:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::OperationalStateEnum val)
+{
+    using EnumType = OperationalState::OperationalStateEnum;
+    switch (val)
+    {
+    case EnumType::kStopped:
+    case EnumType::kRunning:
+    case EnumType::kPaused:
+    case EnumType::kError:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::ChangeIndicationEnum val)
+{
+    using EnumType = HepaFilterMonitoring::ChangeIndicationEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::DegradationDirectionEnum val)
+{
+    using EnumType = HepaFilterMonitoring::DegradationDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kUp:
+    case EnumType::kDown:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(HepaFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = HepaFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMonitoring::ChangeIndicationEnum val)
+{
+    using EnumType = ActivatedCarbonFilterMonitoring::ChangeIndicationEnum;
+    switch (val)
+    {
+    case EnumType::kOk:
+    case EnumType::kWarning:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMonitoring::DegradationDirectionEnum val)
+{
+    using EnumType = ActivatedCarbonFilterMonitoring::DegradationDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kUp:
+    case EnumType::kDown:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum val)
+{
+    using EnumType = ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUpc:
+    case EnumType::kGtin8:
+    case EnumType::kEan:
+    case EnumType::kGtin14:
+    case EnumType::kOem:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::StatusCodeEnum val)
+{
+    using EnumType = ValveConfigurationAndControl::StatusCodeEnum;
+    switch (val)
+    {
+    case EnumType::kFailureDueToFault:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::ValveStateEnum val)
+{
+    using EnumType = ValveConfigurationAndControl::ValveStateEnum;
+    switch (val)
+    {
+    case EnumType::kClosed:
+    case EnumType::kOpen:
+    case EnumType::kTransitioning:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ElectricalEnergyMeasurement::MeasurementTypeEnum val)
+{
+    using EnumType = ElectricalEnergyMeasurement::MeasurementTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kVoltage:
+    case EnumType::kActiveCurrent:
+    case EnumType::kReactiveCurrent:
+    case EnumType::kApparentCurrent:
+    case EnumType::kActivePower:
+    case EnumType::kReactivePower:
+    case EnumType::kApparentPower:
+    case EnumType::kRMSVoltage:
+    case EnumType::kRMSCurrent:
+    case EnumType::kRMSPower:
+    case EnumType::kFrequency:
+    case EnumType::kPowerFactor:
+    case EnumType::kNeutralCurrent:
+    case EnumType::kElectricalEnergy:
+        return val;
+    default:
+        return static_cast<EnumType>(15);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::CriticalityLevelEnum val)
+{
+    using EnumType = DemandResponseLoadControl::CriticalityLevelEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGreen:
+    case EnumType::kLevel1:
+    case EnumType::kLevel2:
+    case EnumType::kLevel3:
+    case EnumType::kLevel4:
+    case EnumType::kLevel5:
+    case EnumType::kEmergency:
+    case EnumType::kPlannedOutage:
+    case EnumType::kServiceDisconnect:
+        return val;
+    default:
+        return static_cast<EnumType>(10);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::HeatingSourceEnum val)
+{
+    using EnumType = DemandResponseLoadControl::HeatingSourceEnum;
+    switch (val)
+    {
+    case EnumType::kAny:
+    case EnumType::kElectric:
+    case EnumType::kNonElectric:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventChangeSourceEnum val)
+{
+    using EnumType = DemandResponseLoadControl::LoadControlEventChangeSourceEnum;
+    switch (val)
+    {
+    case EnumType::kAutomatic:
+    case EnumType::kUserAction:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadControl::LoadControlEventStatusEnum val)
+{
+    using EnumType = DemandResponseLoadControl::LoadControlEventStatusEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kReceived:
+    case EnumType::kInProgress:
+    case EnumType::kCompleted:
+    case EnumType::kOptedOut:
+    case EnumType::kOptedIn:
+    case EnumType::kCanceled:
+    case EnumType::kSuperseded:
+    case EnumType::kPartialOptedOut:
+    case EnumType::kPartialOptedIn:
+    case EnumType::kNoParticipation:
+    case EnumType::kUnavailable:
+    case EnumType::kFailed:
+        return val;
+    default:
+        return static_cast<EnumType>(13);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CauseEnum val)
+{
+    using EnumType = DeviceEnergyManagement::CauseEnum;
+    switch (val)
+    {
+    case EnumType::kNormalCompletion:
+    case EnumType::kOffline:
+    case EnumType::kFault:
+    case EnumType::kUserOptOut:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CostTypeEnum val)
+{
+    using EnumType = DeviceEnergyManagement::CostTypeEnum;
+    switch (val)
+    {
+    case EnumType::kFinancial:
+    case EnumType::kGHGEmissions:
+    case EnumType::kComfort:
+    case EnumType::kTemperature:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESAStateEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ESAStateEnum;
+    switch (val)
+    {
+    case EnumType::kOffline:
+    case EnumType::kOnline:
+    case EnumType::kFault:
+    case EnumType::kUserOptOut:
+    case EnumType::kPowerAdjustActive:
+    case EnumType::kPaused:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESATypeEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ESATypeEnum;
+    switch (val)
+    {
+    case EnumType::kEvse:
+    case EnumType::kSpaceHeating:
+    case EnumType::kWaterHeating:
+    case EnumType::kSpaceCooling:
+    case EnumType::kSpaceHeatingCooling:
+    case EnumType::kBatteryStorage:
+    case EnumType::kSolarPV:
+    case EnumType::kFridgeFreezer:
+    case EnumType::kWashingMachine:
+    case EnumType::kDishwasher:
+    case EnumType::kCooking:
+    case EnumType::kHomeWaterPump:
+    case EnumType::kIrrigationWaterPump:
+    case EnumType::kPoolPump:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(14);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::EnergyTransferStoppedReasonEnum val)
+{
+    using EnumType = EnergyEvse::EnergyTransferStoppedReasonEnum;
+    switch (val)
+    {
+    case EnumType::kEVStopped:
+    case EnumType::kEVSEStopped:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::FaultStateEnum val)
+{
+    using EnumType = EnergyEvse::FaultStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoError:
+    case EnumType::kMeterFailure:
+    case EnumType::kOverVoltage:
+    case EnumType::kUnderVoltage:
+    case EnumType::kOverCurrent:
+    case EnumType::kContactWetFailure:
+    case EnumType::kContactDryFailure:
+    case EnumType::kGroundFault:
+    case EnumType::kPowerLoss:
+    case EnumType::kPowerQuality:
+    case EnumType::kPilotShortCircuit:
+    case EnumType::kEmergencyStop:
+    case EnumType::kEVDisconnected:
+    case EnumType::kWrongPowerSupply:
+    case EnumType::kLiveNeutralSwap:
+    case EnumType::kOverTemperature:
+    case EnumType::kOther:
+        return val;
+    default:
+        return static_cast<EnumType>(16);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::StateEnum val)
+{
+    using EnumType = EnergyEvse::StateEnum;
+    switch (val)
+    {
+    case EnumType::kNotPluggedIn:
+    case EnumType::kPluggedInNoDemand:
+    case EnumType::kPluggedInDemand:
+    case EnumType::kPluggedInCharging:
+    case EnumType::kPluggedInDischarging:
+    case EnumType::kSessionEnding:
+    case EnumType::kFault:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyEvse::SupplyStateEnum val)
+{
+    using EnumType = EnergyEvse::SupplyStateEnum;
+    switch (val)
+    {
+    case EnumType::kDisabled:
+    case EnumType::kChargingEnabled:
+    case EnumType::kDischargingEnabled:
+    case EnumType::kDisabledError:
+    case EnumType::kDisabledDiagnostics:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(EnergyPreference::EnergyPriorityEnum val)
+{
+    using EnumType = EnergyPreference::EnergyPriorityEnum;
+    switch (val)
+    {
+    case EnumType::kComfort:
+    case EnumType::kSpeed:
+    case EnumType::kEfficiency:
+    case EnumType::kWaterConsumption:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;
@@ -1206,9 +1841,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::CredentialTyp
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(9);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DataOperationTypeEnum val)
@@ -1232,9 +1870,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockState v
     case EnumType::kNotFullyLocked:
     case EnumType::kLocked:
     case EnumType::kUnlocked:
+    case EnumType::kUnlatched:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(4);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockType val)
@@ -1253,9 +1892,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlLockType va
     case EnumType::kInterconnectedLock:
     case EnumType::kDeadLatch:
     case EnumType::kDoorFurniture:
+    case EnumType::kEurocylinder:
         return val;
     default:
-        return static_cast<EnumType>(11);
+        return static_cast<EnumType>(12);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::DlStatus val)
@@ -1393,9 +2033,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
     case EnumType::kFace:
+    case EnumType::kAliroCredentialIssuerKey:
+    case EnumType::kAliroEvictableEndpointKey:
+    case EnumType::kAliroNonEvictableEndpointKey:
         return val;
     default:
-        return static_cast<EnumType>(11);
+        return static_cast<EnumType>(14);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)
@@ -1407,9 +2050,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperation
     case EnumType::kUnlock:
     case EnumType::kNonAccessUserEvent:
     case EnumType::kForcedUserEvent:
+    case EnumType::kUnlatch:
         return val;
     default:
-        return static_cast<EnumType>(4);
+        return static_cast<EnumType>(5);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperatingModeEnum val)
@@ -1457,9 +2101,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::OperationSour
     case EnumType::kRemote:
     case EnumType::kRfid:
     case EnumType::kBiometric:
+    case EnumType::kAliro:
         return val;
     default:
-        return static_cast<EnumType>(10);
+        return static_cast<EnumType>(11);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::UserStatusEnum val)
@@ -1584,22 +2229,78 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndCon
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointAdjustMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACCapacityFormatEnum val)
 {
-    using EnumType = Thermostat::SetpointAdjustMode;
+    using EnumType = Thermostat::ACCapacityFormatEnum;
     switch (val)
     {
-    case EnumType::kHeat:
-    case EnumType::kCool:
-    case EnumType::kBoth:
+    case EnumType::kBTUh:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(1);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatControlSequence val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACCompressorTypeEnum val)
 {
-    using EnumType = Thermostat::ThermostatControlSequence;
+    using EnumType = Thermostat::ACCompressorTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kT1:
+    case EnumType::kT2:
+    case EnumType::kT3:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACLouverPositionEnum val)
+{
+    using EnumType = Thermostat::ACLouverPositionEnum;
+    switch (val)
+    {
+    case EnumType::kClosed:
+    case EnumType::kOpen:
+    case EnumType::kQuarter:
+    case EnumType::kHalf:
+    case EnumType::kThreeQuarters:
+        return val;
+    default:
+        return static_cast<EnumType>(0);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACRefrigerantTypeEnum val)
+{
+    using EnumType = Thermostat::ACRefrigerantTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kR22:
+    case EnumType::kR410a:
+    case EnumType::kR407c:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ACTypeEnum val)
+{
+    using EnumType = Thermostat::ACTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kCoolingFixed:
+    case EnumType::kHeatPumpFixed:
+    case EnumType::kCoolingInverter:
+    case EnumType::kHeatPumpInverter:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ControlSequenceOfOperationEnum val)
+{
+    using EnumType = Thermostat::ControlSequenceOfOperationEnum;
     switch (val)
     {
     case EnumType::kCoolingOnly:
@@ -1613,22 +2314,69 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatC
         return static_cast<EnumType>(6);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatRunningMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::PresetScenarioEnum val)
 {
-    using EnumType = Thermostat::ThermostatRunningMode;
+    using EnumType = Thermostat::PresetScenarioEnum;
     switch (val)
     {
-    case EnumType::kOff:
-    case EnumType::kCool:
-    case EnumType::kHeat:
+    case EnumType::kUnspecified:
+    case EnumType::kOccupied:
+    case EnumType::kUnoccupied:
+    case EnumType::kSleep:
+    case EnumType::kWake:
+    case EnumType::kVacation:
+    case EnumType::kUserDefined:
         return val;
     default:
-        return static_cast<EnumType>(1);
+        return static_cast<EnumType>(7);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatSystemMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointChangeSourceEnum val)
 {
-    using EnumType = Thermostat::ThermostatSystemMode;
+    using EnumType = Thermostat::SetpointChangeSourceEnum;
+    switch (val)
+    {
+    case EnumType::kManual:
+    case EnumType::kSchedule:
+    case EnumType::kExternal:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SetpointRaiseLowerModeEnum val)
+{
+    using EnumType = Thermostat::SetpointRaiseLowerModeEnum;
+    switch (val)
+    {
+    case EnumType::kHeat:
+    case EnumType::kCool:
+    case EnumType::kBoth:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::StartOfWeekEnum val)
+{
+    using EnumType = Thermostat::StartOfWeekEnum;
+    switch (val)
+    {
+    case EnumType::kSunday:
+    case EnumType::kMonday:
+    case EnumType::kTuesday:
+    case EnumType::kWednesday:
+    case EnumType::kThursday:
+    case EnumType::kFriday:
+    case EnumType::kSaturday:
+        return val;
+    default:
+        return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::SystemModeEnum val)
+{
+    using EnumType = Thermostat::SystemModeEnum;
     switch (val)
     {
     case EnumType::kOff:
@@ -1645,26 +2393,47 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatS
         return static_cast<EnumType>(2);
     }
 }
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequenceType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::TemperatureSetpointHoldEnum val)
 {
-    using EnumType = FanControl::FanModeSequenceType;
+    using EnumType = Thermostat::TemperatureSetpointHoldEnum;
     switch (val)
     {
-    case EnumType::kOffLowMedHigh:
-    case EnumType::kOffLowHigh:
-    case EnumType::kOffLowMedHighAuto:
-    case EnumType::kOffLowHighAuto:
-    case EnumType::kOffOnAuto:
-    case EnumType::kOffOn:
+    case EnumType::kSetpointHoldOff:
+    case EnumType::kSetpointHoldOn:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Thermostat::ThermostatRunningModeEnum val)
 {
-    using EnumType = FanControl::FanModeType;
+    using EnumType = Thermostat::ThermostatRunningModeEnum;
+    switch (val)
+    {
+    case EnumType::kOff:
+    case EnumType::kCool:
+    case EnumType::kHeat:
+        return val;
+    default:
+        return static_cast<EnumType>(1);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::AirflowDirectionEnum val)
+{
+    using EnumType = FanControl::AirflowDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kForward:
+    case EnumType::kReverse:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeEnum val)
+{
+    using EnumType = FanControl::FanModeEnum;
     switch (val)
     {
     case EnumType::kOff:
@@ -1677,6 +2446,76 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeType
         return val;
     default:
         return static_cast<EnumType>(7);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::FanModeSequenceEnum val)
+{
+    using EnumType = FanControl::FanModeSequenceEnum;
+    switch (val)
+    {
+    case EnumType::kOffLowMedHigh:
+    case EnumType::kOffLowHigh:
+    case EnumType::kOffLowMedHighAuto:
+    case EnumType::kOffLowHighAuto:
+    case EnumType::kOffHighAuto:
+    case EnumType::kOffHigh:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FanControl::StepDirectionEnum val)
+{
+    using EnumType = FanControl::StepDirectionEnum;
+    switch (val)
+    {
+    case EnumType::kIncrease:
+    case EnumType::kDecrease:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::KeypadLockoutEnum;
+    switch (val)
+    {
+    case EnumType::kNoLockout:
+    case EnumType::kLockout1:
+    case EnumType::kLockout2:
+    case EnumType::kLockout3:
+    case EnumType::kLockout4:
+    case EnumType::kLockout5:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::ScheduleProgrammingVisibilityEnum;
+    switch (val)
+    {
+    case EnumType::kScheduleProgrammingPermitted:
+    case EnumType::kScheduleProgrammingDenied:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum val)
+{
+    using EnumType = ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum;
+    switch (val)
+    {
+    case EnumType::kCelsius:
+    case EnumType::kFahrenheit:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
     }
 }
 
@@ -1710,17 +2549,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
     using EnumType = ColorControl::ColorMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kCurrentHueAndCurrentSaturation:
     case EnumType::kCurrentXAndCurrentY:
     case EnumType::kColorTemperature:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
-    case EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
-    case EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -1791,9 +2622,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::Saturatio
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(IlluminanceMeasurement::LightSensorType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(IlluminanceMeasurement::LightSensorTypeEnum val)
 {
-    using EnumType = IlluminanceMeasurement::LightSensorType;
+    using EnumType = IlluminanceMeasurement::LightSensorTypeEnum;
     switch (val)
     {
     case EnumType::kPhotodiode:
@@ -1819,14 +2650,486 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OccupancySensing::Occup
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentrationMeasurement::LevelValueEnum val)
 {
-    using EnumType = Channel::ChannelStatusEnum;
+    using EnumType = CarbonMonoxideConcentrationMeasurement::LevelValueEnum;
     switch (val)
     {
-    case EnumType::kSuccess:
-    case EnumType::kMultipleMatches:
-    case EnumType::kNoMatches:
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = CarbonDioxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = NitrogenDioxideConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = OzoneConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = OzoneConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(OzoneConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = OzoneConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = Pm25ConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = Pm25ConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm25ConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = Pm25ConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = FormaldehydeConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = FormaldehydeConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(FormaldehydeConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = FormaldehydeConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = Pm1ConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = Pm1ConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm1ConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = Pm1ConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = Pm10ConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = Pm10ConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Pm10ConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = Pm10ConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused))
+EnsureKnownEnumValue(TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasurement::LevelValueEnum val)
+{
+    using EnumType = RadonConcentrationMeasurement::LevelValueEnum;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasurement::MeasurementMediumEnum val)
+{
+    using EnumType = RadonConcentrationMeasurement::MeasurementMediumEnum;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
+    case EnumType::kSoil:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasurement::MeasurementUnitEnum val)
+{
+    using EnumType = RadonConcentrationMeasurement::MeasurementUnitEnum;
+    switch (val)
+    {
+    case EnumType::kPpm:
+    case EnumType::kPpb:
+    case EnumType::kPpt:
+    case EnumType::kMgm3:
+    case EnumType::kUgm3:
+    case EnumType::kNgm3:
+    case EnumType::kPm3:
+    case EnumType::kBqm3:
+        return val;
+    default:
+        return static_cast<EnumType>(8);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelTypeEnum val)
+{
+    using EnumType = Channel::ChannelTypeEnum;
+    switch (val)
+    {
+    case EnumType::kSatellite:
+    case EnumType::kCable:
+    case EnumType::kTerrestrial:
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -1843,10 +3146,23 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoType
         return static_cast<EnumType>(1);
     }
 }
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::TargetNavigatorStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::StatusEnum val)
 {
-    using EnumType = TargetNavigator::TargetNavigatorStatusEnum;
+    using EnumType = Channel::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kMultipleMatches:
+    case EnumType::kNoMatches:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::StatusEnum val)
+{
+    using EnumType = TargetNavigator::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -1858,20 +3174,32 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TargetNavigator::Target
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::MediaPlaybackStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::CharacteristicEnum val)
 {
-    using EnumType = MediaPlayback::MediaPlaybackStatusEnum;
+    using EnumType = MediaPlayback::CharacteristicEnum;
     switch (val)
     {
-    case EnumType::kSuccess:
-    case EnumType::kInvalidStateForCommand:
-    case EnumType::kNotAllowed:
-    case EnumType::kNotActive:
-    case EnumType::kSpeedOutOfRange:
-    case EnumType::kSeekOutOfRange:
+    case EnumType::kForcedSubtitles:
+    case EnumType::kDescribesVideo:
+    case EnumType::kEasyToRead:
+    case EnumType::kFrameBased:
+    case EnumType::kMainProgram:
+    case EnumType::kOriginalContent:
+    case EnumType::kVoiceOverTranslation:
+    case EnumType::kCaption:
+    case EnumType::kSubtitle:
+    case EnumType::kAlternate:
+    case EnumType::kSupplementary:
+    case EnumType::kCommentary:
+    case EnumType::kDubbedTranslation:
+    case EnumType::kDescription:
+    case EnumType::kMetadata:
+    case EnumType::kEnhancedAudioIntelligibility:
+    case EnumType::kEmergency:
+    case EnumType::kKaraoke:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(18);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::PlaybackStateEnum val)
@@ -1886,6 +3214,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::Playback
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(MediaPlayback::StatusEnum val)
+{
+    using EnumType = MediaPlayback::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kInvalidStateForCommand:
+    case EnumType::kNotAllowed:
+    case EnumType::kNotActive:
+    case EnumType::kSpeedOutOfRange:
+    case EnumType::kSeekOutOfRange:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
     }
 }
 
@@ -1912,9 +3256,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(MediaInput::InputTypeEn
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CECKeyCodeEnum val)
 {
-    using EnumType = KeypadInput::CecKeyCode;
+    using EnumType = KeypadInput::CECKeyCodeEnum;
     switch (val)
     {
     case EnumType::kSelect:
@@ -2008,9 +3352,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::CecKeyCode
         return static_cast<EnumType>(14);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::KeypadInputStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::StatusEnum val)
 {
-    using EnumType = KeypadInput::KeypadInputStatusEnum;
+    using EnumType = KeypadInput::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -2022,17 +3366,32 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(KeypadInput::KeypadInpu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::ContentLaunchStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::CharacteristicEnum val)
 {
-    using EnumType = ContentLauncher::ContentLaunchStatusEnum;
+    using EnumType = ContentLauncher::CharacteristicEnum;
     switch (val)
     {
-    case EnumType::kSuccess:
-    case EnumType::kUrlNotAvailable:
-    case EnumType::kAuthFailed:
+    case EnumType::kForcedSubtitles:
+    case EnumType::kDescribesVideo:
+    case EnumType::kEasyToRead:
+    case EnumType::kFrameBased:
+    case EnumType::kMainProgram:
+    case EnumType::kOriginalContent:
+    case EnumType::kVoiceOverTranslation:
+    case EnumType::kCaption:
+    case EnumType::kSubtitle:
+    case EnumType::kAlternate:
+    case EnumType::kSupplementary:
+    case EnumType::kCommentary:
+    case EnumType::kDubbedTranslation:
+    case EnumType::kDescription:
+    case EnumType::kMetadata:
+    case EnumType::kEnhancedAudioIntelligibility:
+    case EnumType::kEmergency:
+    case EnumType::kKaraoke:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(18);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::MetricTypeEnum val)
@@ -2066,9 +3425,27 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::Parame
     case EnumType::kSportsTeam:
     case EnumType::kType:
     case EnumType::kVideo:
+    case EnumType::kSeason:
+    case EnumType::kEpisode:
+    case EnumType::kAny:
         return val;
     default:
-        return static_cast<EnumType>(14);
+        return static_cast<EnumType>(17);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentLauncher::StatusEnum val)
+{
+    using EnumType = ContentLauncher::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kURLNotAvailable:
+    case EnumType::kAuthFailed:
+    case EnumType::kTextTrackNotAvailable:
+    case EnumType::kAudioTrackNotAvailable:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
     }
 }
 
@@ -2089,9 +3466,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(AudioOutput::OutputType
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::ApplicationLauncherStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationLauncher::StatusEnum val)
 {
-    using EnumType = ApplicationLauncher::ApplicationLauncherStatusEnum;
+    using EnumType = ApplicationLauncher::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
@@ -2115,6 +3492,19 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ApplicationBasic::Appli
         return val;
     default:
         return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ContentAppObserver::StatusEnum val)
+{
+    using EnumType = ContentAppObserver::StatusEnum;
+    switch (val)
+    {
+    case EnumType::kSuccess:
+    case EnumType::kUnexpectedData:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
     }
 }
 

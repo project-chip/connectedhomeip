@@ -19,8 +19,6 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-#import "MTRAsyncCallbackWorkQueue.h"
-
 @interface MTRAsyncCallbackQueueTests : XCTestCase
 
 @end

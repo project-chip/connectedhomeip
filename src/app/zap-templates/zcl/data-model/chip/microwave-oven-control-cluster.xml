@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x005F" />
+    <field name="PowerAsNumber"       mask="0x01" />
+    <field name="PowerInWatts"        mask="0x02" />
+    <field name="PowerNumberLimits"   mask="0x04" />
+  </bitmap>
+
+  <cluster apiMaturity="provisional">
+    <name>Microwave Oven Control</name>
+    <domain>Appliances</domain>
+    <description>Attributes and commands for configuring the microwave oven control, and reporting cooking stats.</description>
+    <code>0x005F</code>
+    <define>MICROWAVE_OVEN_CONTROL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <attribute side="server" code="0x0000" define="COOK_TIME"           type="elapsed_s" default="30"  writable="false" optional="false">CookTime</attribute>
+    <attribute side="server" code="0x0001" define="MAX_COOK_TIME"       type="elapsed_s"               writable="false" optional="false" min="1" max="86400">MaxCookTime</attribute>
+    <attribute side="server" code="0x0002" define="POWER_SETTING"       type="int8u"     default="100" writable="false" optional="true">PowerSetting</attribute>
+    <attribute side="server" code="0x0003" define="MIN_POWER"           type="int8u"     default="10"  writable="false" optional="true">MinPower</attribute>
+    <attribute side="server" code="0x0004" define="MAX_POWER"           type="int8u"     default="100" writable="false" optional="true">MaxPower</attribute>
+    <attribute side="server" code="0x0005" define="POWER_STEP"          type="int8u"     default="10"  writable="false" optional="true">PowerStep</attribute>
+    <attribute side="server" code="0x0006" define="SUPPORTED_WATTS"     type="array" entryType="int16u" writable="false" optional="true">SupportedWatts</attribute>
+    <attribute side="server" code="0x0007" define="SELECTED_WATT_INDEX" type="int8u"                   writable="false" optional="true">SelectedWattIndex</attribute>
+    <attribute side="server" code="0x0008" define="WATT_RATING"         type="int16u"                  writable="false" optional="true">WattRating</attribute>
+
+    <command source="client" code="0x00" name="SetCookingParameters" optional="false">
+        <description>Set Cooking Parameters</description>
+        <arg name="CookMode"          type="int8u"     optional="true"/>
+        <arg name="CookTime"          type="elapsed_s" optional="true"/>
+        <arg name="PowerSetting"      type="int8u" min="MIN_POWER" max="MAX_POWER" optional="true"/>
+        <arg name="WattSettingIndex"  type="int8u"     optional="true"/>
+        <arg name="StartAfterSetting" type="boolean"   optional="true"/>
+    </command>
+    <command source="client" code="0x01" name="AddMoreTime" optional="true">
+        <description>Add More Cooking Time</description>
+        <arg name="TimeToAdd" type="elapsed_s" optional="false"/>
+    </command>
+  </cluster>
+</configurator>

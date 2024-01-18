@@ -23,6 +23,8 @@ class QpgApp(Enum):
     LOCK = auto()
     SHELL = auto()
     PERSISTENT_STORAGE = auto()
+    LIGHT_SWITCH = auto()
+    THERMOSTAT = auto()
 
     def ExampleName(self):
         if self == QpgApp.LIGHT:
@@ -33,6 +35,10 @@ class QpgApp(Enum):
             return 'shell'
         elif self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent-storage'
+        elif self == QpgApp.LIGHT_SWITCH:
+            return 'light-switch-app'
+        elif self == QpgApp.THERMOSTAT:
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -45,6 +51,10 @@ class QpgApp(Enum):
             return 'chip-qpg6105-shell-example'
         elif self == QpgApp.PERSISTENT_STORAGE:
             return 'chip-qpg6105-persistent_storage-example'
+        elif self == QpgApp.LIGHT_SWITCH:
+            return 'chip-qpg6105-light-switch-example'
+        elif self == QpgApp.THERMOSTAT:
+            return 'chip-qpg6105-thermostat-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -57,6 +67,10 @@ class QpgApp(Enum):
             return 'shell_app.out.flashbundle.txt'
         elif self == QpgApp.PERSISTENT_STORAGE:
             return 'persistent_storage_app.out.flashbundle.txt'
+        elif self == QpgApp.LIGHT_SWITCH:
+            return 'light_switch_app.out.flashbundle.txt'
+        elif self == QpgApp.THERMOSTAT:
+            return 'thermostat.out.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -81,18 +95,22 @@ class QpgBuilder(GnBuilder):
                  runner,
                  app: QpgApp = QpgApp.LIGHT,
                  board: QpgBoard = QpgBoard.QPG6105,
-                 enable_rpcs: bool = False):
+                 enable_rpcs: bool = False,
+                 update_image: bool = False):
         super(QpgBuilder, self).__init__(
             root=app.BuildRoot(root),
             runner=runner)
         self.app = app
         self.board = board
         self.enable_rpcs = enable_rpcs
+        self.update_image = update_image
 
     def GnBuildArgs(self):
         args = ['qpg_target_ic=\"%s\"' % self.board.GnArgName()]
         if self.enable_rpcs:
             args.append('import("//with_pw_rpc.gni")')
+        if self.update_image:
+            args.append('matter_device_software_version_string=\"1.1_OTA_TEST\" matter_device_software_version=4')
         return args
 
     def build_outputs(self):

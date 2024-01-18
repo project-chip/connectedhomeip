@@ -31,7 +31,6 @@
 #include <lib/core/Optional.h>
 
 #include "TLVCommon.h"
-
 #include "TLVWriter.h"
 
 /**
@@ -168,56 +167,57 @@ public:
      * Advances the TLVReader object to the next TLV element to be read, asserting the tag of
      * the new element.
      *
-     * The Next(Tag expectedTag) method is a convenience method that has the
-     * same behavior as Next(), but also verifies that the tag of the new TLV element matches
-     * the supplied argument.
+     * This is a convenience method that combines the behavior of Next() and Expect(...).
      *
-     * @param[in] expectedTag               The expected tag for the next element.
+     * Note that if this method returns an error, the reader may or may not have been advanced already.
+     * In use cases where this is important, separate calls to Next() and Expect(...) should be made.
      *
-     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
-     * @retval #CHIP_END_OF_TLV            If no further elements are available.
+     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element
+     *                                     matching the expected parameters.
+     * @retval other                       See return values of Next() and Expect().
+     */
+    CHIP_ERROR Next(Tag expectedTag);
+
+    /**
+     * Checks that the TLV reader is positioned at an element with the expected tag.
+     *
+     * @retval #CHIP_NO_ERROR              If the reader is positioned on the expected element.
+     * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the reader is not positioned on an element.
      * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
      *                                      If the tag associated with the new element does not match the
      *                                      value of the @p expectedTag argument.
-     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
-     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
-     *                                      If the reader encountered an invalid or unsupported TLV
-     *                                      element type.
-     * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
-     * @retval other                        Other CHIP or platform error codes returned by the configured
-     *                                      TLVBackingStore.
-     *
      */
-    CHIP_ERROR Next(Tag expectedTag);
+    CHIP_ERROR Expect(Tag expectedTag);
 
     /**
      * Advances the TLVReader object to the next TLV element to be read, asserting the type and tag of
      * the new element.
      *
-     * The Next(TLVType expectedType, Tag expectedTag) method is a convenience method that has the
-     * same behavior as Next(), but also verifies that the type and tag of the new TLV element match
-     * the supplied arguments.
+     * This is a convenience method that combines the behavior of Next() and Expect(...).
+     *
+     * Note that if this method returns an error, the reader may or may not have been advanced already.
+     * In use cases where this is important, separate calls to Next() and Expect(...) should be made.
+     *
+     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element
+     *                                     matching the expected parameters.
+     * @retval other                       See return values of Next() and Expect().
+     */
+    CHIP_ERROR Next(TLVType expectedType, Tag expectedTag);
+
+    /**
+     * Checks that the TLV reader is positioned at an element with the expected type and tag.
      *
      * @param[in] expectedType              The expected data type for the next element.
      * @param[in] expectedTag               The expected tag for the next element.
      *
-     * @retval #CHIP_NO_ERROR              If the reader was successfully positioned on a new element.
-     * @retval #CHIP_END_OF_TLV            If no further elements are available.
+     * @retval #CHIP_NO_ERROR              If the reader is positioned on the expected element.
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the type of the new element does not match the value
      *                                      of the @p expectedType argument.
      * @retval #CHIP_ERROR_UNEXPECTED_TLV_ELEMENT
      *                                      If the tag associated with the new element does not match the
      *                                      value of the @p expectedTag argument.
-     * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
-     * @retval #CHIP_ERROR_INVALID_TLV_ELEMENT
-     *                                      If the reader encountered an invalid or unsupported TLV
-     *                                      element type.
-     * @retval #CHIP_ERROR_INVALID_TLV_TAG If the reader encountered a TLV tag in an invalid context.
-     * @retval other                        Other CHIP or platform error codes returned by the configured
-     *                                      TLVBackingStore.
-     *
      */
-    CHIP_ERROR Next(TLVType expectedType, Tag expectedTag);
+    CHIP_ERROR Expect(TLVType expectedType, Tag expectedTag);
 
     /**
      * Returns the type of the current TLV element.
@@ -283,7 +283,7 @@ public:
      * @retval #CHIP_ERROR_WRONG_TLV_TYPE  If the current element is not a TLV boolean type, or the
      *                                      reader is not positioned on an element.
      */
-    CHIP_ERROR Get(bool & v);
+    CHIP_ERROR Get(bool & v) const;
 
     /**
      * Get the value of the current element as an 8-bit signed integer.
@@ -298,7 +298,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int8_t & v);
+    CHIP_ERROR Get(int8_t & v) const;
 
     /**
      * Get the value of the current element as a 16-bit signed integer.
@@ -313,7 +313,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int16_t & v);
+    CHIP_ERROR Get(int16_t & v) const;
 
     /**
      * Get the value of the current element as a 32-bit signed integer.
@@ -328,7 +328,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int32_t & v);
+    CHIP_ERROR Get(int32_t & v) const;
 
     /**
      * Get the value of the current element as a 64-bit signed integer.
@@ -343,7 +343,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(int64_t & v);
+    CHIP_ERROR Get(int64_t & v) const;
 
     /**
      * Get the value of the current element as an 8-bit unsigned integer.
@@ -359,7 +359,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint8_t & v);
+    CHIP_ERROR Get(uint8_t & v) const;
 
     /**
      * Get the value of the current element as a 16-bit unsigned integer.
@@ -375,7 +375,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint16_t & v);
+    CHIP_ERROR Get(uint16_t & v) const;
 
     /**
      * Get the value of the current element as a 32-bit unsigned integer.
@@ -391,7 +391,7 @@ public:
      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint32_t & v);
+    CHIP_ERROR Get(uint32_t & v) const;
 
     /**
      * Get the value of the current element as a 64-bit unsigned integer.
@@ -405,7 +405,7 @@ public:
      *                                      unsigned), or the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(uint64_t & v);
+    CHIP_ERROR Get(uint64_t & v) const;
 
     /**
      * Get the value of the current element as a double-precision floating point number.
@@ -417,7 +417,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(double & v);
+    CHIP_ERROR Get(double & v) const;
 
     /**
      * Get the value of the current element as a single-precision floating point number.
@@ -429,7 +429,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(float & v);
+    CHIP_ERROR Get(float & v) const;
 
     /**
      * Get the value of the current element as a ByteSpan
@@ -441,7 +441,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(ByteSpan & v);
+    CHIP_ERROR Get(ByteSpan & v) const;
 
     /**
      * Get the value of the current element as a FixedByteSpan
@@ -454,7 +454,7 @@ public:
      *
      */
     template <size_t N>
-    CHIP_ERROR Get(FixedByteSpan<N> & v)
+    CHIP_ERROR Get(FixedByteSpan<N> & v) const
     {
         const uint8_t * val;
         ReturnErrorOnFailure(GetDataPtr(val));
@@ -473,7 +473,7 @@ public:
      *                                      the reader is not positioned on an element.
      *
      */
-    CHIP_ERROR Get(CharSpan & v);
+    CHIP_ERROR Get(CharSpan & v) const;
 
     /**
      * Get the Localized String Identifier contained in the current element..
@@ -635,9 +635,8 @@ public:
      * Get a pointer to the initial encoded byte of a TLV byte or UTF8 string element.
      *
      * This method returns a direct pointer to the encoded string value within the underlying input buffer
-     * if a non-zero length string payload is present. To succeed, the method requires that the entirety of the
-     * string value be present in a single buffer. Otherwise the method returns #CHIP_ERROR_TLV_UNDERRUN.
-     * This makes the method of limited use when reading data from multiple discontiguous buffers.
+     * as fetched by `Next`. To succeed, the method requires that the entirety of the
+     * string value be present in a single buffer.
      *
      * If no string data is present (i.e the length is zero), data shall be updated to point to null.
      *
@@ -654,7 +653,7 @@ public:
      *                                      TLVBackingStore.
      *
      */
-    CHIP_ERROR GetDataPtr(const uint8_t *& data);
+    CHIP_ERROR GetDataPtr(const uint8_t *& data) const;
 
     /**
      * Prepares a TLVReader object for reading the members of TLV container element.
@@ -856,6 +855,11 @@ public:
      * @return the stored backing store.
      */
     TLVBackingStore * GetBackingStore() { return mBackingStore; }
+
+    /**
+     * Returns true if the current TLV element type is a double.
+     */
+    bool IsElementDouble() { return ElementType() == TLVElementType::FloatingPointNumber64; }
 
     /**
      * Gets the point in the underlying input buffer that corresponds to the reader's current position.

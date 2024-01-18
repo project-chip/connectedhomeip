@@ -31,8 +31,8 @@ pw_python_package("build_examples") {
     "testdata/dry_run_linux-arm64-ota-requestor-nodeps-ipv6only.txt",
     "testdata/dry_run_linux-x64-all-clusters-coverage.txt",
     "testdata/dry_run_nrf-nrf52840dk-pump.txt",
-    "testdata/dry_run_openiotsdk-lock.txt",
-    "testdata/dry_run_openiotsdk-shell.txt",
+    "testdata/dry_run_openiotsdk-lock-mbedtls.txt",
+    "testdata/dry_run_openiotsdk-shell-mbedtls.txt",
   ]
 
   sources = [
@@ -43,6 +43,7 @@ pw_python_package("build_examples") {
     "builders/__init__.py",
     "builders/ameba.py",
     "builders/android.py",
+    "builders/asr.py",
     "builders/bouffalolab.py",
     "builders/builder.py",
     "builders/efr32.py",

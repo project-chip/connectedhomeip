@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import io
 import unittest
 from unittest.mock import mock_open, patch
 
@@ -66,7 +65,8 @@ class TestYamlLoader(unittest.TestCase):
 
         content = None
 
-        name, pics, config, tests = load(content)
+        filename, name, pics, config, tests = load(content)
+        self.assertEqual(filename, '')
         self.assertEqual(name, '')
         self.assertEqual(pics, None)
         self.assertEqual(config, {})
@@ -77,7 +77,8 @@ class TestYamlLoader(unittest.TestCase):
 
         content = ''
 
-        name, pics, config, tests = load(content)
+        filename, name, pics, config, tests = load(content)
+        self.assertEqual(name, '')
         self.assertEqual(name, '')
         self.assertEqual(pics, None)
         self.assertEqual(config, {})
@@ -99,7 +100,7 @@ class TestYamlLoader(unittest.TestCase):
         name: Test Name
         '''
 
-        name, _, _, _ = load(content)
+        _, name, _, _, _ = load(content)
         self.assertEqual(name, 'Test Name')
 
     def test_key_name_wrong_values(self):
@@ -117,7 +118,7 @@ class TestYamlLoader(unittest.TestCase):
         PICS: OO.S
         '''
 
-        _, pics, _, _ = load(content)
+        _, _, pics, _, _ = load(content)
         self.assertEqual(pics, 'OO.S')
 
     def test_key_pics_list(self):
@@ -129,7 +130,7 @@ class TestYamlLoader(unittest.TestCase):
             - OO.C
         '''
 
-        _, pics, _, _ = load(content)
+        _, _, pics, _, _ = load(content)
         self.assertEqual(pics, ['OO.S', 'OO.C'])
 
     def test_key_pics_wrong_values(self):
@@ -149,7 +150,7 @@ class TestYamlLoader(unittest.TestCase):
             name2: value2
         '''
 
-        _, _, config, _ = load(content)
+        _, _, _, config, _ = load(content)
         self.assertEqual(config, {'name': 'value', 'name2': 'value2'})
 
     def test_key_config_wrong_values(self):
@@ -169,7 +170,7 @@ class TestYamlLoader(unittest.TestCase):
             - label: Test2
         '''
 
-        _, _, _, tests = load(content)
+        _, _, _, _, tests = load(content)
         self.assertEqual(tests, [{'label': 'Test1'}, {'label': 'Test2'}])
 
     def test_key_tests_wrong_values(self):
@@ -202,7 +203,7 @@ class TestYamlLoader(unittest.TestCase):
 
         wrong_values = self._get_wrong_values([bool], spaces=6)
         for key in keys:
-            _, _, _, tests = load(content.format(key=key, value=True))
+            _, _, _, _, tests = load(content.format(key=key, value=True))
             self.assertEqual(tests, [{key: True}])
 
             for value in wrong_values:
@@ -232,7 +233,7 @@ class TestYamlLoader(unittest.TestCase):
 
         wrong_values = self._get_wrong_values([str], spaces=6)
         for key in keys:
-            _, _, _, tests = load(content.format(key=key, value='a string'))
+            _, _, _, _, tests = load(content.format(key=key, value='a string'))
             self.assertEqual(tests, [{key: 'a string'}])
 
             for value in wrong_values:
@@ -245,9 +246,6 @@ class TestYamlLoader(unittest.TestCase):
         content = ('tests:\n'
                    '  - {key}: {value}')
         keys = [
-            'nodeId',
-            'groupId',
-            'endpoint',
             'minInterval',
             'maxInterval',
             'timedInteractionTimeoutMs',
@@ -256,7 +254,7 @@ class TestYamlLoader(unittest.TestCase):
 
         wrong_values = self._get_wrong_values([int], spaces=6)
         for key in keys:
-            _, _, _, tests = load(content.format(key=key, value=1))
+            _, _, _, _, tests = load(content.format(key=key, value=1))
             self.assertEqual(tests, [{key: 1}])
 
             for value in wrong_values:
@@ -267,7 +265,8 @@ class TestYamlLoader(unittest.TestCase):
         load = YamlLoader().load
 
         content = ('tests:\n'
-                   '  - {key}: {value}')
+                   '  - command: writeAttribute\n'
+                   '    {key}: {value}')
         keys = [
             'arguments',
         ]
@@ -276,8 +275,10 @@ class TestYamlLoader(unittest.TestCase):
                        '      value: True\n')
         wrong_values = self._get_wrong_values([dict], spaces=6)
         for key in keys:
-            _, _, _, tests = load(content.format(key=key, value=valid_value))
-            self.assertEqual(tests, [{key: {'value': True}}])
+            _, _, _, _, tests = load(
+                content.format(key=key, value=valid_value))
+            self.assertEqual(
+                tests, [{'command': 'writeAttribute', key: {'value': True}}])
 
             for value in wrong_values:
                 x = content.format(key=key, value=value)
@@ -291,15 +292,66 @@ class TestYamlLoader(unittest.TestCase):
 
         value = ('\n'
                  '      value: True\n')
-        _, _, _, tests = load(content.format(value=value))
+        _, _, _, _, tests = load(content.format(value=value))
         self.assertEqual(tests, [{'response': {'value': True}}])
 
         value = ('\n'
                  '      - value: True\n')
-        _, _, _, tests = load(content.format(value=value))
+        _, _, _, _, tests = load(content.format(value=value))
         self.assertEqual(tests, [{'response': [{'value': True}]}])
 
-        wrong_values = self._get_wrong_values([dict, list], spaces=6)
+        wrong_values = self._get_wrong_values([dict, list, str], spaces=6)
+        for value in wrong_values:
+            x = content.format(value=value)
+            self.assertRaises(TestStepInvalidTypeError, load, x)
+
+    def test_key_tests_step_endpoint_number_key(self):
+        load = YamlLoader().load
+
+        content = ('tests:\n'
+                   '  - endpoint: {value}')
+
+        _, _, _, _, tests = load(content.format(value=1))
+        self.assertEqual(tests, [{'endpoint': 1}])
+
+        _, _, _, _, tests = load(content.format(value='TestKey'))
+        self.assertEqual(tests, [{'endpoint': 'TestKey'}])
+
+        wrong_values = self._get_wrong_values([str, int], spaces=6)
+        for value in wrong_values:
+            x = content.format(value=value)
+            self.assertRaises(TestStepInvalidTypeError, load, x)
+
+    def test_key_tests_step_group_id_key(self):
+        load = YamlLoader().load
+
+        content = ('tests:\n'
+                   '  - groupId: {value}')
+
+        _, _, _, _, tests = load(content.format(value=1))
+        self.assertEqual(tests, [{'groupId': 1}])
+
+        _, _, _, _, tests = load(content.format(value='TestKey'))
+        self.assertEqual(tests, [{'groupId': 'TestKey'}])
+
+        wrong_values = self._get_wrong_values([str, int], spaces=6)
+        for value in wrong_values:
+            x = content.format(value=value)
+            self.assertRaises(TestStepInvalidTypeError, load, x)
+
+    def test_key_tests_step_node_id_key(self):
+        load = YamlLoader().load
+
+        content = ('tests:\n'
+                   '  - nodeId: {value}')
+
+        _, _, _, _, tests = load(content.format(value=1))
+        self.assertEqual(tests, [{'nodeId': 1}])
+
+        _, _, _, _, tests = load(content.format(value='TestKey'))
+        self.assertEqual(tests, [{'nodeId': 'TestKey'}])
+
+        wrong_values = self._get_wrong_values([str, int], spaces=6)
         for value in wrong_values:
             x = content.format(value=value)
             self.assertRaises(TestStepInvalidTypeError, load, x)
@@ -310,10 +362,10 @@ class TestYamlLoader(unittest.TestCase):
         content = ('tests:\n'
                    '  - eventNumber: {value}')
 
-        _, _, _, tests = load(content.format(value=1))
+        _, _, _, _, tests = load(content.format(value=1))
         self.assertEqual(tests, [{'eventNumber': 1}])
 
-        _, _, _, tests = load(content.format(value='TestKey'))
+        _, _, _, _, tests = load(content.format(value='TestKey'))
         self.assertEqual(tests, [{'eventNumber': 'TestKey'}])
 
         wrong_values = self._get_wrong_values([str, int], spaces=6)
@@ -328,7 +380,7 @@ class TestYamlLoader(unittest.TestCase):
                    '  - verification: {value}\n'
                    '    disabled: true')
 
-        _, _, _, tests = load(content.format(value='Test Sentence'))
+        _, _, _, _, tests = load(content.format(value='Test Sentence'))
         self.assertEqual(
             tests, [{'verification': 'Test Sentence', 'disabled': True}])
 
@@ -392,7 +444,7 @@ class TestYamlLoader(unittest.TestCase):
                 disabled: true
         '''
 
-        _, _, _, tests = load(content)
+        _, _, _, _, tests = load(content)
         self.assertEqual(tests, [
                          {'label': 'A Test Name', 'verification': 'A verification sentence', 'disabled': True}])
 
@@ -412,7 +464,7 @@ class TestYamlLoader(unittest.TestCase):
                 command: UserPrompt
         '''
 
-        _, _, _, tests = load(content)
+        _, _, _, _, tests = load(content)
         self.assertEqual(tests, [
                          {'label': 'A Test Name', 'verification': 'A verification sentence', 'command': 'UserPrompt'}])
 
@@ -427,7 +479,7 @@ class TestYamlLoader(unittest.TestCase):
                    '  - response:\n'
                    '      values: {value}')
 
-        _, _, _, tests = load(content.format(value=[]))
+        _, _, _, _, tests = load(content.format(value=[]))
         self.assertEqual(tests, [{'response': {'values': []}}])
 
         wrong_values = self._get_wrong_values([list], spaces=8)
@@ -442,7 +494,7 @@ class TestYamlLoader(unittest.TestCase):
                    '  - response:\n'
                    '      error: {value}')
 
-        _, _, _, tests = load(content.format(value='AnError'))
+        _, _, _, _, tests = load(content.format(value='AnError'))
         self.assertEqual(tests, [{'response': {'error': 'AnError'}}])
 
         wrong_values = self._get_wrong_values([str], spaces=8)
@@ -457,7 +509,7 @@ class TestYamlLoader(unittest.TestCase):
                    '  - response:\n'
                    '      clusterError: {value}')
 
-        _, _, _, tests = load(content.format(value=1))
+        _, _, _, _, tests = load(content.format(value=1))
         self.assertEqual(tests, [{'response': {'clusterError': 1}}])
 
         wrong_values = self._get_wrong_values([int], spaces=8)
@@ -472,7 +524,7 @@ class TestYamlLoader(unittest.TestCase):
                    '  - response:\n'
                    '      constraints: {value}')
 
-        _, _, _, tests = load(content.format(value={}))
+        _, _, _, _, tests = load(content.format(value={}))
         self.assertEqual(tests, [{'response': {'constraints': {}}}])
 
         wrong_values = self._get_wrong_values([dict], spaces=8)
@@ -487,7 +539,7 @@ class TestYamlLoader(unittest.TestCase):
                    '  - response:\n'
                    '      saveAs: {value}')
 
-        _, _, _, tests = load(content.format(value='AKey'))
+        _, _, _, _, tests = load(content.format(value='AKey'))
         self.assertEqual(tests, [{'response': {'saveAs': 'AKey'}}])
 
         wrong_values = self._get_wrong_values([str], spaces=8)

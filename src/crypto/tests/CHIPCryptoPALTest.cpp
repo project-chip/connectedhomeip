@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,12 +37,10 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 
@@ -54,15 +52,10 @@
 
 #include <lib/support/BytesToHex.h>
 
-#if CHIP_CRYPTO_MBEDTLS
-#include <mbedtls/memory_buffer_alloc.h>
-#endif
-
 #include <credentials/CHIPCert.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
-
-#define HSM_ECC_KEYID 0x11223344
 
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
@@ -74,6 +67,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#if CHIP_CRYPTO_MBEDTLS || CHIP_CRYPTO_PSA
+#include <mbedtls/memory_buffer_alloc.h>
+#endif
+
 #if CHIP_CRYPTO_PSA
 #include <psa/crypto.h>
 #endif
@@ -84,43 +81,14 @@ using namespace chip::TLV;
 
 namespace {
 
-#ifdef ENABLE_HSM_EC_KEY
-class Test_P256Keypair : public P256KeypairHSM
-{
-public:
-    Test_P256Keypair() { SetKeyId(HSM_ECC_KEYID); }
-    Test_P256Keypair(uint32_t keyId) { SetKeyId(keyId); }
-};
-#else
 using Test_P256Keypair                  = P256Keypair;
-#endif
-
-#ifdef ENABLE_HSM_SPAKE
-using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2pHSM_P256_SHA256_HKDF_HMAC;
-#else
 using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
-#endif
-
-#ifdef ENABLE_HSM_PBKDF2
-using TestPBKDF2_sha256 = PBKDF2_sha256HSM;
-#else
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
-#endif
-
-#ifdef ENABLE_HSM_HKDF
-using TestHKDF_sha = HKDF_shaHSM;
-#else
 using TestHKDF_sha                      = HKDF_sha;
-#endif
-
-#ifdef ENABLE_HSM_HMAC
-using TestHMAC_sha = HMAC_shaHSM;
-#else
 using TestHMAC_sha                      = HMAC_sha;
-#endif
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
-#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
+#if defined(MBEDTLS_MEMORY_DEBUG)
 class HeapChecker
 {
 public:
@@ -155,6 +123,8 @@ public:
     explicit HeapChecker(nlTestSuite *) {}
 };
 #endif
+
+#include "DacValidationExplicitVectors.h"
 
 } // namespace
 
@@ -197,13 +167,13 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
         .ciphertextLen = 16,
     },
     {
-        .key       = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
-        .nonce     = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
-        .plaintext = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-                                       "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-        .plaintextLen = 32,
-        .ciphertext   = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
-                                        "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
+        .key           = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
+        .nonce         = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
+        .plaintext     = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                                           "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+        .plaintextLen  = 32,
+        .ciphertext    = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
+                                           "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
         .ciphertextLen = 32,
     }
 };
@@ -213,7 +183,7 @@ struct TestAesKey
 public:
     TestAesKey(nlTestSuite * inSuite, const uint8_t * keyBytes, size_t keyLength)
     {
-        Crypto::Aes128KeyByteArray keyMaterial;
+        Crypto::Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(&keyMaterial, keyBytes, keyLength);
 
         CHIP_ERROR err = keystore.CreateKey(keyMaterial, key);
@@ -224,6 +194,24 @@ public:
 
     DefaultSessionKeystore keystore;
     Aes128KeyHandle key;
+};
+
+struct TestHmacKey
+{
+public:
+    TestHmacKey(nlTestSuite * inSuite, const uint8_t * keyBytes, size_t keyLength)
+    {
+        Crypto::Symmetric128BitsKeyByteArray keyMaterial;
+        memcpy(&keyMaterial, keyBytes, keyLength);
+
+        CHIP_ERROR err = keystore.CreateKey(keyMaterial, key);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    }
+
+    ~TestHmacKey() { keystore.DestroyKey(key); }
+
+    DefaultSessionKeystore keystore;
+    Hmac128KeyHandle key;
 };
 
 static void TestAES_CTR_128_Encrypt(nlTestSuite * inSuite, const AesCtrTestEntry * vector)
@@ -605,14 +593,11 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     HeapChecker heapChecker(inSuite);
     // Cover case of invalid buffers
     uint8_t placeholder[10] = { 0 };
-    MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
-    ByteSpan good_buffer(placeholder, sizeof(placeholder));
+    MutableByteSpan good_out_buffer(placeholder);
+    ByteSpan good_buffer(placeholder);
 
-    MutableByteSpan bad_out_buffer_nullptr(nullptr, sizeof(placeholder));
-    MutableByteSpan bad_out_buffer_empty(placeholder, 0);
-
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
-    ByteSpan bad_buffer_empty(placeholder, 0);
+    MutableByteSpan bad_out_buffer_empty;
+    ByteSpan bad_buffer_empty;
 
     struct ErrorCase
     {
@@ -622,9 +607,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     };
 
     const ErrorCase error_cases[] = {
-        { .input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
-        { .input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
     };
 
@@ -636,6 +619,136 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
         {
             ChipLogError(Crypto, "Failed TestRawIntegerToDerInvalidCases sub-case %d", case_idx);
             NL_TEST_ASSERT(inSuite, v.expected_status == status);
+        }
+        ++case_idx;
+    }
+}
+
+static void TestReadDerLengthValidCases(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t short_zero_length[] = { 0x00 };
+    ByteSpan short_zero_length_buf(short_zero_length);
+
+    const uint8_t short_length[] = { 0x15 };
+    ByteSpan short_length_buf(short_length);
+
+    const uint8_t single_byte_length[] = { 0x81, 0x80 };
+    ByteSpan single_byte_length_buf(single_byte_length);
+
+    const uint8_t single_byte_length_large[] = { 0x81, 0xFF };
+    ByteSpan single_byte_length_large_buf(single_byte_length_large);
+
+    const uint8_t two_byte_length[] = { 0x82, 0xFF, 0x01 };
+    ByteSpan two_byte_length_buf(two_byte_length);
+
+    const uint8_t three_byte_length[] = { 0x83, 0xFF, 0x00, 0xAA };
+    ByteSpan three_byte_length_buf(three_byte_length);
+
+    const uint8_t four_byte_length[] = { 0x84, 0x01, 0x02, 0x03, 0x04 };
+    ByteSpan four_byte_length_buf(four_byte_length);
+
+    const uint8_t four_byte_length_large[] = { 0x84, 0xFF, 0xFF, 0xFF, 0xFF };
+    ByteSpan four_byte_length_large_buf(four_byte_length_large);
+
+    uint8_t max_byte_length_large[1 + sizeof(size_t)];
+    ByteSpan max_byte_length_large_buf(max_byte_length_large);
+
+    // We build a DER length value of SIZE_MAX programmatically.
+    max_byte_length_large[0] = 0x80 | sizeof(size_t);
+    memset(&max_byte_length_large[1], 0xFF, sizeof(size_t));
+
+    struct SuccessCase
+    {
+        const ByteSpan & input_buf;
+        const size_t expected_length;
+    };
+
+    const SuccessCase cases[] = {
+        { .input_buf = short_zero_length_buf, .expected_length = static_cast<size_t>(0x00) },
+        { .input_buf = short_length_buf, .expected_length = static_cast<size_t>(0x15) },
+        { .input_buf = single_byte_length_buf, .expected_length = static_cast<size_t>(0x80) },
+        { .input_buf = single_byte_length_large_buf, .expected_length = static_cast<size_t>(0xFF) },
+        { .input_buf = two_byte_length_buf, .expected_length = static_cast<size_t>(0xFF01) },
+        { .input_buf = three_byte_length_buf, .expected_length = static_cast<size_t>(0xFF00AAUL) },
+        { .input_buf = four_byte_length_buf, .expected_length = static_cast<size_t>(0x01020304UL) },
+        { .input_buf = four_byte_length_large_buf, .expected_length = static_cast<size_t>(0xFFFFFFFFUL) },
+        { .input_buf = max_byte_length_large_buf, .expected_length = SIZE_MAX },
+    };
+
+    int case_idx = 0;
+    for (const SuccessCase & v : cases)
+    {
+        size_t output_length = SIZE_MAX - 1;
+        chip::Encoding::LittleEndian::Reader input_reader{ v.input_buf };
+        CHIP_ERROR status = ReadDerLength(input_reader, output_length);
+        if ((status != CHIP_NO_ERROR) || (v.expected_length != output_length))
+        {
+            ChipLogError(Crypto, "Failed TestReadDerLengthValidCases sub-case %d", case_idx);
+            NL_TEST_ASSERT_EQUALS(inSuite, output_length, v.expected_length);
+            NL_TEST_ASSERT_SUCCESS(inSuite, status);
+        }
+        ++case_idx;
+    }
+}
+
+static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t placeholder[1];
+
+    ByteSpan bad_buffer_empty(placeholder, 0);
+
+    const uint8_t zero_multi_byte_length[] = { 0x80 };
+    ByteSpan zero_multi_byte_length_buf(zero_multi_byte_length);
+
+    const uint8_t single_byte_length_zero[] = { 0x81, 0x00 };
+    ByteSpan single_byte_length_zero_buf(single_byte_length_zero);
+
+    const uint8_t single_byte_length_too_small[] = { 0x81, 0x7F };
+    ByteSpan single_byte_length_too_small_buf(single_byte_length_too_small);
+
+    const uint8_t multiple_byte_length_zero_padded[] = { 0x82, 0x00, 0xFF };
+    ByteSpan multiple_byte_length_zero_padded_buf(multiple_byte_length_zero_padded);
+
+    const uint8_t multiple_byte_length_insufficient_bytes[] = { 0x84, 0xFF, 0xAA, 0x01 };
+    ByteSpan multiple_byte_length_insufficient_bytes_buf(multiple_byte_length_insufficient_bytes);
+
+    const uint8_t multiple_byte_length_insufficient_bytes2[] = { 0x83 };
+    ByteSpan multiple_byte_length_insufficient_bytes2_buf(multiple_byte_length_insufficient_bytes2);
+
+    uint8_t max_byte_length_large_insufficient_bytes[1 + sizeof(size_t) - 1];
+    ByteSpan max_byte_length_large_insufficient_bytes_buf(max_byte_length_large_insufficient_bytes);
+
+    // We build a DER length value of SIZE_MAX programmatically, with one byte too few.
+    max_byte_length_large_insufficient_bytes[0] = 0x80 | sizeof(size_t);
+    memset(&max_byte_length_large_insufficient_bytes[1], 0xFF, sizeof(max_byte_length_large_insufficient_bytes) - 1);
+
+    struct ErrorCase
+    {
+        const ByteSpan & input_buf;
+        CHIP_ERROR expected_status;
+    };
+
+    const ErrorCase error_cases[] = {
+        { .input_buf = bad_buffer_empty, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = zero_multi_byte_length_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = single_byte_length_zero_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = single_byte_length_too_small_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = multiple_byte_length_zero_padded_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
+        { .input_buf = multiple_byte_length_insufficient_bytes_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = multiple_byte_length_insufficient_bytes2_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .input_buf = max_byte_length_large_insufficient_bytes_buf, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
+    };
+
+    int case_idx = 0;
+    for (const ErrorCase & v : error_cases)
+    {
+        size_t output_length = SIZE_MAX;
+        chip::Encoding::LittleEndian::Reader input_reader{ v.input_buf };
+        CHIP_ERROR status = ReadDerLength(input_reader, output_length);
+        if (status != v.expected_status)
+        {
+            ChipLogError(Crypto, "Failed TestReadDerLengthInvalidCases sub-case %d", case_idx);
+            NL_TEST_ASSERT_EQUALS(inSuite, v.expected_status, status);
         }
         ++case_idx;
     }
@@ -786,16 +899,16 @@ static void TestHash_SHA256_Stream(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
+static void TestHMAC_SHA256_RawKey(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors);
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_raw_key);
     int numOfTestsExecuted = 0;
     TestHMAC_sha mHMAC;
 
     for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
-        hmac_sha256_vector v = hmac_sha256_test_vectors[numOfTestsExecuted];
+        hmac_sha256_vector v = hmac_sha256_test_vectors_raw_key[numOfTestsExecuted];
         size_t out_length    = v.output_hash_length;
         chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
         out_buffer.Alloc(out_length);
@@ -803,6 +916,37 @@ static void TestHMAC_SHA256(nlTestSuite * inSuite, void * inContext)
         mHMAC.HMAC_SHA256(v.key, v.key_length, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
         bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
         NL_TEST_ASSERT(inSuite, success);
+    }
+    NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
+}
+
+static void TestHMAC_SHA256_KeyHandle(nlTestSuite * inSuite, void * inContext)
+{
+    HeapChecker heapChecker(inSuite);
+    int numOfTestCases     = ArraySize(hmac_sha256_test_vectors_key_handle);
+    int numOfTestsExecuted = 0;
+    TestHMAC_sha mHMAC;
+
+    for (numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
+    {
+        hmac_sha256_vector v = hmac_sha256_test_vectors_key_handle[numOfTestsExecuted];
+        size_t out_length    = v.output_hash_length;
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_buffer;
+        out_buffer.Alloc(out_length);
+        NL_TEST_ASSERT(inSuite, out_buffer);
+        Crypto::DefaultSessionKeystore keystore;
+
+        Symmetric128BitsKeyByteArray keyMaterial;
+        memcpy(keyMaterial, v.key, v.key_length);
+
+        Hmac128KeyHandle keyHandle;
+        NL_TEST_ASSERT_SUCCESS(inSuite, keystore.CreateKey(keyMaterial, keyHandle));
+
+        mHMAC.HMAC_SHA256(keyHandle, v.message, v.message_length, out_buffer.Get(), v.output_hash_length);
+        bool success = memcmp(v.output_hash, out_buffer.Get(), out_length) == 0;
+        NL_TEST_ASSERT(inSuite, success);
+
+        keystore.DestroyKey(keyHandle);
     }
     NL_TEST_ASSERT(inSuite, numOfTestsExecuted == numOfTestCases);
 }
@@ -1043,11 +1187,7 @@ static void TestECDH_EstablishSecret(nlTestSuite * inSuite, void * inContext)
     Test_P256Keypair keypair1;
     NL_TEST_ASSERT(inSuite, keypair1.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
-#ifdef ENABLE_HSM_EC_KEY
-    Test_P256Keypair keypair2(HSM_ECC_KEYID + 1);
-#else
     Test_P256Keypair keypair2;
-#endif
     NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256ECDHDerivedSecret out_secret1;
@@ -1200,7 +1340,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
     // Second case: correct CSR
     {
-        const uint8_t kGoodCsr[205] = {
+        const uint8_t kGoodCsr[] = {
             0x30, 0x81, 0xca, 0x30, 0x70, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0a,
             0x0c, 0x03, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06,
             0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0xa3, 0xbe, 0xa1, 0xf5, 0x42, 0x01,
@@ -1213,7 +1353,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
             0x21, 0x00, 0x8b, 0x6b, 0x49, 0xb6, 0x7d, 0x3e, 0x67, 0x9e, 0xb1, 0x22, 0xd3, 0x63, 0x82, 0x40, 0x4f, 0x49, 0xa4,
             0xdc, 0x17, 0x35, 0xac, 0x4b, 0x7a, 0xbf, 0x52, 0x05, 0x58, 0x68, 0xe0, 0xaa, 0xd2, 0x8e,
         };
-        const uint8_t kGoodCsrSubjectPublicKey[65] = {
+        const uint8_t kGoodCsrSubjectPublicKey[] = {
             0x04, 0xa3, 0xbe, 0xa1, 0xf5, 0x42, 0x01, 0x07, 0x3c, 0x4b, 0x75, 0x85, 0xd8, 0xe2, 0x98, 0xac, 0x2f,
             0xf6, 0x98, 0xdb, 0xd9, 0x5b, 0xe0, 0x7e, 0xc1, 0x04, 0xd5, 0x73, 0xc5, 0xb0, 0x90, 0x77, 0x27, 0x00,
             0x1e, 0x22, 0xc7, 0x89, 0x5e, 0x4d, 0x75, 0x07, 0x89, 0x82, 0x0f, 0x49, 0xb6, 0x59, 0xd5, 0xc5, 0x15,
@@ -1234,7 +1374,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
     // Third case: bad signature
     {
-        const uint8_t kBadSignatureSignatureCsr[205] = {
+        const uint8_t kBadSignatureSignatureCsr[] = {
             0x30, 0x81, 0xca, 0x30, 0x70, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0a,
             0x0c, 0x03, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06,
             0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0xa3, 0xbe, 0xa1, 0xf5, 0x42, 0x01,
@@ -1259,7 +1399,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
     // Fourth case: CSR too big
     {
-        const uint8_t kBadTooBigCsr[256] = {
+        const uint8_t kBadTooBigCsr[] = {
             0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0b,
             0x0c, 0x03, 0x43, 0x53, 0x41, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06, 0x08,
             0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0x72, 0x48, 0xc0, 0x36, 0xf0, 0x12, 0x5f, 0xd1,
@@ -1285,7 +1425,9 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
     // Fifth case: obviously invalid CSR (1/2)
     {
-        const uint8_t kTooSmallCsr[10] = { 0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30 };
+        const uint8_t kTooSmallCsr[] = {
+            0x30, 0x81, 0xda, 0x30, 0x81, 0x81, 0x02, 0x01, 0x00, 0x30,
+        };
 
         Crypto::ClearSecretData(pubKey.Bytes(), pubKey.Length());
 
@@ -1298,7 +1440,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
     // Sixth case: obviously invalid CSR (2/2)
     {
-        const uint8_t kNotSequenceCsr[205] = {
+        const uint8_t kNotSequenceCsr[] = {
             0x31, 0x81, 0xca, 0x30, 0x70, 0x02, 0x01, 0x00, 0x30, 0x0e, 0x31, 0x0c, 0x30, 0x0a, 0x06, 0x03, 0x55, 0x04, 0x0a,
             0x0c, 0x03, 0x43, 0x53, 0x52, 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x02, 0x01, 0x06,
             0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00, 0x04, 0xa3, 0xbe, 0xa1, 0xf5, 0x42, 0x01,
@@ -1324,7 +1466,7 @@ void TestCSR_Verify(nlTestSuite * inSuite, void * inContext)
 
 void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t csrBuf[kMAX_CSR_Length];
+    uint8_t csrBuf[kMIN_CSR_Buffer_Size];
     ClearSecretData(csrBuf);
     MutableByteSpan csrSpan(csrBuf);
 
@@ -1333,7 +1475,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Validate case of buffer too small
-    uint8_t csrBufTooSmall[kMAX_CSR_Length - 1];
+    uint8_t csrBufTooSmall[kMIN_CSR_Buffer_Size - 1];
     MutableByteSpan csrSpanTooSmall(csrBufTooSmall);
     NL_TEST_ASSERT(inSuite, GenerateCertificateSigningRequest(&keypair, csrSpanTooSmall) == CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -1355,8 +1497,8 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
         size_t length      = csrSpan.size();
-        csrBuf[length - 2] = (uint8_t)(csrBuf[length - 2] + 1);
-        csrBuf[length - 1] = (uint8_t)(csrBuf[length - 1] + 1);
+        csrBuf[length - 2] = (uint8_t) (csrBuf[length - 2] + 1);
+        csrBuf[length - 1] = (uint8_t) (csrBuf[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey) != CHIP_NO_ERROR);
     }
@@ -1369,7 +1511,7 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
 {
     HeapChecker heapChecker(inSuite);
-    uint8_t csr[kMAX_CSR_Length];
+    uint8_t csr[kMIN_CSR_Buffer_Size];
     size_t length = sizeof(csr);
 
     Test_P256Keypair keypair;
@@ -1386,8 +1528,8 @@ static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }
@@ -1660,12 +1802,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
 
 // We need to "generate" specific field elements
 // to do so we need to override the specific method
-class Test_Spake2p_P256_SHA256_HKDF_HMAC :
-#ifdef ENABLE_HSM_SPAKE
-    public Spake2pHSM_P256_SHA256_HKDF_HMAC
-#else
-    public Spake2p_P256_SHA256_HKDF_HMAC
-#endif
+class Test_Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p_P256_SHA256_HKDF_HMAC
 {
 public:
     CHIP_ERROR TestSetFE(const uint8_t * fe_in, size_t fe_in_len)
@@ -1838,7 +1975,7 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
 {
     HeapChecker heapChecker(inSuite);
     // Data from spec test vector (see Operational Discovery section)
-    const uint8_t kRootPublicKey[65] = {
+    const uint8_t kRootPublicKey[] = {
         0x04, 0x4a, 0x9f, 0x42, 0xb1, 0xca, 0x48, 0x40, 0xd3, 0x72, 0x92, 0xbb, 0xc7, 0xf6, 0xa7, 0xe1, 0x1e,
         0x22, 0x20, 0x0c, 0x97, 0x6f, 0xc9, 0x00, 0xdb, 0xc9, 0x8a, 0x7a, 0x38, 0x3a, 0x64, 0x1c, 0xb8, 0x25,
         0x4a, 0x2e, 0x56, 0xd4, 0xe2, 0x95, 0xa8, 0x47, 0x94, 0x3b, 0x4e, 0x38, 0x97, 0xc4, 0xa7, 0x73, 0xe9,
@@ -1848,7 +1985,7 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
 
     constexpr uint64_t kFabricId = 0x2906C908D115D362;
 
-    const uint8_t kExpectedCompressedFabricIdentifier[8] = {
+    const uint8_t kExpectedCompressedFabricIdentifier[] = {
         0x87, 0xe1, 0xb0, 0x04, 0xe2, 0x35, 0xa1, 0x30,
     };
     static_assert(sizeof(kExpectedCompressedFabricIdentifier) == kCompressedFabricIdentifierSize,
@@ -1892,7 +2029,7 @@ static void TestCompressedFabricIdentifier(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, compressed_fabric_id_int == kExpectedCompressedFabricIdentifierInt);
 
     // Test invalid public key
-    const uint8_t kInvalidRootPublicKey[65] = {
+    const uint8_t kInvalidRootPublicKey[] = {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1917,7 +2054,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = TestCerts::gTestCerts[i];
+        TestCert certType = TestCerts::gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1954,14 +2091,26 @@ static void TestX509_VerifyAttestationCertificateFormat(nlTestSuite * inSuite, v
         {  ByteSpan(),                                    Crypto::AttestationCertType::kDAC, CHIP_ERROR_INVALID_ARGUMENT },
         {  sTestCert_PAI_FFF2_NoPID_FB_Cert,              Crypto::AttestationCertType::kDAC, CHIP_ERROR_INTERNAL         },
         {  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert, Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaaWithNoPathlen},                   Crypto::AttestationCertType::kPAA, CHIP_NO_ERROR               },
+        {  ByteSpan{kPaiPathLenMissing},                  Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaiPathLen1},                        Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kPaaPathLen2},                        Crypto::AttestationCertType::kPAA, CHIP_ERROR_INTERNAL         },
+        {  ByteSpan{kWrongPathLenFormat},                 Crypto::AttestationCertType::kPAI, CHIP_ERROR_INTERNAL         },
     };
     // clang-format on
 
+    int case_idx = 0;
     for (auto & testCase : sValidationTestCases)
     {
         ByteSpan cert  = testCase.cert;
         CHIP_ERROR err = VerifyAttestationCertificateFormat(cert, testCase.type);
+        if (err != testCase.expectedError)
+        {
+            ChipLogError(Crypto, "Failed TestX509_VerifyAttestationCertificateFormat sub-case %d, err: %" CHIP_ERROR_FORMAT,
+                         case_idx, err.Format());
+        }
         NL_TEST_ASSERT(inSuite, err == testCase.expectedError);
+        ++case_idx;
     }
 }
 
@@ -1998,7 +2147,7 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
         {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,    sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert,  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Valid cases without intermediate:
-        {  ByteSpan(sTestCert_Root01_DER, sTestCert_Root01_DER_Len), ByteSpan(), ByteSpan(sTestCert_Node01_02_DER, sTestCert_Node01_02_DER_Len), CHIP_NO_ERROR,          CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_Root01_DER,                ByteSpan(),                                sTestCert_Node01_02_DER,                         CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Error cases with invalid (empty Span) inputs:
         {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
         {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              ByteSpan(),                                      CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },
@@ -2093,7 +2242,7 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2101,8 +2250,15 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractSKIDFromX509Cert(cert, skidOut);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+        if (!skidSpan.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, skidSpan.data_equal(skidOut));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
 }
 
@@ -2120,7 +2276,7 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2128,8 +2284,300 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = ExtractAKIDFromX509Cert(cert, akidOut);
+        if (!akidSpan.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
+    }
+}
+
+static void TestCDPExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        CharSpan mExpectedResult;
+    };
+
+    constexpr const char * exampleHttpURI  = "http://example.com/crl.pem";
+    constexpr const char * exampleHttpsURI = "https://example.com/crl.pem";
+    CharSpan httpSpan                      = CharSpan::fromCharString(exampleHttpURI);
+    CharSpan httpsSpan                     = CharSpan::fromCharString(exampleHttpsURI);
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                             Expected Error               Expected Output
+        // ==============================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, CharSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_NO_ERROR,               httpSpan   },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        CharSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               httpsSpan  },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_ERROR_BUFFER_TOO_SMALL, CharSpan() },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        char cdpBuf[kMaxCRLDistributionPointURLLength] = { '\0' };
+        MutableCharSpan cdp(cdpBuf);
+        err = ExtractCRLDistributionPointURIFromX509Cert(testCase.Cert, cdp);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
+        {
+            NL_TEST_ASSERT(inSuite, cdp.size() == testCase.mExpectedResult.size());
+            NL_TEST_ASSERT(inSuite, cdp.data_equal(testCase.mExpectedResult));
+        }
+    }
+}
+
+static void TestCDPCRLIssuerExtension_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct CDPTestCase
+    {
+        ByteSpan Cert;
+        CHIP_ERROR mExpectedError;
+        ByteSpan mCRLIssuerCert;
+    };
+
+    // clang-format off
+    static CDPTestCase sCDPTestCases[] = {
+        // Cert                                                             Expected Error               Expected CRL Issuer Cert
+        // =======================================================================================================================
+        {  ByteSpan(),                                                      CHIP_ERROR_INVALID_ARGUMENT, ByteSpan() },
+        {  sTestCert_PAA_FFF1_Cert,                                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_PAI_FFF2_8001_Cert,                                    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF2_8003_0019_FB_Cert,                            CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Cert,                           CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert,                     CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert,                         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert,              CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert,                      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert,         CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert,    CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert,  CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert,      CHIP_ERROR_NOT_FOUND,        ByteSpan() },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert,           CHIP_NO_ERROR,               sTestCert_PAA_FFF1_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert,          CHIP_NO_ERROR,               sTestCert_PAA_NoVID_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert,      CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+        {  sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert, CHIP_NO_ERROR,               sTestCert_PAI_FFF2_8004_FB_Cert },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCDPTestCases)
+    {
+        uint8_t crlIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan crlIssuer(crlIssuerBuf);
+        err = ExtractCDPExtensionCRLIssuerFromX509Cert(testCase.Cert, crlIssuer);
+        NL_TEST_ASSERT(inSuite, err == testCase.mExpectedError);
+        if (testCase.mExpectedError == CHIP_NO_ERROR)
+        {
+            uint8_t crlIssuerSubjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+            MutableByteSpan crlIssuerSubject(crlIssuerSubjectBuf);
+
+            err = ExtractSubjectFromX509Cert(testCase.mCRLIssuerCert, crlIssuerSubject);
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+            NL_TEST_ASSERT(inSuite, crlIssuer.data_equal(crlIssuerSubject));
+        }
+    }
+}
+
+static void TestSerialNumber_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct SerialNumberTestCase
+    {
+        TestCert Cert;
+        ByteSpan mExpectedResult;
+    };
+
+    const uint8_t serialNumberRoot01[]    = { 0x53, 0x4c, 0x45, 0x82, 0x73, 0x62, 0x35, 0x14 };
+    const uint8_t serialNumberICA01[]     = { 0x69, 0xd8, 0x6a, 0x8d, 0x80, 0xfc, 0x8f, 0x5d };
+    const uint8_t serialNumberNode02_08[] = { 0x3e, 0x67, 0x94, 0x70, 0x7a, 0xec, 0xb8, 0x15 };
+
+    // clang-format off
+    static SerialNumberTestCase sSerialNumberTestCases[] = {
+        // Cert                    Expected Output
+        // ====================================================
+        {  TestCert::kRoot01,      ByteSpan(serialNumberRoot01) },
+        {  TestCert::kICA01,       ByteSpan(serialNumberICA01) },
+        {  TestCert::kNode02_08,   ByteSpan(serialNumberNode02_08) },
+    };
+    // clang-format on
+
+    for (auto & testCase : sSerialNumberTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, akidSpan.data_equal(akidOut));
+
+        uint8_t serialNumberBuf[kMaxCertificateSerialNumberLength] = { 0 };
+        MutableByteSpan serialNumber(serialNumberBuf);
+        err = ExtractSerialNumberFromX509Cert(cert, serialNumber);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, serialNumber.data_equal(testCase.mExpectedResult));
+    }
+}
+
+static void TestSubject_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct TestCase
+    {
+        TestCert Cert;
+        ChipDN mExpectedDN;
+    };
+
+    ChipDN subjectDN_Root01;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Root01.AddAttribute_MatterRCACId(0xCACACACA00000001));
+    ChipDN subjectDN_ICA01;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_ICA01.AddAttribute_MatterICACId(0xCACACACA00000003));
+    ChipDN subjectDN_Node02_02;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_02.AddAttribute_MatterNodeId(0xDEDEDEDE00020002));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    NL_TEST_ASSERT(inSuite,
+                   CHIP_NO_ERROR ==
+                       subjectDN_Node02_02.AddAttribute_CommonName("TEST CERT COMMON NAME Attr for Node02_02"_span, false));
+    ChipDN subjectDN_Node02_04;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCE1002));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_CommonName("TestCert02_04"_span, false));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterCASEAuthTag(0xABCD0003));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_04.AddAttribute_MatterNodeId(0xDEDEDEDE00020004));
+    ChipDN subjectDN_Node02_08;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCF00A0));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterNodeId(0xDEDEDEDE00020008));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCD0020));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == subjectDN_Node02_08.AddAttribute_MatterCASEAuthTag(0xABCE0100));
+
+    // clang-format off
+    static TestCase sTestCases[] = {
+        // Cert                    Expected Output
+        // ==============================================
+        {  TestCert::kRoot01,      subjectDN_Root01    },
+        {  TestCert::kICA01,       subjectDN_ICA01     },
+        {  TestCert::kNode02_02,   subjectDN_Node02_02 },
+        {  TestCert::kNode02_04,   subjectDN_Node02_04 },
+        {  TestCert::kNode02_08,   subjectDN_Node02_08 },
+    };
+    // clang-format on
+
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint8_t subjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan subject(subjectBuf);
+        err = ExtractSubjectFromX509Cert(cert, subject);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        static uint8_t expectedSubjectBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        ASN1::ASN1Writer writer;
+        writer.Init(expectedSubjectBuf);
+        err = testCase.mExpectedDN.EncodeToASN1(writer);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        size_t expectedSubjectLen = writer.GetLengthWritten();
+        NL_TEST_ASSERT(inSuite, expectedSubjectLen == subject.size());
+        NL_TEST_ASSERT(inSuite, memcmp(subject.data(), expectedSubjectBuf, expectedSubjectLen) == 0);
+    }
+}
+
+static void TestIssuer_x509Extraction(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace TestCerts;
+
+    HeapChecker heapChecker(inSuite);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    struct TestCase
+    {
+        TestCert Cert;
+        ChipDN mExpectedDN;
+    };
+
+    ChipDN issuerDN_Root01;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_Root01.AddAttribute_MatterRCACId(0xCACACACA00000001));
+    ChipDN issuerDN_ICA02;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_ICA02.AddAttribute_MatterRCACId(0xCACACACA00000002));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_ICA02.AddAttribute_MatterFabricId(0xFAB000000000001D));
+    ChipDN issuerDN_Node02_02;
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_Node02_02.AddAttribute_MatterICACId(0xCACACACA00000004));
+    NL_TEST_ASSERT(inSuite, CHIP_NO_ERROR == issuerDN_Node02_02.AddAttribute_MatterFabricId(0xFAB000000000001D));
+
+    // clang-format off
+    static TestCase sTestCases[] = {
+        // Cert                    Expected Output
+        // ==============================================
+        {  TestCert::kRoot01,      issuerDN_Root01    },
+        {  TestCert::kICA02,       issuerDN_ICA02     },
+        {  TestCert::kNode02_02,   issuerDN_Node02_02 },
+    };
+    // clang-format on
+
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan cert;
+        err = GetTestCert(testCase.Cert, TestCertLoadFlags::kDERForm, cert);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        uint8_t issuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        MutableByteSpan issuer(issuerBuf);
+        err = ExtractIssuerFromX509Cert(cert, issuer);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        static uint8_t expectedIssuerBuf[kMaxCertificateDistinguishedNameLength] = { 0 };
+        ASN1::ASN1Writer writer;
+        writer.Init(expectedIssuerBuf);
+        err = testCase.mExpectedDN.EncodeToASN1(writer);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        size_t expectedIssuerLen = writer.GetLengthWritten();
+        NL_TEST_ASSERT(inSuite, expectedIssuerLen == issuer.size());
+        NL_TEST_ASSERT(inSuite, memcmp(issuer.data(), expectedIssuerBuf, expectedIssuerLen) == 0);
     }
 }
 
@@ -2171,10 +2619,12 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
     const char * sTestCNAttribute11 = "ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:B1";
     const char * sTestCNAttribute12 = "ACME Matter Devel DAC 5CDA9899 Mpid: Mvid:FFF1";
 
-    // Common Name (CN) VID/PID encoding error cases (more examples):
+    // Common Name (CN) VID/PID encoding more cases (more examples):
     const char * sTestCNAttribute13 = "Mpid:987Mvid:FFF10x";
-    const char * sTestCNAttribute14 = "MpidMvid:FFF10 Matter Test Mpid:FE67";
+    const char * sTestCNAttribute14 = "MpidMvid:FFF10 Matter Test Mpid:FE67"; // Valid, even if there is run-in.
     const char * sTestCNAttribute15 = "Matter Devel Mpid:Mvid:Fff1";
+    // Even though "Mpid:" appears thrice, only the value with correct hex afterwards is taken
+    const char * sTestCNAttribute16 = "Mpid:Mvid:FFF1 Mpid:12cd Matter Test Mpid:FE67";
 
     struct TestCase
     {
@@ -2215,50 +2665,66 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute07), strlen(sTestCNAttribute07)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute08), strlen(sTestCNAttribute08)), true, true, chip::VendorId::TestVendor1, 0x00B1, CHIP_NO_ERROR },
         // Common Name (CN) VID/PID encoding error cases:
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute09), strlen(sTestCNAttribute09)), false, true, chip::VendorId::NotSpecified, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute10), strlen(sTestCNAttribute10)), false, true, chip::VendorId::NotSpecified, 0x00B1, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute11), strlen(sTestCNAttribute11)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute12), strlen(sTestCNAttribute12)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute13), strlen(sTestCNAttribute13)), true, false, chip::VendorId::TestVendor1, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute09), strlen(sTestCNAttribute09)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute10), strlen(sTestCNAttribute10)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute11), strlen(sTestCNAttribute11)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute12), strlen(sTestCNAttribute12)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        // Common Name (CN) VID/PID encoding additional cases:
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute13), strlen(sTestCNAttribute13)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute14), strlen(sTestCNAttribute14)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_WRONG_CERT_DN },
+        { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute16), strlen(sTestCNAttribute16)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
         // Other input combinations:
         { DNAttrType::kUnspecified, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(nullptr, 0), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
+        { DNAttrType::kCommonName, ByteSpan(), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
     };
     // clang-format on
 
+    int caseIdx = 0;
     for (const auto & testCase : kTestCases)
     {
         AttestationCertVidPid vidpid;
         AttestationCertVidPid vidpidFromCN;
         AttestationCertVidPid vidpidToCheck;
         CHIP_ERROR result = ExtractVIDPIDFromAttributeString(testCase.attrType, testCase.attr, vidpid, vidpidFromCN);
+        ChipLogProgress(Crypto, "Checking VID/PID DN case %d. Expected: %" CHIP_ERROR_FORMAT, caseIdx,
+                        testCase.expectedResult.Format());
+
+        if (result != testCase.expectedResult)
+        {
+            ChipLogError(Crypto, "Actual result: %" CHIP_ERROR_FORMAT, result.Format());
+        }
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
-        if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
+        // Only do assertions on output params in case of success since otherwise
+        // many of the output params are intermediate outputs.
+        if (result == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, !vidpidFromCN.Initialized());
-            vidpidToCheck = vidpid;
-        }
-        else if (testCase.attrType == DNAttrType::kCommonName)
-        {
-            NL_TEST_ASSERT(inSuite, !vidpid.Initialized());
-            vidpidToCheck = vidpidFromCN;
-        }
+            if (testCase.attrType == DNAttrType::kMatterVID || testCase.attrType == DNAttrType::kMatterPID)
+            {
+                NL_TEST_ASSERT(inSuite, !vidpidFromCN.Initialized());
+                vidpidToCheck = vidpid;
+            }
+            else if (testCase.attrType == DNAttrType::kCommonName)
+            {
+                NL_TEST_ASSERT(inSuite, !vidpid.Initialized());
+                vidpidToCheck = vidpidFromCN;
+            }
 
-        NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.HasValue() == testCase.expectedVidPresent);
-        NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.HasValue() == testCase.expectedPidPresent);
+            NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.HasValue() == testCase.expectedVidPresent);
+            NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.HasValue() == testCase.expectedPidPresent);
 
-        if (testCase.expectedVidPresent)
-        {
-            NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.Value() == testCase.expectedVid);
-        }
+            if (testCase.expectedVidPresent)
+            {
+                NL_TEST_ASSERT(inSuite, vidpidToCheck.mVendorId.Value() == testCase.expectedVid);
+            }
 
-        if (testCase.expectedPidPresent)
-        {
-            NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.Value() == testCase.expectedPid);
+            if (testCase.expectedPidPresent)
+            {
+                NL_TEST_ASSERT(inSuite, vidpidToCheck.mProductId.Value() == testCase.expectedPid);
+            }
         }
+        ++caseIdx;
     }
 }
 
@@ -2520,6 +2986,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test decrypting AES-CCM-128 invalid nonce", TestAES_CCM_128DecryptInvalidNonceLen),
     NL_TEST_DEF("Test encrypt/decrypt AES-CTR-128 test vectors", TestAES_CTR_128CryptTestVectors),
     NL_TEST_DEF("Test ASN.1 signature conversion routines", TestAsn1Conversions),
+    NL_TEST_DEF("Test reading a length from ASN.1 DER stream success cases", TestReadDerLengthValidCases),
+    NL_TEST_DEF("Test reading a length from ASN.1 DER stream error cases", TestReadDerLengthInvalidCases),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion", TestRawIntegerToDerValidCases),
     NL_TEST_DEF("Test Integer to ASN.1 DER conversion error cases", TestRawIntegerToDerInvalidCases),
     NL_TEST_DEF("Test ECDSA signing and validation message using SHA256", TestECDSA_Signing_SHA256_Msg),
@@ -2533,7 +3001,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test Hash SHA 256", TestHash_SHA256),
     NL_TEST_DEF("Test Hash SHA 256 Stream", TestHash_SHA256_Stream),
     NL_TEST_DEF("Test HKDF SHA 256", TestHKDF_SHA256),
-    NL_TEST_DEF("Test HMAC SHA 256", TestHMAC_SHA256),
+    NL_TEST_DEF("Test HMAC SHA 256 - Raw Key", TestHMAC_SHA256_RawKey),
+    NL_TEST_DEF("Test HMAC SHA 256 - Key Handle", TestHMAC_SHA256_KeyHandle),
     NL_TEST_DEF("Test DRBG invalid inputs", TestDRBG_InvalidInputs),
     NL_TEST_DEF("Test DRBG output", TestDRBG_Output),
     NL_TEST_DEF("Test ECDH derive shared secret", TestECDH_EstablishSecret),
@@ -2560,6 +3029,11 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test x509 Certificate Timestamp Validation", TestX509_IssuingTimestampValidation),
     NL_TEST_DEF("Test Subject Key Id Extraction from x509 Certificate", TestSKID_x509Extraction),
     NL_TEST_DEF("Test Authority Key Id Extraction from x509 Certificate", TestAKID_x509Extraction),
+    NL_TEST_DEF("Test CRL Distribution Point Extension Extraction from x509 Certificate", TestCDPExtension_x509Extraction),
+    NL_TEST_DEF("Test CDP Extension CRL Issuer Extraction from x509 Certificate", TestCDPCRLIssuerExtension_x509Extraction),
+    NL_TEST_DEF("Test Serial Number Extraction from x509 Certificate", TestSerialNumber_x509Extraction),
+    NL_TEST_DEF("Test Subject Extraction from x509 Certificate", TestSubject_x509Extraction),
+    NL_TEST_DEF("Test Issuer Extraction from x509 Certificate", TestIssuer_x509Extraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from Attribute String", TestVIDPID_StringExtraction),
     NL_TEST_DEF("Test Vendor ID and Product ID Extraction from x509 Attestation Certificate", TestVIDPID_x509Extraction),
     NL_TEST_DEF("Test Replace Resigned Certificate Version if Found", TestX509_ReplaceCertIfResignedCertFound),
@@ -2607,7 +3081,7 @@ int TestCHIPCryptoPAL(void)
         TestCHIPCryptoPAL_Teardown
     };
     // clang-format on
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     add_entropy_source(test_entropy_source, nullptr, 16);

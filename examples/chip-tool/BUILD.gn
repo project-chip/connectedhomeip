@@ -35,19 +35,20 @@ config("config") {
   ]
 
   defines = [
-    "CONFIG_USE_LOCAL_STORAGE=${config_use_local_storage}",
     "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}",
     "CONFIG_USE_INTERACTIVE_MODE=${config_use_interactive_mode}",
-    "CONFIG_ENABLE_YAML_TESTS=${config_enable_yaml_tests}",
   ]
+
+  # Note: CONFIG_USE_LOCAL_STORAGE is tested for via #ifdef, not #if.
+  if (config_use_local_storage) {
+    defines += [ "CONFIG_USE_LOCAL_STORAGE" ]
+  }
 
   cflags = [ "-Wconversion" ]
 }
 
 static_library("chip-tool-utils") {
   sources = [
-    "${chip_root}/src/app/tests/suites/include/ConstraintsChecker.h",
-    "${chip_root}/src/app/tests/suites/include/ValueChecker.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
@@ -61,7 +62,6 @@ static_library("chip-tool-utils") {
     "commands/common/Commands.cpp",
     "commands/common/Commands.h",
     "commands/common/CredentialIssuerCommands.h",
-    "commands/common/DeviceScanner.cpp",
     "commands/common/HexConversion.h",
     "commands/common/RemoteDataModelLogger.cpp",
     "commands/common/RemoteDataModelLogger.h",
@@ -70,8 +70,8 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
-    "commands/pairing/CloseSessionCommand.cpp",
-    "commands/pairing/CloseSessionCommand.h",
+    "commands/icd/ICDCommand.cpp",
+    "commands/icd/ICDCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
     "commands/pairing/PairingCommand.cpp",
@@ -80,6 +80,8 @@ static_library("chip-tool-utils") {
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
     "commands/payload/SetupPayloadVerhoeff.cpp",
+    "commands/session-management/CloseSessionCommand.cpp",
+    "commands/session-management/CloseSessionCommand.h",
     "commands/storage/StorageManagementCommand.cpp",
   ]
 
@@ -89,23 +91,21 @@ static_library("chip-tool-utils") {
     sources += [ "commands/interactive/InteractiveCommands.cpp" ]
     deps += [
       "${chip_root}/examples/common/websocket-server",
+      "${chip_root}/src/platform/logging:headers",
       "${editline_root}:editline",
     ]
   }
 
-  if (config_enable_yaml_tests) {
-    sources += [ "commands/tests/TestCommand.cpp" ]
+  if (chip_device_platform == "darwin") {
+    sources += [ "commands/common/DeviceScanner.cpp" ]
   }
 
   public_deps = [
+    "${chip_root}/examples/common/tracing:commandline",
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/app/tests/suites/commands/commissioner",
-    "${chip_root}/src/app/tests/suites/commands/delay",
-    "${chip_root}/src/app/tests/suites/commands/discovery",
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
-    "${chip_root}/src/app/tests/suites/commands/log",
-    "${chip_root}/src/app/tests/suites/commands/system",
-    "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:file_attestation_trust_store",
     "${chip_root}/src/lib",

@@ -28,13 +28,15 @@ extern "C" {
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
+#ifdef SL_BOARD_NAME
 #include "sl_board_control.h"
+#endif
 #include "sl_uartdrv_instances.h"
+#if SL_WIFI
+#include "spi_multiplex.h"
+#endif // SL_WIFI
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-#include "spi_multiplex.h"
-#endif /* EFR32MG24 && WF200_WIFI */
 #endif
 #ifdef SL_CATALOG_UARTDRV_USART_PRESENT
 #include "sl_uartdrv_usart_vcom_config.h"
@@ -134,8 +136,6 @@ static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
-static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
-                             UARTDRV_Count_t transferCount);
 static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
@@ -254,7 +254,9 @@ void uartConsoleInit(void)
         return;
     }
 
+#ifdef SL_BOARD_NAME
     sl_board_enable_vcom();
+#endif
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
@@ -472,17 +474,21 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
-
+#if SL_UARTCTRL_MUX
+    sl_wfx_host_pre_uart_transfer();
+#endif // SL_UARTCTRL_MUX
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
-    pre_uart_transfer();
-#endif /* EFR32MG24 && WF200_WIFI */
-
+    // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
+    // WF200 SPI IRQ
+    UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
+#else
+    // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
     ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    post_uart_transfer();
 #endif /* EFR32MG24 && WF200_WIFI */
+#if SL_UARTCTRL_MUX
+    sl_wfx_host_post_uart_transfer();
+#endif // SL_UARTCTRL_MUX
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);

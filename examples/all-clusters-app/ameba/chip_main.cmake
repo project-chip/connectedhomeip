@@ -154,17 +154,37 @@ list(
     APPEND ${list_chip_main_sources}
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
-
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/BindingHandler.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/OperationalStateManager.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/ManualOperationCommand.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
+
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/DeviceEnergyManagementManager.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseDelegateImpl.cpp
+    ${chip_dir}/examples/energy-management-app/energy-management-common/src/EnergyEvseManager.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
+
+    ${chip_dir}/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
@@ -205,6 +225,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
+    ${chip_dir}/examples/energy-management-app/energy-management-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
     ${chip_dir}/examples/platform/ameba/route_hook
@@ -254,11 +275,11 @@ list(
     -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCHIP_SHELL_MAX_TOKENS=11
     -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+    -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
 )
 
 if (matter_enable_persistentstorage_audit)
@@ -295,8 +316,7 @@ list(
     APPEND chip_main_cpp_flags
 
 	-Wno-unused-parameter
-	-std=gnu++11
-	-std=c++14
+	-std=c++17
 	-fno-rtti
 )
 target_compile_definitions(${chip_main} PRIVATE ${chip_main_flags} )

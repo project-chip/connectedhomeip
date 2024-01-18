@@ -35,10 +35,3 @@
 //  Until this is improved in OpenThread we need to increase the retransmission
 //  interval to survive the stall.
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (1000_ms32)
-
-/**
- * CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
- *
- * Reduce packet buffer pool size to 8 (default 15) to reduce ram consumption
- */
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8

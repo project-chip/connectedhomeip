@@ -22,22 +22,40 @@
 #include <map>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
+#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 #include <src/include/platform/OTAImageProcessor.h>
 
 /*
  * OTA hooks that can be overwritten by application.
- * Default behavior is implemented as WEAK symbols in
- * platform OtaHooks.cpp.
+ * Default behavior is implemented as WEAK symbols in platform OtaHooks.cpp.
+ */
+
+/*
+ * This hook is called at the end of OTAImageProcessorImpl::Init.
+ * It should generally register the OTATlvProcessor instances.
  */
 extern "C" CHIP_ERROR OtaHookInit();
+
+/*
+ * This hook is called at the end of OTAImageProcessorImpl::HandleApply.
+ * The default implementation saves the internal OTA entry structure and resets the device.
+ */
 extern "C" void OtaHookReset();
+
+/*
+ * This hook is called at the end of OTAImageProcessorImpl::HandleAbort.
+ * For example, it can be used to schedule a retry.
+ */
+extern "C" void OtaHookAbort();
 
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
+    using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
+
     CHIP_ERROR Init(OTADownloader * downloader);
     void Clear();
 
@@ -54,6 +72,7 @@ public:
     CHIP_ERROR ProcessPayload(ByteSpan & block);
     CHIP_ERROR SelectProcessor(ByteSpan & block);
     CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
+    Optional<ProviderLocation> & GetBackupProvider() { return mBackupProviderLocation; }
 
     static void FetchNextData(uint32_t context);
     static OTAImageProcessorImpl & GetDefaultInstance();
@@ -78,12 +97,18 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
+    /**
+     * Call AbortAction for all processors that were used
+     */
+    void AbortAllProcessors();
+
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
     OTATlvProcessor * mCurrentProcessor = nullptr;
     OTADataAccumulator mAccumulator;
     std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
+    Optional<ProviderLocation> mBackupProviderLocation;
 };
 
 } // namespace chip

@@ -17,6 +17,7 @@
 
 #import "MTRError.h"
 #import "MTRError_Internal.h"
+#import "MTRFramework.h"
 #import "MTROnboardingPayloadParser.h"
 #import "MTRSetupPayload_Internal.h"
 #import "setup_payload/ManualSetupPayloadGenerator.h"
@@ -28,6 +29,13 @@
 
 @implementation MTRSetupPayload {
     chip::SetupPayload _chipSetupPayload;
+}
+
++ (void)initialize
+{
+    // Need to make sure we set up Platform memory stuff before we start
+    // serializing payloads.
+    MTRFrameworkInit();
 }
 
 - (MTRDiscoveryCapabilities)convertRendezvousFlags:(const chip::Optional<chip::RendezvousInformationFlags> &)value
@@ -131,7 +139,10 @@
         _vendorID = @(0); // Not available.
         _productID = @(0); // Not available.
         _commissioningFlow = MTRCommissioningFlowStandard;
-        _discoveryCapabilities = MTRDiscoveryCapabilitiesUnknown;
+        // We are using a long discriminator, so have to have a known
+        // discoveryCapabilities to be a valid payload.  Just default to "try
+        // all discovery methods".
+        _discoveryCapabilities = MTRDiscoveryCapabilitiesAllMask;
         _hasShortDiscriminator = NO;
         _discriminator = discriminator;
         _setupPasscode = setupPasscode;
@@ -355,9 +366,18 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
     payload.rendezvousInformation = [MTRSetupPayload convertDiscoveryCapabilities:self.discoveryCapabilities];
     payload.discriminator.SetLongValue([self.discriminator unsignedShortValue]);
     payload.setUpPINCode = [self.setupPasscode unsignedIntValue];
+    if (self.serialNumber != nil) {
+        CHIP_ERROR err = payload.addSerialNumber(self.serialNumber.UTF8String);
+        if (err != CHIP_NO_ERROR) {
+            if (error != nil) {
+                *error = [MTRError errorForCHIPErrorCode:err];
+            }
+            return nil;
+        }
+    }
 
-    std::string outDecimalString;
-    CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38Representation(outDecimalString);
+    std::string outQRCodeString;
+    CHIP_ERROR err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase38RepresentationWithAutoTLVBuffer(outQRCodeString);
 
     if (err != CHIP_NO_ERROR) {
         if (error != nil) {
@@ -366,7 +386,7 @@ static NSString * const MTRSetupPayloadCodingKeySerialNumber = @"MTRSP.ck.serial
         return nil;
     }
 
-    return [NSString stringWithUTF8String:outDecimalString.c_str()];
+    return [NSString stringWithUTF8String:outQRCodeString.c_str()];
 }
 
 + (nullable NSNumber *)_boxDiscoveryCapabilities:(MTRDiscoveryCapabilities)discoveryCapabilities

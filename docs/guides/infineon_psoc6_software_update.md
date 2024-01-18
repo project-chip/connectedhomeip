@@ -69,7 +69,7 @@ Infineon PSoC6 example applications by passing the
 *   Once the commissioning process completes enter:
 
            ```
-           ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+           ./out/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
            ```
 
 *   The application device will connect to the Provider and start the image

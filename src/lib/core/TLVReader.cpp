@@ -32,6 +32,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/utf8.h>
 
 namespace chip {
 namespace TLV {
@@ -117,7 +118,7 @@ uint32_t TLVReader::GetLength() const
     return 0;
 }
 
-CHIP_ERROR TLVReader::Get(bool & v)
+CHIP_ERROR TLVReader::Get(bool & v) const
 {
     TLVElementType elemType = ElementType();
     if (elemType == TLVElementType::BooleanFalse)
@@ -129,7 +130,7 @@ CHIP_ERROR TLVReader::Get(bool & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(int8_t & v)
+CHIP_ERROR TLVReader::Get(int8_t & v) const
 {
     int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
@@ -141,7 +142,7 @@ CHIP_ERROR TLVReader::Get(int8_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(int16_t & v)
+CHIP_ERROR TLVReader::Get(int16_t & v) const
 {
     int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
@@ -153,7 +154,7 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(int32_t & v)
+CHIP_ERROR TLVReader::Get(int32_t & v) const
 {
     int64_t v64    = 0;
     CHIP_ERROR err = Get(v64);
@@ -165,7 +166,7 @@ CHIP_ERROR TLVReader::Get(int32_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(int64_t & v)
+CHIP_ERROR TLVReader::Get(int64_t & v) const
 {
     // Internal callers of this method depend on it not modifying "v" on failure.
     switch (ElementType())
@@ -189,7 +190,7 @@ CHIP_ERROR TLVReader::Get(int64_t & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(uint8_t & v)
+CHIP_ERROR TLVReader::Get(uint8_t & v) const
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
@@ -201,7 +202,7 @@ CHIP_ERROR TLVReader::Get(uint8_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint16_t & v)
+CHIP_ERROR TLVReader::Get(uint16_t & v) const
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
@@ -213,7 +214,7 @@ CHIP_ERROR TLVReader::Get(uint16_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint32_t & v)
+CHIP_ERROR TLVReader::Get(uint32_t & v) const
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
@@ -225,7 +226,7 @@ CHIP_ERROR TLVReader::Get(uint32_t & v)
     return err;
 }
 
-CHIP_ERROR TLVReader::Get(uint64_t & v)
+CHIP_ERROR TLVReader::Get(uint64_t & v) const
 {
     // Internal callers of this method depend on it not modifying "v" on failure.
     switch (ElementType())
@@ -256,7 +257,7 @@ float BitCastToFloat(const uint64_t elemLenOrVal)
 // between float and double wherever possible, because these conversions are
 // relatively expensive on platforms that use soft-float instruction sets.
 
-CHIP_ERROR TLVReader::Get(float & v)
+CHIP_ERROR TLVReader::Get(float & v) const
 {
     switch (ElementType())
     {
@@ -270,7 +271,7 @@ CHIP_ERROR TLVReader::Get(float & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(double & v)
+CHIP_ERROR TLVReader::Get(double & v) const
 {
     switch (ElementType())
     {
@@ -290,7 +291,7 @@ CHIP_ERROR TLVReader::Get(double & v)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TLVReader::Get(ByteSpan & v)
+CHIP_ERROR TLVReader::Get(ByteSpan & v) const
 {
     const uint8_t * val;
     ReturnErrorOnFailure(GetDataPtr(val));
@@ -304,7 +305,7 @@ constexpr int kUnicodeInformationSeparator1       = 0x1F;
 constexpr size_t kMaxLocalizedStringIdentifierLen = 2 * sizeof(LocalizedStringIdentifier);
 } // namespace
 
-CHIP_ERROR TLVReader::Get(CharSpan & v)
+CHIP_ERROR TLVReader::Get(CharSpan & v) const
 {
     if (!TLVTypeIsUTF8String(ElementType()))
     {
@@ -313,6 +314,11 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
 
     const uint8_t * bytes;
     ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    if (bytes == nullptr)
+    {
+        // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
+        return CHIP_NO_ERROR;
+    }
 
     uint32_t len = GetLength();
 
@@ -325,6 +331,25 @@ CHIP_ERROR TLVReader::Get(CharSpan & v)
     }
 
     v = CharSpan(Uint8::to_const_char(bytes), len);
+#if CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
+    // Spec requirement: A.11.2. UTF-8 and Octet Strings
+    //
+    // For UTF-8 strings, the value octets SHALL encode a valid
+    // UTF-8 character (code points) sequence.
+    //
+    // Senders SHALL NOT include a terminating null character to
+    // mark the end of a string.
+
+    if (!Utf8::IsValid(v))
+    {
+        return CHIP_ERROR_INVALID_UTF8;
+    }
+
+    if (!v.empty() && (v.back() == 0))
+    {
+        return CHIP_ERROR_INVALID_TLV_CHAR_STRING;
+    }
+#endif // CHIP_CONFIG_TLV_VALIDATE_CHAR_STRING_ON_READ
     return CHIP_NO_ERROR;
 }
 
@@ -335,6 +360,11 @@ CHIP_ERROR TLVReader::Get(Optional<LocalizedStringIdentifier> & lsid)
 
     const uint8_t * bytes;
     ReturnErrorOnFailure(GetDataPtr(bytes)); // Does length sanity checks
+    if (bytes == nullptr)
+    {
+        // Calling memchr further down with bytes == nullptr would have undefined behaviour, exiting early.
+        return CHIP_NO_ERROR;
+    }
 
     uint32_t len = GetLength();
 
@@ -450,12 +480,9 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
     return err;
 }
 
-CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
+CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data) const
 {
-    CHIP_ERROR err;
-
-    if (!TLVTypeIsString(ElementType()))
-        return CHIP_ERROR_WRONG_TLV_TYPE;
+    VerifyOrReturnError(TLVTypeIsString(ElementType()), CHIP_ERROR_WRONG_TLV_TYPE);
 
     if (GetLength() == 0)
     {
@@ -463,19 +490,12 @@ CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
         return CHIP_NO_ERROR;
     }
 
-    err = EnsureData(CHIP_ERROR_TLV_UNDERRUN);
-    if (err != CHIP_NO_ERROR)
-        return err;
-
     uint32_t remainingLen = static_cast<decltype(mMaxLen)>(mBufEnd - mReadPoint);
 
     // Verify that the entirety of the data is available in the buffer.
     // Note that this may not be possible if the reader is reading from a chain of buffers.
-    if (remainingLen < static_cast<uint32_t>(mElemLenOrVal))
-        return CHIP_ERROR_TLV_UNDERRUN;
-
+    VerifyOrReturnError(remainingLen >= static_cast<uint32_t>(mElemLenOrVal), CHIP_ERROR_TLV_UNDERRUN);
     data = mReadPoint;
-
     return CHIP_NO_ERROR;
 }
 
@@ -566,41 +586,48 @@ CHIP_ERROR TLVReader::VerifyEndOfContainer()
 
 CHIP_ERROR TLVReader::Next()
 {
-    CHIP_ERROR err;
+    ReturnErrorOnFailure(Skip());
+    ReturnErrorOnFailure(ReadElement());
+
     TLVElementType elemType = ElementType();
 
-    err = Skip();
-    if (err != CHIP_NO_ERROR)
-        return err;
+    VerifyOrReturnError(elemType != TLVElementType::EndOfContainer, CHIP_END_OF_TLV);
 
-    err = ReadElement();
-    if (err != CHIP_NO_ERROR)
-        return err;
+    // Ensure that GetDataPtr calls can be called immediately after Next, so
+    // that `Get(ByteSpan&)` does not need to advance buffers and just works
+    if (TLVTypeIsString(elemType) && (GetLength() != 0))
+    {
+        ReturnErrorOnFailure(EnsureData(CHIP_ERROR_TLV_UNDERRUN));
+    }
 
-    elemType = ElementType();
-    if (elemType == TLVElementType::EndOfContainer)
-        return CHIP_END_OF_TLV;
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR TLVReader::Expect(Tag expectedTag)
+{
+    VerifyOrReturnError(GetType() != kTLVType_NotSpecified, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(GetTag() == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVReader::Next(Tag expectedTag)
 {
-    CHIP_ERROR err = Next();
-    if (err != CHIP_NO_ERROR)
-        return err;
-    if (mElemTag != expectedTag)
-        return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+    ReturnErrorOnFailure(Next());
+    ReturnErrorOnFailure(Expect(expectedTag));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TLVReader::Expect(TLVType expectedType, Tag expectedTag)
+{
+    VerifyOrReturnError(GetType() == expectedType, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(GetTag() == expectedTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TLVReader::Next(TLVType expectedType, Tag expectedTag)
 {
-    CHIP_ERROR err = Next(expectedTag);
-    if (err != CHIP_NO_ERROR)
-        return err;
-    if (GetType() != expectedType)
-        return CHIP_ERROR_WRONG_TLV_TYPE;
+    ReturnErrorOnFailure(Next());
+    ReturnErrorOnFailure(Expect(expectedType, expectedTag));
     return CHIP_NO_ERROR;
 }
 

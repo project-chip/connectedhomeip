@@ -51,6 +51,7 @@ ZAP_VERSION_RE = re.compile(r'v(\d\d\d\d)\.(\d\d)\.(\d\d)-nightly')
 USAGE_FILES_DEPENDING_ON_ZAP_VERSION = [
     'integrations/docker/images/chip-cert-bins/Dockerfile',
     'scripts/setup/zap.json',
+    'scripts/setup/zap.version',
 ]
 
 
@@ -124,7 +125,7 @@ def version_update(log_level, update, new_version):
         found_versions = set()
         for m in ZAP_VERSION_RE.finditer(file_data):
             version = file_data[m.start():m.end()]
-            if not version in found_versions:
+            if version not in found_versions:
                 logging.info('%s currently used in %s', version, name)
                 found_versions.add(version)
 

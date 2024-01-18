@@ -40,7 +40,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-PlatformManagerImpl PlatformManagerImpl::sInstance;
+Global<PlatformManagerImpl> PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
@@ -52,8 +52,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SuccessOrExit(err);
 #endif // CHIP_DISABLE_PLATFORM_KVS
 
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Ensure there is a dispatch queue available
     static_cast<System::LayerSocketsLoop &>(DeviceLayer::SystemLayer()).SetDispatchQueue(GetWorkQueue());
+#endif
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -88,7 +90,7 @@ CHIP_ERROR PlatformManagerImpl::_StopEventLoopTask()
     if (!mIsWorkQueueSuspended && !mIsWorkQueueSuspensionPending)
     {
         mIsWorkQueueSuspensionPending = true;
-        if (dispatch_get_current_queue() != mWorkQueue)
+        if (!IsWorkQueueCurrentQueue())
         {
             // dispatch_sync is used in order to guarantee serialization of the caller with
             // respect to any tasks that might already be on the queue, or running.
@@ -157,9 +159,28 @@ bool PlatformManagerImpl::_IsChipStackLockedByCurrentThread() const
 {
     // If we have no work queue, or it's suspended, then we assume our caller
     // knows what they are doing in terms of their own concurrency.
-    return !mWorkQueue || mIsWorkQueueSuspended || dispatch_get_current_queue() == mWorkQueue;
+    return !mWorkQueue || mIsWorkQueueSuspended || IsWorkQueueCurrentQueue();
 };
 #endif
+
+static int sPlatformManagerKey; // We use pointer to this as key.
+
+dispatch_queue_t PlatformManagerImpl::GetWorkQueue()
+{
+    if (mWorkQueue == nullptr)
+    {
+        mWorkQueue = dispatch_queue_create(CHIP_CONTROLLER_QUEUE, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        dispatch_suspend(mWorkQueue);
+        dispatch_queue_set_specific(mWorkQueue, &sPlatformManagerKey, this, nullptr);
+        mIsWorkQueueSuspended = true;
+    }
+    return mWorkQueue;
+}
+
+bool PlatformManagerImpl::IsWorkQueueCurrentQueue() const
+{
+    return dispatch_get_specific(&sPlatformManagerKey) == this;
+}
 
 CHIP_ERROR PlatformManagerImpl::StartBleScan(BleScannerDelegate * delegate)
 {

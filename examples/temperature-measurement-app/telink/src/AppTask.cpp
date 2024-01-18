@@ -17,50 +17,46 @@
  */
 
 #include "AppTask.h"
-#include "SensorManager.h"
+#include "SensorManagerCommon.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-k_timer sTemperatureMeasurementTimer;
-constexpr uint16_t kSensorTimerPeriodMs = 5000; // 5s timer period
+k_timer sTemperatureMeasurementUpdateTimer;
+constexpr uint16_t kTemperatureMeasurementUpdateTimerPeriodMs = 5000; // 5s timer period
 } // namespace
 
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
+    CHIP_ERROR err;
+
     InitCommonParts();
 
-    // Initialize temperature measurement timer
-    k_timer_init(&sTemperatureMeasurementTimer, &AppTask::TemperatureMeasurementTimerTimeoutCallback, nullptr);
-    k_timer_user_data_set(&sTemperatureMeasurementTimer, this);
-    k_timer_start(&sTemperatureMeasurementTimer, K_MSEC(kSensorTimerPeriodMs), K_NO_WAIT);
-
-    // Init Temperature Sensor
-    CHIP_ERROR err = SensorMgr().Init();
+    err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("SensorMgr Init fail");
+        LOG_ERR("Init of the Sensor Manager failed");
         return err;
     }
+
+    // Initialize temperature measurement update timer
+    k_timer_init(&sTemperatureMeasurementUpdateTimer, &AppTask::TemperatureMeasurementUpdateTimerTimeoutCallback, nullptr);
+    k_timer_user_data_set(&sTemperatureMeasurementUpdateTimer, this);
+    k_timer_start(&sTemperatureMeasurementUpdateTimer, K_MSEC(kTemperatureMeasurementUpdateTimerPeriodMs), K_NO_WAIT);
 
     PlatformMgr().LockChipStack();
-    app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(kExampleEndpointId, SensorMgr().GetMinMeasuredValue());
-    app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kExampleEndpointId, SensorMgr().GetMaxMeasuredValue());
+    app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(kExampleEndpointId,
+                                                                             SensorMgr().GetMinMeasuredTempValue());
+    app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kExampleEndpointId,
+                                                                             SensorMgr().GetMaxMeasuredTempValue());
     PlatformMgr().UnlockChipStack();
-
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkTerm");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
 
     return CHIP_NO_ERROR;
 }
 
-void AppTask::TemperatureMeasurementTimerTimeoutCallback(k_timer * timer)
+void AppTask::TemperatureMeasurementUpdateTimerTimeoutCallback(k_timer * timer)
 {
     if (!timer)
     {
@@ -69,23 +65,33 @@ void AppTask::TemperatureMeasurementTimerTimeoutCallback(k_timer * timer)
 
     AppEvent event;
     event.Type    = AppEvent::kEventType_Timer;
-    event.Handler = TemperatureMeasurementTimerEventHandler;
+    event.Handler = TemperatureMeasurementUpdateTimerEventHandler;
     sAppTask.PostEvent(&event);
 }
 
-void AppTask::TemperatureMeasurementTimerEventHandler(AppEvent * aEvent)
+void AppTask::TemperatureMeasurementUpdateTimerEventHandler(AppEvent * aEvent)
 {
+    CHIP_ERROR ret;
+    int16_t temperature;
+
     if (aEvent->Type != AppEvent::kEventType_Timer)
     {
         return;
     }
 
+    ret = SensorMgr().GetTempAndHumMeasurValue(&temperature, NULL);
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Update of the Temperature clusters failed");
+        return;
+    }
+
+    LOG_INF("Current temperature is (%d*0.01)°C", temperature);
+
     PlatformMgr().LockChipStack();
-    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kExampleEndpointId, SensorMgr().GetMeasuredValue());
+    app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kExampleEndpointId, temperature);
     PlatformMgr().UnlockChipStack();
 
-    LOG_INF("Current temperature is (%d*0.01)°C", SensorMgr().GetMeasuredValue());
-
     // Start next timer to handle temp sensor.
-    k_timer_start(&sTemperatureMeasurementTimer, K_MSEC(kSensorTimerPeriodMs), K_NO_WAIT);
+    k_timer_start(&sTemperatureMeasurementUpdateTimer, K_MSEC(kTemperatureMeasurementUpdateTimerPeriodMs), K_NO_WAIT);
 }

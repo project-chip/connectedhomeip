@@ -22,6 +22,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -34,12 +35,17 @@ NS_ASSUME_NONNULL_BEGIN
 @class MTRDeviceControllerStartupParams;
 @class MTRFabricInfo;
 
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactoryParams : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
+
 /*
- * Storage delegate must be provided for correct functioning of Matter
- * controllers.  It is used to store persistent information for the fabrics the
- * controllers ends up interacting with.
+ * Storage used to store persistent information for the fabrics the
+ * controllers ends up interacting with.  This is only used if "initWithStorage"
+ * is used to initialize the MTRDeviceControllerFactoryParams.  If "init" is
+ * used, this property will contain a dummy storage that will not be used for
+ * anything.
  */
 @property (nonatomic, strong, readonly) id<MTRStorage> storage;
 
@@ -83,11 +89,16 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 @property (nonatomic, assign) BOOL shouldStartServer;
 
-- (instancetype)init NS_UNAVAILABLE;
+/*
+ * Initialize the device controller factory with storage.  In this mode, the
+ * storage will be used to store various information needed by the Matter
+ * framework.
+ */
 - (instancetype)initWithStorage:(id<MTRStorage>)storage;
+
 @end
 
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDeviceControllerFactory : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -145,6 +156,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * The fabric is identified by the root public key and fabric id in
  * the startupParams.
+ *
+ * This method can only be used if the factory was initialized with storage.
+ * When using per-controller storage, use createController.
  */
 - (MTRDeviceController * _Nullable)createControllerOnExistingFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                               error:(NSError * __autoreleasing *)error;
@@ -156,6 +170,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * The fabric is identified by the root public key and fabric id in
  * the startupParams.
+ *
+ * This method can only be used if the factory was initialized with storage.
+ * When using per-controller storage, use createController.
  */
 - (MTRDeviceController * _Nullable)createControllerOnNewFabric:(MTRDeviceControllerStartupParams *)startupParams
                                                          error:(NSError * __autoreleasing *)error;

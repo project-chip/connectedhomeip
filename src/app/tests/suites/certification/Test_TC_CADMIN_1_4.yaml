@@ -25,15 +25,15 @@ config:
         type: node_id
         defaultValue: 0xCAFE
     endpoint: 0
-    discriminator:
-        type: int16u
-        defaultValue: 3840
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
     waitAfterCommissioning:
         type: int16u
         defaultValue: 5000
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -54,7 +54,18 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH_CR1 starts a commissioning process with DUT_CE"
+    - label: "Step 1a: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1a: TH_CR1 commissioned with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -64,14 +75,15 @@ tests:
                 value: nodeId
 
     - label:
-          "TH1 reads CurrentFabricIndex attribute and save it for future use."
+          "Step 1b: TH1 reads CurrentFabricIndex attribute and save it for
+          future use."
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "CurrentFabricIndex"
       response:
           saveAs: TH1FabricIndex
 
-    - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
+    - label: "Step 2a: TH_CR1 opens a commissioning window on DUT_CE using BCM"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
@@ -79,9 +91,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
-    - label: "Waiting after opening commissioning window"
+    - label: "Step 2a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -89,31 +102,18 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    #Check for DNS-SD advertisement CM is not possible in YAML
-    - label: "Verify that the DNS-SD advertisement shows CM=1"
-      verification: |
-          On TH_CR1 send the below command
-
-          avahi-browse -rt _matterc._udp
-          +   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
-          =   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
-            hostname = [E45F010F27530000.local]
-            address = [fe80::e65f:1ff:fe0f:2753]
-            port = [5540]
-            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
+    - label: "Step 2b: Verify that the DNS-SD advertisement shows CM=1"
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
           values:
-              - name: "message"
-                value: "enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "commissioningMode"
+                value: 1
 
     - label:
-          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
-          attribute of DUT_CE"
+          "Step 2c: TH_CR1 writes the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
       command: "writeAttribute"
       cluster: "Basic Information"
       attribute: "NodeLabel"
@@ -122,8 +122,8 @@ tests:
           value: "chiptest"
 
     - label:
-          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
-          attribute of DUT_CE"
+          "Step 2d: TH_CR1 reads the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
       command: "readAttribute"
       cluster: "Basic Information"
       attribute: "NodeLabel"
@@ -133,7 +133,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH_CR2 starts a commissioning process with DUT_CE"
+    - label: "Step 3a: TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -145,7 +145,7 @@ tests:
               - name: "payload"
                 value: payload
 
-    - label: "DUT_CE is commissioned by TH_CR2 on Fabric ID2 "
+    - label: "Step 3b: DUT_CE is commissioned by TH_CR2 on Fabric ID2 "
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -156,7 +156,8 @@ tests:
                 value: nodeId2
 
     - label:
-          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+          "Step 3c: TH2 reads CurrentFabricIndex attribute and save it for
+          future use."
       identity: "beta"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -166,7 +167,8 @@ tests:
 
     #Check for DNS-SD advertisement is not possible in YAML
     - label:
-          "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
+          "Step 4: Verify DUT_CE is now discoverable over DNS-SD with two SRV
+          Records"
       verification: |
           On TH_CR2 send the below command
 
@@ -195,22 +197,30 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
+    - label: "Step 5: TH_CR1 reads the list of Fabrics on DUT_CE"
       command: "readAttribute"
       cluster: "Operational Credentials"
       PICS: OPCREDS.S.A0001
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value:
-              [
-                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
-                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
-              ]
           constraints:
               type: list
+              contains:
+                  [
+                      {
+                          Label: "",
+                          FabricIndex: TH1FabricIndex,
+                          NodeID: nodeId,
+                      },
+                      {
+                          Label: "",
+                          FabricIndex: TH2FabricIndex,
+                          NodeID: nodeId2,
+                      },
+                  ]
 
-    - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
+    - label: "Step 6: TH_CR2 reads the list of Fabrics on DUT_CE"
       identity: "beta"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -218,17 +228,25 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value:
-              [
-                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
-                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
-              ]
           constraints:
               type: list
+              contains:
+                  [
+                      {
+                          Label: "",
+                          FabricIndex: TH1FabricIndex,
+                          NodeID: nodeId,
+                      },
+                      {
+                          Label: "",
+                          FabricIndex: TH2FabricIndex,
+                          NodeID: nodeId2,
+                      },
+                  ]
 
     - label:
-          "TH_CR1 writes the Basic Information Clusters NodeLabel mandatory
-          attribute of DUT_CE"
+          "Step 7a: TH_CR1 writes the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
       command: "writeAttribute"
       cluster: "Basic Information"
       attribute: "NodeLabel"
@@ -237,8 +255,8 @@ tests:
           value: "chiptest"
 
     - label:
-          "TH_CR1 reads the Basic Information Clusters NodeLabel mandatory
-          attribute of DUT_CE"
+          "Step 7b: TH_CR1 reads the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
       command: "readAttribute"
       cluster: "Basic Information"
       attribute: "NodeLabel"
@@ -250,8 +268,8 @@ tests:
               maxLength: 32
 
     - label:
-          "TH_CR2 writes the Basic Information Clusters NodeLabel mandatory
-          attribute of DUT_CE"
+          "Step 8a: TH_CR2 writes the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
       identity: "beta"
       command: "writeAttribute"
       cluster: "Basic Information"
@@ -261,8 +279,8 @@ tests:
           value: "chiptest"
 
     - label:
-          "TH_CR2 reads the Basic Information Clusters NodeLabel mandatory
-          attribute of DUT_CE"
+          "Step 8b: TH_CR2 reads the Basic Information Clusters NodeLabel
+          mandatory attribute of DUT_CE"
       identity: "beta"
       command: "readAttribute"
       cluster: "Basic Information"
@@ -274,7 +292,7 @@ tests:
               type: char_string
               maxLength: 32
 
-    - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
+    - label: "Step 9: TH_CR2 opens a commissioning window on DUT_CE using BCM"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
@@ -283,18 +301,20 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
-    - label: "Wait for the commissioning window in step 13 to timeout"
+    - label: "Step 10: Wait for the commissioning window in step 13 to timeout"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 180000
+                value: PIXIT.CADMIN.CwDuration * 1000
 
     - label:
-          "TH_CR2 reads the window status to verify the DUT_CE window is closed"
+          "Step 11: TH_CR2 reads the window status to verify the DUT_CE window
+          is closed"
       cluster: "Administrator Commissioning"
       PICS: CADMIN.S.A0000
       command: "readAttribute"
@@ -302,7 +322,7 @@ tests:
       response:
           value: 0
 
-    - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
+    - label: "Step 12a: TH_CR2 opens a commissioning window on DUT_CE using BCM"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
@@ -311,9 +331,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 180
+                value: PIXIT.CADMIN.CwDuration
 
-    - label: "Waiting after opening commissioning window"
+    - label: "Step 12b: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -322,8 +343,8 @@ tests:
                 value: waitAfterCommissioning
 
     - label:
-          "TH_CR1 starts a commissioning process with DUT_CE before the timeout
-          from step 12"
+          "Step 13a: TH_CR1 starts a commissioning process with DUT_CE before
+          the timeout from step 12"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
       PICS: CADMIN.S
@@ -335,14 +356,6 @@ tests:
                 value: payload
       response:
           error: FAILURE
-          clusterError: 9
-
-    - label: "TH_CR2 revokes the commissioning window"
-      identity: "beta"
-      cluster: "Administrator Commissioning"
-      command: "RevokeCommissioning"
-      PICS: CADMIN.S.C02.Rsp && CADMIN.S.C01.Rsp
-      timedInteractionTimeoutMs: 10000
 
     - label: "Remove TH2 FabricIndex"
       PICS: OPCREDS.S.C0a.Rsp && CADMIN.S

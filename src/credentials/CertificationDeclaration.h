@@ -93,6 +93,14 @@ struct CertificationElementsWithoutPIDs
     char certificateId[kCertificateIdLength + 1] = { 0 };
 };
 
+enum class CertificationType : uint8_t
+{
+    kDevelopmentAndTest,
+    kProvisional,
+    kOfficial,
+    kReserved,
+};
+
 class CertificationElementsDecoder
 {
 public:

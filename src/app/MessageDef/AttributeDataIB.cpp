@@ -127,10 +127,10 @@ AttributeDataIB::Builder & AttributeDataIB::Builder::DataVersion(const chip::Dat
     return *this;
 }
 
-AttributeDataIB::Builder & AttributeDataIB::Builder::EndOfAttributeDataIB()
+CHIP_ERROR AttributeDataIB::Builder::EndOfAttributeDataIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

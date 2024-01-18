@@ -38,6 +38,8 @@ const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
 // Notify application about stopped advertising if the callback has been provided
 void NotifyAdvertisingStopped(const sys_snode_t * node)
 {
+    VerifyOrReturn(node);
+
     const Request & request = ToRequest(node);
 
     if (request.onStopped != nullptr)

@@ -17,14 +17,17 @@
 
 #ifndef _WFX_RSI_H_
 #define _WFX_RSI_H_
+
+#include "event_groups.h"
+
 /*
  * Interface to RSI Sapis
  */
 
-#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256 + 1024 + 512) /* Unknown how big this should be 	*/
-#define WFX_RSI_TASK_SZ (1024 + 1024 + 1024)                 /* Stack for the WFX/RSI task		*/
-#define WFX_RSI_BUF_SZ (1024 * 15)                           /* May need tweak 			*/
-#define WFX_RSI_CONFIG_MAX_JOIN (5)                          /* Max join retries			*/
+#define WFX_RSI_WLAN_TASK_SZ (1024 + 512 + 256) /* Stack for the WLAN task	 	*/
+#define WFX_RSI_TASK_SZ (1024 + 1024)           /* Stack for the WFX/RSI task		*/
+#define WFX_RSI_BUF_SZ (1024 * 10)              /* May need tweak 			*/
+#define WFX_RSI_CONFIG_MAX_JOIN (5)             /* Max join retries			*/
 
 /*
  * Various events fielded by the wfx_rsi task
@@ -50,6 +53,7 @@
 #define WFX_RSI_ST_STA_READY (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE)
 #define WFX_RSI_ST_STARTED (0x200)     /* RSI task started			*/
 #define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
+#define WFX_RSI_ST_SLEEP_READY (0x800) /* Notify the M4 to go to sleep*/
 
 struct wfx_rsi
 {
@@ -81,7 +85,6 @@ extern "C" {
 #endif
 void wfx_rsidev_init(void);
 void wfx_rsi_task(void * arg);
-void efr32Log(const char * aFormat, ...);
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -89,8 +92,11 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
-int32_t wfx_rsi_init_platform();
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
+int32_t wfx_wifi_rsi_init(void);
+#if SL_ICD_ENABLED
+void sl_wfx_host_si91x_sleep_wakeup();
+int32_t wfx_rsi_power_save();
+#endif /* SL_ICD_ENABLED */
 
 #ifdef __cplusplus
 }

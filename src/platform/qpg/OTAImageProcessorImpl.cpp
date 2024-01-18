@@ -94,7 +94,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
         if (true != qvCHIP_OtaValidateImage(qvCHIP_OtaImgHeader))
         {
-            return CHIP_ERROR_UNSUPPORTED_EXCHANGE_VERSION;
+            // Dropping image due to invalid header
+            return CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_IGNORED;
         }
     }
 
@@ -244,7 +245,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;

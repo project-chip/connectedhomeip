@@ -72,6 +72,7 @@ enum ArgumentType
     Vector16,
     Vector32,
     VectorCustom,
+    VectorString, // comma separated string items
 };
 
 struct Argument
@@ -143,7 +144,10 @@ public:
     size_t AddArgument(const char * name, chip::ByteSpan * value, const char * desc = "", uint8_t flags = 0);
     size_t AddArgument(const char * name, chip::Span<const char> * value, const char * desc = "", uint8_t flags = 0);
     size_t AddArgument(const char * name, AddressWithInterface * out, const char * desc = "", uint8_t flags = 0);
-    size_t AddArgument(const char * name, ComplexArgument * value, const char * desc = "");
+    // Optional Complex arguments are not currently supported via the <chip::Optional> class.
+    // Instead, they must be explicitly specified as optional using kOptional in the flags parameter,
+    // and the base TypedComplexArgument<T> class is referenced.
+    size_t AddArgument(const char * name, ComplexArgument * value, const char * desc = "", uint8_t flags = 0);
     size_t AddArgument(const char * name, CustomArgument * value, const char * desc = "");
     size_t AddArgument(const char * name, int64_t min, uint64_t max, bool * out, const char * desc = "", uint8_t flags = 0)
     {
@@ -254,17 +258,32 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<double *>(value), desc, flags | Argument::kNullable);
     }
 
+    size_t AddArgument(const char * name, std::vector<std::string> * value, const char * desc);
+    size_t AddArgument(const char * name, chip::Optional<std::vector<std::string>> * value, const char * desc);
+
     void ResetArguments();
 
     virtual CHIP_ERROR Run() = 0;
 
     bool IsInteractive() { return mIsInteractive; }
 
-    CHIP_ERROR RunAsInteractive()
+    CHIP_ERROR RunAsInteractive(const chip::Optional<char *> & interactiveStorageDirectory, bool advertiseOperational)
     {
-        mIsInteractive = true;
+        mStorageDirectory     = interactiveStorageDirectory;
+        mIsInteractive        = true;
+        mAdvertiseOperational = advertiseOperational;
         return Run();
     }
+
+    const chip::Optional<char *> & GetStorageDirectory() const { return mStorageDirectory; }
+
+protected:
+    // mStorageDirectory lives here so we can just set it in RunAsInteractive.
+    chip::Optional<char *> mStorageDirectory;
+
+    // mAdvertiseOperational lives here so we can just set it in
+    // RunAsInteractive; it's only used by CHIPCommand.
+    bool mAdvertiseOperational = false;
 
 private:
     bool InitArgument(size_t argIndex, char * argValue);

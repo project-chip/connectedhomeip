@@ -38,9 +38,12 @@
 #include <binding-handler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
+#include <common/Esp32ThreadInit.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/esp32/mode-support/static-supported-modes-manager.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <static-supported-temperature-levels.h>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
@@ -48,10 +51,6 @@
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
-#endif
-
-#if CONFIG_OPENTHREAD_ENABLED
-#include <platform/ThreadStackManager.h>
 #endif
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -67,12 +66,13 @@
 using namespace ::chip;
 using namespace ::chip::Shell;
 using namespace ::chip::DeviceManager;
+using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-const char * TAG = "all-clusters-app";
+extern const char TAG[] = "all-clusters-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
@@ -81,6 +81,7 @@ namespace {
 class AppCallbacks : public AppDelegate
 {
 public:
+    void OnCommissioningSessionEstablishmentStarted() {}
     void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
     void OnCommissioningSessionStopped() override
     {
@@ -92,6 +93,8 @@ public:
 };
 
 AppCallbacks sCallbacks;
+
+app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -111,18 +114,41 @@ static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(&sCallbacks); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
+#if !(CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_CONFIG_ENABLE_THREAD)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
-    CHIP_ERROR err = GetAppTask().LockInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to initialize app task lock, err:%" CHIP_ERROR_FORMAT, err.Format());
-    }
+#endif
 
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
+    CHIP_ERROR err =
+        app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
+            FIXED_ENDPOINT_COUNT);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+}
+
+// #include <laundry-washer-controls-server/laundry-washer-controls-server.h>
+#include <examples/all-clusters-app/all-clusters-common/include/laundry-washer-controls-delegate-impl.h>
+#include <src/app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(1, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
+}
+
+#include <examples/all-clusters-app/all-clusters-common/include/laundry-dryer-controls-delegate-impl.h>
+#include <src/app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
+using namespace chip::app::Clusters::LaundryDryerControls;
+void emberAfLaundryDryerControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryDryerControlsServer::SetDefaultDelegate(endpoint, &LaundryDryerControlDelegate::getLaundryDryerControlDelegate());
 }
 
 extern "C" void app_main()
@@ -189,18 +215,7 @@ extern "C" void app_main()
     {
         ESP_LOGE(TAG, "GetAppTask().StartAppTask() failed : %" CHIP_ERROR_FORMAT, error.Format());
     }
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (DeviceLayer::ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to initialize Thread stack");
-        return;
-    }
-    if (DeviceLayer::ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to launch Thread task");
-        return;
-    }
-#endif
+    ESPOpenThreadInit();
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }

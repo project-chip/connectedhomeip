@@ -16,6 +16,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Note: This class does not support parsing certificates related to Device Attestation.
  */
 NS_SWIFT_SENDABLE
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRCertificateInfo : NSObject <NSCopying>
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -70,7 +71,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * Represents the Matter-specific components of an X.509 Distinguished Name.
  */
 NS_SWIFT_SENDABLE
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDistinguishedNameInfo : NSObject <NSCopying>
 
 + (instancetype)new NS_UNAVAILABLE;

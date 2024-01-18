@@ -1,0 +1,84 @@
+/** {{description}} */
+{{#if apiMaturity}}{{apiMaturity}} {{/if~}}
+cluster {{asUpperCamelCase name}} = {{!}}
+     {{~#if manufacturerCode}}
+        {{~asMEI manufacturerCode code~}}
+     {{else}}
+        {{~code~}}
+     {{/if}} {
+  {{#global_attribute_default code="0xFFFD"}}
+  {{#if defaultValue}}
+  revision {{defaultValue}};
+  {{else}}
+  revision 1; // NOTE: Default/not specifically set
+  {{/if}}
+
+  {{/global_attribute_default}}
+  {{#zcl_enums}}
+  enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
+    {{#zcl_enum_items}}
+    k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
+    {{/zcl_enum_items}}
+  }
+
+  {{/zcl_enums}}
+  {{#zcl_bitmaps}}
+  bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
+    {{#zcl_bitmap_items}}
+    k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
+    {{/zcl_bitmap_items}}
+  }
+
+  {{/zcl_bitmaps}}
+  {{#zcl_structs}}
+  {{~>idl_structure_definition extraIndent=1}}
+
+  {{/zcl_structs}}
+  {{#zcl_events}}
+  {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
+  {{~#chip_access_elements entity="event"~}}
+      {{~#first~}}access({{~/first~}}
+      {{~#not_first~}}, {{/not_first~}}
+        {{operation}}: {{role}}
+      {{~#last}}) {{/last~}}
+  {{~/chip_access_elements~}}
+  {{asUpperCamelCase name preserveAcronyms=true}} = {{!}}
+    {{~#if manufacturerCode}}
+       {{~asMEI manufacturerCode code~}}
+    {{else}}
+       {{~code~}}
+    {{/if}} {
+    {{#zcl_event_fields}}
+    {{>idl_structure_member label=name}}
+
+    {{/zcl_event_fields}}
+  }
+
+  {{/zcl_events}}
+  {{#zcl_attributes_server}}
+    {{#if clusterRef}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+    {{/if}}
+  {{/zcl_attributes_server}}
+
+  {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
+  {{~!TODO(26053): global attributes are marked as optional,
+                   hence the exclusion above and re-add here.}}
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+  {{#zcl_commands}}
+    {{#if (isStrEqual source "client")}}
+    {{~>idl_command_request_struct}}
+    {{else}}
+    {{~>idl_command_response_struct}}
+    {{/if}}
+  {{/zcl_commands}}
+  {{#zcl_commands_source_client}}
+    {{~>idl_command_request_response}}{{~new_line 1~}}
+  {{/zcl_commands_source_client}}
+}
+

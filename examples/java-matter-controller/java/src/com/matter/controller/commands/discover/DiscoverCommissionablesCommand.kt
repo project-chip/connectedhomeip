@@ -24,7 +24,8 @@ import com.matter.controller.commands.common.MatterCommand
 import java.util.concurrent.TimeUnit
 
 class DiscoverCommissionablesCommand(
-  controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
+  controller: ChipDeviceController,
+  credsIssuer: CredentialsIssuer?
 ) : MatterCommand(controller, credsIssuer, "commissionables") {
   override fun runCommand() {
     currentCommissioner().discoverCommissionableNodes()
@@ -55,5 +56,5 @@ class DiscoverCommissionablesCommand(
   companion object {
     private const val MAX_DISCOVERED_DEVICES = 10
     private const val TIME_TO_WAIT_FOR_RESULTS_SECONDS = 7L
-  }  
+  }
 }

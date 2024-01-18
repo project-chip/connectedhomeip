@@ -21,6 +21,7 @@
 #include "task.h"
 
 #include <lib/shell/Engine.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace {
 
@@ -35,7 +36,11 @@ namespace chip {
 
 void LaunchShell()
 {
-    chip::Shell::Engine::Root().Init();
+    if (chip::Shell::Engine::Root().Init() < 0)
+    {
+        ChipLogError(DeviceLayer, "Failed to initialize shell engine!");
+        return;
+    }
     xTaskCreate(MatterShellTask, "matter_shell", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
 }
 

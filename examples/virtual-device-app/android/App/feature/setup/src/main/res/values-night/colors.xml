@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="setup_notification_background_tint">#6E6E6E</color>
+    <color name="setup_notification_icon_tint">#78C3FF</color>
+</resources>

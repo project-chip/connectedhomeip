@@ -58,7 +58,7 @@ private:
     std::queue<ChipDeviceEvent> mEventQueue;
     std::mutex mEventQueueLock;
 
-    DeviceSafeQueue(const DeviceSafeQueue &) = delete;
+    DeviceSafeQueue(const DeviceSafeQueue &)             = delete;
     DeviceSafeQueue & operator=(const DeviceSafeQueue &) = delete;
 };
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,7 +19,8 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <lib/support/UnitTestRegistration.h>
-#include <lib/support/jsontlv/TlvJson.h>
+#include <lib/support/jsontlv/TextFormat.h>
+#include <lib/support/jsontlv/TlvToJson.h>
 #include <nlunit-test.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -52,20 +53,12 @@ CHIP_ERROR SetupReader()
     return gReader.Next();
 }
 
-bool Matches(const char * referenceString, Json::Value & generatedValue)
+bool Matches(const std::string & referenceString, const std::string & generatedString)
 {
-    auto generatedStr = JsonToString(generatedValue);
+    auto compactReferenceString = PrettyPrintJsonString(referenceString);
+    auto compactGeneratedString = PrettyPrintJsonString(generatedString);
 
-    // Normalize the reference string to the expected compact value.
-    Json::Reader reader;
-    Json::Value referenceValue;
-    reader.parse(referenceString, referenceValue);
-
-    Json::FastWriter writer;
-    writer.omitEndingLineFeed();
-    auto compactReferenceString = writer.write(referenceValue);
-
-    auto matches = (generatedStr == compactReferenceString);
+    auto matches = (compactGeneratedString == compactReferenceString);
 
     if (!matches)
     {
@@ -74,20 +67,27 @@ bool Matches(const char * referenceString, Json::Value & generatedValue)
         printf("%s\n", compactReferenceString.c_str());
 
         printf("Generated:\n");
-        printf("%s\n", generatedStr.c_str());
+        printf("%s\n", compactGeneratedString.c_str());
     }
 
     return matches;
 }
 
 template <typename T>
-void EncodeAndValidate(T val, const char * expectedJsonString)
+void EncodeAndValidate(T val, const std::string & expectedJsonString)
 {
     CHIP_ERROR err;
+    TLV::TLVType container;
 
     SetupBuf();
 
-    err = DataModel::Encode(gWriter, TLV::AnonymousTag(), val);
+    err = gWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    err = DataModel::Encode(gWriter, TLV::ContextTag(1), val);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    err = gWriter.EndContainer(container);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
     err = gWriter.Finalize();
@@ -96,65 +96,69 @@ void EncodeAndValidate(T val, const char * expectedJsonString)
     err = SetupReader();
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    Json::Value d;
-    err = TlvToJson(gReader, d);
+    std::string jsonString;
+    err = TlvToJson(gReader, jsonString);
     NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
 
-    bool matches = Matches(expectedJsonString, d);
+    bool matches = Matches(expectedJsonString, jsonString);
     NL_TEST_ASSERT(gSuite, matches);
 }
 
 void TestConverter(nlTestSuite * inSuite, void * inContext)
 {
+    std::string jsonString;
+
     gSuite = inSuite;
 
-    EncodeAndValidate(static_cast<uint32_t>(30),
-                      "{\n"
-                      "   \"value\" : 30\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:UINT\" : 30\n"
+                 "}\n";
+    EncodeAndValidate(static_cast<uint32_t>(30), jsonString);
 
-    EncodeAndValidate(static_cast<int32_t>(-30),
-                      "{\n"
-                      "   \"value\" : -30\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:INT\" : -30\n"
+                 "}\n";
+    EncodeAndValidate(static_cast<int32_t>(-30), jsonString);
 
-    EncodeAndValidate(false,
-                      "{\n"
-                      "   \"value\" : false\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:BOOL\" : false\n"
+                 "}\n";
+    EncodeAndValidate(false, jsonString);
 
-    EncodeAndValidate(true,
-                      "{\n"
-                      "   \"value\" : true\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:BOOL\" : true\n"
+                 "}\n";
+    EncodeAndValidate(true, jsonString);
 
-    EncodeAndValidate(1.0,
-                      "{\n"
-                      "   \"value\" : 1.0\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:FLOAT\" : 1.0\n"
+                 "}\n";
+    EncodeAndValidate(static_cast<float>(1.0), jsonString);
 
-    const char charBuf[] = "hello";
-    CharSpan charSpan(charBuf);
-    EncodeAndValidate(charSpan,
-                      "{\n"
-                      "   \"value\" : \"hello\"\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:DOUBLE\" : 1.0\n"
+                 "}\n";
+    EncodeAndValidate(static_cast<double>(1.0), jsonString);
 
-    //
+    CharSpan charSpan = "hello"_span;
+    jsonString        = "{\n"
+                        "   \"1:STRING\" : \"hello\"\n"
+                        "}\n";
+    EncodeAndValidate(charSpan, jsonString);
+
     // Validated using https://base64.guru/converter/encode/hex
-    //
     const uint8_t byteBuf[] = { 0x01, 0x02, 0x03, 0x04, 0xff, 0xfe, 0x99, 0x88, 0xdd, 0xcd };
     ByteSpan byteSpan(byteBuf);
-    EncodeAndValidate(byteSpan,
-                      "{\n"
-                      "   \"value\" : \"base64:AQIDBP/+mYjdzQ==\"\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:BYTES\" : \"AQIDBP/+mYjdzQ==\"\n"
+                 "}\n";
+    EncodeAndValidate(byteSpan, jsonString);
 
     DataModel::Nullable<uint8_t> nullValue;
-    EncodeAndValidate(nullValue,
-                      "{\n"
-                      "   \"value\" : null\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:NULL\" : null\n"
+                 "}\n";
+    EncodeAndValidate(nullValue, jsonString);
 
     Clusters::UnitTesting::Structs::SimpleStruct::Type structVal;
     structVal.a = 20;
@@ -164,72 +168,70 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     structVal.g = 1.0;
     structVal.h = 1.0;
 
-    EncodeAndValidate(structVal,
-                      "{\n"
-                      "   \"value\" : {\n"
-                      "      \"0\" : 20,\n"
-                      "      \"1\" : true,\n"
-                      "      \"2\" : 0,\n"
-                      "      \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
-                      "      \"4\" : \"hello\",\n"
-                      "      \"5\" : 0,\n"
-                      "      \"6\" : 1.0,\n"
-                      "      \"7\" : 1.0\n"
-                      "   }\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:STRUCT\" : {\n"
+                 "      \"0:UINT\" : 20,\n"
+                 "      \"1:BOOL\" : true,\n"
+                 "      \"2:UINT\" : 0,\n"
+                 "      \"3:BYTES\" : \"AQIDBP/+mYjdzQ==\",\n"
+                 "      \"4:STRING\" : \"hello\",\n"
+                 "      \"5:UINT\" : 0,\n"
+                 "      \"6:FLOAT\" : 1.0,\n"
+                 "      \"7:DOUBLE\" : 1.0\n"
+                 "   }\n"
+                 "}\n";
+    EncodeAndValidate(structVal, jsonString);
 
     uint8_t int8uListData[] = { 1, 2, 3, 4 };
     DataModel::List<uint8_t> int8uList;
 
-    int8uList = int8uListData;
+    int8uList  = int8uListData;
+    jsonString = "{\n"
+                 "   \"1:ARRAY-UINT\" : [ 1, 2, 3, 4 ]\n"
+                 "}\n";
+    EncodeAndValidate(int8uList, jsonString);
 
-    EncodeAndValidate(int8uList,
-                      "{\n"
-                      "   \"value\" : [ 1, 2, 3, 4 ]\n"
-                      "}\n");
-
-    int8uList = {};
-    EncodeAndValidate(int8uList,
-                      "{\n"
-                      "   \"value\" : []\n"
-                      "}\n");
+    int8uList  = {};
+    jsonString = "{\n"
+                 "   \"1:ARRAY-?\" : [ ]\n"
+                 "}\n";
+    EncodeAndValidate(int8uList, jsonString);
 
     DataModel::Nullable<DataModel::List<uint8_t>> nullValueList;
-    EncodeAndValidate(nullValueList,
-                      "{\n"
-                      "   \"value\" : null\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:NULL\" : null\n"
+                 "}\n";
+    EncodeAndValidate(nullValueList, jsonString);
 
     Clusters::UnitTesting::Structs::SimpleStruct::Type structListData[2] = { structVal, structVal };
     DataModel::List<Clusters::UnitTesting::Structs::SimpleStruct::Type> structList;
 
     structList = structListData;
-
-    EncodeAndValidate(structList,
-                      "{\n"
-                      "   \"value\" : [\n"
-                      "      {\n"
-                      "         \"0\" : 20,\n"
-                      "         \"1\" : true,\n"
-                      "         \"2\" : 0,\n"
-                      "         \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
-                      "         \"4\" : \"hello\",\n"
-                      "         \"5\" : 0,\n"
-                      "         \"6\" : 1.0,\n"
-                      "         \"7\" : 1.0\n"
-                      "      },\n"
-                      "      {\n"
-                      "         \"0\" : 20,\n"
-                      "         \"1\" : true,\n"
-                      "         \"2\" : 0,\n"
-                      "         \"3\" : \"base64:AQIDBP/+mYjdzQ==\",\n"
-                      "         \"4\" : \"hello\",\n"
-                      "         \"5\" : 0,\n"
-                      "         \"6\" : 1.0,\n"
-                      "         \"7\" : 1.0\n"
-                      "      }\n"
-                      "   ]\n"
-                      "}\n");
+    jsonString = "{\n"
+                 "   \"1:ARRAY-STRUCT\" : [\n"
+                 "      {\n"
+                 "         \"0:UINT\" : 20,\n"
+                 "         \"1:BOOL\" : true,\n"
+                 "         \"2:UINT\" : 0,\n"
+                 "         \"3:BYTES\" : \"AQIDBP/+mYjdzQ==\",\n"
+                 "         \"4:STRING\" : \"hello\",\n"
+                 "         \"5:UINT\" : 0,\n"
+                 "         \"6:FLOAT\" : 1.0,\n"
+                 "         \"7:DOUBLE\" : 1.0\n"
+                 "      },\n"
+                 "      {\n"
+                 "         \"0:UINT\" : 20,\n"
+                 "         \"1:BOOL\" : true,\n"
+                 "         \"2:UINT\" : 0,\n"
+                 "         \"3:BYTES\" : \"AQIDBP/+mYjdzQ==\",\n"
+                 "         \"4:STRING\" : \"hello\",\n"
+                 "         \"5:UINT\" : 0,\n"
+                 "         \"6:FLOAT\" : 1.0,\n"
+                 "         \"7:DOUBLE\" : 1.0\n"
+                 "      }\n"
+                 "   ]\n"
+                 "}\n";
+    EncodeAndValidate(structList, jsonString);
 }
 
 int Initialize(void * apSuite)
@@ -249,11 +251,11 @@ const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_S
 
 } // namespace
 
-int TestTlvJson()
+int TestTlvToJson()
 {
-    nlTestSuite theSuite = { "TlvJson", sTests, Initialize, Finalize };
+    nlTestSuite theSuite = { "TlvToJson", sTests, Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestTlvJson)
+CHIP_REGISTER_TEST_SUITE(TestTlvToJson)

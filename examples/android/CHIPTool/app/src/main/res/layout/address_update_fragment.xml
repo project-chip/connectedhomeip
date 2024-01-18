@@ -42,4 +42,22 @@
       android:layout_height="wrap_content"
       app:barrierDirection="bottom"
       app:constraint_referenced_ids="fabricIdEd,deviceIdEd,epIdEd" />
+
+    <TextView
+        android:id="@+id/deviceIdTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text = "@string/commissioned_device_id_text"
+        app:layout_constraintTop_toBottomOf="@id/fabricIdEd"
+        />
+
+    <Spinner
+        android:id="@+id/deviceIdSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/deviceIdTv" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

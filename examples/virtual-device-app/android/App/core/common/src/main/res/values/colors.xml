@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@android:color/white</color>
+    <color name="colorPrimaryDark">@android:color/white</color>
+    <color name="colorControlActivated">#4ca7ed</color>
+    <color name="textColor">@android:color/black</color>
+    <color name="color_background_secondary">#f6f6f6</color>
+    <color name="action_bar_background_color_light">@color/color_background_secondary</color>
+    <color name="toolbar_button_color">@color/textColor</color>
+    <color name="menu_item_bg_color">#fcfcfc</color>
+    <color name="device_image_tint">@android:color/black</color>
+</resources>

@@ -30,7 +30,7 @@
 #endif
 #include <lwip/tcpip.h>
 
-//#include "AppConfig.h"
+// #include "AppConfig.h"
 #include "FreeRTOS.h"
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
@@ -182,8 +182,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
 {
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kThreadFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kBLEFault)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -192,9 +192,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
 {
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_ENUM_HARDWARE_FAILURE));
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_ENUM_NETWORK_JAMMED));
-    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_ENUM_CONNECTION_FAILED));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kHardwareFailure)));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kNetworkJammed)));
+    ReturnErrorOnFailure(networkFaults.add(to_underlying(NetworkFaultEnum::kConnectionFailed)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -210,7 +210,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->fabricConnected           = true;
     ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
-    ifp->type = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+    ifp->type = InterfaceTypeEnum::kThread;
 #else
     /* TODO */
 #endif

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,10 +32,10 @@ struct CommissioningView: View {
             if(viewModel.commisisoningWindowOpened == true) {
                 Text("Commissioning window opened.").padding()
                 
-                Text("Onboarding PIN: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPaylod().setupPasscode)!))
+                Text("Onboarding PIN: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupPasscode)!))
                     .border(Color.blue, width: 1)
                     .padding()
-                Text("Discriminator: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPaylod().setupDiscriminator)!))
+                Text("Discriminator: " + String((CastingServerBridge.getSharedInstance()?.getOnboardingPayload().setupDiscriminator)!))
                     .border(Color.blue, width: 1)
                     .padding()
 

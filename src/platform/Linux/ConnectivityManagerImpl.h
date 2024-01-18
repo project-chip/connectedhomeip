@@ -45,6 +45,7 @@
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+#include <system/SystemMutex.h>
 
 #include <mutex>
 #endif
@@ -136,6 +137,7 @@ public:
 
     void StartWiFiManagement();
     bool IsWiFiManagementStarted();
+    void StartNonConcurrentWiFiManagement();
     int32_t GetDisconnectReason();
     CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
@@ -205,9 +207,11 @@ private:
 
     static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
+    static CHIP_ERROR _StartWiFiManagement(ConnectivityManagerImpl * self);
+
     static bool mAssociationStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
-    static GDBusWpaSupplicant mWpaSupplicant;
+    static GDBusWpaSupplicant mWpaSupplicant CHIP_GUARDED_BY(mWpaSupplicantMutex);
     // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
     // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
     static std::mutex mWpaSupplicantMutex;

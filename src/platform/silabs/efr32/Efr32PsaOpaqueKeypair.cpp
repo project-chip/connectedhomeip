@@ -124,7 +124,7 @@ EFR32OpaqueKeypair::~EFR32OpaqueKeypair()
         // Delete volatile keys, since nobody else can after we drop the key ID.
         if (!mIsPersistent)
         {
-            Delete();
+            DestroyKey();
         }
 
         MemoryFree(mContext);
@@ -145,7 +145,7 @@ CHIP_ERROR EFR32OpaqueKeypair::Load(EFR32OpaqueKeyId opaque_id)
     // If the object contains a volatile key, clean it up before reusing the object storage
     if (mHasKey && !mIsPersistent)
     {
-        Delete();
+        DestroyKey();
     }
 
     key_id = psa_key_id_from_opaque(opaque_id);
@@ -342,7 +342,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR EFR32OpaqueKeypair::Delete()
+CHIP_ERROR EFR32OpaqueKeypair::DestroyKey()
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
     psa_status_t status = PSA_ERROR_BAD_STATE;
@@ -422,7 +422,7 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDSA_sign_msg(const uint8_t * msg, size_t ms
     error = Sign(msg, msg_length, out_signature.Bytes(), out_signature.Capacity(), &output_length);
 
     SuccessOrExit(error);
-    SuccessOrExit(out_signature.SetLength(output_length));
+    SuccessOrExit(error = out_signature.SetLength(output_length));
 exit:
     return error;
 }
@@ -437,7 +437,7 @@ CHIP_ERROR EFR32OpaqueP256Keypair::ECDH_derive_secret(const P256PublicKey & remo
                    (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length(), &output_length);
 
     SuccessOrExit(error);
-    SuccessOrExit(out_secret.SetLength(output_length));
+    SuccessOrExit(error = out_secret.SetLength(output_length));
 exit:
     return error;
 }

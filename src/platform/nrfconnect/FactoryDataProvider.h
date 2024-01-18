@@ -40,11 +40,43 @@ struct InternalFlashFactoryData
         return CHIP_NO_ERROR;
     }
 
+#ifdef CONFIG_CHIP_FACTORY_DATA_WRITE_PROTECT
+#define TO_STR_IMPL(x) #x
+#define TO_STR(x) TO_STR_IMPL(x)
+    // These two helpers allows to get the factory data memory block which shall be protected with fprotect, so that:
+    // 1) it is aligned to the multiple of CONFIG_FPROTECT_BLOCK_SIZE (which differs between nRF families)
+    // 2) it does not exceed the settings partition start address
+    // Note that this block can overlap with app partition but this is not a problem since we do not aim to modify
+    // the application code at runtime anyway.
+    constexpr size_t FactoryDataBlockBegin()
+    {
+        // calculate the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE smaller than PM_FACTORY_DATA_ADDRESS
+        return PM_FACTORY_DATA_ADDRESS & (-CONFIG_FPROTECT_BLOCK_SIZE);
+    }
+
+    constexpr size_t FactoryDataBlockSize()
+    {
+        // calculate the factory data end address rounded up to the nearest multiple of CONFIG_FPROTECT_BLOCK_SIZE
+        // and make sure we do not overlap with settings partition
+        constexpr size_t kFactoryDataBlockEnd =
+            (PM_FACTORY_DATA_ADDRESS + PM_FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
+        static_assert(kFactoryDataBlockEnd <= PM_SETTINGS_STORAGE_ADDRESS,
+                      "FPROTECT memory block, which contains factory data"
+                      "partition overlaps with the settings partition."
+                      "Probably your settings partition size is not a multiple"
+                      "of the atomic FPROTECT block size of " TO_STR(CONFIG_FPROTECT_BLOCK_SIZE) "kB");
+        return kFactoryDataBlockEnd - FactoryDataBlockBegin();
+    }
+#undef TO_STR
+#undef TO_STR_IMPL
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite()
     {
-        int ret = fprotect_area(PM_FACTORY_DATA_ADDRESS, PM_FACTORY_DATA_SIZE);
+        int ret = fprotect_area(FactoryDataBlockBegin(), FactoryDataBlockSize());
         return System::MapErrorZephyr(ret);
     }
+#else
+    CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+#endif
 };
 
 struct ExternalFlashFactoryData
@@ -107,6 +139,8 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+    CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish) override;
+    CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor) override;
 
     // ===== Members functions that are platform-specific
     CHIP_ERROR GetEnableKey(MutableByteSpan & enableKey);

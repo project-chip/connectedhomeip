@@ -25,9 +25,14 @@
  */
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/Optional.h>
 #include <system/SystemClock.h>
 #include <system/SystemConfig.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/opt.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 
@@ -66,7 +71,7 @@ namespace chip {
  *  timeout when it sends a message to the present node and the present node is
  *  perceived by the peer as idle.
  *
- *  This value is announced to the peer using SII (Sleepy Idle Interval) key
+ *  This value is announced to the peer using SII (Session Idle Interval) key
  *  in the advertised DNS Service Discovery TXT records. Additionally, it is
  *  exchanged in the initial phase of the PASE/CASE session establishment.
  *
@@ -122,15 +127,23 @@ namespace chip {
  *
  */
 #ifndef CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
-#if LWIP_PBUF_FROM_CUSTOM_POOLS
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
-#elif PBUF_POOL_SIZE
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if !LWIP_PBUF_FROM_CUSTOM_POOLS && PBUF_POOL_SIZE != 0
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE std::min(PBUF_POOL_SIZE, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
-#elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
+#else
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
+#endif // !LWIP_PBUF_FROM_CUSTOM_POOLS && PBUF_POOL_SIZE != 0
+
+#else // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE std::min(CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
 #else
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
-#endif // PBUF_POOL_SIZE
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 
 /**
@@ -162,8 +175,12 @@ namespace chip {
 #ifndef CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
 #if CHIP_ENABLE_OPENTHREAD && !CHIP_DEVICE_LAYER_TARGET_LINUX
 #define CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST (500_ms)
+#else
+#define CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST (0_ms)
 #endif
-#endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST && !CHIP_DEVICE_LAYER_TARGET_LINUX
+#endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
+
+inline constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Clock::Milliseconds16(4000);
 
 /**
  *  @brief
@@ -171,8 +188,10 @@ namespace chip {
  */
 struct ReliableMessageProtocolConfig
 {
-    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval) :
-        mIdleRetransTimeout(idleInterval), mActiveRetransTimeout(activeInterval)
+    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval,
+                                  System::Clock::Milliseconds16 activeThreshold = kDefaultActiveTime) :
+        mIdleRetransTimeout(idleInterval),
+        mActiveRetransTimeout(activeInterval), mActiveThresholdTime(activeThreshold)
     {}
 
     // Configurable timeout in msec for retransmission of the first sent message.
@@ -181,9 +200,13 @@ struct ReliableMessageProtocolConfig
     // Configurable timeout in msec for retransmission of all subsequent messages.
     System::Clock::Milliseconds32 mActiveRetransTimeout;
 
+    // Configurable amount of time the node SHOULD stay active after network activity.
+    System::Clock::Milliseconds16 mActiveThresholdTime;
+
     bool operator==(const ReliableMessageProtocolConfig & that) const
     {
-        return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout;
+        return mIdleRetransTimeout == that.mIdleRetransTimeout && mActiveRetransTimeout == that.mActiveRetransTimeout &&
+            mActiveThresholdTime == that.mActiveThresholdTime;
     }
 };
 
@@ -224,7 +247,8 @@ System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activ
  * time defines). This is reserved for tests that need the ability to set these at runtime to make certain test scenarios possible.
  *
  */
-void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout);
+void OverrideLocalMRPConfig(System::Clock::Timeout idleRetransTimeout, System::Clock::Timeout activeRetransTimeout,
+                            System::Clock::Timeout activeThresholdTime = kDefaultActiveTime);
 
 /**
  * @brief

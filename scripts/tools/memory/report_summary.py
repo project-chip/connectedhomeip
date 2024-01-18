@@ -31,7 +31,6 @@ import sys
 import memdf.collect
 import memdf.report
 import memdf.select
-import numpy  # type: ignore
 from memdf import Config, DFs, SymbolDF
 
 

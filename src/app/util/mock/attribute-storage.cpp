@@ -28,13 +28,15 @@
  *    might be fixed with a mock endpoint-config.h
  */
 
-#include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
+#include <app/att-storage.h>
+#include <app/util/af.h>
 #include <app/util/mock/Constants.h>
+#include <app/util/mock/MockNodeConfig.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
@@ -47,6 +49,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <app/util/af-types.h>
 #include <app/util/attribute-metadata.h>
 
 typedef uint8_t EmberAfClusterMask;
@@ -54,29 +57,61 @@ typedef uint8_t EmberAfClusterMask;
 using namespace chip;
 using namespace chip::Test;
 using namespace chip::app;
+using namespace Clusters::Globals::Attributes;
 
 namespace {
-DataVersion dataVersion   = 0;
-EndpointId endpoints[]    = { kMockEndpoint1, kMockEndpoint2, kMockEndpoint3 };
-uint16_t clusterIndex[]   = { 0, 2, 5 };
-uint8_t clusterCount[]    = { 2, 3, 4 };
-ClusterId clusters[]      = { MockClusterId(1), MockClusterId(2), MockClusterId(1), MockClusterId(2), MockClusterId(3),
-                         MockClusterId(1), MockClusterId(2), MockClusterId(3), MockClusterId(4) };
-uint16_t attributeIndex[] = { 0, 2, 5, 7, 11, 16, 19, 25, 27 };
-uint16_t attributeCount[] = { 2, 3, 2, 4, 5, 3, 6, 2, 2 };
-AttributeId attributes[]  = {
+
+DataVersion dataVersion           = 0;
+const MockNodeConfig * mockConfig = nullptr;
+
+const MockNodeConfig & DefaultMockNodeConfig()
+{
     // clang-format off
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id,
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id, MockAttributeId(1),
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id,
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id, MockAttributeId(1),
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id,
-    Clusters::Globals::Attributes::ClusterRevision::Id, Clusters::Globals::Attributes::FeatureMap::Id
+    static const MockNodeConfig config({
+        MockEndpointConfig(kMockEndpoint1, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }, {
+                MockEventId(1), MockEventId(2),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint2, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+            }),
+        }),
+        MockEndpointConfig(kMockEndpoint3, {
+            MockClusterConfig(MockClusterId(1), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            }),
+            MockClusterConfig(MockClusterId(2), {
+                ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3), MockAttributeId(4),
+            }),
+            MockClusterConfig(MockClusterId(3), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+            MockClusterConfig(MockClusterId(4), {
+                ClusterRevision::Id, FeatureMap::Id,
+            }),
+        }),
+    });
     // clang-format on
-};
+    return config;
+}
+
+const MockNodeConfig & GetMockNodeConfig()
+{
+    return (mockConfig != nullptr) ? *mockConfig : DefaultMockNodeConfig();
+}
 
 uint16_t mockClusterRevision = 1;
 uint32_t mockFeatureMap      = 0x1234;
@@ -98,90 +133,65 @@ uint8_t mockAttribute4[256]  = {
 
 uint16_t emberAfEndpointCount()
 {
-    return ArraySize(endpoints);
+    return static_cast<uint16_t>(GetMockNodeConfig().endpoints.size());
 }
 
-uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint)
+uint16_t emberAfIndexFromEndpoint(EndpointId endpointId)
 {
-    static_assert(ArraySize(endpoints) < UINT16_MAX, "Need to be able to return endpoint index as a 16-bit value.");
+    ptrdiff_t index;
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId, &index);
+    VerifyOrReturnValue(endpoint != nullptr, kEmberInvalidEndpointIndex);
+    return static_cast<uint16_t>(index);
+}
 
-    for (size_t i = 0; i < ArraySize(endpoints); i++)
-    {
-        if (endpoints[i] == endpoint)
-        {
-            return static_cast<uint16_t>(i);
-        }
-    }
-    return UINT16_MAX;
+uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpointId)
+{
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+    VerifyOrReturnValue(endpoint != nullptr, 0);
+    return static_cast<uint8_t>(endpoint->clusters.size());
 }
 
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server)
 {
-    for (size_t i = 0; i < ArraySize(endpoints); i++)
-    {
-        if (endpoints[i] == endpoint)
-        {
-            return clusterCount[i];
-        }
-    }
-    return 0;
+    return (server) ? emberAfGetClusterCountForEndpoint(endpoint) : 0;
 }
 
-uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
+uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpointId, chip::ClusterId clusterId)
 {
-    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
-    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
-    {
-        if (clusters[i + clusterIndex[endpointIndex]] == cluster)
-        {
-            return attributeCount[i + clusterIndex[endpointIndex]];
-        }
-    }
-    return 0;
+    auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
+    VerifyOrReturnValue(cluster != nullptr, 0);
+    return static_cast<uint16_t>(cluster->attributes.size());
 }
 
-uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
+uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                      chip::AttributeId attributeId)
 {
-    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
-    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
-    {
-        if (clusters[i + clusterIndex[endpointIndex]] == cluster)
-        {
-            uint16_t clusterAttributeOffset = attributeIndex[i + clusterIndex[endpointIndex]];
-            for (uint16_t j = 0; j < emberAfGetServerAttributeCount(endpoint, cluster); j++)
-            {
-                if (attributes[clusterAttributeOffset + j] == attributeId)
-                {
-                    return j;
-                }
-            }
-            break;
-        }
-    }
-    return UINT16_MAX;
+    auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
+    VerifyOrReturnValue(cluster != nullptr, kEmberInvalidEndpointIndex);
+    ptrdiff_t index;
+    auto attribute = cluster->attributeById(attributeId, &index);
+    VerifyOrReturnValue(attribute != nullptr, kEmberInvalidEndpointIndex);
+    return static_cast<uint16_t>(index);
 }
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {
-    return !(emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) == UINT16_MAX);
+    return emberAfGetServerAttributeIndexByAttributeId(endpoint, clusterId, attributeId) != kEmberInvalidEndpointIndex;
 }
 
 chip::EndpointId emberAfEndpointFromIndex(uint16_t index)
 {
-    VerifyOrDie(index < ArraySize(endpoints));
-    return endpoints[index];
+    auto & config = GetMockNodeConfig();
+    VerifyOrDie(index < config.endpoints.size());
+    return config.endpoints[index].id;
 }
 
-chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint, uint8_t n, bool server)
+chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpointId, uint8_t n, bool server)
 {
-    if (n >= emberAfClusterCount(endpoint, server))
-    {
-        return chip::Optional<chip::ClusterId>::Missing();
-    }
-    return chip::Optional<chip::ClusterId>(clusters[clusterIndex[emberAfIndexFromEndpoint(endpoint)] + n]);
+    VerifyOrReturnValue(server, NullOptional); // only server clusters supported
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+    VerifyOrReturnValue(endpoint != nullptr && n < endpoint->clusters.size(), NullOptional);
+    return MakeOptional(endpoint->clusters[n].id);
 }
 
 // Returns number of clusters put into the passed cluster list
@@ -202,43 +212,26 @@ uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterL
     return cluster_count;
 }
 
-chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+chip::Optional<chip::AttributeId> emberAfGetServerAttributeIdByIndex(chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                                      uint16_t index)
 {
-    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
-    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
-    {
-        if (clusters[i + clusterIndex[endpointIndex]] == cluster)
-        {
-            uint16_t clusterAttributeOffset = attributeIndex[i + clusterIndex[endpointIndex]];
-            if (index < emberAfGetServerAttributeCount(endpoint, cluster))
-            {
-                return Optional<AttributeId>(attributes[clusterAttributeOffset + index]);
-            }
-            break;
-        }
-    }
-    return Optional<AttributeId>::Missing();
+    auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
+    VerifyOrReturnValue(cluster != nullptr && index < cluster->attributes.size(), NullOptional);
+    return MakeOptional(cluster->attributes[index].id);
 }
 
-uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId cluster, EmberAfClusterMask mask)
+uint8_t emberAfClusterIndex(chip::EndpointId endpointId, chip::ClusterId clusterId, EmberAfClusterMask mask)
 {
-    uint16_t endpointIndex         = emberAfIndexFromEndpoint(endpoint);
-    uint8_t clusterCountOnEndpoint = emberAfClusterCount(endpoint, true);
-    for (uint8_t i = 0; i < clusterCountOnEndpoint; i++)
-    {
-        if (clusters[i + clusterIndex[endpointIndex]] == cluster)
-        {
-            return i;
-        }
-    }
-    return UINT8_MAX;
+    VerifyOrReturnValue(mask == 0 || (mask & CLUSTER_MASK_SERVER) != 0, UINT8_MAX); // only server clusters supported
+    ptrdiff_t index;
+    auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId, &index);
+    VerifyOrReturnValue(cluster != nullptr, UINT8_MAX);
+    return static_cast<uint8_t>(index);
 }
 
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
-    return index < ArraySize(endpoints);
+    return index < GetMockNodeConfig().endpoints.size();
 }
 
 // This duplication of basic utilities is really unfortunate, but we can't link
@@ -270,12 +263,64 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
     return (length == 0xFFFF ? 0 : length);
 }
 
+// This will find the first server that has the clusterId given from the index of endpoint.
+bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
+{
+    auto config = GetMockNodeConfig();
+    VerifyOrReturnValue(index < config.endpoints.size(), false);
+    return true; // TODO: TestSceneTable relies on returning true here: https://github.com/project-chip/connectedhomeip/issues/30696
+    // return config.endpoints[index].clusterById(clusterId) != nullptr;
+}
+
+const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpointId)
+{
+    auto endpoint = GetMockNodeConfig().endpointById(endpointId);
+    VerifyOrReturnValue(endpoint != nullptr, nullptr);
+    return endpoint->emberEndpoint();
+}
+
+const EmberAfCluster * emberAfFindServerCluster(EndpointId endpointId, ClusterId clusterId)
+{
+    auto cluster = GetMockNodeConfig().clusterByIds(endpointId, clusterId);
+    VerifyOrReturnValue(cluster != nullptr, nullptr);
+    return cluster->emberCluster();
+}
+
 namespace chip {
 namespace app {
+
 AttributeAccessInterface * GetAttributeAccessOverride(EndpointId aEndpointId, ClusterId aClusterId)
 {
     return nullptr;
 }
+
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
+{
+    EnsureMatchingEndpoint();
+}
+EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
+{
+    ++mEndpointIndex;
+    EnsureMatchingEndpoint();
+    return *this;
+}
+
+void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
+{
+    for (; mEndpointIndex < mEndpointCount; ++mEndpointIndex)
+    {
+        if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
+        {
+            continue;
+        }
+
+        if (emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
+        {
+            break;
+        }
+    }
+}
+
 } // namespace app
 namespace Test {
 
@@ -313,9 +358,8 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
         ReturnErrorOnFailure(errorStatus.GetError());
-        attributeStatus.EndOfAttributeStatusIB();
-        ReturnErrorOnFailure(attributeStatus.GetError());
-        return attributeReport.EndOfAttributeReportIB().GetError();
+        ReturnErrorOnFailure(attributeStatus.EndOfAttributeStatusIB());
+        return attributeReport.EndOfAttributeReportIB();
     }
 
     // Attribute 4 acts as a large attribute to trigger chunking.
@@ -374,9 +418,8 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    attributeData.EndOfAttributeDataIB();
-    ReturnErrorOnFailure(attributeData.GetError());
-    return attributeReport.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB());
+    return attributeReport.EndOfAttributeReportIB();
 }
 
 } // namespace Test

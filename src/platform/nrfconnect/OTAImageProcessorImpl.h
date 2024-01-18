@@ -44,6 +44,7 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & aBlock) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
+    void SetImageConfirmed() { mImageConfirmed = true; }
 
 protected:
     CHIP_ERROR PrepareDownloadImpl();
@@ -53,6 +54,9 @@ protected:
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
     ExternalFlashManager * mFlashHandler;
+
+private:
+    bool mImageConfirmed = false;
 };
 
 } // namespace DeviceLayer

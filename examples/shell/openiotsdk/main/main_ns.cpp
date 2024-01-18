@@ -29,41 +29,19 @@
 using namespace ::chip;
 using namespace ::chip::Shell;
 
-static void app_thread(void * argument)
+int main()
 {
-    int ret;
+    if (openiotsdk_platform_init())
+    {
+        ChipLogError(Shell, "Open IoT SDK platform initialization failed");
+        return EXIT_FAILURE;
+    }
+
+    ChipLogProgress(Shell, "Open IoT SDK shell example application start");
 
     if (openiotsdk_network_init(true))
     {
         ChipLogError(Shell, "Network initialization failed");
-        goto exit;
-    }
-
-    // Initialize the default streamer that was linked.
-    ret = Engine::Root().Init();
-    if (ret)
-    {
-        ChipLogError(Shell, "Streamer initialization failed [%d]", ret);
-        goto exit;
-    }
-
-    cmd_misc_init();
-
-    ChipLogProgress(Shell, "Open IoT SDK shell example application run");
-
-    Engine::Root().RunMainLoop();
-
-exit:
-    osThreadTerminate(osThreadGetId());
-}
-
-int main()
-{
-    ChipLogProgress(Shell, "Open IoT SDK shell example application start");
-
-    if (openiotsdk_platform_init())
-    {
-        ChipLogError(Shell, "Open IoT SDK platform initialization failed");
         return EXIT_FAILURE;
     }
 
@@ -73,22 +51,19 @@ int main()
         return EXIT_FAILURE;
     }
 
-    static const osThreadAttr_t thread_attr = {
-        .stack_size = 8 * 1024 // Allocate enough stack for app thread
-    };
-
-    osThreadId_t appThread = osThreadNew(app_thread, NULL, &thread_attr);
-    if (appThread == NULL)
+    // Initialize the default streamer that was linked.
+    int ret = Engine::Root().Init();
+    if (ret)
     {
-        ChipLogError(Shell, "Failed to create app thread");
+        ChipLogError(Shell, "Streamer initialization failed [%d]", ret);
         return EXIT_FAILURE;
     }
 
-    if (openiotsdk_platform_run())
-    {
-        ChipLogError(Shell, "Open IoT SDK platform run failed");
-        return EXIT_FAILURE;
-    }
+    cmd_misc_init();
+
+    ChipLogProgress(Shell, "Open IoT SDK shell example application run");
+
+    Engine::Root().RunMainLoop();
 
     return EXIT_SUCCESS;
 }

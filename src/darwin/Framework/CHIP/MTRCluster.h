@@ -29,6 +29,7 @@ typedef void (^MTRStatusCompletion)(NSError * _Nullable error);
 typedef void (^MTRSubscriptionEstablishedHandler)(void);
 
 @class MTRBaseDevice;
+@class MTRDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,6 +40,29 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCluster : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * The endpoint this cluster lives on.
+ */
+@property (nonatomic, readonly) NSNumber * endpointID NS_REFINED_FOR_SWIFT MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+@end
+
+/**
+ * Base for all MTRBaseCluster* types.
+ */
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
+@interface MTRGenericBaseCluster : MTRCluster
+@end
+
+/**
+ * Base for all MTRCluster* types.
+ */
+MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
+@interface MTRGenericCluster : MTRCluster
+/**
+ * The device this cluster object is associated with.
+ */
+@property (nonatomic, strong, readonly) MTRDevice * device;
 @end
 
 /**
@@ -94,7 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
  * non-fabric-sensitive data for the given attribute path.
  */
 @property (nonatomic, assign, getter=shouldFilterByFabric)
-    BOOL filterByFabric API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    BOOL filterByFabric MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Sets a filter for which events will be reported in the read/subscribe interaction.
@@ -103,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, queued events with an event number smaller than minEventNumber will not be reported.
  */
-@property (nonatomic, copy, nullable) NSNumber * minEventNumber API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, nullable) NSNumber * minEventNumber MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
@@ -125,7 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If NO, the subscribe will allow any previous subscriptions to remain.
  */
 @property (nonatomic, assign, getter=shouldReplaceExistingSubscriptions)
-    BOOL replaceExistingSubscriptions API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    BOOL replaceExistingSubscriptions MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Whether the subscription should automatically try to re-establish if it
@@ -140,14 +164,14 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @property (nonatomic, assign, getter=shouldResubscribeAutomatically)
-    BOOL resubscribeAutomatically API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    BOOL resubscribeAutomatically MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The minimum time, in seconds, between consecutive reports a server will send
  * for this subscription.  This can be used to rate-limit the subscription
  * traffic.  Any non-negative value is allowed, including 0.
  */
-@property (nonatomic, copy) NSNumber * minInterval API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy) NSNumber * minInterval MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The suggested maximum time, in seconds, during which the server is allowed to
@@ -155,7 +179,7 @@ NS_ASSUME_NONNULL_BEGIN
  * minInterval.  The server is allowed to use a larger time than this as the
  * maxInterval it selects if it needs to (e.g. to meet its power budget).
  */
-@property (nonatomic, copy) NSNumber * maxInterval API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy) NSNumber * maxInterval MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Controls whether events will be reported urgently. The default value is YES.
@@ -165,7 +189,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If NO, the events will be reported at the maximum interval.
  */
 @property (nonatomic, assign, getter=shouldReportEventsUrgently)
-    BOOL reportEventsUrgently API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    BOOL reportEventsUrgently MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Initialize an MTRSubscribeParams.  Must provide a minInterval and

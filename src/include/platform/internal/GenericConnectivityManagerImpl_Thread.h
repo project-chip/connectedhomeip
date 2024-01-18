@@ -63,11 +63,9 @@ protected:
     bool _IsThreadApplicationControlled();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
-#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif /* CHIP_CONFIG_ENABLE_ICD_SERVER */
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
@@ -141,27 +139,14 @@ GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(Connectiv
     return ThreadStackMgrImpl().SetThreadDeviceType(deviceType);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
 template <class ImplClass>
 inline CHIP_ERROR
-GenericConnectivityManagerImpl_Thread<ImplClass>::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
+GenericConnectivityManagerImpl_Thread<ImplClass>::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    return ThreadStackMgrImpl().GetSEDIntervalsConfig(intervalsConfig);
+    return ThreadStackMgrImpl().SetPollingInterval(pollingInterval);
 }
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetSEDIntervalsConfig(
-    const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    return ThreadStackMgrImpl().SetSEDIntervalsConfig(intervalsConfig);
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    return ThreadStackMgrImpl().RequestSEDActiveMode(onOff, delayIdle);
-}
-#endif
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()

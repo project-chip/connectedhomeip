@@ -27,8 +27,8 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
 #include <system/TimeSource.h>
@@ -84,7 +84,7 @@ int TestTimeSource()
         "chip-timesource", &sTests[0], nullptr /* setup */, nullptr /* teardown */
     };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr /* context */);
 
     return (nlTestRunnerStats(&theSuite));

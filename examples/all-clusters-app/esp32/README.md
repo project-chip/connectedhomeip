@@ -1,4 +1,4 @@
-# CHIP ESP32 All Clusters Example
+# Matter ESP32 All Clusters Example
 
 A prototype application that demonstrates device commissioning and cluster
 control.

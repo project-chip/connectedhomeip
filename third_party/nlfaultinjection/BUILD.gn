@@ -15,13 +15,13 @@
 import("//build_overrides/nlassert.gni")
 
 config("nlfaultinjection_config") {
-  include_dirs = [ "repo/include" ]
+  include_dirs = [ "include" ]
 }
 
 static_library("nlfaultinjection") {
   sources = [
-    "repo/include/nlfaultinjection.hpp",
-    "repo/src/nlfaultinjection.cpp",
+    "include/nlfaultinjection.hpp",
+    "src/nlfaultinjection.cpp",
   ]
 
   deps = [ "${nlassert_root}:nlassert" ]

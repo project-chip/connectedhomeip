@@ -107,7 +107,7 @@ SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::MaxInterv
     return *this;
 }
 
-SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::EndOfSubscribeResponseMessage()
+CHIP_ERROR SubscribeResponseMessage::Builder::EndOfSubscribeResponseMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -117,7 +117,7 @@ SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::EndOfSubs
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

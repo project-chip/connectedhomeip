@@ -82,36 +82,26 @@ public class MatterServant {
     mTvApp =
         new TvApp(
             (app, clusterId, endpoint) -> {
-              switch (clusterId) {
-                case Clusters.ClusterId_KeypadInput:
-                  app.setKeypadInputManager(endpoint, new KeypadInputManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_WakeOnLan:
-                  app.setWakeOnLanManager(endpoint, new WakeOnLanManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_MediaInput:
-                  app.setMediaInputManager(endpoint, new MediaInputManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_ContentLauncher:
-                  app.setContentLaunchManager(endpoint, new ContentLaunchManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_LowPower:
-                  app.setLowPowerManager(endpoint, new LowPowerManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_MediaPlayback:
-                  app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_Channel:
-                  app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_OnOff:
-                  mOnOffEndpoint = endpoint;
-                  app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
-                  break;
-                case Clusters.ClusterId_LevelControl:
-                  mLevelEndpoint = endpoint;
-                  app.setLevelManager(endpoint, new LevelManagerStub(endpoint));
-                  break;
+              if (clusterId == Clusters.ClusterId_KeypadInput) {
+                app.setKeypadInputManager(endpoint, new KeypadInputManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_WakeOnLan) {
+                app.setWakeOnLanManager(endpoint, new WakeOnLanManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_MediaInput) {
+                app.setMediaInputManager(endpoint, new MediaInputManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_ContentLauncher) {
+                app.setContentLaunchManager(endpoint, new ContentLaunchManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_LowPower) {
+                app.setLowPowerManager(endpoint, new LowPowerManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_MediaPlayback) {
+                app.setMediaPlaybackManager(endpoint, new MediaPlaybackManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_Channel) {
+                app.setChannelManager(endpoint, new ChannelManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_OnOff) {
+                mOnOffEndpoint = endpoint;
+                app.setOnOffManager(endpoint, new OnOffManagerStub(endpoint));
+              } else if (clusterId == Clusters.ClusterId_LevelControl) {
+                mLevelEndpoint = endpoint;
+                app.setLevelManager(endpoint, new LevelManagerStub(endpoint));
               }
             });
     mTvApp.setDACProvider(new DACProviderStub());

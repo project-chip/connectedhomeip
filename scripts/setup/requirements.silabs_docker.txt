@@ -1,0 +1,1 @@
+../../integrations/docker/images/stage-2/chip-build-efr32/requirements.txt

@@ -19,6 +19,7 @@
 #include "AppTaskCommon.h"
 #include "AppTask.h"
 
+#include "BLEManagerImpl.h"
 #include "ButtonManager.h"
 
 #include "ThreadUtil.h"
@@ -29,9 +30,18 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-#include "OTAUtil.h"
+#if CONFIG_BOOTLOADER_MCUBOOT
+#include <OTAUtil.h>
 #endif
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
+#endif
+
+#include <zephyr/fs/nvs.h>
+#include <zephyr/settings/settings.h>
+
+using namespace chip::app;
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -40,7 +50,25 @@ constexpr int kFactoryResetCalcTimeout = 3000;
 constexpr int kFactoryResetTriggerCntr = 3;
 constexpr int kAppEventQueueSize       = 10;
 
-#if APP_USE_IDENTIFY_PWM
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios);
+#if APP_USE_BLE_START_BUTTON
+const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
+#endif
+#if APP_USE_THREAD_START_BUTTON
+const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
+const struct gpio_dt_spec sExampleActionButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_4), gpios);
+#endif
+#else
+const struct gpio_dt_spec sButtonCol1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col1), gpios);
+const struct gpio_dt_spec sButtonCol2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_col2), gpios);
+const struct gpio_dt_spec sButtonRow1Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row1), gpios);
+const struct gpio_dt_spec sButtonRow2Dt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_matrix_row2), gpios);
+#endif
+
+#ifdef APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
 constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
 constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
@@ -49,7 +77,7 @@ constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
 constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
 constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
 
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
+const struct pwm_dt_spec sPwmIdentifySpecGreenLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3));
 #endif
 
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
@@ -63,7 +91,9 @@ LEDWidget sStatusLED;
 #endif
 
 Button sFactoryResetButton;
+#if APP_USE_BLE_START_BUTTON
 Button sBleAdvStartButton;
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
 Button sExampleActionButton;
 #endif
@@ -74,16 +104,17 @@ Button sThreadStartButton;
 k_timer sFactoryResetTimer;
 uint8_t sFactoryResetCntr = 0;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sIsThreadAttached    = false;
-bool sHaveBLEConnections  = false;
+bool sIsCommissioningFailed = false;
+bool sIsThreadProvisioned   = false;
+bool sIsThreadEnabled       = false;
+bool sIsThreadAttached      = false;
+bool sHaveBLEConnections    = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 void OnIdentifyTriggerEffect(Identify * identify)
 {
     AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
@@ -93,7 +124,7 @@ Identify sIdentify = {
     kExampleEndpointId,
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator,
     OnIdentifyTriggerEffect,
 };
 #endif
@@ -103,6 +134,26 @@ Identify sIdentify = {
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
+
+class AppCallbacks : public AppDelegate
+{
+    bool isComissioningStarted;
+
+public:
+    void OnCommissioningSessionEstablishmentStarted() override { sIsCommissioningFailed = false; }
+    void OnCommissioningSessionStarted() override { isComissioningStarted = true; }
+    void OnCommissioningSessionStopped() override { isComissioningStarted = false; }
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override { sIsCommissioningFailed = true; }
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    void OnCommissioningWindowClosed() override
+    {
+        if (!isComissioningStarted)
+            chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+    }
+#endif
+};
+
+AppCallbacks sCallbacks;
 } // namespace
 
 class AppFabricTableDelegate : public FabricTable::Delegate
@@ -111,14 +162,53 @@ class AppFabricTableDelegate : public FabricTable::Delegate
     {
         if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
         {
-            chip::Server::GetInstance().ScheduleFactoryReset();
+            ChipLogProgress(DeviceLayer, "Performing erasing of settings partition");
+
+            // Do FactoryReset in case of failed commissioning to allow new pairing via BLE
+            if (sIsCommissioningFailed)
+            {
+                chip::Server::GetInstance().ScheduleFactoryReset();
+            }
+            // TC-OPCREDS-3.6 (device doesn't need to reboot automatically after the last fabric is removed) can't use FactoryReset
+            else
+            {
+                void * storage = nullptr;
+                int status     = settings_storage_get(&storage);
+
+                if (!status)
+                {
+                    status = nvs_clear(static_cast<nvs_fs *>(storage));
+                }
+
+                if (!status)
+                {
+                    status = nvs_mount(static_cast<nvs_fs *>(storage));
+                }
+
+                if (status)
+                {
+                    ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
+                }
+            }
+        }
+    }
+};
+
+class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+{
+    // Disable openthread before reset to prevent writing to NVS
+    void OnShutDown() override
+    {
+        if (ThreadStackManagerImpl().IsThreadEnabled())
+        {
+            ThreadStackManagerImpl().Finalize();
         }
     }
 };
 
 #if CONFIG_CHIP_LIB_SHELL
-#include <sys.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/reboot.h>
 
 static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** argv)
 {
@@ -126,13 +216,23 @@ static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** ar
     ARG_UNUSED(argv);
 
     shell_print(shell, "Performing board reboot...");
-    sys_reboot();
+    sys_reboot(0);
+
+    return 0;
 }
 
 SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board command", cmd_telink_reboot),
                                SHELL_SUBCMD_SET_END);
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
+
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+void AppTaskCommon::PowerOnFactoryReset(void)
+{
+    LOG_INF("schedule factory reset");
+    chip::Server::GetInstance().ScheduleFactoryReset();
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
 
 CHIP_ERROR AppTaskCommon::StartApp(void)
 {
@@ -145,6 +245,18 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
     }
 
     AppEvent event = {};
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    StartThreadButtonEventHandler();
+#endif
+
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("Confirm image.");
+        OtaConfirmNewImage();
+    }
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     while (true)
     {
@@ -160,9 +272,8 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
     // Initialize status LED
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-    LEDWidget::InitGpio(LEDS_PORT);
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
-    sStatusLED.Init(SYSTEM_STATE_LED);
+    sStatusLED.Init(GPIO_DT_SPEC_GET_OR(DT_ALIAS(system_state_led), gpios, {}));
 
     UpdateStatusLED();
 #endif
@@ -173,7 +284,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
     k_timer_user_data_set(&sFactoryResetTimer, this);
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
     // Initialize PWM Identify led
     err = GetAppTask().mPwmIdentifyLed.Init(&sPwmIdentifySpecGreenLed, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMaxLevel);
     if (err != CHIP_NO_ERROR)
@@ -206,15 +317,12 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.appDelegate = &sCallbacks;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
 #if APP_SET_DEVICE_INFO_PROVIDER
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-#endif
-
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
 #endif
 
     ConfigurationMgr().LogDeviceConfig();
@@ -223,9 +331,18 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 #if APP_SET_NETWORK_COMM_ENDPOINT_SEC
     // We only have network commissioning on endpoint 0.
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
-    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
+
+    // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
+    // The OpenThread thread is running during factory reset. The nvs_clear function is called during
+    // factory reset, which makes the NVS storage innaccessible, but the OpenThread knows nothing
+    // about this and tries to store the parameters to NVS. Because of this the OpenThread need to be
+    // shut down before NVS. This delegate fixes the issue "Failed to store setting , ret -13",
+    // which means that the NVS is already disabled.
+    // For this the OnShutdown function is used
+    PlatformMgr().SetDelegate(new PlatformMgrDelegate);
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
@@ -242,36 +359,74 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     return CHIP_NO_ERROR;
 }
 
+#ifdef CONFIG_CHIP_PW_RPC
+void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+{
+    if (!btnPressed)
+    {
+        return;
+    }
+
+    switch (btnId)
+    {
+#if APP_USE_EXAMPLE_START_BUTTON
+    case kButtonId_ExampleAction:
+        ExampleActionButtonEventHandler();
+        break;
+#endif
+    case kButtonId_FactoryReset:
+        FactoryResetButtonEventHandler();
+        break;
+#if APP_USE_THREAD_START_BUTTON
+    case kButtonId_StartThread:
+        StartThreadButtonEventHandler();
+        break;
+#endif
+#if APP_USE_BLE_START_BUTTON
+    case kButtonId_StartBleAdv:
+        StartBleAdvButtonEventHandler();
+        break;
+#endif
+    }
+}
+#endif
+
 void AppTaskCommon::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
-#if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
+#if APP_USE_BLE_START_BUTTON
+    sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
 #endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sExampleActionButtonDt, ExampleActionButtonEventHandler);
     }
+#endif
+#if APP_USE_THREAD_START_BUTTON
+    sThreadStartButton.Configure(&sThreadStartButtonDt, StartThreadButtonEventHandler);
 #endif
 #else
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
-#if APP_USE_THREAD_START_BUTTON
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
+#if APP_USE_BLE_START_BUTTON
+    sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
 #endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
-        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
+        sExampleActionButton.Configure(&sButtonRow1Dt, &sButtonCol2Dt, ExampleActionButtonEventHandler);
     }
+#endif
+#if APP_USE_THREAD_START_BUTTON
+    sThreadStartButton.Configure(&sButtonRow2Dt, &sButtonCol1Dt, StartThreadButtonEventHandler);
 #endif
 #endif
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
+#if APP_USE_BLE_START_BUTTON
     ButtonManagerInst().AddButton(sBleAdvStartButton);
+#endif
 #if APP_USE_THREAD_START_BUTTON
     ButtonManagerInst().AddButton(sThreadStartButton);
 #endif
@@ -321,7 +476,7 @@ void AppTaskCommon::UpdateStatusLED()
 }
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 void AppTaskCommon::ActionIdentifyStateUpdateHandler(k_timer * timer)
 {
     AppEvent event;
@@ -335,45 +490,45 @@ void AppTaskCommon::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
     GetAppTask().mPwmIdentifyLed.UpdateAction();
 }
 
-void AppTaskCommon::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
+void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEnum aEffect)
 {
     AppEvent event;
     event.Type = AppEvent::kEventType_IdentifyStart;
 
     switch (aEffect)
     {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT");
+    case Clusters::Identify::EffectIdentifierEnum::kFinishEffect:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kFinishEffect");
         event.Handler = [](AppEvent *) {
             GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
         };
         break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT");
+    case Clusters::Identify::EffectIdentifierEnum::kStopEffect:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kStopEffect");
         event.Handler = [](AppEvent *) { GetAppTask().mPwmIdentifyLed.StopAction(); };
         event.Type    = AppEvent::kEventType_IdentifyStop;
         break;
@@ -386,6 +541,7 @@ void AppTaskCommon::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffec
 }
 #endif
 
+#if APP_USE_BLE_START_BUTTON
 void AppTaskCommon::StartBleAdvButtonEventHandler(void)
 {
     AppEvent event;
@@ -418,6 +574,7 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         LOG_ERR("OpenBasicCommissioningWindow fail");
     }
 }
+#endif
 
 void AppTaskCommon::FactoryResetButtonEventHandler(void)
 {
@@ -472,7 +629,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON || !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -489,8 +646,13 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
     {
         // Switch context from BLE to Thread
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
         Internal::BLEManagerImpl sInstance;
         sInstance.SwitchToIeee802154();
+#else
+        ThreadStackMgrImpl().SetRadioBlocked(false);
+        ThreadStackMgrImpl().SetThreadEnabled(true);
+#endif
         StartDefaultThreadNetwork();
     }
     else
@@ -531,6 +693,23 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
 #endif
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
+#endif
         break;
     case DeviceEventType::kThreadStateChange:
         sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
@@ -540,11 +719,16 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         UpdateStatusLED();
 #endif
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        InitBasicOTARequestor();
+        if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle)
         {
-            InitBasicOTARequestor();
+#endif
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+            OtaConfirmNewImage();
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
+#if CONFIG_CHIP_OTA_REQUESTOR
         }
 #endif
         break;

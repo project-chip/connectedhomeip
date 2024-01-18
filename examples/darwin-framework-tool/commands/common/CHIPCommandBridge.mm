@@ -21,7 +21,7 @@
 #import "CHIPToolKeypair.h"
 #import <Matter/Matter.h>
 
-#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 
 #include "MTRError_Utils.h"
@@ -31,7 +31,7 @@ std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
 dispatch_queue_t CHIPCommandBridge::mOTAProviderCallbackQueue;
 OTAProviderDelegate * CHIPCommandBridge::mOTADelegate;
-constexpr const char * kTrustStorePathVariable = "PAA_TRUST_STORE_PATH";
+constexpr char kTrustStorePathVariable[] = "PAA_TRUST_STORE_PATH";
 
 CHIPToolKeypair * gNocSigner = [[CHIPToolKeypair alloc] init];
 
@@ -40,6 +40,12 @@ CHIP_ERROR CHIPCommandBridge::Run()
     ChipLogProgress(chipTool, "Running Command");
     ReturnErrorOnFailure(MaybeSetUpStack());
     SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
+
+    {
+        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+        mWaitingForResponse = YES;
+    }
+
     ReturnLogErrorOnFailure(RunCommand());
 
     auto err = StartWaiting(GetWaitDuration());
@@ -137,15 +143,19 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     ipk = [gNocSigner getIPK];
 
     constexpr const char * identities[] = { kIdentityAlpha, kIdentityBeta, kIdentityGamma };
+    std::string commissionerName = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
     for (size_t i = 0; i < ArraySize(identities); ++i) {
         auto controllerParams = [[MTRDeviceControllerStartupParams alloc] initWithIPK:ipk fabricID:@(i + 1) nocSigner:gNocSigner];
 
+        if (commissionerName.compare(identities[i]) == 0 && mCommissionerNodeId.HasValue()) {
+            controllerParams.nodeId = @(mCommissionerNodeId.Value());
+        }
         // We're not sure whether we're creating a new fabric or using an
         // existing one, so just try both.
         auto controller = [factory createControllerOnExistingFabric:controllerParams error:&error];
         if (controller == nil) {
             // Maybe we didn't have this fabric yet.
-            controllerParams.vendorID = @(chip::VendorId::TestVendor1);
+            controllerParams.vendorID = @(mCommissionerVendorId.ValueOr(chip::VendorId::TestVendor1));
             controller = [factory createControllerOnNewFabric:controllerParams error:&error];
         }
         if (controller == nil) {

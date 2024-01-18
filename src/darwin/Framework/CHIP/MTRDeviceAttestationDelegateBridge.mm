@@ -21,19 +21,20 @@
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
 
+#include <lib/support/TypeTraits.h>
+
 void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner,
     chip::DeviceProxy * device, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
     dispatch_async(mQueue, ^{
-        MTR_LOG_DEFAULT(
-            "MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu", attestationResult);
+        MTR_LOG_DEFAULT("MTRDeviceAttestationDelegateBridge::OnDeviceAttestationFailed completed with result: %hu",
+            chip::to_underlying(attestationResult));
 
         mResult = attestationResult;
 
         id<MTRDeviceAttestationDelegate> strongDelegate = mDeviceAttestationDelegate;
-        if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:
-                                                                              opaqueDeviceHandle:attestationDeviceInfo:error:)]
+        if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]
             || [strongDelegate respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
             MTRDeviceController * strongController = mDeviceController;
             if (strongController) {
@@ -43,12 +44,13 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
                 MTRDeviceAttestationDeviceInfo * deviceInfo =
                     [[MTRDeviceAttestationDeviceInfo alloc] initWithDACCertificate:dacData
                                                                  dacPAICertificate:paiData
-                                                            certificateDeclaration:cdData];
+                                                            certificateDeclaration:cdData
+                                                          basicInformationVendorID:@(info.BasicInformationVendorId())
+                                                         basicInformationProductID:@(info.BasicInformationProductId())];
                 NSError * error = (attestationResult == chip::Credentials::AttestationVerificationResult::kSuccess)
                     ? nil
                     : [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTEGRITY_CHECK_FAILED];
-                if ([strongDelegate respondsToSelector:@selector
-                                    (deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]) {
+                if ([strongDelegate respondsToSelector:@selector(deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:)]) {
                     [strongDelegate deviceAttestationCompletedForController:mDeviceController
                                                          opaqueDeviceHandle:device
                                                       attestationDeviceInfo:deviceInfo

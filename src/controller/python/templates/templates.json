@@ -8,6 +8,9 @@
         "templates/chip/helper.js",
         "controller/python/templates/helper.js"
     ],
+    "resources": {
+        "config-data": "../../../../src/app/common/templates/config-data.yaml"
+    },
     "override": "../../../../src/app/zap-templates/common/override.js",
     "partials": [
         {

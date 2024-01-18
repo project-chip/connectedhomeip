@@ -20,6 +20,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/Span.h>
 
 #include "CASEDestinationId.h"

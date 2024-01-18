@@ -26,6 +26,7 @@ class MbedApp(Enum):
     ALL_CLUSTERS_MINIMAL = auto()
     PIGWEED = auto()
     SHELL = auto()
+    OTA_REQUESTOR = auto()
 
     @property
     def ExampleName(self):
@@ -39,6 +40,8 @@ class MbedApp(Enum):
             return 'all-clusters-minimal-app'
         elif self == MbedApp.PIGWEED:
             return 'pigweed-app'
+        elif self == MbedApp.OTA_REQUESTOR:
+            return 'ota-requestor-app'
         elif self == MbedApp.SHELL:
             return 'shell'
         else:
@@ -56,6 +59,8 @@ class MbedApp(Enum):
             return 'chip-mbed-all-clusters-minimal-app-example'
         elif self == MbedApp.PIGWEED:
             return 'chip-mbed-pigweed-app-example'
+        elif self == MbedApp.OTA_REQUESTOR:
+            return 'chip-mbed-ota-requestor-app-example'
         elif self == MbedApp.SHELL:
             return 'chip-mbed-shell-example'
         else:

@@ -202,6 +202,85 @@ class ClusterObjectTests:
 
     @ classmethod
     @ base.test_case
+    async def TestAttributeCacheAttributeView(cls, devCtrl):
+        logger.info("Test AttributeCache Attribute-View")
+        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=False, reportInterval=(3, 10))
+
+        event = asyncio.Event()
+
+        def subUpdate(path: TypedAttributePath, transaction: SubscriptionTransaction):
+            event.set()
+
+        sub.SetAttributeUpdateCallback(subUpdate)
+
+        try:
+            data = sub.GetAttributes()
+            req = Clusters.OnOff.Commands.On()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 1):
+                raise ValueError("Current On/Off state should be 1")
+
+            event.clear()
+
+            req = Clusters.OnOff.Commands.Off()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            if (data[1][Clusters.OnOff][Clusters.OnOff.Attributes.OnOff] != 0):
+                raise ValueError("Current On/Off state should be 0")
+
+        except TimeoutError:
+            raise AssertionError("Did not receive updated attribute")
+        finally:
+            sub.Shutdown()
+
+    @ classmethod
+    @ base.test_case
+    async def TestAttributeCacheClusterView(cls, devCtrl):
+        logger.info("Test AttributeCache Cluster-View")
+        sub: SubscriptionTransaction = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], returnClusterObject=True, reportInterval=(3, 10))
+
+        event = asyncio.Event()
+
+        def subUpdate(path: TypedAttributePath, transaction: SubscriptionTransaction):
+            event.set()
+
+        sub.SetAttributeUpdateCallback(subUpdate)
+
+        try:
+            data = sub.GetAttributes()
+
+            req = Clusters.OnOff.Commands.On()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            cluster: Clusters.OnOff = data[1][Clusters.OnOff]
+            if (not cluster.onOff):
+                raise ValueError("Current On/Off state should be True")
+
+            event.clear()
+
+            req = Clusters.OnOff.Commands.Off()
+            await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+
+            await asyncio.wait_for(event.wait(), timeout=11)
+
+            cluster: Clusters.OnOff = data[1][Clusters.OnOff]
+            if (cluster.onOff):
+                raise ValueError("Current On/Off state should be False")
+
+        except TimeoutError:
+            raise AssertionError("Did not receive updated attribute")
+        finally:
+            sub.Shutdown()
+
+    @ classmethod
+    @ base.test_case
     async def TestSubscribeZeroMinInterval(cls, devCtrl):
         '''
         This validates receiving subscription reports for two attributes at a time in quick succession after
@@ -638,6 +717,8 @@ class ClusterObjectTests:
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestSubscribeZeroMinInterval(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
+            await cls.TestAttributeCacheAttributeView(devCtrl)
+            await cls.TestAttributeCacheClusterView(devCtrl)
             await cls.TestMixedReadAttributeAndEvents(devCtrl)
             # Note: Write will change some attribute values, always put it after read tests
             await cls.TestWriteRequest(devCtrl)

@@ -27,19 +27,21 @@ CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 ALL_PLATFORMS = set([
     'ameba',
     'android',
+    'asr',
     'bl602',
     'bouffalolab',
-    'cc13x2_26x2',
+    'cc13xx_26xx',
     'cc32xx',
     'darwin',
-    'efr32',
+    'silabs',
     'esp32',
     'infineon',
-    'k32w0',
+    'k32w',
     'linux',
     'mbed',
     'nrfconnect',
     'qpg',
+    'stm32',
     'telink',
     'tizen',
     'webos',
@@ -89,7 +91,7 @@ def make_chip_root_safe_directory() -> None:
         subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
 
 
-def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool) -> None:
+def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool, jobs: int) -> None:
     names = ', '.join([module.name for module in modules])
     logging.info(f'Checking out: {names}')
 
@@ -97,6 +99,7 @@ def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool)
     cmd += ['--depth', '1'] if shallow else []
     cmd += ['--force'] if force else []
     cmd += ['--recursive'] if recursive else []
+    cmd += ['--jobs', f'{jobs}'] if jobs else []
     cmd += [module.path for module in modules]
 
     subprocess.check_call(cmd)
@@ -126,6 +129,7 @@ def main():
     parser.add_argument('--deinit-unmatched', action='store_true',
                         help='Deinitialize submodules for non-matching platforms')
     parser.add_argument('--recursive', action='store_true', help='Recursive init of the listed submodules')
+    parser.add_argument('--jobs', type=int, metavar='N', help='Clone new submodules in parallel with N jobs')
     args = parser.parse_args()
 
     modules = list(load_module_info())
@@ -136,7 +140,7 @@ def main():
 
     if args.allow_changing_global_git_config:
         make_chip_root_safe_directory()  # ignore directory ownership issues for sub-modules
-    checkout_modules(selected_modules, args.shallow, args.force, args.recursive)
+    checkout_modules(selected_modules, args.shallow, args.force, args.recursive, args.jobs)
 
     if args.deinit_unmatched and unmatched_modules:
         deinit_modules(unmatched_modules, args.force)

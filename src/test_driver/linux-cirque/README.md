@@ -16,7 +16,7 @@ If you don't want cirque break your local environment, you can enter a
 environment insider docker
 
 ```
-integrations/docker/images/chip-build-cirque/run.sh --privileged --volume /dev/pts:/dev/pts --volume /tmp:/tmp -it -- bash
+integrations/docker/images/stage-2/chip-build-cirque/run.sh --privileged --volume /dev/pts:/dev/pts --volume /tmp:/tmp -it -- bash
 ```
 
 ## Setting up cirque environment
@@ -32,8 +32,8 @@ It will:
 
 1. Install necessary packages required by cirque,
 
-2. Build `connectedhomeip/chip-cirque-device-base:latest` docker image for
-   running devices,
+2. Build `project-chip/chip-cirque-device-base:latest` docker image for running
+   devices,
 
 3. Build openthread for simulating thread network.
 

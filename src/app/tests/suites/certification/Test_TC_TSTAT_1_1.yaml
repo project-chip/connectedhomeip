@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,15 +31,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read the global attribute: ClusterRevision"
+    - label: "Step 2: Read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          value: 6
           constraints:
               type: int16u
 
-    - label: "Read the global attribute: FeatureMap"
+    - label: "Step 3a: Read the global attribute: FeatureMap"
       PICS:
           "!TSTAT.S.F00 && !TSTAT.S.F01 && !TSTAT.S.F02 && !TSTAT.S.F03 &&
           !TSTAT.S.F04 && !TSTAT.S.F05"
@@ -50,7 +50,9 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Given TSTAT.S.F00(HEAT ensure featuremap has the correct bit set"
+    - label:
+          "Step 3b: Given TSTAT.S.F00(HEAT ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -59,7 +61,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x1]
 
-    - label: "Given TSTAT.S.F01(COOL) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3c: Given TSTAT.S.F01(COOL) ensure featuremap has the correct
+          bit set"
       PICS: TSTAT.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -68,7 +72,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x2]
 
-    - label: "Given TSTAT.S.F02(OCC) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3d: Given TSTAT.S.F02(OCC) ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -77,7 +83,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x4]
 
-    - label: "Given TSTAT.S.F03(SCH) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3e: Given TSTAT.S.F03(SCH) ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -86,7 +94,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x8]
 
-    - label: "Given TSTAT.S.F04(SB) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3f: Given TSTAT.S.F04(SB) ensure featuremap has the correct bit
+          set"
       PICS: TSTAT.S.F04
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -95,7 +105,9 @@ tests:
               type: bitmap32
               hasMasksSet: [0x10]
 
-    - label: "Given TSTAT.S.F05(AUTO) ensure featuremap has the correct bit set"
+    - label:
+          "Step 3g: Given TSTAT.S.F05(AUTO) ensure featuremap has the correct
+          bit set"
       PICS: TSTAT.S.F05
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -104,7 +116,28 @@ tests:
               type: bitmap32
               hasMasksSet: [0x20]
 
-    - label: "Read the global attribute: AttributeList"
+    - label:
+          "Step 3h: Given TSTAT.S.F06(LTNE) ensure featuremap has the correct
+          bit set"
+      PICS: TSTAT.S.F06
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x40]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 27, 28, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4a: Read the global attribute: AttributeList"
+      PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -113,7 +146,7 @@ tests:
               contains: [0, 27, 28, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
+          "Step 4b: Read the Feature dependent(TSTAT.S.F00(HEAT)) attribute in
           AttributeList"
       PICS: TSTAT.S.F00
       command: "readAttribute"
@@ -123,7 +156,7 @@ tests:
               type: list
               contains: [18]
     - label:
-          "Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
+          "Step 4c: Read the Feature dependent(TSTAT.S.F01(COOL)) attribute in
           AttributeList"
       PICS: TSTAT.S.F01
       command: "readAttribute"
@@ -134,7 +167,7 @@ tests:
               contains: [17]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
+          "Step 4d: Read the Feature dependent(TSTAT.S.F02(OCC)) attribute in
           AttributeList"
       PICS: TSTAT.S.F02
       command: "readAttribute"
@@ -145,8 +178,8 @@ tests:
               contains: [2]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F00(HEAT) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
+          "Step 4e: Read the Feature dependent(TSTAT.S.F00(HEAT) &
+          TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F00 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -156,8 +189,8 @@ tests:
               contains: [20]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F01(COOL) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
+          "Step 4f: Read the Feature dependent(TSTAT.S.F01(COOL) &
+          TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F01 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -167,7 +200,7 @@ tests:
               contains: [19]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
+          "Step 4g: Read the Feature dependent(TSTAT.S.F05(AUTO)) attribute in
           AttributeList"
       PICS: TSTAT.S.F05
       command: "readAttribute"
@@ -178,7 +211,7 @@ tests:
               contains: [17, 18, 25]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
+          "Step 4h: Read the Feature dependent(TSTAT.S.F03(SCH)) attribute in
           AttributeList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -189,7 +222,7 @@ tests:
               contains: [32, 33, 34]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F04(SB)) attribute in
+          "Step 4i: Read the Feature dependent(TSTAT.S.F04(SB)) attribute in
           AttributeList"
       PICS: TSTAT.S.F04
       command: "readAttribute"
@@ -200,8 +233,8 @@ tests:
               contains: [52, 53, 54]
 
     - label:
-          "Read the Feature dependent(TSTAT.S.F04(SB) & TSTAT.S.F02(OCC))
-          attribute in AttributeList"
+          "Step 4j: Read the Feature dependent(TSTAT.S.F04(SB) &
+          TSTAT.S.F02(OCC)) attribute in AttributeList"
       PICS: TSTAT.S.F04 && TSTAT.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -210,7 +243,317 @@ tests:
               type: list
               contains: [55, 56, 57]
 
-    - label: "Read the global attribute: AcceptedCommandList"
+    - label: "Step 4k: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0001
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Step 4l: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0009
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9]
+
+    - label: "Step 4m: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0010
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [16]
+
+    - label: "Step 4n: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A001a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [26]
+
+    - label: "Step 4o: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A001d
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [29]
+
+    - label: "Step 4p: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0023
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [35]
+
+    - label: "Step 4q: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0024
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [36]
+
+    - label: "Step 4r: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0025
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [37]
+
+    - label: "Step 4s: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0029
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [41]
+
+    - label: "Step 4t: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0030
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [48]
+
+    - label: "Step 4u: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0031
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [49]
+
+    - label: "Step 4x: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0032
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [50]
+
+    - label: "Step 5y: Read the optional attribute: AttributeList"
+      PICS: TSTAT.S.A003a
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [58]
+
+    - label: "Step 4z: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0040
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [64]
+
+    - label: "Step 4A: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0041
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65]
+
+    - label: "Step 4B: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0042
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [66]
+
+    - label: "Step 4C: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0043
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [67]
+
+    - label: "Step 5D: Read the optional attribute: AttributeList"
+      PICS: TSTAT.S.A0044
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [68]
+
+    - label: "Step 4E: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0045
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [69]
+
+    - label: "Step 4F: Read the optional attribute in AttributeList"
+      PICS: TSTAT.S.A0046
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [70]
+
+    - label: "Step 5G: Read the optional attribute: AttributeList"
+      PICS: TSTAT.S.A0047
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [71]
+
+    - label:
+          "Step 4H: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F00 && TSTAT.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 4I: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F00 && TSTAT.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label:
+          "Step 4J: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F00 && TSTAT.S.A0008
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "Step 4K: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [21]
+
+    - label:
+          "Step 4L: Read the Feature dependent(TSTAT.S.F00(HEAT)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [22]
+
+    - label:
+          "Step 4M: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0005
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label:
+          "Step 4N: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [6]
+
+    - label:
+          "Step 4O: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0007
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
+
+    - label:
+          "Step 4P: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0017
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [23]
+
+    - label:
+          "Step 4Q: Read the Feature dependent(TSTAT.S.F01(COOL)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F01 && TSTAT.S.A0018
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [24]
+
+    - label:
+          "Step 4R: Read the Feature dependent(TSTAT.S.F05(AUTO)) optional
+          attribute in AttributeList"
+      PICS: TSTAT.S.F05 && TSTAT.S.A001e
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [30]
+
+    - label: "Step 5a: Read the mandatory commands in AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -219,7 +562,7 @@ tests:
               contains: [0]
 
     - label:
-          "Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          "Step 5b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
           AcceptedCommandList"
       PICS: TSTAT.S.F03
       command: "readAttribute"
@@ -227,25 +570,55 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3]
+              contains: [1, 2, 3]
 
-    - label: "Read the global attribute: GeneratedCommandList"
+    - label:
+          "Step 5c: Read the optional (GetRelayStatusLog) command in
+          AcceptedCommandList"
+      PICS: TSTAT.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label: "Step 6a: Read the global attribute: GeneratedCommandList"
+      PICS: " !TSTAT.S.C04.Rsp && !TSTAT.S.C02.Rsp "
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 6b: Read Feature dependent(TSTAT.S.F03(SCH)) commands in
+          GeneratedCommandList"
+      PICS: TSTAT.S.F03
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
           constraints:
               type: list
-    #Commenting out the step EventList attribute which is out of scope for matter V1.0
-    # - label: "Read the global attribute: EventList"
-    #   disabled: true
-    #   verification: |
-    #       Not implemented in chip-tool
-    #   cluster: "LogCommands"
-    #   command: "UserPrompt"
-    #   PICS: PICS_USER_PROMPT
-    #   arguments:
-    #       values:
-    #           - name: "message"
-    #             value: "Please enter 'y' for success"
-    #           - name: "expectedValue"
-    #             value: "y"
+              contains: [0]
+
+    - label:
+          "Step 6c: Read optional command (GetRelayStatusLogResponse) in
+          GeneratedCommandList"
+      PICS: TSTAT.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1]
+
+    - label: "Step 7: Read EventList attribute from the DUT."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list

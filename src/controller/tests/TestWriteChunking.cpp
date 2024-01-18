@@ -31,7 +31,7 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -83,7 +83,8 @@ DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE)
     DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute2, ARRAY, 1, ATTRIBUTE_MASK_WRITABLE), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Clusters::UnitTesting::Id, testClusterAttrsOnEndpoint, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
@@ -203,21 +204,22 @@ void TestWriteChunking::TestListChunking(nlTestSuite * apSuite, void * apContext
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     //
-    // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
+    // We've empirically determined that by reserving all but 75 bytes in the packet buffer, we can fit 2
     // AttributeDataIBs into the packet. ~30-40 bytes covers a single write chunk, but let's 2-3x that
     // to ensure we'll sweep from fitting 2 chunks to 3-4 chunks.
     //
-    for (int i = 100; i > 0; i--)
+    constexpr size_t minReservationSize = kMaxSecureSduLengthBytes - 75 - 100;
+    for (uint32_t i = 100; i > 0; i--)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         TestWriteCallback writeCallback;
 
         ChipLogDetail(DataManagement, "Running iteration %d\n", i);
 
-        gIterationCount = (uint32_t) i;
+        gIterationCount = i;
 
         app::WriteClient writeClient(&ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-                                     static_cast<uint16_t>(850 + i) /* reserved buffer size */);
+                                     static_cast<uint16_t>(minReservationSize + i) /* reserved buffer size */);
 
         ByteSpan list[kTestListLength];
 
@@ -358,15 +360,16 @@ void TestWriteChunking::TestConflictWrite(nlTestSuite * apSuite, void * apContex
 
     app::AttributePathParams attributePath(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
 
+    /* use a smaller chunk (128 bytes) so we only need a few attributes in the write request. */
+    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
+
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(
-        &ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient1(&ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(
-        &ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient2(&ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
 
@@ -435,15 +438,16 @@ void TestWriteChunking::TestNonConflictWrite(nlTestSuite * apSuite, void * apCon
     app::AttributePathParams attributePath1(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute);
     app::AttributePathParams attributePath2(kTestEndpointId, app::Clusters::UnitTesting::Id, kTestListAttribute2);
 
+    /* use a smaller chunk (128 bytes) so we only need a few attributes in the write request. */
+    constexpr size_t kReserveSize = kMaxSecureSduLengthBytes - 128;
+
     TestWriteCallback writeCallback1;
-    app::WriteClient writeClient1(
-        &ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient1(&ctx.GetExchangeManager(), &writeCallback1, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     TestWriteCallback writeCallback2;
-    app::WriteClient writeClient2(
-        &ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+    app::WriteClient writeClient2(&ctx.GetExchangeManager(), &writeCallback2, Optional<uint16_t>::Missing(),
+                                  static_cast<uint16_t>(kReserveSize));
 
     ByteSpan list[kTestListLength];
 
@@ -514,7 +518,8 @@ void RunTest(nlTestSuite * apSuite, TestContext & ctx, Instructions instructions
     TestWriteCallback writeCallback;
     std::unique_ptr<WriteClient> writeClient = std::make_unique<WriteClient>(
         &ctx.GetExchangeManager(), &writeCallback, Optional<uint16_t>::Missing(),
-        static_cast<uint16_t>(900) /* use a smaller chunk so we only need a few attributes in the write request. */);
+        static_cast<uint16_t>(kMaxSecureSduLengthBytes -
+                              128) /* use a smaller chunk so we only need a few attributes in the write request. */);
 
     ConcreteAttributePath onGoingPath = ConcreteAttributePath();
     std::vector<PathStatus> status;
@@ -634,7 +639,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .expectedStatus = { true, true },
             });
 
@@ -660,7 +665,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -671,7 +676,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull },
                 .expectedStatus = { true },
             });
@@ -682,8 +687,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -711,28 +716,23 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     emberAfClearDynamicEndpoint(0);
 }
 
-// clang-format off
-const nlTest sTests[] =
-{
+const nlTest sTests[] = {
     NL_TEST_DEF("TestListChunking", TestWriteChunking::TestListChunking),
     NL_TEST_DEF("TestBadChunking", TestWriteChunking::TestBadChunking),
     NL_TEST_DEF("TestConflictWrite", TestWriteChunking::TestConflictWrite),
     NL_TEST_DEF("TestNonConflictWrite", TestWriteChunking::TestNonConflictWrite),
     NL_TEST_DEF("TestTransactionalList", TestWriteChunking::TestTransactionalList),
-    NL_TEST_SENTINEL()
+    NL_TEST_SENTINEL(),
 };
 
-// clang-format on
-
-// clang-format off
-nlTestSuite sSuite =
-{
+nlTestSuite sSuite = {
     "TestWriteChunking",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
-// clang-format on
 
 } // namespace
 

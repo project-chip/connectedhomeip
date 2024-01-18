@@ -38,7 +38,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
-CHIP_ERROR ChipAndroidAppInit(void)
+CHIP_ERROR ChipAndroidAppInit(AppDelegate * appDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -50,6 +50,11 @@ CHIP_ERROR ChipAndroidAppInit(void)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    if (appDelegate != nullptr)
+    {
+        initParams.appDelegate = appDelegate;
+    }
+
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
@@ -74,4 +79,9 @@ void ChipAndroidAppShutdown(void)
 {
     chip::Server::GetInstance().Shutdown();
     chip::Platform::MemoryShutdown();
+}
+
+void ChipAndroidAppReset(void)
+{
+    chip::Server::GetInstance().ScheduleFactoryReset();
 }

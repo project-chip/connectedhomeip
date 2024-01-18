@@ -19,7 +19,7 @@
 #pragma once
 
 #include "StructParser.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelRevision.h>
 #include <app/util/basic-types.h>
 

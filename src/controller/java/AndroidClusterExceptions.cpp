@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 
 namespace chip {
 
-CHIP_ERROR AndroidClusterExceptions::CreateChipClusterException(JNIEnv * env, jint errorCode, jthrowable & outEx)
+CHIP_ERROR AndroidClusterExceptions::CreateChipClusterException(JNIEnv * env, uint32_t errorCode, jthrowable & outEx)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID exceptionConstructor;
@@ -34,10 +34,10 @@ CHIP_ERROR AndroidClusterExceptions::CreateChipClusterException(JNIEnv * env, ji
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     chip::JniClass clusterExceptionJniCls(clusterExceptionCls);
 
-    exceptionConstructor = env->GetMethodID(clusterExceptionCls, "<init>", "(I)V");
+    exceptionConstructor = env->GetMethodID(clusterExceptionCls, "<init>", "(J)V");
     VerifyOrReturnError(exceptionConstructor != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-    outEx = (jthrowable) env->NewObject(clusterExceptionCls, exceptionConstructor, errorCode);
+    outEx = (jthrowable) env->NewObject(clusterExceptionCls, exceptionConstructor, static_cast<jlong>(errorCode));
     VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
     return err;

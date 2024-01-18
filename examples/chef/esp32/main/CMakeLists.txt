@@ -32,6 +32,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/../"
+                      "${CMAKE_SOURCE_DIR}/../common"
                       "${CMAKE_SOURCE_DIR}/main/include/"
 )
 
@@ -60,11 +61,11 @@ message(STATUS "** End of Cluster List **")
 set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
+                      "${CMAKE_SOURCE_DIR}/../common"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
-                      "${CMAKE_SOURCE_DIR}/../common"
 )
 
 if (CONFIG_ENABLE_CHIP_SHELL)
@@ -107,7 +108,7 @@ endif (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       "${PRIV_INCLUDE_DIRS_LIST}"
-                      PRIV_REQUIRES chip nvs_flash bt console esp32_mbedtls QRCode tft screen-framework spidriver
+                      PRIV_REQUIRES chip nvs_flash bt console mbedtls QRCode tft screen-framework spidriver
                       SRC_DIRS ${SRC_DIRS_LIST})
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")

@@ -43,6 +43,8 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
+    CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
@@ -51,11 +53,6 @@ private:
     void InitiateFactoryReset() override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    CHIP_ERROR GetWiFiStationSecurityType(Internal::WiFiAuthSecurityType & secType);
-    CHIP_ERROR UpdateWiFiStationSecurityType(Internal::WiFiAuthSecurityType secType);
-#endif
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 

@@ -27,7 +27,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <app/InteractionModelEngine.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;
@@ -192,11 +192,61 @@ static CHIP_ERROR AppendAttributeValueToArray(
             if (err == CHIP_NO_ERROR) {
                 completionHandler(result, nil);
             } else {
-                completionHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:err.AsInteger() userInfo:nil]);
+                completionHandler(nil, [MTRError errorForCHIPErrorCode:err]);
             }
         }
         errorHandler:^(NSError * error) {
             completionHandler(nil, error);
+        }];
+}
+
+- (void)_readKnownCachedAttributeWithEndpointID:(chip::EndpointId)endpointID
+                                      clusterID:(chip::ClusterId)clusterID
+                                    attributeID:(chip::AttributeId)attributeID
+                                          queue:(dispatch_queue_t)queue
+                                     completion:(void (^)(id _Nullable value, NSError * _Nullable error))completion
+{
+    auto completionWrapper = ^(id _Nullable value, NSError * _Nullable error) {
+        dispatch_async(queue, ^{
+            completion(value, error);
+        });
+    };
+
+    if (!self.baseDevice) {
+        completionWrapper(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        return;
+    }
+
+    [self.baseDevice.deviceController
+        asyncDispatchToMatterQueue:^() {
+            if (!self.cppClusterStateCache) {
+                completionWrapper(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NOT_FOUND]);
+                return;
+            }
+
+            app::ConcreteAttributePath path(endpointID, clusterID, attributeID);
+            NSMutableArray * array = [[NSMutableArray alloc] init];
+
+            CHIP_ERROR err = AppendAttributeValueToArray(path, self.cppClusterStateCache, array);
+            if (err != CHIP_NO_ERROR) {
+                completionWrapper(nil, [MTRError errorForCHIPErrorCode:err]);
+                return;
+            }
+
+            // AppendAttributeValueToArray guarantees that it always adds
+            // exactly one value.
+            NSDictionary<NSString *, id> * value = array[0];
+            NSError * initError;
+            auto * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:&initError];
+            if (initError != nil) {
+                completionWrapper(nil, initError);
+                return;
+            }
+
+            completionWrapper(report.value, report.error);
+        }
+        errorHandler:^(NSError * error) {
+            completionWrapper(nil, error);
         }];
 }
 

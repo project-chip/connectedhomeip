@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 
-if (!build_java_matter_controller) {
+if (!matter_enable_java_compilation) {
   import("${build_root}/config/android_abi.gni")
 }
 
@@ -29,7 +29,7 @@ shared_library("jni") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 
-  if (build_java_matter_controller) {
+  if (matter_enable_java_compilation) {
     defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
     include_dirs = java_matter_controller_dependent_paths
 
@@ -56,7 +56,7 @@ android_library("java") {
 
   sources = [ "src/chip/testing/MessagingContext.java" ]
 
-  if (build_java_matter_controller) {
+  if (matter_enable_java_compilation) {
     deps += [
       "${chip_root}/third_party/java_deps:json",
       "${chip_root}/third_party/java_deps/stub_src",
@@ -73,7 +73,7 @@ android_library("java") {
   #  ..../platforms/android-26/android.jar to access BLE items)
 }
 
-if (!build_java_matter_controller) {
+if (!matter_enable_java_compilation) {
   java_prebuilt("android") {
     jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
   }

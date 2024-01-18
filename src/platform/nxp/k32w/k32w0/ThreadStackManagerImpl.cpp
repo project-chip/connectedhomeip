@@ -31,12 +31,12 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.hpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include <lib/support/CHIPPlatformMemory.h>
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 extern "C" bool isThreadInitialized();
 #endif
 
@@ -68,8 +68,16 @@ exit:
 
 void ThreadStackManagerImpl::ProcessThreadActivity()
 {
+    /* reuse thread task for ble processing.
+     * by doing this, we avoid allocating a new stack for short-lived
+     * BLE processing (e.g.: only during Matter commissioning)
+     */
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    auto * bleManager = &chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager->DoBleProcessing();
+#endif
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
     if (isThreadInitialized())
 #endif
     {
@@ -99,7 +107,7 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 
 extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 {
-    size_t totalAllocSize = (size_t)(num * size);
+    size_t totalAllocSize = (size_t) (num * size);
 
     if (size && totalAllocSize / size != num)
         return nullptr;

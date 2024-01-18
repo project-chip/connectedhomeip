@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.2.2. [TC-MOD-2.2] ChangeToMode Verification (DUT as Client)
+name: 81.2.2. [TC-MOD-2.2] ChangeToMode Verification (DUT as Client)
 
 PICS:
     - MOD.C.C00.Tx
@@ -24,17 +24,12 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Note"
-      verification: |
-          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command
-      disabled: true
-
-    - label: "DUT reads the SupportedModes attribute from the TH"
+    - label: "Step 1: DUT reads the SupportedModes attribute from the TH"
       PICS: MOD.C.A0002
       verification: |
           ./chip-tool modeselect read supported-modes 1 1
 
-          Verify that the TH response provides a list of supported modes on the TH (all-cluster-app) log:
+          Verify that the TH response provides a list of supported modes and Record the mode numbers for usage in steps 2 on the TH (all-cluster-app) log:
 
           [1666941141.001603][9718:9718] CHIP:DMG:
           [1666941141.001625][9718:9718] CHIP:DMG: ReportDataMessage =
@@ -155,13 +150,13 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a ChangeToMode command to the TH with a integer from the
-          list in step 1."
+          "Step 2: DUT sends a ChangeToMode command to the TH with an integer
+          from the list in step 1."
       PICS: MOD.C.C00.Tx
       verification: |
           ./chip-tool modeselect change-to-mode 4 1 1
 
-          Verify TH responds with a successful (value 0x00) status responseon the TH (all-cluster-app) log:
+          Verify TH responds with a successful (value 0x00) status response on the TH (all-cluster-app) log:
 
           [1666941165.052169][9718:9718] CHIP:DMG: InvokeResponseMessage =
           [1666941165.052172][9718:9718] CHIP:DMG: {

@@ -17,7 +17,6 @@
  */
 
 #include "AppMain.h"
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
@@ -56,6 +55,9 @@ class CustomOTARequestorDriver : public DeviceLayer::ExtendedOTARequestorDriver
 public:
     bool CanConsent() override;
     void UpdateDownloaded() override;
+    void UpdateConfirmed(System::Clock::Seconds32 delay) override;
+    static void AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState);
+    void SendNotifyUpdateApplied();
 };
 
 DefaultOTARequestor gRequestorCore;
@@ -75,6 +77,7 @@ constexpr uint16_t kOptionOtaDownloadPath      = 'f';
 constexpr uint16_t kOptionPeriodicQueryTimeout = 'p';
 constexpr uint16_t kOptionUserConsentState     = 'u';
 constexpr uint16_t kOptionWatchdogTimeout      = 'w';
+constexpr uint16_t kSkipExecImageFile          = 's';
 constexpr size_t kMaxFilePathSize              = 256;
 
 uint32_t gPeriodicQueryTimeoutSec = 0;
@@ -83,6 +86,7 @@ chip::Optional<bool> gRequestorCanConsent;
 static char gOtaDownloadPath[kMaxFilePathSize] = "/tmp/test.bin";
 bool gAutoApplyImage                           = false;
 bool gSendNotifyUpdateApplied                  = true;
+bool gSkipExecImageFile                        = false;
 
 OptionDef cmdLineOptionsDef[] = {
     { "autoApplyImage", chip::ArgParser::kNoArgument, kOptionAutoApplyImage },
@@ -92,6 +96,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "periodicQueryTimeout", chip::ArgParser::kArgumentRequired, kOptionPeriodicQueryTimeout },
     { "userConsentState", chip::ArgParser::kArgumentRequired, kOptionUserConsentState },
     { "watchdogTimeout", chip::ArgParser::kArgumentRequired, kOptionWatchdogTimeout },
+    { "skipExecImageFile", chip::ArgParser::kNoArgument, kSkipExecImageFile },
     {},
 };
 
@@ -124,35 +129,15 @@ OptionSet cmdLineOptions = {
     "  -w, --watchdogTimeout <time in seconds>\n"
     "       Maximum amount of time allowed for an OTA download before the process is cancelled and state reset to idle.\n"
     "       If none or zero is supplied, the timeout is determined by the driver.\n"
+    "  -s, --skipExecImageFile\n"
+    "       To only check Notify Update Applied Command, skip the Image File execution.\n"
 };
 
 OptionSet * allOptions[] = { &cmdLineOptions, nullptr };
 
 // Network commissioning
 namespace {
-constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
-// This file is being used by platforms other than Linux, so we need this check to disable related features since we only
-// implemented them on linux.
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
-                                                                             &sLinuxThreadDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary,
-                                                                           &sLinuxWiFiDriver);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-NetworkCommissioning::LinuxEthernetDriver sLinuxEthernetDriver;
-Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain,
-                                                                               &sLinuxEthernetDriver);
-#else  // CHIP_DEVICE_LAYER_TARGET_LINUX
-Clusters::NetworkCommissioning::NullNetworkDriver sNullNetworkDriver;
-Clusters::NetworkCommissioning::Instance sNullNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sNullNetworkDriver);
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 } // namespace
 
 bool CustomOTARequestorDriver::CanConsent()
@@ -162,7 +147,7 @@ bool CustomOTARequestorDriver::CanConsent()
 
 void CustomOTARequestorDriver::UpdateDownloaded()
 {
-    if (gAutoApplyImage)
+    if (gAutoApplyImage || gSkipExecImageFile)
     {
         // Let the default driver take further action to apply the image.
         // All member variables will be implicitly reset upon loading into the new image.
@@ -176,6 +161,39 @@ void CustomOTARequestorDriver::UpdateDownloaded()
         // Reset to put the state back to idle to allow the next OTA update to occur
         gRequestorCore.Reset();
     }
+}
+
+void CustomOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
+{
+    if (gSkipExecImageFile)
+    {
+        // Just waiting delay time
+        VerifyOrDie(SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), AppliedNotifyUpdateTimer,
+                                             this) == CHIP_NO_ERROR);
+    }
+    else
+    {
+        // Let the default driver take further action to apply the image.
+        // All member variables will be implicitly reset upon loading into the new image.
+        DefaultOTARequestorDriver::UpdateConfirmed(delay);
+    }
+}
+
+void CustomOTARequestorDriver::AppliedNotifyUpdateTimer(System::Layer * systemLayer, void * appState)
+{
+    CustomOTARequestorDriver * driver = reinterpret_cast<CustomOTARequestorDriver *>(appState);
+    driver->SendNotifyUpdateApplied();
+}
+
+void CustomOTARequestorDriver::SendNotifyUpdateApplied()
+{
+    VerifyOrDie(mRequestor != nullptr);
+    mRequestor->NotifyUpdateApplied();
+    // After sending Noficy Update Applied command, so reset provider retry counter.
+    mProviderRetryCount = 0;
+
+    // Reset to put the state back to idle to allow the next OTA update to occur
+    gRequestorCore.Reset();
 }
 
 static void InitOTARequestor(void)
@@ -204,68 +222,6 @@ static void InitOTARequestor(void)
     {
         gUserConsentProvider.SetUserConsentState(gUserConsentState);
         gRequestorUser.SetUserConsentDelegate(&gUserConsentProvider);
-    }
-}
-
-static void InitNetworkCommissioning(void)
-{
-    (void) kNetworkCommissioningEndpointMain;
-    // Enable secondary endpoint only when we need it, this should be applied to all platforms.
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-    const bool kThreadEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    };
-
-    const bool kWiFiEnabled = {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-    };
-
-    if (kThreadEnabled && kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        sWiFiNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-       // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
-        emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
-    }
-    else if (kThreadEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        sThreadNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    }
-    else if (kWiFiEnabled)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-        // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
-        sWiFiNetworkCommissioningInstance.~Instance();
-        new (&sWiFiNetworkCommissioningInstance)
-            Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sLinuxWiFiDriver);
-        sWiFiNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-    }
-    else
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
-    {
-#if CHIP_DEVICE_LAYER_TARGET_LINUX
-        sEthernetNetworkCommissioningInstance.Init();
-#else
-        // Use NullNetworkCommissioningInstance to disable the network commissioning functions.
-        sNullNetworkCommissioningInstance.Init();
-#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
     }
 }
 
@@ -325,6 +281,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         // By default, NotifyUpdateApplied should always be sent. In the presence of this option, disable sending of the command.
         gSendNotifyUpdateApplied = false;
         break;
+    case kSkipExecImageFile:
+        gSkipExecImageFile = true;
+        break;
     default:
         ChipLogError(SoftwareUpdate, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
@@ -338,13 +297,13 @@ void ApplicationInit()
 {
     // Initialize all OTA download components
     InitOTARequestor();
-    // Initialize Network Commissioning instances
-    InitNetworkCommissioning();
 }
+
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions) == 0);
+    VerifyOrDie(ChipLinuxAppInit(argc, argv, &cmdLineOptions, MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
     ChipLinuxAppMainLoop();
 
     // If the event loop had been stopped due to an update being applied, boot into the new image

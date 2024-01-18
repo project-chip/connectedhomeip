@@ -40,18 +40,6 @@ tests:
       response:
           value: 3
 
-    - label: "Write fan mode sequence"
-      command: "writeAttribute"
-      attribute: "FanModeSequence"
-      arguments:
-          value: 5
-
-    - label: "Read back fan mode sequence"
-      command: "readAttribute"
-      attribute: "FanModeSequence"
-      response:
-          value: 5
-
     - label: "Write percent setting"
       command: "writeAttribute"
       attribute: "PercentSetting"

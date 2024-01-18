@@ -21,13 +21,15 @@
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
+#include <platform/nxp/k32w/common/FactoryDataProvider.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
-#include <platform/nxp/k32w/k32w0/K32W0FactoryDataProvider.h>
+#include <platform/nxp/k32w/k32w0/FactoryDataProviderImpl.h>
 
 namespace chip {
 
-using FactoryProvider = DeviceLayer::K32W0FactoryDataProvider;
-using Tags            = FactoryProvider::FactoryDataId;
+using FactoryProvider     = DeviceLayer::FactoryDataProvider;
+using FactoryProviderImpl = DeviceLayer::FactoryDataProviderImpl;
+using Tags                = FactoryProvider::FactoryDataId;
 
 /**
  * OTA custom payload that uses Matter TLVs.

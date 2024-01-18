@@ -15,7 +15,8 @@
 ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
-FROM connectedhomeip/chip-build-vscode:${BUILD_VERSION}
+FROM ghcr.io/project-chip/chip-build-vscode:${BUILD_VERSION}
+LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
@@ -37,6 +38,7 @@ RUN apt-get update \
     docker.io \
     iputils-ping net-tools \
     libncurses5 \
+    libncursesw5 \
     libpython2.7 \
     && :
 
@@ -53,14 +55,13 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 RUN mkdir -p /opt/sdk/sdks/ \
     && chown -R $USERNAME:$USERNAME \
     /opt/sdk/sdks/ `# NXP uses a patch_sdk script to change SDK files` \
-    /opt/espressif/esp-idf `# $USERNAME needs to own the esp-idf and tools for the examples to build` \
-    /opt/espressif/tools \
     /opt/NordicSemiconductor/nrfconnect/ `# $USERNAME needs to own west configuration to build nRF Connect examples` \
-    /opt/ubuntu-21.04-aarch64-sysroot/usr/ `# allow read/write access to header and libraries` \
-    /opt/android/sdk `# allow licenses to be accepted` \
-    /opt/ameba/ambd_sdk_with_chip_non_NDA/ `# AmebaD requires access to change build_info.h` \
-    /opt/fsl-imx-xwayland/5.15-kirkstone/ \
-    /opt/openocd \
+    $IDF_PATH `# $USERNAME needs to own the esp-idf and tools for the examples to build` \
+    $IDF_TOOLS_PATH \
+    $SYSROOT_AARCH64 `# allow read/write access to header and libraries` \
+    $ANDROID_HOME `# allow licenses to be accepted` \
+    $AMEBA_PATH `# AmebaD requires access to change build_info.h` \
+    $IMX_SDK_ROOT \
     && :
 
 # Fix Tizen SDK paths for new user

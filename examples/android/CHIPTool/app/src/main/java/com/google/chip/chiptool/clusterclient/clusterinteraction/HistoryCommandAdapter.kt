@@ -1,6 +1,5 @@
 package com.google.chip.chiptool.clusterclient.clusterinteraction
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,9 @@ import chip.clusterinfo.CommandResponseInfo
 import com.google.chip.chiptool.R
 
 /**
- * HistoryCommandAdapter implements the historyCommandList(RecycleView) Adapter and associates different
- * history command with the same onClick function provided in [ClusterInteractionHistoryFragment.HistoryCommandListener]
+ * HistoryCommandAdapter implements the historyCommandList(RecycleView) Adapter and associates
+ * different history command with the same onClick function provided in
+ * [ClusterInteractionHistoryFragment.HistoryCommandListener]
  */
 class HistoryCommandAdapter(
   private val HistoryCommandList: List<HistoryCommand>,
@@ -22,8 +22,8 @@ class HistoryCommandAdapter(
   private val inflater: LayoutInflater,
 ) : RecyclerView.Adapter<HistoryCommandAdapter.HistoryCommandViewHolder>() {
 
-  inner class HistoryCommandViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
-                                                         View.OnClickListener {
+  inner class HistoryCommandViewHolder(itemView: View) :
+    RecyclerView.ViewHolder(itemView), View.OnClickListener {
     var historyInfo: LinearLayout = itemView.findViewById(R.id.historyBasicInfo)
     var parameterList: LinearLayout = itemView.findViewById(R.id.historyParameterList)
     var responseValueList: LinearLayout = itemView.findViewById(R.id.historyResponseValueList)
@@ -71,11 +71,9 @@ class HistoryCommandAdapter(
     // go through each element and fill the data
     // fill out cluster name and command name
     clearPreviousReview(holder)
-    val info = inflater.inflate(
-      R.layout.cluster_interaction_history_item_info,
-      null,
-      false
-    ) as ConstraintLayout
+    val info =
+      inflater.inflate(R.layout.cluster_interaction_history_item_info, null, false)
+        as ConstraintLayout
     val historyClusterNameTv: TextView = info.findViewById(R.id.historyClusterNameTv)
     val historyCommandNameTv: TextView = info.findViewById(R.id.historyCommandNameTv)
 
@@ -103,7 +101,10 @@ class HistoryCommandAdapter(
       }
     }
     // fill out responseList
-    if (HistoryCommandList[position].responseValue == null || HistoryCommandList[position].responseValue!!.isEmpty()) {
+    if (
+      HistoryCommandList[position].responseValue == null ||
+        HistoryCommandList[position].responseValue!!.isEmpty()
+    ) {
       val emptyResponseInfo =
         inflater.inflate(android.R.layout.simple_list_item_1, null, false) as TextView
       emptyResponseInfo.text = "No response"
@@ -148,11 +149,12 @@ class HistoryCommandAdapter(
     val clusterCallbackTypeTv: TextView = callbackItem.findViewById(R.id.clusterCallbackTypeTv)
 
     clusterCallbackNameTv.text = variableNameType.name
-    clusterCallbackDataTv.text = if (response.javaClass == ByteArray::class.java) {
-      (response as ByteArray).decodeToString()
-    } else {
-      response.toString()
-    }
+    clusterCallbackDataTv.text =
+      if (response.javaClass == ByteArray::class.java) {
+        (response as ByteArray).decodeToString()
+      } else {
+        response.toString()
+      }
     clusterCallbackTypeTv.text = variableNameType.type
     callbackList.addView(callbackItem)
   }
@@ -174,21 +176,26 @@ class HistoryCommandAdapter(
       response.forEachIndexed { index, it ->
         val attributeCallbackItem =
           inflater.inflate(R.layout.cluster_callback_item, null, false) as ConstraintLayout
-        val clusterCallbackNameTv: TextView = attributeCallbackItem.findViewById(R.id.clusterCallbackNameTv)
-        val clusterCallbackDataTv: TextView = attributeCallbackItem.findViewById(R.id.clusterCallbackDataTv)
-        val clusterCallbackTypeTv: TextView = attributeCallbackItem.findViewById(R.id.clusterCallbackTypeTv)
+        val clusterCallbackNameTv: TextView =
+          attributeCallbackItem.findViewById(R.id.clusterCallbackNameTv)
+        val clusterCallbackDataTv: TextView =
+          attributeCallbackItem.findViewById(R.id.clusterCallbackDataTv)
+        val clusterCallbackTypeTv: TextView =
+          attributeCallbackItem.findViewById(R.id.clusterCallbackTypeTv)
 
         clusterCallbackNameTv.text = variableNameType.name + "[$index]"
-        val objectString = if (it!!.javaClass == ByteArray::class.java) {
-          (it as ByteArray).contentToString()
-        } else {
-          it.toString()
-        }
-        var callbackClassName = if (it!!.javaClass == ByteArray::class.java) {
-          "Byte[]"
-        } else {
-          it!!.javaClass.toString().split('$').last()
-        }
+        val objectString =
+          if (it!!.javaClass == ByteArray::class.java) {
+            (it as ByteArray).contentToString()
+          } else {
+            it.toString()
+          }
+        var callbackClassName =
+          if (it!!.javaClass == ByteArray::class.java) {
+            "Byte[]"
+          } else {
+            it!!.javaClass.toString().split('$').last()
+          }
         clusterCallbackDataTv.text = objectString
         clusterCallbackTypeTv.text = "List<$callbackClassName>"
         callbackList.addView(attributeCallbackItem)

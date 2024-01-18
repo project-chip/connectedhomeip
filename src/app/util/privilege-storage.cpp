@@ -15,9 +15,13 @@
  *    limitations under the License.
  */
 
+#include <lib/core/CHIPConfig.h>
+
 #include "privilege-storage.h"
 
+#if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 #include <zap-generated/access.h>
+#endif // !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 
 #include <lib/support/CodeUtils.h>
 

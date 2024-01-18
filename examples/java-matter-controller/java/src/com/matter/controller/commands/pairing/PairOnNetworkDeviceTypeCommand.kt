@@ -21,14 +21,16 @@ import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairOnNetworkDeviceTypeCommand(
-  controller: ChipDeviceController, credsIssue: CredentialsIssuer?
-) : PairingCommand(
-  controller,
-  "onnetwork-device-type",
-  credsIssue,
-  PairingModeType.ON_NETWORK,
-  PairingNetworkType.NONE,
-  DiscoveryFilterType.DEVICE_TYPE
-) {
+  controller: ChipDeviceController,
+  credsIssue: CredentialsIssuer?
+) :
+  PairingCommand(
+    controller,
+    "onnetwork-device-type",
+    credsIssue,
+    PairingModeType.ON_NETWORK,
+    PairingNetworkType.NONE,
+    DiscoveryFilterType.DEVICE_TYPE
+  ) {
   override fun runCommand() {}
 }

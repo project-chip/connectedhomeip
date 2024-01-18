@@ -26,12 +26,12 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/util/basic-types.h>
+#include <core/ErrorStr.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/Ameba/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 #include "Globals.h"
 #include "LEDWidget.h"
@@ -75,17 +75,14 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     SuccessOrExit(err);
 
     err = mFactoryDataProvider.Init();
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        SetCommissionableDataProvider(&mFactoryDataProvider);
-        SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
-        SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+        ChipLogError(DeviceLayer, "Error initializing FactoryData!");
+        ChipLogError(DeviceLayer, "Check if you have flashed it correctly!");
     }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Using example DAC provider");
-        SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-    }
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
     if (CONFIG_NETWORK_LAYER_BLE)
     {

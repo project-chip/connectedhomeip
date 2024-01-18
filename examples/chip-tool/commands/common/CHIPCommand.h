@@ -24,6 +24,10 @@
 
 #include "Command.h"
 
+#include <TracingCommandLineArgument.h>
+#include <app/icd/client/CheckInHandler.h>
+#include <app/icd/client/DefaultCheckInDelegate.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
 #include <credentials/GroupDataProviderImpl.h>
@@ -33,9 +37,9 @@
 
 #pragma once
 
-constexpr const char kIdentityAlpha[] = "alpha";
-constexpr const char kIdentityBeta[]  = "beta";
-constexpr const char kIdentityGamma[] = "gamma";
+inline constexpr char kIdentityAlpha[] = "alpha";
+inline constexpr char kIdentityBeta[]  = "beta";
+inline constexpr char kIdentityGamma[] = "gamma";
 // The null fabric commissioner is a commissioner that isn't on a fabric.
 // This is a legal configuration in which the commissioner delegates
 // operational communication and invocation of the commssioning complete
@@ -45,7 +49,7 @@ constexpr const char kIdentityGamma[] = "gamma";
 // commissioner portion of such an architecture.  The null-fabric-commissioner
 // can carry a commissioning flow up until the point of operational channel
 // (CASE) communcation.
-constexpr const char kIdentityNull[] = "null-fabric-commissioner";
+inline constexpr char kIdentityNull[] = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {
@@ -57,8 +61,8 @@ public:
     using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    static constexpr uint16_t kMaxGroupsPerFabric    = 5;
-    static constexpr uint16_t kMaxGroupKeysPerFabric = 8;
+    static constexpr uint16_t kMaxGroupsPerFabric    = 50;
+    static constexpr uint16_t kMaxGroupKeysPerFabric = 25;
 
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds, const char * helpText = nullptr) :
         Command(commandName, helpText), mCredIssuerCmds(credIssuerCmds)
@@ -85,7 +89,13 @@ public:
         AddArgument("trace_log", 0, 1, &mTraceLog);
         AddArgument("trace_decode", 0, 1, &mTraceDecode);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        AddArgument("trace-to", &mTraceTo, "Trace destinations, comma-separated (" SUPPORTED_COMMAND_LINE_TRACING_TARGETS ")");
         AddArgument("ble-adapter", 0, UINT16_MAX, &mBleAdapterId);
+        AddArgument("storage-directory", &mStorageDirectory,
+                    "Directory to place chip-tool's storage files in.  Defaults to $TMPDIR, with fallback to /tmp");
+        AddArgument(
+            "commissioner-vendor-id", 0, UINT16_MAX, &mCommissionerVendorId,
+            "The vendor id to use for chip-tool. If not provided, chip::VendorId::TestVendor1 (65521, 0xFFF1) will be used.");
     }
 
     /////////// Command Interface /////////
@@ -135,7 +145,7 @@ protected:
     // If true, the controller will be created with server capabilities enabled,
     // such as advertising operational nodes over DNS-SD and accepting incoming
     // CASE sessions.
-    virtual bool NeedsOperationalAdvertising() { return false; }
+    virtual bool NeedsOperationalAdvertising() { return mAdvertiseOperational; }
 
     // Execute any deferred cleanups.  Used when exiting interactive mode.
     static void ExecuteDeferredCleanups(intptr_t ignored);
@@ -148,9 +158,12 @@ protected:
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
-    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
+    static chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static chip::app::DefaultICDClientStorage sICDClientStorage;
+    static chip::app::DefaultCheckInDelegate sCheckInDelegate;
+    static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
@@ -201,6 +214,7 @@ private:
 
     chip::Optional<char *> mCommissionerName;
     chip::Optional<chip::NodeId> mCommissionerNodeId;
+    chip::Optional<chip::VendorId> mCommissionerVendorId;
     chip::Optional<uint16_t> mBleAdapterId;
     chip::Optional<char *> mPaaTrustStorePath;
     chip::Optional<char *> mCDTrustStorePath;
@@ -212,6 +226,18 @@ private:
     static const chip::Credentials::AttestationTrustStore * sTrustStore;
 
     static void RunQueuedCommand(intptr_t commandArg);
+    typedef decltype(RunQueuedCommand) MatterWorkCallback;
+    static void RunCommandCleanup(intptr_t commandArg);
+
+    // Do cleanup after a commmand is done running.  Must happen with the
+    // Matter stack locked.
+    void CleanupAfterRun();
+
+    // Run the given callback on the Matter thread.  Return whether we managed
+    // to successfully dispatch it to the Matter thread.  If we did, *timedOut
+    // will be set to whether we timed out or whether our mWaitingForResponse
+    // got set to false by the callback itself.
+    CHIP_ERROR RunOnMatterQueue(MatterWorkCallback callback, chip::System::Clock::Timeout timeout, bool * timedOut);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
 
@@ -232,4 +258,7 @@ private:
     chip::Optional<bool> mTraceLog;
     chip::Optional<bool> mTraceDecode;
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    chip::CommandLineApp::TracingSetup mTracingSetup;
+    chip::Optional<std::vector<std::string>> mTraceTo;
 };

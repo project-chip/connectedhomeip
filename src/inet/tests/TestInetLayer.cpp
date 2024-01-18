@@ -205,7 +205,7 @@ static void CheckSucceededOrFailed(TestState & aTestState, bool & aOutSucceeded,
 {
     const TransferStats & lStats = aTestState.mStats;
 
-#if DEBUG
+#ifdef DEBUG_TCP_TEST
     printf("%u/%u sent, %u/%u received\n", lStats.mTransmit.mActual, lStats.mTransmit.mExpected, lStats.mReceive.mActual,
            lStats.mReceive.mExpected);
 #endif
@@ -298,7 +298,7 @@ int main(int argc, char * argv[])
 
         CheckSucceededOrFailed(sTestState, lSucceeded, lFailed);
 
-#if DEBUG
+#ifdef DEBUG_TCP_TEST
         // clang-format off
         printf("%s %s number of expected bytes\n",
                ((lSucceeded) ? "successfully" :

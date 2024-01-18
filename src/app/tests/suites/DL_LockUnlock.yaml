@@ -18,7 +18,7 @@ config:
     nodeId: 0x12344321
     cluster: "Door Lock"
     endpoint: 1
-    timeout: 15
+    timeout: 25
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -31,6 +31,26 @@ tests:
 
     - label: "Try to unlock the door without PIN"
       command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Try to lock the door without a PIN"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Try to unbolt the door without PIN"
+      command: "UnboltDoor"
       timedInteractionTimeoutMs: 10000
 
     - label: "Verify that lock state attribute value is set to Unlocked"
@@ -136,6 +156,14 @@ tests:
           - values:
                 - value:
                       {
+                          "LockOperationType": 4,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
                           "LockOperationType": 1,
                           "OperationSource": 7,
                           "UserIndex": null,
@@ -148,6 +176,31 @@ tests:
                           "OperationSource": 7,
                           "UserIndex": null,
                           "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
+                          "LockOperationType": 1,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
+                          "LockOperationType": 0,
+                          "OperationSource": 7,
+                          "UserIndex": null,
+                          "Credentials": null,
+                      }
+          - values:
+                - value:
+                      {
+                          "LockOperationType": 4,
+                          "OperationSource": 7,
+                          "UserIndex": 1,
+                          "Credentials":
+                              [{ "CredentialType": 1, "CredentialIndex": 2 }],
                       }
           - values:
                 - value:

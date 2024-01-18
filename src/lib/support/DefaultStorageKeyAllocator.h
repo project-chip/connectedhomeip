@@ -33,7 +33,7 @@ namespace chip {
 class StorageKeyName
 {
 public:
-    StorageKeyName(const StorageKeyName & other) = default;
+    StorageKeyName(const StorageKeyName & other)             = default;
     StorageKeyName & operator=(const StorageKeyName & other) = default;
 
     ~StorageKeyName() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
@@ -134,6 +134,9 @@ public:
     static StorageKeyName GroupDataCounter() { return StorageKeyName::FromConst("g/gdc"); }
     static StorageKeyName GroupControlCounter() { return StorageKeyName::FromConst("g/gcc"); }
 
+    // ICD Check-In Counter
+    static StorageKeyName ICDCheckInCounter() { return StorageKeyName::FromConst("g/icd/cic"); }
+
     // Device Information Provider
     static StorageKeyName UserLabelLengthKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/userlbl/%x", endpoint); }
     static StorageKeyName UserLabelIndexKey(EndpointId endpoint, uint32_t index)
@@ -170,16 +173,24 @@ public:
         return StorageKeyName::Formatted("g/a/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
     }
 
+    // Returns the key for Safely stored attributes.
+    static StorageKeyName SafeAttributeValue(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId)
+    {
+        // Needs at most 26 chars: 6 for "s/a///", 4 for the endpoint id, 8 each
+        // for the cluster and attribute ids.
+        return StorageKeyName::Formatted("g/sa/%x/%" PRIx32 "/%" PRIx32, endpointId, clusterId, attributeId);
+    }
+
     // TODO: Should store fabric-specific parts of the binding list under keys
     // starting with "f/%x/".
     static StorageKeyName BindingTable() { return StorageKeyName::FromConst("g/bt"); }
     static StorageKeyName BindingTableEntry(uint8_t index) { return StorageKeyName::Formatted("g/bt/%x", index); }
 
-    // Client Monitoring
+    // ICD Management
 
-    static StorageKeyName ClientMonitoringTableEntry(chip::FabricIndex fabric)
+    static StorageKeyName ICDManagementTableEntry(chip::FabricIndex fabric, uint16_t index)
     {
-        return StorageKeyName::Formatted("f/%x/cm", fabric);
+        return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
     }
 
     static StorageKeyName OTADefaultProviders() { return StorageKeyName::FromConst("g/o/dp"); }
@@ -198,12 +209,42 @@ public:
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
 
-    static StorageKeyName GlobalSceneCountKey() { return StorageKeyName::Formatted("g/scc"); }
-    static StorageKeyName FabricSceneDataKey(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/sc", fabric); }
-    static StorageKeyName FabricSceneKey(chip::FabricIndex fabric, uint8_t id)
+    // Number of scenes stored in a given endpoint's scene table, across all fabrics.
+    static StorageKeyName EndpointSceneCountKey(EndpointId endpoint) { return StorageKeyName::Formatted("g/scc/e/%x", endpoint); }
+
+    // Stores the scene count for a fabric for the given endpoint and a map between scene storage ids (<sceneId, groupId>) and
+    // sceneIndex for a specific Fabric and endpoint.
+    static StorageKeyName FabricSceneDataKey(FabricIndex fabric, EndpointId endpoint)
     {
-        return StorageKeyName::Formatted("f/%x/sc/%x", fabric, id);
+        return StorageKeyName::Formatted("f/%x/e/%x/sc", fabric, endpoint);
     }
+
+    // Stores the actual scene data for a given scene on a given endpoint for a particular fabric.
+    // idx corresponds to the indices read from FabricSceneDataKey.
+    // SceneIndex
+    static StorageKeyName FabricSceneKey(FabricIndex fabric, EndpointId endpoint, uint16_t idx)
+    {
+        return StorageKeyName::Formatted("f/%x/e/%x/sc/%x", fabric, endpoint, idx);
+    }
+
+    // Time synchronization cluster
+    static StorageKeyName TSTrustedTimeSource() { return StorageKeyName::FromConst("g/ts/tts"); }
+    static StorageKeyName TSDefaultNTP() { return StorageKeyName::FromConst("g/ts/dntp"); }
+    static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
+    static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
+
+    // FabricICDClientInfoCounter is only used by DefaultICDClientStorage
+    // Records the number of ClientInfos for a particular fabric
+    static StorageKeyName FabricICDClientInfoCounter(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdc", fabric); }
+
+    // ICDClientInfoKey is only used by DefaultICDClientStorage
+    // Stores/Loads all ICD clientInfos for a particular fabric
+    static StorageKeyName ICDClientInfoKey(FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/icdk", fabric); }
+
+    // ICDFabricList is only used by DefaultICDClientStorage
+    // when new fabric is created, this list needs to be updated,
+    // when client init DefaultICDClientStorage, this table needs to be loaded.
+    static StorageKeyName ICDFabricList() { return StorageKeyName::FromConst("g/icdfl"); }
 };
 
 } // namespace chip

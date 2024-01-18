@@ -24,7 +24,7 @@ public abstract class FailureCallback {
 
   public abstract void handle(MatterError err);
 
-  private final void handleInternal(int errorCode, String errorMessage) {
+  protected final void handleInternal(int errorCode, String errorMessage) {
     try {
       handle(new MatterError(errorCode, errorMessage));
     } catch (Throwable t) {

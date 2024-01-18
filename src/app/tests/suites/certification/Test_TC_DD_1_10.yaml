@@ -58,10 +58,11 @@ tests:
       disabled: true
 
     - label:
-          "Power up the TH Device and put the TH Device in commissioning mode"
+          "Step 1: Power up the TH Device and put the TH Device in commissioning
+          mode"
       verification: |
           1. Launch TH that has NFC tag
-          ./chip-all-clusters-app
+           ./chip-all-clusters-app
           ...
           [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
           [1646286638.375960][11651:11651] CHIP:DL:   Serial Number: TEST_SN
@@ -79,7 +80,7 @@ tests:
           [1646286638.378089][11651:11651] CHIP:SVR: Long manual pairing code: [749701123365521327694]
       disabled: true
 
-    - label: "Bring the DUT close to the NFC tag for the TH Device"
+    - label: "Step 2: Bring the DUT close to the NFC tag for the TH Device"
       verification: |
           Vendor specific field testcase as chip-all-clusters-app does not have an NFC tag to scan
       disabled: true

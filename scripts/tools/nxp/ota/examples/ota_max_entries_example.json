@@ -1,0 +1,172 @@
+{
+    "inputs": [
+        {
+            "tag": 4,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1003
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 5,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1004
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 6,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1005
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 7,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1006
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 8,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1007
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 9,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1008
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 10,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1009
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        },
+        {
+            "tag": 11,
+            "descriptor": [
+                {
+                    "name": "ssbl_version",
+                    "length": 4,
+                    "value": 1010
+                },
+                {
+                    "name": "ssbl_version_str",
+                    "length": 64,
+                    "value": "SsblTestVersion"
+                },
+                {
+                    "name": "ssbl_build_date",
+                    "length": 64,
+                    "value": "2023-02-13"
+                }
+            ],
+            "path": "./binaries/ssbl_ext_flash_ota_entry_example.bin"
+        }
+    ]
+}

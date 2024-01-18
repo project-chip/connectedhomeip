@@ -1,7 +1,7 @@
-# CHIP ESP32 Bridge App Example
+# Matter ESP32 Bridge App Example
 
 Please
-[setup ESP-IDF and CHIP Environment](../../../docs/guides/esp32/setup_idf_chip.md)
+[setup ESP-IDF and Matter Environment](../../../docs/guides/esp32/setup_idf_chip.md)
 and refer
 [building and commissioning](../../../docs/guides/esp32/build_app_and_commission.md)
 guides to get started.
@@ -62,7 +62,7 @@ defined:
     application's `main.cpp` for an example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
-`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)`
+`DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)`
 `DECLARE_DYNAMIC_CLUSTER_LIST_END`
 
 -   These three macros are used to declare a list of clusters for use within a

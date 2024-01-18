@@ -229,6 +229,13 @@ extern wiced_result_t wiced_button_manager_init(button_manager_t * manager,
  */
 extern wiced_result_t wiced_button_manager_deinit(button_manager_t * manager);
 
+/**
+ * Checks if there is pending event and then re-send the event.
+ *
+ * @return         void : no return value is expected.
+ */
+extern void wiced_button_manager_pending_event_handle(void);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

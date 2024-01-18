@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 39.2.5. [TC-WNCV-2.5] EndProductType Attribute with server as DUT
+name: 39.2.5. [TC-WNCV-2.5] EndProductType attribute [DUT as Server]
 
 PICS:
     - WNCV.S
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads EndProductType attribute from DUT"
+    - label: "Step 1: TH reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
       PICS: WNCV.S.A000d

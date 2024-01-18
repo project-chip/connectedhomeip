@@ -306,7 +306,7 @@ out/chip-tool pairing onnetwork-long 0x1234567890 20202021 18
 **Write to the DefaultOTAProviders attribute**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"providerNodeID": 3735928559, "endpoint": 0}]' 0x1234567890 0
+out/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"providerNodeID": 3735928559, "endpoint": 0}]' 0x1234567890 0
 ```
 
 Every 60 seconds from when the OTA Requestor application has launched, the OTA
@@ -400,15 +400,15 @@ out/chip-tool pairing onnetwork-long 0xB0B 20202021 18 --commissioner-name beta
 **Write/Read DefaultOTAProviders on the first fabric (alpha)**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"providerNodeID": 12648430, "endpoint": 0}]' 0xDEB 0
-out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0xDEB 0
+out/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"providerNodeID": 12648430, "endpoint": 0}]' 0xDEB 0
+out/chip-tool otasoftwareupdaterequestor read default-otaproviders 0xDEB 0
 ```
 
 **Write/Read DefaultOTAProviders on second fabric (beta)**
 
 ```
-out/chip-tool otasoftwareupdaterequestor write default-ota-providers '[{"providerNodeID": 45242, "endpoint": 0}]' 0xB0B 0 --commissioner-name beta
-out/chip-tool otasoftwareupdaterequestor read default-ota-providers 0xB0B 0 --commissioner-name beta
+out/chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"providerNodeID": 45242, "endpoint": 0}]' 0xB0B 0 --commissioner-name beta
+out/chip-tool otasoftwareupdaterequestor read default-otaproviders 0xB0B 0 --commissioner-name beta
 ```
 
 **Write ACL for the first OTA Provider application**

@@ -31,13 +31,6 @@
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
 
-/**
- * CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE
- *
- * Reduce packet buffer pool size to 8 (default 15) to reduce ram consumption
- */
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
-
 // All clusters app has 3 group endpoints. This needs to defined here so that
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3

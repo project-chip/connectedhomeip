@@ -5,18 +5,22 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import com.R;
 import com.chip.casting.AppParameters;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
-import com.chip.casting.util.DACProviderStub;
 import com.chip.casting.util.GlobalCastingConstants;
 import com.chip.casting.util.PreferencesConfigurationManager;
+import com.matter.casting.DiscoveryExampleFragment;
+import com.matter.casting.InitializationExample;
+import com.matter.casting.core.CastingPlayer;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
     implements CommissionerDiscoveryFragment.Callback,
         ConnectionFragment.Callback,
-        SelectClusterFragment.Callback {
+        SelectClusterFragment.Callback,
+        DiscoveryExampleFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -27,13 +31,21 @@ public class MainActivity extends AppCompatActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    boolean ret = initJni();
+    boolean ret =
+        GlobalCastingConstants.ChipCastingSimplified
+            ? InitializationExample.initAndStart(this.getApplicationContext()).hasNoError()
+            : initJni();
     if (!ret) {
       Log.e(TAG, "Failed to initialize Matter TV casting library");
       return;
     }
 
-    Fragment fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
+    Fragment fragment = null;
+    if (GlobalCastingConstants.ChipCastingSimplified) {
+      fragment = DiscoveryExampleFragment.newInstance();
+    } else {
+      fragment = CommissionerDiscoveryFragment.newInstance(tvCastingApp);
+    }
     getSupportFragmentManager()
         .beginTransaction()
         .add(R.id.main_fragment_container, fragment, fragment.getClass().getSimpleName())
@@ -43,6 +55,13 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void handleCommissioningButtonClicked(DiscoveredNodeData commissioner) {
     showFragment(ConnectionFragment.newInstance(tvCastingApp, commissioner));
+  }
+
+  @Override
+  public void handleConnectionButtonClicked(CastingPlayer player) {
+    Log.i(TAG, "MainActivity.handleConnectionButtonClicked() called");
+    // TODO: In future PR, show fragment that connects to the player.
+    // showFragment(ConnectionFragment.newInstance(CastingPlayer player));
   }
 
   @Override
@@ -76,9 +95,9 @@ public class MainActivity extends AppCompatActivity
    * TvCastingApp
    */
   private boolean initJni() {
-    tvCastingApp = new TvCastingApp();
+    tvCastingApp = TvCastingApp.getInstance();
 
-    tvCastingApp.setDACProvider(new DACProviderStub());
+    tvCastingApp.setDACProvider(new com.chip.casting.util.DACProviderStub());
 
     AppParameters appParameters = new AppParameters();
     appParameters.setConfigurationManager(

@@ -27,6 +27,11 @@ PICS:
     - label: "Run steps in SDK and CI only"
       id: PICS_SDK_CI_ONLY
 
+    - label:
+          "EventList attribute enabled (default to false while EventList is
+          provisional)"
+      id: PICS_EVENT_LIST_ENABLED
+
     #
     # Base Details
     #
@@ -331,6 +336,11 @@ PICS:
           "Does commissionee provide a Firmware Information field in the
           AttestationResponse?"
       id: MCORE.DA.ATTESTELEMENT_FW_INFO
+    #
+    #IDM
+    #
+    - label: "Does the device implement the ICD Management cluster as a server?"
+      id: ICDM.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -881,7 +891,7 @@ PICS:
     - label:
           "Can the StateValue attribute be changed by manual operation at the
           DUT?"
-      id: BOOL.M.ManuallyControlled
+      id: BOOL.S.M.ManuallyControlled
 
     #
     # client / manually
@@ -971,6 +981,9 @@ PICS:
 
     - label: "Does the DUT(server) support the CapabilityMinima attribute?"
       id: BRBINFO.S.A0013
+
+    - label: "Does the DUT(server) support the ProductAppearance attribute?"
+      id: BRBINFO.S.A0014
 
     #
     # server / Events
@@ -1089,6 +1102,11 @@ PICS:
           "Does the DUT(client) have access privileges for the CapabilityMinima
           attribute implemented on server?"
       id: BRBINFO.C.A0013
+
+    - label:
+          "Does the DUT(client) have access privileges for the ProductAppearance
+          attribute implemented on server?"
+      id: BRBINFO.C.A0014
 
     #
     # client / Events
@@ -1713,6 +1731,132 @@ PICS:
     - label: "Does the DUT(client) support the Color Temperature feature?"
       id: CC.C.F04
 
+    #  Dishwasher Alarm Cluster
+
+    - label:
+          "Does the device implement the Dishwasher Alarm cluster as a server?"
+      id: DISHALM.S
+
+    - label:
+          "Does the device implement the Dishwasher Alarm cluster as a client?"
+      id: DISHALM.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Reset command"
+      id: DISHALM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Mask attribute?"
+      id: DISHALM.S.A0000
+
+    - label: "Does the device implement the Latch attribute?"
+      id: DISHALM.S.A0001
+
+    - label: "Does the device implement the State attribute?"
+      id: DISHALM.S.A0002
+
+    - label: "Does the DUT(server) support the PARTSLIST attribute?"
+      id: DISHALM.S.A0003
+
+    #
+    # server / events
+    #
+    - label: "Does the device implement the Notify event_?"
+      id: DISHALM.S.E00
+
+    #
+    # server / Manual controllable
+    #
+    - label:
+          "Can the Dishwasher Alarm attribute changed by physical control at the
+          device?"
+      id: DISHALM.S.M.ManuallyControlled
+
+    - label: "Does the device support the Inflow alarm?"
+      id: DISHALM.S.M.InflowAlarmSupported
+
+    - label: "Does the device support the Drain alarm?"
+      id: DISHALM.S.M.DrainAlarmSupported
+
+    - label: "Does the device support the Door alarm?"
+      id: DISHALM.S.M.DoorAlarmSupported
+
+    - label: "Does the device support the TempLow alarm?"
+      id: DISHALM.S.M.TempLowAlarmSupported
+
+    - label: "Does the device support the TempHigh alarm?"
+      id: DISHALM.S.M.TempHighAlarmSupported
+
+    - label: "Does the device support the WaterLevel alarm?"
+      id: DISHALM.S.M.WaterLevelAlarmSupported
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the Reset command?"
+      id: DISHALM.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Modify command?"
+      id: DISHALM.S.C01.Rsp
+
+    #  Dishwasher Mode Cluster
+
+    - label: "Does the device implement the DISHM cluster as a server?"
+      id: DISHM.S
+
+    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+      id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    # PIXIT
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.DISHM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.DISHM.MODE_CHANGE_OK
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: DISHM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DISHM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DISHM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: DISHM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: DISHM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: DISHM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: DISHM.S.C01.Tx
+
     # Descriptor Cluster TestPlan
     - label: "Does the device implement the Descriptor cluster as a server?"
       id: DESC.S
@@ -1734,6 +1878,15 @@ PICS:
 
     - label: "Does the DUT(server) support the PARTSLIST attribute?"
       id: DESC.S.A0003
+
+    - label: "Does the DUT(server) support the TAGLIST attribute?"
+      id: DESC.S.A0004
+
+    #
+    #Feature
+    #
+    - label: "Does the device support the TagList command"
+      id: DESC.S.F00
 
     #
     # client / attributes
@@ -1850,6 +2003,10 @@ PICS:
     - label: "Does the DUT(server) support the CapabilityMinima attribute?"
       id: BINFO.S.A0013
 
+    - label: "Does the DUT(server) support the ProductAppearance attribute?"
+      id: BINFO.S.A0014
+
+    #####
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
 
@@ -1869,6 +2026,7 @@ PICS:
     - label: "Does the DUT(server) support the CurrentFabricIndex attribute?"
       id: OPCREDS.S.A0005
 
+    #########
     - label: "Does the DUT(Server) support MaxNetworks attribute?"
       id: CNET.S.A0000
 
@@ -2491,6 +2649,77 @@ PICS:
       id: DRLK.S.A0035
 
     #
+    #Server ReadOnly attribute
+    #
+    - label:
+          "Does the DUT(server) support the EnableLocalProgramming attribute and
+          is ReadOnly"
+      id: DRLK.S.A0028.ReadOnly
+
+    - label:
+          "Does the DUT(server) support the LocalProgrammingFeatures attribute
+          and is ReadOnly"
+      id: DRLK.S.A002c.ReadOnly
+
+    #
+    # Server write attributes
+    #
+    - label: "Does the device implement simulation of a Not Fully Locked State?"
+      id: DRLK.S.M.SimulateNotFullyLocked
+
+    - label: "Does the device implement detection of a LockJammed State?"
+      id: DRLK.S.M.DetectLockJammed
+
+    - label: "Does the device implement Language attribute with write access?"
+      id: DRLK.S.M.LanguageAttributeWritable
+
+    - label:
+          "Does the device implement LEDSettings attribute with write access?"
+      id: DRLK.S.M.LEDSettingsAttributeWritable
+
+    - label:
+          "Does the device implement AutoRelockTime attribute with write access?"
+      id: DRLK.S.M.AutoRelockTimeAttributeWritable
+
+    - label:
+          "Does the device implement SoundVolume attribute with write access?"
+      id: DRLK.S.M.SoundVolumeAttributeWritable
+
+    - label:
+          "Does the device implement OperatingMode attribute with write access?"
+      id: DRLK.S.M.OperatingModeAttributeWritable
+
+    - label:
+          "Does the device implement EnableLocalProgramming attribute with write
+          access?"
+      id: DRLK.S.M.EnableLocalProgrammingAttributeWritable
+
+    - label:
+          "Does the device implement LocalProgrammingFeatures attribute with
+          write access?"
+      id: DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
+
+    - label:
+          "Does the device implement WrongCodeEntryLimit attribute with write
+          access?"
+      id: DRLK.S.M.WrongCodeEntryLimitAttributeWritable
+
+    - label:
+          "Does the device implement UserCodedTemporaryDisableTime attribute
+          with write access?"
+      id: DRLK.S.M.UserCodedTemporaryDisableTimeAttributeWritable
+
+    - label:
+          "Does the device implement RequirePINForRemoteOperation attribute with
+          write access?"
+      id: DRLK.S.M.RequirePINForRemoteOperationAttributeWritable
+
+    - label:
+          "Does the device implement ExpiringUserTimeOut attribute with write
+          access?"
+      id: DRLK.S.M.ExpiringUserTimeOutAttributeWritable
+
+    #
     # server / commandsReceived
     #
     - label: "Does the DUT(server) support the Lock Door command?"
@@ -2546,6 +2775,9 @@ PICS:
 
     - label: "Does the DUT(server) support the Clear Credential command?"
       id: DRLK.S.C26.Rsp
+
+    - label: "Does the DUT(server) support the Unbolt Door command?"
+      id: DRLK.S.C27.Rsp
 
     #
     # server / commandsGenerated
@@ -2645,6 +2877,9 @@ PICS:
           schedules feature?"
       id: DRLK.S.F0b
 
+    - label: "Does the DUT(server) support the Lock supports unbolting feature?"
+      id: DRLK.S.F0c
+
     #
     # server / manually
     #
@@ -2652,7 +2887,7 @@ PICS:
       id: DRLK.S.Simulate.NotFullyLocked
 
     - label: "Does the DUT(server) detect a LockJammed State?"
-      id: DRLK.S.DetectLockJammed
+      id: DRLK.S.M.DetectLockJammed
 
     #
     # client / attributes
@@ -2921,6 +3156,9 @@ PICS:
     - label: "Does the DUT(Client) support the Clear Credential command?"
       id: DRLK.C.C26.Tx
 
+    - label: "Does the DUT(Client) support the Unbolt Door command?"
+      id: DRLK.C.C27.Tx
+
     #
     # client / Events
     #
@@ -2991,6 +3229,9 @@ PICS:
           "Does the DUT(client) support the Lock supports holiday access
           schedules feature?"
       id: DRLK.C.F0b
+
+    - label: "Does the DUT(client) support the Lock supports unbolting feature?"
+      id: DRLK.C.F0c
 
     # Ethernet Network Diagnostics Cluster Test Plan
     - label:
@@ -3387,6 +3628,51 @@ PICS:
       id: GRPKEY.C
 
     #
+    # server / features
+    #
+    - label:
+          "Does the DUT(Server) support Group Key Management CacheAndSync
+          feature?"
+      id: GRPKEY.S.F00
+
+    #
+    #server attributes
+    #
+    - label: "Does the device implement the GroupKeyMap attribute?"
+      id: GRPKEY.S.A0000
+
+    - label: "Does the device implement the GroupTable attribute?"
+      id: GRPKEY.S.A0001
+
+    - label: "Does the device implement the MaxGroupsPerFabric attribute?"
+      id: GRPKEY.S.A0002
+
+    - label: "Does the device implement the MaxGroupKeysPerFabric attribute?"
+      id: GRPKEY.S.A0003
+
+    #
+    # server commandsGenerated
+    #
+    - label: "Does the device implement the KeySetWrite command}?"
+      id: GRPKEY.S.C00.Rsp
+
+    - label: "Does the device implement the KeySetRead command}?"
+      id: GRPKEY.S.C01.Rsp
+
+    - label: "Does the device implement the KeySetReadResponse command}?"
+      id: GRPKEY.S.C02.Tx
+
+    - label: "Does the device implement the KeySetRemove command}?"
+      id: GRPKEY.S.C03.Rsp
+
+    - label: "Does the device implement the KeySetReadAllIndices command}?"
+      id: GRPKEY.S.C04.Rsp
+
+    - label:
+          "Does the device implement the KeySetReadAllIndicesResponse command}?"
+      id: GRPKEY.S.C05.Tx
+
+    #
     # client / attributes
     #
     - label:
@@ -3512,6 +3798,106 @@ PICS:
           "Does the DUT(client) implement invoking/generating
           AddGroupIfIdentifying Command?"
       id: G.C.C05.Tx
+
+    # HEPA Filter Monitoring Cluster Test Plan
+    - label:
+          "Does the device implement the HEPA Filter Monitoring cluster as a
+          server?"
+      id: HEPAFREMON.S
+
+    - label:
+          "Does the device implement the HEPA Filter Monitoring cluster as a
+          client?"
+      id: HEPAFREMON.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Condition attribute?"
+      id: HEPAFREMON.S.A0000
+
+    - label: "Does the device implement the DegradationDirection attribute?"
+      id: HEPAFREMON.S.A0001
+
+    - label: "Does the device implement the ChangeIndication attribute?"
+      id: HEPAFREMON.S.A0002
+
+    - label: "Does the device implement the InPlaceIndicator attribute?"
+      id: HEPAFREMON.S.A0003
+
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: HEPAFREMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: HEPAFREMON.S.A0005
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Condition feature?"
+      id: HEPAFREMON.S.F00
+
+    - label: "Does the device support the Warning feature?"
+      id: HEPAFREMON.S.F01
+
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: HEPAFREMON.S.F02
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the ResetCondition command?"
+      id: HEPAFREMON.S.C00.Rsp
+
+    # Activated Carbon Filter Monitoring Cluster Test Plan
+    - label:
+          "Does the device implement the Activated Carbon Filter Monitoring
+          cluster as a server?"
+      id: ACFREMON.S
+
+    - label:
+          "Does the device implement the Activated Carbon Filter Monitoring
+          cluster as a client?"
+      id: ACFREMON.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Condition attribute?"
+      id: ACFREMON.S.A0000
+
+    - label: "Does the device implement the DegradationDirection attribute?"
+      id: ACFREMON.S.A0001
+
+    - label: "Does the device implement the ChangeIndication attribute?"
+      id: ACFREMON.S.A0002
+
+    - label: "Does the device implement the InPlaceIndicator attribute?"
+      id: ACFREMON.S.A0003
+
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: ACFREMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: ACFREMON.S.A0005
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Condition feature?"
+      id: ACFREMON.S.F00
+
+    - label: "Does the device support the Warning feature?"
+      id: ACFREMON.S.F01
+
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: ACFREMON.S.F02
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the ResetCondition command?"
+      id: ACFREMON.S.C00.Rsp
 
     # Identify Cluster Test Plan
     - label: "Does the device implement the Identify cluster as a server?"
@@ -3879,7 +4265,7 @@ PICS:
     - label:
           "Does the DUT support the Content Launcher server cluster, Content
           Search feature?"
-      id: CONTENTLAUNCHER.S.CS
+      id: CONTENTLAUNCHER.S.F00
 
     #
     # server / attributes
@@ -3887,12 +4273,12 @@ PICS:
     - label:
           "Does the DUT support the Application Launcher server cluster,
           Application Platform feature?"
-      id: APPLAUNCHER.S.AP
+      id: APPLAUNCHER.S.F00
 
     - label:
           "Does the DUT support the Media Playback server cluster, Advanced Seek
           feature?"
-      id: MEDIAPLAYBACK.S.AS
+      id: MEDIAPLAYBACK.S.F00
 
     - label:
           "Does the DUT support the Wake On LAN server cluster, MACAddress
@@ -4193,44 +4579,44 @@ PICS:
     - label:
           "Does the DUT support the Keypad Input server cluster, Navigation
           Keys?"
-      id: KEYPADINPUT.S.NV
+      id: KEYPADINPUT.S.F00
 
     - label:
           "Does the DUT support the Keypad Input server cluster, Location Keys?"
-      id: KEYPADINPUT.S.LK
+      id: KEYPADINPUT.S.F01
 
     - label:
           "Does the DUT support the Keypad Input server cluster, Number Keys?"
-      id: KEYPADINPUT.S.NK
+      id: KEYPADINPUT.S.F02
 
     - label:
           "Does the DUT support the Media Input server cluster, Name Updates
           feature?"
-      id: MEDIAINPUT.S.NU
+      id: MEDIAINPUT.S.F00
 
     - label:
           "Does the DUT support the Channel server cluster, Channel List
           feature?"
-      id: CHANNEL.S.CL
+      id: CHANNEL.S.F00
 
     - label:
           "Does the DUT support the Channel server cluster, Lineup Info feature?"
-      id: CHANNEL.S.LI
+      id: CHANNEL.S.F01
 
     - label:
           "Does the DUT support the Media Playback server cluster, Variable
           Speed feature?"
-      id: MEDIAPLAYBACK.S.VS
+      id: MEDIAPLAYBACK.S.F01
 
     - label:
           "Does the DUT support the Audio Ouput server cluster, Name Updates
           feature?"
-      id: AUDIOOUTPUT.S.NU
+      id: AUDIOOUTPUT.S.F00
 
     - label:
           "Does the DUT support the Content Launcher server cluster, URL
           Playback feature?"
-      id: CONTENTLAUNCHER.S.UP
+      id: CONTENTLAUNCHER.S.F01
 
     - label:
           "Does the DUT support the Content Launcher server cluster and is
@@ -4240,12 +4626,12 @@ PICS:
     - label:
           "Does the DUT support the commissioning procedure initiated by a
           commissionee using User Directed Commissioning?"
-      id: MC.S.UDC
+      id: MC.S.M.UDC
 
     - label:
           "Does the DUT support the commissioning procedure initiated by a
           commissionee using User Directed Commissioning without PIN code entry?"
-      id: MC.S.UDCLOGIN
+      id: MC.S.M.UDCLOGIN
 
     #
     # client / commandsGenerated
@@ -4429,6 +4815,11 @@ PICS:
           on the same DUT?"
       id: MOD.S.F00
 
+    - label:
+          "Does the device implement receiving the ChangeToModeWithStatus
+          command?"
+      id: MOD.S.C01.Rsp
+
     #
     # client / attributes
     #
@@ -4499,10 +4890,10 @@ PICS:
     # server / manually
     #
     - label: "Does the Device support User Interface Display"
-      id: CADMIN.UserInterfaceDisplay
+      id: CADMIN.M.UserInterfaceDisplay
 
     - label: "Does the Device support Audio Interface"
-      id: CADMIN.AudioInterface
+      id: CADMIN.M.AudioInterface
 
     #
     # client / attributes
@@ -4746,6 +5137,9 @@ PICS:
     - label: "Level Control for Lighting"
       id: OO.S.F00
 
+    - label: "Device has Deadfront behaviour"
+      id: OO.S.F01
+
     #
     # server / manually
     #
@@ -4897,6 +5291,9 @@ PICS:
 
     - label: "Does the device implement the ActiveBatChargeFaults attribute?"
       id: PS.S.A001e
+
+    - label: "Does the device implement the EndpointList attribute?"
+      id: PS.S.A001f
 
     #
     # server / Events
@@ -5141,55 +5538,55 @@ PICS:
     # server / Events
     #
     - label: "Does the device implement the SupplyVoltageLow event?"
-      id: PCC.S.E0000
+      id: PCC.S.E00
 
     - label: "Does the device implement the SupplyVoltageHigh event?"
-      id: PCC.S.E0001
+      id: PCC.S.E01
 
     - label: "Does the device implement the PowerMissingPhase event?"
-      id: PCC.S.E0002
+      id: PCC.S.E02
 
     - label: "Does the device implement the SystemPressureLow event?"
-      id: PCC.S.E0003
+      id: PCC.S.E03
 
     - label: "Does the device implement the SystemPressureHigh event?"
-      id: PCC.S.E0004
+      id: PCC.S.E04
 
     - label: "Does the device implement the DryRunning event?"
-      id: PCC.S.E0005
+      id: PCC.S.E05
 
     - label: "Does the device implement the MotorTemperatureHigh event?"
-      id: PCC.S.E0006
+      id: PCC.S.E06
 
     - label: "Does the device implement the PumpMotorFatalFailure event?"
-      id: PCC.S.E0007
+      id: PCC.S.E07
 
     - label: "Does the device implement the ElectronicTemperatureHigh event?"
-      id: PCC.S.E0008
+      id: PCC.S.E08
 
     - label: "Does the device implement the PumpBlocked event?"
-      id: PCC.S.E0009
+      id: PCC.S.E09
 
     - label: "Does the device implement the SensorFailure event?"
-      id: PCC.S.E000a
+      id: PCC.S.E0a
 
     - label: "Does the device implement the ElectronicNonFatalFailure event?"
-      id: PCC.S.E000b
+      id: PCC.S.E0b
 
     - label: "Does the device implement the ElectronicFatalFailure event?"
-      id: PCC.S.E000c
+      id: PCC.S.E0c
 
     - label: "Does the device implement the GeneralFault event?"
-      id: PCC.S.E000d
+      id: PCC.S.E0d
 
     - label: "Does the device implement the Leakage event?"
-      id: PCC.S.E000e
+      id: PCC.S.E0e
 
     - label: "Does the device implement the AirDetection event?"
-      id: PCC.S.E000f
+      id: PCC.S.E0f
 
     - label: "Does the device implement the TurbineOperation event?"
-      id: PCC.S.E0010
+      id: PCC.S.E10
 
     #
     # server / features
@@ -5307,6 +5704,12 @@ PICS:
     - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0005
 
+    - label: "Does the device implement the SceneTableSize attribute?"
+      id: S.S.A0006
+
+    - label: "Does the device implement the FabricSceneInfo attribute?"
+      id: S.S.A0007
+
     #
     # server / commandsReceived
     #
@@ -5347,6 +5750,15 @@ PICS:
     #
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
+
+    - label: "Does the device implement the Scene Explicit feature?"
+      id: S.S.F01
+
+    - label: "Does the device implement the Scene TableSize feature?"
+      id: S.S.F02
+
+    - label: "Does the device implement the Scene FabricScenes feature?"
+      id: S.S.F03
 
     #
     # server / manually
@@ -5390,6 +5802,11 @@ PICS:
     - label: "Does the device implement sending the CopyScene command?"
       id: S.C.C42.Tx
 
+    - label:
+          "Does the device process the TransitionTime parameter of the
+          RecallScene command?"
+      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
+
     #
     # client / manually
     #
@@ -5404,6 +5821,119 @@ PICS:
 
     - label: "Read all supported mandatory attribute"
       id: S.C.AM-READ
+
+    # Smoke CO Alarm Cluster Test Plan
+    - label: "Does the device implement the SMOKECO cluster as a server?"
+      id: SMOKECO.S
+
+    - label: "Does the device implement the SMOKECO cluster as a client?"
+      id: SMOKECO.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support this specific cluster feature?"
+      id: SMOKECO.S.F00
+
+    - label: "Does the device support this specific cluster feature?"
+      id: SMOKECO.S.F01
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the ExpressedState attribute?"
+      id: SMOKECO.S.A0000
+
+    - label: "Does the device implement the SmokeState attribute?"
+      id: SMOKECO.S.A0001
+
+    - label: "Does the device implement the COState attribute?"
+      id: SMOKECO.S.A0002
+
+    - label: "Does the device implement the BatteryAlert attribute?"
+      id: SMOKECO.S.A0003
+
+    - label: "Does the device implement the DeviceMuted attribute?"
+      id: SMOKECO.S.A0004
+
+    - label: "Does the device implement the TestInProgress attribute?"
+      id: SMOKECO.S.A0005
+
+    - label: "Does the device implement the HardwareFaultAlert attribute?"
+      id: SMOKECO.S.A0006
+
+    - label: "Does the device implement the EndOfServiceAlert attribute?"
+      id: SMOKECO.S.A0007
+
+    - label: "Does the device implement the InterconnectSmokeAlarm attribute?"
+      id: SMOKECO.S.A0008
+
+    - label: "Does the device implement the InterconnectCOAlarm attribute?"
+      id: SMOKECO.S.A0009
+
+    - label: "Does the device implement the ContaminationState attribute?"
+      id: SMOKECO.S.A000a
+
+    - label: "Does the device implement the SensitivityLevel attribute?"
+      id: SMOKECO.S.A000b
+
+    - label: "Does the device implement the ExpiryDate attribute?"
+      id: SMOKECO.S.A000c
+
+    #
+    # server / Events
+    #
+    - label: "Does the device implement the SmokeAlarm event?"
+      id: SMOKECO.S.E00
+
+    - label: "Does the device implement the COAlarm event?"
+      id: SMOKECO.S.E01
+
+    - label: "Does the device implement the LowBattery event?"
+      id: SMOKECO.S.E02
+
+    - label: "Does the device implement the HardwareFault event?"
+      id: SMOKECO.S.E03
+
+    - label: "Does the device implement the EndOfService event?"
+      id: SMOKECO.S.E04
+
+    - label: "Does the device implement the SelfTestComplete event?"
+      id: SMOKECO.S.E05
+
+    - label: "Does the device implement the AlarmMuted event?"
+      id: SMOKECO.S.E06
+
+    - label: "Does the device implement the MuteEnded event?"
+      id: SMOKECO.S.E07
+
+    - label: "Does the device implement the InterconnectSmokeAlarm event?"
+      id: SMOKECO.S.E08
+
+    - label: "Does the device implement the InterconnectCOAlarm event?"
+      id: SMOKECO.S.E09
+
+    - label: "Does the device implement the AllClear event?"
+      id: SMOKECO.S.E0a
+
+    #
+    # server / manually
+    #
+    - label:
+          "Can the TestInProgress attribute be changed by physical control at
+          the device?"
+      id: SMOKECO.M.ManuallyControlledTest
+
+    - label:
+          "Can the DeviceMuted attribute be changed by physical control at the
+          device?"
+      id: SMOKECO.M.ManuallyControlledMute
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the SelfTestRequest command?"
+      id: SMOKECO.S.C00.Rsp
 
     # Software Diagnostics Cluster Test Plan
     - label:
@@ -5536,10 +6066,10 @@ PICS:
     #
     - label:
           "Does the DUT support reading attribute to get switch state (polling)?"
-      id: SWTCH.C.M.RA
+      id: SWTCH.C.M.SwitchStatePolling
 
     - label: "Does the DUT support eventing to get switch state changes?"
-      id: SWTCH.C.M.EV
+      id: SWTCH.C.M.SwitchStateEventing
 
     - label: "Write all supported optional attributes"
       id: SWTCH.C.AO-WRITE
@@ -5831,6 +6361,9 @@ PICS:
     - label: "Supports a System Mode of Auto"
       id: TSTAT.S.F05
 
+    - label: "Supports a local temperature not exposed"
+      id: TSTAT.S.F06
+
     #
     # server / manually
     #
@@ -6106,7 +6639,7 @@ PICS:
       id: DGTHREAD.S.A0033
 
     - label:
-          "Does the DUT(server) support the RxErrInvalidScrAddrCount attribute?"
+          "Does the DUT(server) support the RxErrInvalidSrcAddrCount attribute?"
       id: DGTHREAD.S.A0034
 
     - label: "Does the DUT(server) support the RxErrSecCount attribute?"
@@ -6446,7 +6979,7 @@ PICS:
 
     - label:
           "Does the DUT(client) have access privileges for the
-          RxErrInvalidScrAddrCount attribute implemented on the server?"
+          RxErrInvalidSrcAddrCount attribute implemented on the server?"
       id: DGTHREAD.C.A0034
 
     - label:
@@ -6540,34 +7073,11 @@ PICS:
     - label: "Does the device implement the SupportedCalendarTypes attribute ?"
       id: LTIME.S.A0002
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
-          ?"
-      id: LTIME.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
-          ?"
-      id: LTIME.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: LTIME.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: LTIME.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: LTIME.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: LTIME.S.Afffd
-
     - label: "Does the DUT (Server) support 12 Hr Hour Format ?"
-      id: LTIME.S.A0000.12HR
+      id: LTIME.S.M.12HR
 
     - label: "Does the DUT (Server) support 24 Hr Hour Format ?"
-      id: LTIME.S.A0000.24HR
+      id: LTIME.S.M.24HR
 
     #
     # client / attributes
@@ -6623,6 +7133,12 @@ PICS:
     - label: "Does the DUT (Client) support 24 Hr Hour Format ?"
       id: LTIME.C.A0000.24HR
 
+    #Features
+    - label:
+          "Can the device be configured to use different calendar formats when
+          conveying values to a user ?"
+      id: LTIME.S.F00
+
     # Unit Localization Cluster Test Plan
     - label: "Does the device implement the Unit Localization as a server?"
       id: LUNIT.S
@@ -6636,29 +7152,6 @@ PICS:
     - label: "Does the device support the TemperatureUnit attribute ?"
       id: LUNIT.S.A0000
 
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
-          ?"
-      id: LUNIT.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
-          ?"
-      id: LUNIT.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: LUNIT.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: LUNIT.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: LUNIT.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: LUNIT.S.Afffd
-
     #
     # server / features
     #
@@ -6669,51 +7162,13 @@ PICS:
     # server / manually
     #
     - label: "Does the device support the TemperatureUnit Fahrenheit ?"
-      id: LUNIT.TempUnit.Fahrenheit
+      id: LUNIT.S.M.Fahrenheit
 
     - label: "Does the device support the TemperatureUnit Celsius ?"
-      id: LUNIT.TempUnit.Celsius
+      id: LUNIT.S.M.Celsius
 
     - label: "Does the device support the TemperatureUnit Kelvin ?"
-      id: LUNIT.TempUnit.Kelvin
-
-    #
-    # client / attributes
-    #
-    - label:
-          "Does the DUT(client) have access privileges for the TemperatureUnit
-          attribute implemented on the server ?"
-      id: LUNIT.C.A0000
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF8)
-          GeneratedCommandList attribute implemented on the server ?"
-      id: LUNIT.C.Afff8
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF9)
-          AcceptedCommandList attribute implemented on the server ?"
-      id: LUNIT.C.Afff9
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFA)
-          EventList attribute implemented on the server ?"
-      id: LUNIT.C.Afffa
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFB)
-          AttributeList attribute implemented on the server ?"
-      id: LUNIT.C.Afffb
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFC)
-          FeatureMap attribute implemented on the server ?"
-      id: LUNIT.C.Afffc
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFD)
-          ClusterRevision attribute implemented on the server ?"
-      id: LUNIT.C.Afffd
+      id: LUNIT.S.M.Kelvin
 
     # User Label Cluster Test Plan
     - label: "Does the device implement the User Label cluster as a server?"
@@ -6856,74 +7311,6 @@ PICS:
       id: DGWIFI.S.F01
 
     #
-    # client / attributes
-    #
-    - label:
-          "Does the DUT(client) have access privileges for the BSSID attribute
-          implemented on the server?"
-      id: DGWIFI.C.A0000
-
-    - label:
-          "Does the DUT(client) have access privileges for the SecurityType
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0001
-
-    - label:
-          "Does the DUT(client) have access privileges for the WiFiVersion
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0002
-
-    - label:
-          "Does the DUT(client) have access privileges for the ChannelNumber
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0003
-
-    - label:
-          "Does the DUT(client) have access privileges for the RSSI attribute
-          implemented on the server?"
-      id: DGWIFI.C.A0004
-
-    - label:
-          "Does the DUT(client) have access privileges for the BeaconLostCount
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0005
-
-    - label:
-          "Does the DUT(client) have access privileges for the BeaconRxCount
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0006
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketMulticastRxCount attribute implemented on the server?"
-      id: DGWIFI.C.A0007
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketMulticastTxCount attribute implemented on the server?"
-      id: DGWIFI.C.A0008
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketUnicastRxCount attribute implemented on the server?"
-      id: DGWIFI.C.A0009
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketUnicastTxCount attribute implemented on the server?"
-      id: DGWIFI.C.A000a
-
-    - label:
-          "Does the DUT(client) have access privileges for the CurrentMaxRate
-          attribute implemented on the server?"
-      id: DGWIFI.C.A000b
-
-    - label:
-          "Does the DUT(client) have access privileges for the OverrunCount
-          attribute implemented on the server?"
-      id: DGWIFI.C.A000c
-
-    #
     # client / commandsGenerated
     #
     - label:
@@ -6931,12 +7318,6 @@ PICS:
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
       id: DGWIFI.C.C00.Tx
-
-    #
-    # client / manually
-    #
-    - label: ""
-      id: DGWIFI.C.A
 
     # Window Covering Cluster Test Plan
     - label:
@@ -7029,29 +7410,6 @@ PICS:
 
     - label: "Does the device implement the SafetyStatus attribute ?"
       id: WNCV.S.A001a
-
-    - label:
-          "Does the device implement the (0xFFF8) GeneratedCommandList attribute
-          ?"
-      id: WNCV.S.Afff8
-
-    - label:
-          "Does the device implement the (0xFFF9) AcceptedCommandList attribute
-          ?"
-      id: WNCV.S.Afff9
-
-    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
-      id: WNCV.S.Afffa
-
-    - label: "Does the device implement the (0xFFFB) AttributeList attribute ?"
-      id: WNCV.S.Afffb
-
-    - label: "Does the device implement the (0xFFFC) FeatureMap attribute ?"
-      id: WNCV.S.Afffc
-
-    - label:
-          "Does the device implement the (0xFFFD) ClusterRevision attribute ?"
-      id: WNCV.S.Afffd
 
     - label:
           "Does the device support scene via the TargetPositionLiftPercent100ths
@@ -7232,36 +7590,6 @@ PICS:
           attribute implemented on the server ?"
       id: WNCV.C.A001a
 
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF8)
-          GeneratedCommandList attribute implemented on the server ?"
-      id: WNCV.C.Afff8
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF9)
-          AcceptedCommandList attribute implemented on the server ?"
-      id: WNCV.C.Afff9
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFA)
-          EventList attribute implemented on the server ?"
-      id: WNCV.C.Afffa
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFB)
-          AttributeList attribute implemented on the server ?"
-      id: WNCV.C.Afffb
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFC)
-          FeatureMap attribute implemented on the server ?"
-      id: WNCV.C.Afffc
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFD)
-          ClusterRevision attribute implemented on the server ?"
-      id: WNCV.C.Afffd
-
     #
     # client / commandsGenerated
     #
@@ -7287,3 +7615,1876 @@ PICS:
     - label:
           "Does the device implement sending the GoToTiltPercentage command ?"
       id: WNCV.C.C08.Tx
+
+    # Time Synchronization Cluster Test Plan
+    - label:
+          "Does the device implement the Time Synchronization cluster as a
+          server?"
+      id: TIMESYNC.S
+
+    - label:
+          "Does the device implement the Time Synchronization cluster as a
+          client?"
+      id: TIMESYNC.C
+
+    #
+    # server / features
+    #
+    - label: "Does the DUT(server) support the TimeZone feature?"
+      id: TIMESYNC.S.F00
+
+    - label: "Does the DUT(server) support the NTPClient feature?"
+      id: TIMESYNC.S.F01
+
+    - label: "Does the DUT(server) support the NTPServer feature?"
+      id: TIMESYNC.S.F02
+
+    - label: "Does the DUT(server) support the TimeSyncClient feature?"
+      id: TIMESYNC.S.F03
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the UTCTime attribute ?"
+      id: TIMESYNC.S.A0000
+
+    - label: "Does the device implement the Granularity attribute ?"
+      id: TIMESYNC.S.A0001
+
+    - label: "Does the device implement the TimeSource attribute ?"
+      id: TIMESYNC.S.A0002
+
+    - label: "Does the device implement the TrustedTimeSource attribute ?"
+      id: TIMESYNC.S.A0003
+
+    - label: "Does the device implement the DefaultNTP attribute ?"
+      id: TIMESYNC.S.A0004
+
+    - label: "Does the device implement the TimeZone attribute ?"
+      id: TIMESYNC.S.A0005
+
+    - label: "Does the device implement the DSTOffset attribute ?"
+      id: TIMESYNC.S.A0006
+
+    - label: "Does the device implement the LocalTime attribute ?"
+      id: TIMESYNC.S.A0007
+
+    - label: "Does the device implement the TimeZoneDatabase attribute ?"
+      id: TIMESYNC.S.A0008
+
+    - label: "Does the device implement the NTPServerAvailable attribute ?"
+      id: TIMESYNC.S.A0009
+
+    - label: "Does the device implement the TimeZoneListMaxSize attribute ?"
+      id: TIMESYNC.S.A000a
+
+    - label: "Does the device implement the DSTOffsetListMaxSize attribute ?"
+      id: TIMESYNC.S.A000b
+
+    - label: "Does the device implement the SupportsDNSResolve attribute ?"
+      id: TIMESYNC.S.A000c
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the SetUTCTime command?"
+      id: TIMESYNC.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the SetTrustedTimeSource command?"
+      id: TIMESYNC.S.C01.Rsp
+
+    - label: "Does the device implement receiving the SetTimeZone command?"
+      id: TIMESYNC.S.C02.Rsp
+
+    - label: "Does the device implement receiving the SetDSTOffset command?"
+      id: TIMESYNC.S.C04.Rsp
+
+    - label: "Does the device implement receiving the SetDefaultNTP command?"
+      id: TIMESYNC.S.C05.Rsp
+
+    #
+    # server / commandsGenerated
+    #
+    - label: "Does the DUT(server) support the SetTimeZoneResponse command?"
+      id: TIMESYNC.S.C03.Tx
+
+    #####################################################################################
+    # Air Quality Cluster Test Plan
+    - label: "Does the device implement the Air Quality cluster as a server?"
+      id: AIRQUAL.S
+
+    - label: "Does the device implement the Air Quality cluster as a client?"
+      id: AIRQUAL.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the AirQuality attribute?"
+      id: AIRQUAL.S.A0000
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Fair feature?"
+      id: AIRQUAL.S.F00
+
+    - label: "Does the device support the Moderate feature?"
+      id: AIRQUAL.S.F01
+
+    - label: "Does the device support the VeryPoor feature?"
+      id: AIRQUAL.S.F02
+
+    - label: "Does the device support the ExtremelyPoor feature?"
+      id: AIRQUAL.S.F03
+
+    #
+    # server / manual
+    #
+    - label: "Changes air quality significantly"
+      id: AIRQUAL.M.AirQualityChange
+
+    # Carbon Dioxide Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Carbon Dioxide Concentration
+          Measurement Cluster as a server?"
+      id: CDOCONC.S
+
+    - label:
+          "Does the device implement the Carbon Dioxide Concentration
+          Measurement Cluster as a client?"
+      id: CDOCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: CDOCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: CDOCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: CDOCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: CDOCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: CDOCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: CDOCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: CDOCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: CDOCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: CDOCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: CDOCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: CDOCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: CDOCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: CDOCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: CDOCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: CDOCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: CDOCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: CDOCONC.S.A000a
+
+    # Carbon Monoxide Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Carbon Monoxide Concentration
+          Measurement Cluster as a server?"
+      id: CMOCONC.S
+
+    - label:
+          "Does the device implement the Carbon Monoxide Concentration
+          Measurement Cluster as a client?"
+      id: CMOCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: CMOCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: CMOCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: CMOCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: CMOCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: CMOCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: CMOCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: CMOCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: CMOCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: CMOCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: CMOCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: CMOCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: CMOCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: CMOCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: CMOCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: CMOCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: CMOCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: CMOCONC.S.A000a
+
+    # Nitrogen Dioxide Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Nitrogen Dioxide Concentration
+          Measurement Cluster as a server?"
+      id: NDOCONC.S
+
+    - label:
+          "Does the device implement the Nitrogen Dioxide Concentration
+          Measurement Cluster as a client?"
+      id: NDOCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: NDOCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: NDOCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: NDOCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: NDOCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: NDOCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: NDOCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: NDOCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: NDOCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: NDOCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: NDOCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: NDOCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: NDOCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: NDOCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: NDOCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: NDOCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: NDOCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: NDOCONC.S.A000a
+
+    # Ozone Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Ozone Concentration Measurement Cluster
+          as a server?"
+      id: OZCONC.S
+
+    - label:
+          "Does the device implement the Ozone Concentration Measurement Cluster
+          as a client?"
+      id: OZCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: OZCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: OZCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: OZCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: OZCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: OZCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: OZCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: OZCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: OZCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: OZCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: OZCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: OZCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: OZCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: OZCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: OZCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: OZCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: OZCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: OZCONC.S.A000a
+
+    # PM2.5 Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the PM2.5 Concentration Measurement Cluster
+          as a server?"
+      id: PMICONC.S
+
+    - label:
+          "Does the device implement the PM2.5 Concentration Measurement Cluster
+          as a client?"
+      id: PMICONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: PMICONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: PMICONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: PMICONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: PMICONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: PMICONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: PMICONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: PMICONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: PMICONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: PMICONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: PMICONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: PMICONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: PMICONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: PMICONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: PMICONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: PMICONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: PMICONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: PMICONC.S.A000a
+
+    # Formaldehyde Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Formaldehyde Concentration Measurement
+          Cluster as a server?"
+      id: FLDCONC.S
+
+    - label:
+          "Does the device implement the Formaldehyde Concentration Measurement
+          Cluster as a client?"
+      id: FLDCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: FLDCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: FLDCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: FLDCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: FLDCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: FLDCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: FLDCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: FLDCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: FLDCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: FLDCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: FLDCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: FLDCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: FLDCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: FLDCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: FLDCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: FLDCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: FLDCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: FLDCONC.S.A000a
+
+    # PM1 Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the PM1 Concentration Measurement Cluster
+          as a server?"
+      id: PMHCONC.S
+
+    - label:
+          "Does the device implement the PM1 Concentration Measurement Cluster
+          as a client?"
+      id: PMHCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: PMHCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: PMHCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: PMHCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: PMHCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: PMHCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: PMHCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: PMHCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: PMHCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: PMHCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: PMHCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: PMHCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: PMHCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: PMHCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: PMHCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: PMHCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: PMHCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: PMHCONC.S.A000a
+
+    # PM10 Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the PM10 Concentration Measurement Cluster
+          as a server?"
+      id: PMKCONC.S
+
+    - label:
+          "Does the device implement the PM10 Concentration Measurement Cluster
+          as a client?"
+      id: PMKCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: PMKCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: PMKCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: PMKCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: PMKCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: PMKCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: PMKCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: PMKCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: PMKCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: PMKCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: PMKCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: PMKCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: PMKCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: PMKCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: PMKCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: PMKCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: PMKCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: PMKCONC.S.A000a
+
+    # Total Volatile Organic Compounds Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Total Volatile Organic Compounds
+          Concentration Measurement Cluster as a server?"
+      id: TVOCCONC.S
+
+    - label:
+          "Does the device implement the Total Volatile Organic Compounds
+          Concentration Measurement Cluster as a client?"
+      id: TVOCCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: TVOCCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: TVOCCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: TVOCCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: TVOCCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: TVOCCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: TVOCCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: TVOCCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: TVOCCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: TVOCCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: TVOCCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: TVOCCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: TVOCCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: TVOCCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: TVOCCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: TVOCCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: TVOCCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: TVOCCONC.S.A000a
+
+    # Radon Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Radon Concentration Measurement Cluster
+          as a server?"
+      id: RNCONC.S
+
+    - label:
+          "Does the device implement the Radon Concentration Measurement Cluster
+          as a client?"
+      id: RNCONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: RNCONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: RNCONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: RNCONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: RNCONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: RNCONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: RNCONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: RNCONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: RNCONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: RNCONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: RNCONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: RNCONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: RNCONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: RNCONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: RNCONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: RNCONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: RNCONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: RNCONC.S.A000a
+
+    ##  Fan control
+
+    # Features
+    - label: "Does the device support multiple speeds from 0-100"
+      id: FAN.S.F00
+
+    - label: "Does the device support automatic mode"
+      id: FAN.S.F01
+
+    - label: "Does the device support rocking movement"
+      id: FAN.S.F02
+
+    - label: "Does the device support wind emulation"
+      id: FAN.S.F03
+
+    - label: "Does the device support the step command"
+      id: FAN.S.F04
+
+    - label: "Does the device support the direction attribute"
+      id: FAN.S.F05
+
+    #
+    # Server Attributes
+    #
+    - label: "Does the device implement the FanMode attribute?"
+      id: FAN.S.A0000
+
+    - label: "Does the device implement the FanModeSequence attribute?"
+      id: FAN.S.A0001
+
+    - label: "Does the device implement the PercentSetting attribute?"
+      id: FAN.S.A0002
+
+    - label: "Does the device implement the PercentCurrent attribute?"
+      id: FAN.S.A0003
+
+    - label: "Does the device implement the SpeedMax attribute?"
+      id: FAN.S.A0004
+
+    - label: "Does the device implement the SpeedSetting attribute?"
+      id: FAN.S.A0005
+
+    - label: "Does the device implement the SpeedCurrent attribute?"
+      id: FAN.S.A0006
+
+    - label: "Does the device implement the RockSupport attribute?"
+      id: FAN.S.A0007
+
+    - label: "Does the device implement the RockSetting attribute?"
+      id: FAN.S.A0008
+
+    - label: "Does the device implement the WindSupport attribute?"
+      id: FAN.S.A0009
+
+    - label: "Does the device implement the WindSetting attribute?"
+      id: FAN.S.A000A
+
+    - label: "Does the device implement the AirflowDirection attribute?"
+      id: FAN.S.A000B
+
+    #
+    #Server commands
+    #
+    - label: "Does the device implement receiving the Step command?"
+      id: FAN.S.C00.Rsp
+
+    #ICD Management
+    #
+    # Server Attribute
+    #
+    - label: "Does the device implement the IdleModeDuration attribute?"
+      id: ICDM.S.A0000
+
+    - label: "Does the device implement the ActiveModeDuration attribute?"
+      id: ICDM.S.A0001
+
+    - label: "Does the device implement the ActiveModeThreshold attribute?"
+      id: ICDM.S.A0002
+
+    - label: "Does the device implement the RegisteredClients attribute?"
+      id: ICDM.S.A0003
+
+    - label: "Does the device implement the IcdCounter attribute?"
+      id: ICDM.S.A0004
+
+    - label:
+          "Does the device implement the ClientsSupportedPerFabric attribute?"
+      id: ICDM.S.A0005
+
+    #
+    # Client Attribute
+    #
+    - label: "Does the device implement the IdleModeDuration attribute?"
+      id: ICDM.C.A0000
+
+    - label: "Does the device implement the ActiveModeDuration attribute?"
+      id: ICDM.C.A0001
+
+    - label: "Does the device implement the ActiveModeThreshold attribute?"
+      id: ICDM.C.A0002
+
+    - label: "Does the device implement the RegisteredClients attribute?"
+      id: ICDM.C.A0003
+
+    - label: "Does the device implement the IcdCounter attribute?"
+      id: ICDM.C.A0004
+
+    - label:
+          "Does the device implement the ClientsSupportedPerFabric attribute?"
+      id: ICDM.C.A0005
+
+    #
+    # Features
+    #
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F00
+
+    #
+    #Commands:
+    #
+    - label: "Does the device implement receiving the RegisterClient command?"
+      id: ICDM.S.C00.Rsp
+
+    - label: "Does the device implement receiving the UnregisterClient command?"
+      id: ICDM.S.C02.Rsp
+
+    - label:
+          "Does the device implement receiving the StayActiveRequest command?"
+      id: ICDM.S.C03.Rsp
+
+    #
+    #Commands generated
+    #
+    - label: "Does the device implement receiving the RegisterClient command?"
+      id: ICDM.S.C01.Tx
+
+    #
+    #Commands received
+    #
+    - label:
+          "Does the device implement receiving the RegisterClientResponse
+          command?"
+      id: ICDM.C.C00.Rsp
+
+    #
+    #Operational State
+    #
+    - label:
+          "Does the device implement the Operational State cluster as a server?"
+      id: OPSTATE.S
+
+    - label:
+          "Does the device implement the Operational State cluster as a client?"
+      id: OPSTATE.C
+
+    # ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state"
+      id: OPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state"
+      id: OPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state"
+      id: OPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: OPSTATE.S.M.ST_ERROR
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: OPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: OPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: OPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: OPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
+
+    #Server Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: OPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: OPSTATE.S.A0001
+
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: OPSTATE.S.A0002
+
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: OPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: OPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: OPSTATE.S.A0005
+    #Events Generated
+
+    - label: "Does the device generate the OperationalError event?"
+      id: OPSTATE.S.E00
+
+    - label: "Does the device generate the OperationCompltion event?"
+      id: OPSTATE.S.E01
+
+    #Server Commands Received
+    - label: "Does the device implement receiving the Pause command?"
+      id: OPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: OPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: OPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: OPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: OPSTATE.S.C04.Tx
+
+    # Smoke CO Alarm Cluster Test Plan
+    - label: "Does the device implement the SMOKECO cluster as a server?"
+      id: SMOKECO.S
+
+    - label: "Does the device implement the SMOKECO cluster as a client?"
+      id: SMOKECO.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support this specific cluster feature?"
+      id: SMOKECO.S.F00
+
+    - label: "Does the device support this specific cluster feature?"
+      id: SMOKECO.S.F01
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the ExpressedState attribute?"
+      id: SMOKECO.S.A0000
+
+    - label: "Does the device implement the SmokeState attribute?"
+      id: SMOKECO.S.A0001
+
+    - label: "Does the device implement the COState attribute?"
+      id: SMOKECO.S.A0002
+
+    - label: "Does the device implement the BatteryAlert attribute?"
+      id: SMOKECO.S.A0003
+
+    - label: "Does the device implement the DeviceMuted attribute?"
+      id: SMOKECO.S.A0004
+
+    - label: "Does the device implement the TestInProgress attribute?"
+      id: SMOKECO.S.A0005
+
+    - label: "Does the device implement the HardwareFaultAlert attribute?"
+      id: SMOKECO.S.A0006
+
+    - label: "Does the device implement the EndOfServiceAlert attribute?"
+      id: SMOKECO.S.A0007
+
+    - label: "Does the device implement the InterconnectSmokeAlarm attribute?"
+      id: SMOKECO.S.A0008
+
+    - label: "Does the device implement the InterconnectCOAlarm attribute?"
+      id: SMOKECO.S.A0009
+
+    - label: "Does the device implement the ContaminationState attribute?"
+      id: SMOKECO.S.A000a
+
+    - label: "Does the device implement the SensitivityLevel attribute?"
+      id: SMOKECO.S.A000b
+
+    - label: "Does the device implement the ExpiryDate attribute?"
+      id: SMOKECO.S.A000c
+
+    #
+    # server / Events
+    #
+    - label: "Does the device implement the SmokeAlarm event?"
+      id: SMOKECO.S.E00
+
+    - label: "Does the device implement the COAlarm event?"
+      id: SMOKECO.S.E01
+
+    - label: "Does the device implement the LowBattery event?"
+      id: SMOKECO.S.E02
+
+    - label: "Does the device implement the HardwareFault event?"
+      id: SMOKECO.S.E03
+
+    - label: "Does the device implement the EndOfService event?"
+      id: SMOKECO.S.E04
+
+    - label: "Does the device implement the SelfTestComplete event?"
+      id: SMOKECO.S.E05
+
+    - label: "Does the device implement the AlarmMuted event?"
+      id: SMOKECO.S.E06
+
+    - label: "Does the device implement the MuteEnded event?"
+      id: SMOKECO.S.E07
+
+    - label: "Does the device implement the InterconnectSmokeAlarm event?"
+      id: SMOKECO.S.E08
+
+    - label: "Does the device implement the InterconnectCOAlarm event?"
+      id: SMOKECO.S.E09
+
+    - label: "Does the device implement the AllClear event?"
+      id: SMOKECO.S.E0a
+
+    #
+    # server / manually
+    #
+    - label:
+          "Can the TestInProgress attribute be changed by physical control at
+          the device?"
+      id: SMOKECO.M.ManuallyControlledTest
+
+    - label:
+          "Can the DeviceMuted attribute be changed by physical control at the
+          device?"
+      id: SMOKECO.M.ManuallyControlledMute
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the SelfTestRequest command?"
+      id: SMOKECO.S.C00.Rsp
+
+    #  Laundry Washer Mode Cluster
+
+    - label: "Does the device implement the LWM cluster as a server?"
+      id: LWM.S
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: LWM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.LWM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.LWM.MODE_CHANGE_OK
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: LWM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: LWM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: LWM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: LWM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: LWM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: LWM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: LWM.S.C01.Tx
+
+    #  Laundry DRYER Mode Cluster
+
+    - label: "Does the device implement the Dryer cluster as a server?"
+      id: DRYERCTRL.S
+
+    #- label: "Does the DUT support testing the failed ChangeToMode command?"
+    #  id: DRYERCTRL.S.M.CAN_TEST_MODE_FAILURE
+
+    #- label:
+    #      "Id of mode the device will fail to transition to, given its current
+    #      state"
+    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_FAIL
+
+    #- label:
+    #      "Id of mode the device will successfully transition to, given its
+    #      current state"
+    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_OK
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: DRYERCTRL.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DRYERCTRL.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DRYERCTRL.S.A0001
+
+    - label: "Can the device be controlled manually?"
+      id: DRYERCTRL.S.M.ManuallyControlled
+
+    # RVC Clean Mode Cluster
+
+    - label: "Does the device implement the RVCCLEANM cluster as a server?"
+      id: RVCCLEANM.S
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: RVCCLEANM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: RVCCLEANM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: RVCCLEANM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: RVCCLEANM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: RVCCLEANM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCCLEANM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCCLEANM.S.C01.Tx
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCCLEANM.MODE_CHANGE_OK
+    #
+    #Temperature Controlled Cabinet Mode Cluster
+    #
+    - label: "Does the device implement the TCCM cluster as a server?"
+      id: TCCM.S
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TCCM.MODE_CHANGE_OK
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TCCM.MODE_CHANGE_FAIL
+
+    #Features
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: TCCM.S.F00
+
+    #Server Attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TCCM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TCCM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TCCM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: TCCM.S.A0003
+
+    #Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TCCM.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TCCM.S.C01.Tx
+
+    #
+    #Temperature Control
+    #
+    - label:
+          "Does the device implement the TemperatureControl cluster as a server?"
+      id: TCTL.S
+
+    - label:
+          "Does the device implement the TemperatureControl cluster as a client?"
+      id: TCTL.C
+
+    #Features
+    - label: "Does the device support temperature number feature"
+      id: TCTL.S.F00
+
+    - label: "Does the device support temperature level feature"
+      id: TCTL.S.F01
+
+    - label: "Does the device support step feature"
+      id: TCTL.S.F02
+
+    #Server Attributes
+    - label: "Does the device implement the TemperatureSetpoint attribute?"
+      id: TCTL.S.A0000
+
+    - label: "Does the device implement the MinTemperature attribute?"
+      id: TCTL.S.A0001
+
+    - label: "Does the device implement the MaxTemperature attribute?"
+      id: TCTL.S.A0002
+
+    - label: "Does the device implement the Step attribute?"
+      id: TCTL.S.A0003
+
+    - label: "Does the device implement the SelectedTemperatureLevel attribute?"
+      id: TCTL.S.A0004
+
+    - label:
+          "Does the device implement the SupportedTemperatureLevels attribute?"
+      id: TCTL.S.A0005
+
+    #Manual controllable
+    - label:
+          "Can the Temperature attribute changed by physical control at the
+          device?"
+      id: TCC.M.ManuallyControlledTemperature
+
+    - label: "Does the device support the INVALID_IN_MODE response"
+      id: TCTL.S.M.SupportsInvalidInMode
+
+    #Commands received
+    - label:
+          "Does the device implement receiving the SetTemperatureCommand
+          command?"
+      id: TCTL.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device support sending the SetTemperatureCommand command?"
+      id: TCTL.C.C00.Tx
+
+    #
+    #Washer Controls
+    #
+    - label:
+          "Does the device implement the Laundry Washer Controls cluster as a
+          server?"
+      id: WASHERCTRL.S
+
+    - label:
+          "Does the device implement the Laundry Washer Controls cluster as a
+          client?"
+      id: WASHERCTRL.C
+
+    #Features
+    - label: "Does the device support spin feature"
+      id: WASHERCTRL.S.F00
+
+    - label: "Does the device support rinse feature"
+      id: WASHERCTRL.S.F01
+
+    #Server Attributes
+    - label: "Does the device implement the SpinSpeeds attribute?"
+      id: WASHERCTRL.S.A0000
+
+    - label: "Does the device implement the SpinSpeedCurrent attribute?"
+      id: WASHERCTRL.S.A0001
+
+    - label: "Does the device implement the NumberOfRinses attribute?"
+      id: WASHERCTRL.S.A0002
+
+    - label: "Does the device implement the SupportedRinses attribute?"
+      id: WASHERCTRL.S.A0003
+
+    #Manual controllable
+    - label: "Can the Spin attribute changed by physical control at the device?"
+      id: WASHERCTRL.S.M.ManuallyControlledSpin
+
+    - label:
+          "Can the Rinse attribute changed by physical control at the device?"
+      id: WASHERCTRL.S.M.ManuallyControlledRinse
+
+    - label: "Can the device be controlled manually?"
+      id: WASHERCTRL.S.M.ManuallyControlled
+
+    #
+    #RVC Run Mode
+    #
+    - label: "Does the device implement the RVCRUNM cluster as a server?"
+      id: RVCRUNM.S
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: RVCRUNM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.RVCRUNM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.RVCRUNM.MODE_CHANGE_OK
+
+    #Features
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: RVCRUNM.S.F00
+
+    #Attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: RVCRUNM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: RVCRUNM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: RVCRUNM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: RVCRUNM.S.A0003
+
+    #Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: RVCRUNM.S.C00.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: RVCRUNM.S.C01.Tx
+
+    #
+    #Refrigerator Alarm
+    #
+    - label:
+          "Does the device implement the Refrigerator Alarm cluster as a server?"
+      id: REFALM.S
+
+    - label:
+          "Does the device implement the Refrigerator Alarm cluster as a client?"
+      id: REFALM.C
+
+    #Attributes
+    - label: "Does the device implement the Mask attribute?"
+      id: REFALM.S.A0000
+
+    - label: "Does the device implement the Latch attribute?"
+      id: REFALM.S.A0001
+
+    - label: "Does the device implement the State attribute?"
+      id: REFALM.S.A0002
+
+    - label: "Does the device implement the Supported attribute?"
+      id: REFALM.S.A0003
+
+    #Events
+    - label: "Does the device implement the Notify event?"
+      id: REFALM.S.E00
+
+    #Commands received
+    - label: "Does the device implement receiving the Reset command?"
+      id: REFALM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ModifyEnabledAlarms command?"
+      id: REFALM.S.C01.Rsp
+
+    #
+    #RVC Operational State
+    #
+    - label:
+          "Does the device implement the RVC Operational State cluster as a
+          server?"
+      id: RVCOPSTATE.S
+
+    - label:
+          "Does the device implement the RVC Operational State cluster as a
+          client?"
+      id: RVCOPSTATE.C
+
+    # ManuallyControlled
+
+    - label: "Does the DUT support testing the Stopped(0x00) operational state?"
+      id: RVCOPSTATE.S.M.ST_STOPPED
+
+    - label: "Does the DUT support testing the Running(0x01) operational state?"
+      id: RVCOPSTATE.S.M.ST_RUNNING
+
+    - label: "Does the DUT support testing the Paused(0x02) operational state?"
+      id: RVCOPSTATE.S.M.ST_PAUSED
+
+    - label: "Does the DUT support testing the Error(0x03) operational state?"
+      id: RVCOPSTATE.S.M.ST_ERROR
+
+    - label:
+          "Does the DUT support testing the SeekingCharger(0x40) operational
+          state?"
+      id: RVCOPSTATE.S.M.ST_SEEKING_CHARGER
+
+    - label:
+          "Does the DUT support testing the Charging(0x41) operational state?"
+      id: RVCOPSTATE.S.M.ST_CHARGING
+
+    - label: "Does the DUT support testing the Docked(0x42) operational state?"
+      id: RVCOPSTATE.S.M.ST_DOCKED
+
+    - label: "Does the DUT support testing the NoError(0x00) error state?"
+      id: RVCOPSTATE.S.M.ERR_NO_ERROR
+
+    - label:
+          "Does the DUT support testing the UnableToStartOrResume(0x01) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+
+    - label:
+          "Does the DUT support testing the UnableToCompleteOperation(0x02)
+          error state?"
+      id: RVCOPSTATE.S.M.ERR_UNABLE_TO_COMPLETE_OPERATION
+
+    - label:
+          "Does the DUT support testing the CommandInvalidInState(0x03) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_COMMAND_INVALID_IN_STATE
+
+    - label:
+          "Does the DUT support testing the FailedToFindChargingDock(0x40) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_FAILED_TO_FIND_CHARGING_DOCK
+
+    - label: "Does the DUT support testing the Stuck(0x41) error state?"
+      id: RVCOPSTATE.S.M.ERR_STUCK
+
+    - label:
+          "Does the DUT support testing the DustBinMissing(0x42) error state?"
+      id: RVCOPSTATE.S.M.ERR_DUST_BIN_MISSING
+
+    - label: "Does the DUT support testing the DustBinFull(0x43) error state?"
+      id: RVCOPSTATE.S.M.ERR_DUST_BIN_FULL
+
+    - label:
+          "Does the DUT support testing the WaterTankEmpty(0x44) error state?"
+      id: RVCOPSTATE.S.M.ERR_WATER_TANK_EMPTY
+
+    - label:
+          "Does the DUT support testing the WaterTankMissing(0x45) error state?"
+      id: RVCOPSTATE.S.M.ERR_WATER_TANK_MISSING
+
+    - label:
+          "Does the DUT support testing the WaterTankLidOpen(0x46) error state?"
+      id: RVCOPSTATE.S.M.ERR_WATER_TANK_LID_OPEN
+
+    - label:
+          "Does the DUT support testing the MopCleaningPadMissing(0x47) error
+          state?"
+      id: RVCOPSTATE.S.M.ERR_MOP_CLEANING_PAD_MISSING
+
+    #Attributes
+    - label: "Does the device implement the PhaseList attribute?"
+      id: RVCOPSTATE.S.A0000
+
+    - label: "Does the device implement the CurrentPhase attribute?"
+      id: RVCOPSTATE.S.A0001
+
+    - label: "Does the device implement the CountdownTime attribute?"
+      id: RVCOPSTATE.S.A0002
+
+    - label: "Does the device implement the OperationalStateList attribute?"
+      id: RVCOPSTATE.S.A0003
+
+    - label: "Does the device implement the OperationalState attribute?"
+      id: RVCOPSTATE.S.A0004
+
+    - label: "Does the device implement the OperationalError attribute?"
+      id: RVCOPSTATE.S.A0005
+
+    #Commands received
+    - label: "Does the device implement receiving the Pause command?"
+      id: RVCOPSTATE.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Stop command?"
+      id: RVCOPSTATE.S.C01.Rsp
+
+    - label: "Does the device implement receiving the Start command?"
+      id: RVCOPSTATE.S.C02.Rsp
+
+    - label: "Does the device implement receiving the Resume command?"
+      id: RVCOPSTATE.S.C03.Rsp
+
+    #Commands generated
+    - label:
+          "Does the device implement generating the OperationalCommandResponse
+          command?"
+      id: RVCOPSTATE.S.C04.Tx
+
+    #Events
+    - label: "Does the device implement the OperationalError Event ?"
+      id: RVCOPSTATE.S.E00
+
+    - label: "Does the device implement the OperationCompletion Event ?"
+      id: RVCOPSTATE.S.E01
+
+    #Client Commands received
+    - label: "Does the device implement sending the Pause command?"
+      id: RVCOPSTATE.C.C00.Tx
+
+    - label: "Does the device implement sending the Stop command?"
+      id: RVCOPSTATE.C.C01.Tx
+
+    - label: "Does the device implement sending the Start command?"
+      id: RVCOPSTATE.C.C02.Tx
+
+    - label: "Does the device implement sending the Resume command?"
+      id: RVCOPSTATE.C.C04.Tx
+
+    #
+    #Boolean State Configuration
+    #
+    - label:
+          "Does the device implement the Boolean State Configuration cluster as
+          a server?"
+      id: BOOLCFG.S
+
+    #Features
+    - label: "Does the device support visual alarms?"
+      id: BOOLCFG.S.F00
+
+    - label: "Does the device support audible alarms??"
+      id: BOOLCFG.S.F01
+
+    - label:
+          "Does the device support the ability to suppress or acknowledge
+          alarms?"
+      id: BOOLCFG.S.F02
+
+    - label:
+          "Does the device support the ability to set level of threshold
+          detection sensitivity?"
+      id: BOOLCFG.S.F03
+
+    #Attributes
+    - label: "Does the device implement the CurrentSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0000
+
+    - label:
+          "Does the device implement the SupportedSensitivityLevels attribute?"
+      id: BOOLCFG.S.A0001
+
+    - label: "Does the device implement the DefaultSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0002
+
+    - label: "Does the device implement the AlarmsActive attribute?"
+      id: BOOLCFG.S.A0003
+
+    - label: "Does the device implement the AlarmsSuppressed attribute?"
+      id: BOOLCFG.S.A0004
+
+    - label: "Does the device implement the AlarmsEnabled attribute?"
+      id: BOOLCFG.S.A0005
+
+    - label: "Does the device implement the AlarmsSupported attribute?"
+      id: BOOLCFG.S.A0006
+
+    - label: "Does the device implement the SensorFault attribute?"
+      id: BOOLCFG.S.A0007
+
+    #Commands received
+    - label: "Does the device implement receiving the SuppressAlarm command?"
+      id: BOOLCFG.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the EnableDisableAlarm command?"
+      id: BOOLCFG.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the AlarmsStateChanged event?"
+      id: BOOLCFG.S.E00
+
+    - label: "Does the device implement the SensorFault event?"
+      id: BOOLCFG.S.E01
+
+    #
+    #Valve Configuration and Control
+    #
+    - label:
+          "Does the device implement the Valve Configuration and Control cluster
+          as a server?"
+      id: VALCC.S
+
+    #Features
+    - label:
+          "Does the device support the ability to use UTC time is used for time
+          indications?"
+      id: VALCC.S.F00
+
+    - label:
+          "Does the device support the ability to setting the specific position
+          of the valve?"
+      id: VALCC.S.F01
+
+    #Attributes
+    - label: "Does the device implement the OpenDuration attribute?"
+      id: VALCC.S.A0000
+
+    - label: "Does the device implement the DefaultOpenDuration attribute?"
+      id: VALCC.S.A0001
+
+    - label: "Does the device implement the AutoCloseTime attribute?"
+      id: VALCC.S.A0002
+
+    - label: "Does the device implement the RemainingDuration attribute?"
+      id: VALCC.S.A0003
+
+    - label: "Does the device implement the CurrentState attribute?"
+      id: VALCC.S.A0004
+
+    - label: "Does the device implement the TargetState attribute?"
+      id: VALCC.S.A0005
+
+    - label: "Does the device implement the CurrentLevel attribute?"
+      id: VALCC.S.A0006
+
+    - label: "Does the device implement the TargetLevel attribute?"
+      id: VALCC.S.A0007
+
+    - label: "Does the device implement the DefaultOpenLevel attribute?"
+      id: VALCC.S.A0008
+
+    - label: "Does the device implement the ValveFault attribute?"
+      id: VALCC.S.A0009
+
+    - label: "Does the device implement the LevelStep attribute?"
+      id: VALCC.S.A000a
+
+    #Commands received
+    - label: "Does the device implement receiving the Open command?"
+      id: VALCC.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Close command?"
+      id: VALCC.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the ValveStateChanged event?"
+      id: VALCC.S.E00
+
+    - label: "Does the device implement the ValveFault event?"
+      id: VALCC.S.E01

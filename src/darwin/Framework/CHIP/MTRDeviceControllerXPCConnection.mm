@@ -170,9 +170,12 @@
                     [handle.proxy stopReportsWithController:controller
                                                      nodeId:nodeID.unsignedLongLongValue
                                                  completion:^{
+                                                     // Make sure handle stays alive until we get to this
+                                                     // completion (in particular while we are working
+                                                     // with handle.proxy).
                                                      __auto_type handleRetainer = handle;
                                                      (void) handleRetainer;
-                                                     clearRegistry();
+                                                     dispatch_async(queue, clearRegistry);
                                                  }];
                 } else {
                     MTR_LOG_ERROR("CHIP XPC connection failed to stop reporting");
@@ -201,6 +204,13 @@
             handler(values, error);
         }
     });
+}
+
+- (void)callSubscriptionEstablishedHandler:(dispatch_block_t)handler
+{
+    // Call the handler from our _workQueue, so that we guarantee the same
+    // number of queue hops as for handleReportWithController.
+    dispatch_async(_workQueue, handler);
 }
 
 @end

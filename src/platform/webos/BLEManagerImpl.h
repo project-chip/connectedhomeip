@@ -163,9 +163,9 @@ private:
 
     enum
     {
-        kMaxConnections             = 1,  // TODO: right max connection
-        kMaxDeviceNameLength        = 20, // TODO: right-size this
-        kMaxAdvertismentDataSetSize = 31  // TODO: verify this
+        kMaxConnections              = 1,  // TODO: right max connection
+        kMaxDeviceNameLength         = 20, // TODO: right-size this
+        kMaxAdvertisementDataSetSize = 31  // TODO: verify this
     };
 
     struct BLEConnection

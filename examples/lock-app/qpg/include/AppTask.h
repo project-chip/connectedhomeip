@@ -66,6 +66,7 @@ private:
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
+    static void JammedLockEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(chip::System::Layer * aLayer, void * aAppState);
 
     static void MatterEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
@@ -86,6 +87,7 @@ private:
     Function_t mFunction;
     bool mFunctionTimerActive;
     bool mSyncClusterToButtonAction;
+    bool mNotifyState;
 
     chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 

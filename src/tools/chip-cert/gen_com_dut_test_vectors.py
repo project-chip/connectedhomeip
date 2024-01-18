@@ -166,7 +166,7 @@ CERT_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Key Usage extension diginalSignature field is wrong "
+        "description": "Certificate Key Usage extension digitalSignature field is wrong "
         "(not present for DAC and present for PAI, which is OK as optional)",
         "test_folder": 'ext_key_usage_dig_sig_wrong',
         "error_flag": 'ext-key-usage-dig-sig',
@@ -663,6 +663,12 @@ CD_STRUCT_TEST_CASES = [
         "error_flag": 'cms-sig',
         "is_success_case": 'false',
     },
+    {
+        "description": 'Origin VID/PID different than VID/PID (correct use of origin)',
+        "test_folder": "origin_pid_vid_correct",
+        "error_flag": 'different-origin',
+        "is_success_case": 'true',
+    },
 ]
 
 
@@ -813,6 +819,9 @@ def main():
                            help='output directory for all generated test vectors')
     argparser.add_argument('-p', '--paa', dest='paapath',
                            default='credentials/test/attestation/Chip-Test-PAA-FFF1-', help='PAA to use')
+    argparser.add_argument('--paa_different_origin', dest='paapath_different_origin',
+                           default='credentials/test/attestation/Chip-Test-PAA-NoVID-',
+                           help='PAA to use when signing the PAI for the origin VID/PID test case (VID=0xFFF2)')
     argparser.add_argument('-d', '--cd', dest='cdpath',
                            default='credentials/test/certification-declaration/Chip-Test-CD-Signing-',
                            help='CD Signing Key/Cert to use')
@@ -946,15 +955,32 @@ def main():
         test_case_out_dir = args.outdir + '/struct_cd_' + test_case["test_folder"]
         vid = 0xFFF1
         pid = 0x8000
+        origin_vid = None
+        origin_pid = None
+        paapath = args.paapath
+        if test_case["error_flag"] == 'different-origin':
+            # This test case mimics a device that uses a PID/VID provided by another vendor
+            # The PID/VID in the CD is set to 0xFFF1/0x8000 as in all other test cases
+            # so testers can use the same comand line invocation to start the test programs
+            # In this case, the DAC VID and PID are different.
+            origin_vid = 0xFFF2
+            origin_pid = 0x8001
+            paapath = args.paapath_different_origin
+        if test_case["error_flag"] == 'dac-origin-vid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
+            origin_vid = vid
+        if test_case["error_flag"] == 'dac-origin-pid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
+            origin_pid = pid
 
         # Generate PAI Cert/Key
-        builder = DevCertBuilder(CertType.PAI, 'no-error', args.paapath, test_case_out_dir,
-                                 chipcert, vid, pid, '', '')
+        dac_vid = origin_vid if origin_vid else vid
+        dac_pid = origin_pid if origin_pid else pid
+        builder = DevCertBuilder(CertType.PAI, 'no-error', paapath, test_case_out_dir,
+                                 chipcert, dac_vid, dac_pid, '', '')
         builder.make_certs_and_keys()
 
         # Generate DAC Cert/Key
-        builder = DevCertBuilder(CertType.DAC, 'no-error', args.paapath, test_case_out_dir,
-                                 chipcert, vid, pid, '', '')
+        builder = DevCertBuilder(CertType.DAC, 'no-error', paapath, test_case_out_dir,
+                                 chipcert, dac_vid, dac_pid, '', '')
         builder.make_certs_and_keys()
 
         # Generate Certification Declaration (CD)
@@ -962,10 +988,10 @@ def main():
         pid_flag = ' -p 0x{:X}'.format(pid)
 
         dac_origin_flag = ' '
-        if test_case["error_flag"] == 'dac-origin-vid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
-            dac_origin_flag += ' -o 0x{:X}'.format(vid)
-        if test_case["error_flag"] == 'dac-origin-pid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
-            dac_origin_flag += ' -r 0x{:X}'.format(pid)
+        if origin_vid:
+            dac_origin_flag += ' -o 0x{:X}'.format(origin_vid)
+        if origin_pid:
+            dac_origin_flag += ' -r 0x{:X}'.format(origin_pid)
 
         if test_case["error_flag"] == 'authorized-paa-list-count0' or test_case["error_flag"] == 'authorized-paa-list-count1-valid'\
                 or test_case["error_flag"] == 'authorized-paa-list-count2-valid'\

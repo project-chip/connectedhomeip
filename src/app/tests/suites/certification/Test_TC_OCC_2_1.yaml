@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Reads mandatory attribute constrains: Occupancy"
+    - label: "Step 2: TH reads from the DUT the (0x0000) Occupancy attribute"
       PICS: OCC.S.A0000
       command: "readAttribute"
       attribute: "Occupancy"
@@ -41,7 +41,9 @@ tests:
               minValue: 0
               maxValue: 1
 
-    - label: "Reads mandatory attribute constrains: OccupancySensorType"
+    - label:
+          "Step 3: TH reads from the DUT the (0x0001) OccupancySensorType
+          attribute"
       PICS: OCC.S.A0001
       command: "readAttribute"
       attribute: "OccupancySensorType"
@@ -51,7 +53,9 @@ tests:
               minValue: 0
               maxValue: 3
 
-    - label: "Reads mandatory attribute constrains: OccupancySensorTypeBitmap"
+    - label:
+          "Step 4:TH reads from the DUT the (0x0002) OccupancySensorTypeBitmap
+          attribute"
       PICS: OCC.S.A0002
       command: "readAttribute"
       attribute: "OccupancySensorTypeBitmap"
@@ -61,7 +65,9 @@ tests:
               minValue: 1
               maxValue: 7
 
-    - label: "Reads optional attribute: PIROccupiedToUnoccupiedDelay"
+    - label:
+          "Step 5: TH reads from the DUT the (0x0010)
+          PIROccupiedToUnoccupiedDelay optional attribute, if PIR sensor"
       PICS: OCC.S.A0010
       command: "readAttribute"
       attribute: "PIROccupiedToUnoccupiedDelay"
@@ -71,7 +77,9 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Reads optional attribute constrains: PIRUnoccupiedToOccupiedDelay"
+    - label:
+          "Step 6: TH reads from the DUT the (0x0011)
+          PIRUnoccupiedToOccupiedDelay optional attribute, if PIR sensor"
       PICS: OCC.S.A0011
       command: "readAttribute"
       attribute: "PIRUnoccupiedToOccupiedDelay"
@@ -82,7 +90,8 @@ tests:
               maxValue: 65535
 
     - label:
-          "Reads optional attribute constrains: PIRUnoccupiedToOccupiedThreshold"
+          "Step 7: TH reads from the DUT the (0x0012)
+          PIRUnoccupiedToOccupiedThreshold optional attribute, if PIR sensor"
       PICS: OCC.S.A0012
       command: "readAttribute"
       attribute: "PIRUnoccupiedToOccupiedThreshold"
@@ -92,7 +101,10 @@ tests:
               minValue: 1
               maxValue: 254
 
-    - label: "Read optional attribute: UltrasonicOccupiedToUnoccupiedDelay"
+    - label:
+          "Step 8: TH reads from the DUT the (0x0020)
+          UltrasonicOccupiedToUnoccupiedDelay optional attribute, if ultrasonic
+          sensor"
       PICS: OCC.S.A0020
       command: "readAttribute"
       attribute: "UltrasonicOccupiedToUnoccupiedDelay"
@@ -102,7 +114,10 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Read attribute: UltrasonicUnoccupiedToOccupiedDelay"
+    - label:
+          "Step 9: TH reads from the DUT the (0x0021)
+          UltrasonicUnoccupiedToOccupiedDelay optional attribute, if ultrasonic
+          sensor"
       PICS: OCC.S.A0021
       command: "readAttribute"
       attribute: "UltrasonicUnoccupiedToOccupiedDelay"
@@ -112,7 +127,10 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Read attribute: UltrasonicUnoccupiedToOccupiedThreshold"
+    - label:
+          "Step 10: TH reads from the DUT the (0x0022)
+          UltrasonicUnoccupiedToOccupiedThreshold optional attribute, if
+          ultrasonic sensor"
       PICS: OCC.S.A0022
       command: "readAttribute"
       attribute: "UltrasonicUnoccupiedToOccupiedThreshold"
@@ -123,8 +141,9 @@ tests:
               maxValue: 254
 
     - label:
-          "Reads optional attribute constrains:
-          PhysicalContactOccupiedToUnoccupiedDelay"
+          "Step 11:TH reads from the DUT the (0x0030)
+          PhysicalContactOccupiedToUnoccupiedDelay optional attribute, if
+          Physical Contact sensor"
       PICS: OCC.S.A0030
       command: "readAttribute"
       attribute: "PhysicalContactOccupiedToUnoccupiedDelay"
@@ -135,8 +154,9 @@ tests:
               maxValue: 65535
 
     - label:
-          "Reads optional attribute constrains:
-          PhysicalContactUnoccupiedToOccupiedDelay"
+          "Step 12: TH reads from the DUT the (0x0031)
+          PhysicalContactUnoccupiedToOccupiedDelay optional attribute, if
+          Physical Contact sensor"
       PICS: OCC.S.A0031
       command: "readAttribute"
       attribute: "PhysicalContactUnoccupiedToOccupiedDelay"
@@ -147,8 +167,9 @@ tests:
               maxValue: 65535
 
     - label:
-          "Reads optional attribute constrains:
-          PhysicalContactUnoccupiedToOccupiedThreshold"
+          "Step 13: TH reads from the DUT the (0x0032)
+          PhysicalContactUnoccupiedToOccupiedThreshold optional attribute, if
+          Physical Contact sensor"
       PICS: OCC.S.A0032
       command: "readAttribute"
       attribute: "PhysicalContactUnoccupiedToOccupiedThreshold"

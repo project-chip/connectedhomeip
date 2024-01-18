@@ -1,0 +1,273 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    4.2.3. [TC-SMOKECO-2.3] Primary Functionality - CO Alarm with DUT as Server
+
+PICS:
+    - SMOKECO.S.F01
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    endpoint: 1
+    timeout: 990
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff00000091"
+    TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM:
+        type: int64u
+        defaultValue: "0xffffffff0000009d"
+    TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a1"
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH subscribes to COState attribute from DUT"
+      PICS: SMOKECO.S.A0002
+      command: "subscribeAttribute"
+      attribute: "COState"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 3: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH gets last event number from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+
+    - label:
+          "Step 4: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
+
+    - label:
+          "Step 5: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning CO Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_CO_ALARM
+
+    - label:
+          "Step 6: TH waits for a report of COState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 1
+          [1692339184.860796][1750:1752] CHIP:EM: <<< [E:53304i S:33644 M:118115310 (Ack:191893921)] (S) Msg TX to 1:0000000000000001 [4D97] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label: "Step 8: TH reads COAlarm event from DUT"
+      PICS: SMOKECO.S.E01
+      command: "readEvent"
+      event: "COAlarm"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: { AlarmSeverityLevel: 1 }
+
+    - label: "Step 9: Start manually DUT self-test"
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 10: TH reads TestInProgress attribute from DUT"
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
+      command: "readAttribute"
+      attribute: "TestInProgress"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "Step 11 & 12: TH sends SelfTestRequest command to DUT"
+      PICS: SMOKECO.S.C00.Rsp
+      command: "SelfTestRequest"
+      response:
+          error: BUSY
+
+    - label: "Step 13: TH reads TestInProgress attribute from DUT"
+      PICS: SMOKECO.S.A0005
+      command: "readAttribute"
+      attribute: "TestInProgress"
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label:
+          "Step 14: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical CO Alarm Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM
+
+    - label:
+          "Step 15: TH waits for a report of COState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 2
+          [1692339184.860796][1750:1752] CHIP:EM: <<< [E:53304i S:33644 M:118115310 (Ack:191893921)] (S) Msg TX to 1:0000000000000001 [4D97] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 16: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 2
+          constraints:
+              type: enum8
+
+    - label: "Step 17: TH reads COAlarm event from DUT"
+      PICS: SMOKECO.S.E01
+      command: "readEvent"
+      event: "COAlarm"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: { AlarmSeverityLevel: 2 }
+
+    - label:
+          "Step 18: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for CO Alarm Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CO_ALARM_CLEAR
+
+    - label:
+          "Step 19: TH waits for a report of COState attribute from DUT with a
+          timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0002
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read costate 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
+          [TOO]   COState: 0
+          [1692339184.860796][1750:1752] CHIP:EM: <<< [E:53304i S:33644 M:118115310 (Ack:191893921)] (S) Msg TX to 1:0000000000000001 [4D97] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 20: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 21: TH reads AllClear event from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}

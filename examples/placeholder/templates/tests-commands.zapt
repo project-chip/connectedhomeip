@@ -10,7 +10,7 @@
 
 std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
 {
-  {{#chip_tests "../linux/apps/app1/ciTests.json"}}
+  {{#chip_tests "../linux/apps/app1/ciTests.json" includeAllClusters=true}}
   if (testName == "{{filename}}")
   {
       return std::unique_ptr<{{filename}}Suite>(new {{filename}}Suite());
@@ -22,7 +22,7 @@ std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
 
 void PrintTestCommands()
 {
-  {{#chip_tests "../linux/apps/app1/ciTests.json"}}
+  {{#chip_tests "../linux/apps/app1/ciTests.json" includeAllClusters=true}}
   {{#first}}
   ChipLogError(chipTool, "Supported commands:");
   {{/first}}

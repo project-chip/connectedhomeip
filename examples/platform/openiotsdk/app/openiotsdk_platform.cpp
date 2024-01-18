@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2022 Project CHIP Authors
  *    All rights reserved.
  *
@@ -28,9 +27,14 @@
 #include "iotsdk/ip_network_api.h"
 #include "mbedtls/platform.h"
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#endif
+
 #include <DeviceInfoProviderImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/openiotsdk/Logging.h>
 #include <platform/openiotsdk/OpenIoTSDKArchUtils.h>
 
 #include <lib/core/CHIPConfig.h>
@@ -44,15 +48,18 @@
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif // USE_CHIP_DATA_MODEL
 
-#ifdef TFM_SUPPORT
+#ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
+#include "openiotsdk_dfu_manager.h"
+#endif // CHIP_OPEN_IOT_SDK_OTA_ENABLE
+
 #include "psa/fwu_config.h"
 #include "psa/update.h"
 #include "tfm_ns_interface.h"
-#endif // TFM_SUPPORT
 
 using namespace ::chip;
 using namespace ::chip::Platform;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Logging::Platform;
 
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
@@ -66,12 +73,10 @@ static osEventFlagsId_t event_flags_id;
 
 static DeviceLayer::DeviceInfoProviderImpl gDeviceInfoProvider;
 
-#ifdef TFM_SUPPORT
 extern "C" {
 // RTOS-specific initialization that is not declared in any header file
 uint32_t tfm_ns_interface_init(void);
 }
-#endif // TFM_SUPPORT
 
 /** Wait for specific event and check error */
 static int wait_for_event(uint32_t event)
@@ -135,7 +140,6 @@ static void network_state_callback(network_state_callback_event_t event)
     }
 }
 
-#ifdef TFM_SUPPORT
 static int get_psa_images_details()
 {
     psa_status_t status;
@@ -163,12 +167,12 @@ static int get_psa_images_details()
 
     return EXIT_SUCCESS;
 }
-#endif // TFM_SUPPORT
 
 int openiotsdk_platform_init(void)
 {
     int ret;
-    osKernelState_t state;
+
+    ois_logging_init();
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)
@@ -177,33 +181,19 @@ int openiotsdk_platform_init(void)
         return EXIT_FAILURE;
     }
 
-#ifdef TFM_SUPPORT
-    ret = tfm_ns_interface_init();
-    if (ret != 0)
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    ret = psa_crypto_init();
+    if (ret)
     {
-        ChipLogError(NotSpecified, "TF-M initialization failed: %d", ret);
+        ChipLogError(NotSpecified, "PSA crypto initialization failed: %d", ret);
         return EXIT_FAILURE;
     }
+#endif
 
     ret = get_psa_images_details();
     if (ret != 0)
     {
         ChipLogError(NotSpecified, "Get PSA image details failed: %d", ret);
-        return EXIT_FAILURE;
-    }
-#endif // TFM_SUPPORT
-
-    ret = osKernelInitialize();
-    if (ret != osOK)
-    {
-        ChipLogError(NotSpecified, "osKernelInitialize failed: %d", ret);
-        return EXIT_FAILURE;
-    }
-
-    state = osKernelGetState();
-    if (state != osKernelReady)
-    {
-        ChipLogError(NotSpecified, "Kernel not ready: %d", state);
         return EXIT_FAILURE;
     }
 
@@ -213,10 +203,6 @@ int openiotsdk_platform_init(void)
 int openiotsdk_chip_init(void)
 {
     CHIP_ERROR err;
-
-#if NDEBUG
-    chip::Logging::SetLogFilter(chip::Logging::LogCategory::kLogCategory_Progress);
-#endif
 
     err = MemoryInit();
     if (err != CHIP_NO_ERROR)
@@ -240,18 +226,6 @@ int openiotsdk_chip_init(void)
     }
 
     DeviceLayer::SetDeviceInfoProvider(&gDeviceInfoProvider);
-
-    return EXIT_SUCCESS;
-}
-
-int openiotsdk_platform_run(void)
-{
-    int ret = osKernelStart();
-    if (ret != osOK)
-    {
-        ChipLogError(NotSpecified, "Failed to start kernel: %d", ret);
-        return EXIT_FAILURE;
-    }
 
     return EXIT_SUCCESS;
 }
@@ -289,12 +263,10 @@ int openiotsdk_network_init(bool wait)
 
 int openiotsdk_chip_run(void)
 {
-    CHIP_ERROR err;
-
 #ifdef USE_CHIP_DATA_MODEL
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    err = initParams.InitializeStaticResourcesBeforeServerInit();
+    CHIP_ERROR err = initParams.InitializeStaticResourcesBeforeServerInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "Initialize static resources before server init failed: %s", err.AsString());
@@ -323,6 +295,18 @@ int openiotsdk_chip_run(void)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif // USE_CHIP_DATA_MODEL
+
+    ChipLogProgress(NotSpecified, "Current software version: [%ld] %s", uint32_t(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION),
+                    CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
+#ifdef CHIP_OPEN_IOT_SDK_OTA_ENABLE
+    err = GetDFUManager().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "DFU manager initialization failed: %s", err.AsString());
+        return EXIT_FAILURE;
+    }
+#endif
 
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,183 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 165.1.1. [TC-HEPAFREMON-1.1] Global Attributes with DUT as Server
+
+PICS:
+    - HEPAFREMON.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "HEPA Filter Monitoring"
+    endpoint: 1
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
+
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute."
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: "!HEPAFREMON.S.F00 && !HEPAFREMON.S.F01 && !HEPAFREMON.S.F02"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 3b: Given HEPAFREMON.S.F00(Condition) ensure featuremap has the
+          correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: HEPAFREMON.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
+
+    - label:
+          "Step 3c: Given HEPAFREMON.S.F01(Warning) ensure featuremap has the
+          correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: HEPAFREMON.S.F01
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x2]
+
+    - label:
+          "Step 3d: Given HEPAFREMON.S.F02(ReplacementProductList) ensure
+          featuremap has the correct bit set"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: HEPAFREMON.S.F02
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x4]
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 65528, 65529, 65530, 65531, 65532, 65533]
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2, 65528, 65529, 65531, 65532, 65533]
+
+    - label:
+          "Step 4b: TH reads the feature dependent(HEPAFREMON.S.F00) attribute
+          in AttributeList"
+      PICS: HEPAFREMON.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2]
+
+    - label:
+          "Step 4c: TH reads the optional attribute InPlaceIndicator
+          (HEPAFREMON.S.A0003) in AttributeList"
+      PICS: HEPAFREMON.S.A0003
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
+          "Step 4d: TH reads the optional attribute LastChangedTime
+          (HEPAFREMON.S.A0004) in AttributeList"
+      PICS: HEPAFREMON.S.A0004
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4]
+
+    - label:
+          "Step 4e: TH reads the optional attribute ReplacementProductList
+          (HEPAFREMON.S.F02) in AttributeList"
+      PICS: HEPAFREMON.S.F02
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [5]
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      PICS: "!HEPAFREMON.S.C00.Rsp"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label:
+          "Step 6: TH reads the optional command (ResetCondition) in
+          AcceptedCommandList"
+      PICS: HEPAFREMON.S.C00.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          value: []
+          constraints:
+              type: list

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-//#include <lib/support/CodeUtils.h>
-//#include <lib/support/SafeInt.h>
+// #include <lib/support/CodeUtils.h>
+// #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/nxp/mw320/NetworkCommissioningDriver.h>
 

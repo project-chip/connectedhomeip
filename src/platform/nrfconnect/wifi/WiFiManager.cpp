@@ -138,11 +138,12 @@ const Map<wifi_iface_state, WiFiManager::StationStatus, 10>
                               { WIFI_STATE_GROUP_HANDSHAKE, WiFiManager::StationStatus::PROVISIONING },
                               { WIFI_STATE_COMPLETED, WiFiManager::StationStatus::FULLY_PROVISIONED } });
 
-const Map<uint32_t, WiFiManager::NetEventHandler, 4>
+const Map<uint32_t, WiFiManager::NetEventHandler, 5>
     WiFiManager::sEventHandlerMap({ { NET_EVENT_WIFI_SCAN_RESULT, WiFiManager::ScanResultHandler },
                                     { NET_EVENT_WIFI_SCAN_DONE, WiFiManager::ScanDoneHandler },
                                     { NET_EVENT_WIFI_CONNECT_RESULT, WiFiManager::ConnectHandler },
-                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler } });
+                                    { NET_EVENT_WIFI_DISCONNECT_RESULT, WiFiManager::DisconnectHandler },
+                                    { NET_EVENT_WIFI_DISCONNECT_COMPLETE, WiFiManager::DisconnectHandler } });
 
 void WiFiManager::WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface)
 {
@@ -167,7 +168,7 @@ CHIP_ERROR WiFiManager::Init()
 
         if (maddr && !net_if_ipv6_maddr_is_joined(maddr) && !net_ipv6_is_addr_mcast_link_all_nodes(&addr))
         {
-            net_if_ipv6_maddr_join(maddr);
+            net_if_ipv6_maddr_join(iface, maddr);
         }
 
         return CHIP_NO_ERROR;
@@ -206,7 +207,7 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
     mWiFiState          = WIFI_STATE_SCANNING;
     mSsidFound          = false;
 
-    if (net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0))
+    if (0 != net_mgmt(NET_REQUEST_WIFI_SCAN, iface, NULL, 0))
     {
         ChipLogError(DeviceLayer, "Scan request failed");
         return CHIP_ERROR_INTERNAL;
@@ -250,10 +251,12 @@ CHIP_ERROR WiFiManager::Disconnect()
     net_if * iface = InetUtils::GetInterface();
     VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
 
-    int status = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
+    mApplicationDisconnectRequested = true;
+    int status                      = net_mgmt(NET_REQUEST_WIFI_DISCONNECT, iface, NULL, 0);
 
     if (status)
     {
+        mApplicationDisconnectRequested = false;
         if (status == -EALREADY)
         {
             ChipLogDetail(DeviceLayer, "Already disconnected");
@@ -286,16 +289,13 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
 
     if (status.state >= WIFI_STATE_ASSOCIATED)
     {
-        uint8_t mac_string_buf[sizeof("xx:xx:xx:xx:xx:xx")];
-        net_sprint_ll_addr_buf(reinterpret_cast<const uint8_t *>(status.bssid), WIFI_MAC_ADDR_LEN,
-                               reinterpret_cast<char *>(mac_string_buf), sizeof(mac_string_buf));
-        info.mBssId        = ByteSpan(mac_string_buf, sizeof(mac_string_buf));
         info.mSecurityType = MapToMatterSecurityType(status.security);
         info.mWiFiVersion  = MapToMatterWiFiVersionCode(status.link_mode);
         info.mRssi         = static_cast<int8_t>(status.rssi);
         info.mChannel      = static_cast<uint16_t>(status.channel);
         info.mSsidLen      = status.ssid_len;
         memcpy(info.mSsid, status.ssid, status.ssid_len);
+        memcpy(info.mBssId, status.bssid, sizeof(status.bssid));
 
         return CHIP_NO_ERROR;
     }
@@ -390,15 +390,13 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
         // Internal scan is supposed to be followed by a connection request if the SSID has been found
         if (Instance().mInternalScan)
         {
-            if (!Instance().mSsidFound && !Instance().mRecoveryTimerAborted)
+
+            if (!Instance().mSsidFound)
             {
-                ChipLogProgress(DeviceLayer, "No requested SSID found");
                 auto currentTimeout = Instance().CalculateNextRecoveryTime();
                 ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
                                 currentTimeout.count());
-                Instance().mRecoveryTimerAborted = false;
                 DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
-                return;
             }
 
             Instance().mWiFiState = WIFI_STATE_ASSOCIATING;
@@ -415,8 +413,8 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
                 Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
                 return;
             }
-            ChipLogProgress(DeviceLayer, "Connection to %*s requested", Instance().mWiFiParams.mParams.ssid_length,
-                            Instance().mWiFiParams.mParams.ssid);
+            ChipLogProgress(DeviceLayer, "Connection to %*s requested [RSSI=%d]", Instance().mWiFiParams.mParams.ssid_length,
+                            Instance().mWiFiParams.mParams.ssid, Instance().mWiFiParams.mRssi);
             Instance().mInternalScan = false;
         }
     });
@@ -489,8 +487,6 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data)
                 ChipLogError(DeviceLayer, "Cannot post event [error: %s]", ErrorStr(error));
             }
         }
-        // Ensure fresh recovery for future connection requests.
-        Instance().ResetRecoveryTime();
         // cleanup the provisioning data as it is configured per each connect request
         Instance().ClearStationProvisioningData();
     });
@@ -508,8 +504,6 @@ void WiFiManager::DisconnectHandler(Platform::UniquePtr<uint8_t>)
         ChipLogProgress(DeviceLayer, "WiFi station disconnected");
         Instance().mWiFiState = WIFI_STATE_DISCONNECTED;
         Instance().PostConnectivityStatusChange(kConnectivity_Lost);
-        // Ensure fresh recovery for future connection requests.
-        Instance().ResetRecoveryTime();
     });
 }
 
@@ -526,25 +520,15 @@ void WiFiManager::PostConnectivityStatusChange(ConnectivityChange changeType)
     PlatformMgr().PostEventOrDie(&networkEvent);
 }
 
-System::Clock::Milliseconds32 WiFiManager::CalculateNextRecoveryTime()
-{
-    if (mConnectionRecoveryTimeMs > kConnectionRecoveryMaxIntervalMs)
-    {
-        // Find the new random jitter value in range [-jitter, +jitter].
-        int32_t jitter            = chip::Crypto::GetRandU32() % (2 * jitter + 1) - jitter;
-        mConnectionRecoveryTimeMs = kConnectionRecoveryMaxIntervalMs + jitter;
-        return System::Clock::Milliseconds32(mConnectionRecoveryTimeMs);
-    }
-    else
-    {
-        uint32_t currentRecoveryTimeout = mConnectionRecoveryTimeMs;
-        mConnectionRecoveryTimeMs       = mConnectionRecoveryTimeMs * 2;
-        return System::Clock::Milliseconds32(currentRecoveryTimeout);
-    }
-}
-
 void WiFiManager::Recover(System::Layer *, void *)
 {
+    // Prevent scheduling recovery if we are already connected to the network.
+    if (Instance().mWiFiState == WIFI_STATE_COMPLETED)
+    {
+        Instance().AbortConnectionRecovery();
+        return;
+    }
+
     // If kConnectionRecoveryMaxOverallInterval has a non-zero value prevent endless re-scan.
     if (0 != kConnectionRecoveryMaxRetries && (++Instance().mConnectionRecoveryCounter >= kConnectionRecoveryMaxRetries))
     {
@@ -565,7 +549,52 @@ void WiFiManager::AbortConnectionRecovery()
 {
     DeviceLayer::SystemLayer().CancelTimer(Recover, nullptr);
     Instance().ResetRecoveryTime();
-    Instance().mRecoveryTimerAborted = true;
+}
+
+System::Clock::Milliseconds32 WiFiManager::CalculateNextRecoveryTime()
+{
+    if (mConnectionRecoveryTimeMs > kConnectionRecoveryMaxIntervalMs)
+    {
+        // Find the new random jitter value in range [-jitter, +jitter].
+        int32_t jitter            = chip::Crypto::GetRandU32() % (2 * jitter + 1) - jitter;
+        mConnectionRecoveryTimeMs = kConnectionRecoveryMaxIntervalMs + jitter;
+        return System::Clock::Milliseconds32(mConnectionRecoveryTimeMs);
+    }
+    else
+    {
+        uint32_t currentRecoveryTimeout = mConnectionRecoveryTimeMs;
+        mConnectionRecoveryTimeMs       = mConnectionRecoveryTimeMs * 2;
+        return System::Clock::Milliseconds32(currentRecoveryTimeout);
+    }
+}
+
+CHIP_ERROR WiFiManager::SetLowPowerMode(bool onoff)
+{
+    net_if * iface = InetUtils::GetInterface();
+    VerifyOrReturnError(nullptr != iface, CHIP_ERROR_INTERNAL);
+
+    wifi_ps_config currentConfig{};
+    if (net_mgmt(NET_REQUEST_WIFI_PS_CONFIG, iface, &currentConfig, sizeof(currentConfig)))
+    {
+        ChipLogError(DeviceLayer, "Get current low power mode config request failed");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if ((currentConfig.ps_params.enabled == WIFI_PS_ENABLED && onoff == false) ||
+        (currentConfig.ps_params.enabled == WIFI_PS_DISABLED && onoff == true))
+    {
+        wifi_ps_params params{ .enabled = onoff ? WIFI_PS_ENABLED : WIFI_PS_DISABLED };
+        if (net_mgmt(NET_REQUEST_WIFI_PS, iface, &params, sizeof(params)))
+        {
+            ChipLogError(DeviceLayer, "Set low power mode request failed");
+            return CHIP_ERROR_INTERNAL;
+        }
+        ChipLogProgress(DeviceLayer, "Successfully set low power mode [%d]", onoff);
+        return CHIP_NO_ERROR;
+    }
+
+    ChipLogDetail(DeviceLayer, "Low power mode is already in requested state [%d]", onoff);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

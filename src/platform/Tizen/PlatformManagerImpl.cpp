@@ -37,9 +37,11 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 
 #include "PosixConfig.h"
+#include "SystemInfo.h"
 #include "platform/internal/GenericPlatformManagerImpl.h"
 #include "platform/internal/GenericPlatformManagerImpl.ipp"
 #include "platform/internal/GenericPlatformManagerImpl_POSIX.h"
@@ -91,9 +93,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
         GLibMatterContextInvokeData invokeData{};
 
-        auto * idleSource = g_idle_source_new();
+        GAutoPtr<GSource> idleSource(g_idle_source_new());
         g_source_set_callback(
-            idleSource,
+            idleSource.get(),
             [](void * userData_) {
                 auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
                 std::unique_lock<std::mutex> lock(data->mDoneMutex);
@@ -102,8 +104,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
                 return G_SOURCE_REMOVE;
             },
             &invokeData, nullptr);
-        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
-        g_source_unref(idleSource);
+        g_source_attach(idleSource.get(), g_main_loop_get_context(mGLibMainLoop));
 
         std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
@@ -117,16 +118,30 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    Internal::PlatformVersion version;
+    ReturnErrorOnFailure(Internal::SystemInfo::GetPlatformVersion(version));
+    ChipLogProgress(DeviceLayer, "Tizen Version: %d.%d", version.mMajor, version.mMinor);
+
     return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_Shutdown()
 {
+    if (mGLibMainLoop == nullptr)
+    {
+        ChipLogError(DeviceLayer, "System Layer is already shutdown.");
+        return;
+    }
+
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 
     g_main_loop_quit(mGLibMainLoop);
     g_main_loop_unref(mGLibMainLoop);
     g_thread_join(mGLibMainLoopThread);
+
+    mGLibMainLoop = nullptr;
 }
 
 CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)

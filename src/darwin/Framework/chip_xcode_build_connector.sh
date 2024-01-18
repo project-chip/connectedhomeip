@@ -58,6 +58,9 @@ for define in "${defines[@]}"; do
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    target_defines+=,\"CHIP_CONFIG_IM_ENABLE_ENCODING_SENTINEL_ENUM_VALUES=1\"
+}
 target_defines=[${target_defines:1}]
 
 declare target_arch=
@@ -90,9 +93,11 @@ done
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="boringssl"'
+    'chip_build_controller_dynamic_server=true'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_enable_wifi=false'
+    'chip_enable_python_modules=false'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
     'enable_fuzz_test_targets=false'
@@ -103,7 +108,10 @@ declare -a args=(
     "mac_deployment_target=\"$LLVM_TARGET_TRIPLE_OS_VERSION$LLVM_TARGET_TRIPLE_SUFFIX\""
 )
 
-[[ $CONFIGURATION == Debug ]] && args+=('is_debug=true')
+case "$CONFIGURATION" in
+    Debug) args+=('is_debug=true') ;;
+    Release) args+=('is_debug=false') ;;
+esac
 
 [[ $PLATFORM_FAMILY_NAME != macOS ]] && {
     args+=(
@@ -130,6 +138,21 @@ declare -a args=(
     )
 }
 
+[[ $CHIP_IS_UBSAN == YES ]] && {
+    args+=(
+        'is_ubsan=true'
+    )
+}
+
+[[ $CHIP_IS_TSAN == YES ]] && {
+    args+=(
+        'is_tsan=true'
+        # The system stats stuff races on the stats in various ways,
+        # so just disable it when using TSan.
+        'chip_system_config_provide_statistics=false'
+    )
+}
+
 [[ $CHIP_IS_CLANG == YES ]] && {
     args+=(
         'is_clang=true'
@@ -139,6 +162,12 @@ declare -a args=(
 [[ $CHIP_IS_BLE == NO ]] && {
     args+=(
         'chip_config_network_layer_ble=false'
+    )
+}
+
+[[ $CHIP_ENABLE_ENCODING_SENTINEL_ENUM_VALUES == YES ]] && {
+    args+=(
+        'enable_encoding_sentinel_enum_values=true'
     )
 }
 

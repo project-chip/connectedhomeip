@@ -24,7 +24,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -32,7 +32,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads SubjectsPerAccessControlEntry attribute from DUT"
+    - label: "Step 2: TH reads SubjectsPerAccessControlEntry attribute from DUT"
       PICS: ACL.S.A0002
       command: "readAttribute"
       attribute: "SubjectsPerAccessControlEntry"
@@ -42,7 +42,7 @@ tests:
               minValue: 4
               maxValue: 65535
 
-    - label: "TH reads TargetsPerAccessControlEntry attribute from DUT"
+    - label: "Step 3: TH reads TargetsPerAccessControlEntry attribute from DUT"
       PICS: ACL.S.A0003
       command: "readAttribute"
       attribute: "TargetsPerAccessControlEntry"
@@ -52,7 +52,7 @@ tests:
               minValue: 3
               maxValue: 65535
 
-    - label: "TH reads AccessControlEntriesPerFabric attribute from DUT"
+    - label: "Step 4: TH reads AccessControlEntriesPerFabric attribute from DUT"
       PICS: ACL.S.A0004
       command: "readAttribute"
       attribute: "AccessControlEntriesPerFabric"

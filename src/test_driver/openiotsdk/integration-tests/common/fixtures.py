@@ -27,6 +27,7 @@ from chip import exceptions
 
 from .fvp_device import FvpDevice
 from .telnet_connection import TelnetConnection
+from .terminal_device import TerminalDevice
 
 log = logging.getLogger(__name__)
 
@@ -65,6 +66,24 @@ def networkInterface(request):
         return None
 
 
+@pytest.fixture(scope="session")
+def otaProvider(request, rootDir):
+    if request.config.getoption('otaProvider'):
+        return request.config.getoption('otaProvider')
+    else:
+        return os.path.join(rootDir, 'out/chip-ota-provider-app')
+
+
+@pytest.fixture(scope="session")
+def softwareVersion(request):
+    if request.config.getoption('softwareVersion'):
+        version = request.config.getoption('softwareVersion')
+        params = version.split(':')
+        return (params[0], params[1])
+    else:
+        return ("1", "0.0.1")
+
+
 @pytest.fixture(scope="function")
 def device(fvp, fvpConfig, binaryPath, telnetPort, networkInterface):
     connection = TelnetConnection('localhost', telnetPort)
@@ -75,34 +94,20 @@ def device(fvp, fvpConfig, binaryPath, telnetPort, networkInterface):
 
 
 @pytest.fixture(scope="session")
-def vendor_id():
-    return 0xFFF1
-
-
-@pytest.fixture(scope="session")
-def fabric_id():
-    return 1
-
-
-@pytest.fixture(scope="session")
-def node_id():
-    return 1
-
-
-@pytest.fixture(scope="function")
-def controller(vendor_id, fabric_id, node_id):
+def controller(controllerConfig):
     try:
         chip.native.Init()
         chipStack = chip.ChipStack.ChipStack(
-            persistentStoragePath='/tmp/openiotsdk-test-storage.json', enableServerInteractions=False)
+            persistentStoragePath=controllerConfig['persistentStoragePath'], enableServerInteractions=False)
         certificateAuthorityManager = chip.CertificateAuthority.CertificateAuthorityManager(
             chipStack, chipStack.GetStorageManager())
         certificateAuthorityManager.LoadAuthoritiesFromStorage()
         if (len(certificateAuthorityManager.activeCaList) == 0):
             ca = certificateAuthorityManager.NewCertificateAuthority()
-            ca.NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id)
+            ca.NewFabricAdmin(vendorId=controllerConfig['vendorId'], fabricId=controllerConfig['fabricId'])
         elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
-            certificateAuthorityManager.activeCaList[0].NewFabricAdmin(vendorId=vendor_id, fabricId=fabric_id)
+            certificateAuthorityManager.activeCaList[0].NewFabricAdmin(
+                vendorId=controllerConfig['vendorId'], fabricId=controllerConfig['fabricId'])
 
         caList = certificateAuthorityManager.activeCaList
 
@@ -116,3 +121,27 @@ def controller(vendor_id, fabric_id, node_id):
         return None
 
     yield devCtrl
+
+    devCtrl.Shutdown()
+    certificateAuthorityManager.Shutdown()
+    chipStack.Shutdown()
+    os.remove(controllerConfig['persistentStoragePath'])
+
+
+@pytest.fixture(scope="session")
+def ota_provider(otaProvider, otaProviderConfig):
+    args = [
+        '--discriminator', otaProviderConfig['discriminator'],
+        '--secured-device-port',  otaProviderConfig['port'],
+        '-c',
+        '--KVS', otaProviderConfig['persistentStoragePath'],
+        '--filepath', otaProviderConfig['filePath'],
+    ]
+
+    device = TerminalDevice(otaProvider, args, "OTAprovider")
+    device.start()
+
+    yield device
+
+    device.stop()
+    os.remove(otaProviderConfig['persistentStoragePath'])

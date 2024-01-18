@@ -21,6 +21,7 @@
 #include "lib/core/CHIPError.h"
 #include "system/SystemPacketBuffer.h"
 #include "system/TLVPacketBufferBackingStore.h"
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ReadClient.h>
@@ -33,6 +34,7 @@
 #include <set>
 #include <vector>
 
+#if CHIP_CONFIG_ENABLE_READ_CLIENT
 namespace chip {
 namespace app {
 /*
@@ -70,6 +72,14 @@ public:
     class Callback : public ReadClient::Callback
     {
     public:
+        Callback() = default;
+
+        // Callbacks are not expected to be copyable or movable.
+        Callback(const Callback &)             = delete;
+        Callback(Callback &&)                  = delete;
+        Callback & operator=(const Callback &) = delete;
+        Callback & operator=(Callback &&)      = delete;
+
         /*
          * Called anytime an attribute value has changed in the cache
          */
@@ -101,6 +111,11 @@ public:
     {
         mHighestReceivedEventNumber = highestReceivedEventNumber;
     }
+
+    ClusterStateCache(const ClusterStateCache &)             = delete;
+    ClusterStateCache(ClusterStateCache &&)                  = delete;
+    ClusterStateCache & operator=(const ClusterStateCache &) = delete;
+    ClusterStateCache & operator=(ClusterStateCache &&)      = delete;
 
     void SetHighestReceivedEventNumber(EventNumber highestReceivedEventNumber)
     {
@@ -150,6 +165,17 @@ public:
 
         ReturnErrorOnFailure(Get(path, reader));
         return DataModel::Decode(reader, value);
+    }
+
+    /**
+     * Get the value of a particular attribute for the given endpoint.  See the
+     * documentation for Get() with a ConcreteAttributePath above.
+     */
+    template <typename AttributeObjectTypeT>
+    CHIP_ERROR Get(EndpointId endpoint, typename AttributeObjectTypeT::DecodableType & value) const
+    {
+        ConcreteAttributePath path(endpoint, AttributeObjectTypeT::GetClusterId(), AttributeObjectTypeT::GetAttributeId());
+        return Get<AttributeObjectTypeT>(path, value);
     }
 
     /*
@@ -500,7 +526,16 @@ public:
     CHIP_ERROR GetLastReportDataPath(ConcreteClusterPath & aPath);
 
 private:
-    using AttributeState = Variant<Platform::ScopedMemoryBufferWithSize<uint8_t>, StatusIB>;
+    // An attribute state can be one of three things:
+    // * If we got a path-specific error for the attribute, the corresponding
+    //   status.
+    // * If we got data for the attribute and we are storing data ourselves, the
+    //   data.
+    // * If we got data for the attribute and we are not storing data
+    //   oureselves, the size of the data, so we can still prioritize sending
+    //   DataVersions correctly.
+    using AttributeData  = Platform::ScopedMemoryBufferWithSize<uint8_t>;
+    using AttributeState = Variant<StatusIB, AttributeData, size_t>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
     //
     // mCurrentDataVersion represents a known data version for a cluster.  In order for this to have a
@@ -611,6 +646,11 @@ private:
         return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
     }
 
+    void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) override
+    {
+        return mCallback.OnCASESessionEstablished(aSession, aSubscriptionParams);
+    }
+
     // Commit the pending cluster data version, if there is one.
     void CommitPendingDataVersion();
 
@@ -632,8 +672,9 @@ private:
     std::map<ConcreteEventPath, StatusIB> mEventStatusCache;
     BufferedReadCallback mBufferedReader;
     ConcreteClusterPath mLastReportDataPath = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
-    bool mCacheData                         = true;
+    const bool mCacheData                   = true;
 };
 
-}; // namespace app
-}; // namespace chip
+};     // namespace app
+};     // namespace chip
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT

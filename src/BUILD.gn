@@ -16,10 +16,11 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/ble/ble.gni")
-import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/tracing/tracing_args.gni")
 
 declare_args() {
   # Build monolithic test library.
@@ -36,6 +37,11 @@ config("includes") {
     ".",
     "${root_gen_dir}/include",
   ]
+
+  if (chip_device_platform == "external" &&
+      chip_external_platform_include_dir != "") {
+    include_dirs += [ "${chip_external_platform_include_dir}" ]
+  }
 
   # TODO: generated file dependency should be a lib NOT an include
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
@@ -59,6 +65,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/core/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/interaction_model/tests",
       "${chip_root}/src/protocols/user_directed_commissioning/tests",
       "${chip_root}/src/transport/retransmit/tests",
     ]
@@ -90,11 +97,17 @@ if (chip_build_tests) {
         # TODO(#10447): App test has HF on EFR32.
         "${chip_root}/src/app/tests",
         "${chip_root}/src/credentials/tests",
+        "${chip_root}/src/lib/format/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/protocols/secure_channel/tests",
         "${chip_root}/src/system/tests",
         "${chip_root}/src/transport/tests",
       ]
+
+      if (matter_enable_tracing_support &&
+          matter_trace_config == "multiplexed") {
+        deps += [ "${chip_root}/src/tracing/tests" ]
+      }
     }
 
     if (chip_device_platform != "none") {
@@ -146,5 +159,11 @@ if (chip_build_tests) {
       "${chip_root}/src/credentials/tests",
       "${chip_root}/src/crypto/tests",
     ]
+  }
+
+  if (matter_enable_java_compilation) {
+    group("java_controller_tests") {
+      deps = [ "${chip_root}/src/controller/java:unit_tests" ]
+    }
   }
 }

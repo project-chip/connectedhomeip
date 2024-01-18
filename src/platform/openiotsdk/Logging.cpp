@@ -48,18 +48,11 @@ namespace Logging {
 namespace Platform {
 
 /**
- * Logging static buffer
- */
-namespace {
-char logMsgBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-}
-
-/**
  * CHIP log output functions.
  */
 void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    vsnprintf(logMsgBuffer, sizeof(logMsgBuffer), msg, v);
+    char logMsgBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 
     const char * category_prefix;
     switch (category)
@@ -79,10 +72,20 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
         break;
     }
 
-    printf("%s [%s] %s\r\n", category_prefix, module, logMsgBuffer);
+    int header_len  = snprintf(logMsgBuffer, sizeof(logMsgBuffer), "%s [%s] ", category_prefix, module);
+    int content_len = vsnprintf(logMsgBuffer + header_len, sizeof(logMsgBuffer) - header_len, msg, v);
+    int trailer_len = snprintf(logMsgBuffer + header_len + content_len, sizeof(logMsgBuffer) - header_len - content_len, "\r\n");
+    fwrite(logMsgBuffer, header_len + content_len + trailer_len, 1, stdout);
 
     // Let the application know that a log message has been emitted.
     DeviceLayer::OnLogOutput();
+}
+
+void ois_logging_init()
+{
+#if defined(NDEBUG) && CHIP_CONFIG_TEST == 0
+    SetLogFilter(LogCategory::kLogCategory_Progress);
+#endif
 }
 
 } // namespace Platform

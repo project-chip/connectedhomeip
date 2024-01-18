@@ -36,14 +36,16 @@
 // Enable use of external heap allocator (calloc/free) for OpenThread.
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#ifdef SL_ICD_ENABLED
 #define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 0
+
 // In seconds
-#define SL_MLE_TIMEOUT_seconds (SL_SLEEP_TIME_MS / 1000)
+#define SL_MLE_TIMEOUT_s (SL_OT_IDLE_INTERVAL / 1000)
 
 // Timeout after 2 missed checkin or 4 mins if sleep interval is too short.
-#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_seconds < 120) ? 240 : ((SL_MLE_TIMEOUT_seconds * 2) + 1))
-#endif
+#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_s < 120) ? 240 : ((SL_MLE_TIMEOUT_s * 2) + 1))
+
+#endif // SL_ICD_ENABLED
 
 /****Uncomment below section for OpenThread Debug logs*/
 // #define OPENTHREAD_CONFIG_LOG_LEVEL OT_LOG_LEVEL_DEBG
@@ -84,7 +86,7 @@
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 0
 #define OPENTHREAD_CONFIG_COMMISSIONER_ENABLE 0
 #define OPENTHREAD_CONFIG_UDP_FORWARD_ENABLE 0
-#define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE 0
+#define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
 #define OPENTHREAD_CONFIG_DHCP6_CLIENT_ENABLE 0
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
 #define OPENTHREAD_CONFIG_TCP_ENABLE 0
@@ -95,6 +97,10 @@
 // Define as 1 to stay awake between fragments while transmitting a large packet,
 // and to stay awake after receiving a packet with frame pending set to true.
 #define OPENTHREAD_CONFIG_MAC_STAY_AWAKE_BETWEEN_FRAGMENTS 1
+
+#define OPENTHREAD_CONFIG_ENABLE_BUILTIN_MBEDTLS 0
+
+#define OPENTHREAD_CONFIG_DETERMINISTIC_ECDSA_ENABLE 0
 
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.

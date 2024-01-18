@@ -1,0 +1,12 @@
+diff --git a/toolchain_GNUARM.cmake b/toolchain_GNUARM.cmake
+index d044ed4a5..3d8f64d17 100644
+--- a/toolchain_GNUARM.cmake
++++ b/toolchain_GNUARM.cmake
+@@ -71,7 +71,6 @@ macro(tfm_toolchain_reset_linker_flags)
+         --entry=Reset_Handler
+         --specs=nano.specs
+         LINKER:-check-sections
+-        LINKER:-fatal-warnings
+         LINKER:--gc-sections
+         LINKER:--no-wchar-size-warning
+         ${MEMORY_USAGE_FLAG}

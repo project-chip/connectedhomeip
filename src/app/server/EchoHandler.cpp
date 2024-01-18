@@ -22,7 +22,7 @@
 
 #include <app/server/EchoHandler.h>
 
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <protocols/echo/Echo.h>
 
 namespace {

@@ -70,7 +70,7 @@ OR use GN/Ninja directly
           cd ~/connectedhomeip/src/test_driver/efr32/
           git submodule update --init
           source third_party/connectedhomeip/scripts/activate.sh
-          export EFR32_BOARD=BRD4161A
+          export SILABS_BOARD=BRD4161A
           gn gen out/debug
           ninja -C out/debug
           ```
@@ -104,8 +104,20 @@ Or build using build script from the root
 The runner will be installed into the venv and python wheels will be packaged in
 the output folder for deploying.
 
+Then the python wheels need to installed using pip3.
+
+    ```
+    pip3 install out/debug/chip_nl_test_runner_wheels/*.whl
+    ```
+
+Other python libraries may need to be installed such as
+
+    ```
+    pip3 install pyserial
+    ```
+
 -   To run the tests:
 
     ```
-    python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f out/debug/chip-efr32-device_tests.s37 -o out.log
+    python -m nl_test_runner.nl_test_runner -d /dev/ttyACM1 -f out/debug/matter-silabs-device_tests.s37 -o out.log
     ```

@@ -20,7 +20,6 @@ package com.matter.controller.commands.common
 import chip.devicecontroller.ChipDeviceController
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
-import java.util.logging.Logger
 
 abstract class MatterCommand(
   private val chipDeviceController: ChipDeviceController,
@@ -40,27 +39,28 @@ abstract class MatterCommand(
     addArgument(
       "paa-trust-store-path",
       paaTrustStorePath,
-      "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working "
-              + "directory.",
+      "Path to directory holding PAA certificate information.  Can be absolute or relative to the current working " +
+        "directory.",
       true
     )
     addArgument(
       "cd-trust-store-path",
       cdTrustStorePath,
-      "Path to directory holding CD certificate information.  Can be absolute or relative to the current working "
-              + "directory.",
+      "Path to directory holding CD certificate information.  Can be absolute or relative to the current working " +
+        "directory.",
       true
     )
     addArgument(
       "commissioner-name",
       commissionerName,
-      "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to "
-              + "4.  The default if not specified is \"alpha\".",
+      "Name of fabric to use. Valid values are \"alpha\", \"beta\", \"gamma\", and integers greater than or equal to " +
+        "4.  The default if not specified is \"alpha\".",
       true
     )
     addArgument(
       "commissioner-nodeid",
-      0, Long.MAX_VALUE,
+      0,
+      Long.MAX_VALUE,
       commissionerNodeId,
       "The node id to use for java-matter-controller.  If not provided, kTestControllerNodeId (112233, 0x1B669) will be used.",
       true
@@ -68,15 +68,15 @@ abstract class MatterCommand(
     addArgument(
       "use-max-sized-certs",
       useMaxSizedCerts,
-      "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational "
-              + "certificates are generated.",
+      "Maximize the size of operational certificates. If not provided or 0 (\"false\"), normally sized operational " +
+        "certificates are generated.",
       true
     )
     addArgument(
       "only-allow-trusted-cd-keys",
       onlyAllowTrustedCdKeys,
-      "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD "
-              + "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.",
+      "Only allow trusted CD verifying keys (disallow test keys). If not provided or 0 (\"false\"), untrusted CD " +
+        "verifying keys are allowed. If 1 (\"true\"), test keys are disallowed.",
       true
     )
   }
@@ -93,24 +93,21 @@ abstract class MatterCommand(
   }
 
   protected abstract fun runCommand()
+
   fun setSuccess() {
-    futureResult.setRealResult(RealResult.Success())
+    futureResult.setRealResult(RealResult.success())
   }
 
   fun setFailure(error: String?) {
-    futureResult.setRealResult(RealResult.Error(error))
+    futureResult.setRealResult(RealResult.error(error))
   }
 
   fun waitCompleteMs(timeoutMs: Long) {
-    futureResult.setTimeoutMs(timeoutMs)
+    futureResult.timeoutMs = timeoutMs
     futureResult.waitResult()
   }
 
   fun clear() {
     futureResult.clear()
   }
-
-  companion object {
-    private val logger = Logger.getLogger(MatterCommand::class.java.name)
-  }    
 }

@@ -17,9 +17,7 @@ limitations under the License.
 
 import logging
 import os
-import pprint
 import sys
-import time
 
 from helper.CHIPTestBase import CHIPVirtualHome
 
@@ -45,7 +43,7 @@ MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 DEVICE_CONFIG = {
     'device0': {
         'type': 'MobileDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -54,7 +52,7 @@ DEVICE_CONFIG = {
     },
     'device1': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',
@@ -63,7 +61,7 @@ DEVICE_CONFIG = {
     },
     'device2': {
         'type': 'CHIPEndDevice',
-        'base_image': 'connectedhomeip/chip-cirque-device-base',
+        'base_image': '@default',
         'capability': ['Thread', 'TrafficControl', 'Mount'],
         'rcp_mode': True,
         'docker_network': 'Ipv6',

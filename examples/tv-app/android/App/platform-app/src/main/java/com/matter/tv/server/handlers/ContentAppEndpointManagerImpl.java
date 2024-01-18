@@ -18,7 +18,7 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     this.context = context;
   }
 
-  public String sendCommand(int endpointId, int clusterId, int commandId, String commandPayload) {
+  public String sendCommand(int endpointId, long clusterId, long commandId, String commandPayload) {
     Log.d(TAG, "Received a command for endpointId " + endpointId + ". Message " + commandPayload);
 
     ContentApp discoveredApp =
@@ -54,7 +54,7 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
     return "Success";
   }
 
-  public String readAttribute(int endpointId, int clusterId, int attributeId) {
+  public String readAttribute(int endpointId, long clusterId, long attributeId) {
     Log.d(
         TAG,
         "Received a attribute read request for endpointId "

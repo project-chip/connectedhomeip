@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
                                     masterKey:(NSData *)masterKey
                                          PSKc:(NSData *)PSKc
                                 channelNumber:(NSNumber *)channelNumber
-                                        panID:(NSData *)panID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                                        panID:(NSData *)panID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create a Thread Operational Dataset object with a RCP formatted active operational dataset.
@@ -64,10 +64,10 @@ NS_ASSUME_NONNULL_BEGIN
 extern size_t const MTRSizeThreadNetworkName;
 extern size_t const MTRSizeThreadExtendedPanId MTR_DEPRECATED(
     "Please use MTRSizeThreadExtendedPANID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-extern size_t const MTRSizeThreadExtendedPANID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+extern size_t const MTRSizeThreadExtendedPANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 extern size_t const MTRSizeThreadMasterKey;
 extern size_t const MTRSizeThreadPSKc;
-extern size_t const MTRSizeThreadPANID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+extern size_t const MTRSizeThreadPANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The Thread Network name
@@ -92,7 +92,7 @@ extern size_t const MTRSizeThreadPANID API_AVAILABLE(ios(16.4), macos(13.3), wat
 /**
  * The Thread network channel.  Always an unsigned 16-bit integer.
  */
-@property (nonatomic, copy, readonly) NSNumber * channelNumber API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, readonly) NSNumber * channelNumber MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * A uint16_t stored as 2-bytes in host order representing the Thread PAN ID

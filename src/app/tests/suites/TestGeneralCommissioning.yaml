@@ -272,3 +272,92 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Read original regulatory location"
+      command: "readAttribute"
+      attribute: "RegulatoryConfig"
+      response:
+          saveAs: originalRegulatoryConfig
+
+    - label: "Read original location"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "Location"
+      response:
+          value: "XX"
+          saveAs: originalLocation
+
+    - label: "Try to SetRegulatoryConfig with 0-length country code"
+      command: "SetRegulatoryConfig"
+      arguments:
+          values:
+              - name: "NewRegulatoryConfig"
+                value: 0
+              - name: "CountryCode"
+                value: ""
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read back location"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "Location"
+      response:
+          value: originalLocation
+
+    - label: "Try to SetRegulatoryConfig with length-1 country code"
+      command: "SetRegulatoryConfig"
+      arguments:
+          values:
+              - name: "NewRegulatoryConfig"
+                value: 0
+              - name: "CountryCode"
+                value: "U"
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read back location second time"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "Location"
+      response:
+          value: originalLocation
+
+    - label: "Try to SetRegulatoryConfig with length-2 country code"
+      command: "SetRegulatoryConfig"
+      arguments:
+          values:
+              - name: "NewRegulatoryConfig"
+                value: 0
+              - name: "CountryCode"
+                value: "US"
+              - name: "Breadcrumb"
+                value: 0
+      response:
+          values:
+              - name: "ErrorCode"
+                value: 0
+              - name: "DebugText"
+                value: ""
+
+    - label: "Read back location third time"
+      command: "readAttribute"
+      cluster: "Basic Information"
+      attribute: "Location"
+      response:
+          value: "US"
+
+    - label: "Restore initial values"
+      command: "SetRegulatoryConfig"
+      arguments:
+          values:
+              - name: "NewRegulatoryConfig"
+                value: originalRegulatoryConfig
+              - name: "CountryCode"
+                value: originalLocation
+              - name: "Breadcrumb"
+                value: 0

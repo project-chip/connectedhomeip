@@ -1,4 +1,4 @@
-{{#chip_tests tests}}
+{{#chip_tests tests includeAllClusters=true}}
 class {{filename}}Suite: public TestCommand
 {
 public:

@@ -42,8 +42,8 @@
 #include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
+#include <transport/Session.h>
 #include <transport/SessionDelegate.h>
-#include <transport/SessionHandle.h>
 #include <transport/SessionHolder.h>
 #include <transport/SessionMessageDelegate.h>
 #include <transport/TransportMgr.h>
@@ -528,7 +528,7 @@ namespace MessagePacketBuffer {
 /**
  * Maximum size of a message footer, in bytes.
  */
-constexpr uint16_t kMaxFooterSize = kMaxTagLen;
+inline constexpr uint16_t kMaxFooterSize = kMaxTagLen;
 
 /**
  * Allocates a packet buffer with space for message headers and footers.

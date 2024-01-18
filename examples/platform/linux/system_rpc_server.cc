@@ -37,6 +37,7 @@ namespace {
 constexpr size_t kMaxTransmissionUnit = 512;
 uint16_t socket_port                  = 33000;
 
+stream::ServerSocket server_socket;
 stream::SocketStream socket_stream;
 
 hdlc::RpcChannelOutput hdlc_channel_output(socket_stream, hdlc::kDefaultRpcAddress, "HDLC channel");
@@ -50,11 +51,6 @@ void set_socket_port(uint16_t new_socket_port)
     socket_port = new_socket_port;
 }
 
-int GetServerSocketFd()
-{
-    return socket_stream.connection_fd();
-}
-
 void Init()
 {
     log_basic::SetOutput([](std::string_view log) {
@@ -63,7 +59,10 @@ void Init()
     });
 
     PW_LOG_INFO("Starting pw_rpc server on port %d", socket_port);
-    PW_CHECK_OK(socket_stream.Serve(socket_port));
+    PW_CHECK_OK(server_socket.Listen(socket_port));
+    auto accept_result = server_socket.Accept();
+    PW_CHECK_OK(accept_result.status());
+    socket_stream = *std::move(accept_result);
 }
 
 rpc::Server & Server()
@@ -88,7 +87,12 @@ Status Start()
                 // An out of range status indicates the remote end has disconnected.
                 // Start to serve the connection again, which will allow another
                 // remote to connect.
-                PW_CHECK_OK(socket_stream.Serve(socket_port));
+                socket_stream.Close();
+                server_socket.Close();
+                PW_CHECK_OK(server_socket.Listen(socket_port));
+                auto accept_result = server_socket.Accept();
+                PW_CHECK_OK(accept_result.status());
+                socket_stream = *std::move(accept_result);
             }
             continue;
         }

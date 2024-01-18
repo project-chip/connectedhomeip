@@ -23,712 +23,6 @@
 
 #include <lib/support/CHIPListUtils.h>
 
-class Test_TC_BINFO_2_3_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_BINFO_2_3_SimulatedSuite() : TestCommand("Test_TC_BINFO_2_3_Simulated", 21)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_BINFO_2_3_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 0:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Log OnOff Test Startup");
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::Log::Type value;
-            value.message = chip::Span<const char>("*** Basic Cluster Tests Readygarbage: not in length on purpose", 29);
-            return Log(kIdentityAlpha, value);
-        }
-        case 1: {
-            LogStep(1, "DUT reads DataModelRevision from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::DataModelRevision::Id);
-        }
-        case 2: {
-            LogStep(2, "DUT reads VendorName from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorName::Id);
-        }
-        case 3: {
-            LogStep(3, "DUT reads VendorID from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::VendorID::Id);
-        }
-        case 4: {
-            LogStep(4, "DUT reads ProductName from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductName::Id);
-        }
-        case 5: {
-            LogStep(5, "DUT reads ProductID from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductID::Id);
-        }
-        case 6: {
-            LogStep(6, "DUT reads NodeLabel from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::NodeLabel::Id);
-        }
-        case 7: {
-            LogStep(7, "DUT reads Location from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Location::Id);
-        }
-        case 8: {
-            LogStep(8, "DUT reads HardwareVersion from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersion::Id);
-        }
-        case 9: {
-            LogStep(9, "DUT reads HardwareVersionString from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::HardwareVersionString::Id);
-        }
-        case 10: {
-            LogStep(10, "DUT reads SoftwareVersion from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersion::Id);
-        }
-        case 11: {
-            LogStep(11, "DUT reads SoftwareVersionString from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SoftwareVersionString::Id);
-        }
-        case 12: {
-            LogStep(12, "DUT reads ManufacturingDate from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ManufacturingDate::Id);
-        }
-        case 13: {
-            LogStep(13, "DUT reads PartNumber from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::PartNumber::Id);
-        }
-        case 14: {
-            LogStep(14, "DUT reads ProductURL from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductURL::Id);
-        }
-        case 15: {
-            LogStep(15, "DUT reads ProductLabel from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000e"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::ProductLabel::Id);
-        }
-        case 16: {
-            LogStep(16, "DUT reads SerialNumber from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A000f"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::SerialNumber::Id);
-        }
-        case 17: {
-            LogStep(17, "DUT reads LocalConfigDisabled from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::LocalConfigDisabled::Id);
-        }
-        case 18: {
-            LogStep(18, "DUT reads Reachable from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::Reachable::Id);
-        }
-        case 19: {
-            LogStep(19, "DUT reads UniqueID from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::UniqueID::Id);
-        }
-        case 20: {
-            LogStep(20, "DUT reads CapabilityMinima from the TH");
-            VerifyOrDo(!ShouldSkip("BINFO.C.A0013"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), BasicInformation::Id, BasicInformation::Attributes::CapabilityMinima::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_DESC_2_2_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_DESC_2_2_SimulatedSuite() : TestCommand("Test_TC_DESC_2_2_Simulated", 4)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_DESC_2_2_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT reads DeviceTypeList from TH.");
-            VerifyOrDo(!ShouldSkip("DESC.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::DeviceTypeList::Id);
-        }
-        case 1: {
-            LogStep(1, "DUT reads ServerList from the TH");
-            VerifyOrDo(!ShouldSkip("DESC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::ServerList::Id);
-        }
-        case 2: {
-            LogStep(2, "DUT reads ClientList attribute from the TH");
-            VerifyOrDo(!ShouldSkip("DESC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::ClientList::Id);
-        }
-        case 3: {
-            LogStep(3, "DUT reads PartsList attribute from the TH");
-            VerifyOrDo(!ShouldSkip("DESC.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), Descriptor::Id, Descriptor::Attributes::PartsList::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_DGETH_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_DGETH_3_1_SimulatedSuite() : TestCommand("Test_TC_DGETH_3_1_Simulated", 9)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_DGETH_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Read attribute: PHYRate");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::PHYRate::Id);
-        }
-        case 1: {
-            LogStep(1, "Read attribute: FullDuplex");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::FullDuplex::Id);
-        }
-        case 2: {
-            LogStep(2, "Read attribute: PacketRxCount");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id);
-        }
-        case 3: {
-            LogStep(3, "Read attribute: PacketTxCount");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id);
-        }
-        case 4: {
-            LogStep(4, "Read attribute: TxErrCount");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::TxErrCount::Id);
-        }
-        case 5: {
-            LogStep(5, "Read attribute: CollisionCount");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::CollisionCount::Id);
-        }
-        case 6: {
-            LogStep(6, "Read attribute: OverrunCount");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::OverrunCount::Id);
-        }
-        case 7: {
-            LogStep(7, "Read attribute: CarrierDetect");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id);
-        }
-        case 8: {
-            LogStep(8, "Read attribute: TimeSinceReset");
-            VerifyOrDo(!ShouldSkip("DGETH.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
-                                 EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_DGSW_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_DGSW_3_1_SimulatedSuite() : TestCommand("Test_TC_DGSW_3_1_Simulated", 4)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_DGSW_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Read attribute: ThreadMetrics");
-            VerifyOrDo(!ShouldSkip("DGSW.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::ThreadMetrics::Id);
-        }
-        case 1: {
-            LogStep(1, "Read attribute: CurrentHeapFree");
-            VerifyOrDo(!ShouldSkip("DGSW.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::CurrentHeapFree::Id);
-        }
-        case 2: {
-            LogStep(2, "Read attribute: CurrentHeapUsed");
-            VerifyOrDo(!ShouldSkip("DGSW.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id);
-        }
-        case 3: {
-            LogStep(3, "Read attribute: CurrentHeapHighWatermark");
-            VerifyOrDo(!ShouldSkip("DGSW.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), SoftwareDiagnostics::Id,
-                                 SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_DGWIFI_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_DGWIFI_3_1_SimulatedSuite() : TestCommand("Test_TC_DGWIFI_3_1_Simulated", 13)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_DGWIFI_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Read attribute: BSSID");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::Bssid::Id);
-        }
-        case 1: {
-            LogStep(1, "Read attribute: SecurityType");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::SecurityType::Id);
-        }
-        case 2: {
-            LogStep(2, "Read attribute: WiFiVersion");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id);
-        }
-        case 3: {
-            LogStep(3, "Read attribute: ChannelNumber");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0003"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id);
-        }
-        case 4: {
-            LogStep(4, "Read attribute: RSSI");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0004"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::Rssi::Id);
-        }
-        case 5: {
-            LogStep(5, "Read attribute: BeaconLostCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0005"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id);
-        }
-        case 6: {
-            LogStep(6, "Read attribute: BeaconRxCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id);
-        }
-        case 7: {
-            LogStep(7, "Read attribute: PacketMulticastRxCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id);
-        }
-        case 8: {
-            LogStep(8, "Read attribute: PacketMulticastTxCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0008"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id);
-        }
-        case 9: {
-            LogStep(9, "Read attribute: PacketUnicastRxCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A0009"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id);
-        }
-        case 10: {
-            LogStep(10, "Read attribute: PacketUnicastTxCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A000a"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id);
-        }
-        case 11: {
-            LogStep(11, "Read attribute: CurrentMaxRate");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A000b"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id,
-                                 WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id);
-        }
-        case 12: {
-            LogStep(12, "Read attribute: OverrunCount");
-            VerifyOrDo(!ShouldSkip("DGWIFI.C.A000c"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Attributes::OverrunCount::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_G_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_G_3_1_SimulatedSuite() : TestCommand("Test_TC_G_3_1_Simulated", 1)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_G_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT reads NameSupport attribute value from TH");
-            VerifyOrDo(!ShouldSkip("G.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), Groups::Id, Groups::Attributes::NameSupport::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_RH_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_RH_3_1_SimulatedSuite() : TestCommand("Test_TC_RH_3_1_Simulated", 7)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_RH_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 4:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 5:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 6:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Read attribute MeasuredValue");
-            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
-                                 RelativeHumidityMeasurement::Attributes::MeasuredValue::Id);
-        }
-        case 1: {
-            LogStep(1, "Read attribute MinMeasuredValue");
-            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
-                                 RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id);
-        }
-        case 2: {
-            LogStep(2, "Read attribute MaxMeasuredValue");
-            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
-                                 RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id);
-        }
-        case 3: {
-            LogStep(3, "Read attribute Tolerance");
-            return WaitAttribute(GetEndpoint(0), RelativeHumidityMeasurement::Id,
-                                 RelativeHumidityMeasurement::Attributes::Tolerance::Id);
-        }
-        case 4: {
-            LogStep(4,
-                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
-                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
-                    "DUT to TH again");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 5: {
-            LogStep(5, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 6: {
-            LogStep(6,
-                    "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
-                    "specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
 class Test_TC_WNCV_5_1_SimulatedSuite : public TestCommand
 {
 public:
@@ -776,354 +70,28 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "DUT reads the FeatureMap attribute from TH");
-            VerifyOrDo(!ShouldSkip("WNCV.C.Afffc"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(0, "Step 1a: DUT reads the FeatureMap attribute from TH");
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::FeatureMap::Id);
         }
         case 1: {
-            LogStep(1, "DUT reads the Type attribute from TH");
+            LogStep(1, "Step 2a: DUT reads the Type attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::Type::Id);
         }
         case 2: {
-            LogStep(2, "DUT reads the EndProductType attribute from TH");
+            LogStep(2, "Step 2b: DUT reads the EndProductType attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::EndProductType::Id);
         }
         case 3: {
-            LogStep(3, "DUT reads the Mode attribute from TH");
+            LogStep(3, "Step 3a: DUT reads the Mode attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::Mode::Id);
         }
         case 4: {
-            LogStep(4, "DUT reads the ConfigStatus attribute from TH");
+            LogStep(4, "Step 3b: DUT reads the ConfigStatus attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_LCFG_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_LCFG_3_1_SimulatedSuite() : TestCommand("Test_TC_LCFG_3_1_Simulated", 2)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_LCFG_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT reads SupportedLocales attribute from TH");
-            VerifyOrDo(!ShouldSkip("LCFG.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), LocalizationConfiguration::Id,
-                                 LocalizationConfiguration::Attributes::SupportedLocales::Id);
-        }
-        case 1: {
-            LogStep(1, "DUT reads ActiveLocale attribute from TH");
-            VerifyOrDo(!ShouldSkip("LCFG.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), LocalizationConfiguration::Id,
-                                 LocalizationConfiguration::Attributes::ActiveLocale::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_LUNIT_1_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_LUNIT_1_1_SimulatedSuite() : TestCommand("Test_TC_LUNIT_1_1_Simulated", 5)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_LUNIT_1_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT read (0xFFFD) ClusterRevision attribute");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.Afffd"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::ClusterRevision::Id);
-        }
-        case 1: {
-            LogStep(1, "DUT read (0xFFFC) FeatureMap attribute");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.Afffc"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::FeatureMap::Id);
-        }
-        case 2: {
-            LogStep(2, "DUT read (0xFFFB) AttributeList attribute");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.Afffb"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::AttributeList::Id);
-        }
-        case 3: {
-            LogStep(3, "DUT read (0xFFF9) AcceptedCommandList attribute");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.Afff9"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::AcceptedCommandList::Id);
-        }
-        case 4: {
-            LogStep(4, "DUT read (0xFFF8) GeneratedCommandList attribute");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.Afff8"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::GeneratedCommandList::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_LUNIT_2_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_LUNIT_2_1_SimulatedSuite() : TestCommand("Test_TC_LUNIT_2_1_Simulated", 3)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_LUNIT_2_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT reads TemperatureUnit attribute from TH");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
-        }
-        case 1: {
-            LogStep(1, "DUT writes 2 to TemperatureUnit attribute on TH");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
-        }
-        case 2: {
-            LogStep(2, "DUT reads TemperatureUnit attribute from TH");
-            VerifyOrDo(!ShouldSkip("LUNIT.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UnitLocalization::Id, UnitLocalization::Attributes::TemperatureUnit::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_OCC_2_2_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_OCC_2_2_SimulatedSuite() : TestCommand("Test_TC_OCC_2_2_Simulated", 12)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_OCC_2_2_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT reads from the TH the (0x0000) Occupancy attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::Occupancy::Id);
-        }
-        case 1: {
-            LogStep(1, "DUT reads from the TH the (0x0001) OccupancySensorType attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
-        }
-        case 2: {
-            LogStep(2, "DUT reads from the TH the (0x0002) OccupancySensorTypeBitmap attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
-        }
-        case 3: {
-            LogStep(3, "DUT reads from the TH the (0x0010) PIROccupiedToUnoccupiedDelay optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0010"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id);
-        }
-        case 4: {
-            LogStep(4, "DUT reads from the TH the (0x0011) PIRUnoccupiedToOccupiedDelay optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0011"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PIRUnoccupiedToOccupiedDelay::Id);
-        }
-        case 5: {
-            LogStep(5, "DUT reads from the TH the (0x0012) PIRUnoccupiedToOccupiedThreshold optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0012"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PIRUnoccupiedToOccupiedThreshold::Id);
-        }
-        case 6: {
-            LogStep(6, "DUT reads from the TH the (0x0020) UltrasonicOccupiedToUnoccupiedDelay optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0020"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id);
-        }
-        case 7: {
-            LogStep(7, "DUT reads from the TH the (0x0021) UltrasonicUnoccupiedToOccupiedDelay optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0021"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id);
-        }
-        case 8: {
-            LogStep(8, "DUT reads from the TH the (0x0022) UltrasonicUnoccupiedToOccupiedThreshold optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0022"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id);
-        }
-        case 9: {
-            LogStep(9, "DUT reads from the TH the (0x0030) PhysicalContactOccupiedToUnoccupiedDelay optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0030"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id);
-        }
-        case 10: {
-            LogStep(10, "DUT reads from the TH the (0x0031) PhysicalContactUnoccupiedToOccupiedDelay optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0031"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id);
-        }
-        case 11: {
-            LogStep(11, "DUT reads from the TH the (0x0032) PhysicalContactUnoccupiedToOccupiedThreshold optional attribute");
-            VerifyOrDo(!ShouldSkip("OCC.C.A0032"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id,
-                                 OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id);
         }
         }
         return CHIP_NO_ERROR;
@@ -1179,22 +147,22 @@ private:
         case 0: {
             LogStep(0, "TH reads OccupancySensorType attribute from DUT");
             VerifyOrDo(!ShouldSkip("OCC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
+            return WaitAttribute(GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
         }
         case 1: {
             LogStep(1, "TH reads OccupancySensorTypeBitmap attribute from DUT");
             VerifyOrDo(!ShouldSkip("OCC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
+            return WaitAttribute(GetEndpoint(1), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
         }
         }
         return CHIP_NO_ERROR;
     }
 };
 
-class Test_TC_ULABEL_3_1_SimulatedSuite : public TestCommand
+class Test_TC_DGSW_3_2_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_ULABEL_3_1_SimulatedSuite() : TestCommand("Test_TC_ULABEL_3_1_Simulated", 2)
+    Test_TC_DGSW_3_2_SimulatedSuite() : TestCommand("Test_TC_DGSW_3_2_Simulated", 1)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -1202,7 +170,7 @@ public:
         AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
     }
 
-    ~Test_TC_ULABEL_3_1_SimulatedSuite() {}
+    ~Test_TC_DGSW_3_2_SimulatedSuite() {}
 
 private:
     chip::Optional<chip::NodeId> mNodeId;
@@ -1238,149 +206,1426 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "Read attribute: LabelList");
-            VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
+            LogStep(0, "DUT sends ResetWatermarks to TH");
+            VerifyOrDo(!ShouldSkip("DGSW.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), SoftwareDiagnostics::Id, SoftwareDiagnostics::Commands::ResetWatermarks::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGETH_3_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGETH_3_2_SimulatedSuite() : TestCommand("Test_TC_DGETH_3_2_Simulated", 1)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGETH_3_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "DUT sends ResetCounts to TH");
+            VerifyOrDo(!ShouldSkip("DGETH.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), EthernetNetworkDiagnostics::Id,
+                               EthernetNetworkDiagnostics::Commands::ResetCounts::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGWIFI_3_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGWIFI_3_2_SimulatedSuite() : TestCommand("Test_TC_DGWIFI_3_2_Simulated", 1)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGWIFI_3_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "DUT sends ResetCounts command to TH");
+            VerifyOrDo(!ShouldSkip("DGWIFI.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_WNCV_6_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_WNCV_6_1_SimulatedSuite() : TestCommand("Test_TC_WNCV_6_1_Simulated", 3)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_WNCV_6_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Step 1a: DUT sends UpOrOpen command to TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id);
         }
         case 1: {
-            LogStep(1, "write attribute: LabelList");
-            VerifyOrDo(!ShouldSkip("ULABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), UserLabel::Id, UserLabel::Attributes::LabelList::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_FLABEL_3_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_FLABEL_3_1_SimulatedSuite() : TestCommand("Test_TC_FLABEL_3_1_Simulated", 1)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_FLABEL_3_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT reads LabelList from the TH");
-            VerifyOrDo(!ShouldSkip("FLABEL.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), FixedLabel::Id, FixedLabel::Attributes::LabelList::Id);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
-class Test_TC_LTIME_1_1_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_LTIME_1_1_SimulatedSuite() : TestCommand("Test_TC_LTIME_1_1_Simulated", 5)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_LTIME_1_1_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "DUT read (0xFFFD) ClusterRevision attribute");
-            VerifyOrDo(!ShouldSkip("LTIME.C.Afffd"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), TimeFormatLocalization::Id,
-                                 TimeFormatLocalization::Attributes::ClusterRevision::Id);
-        }
-        case 1: {
-            LogStep(1, "DUT read (0xFFFC) FeatureMap attribute");
-            VerifyOrDo(!ShouldSkip("LTIME.C.Afffc"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::FeatureMap::Id);
+            LogStep(1, "Step 2a: DUT sends DownOrClose command to TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.C01.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id);
         }
         case 2: {
-            LogStep(2, "DUT read (0xFFFB) AttributeList attribute");
-            VerifyOrDo(!ShouldSkip("LTIME.C.Afffb"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::AttributeList::Id);
+            LogStep(2, "Step 3a: DUT sends StopMotion command to TH");
+            VerifyOrDo(!ShouldSkip("WNCV.C.C02.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_WNCV_7_1_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_WNCV_7_1_SimulatedSuite() : TestCommand("Test_TC_WNCV_7_1_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_WNCV_7_1_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "Step 1a: If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT");
+            VerifyOrDo(!ShouldSkip("WNCV.C.C05.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id);
+        }
+        case 1: {
+            LogStep(1, "Step 2a: If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT");
+            VerifyOrDo(!ShouldSkip("WNCV.C.C08.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_3_4_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_3_4_SimulatedSuite() : TestCommand("Test_TC_CC_3_4_Simulated", 16)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("ConfigTransitionTime", 0, UINT16_MAX, &mConfigTransitionTime);
+    }
+
+    ~Test_TC_CC_3_4_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<uint16_t> mConfigTransitionTime;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 14:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "PreCondition: Set TH OnOff to On");
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT sends MoveToHue command to TH an Hue with _TransitionTime 300");
+            VerifyOrDo(!ShouldSkip("CC.C.C00.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHue::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads CurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.C00.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
         }
         case 3: {
-            LogStep(3, "DUT read (0xFFF9) AcceptedCommandList attribute");
-            VerifyOrDo(!ShouldSkip("LTIME.C.Afff9"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), TimeFormatLocalization::Id,
-                                 TimeFormatLocalization::Attributes::AcceptedCommandList::Id);
+            LogStep(3, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 4: {
-            LogStep(4, "DUT read (0xFFF8) GeneratedCommandList attribute");
-            VerifyOrDo(!ShouldSkip("LTIME.C.Afff8"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(0), TimeFormatLocalization::Id,
-                                 TimeFormatLocalization::Attributes::GeneratedCommandList::Id);
+            LogStep(4, "DUT reads CurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.C00.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT sends MoveHue command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C01.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveHue::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads CurrentHue attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C01.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 7: {
+            LogStep(7, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "DUT reads CurrentHue attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C01.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT sends StepHue command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C02.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepHue::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads CurrentHue attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C02.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 11: {
+            LogStep(11, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 12: {
+            LogStep(12, "DUT reads CurrentHue attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C02.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 13: {
+            LogStep(13, "DUT sends StopMoveStep command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C03.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id);
+        }
+        case 14: {
+            LogStep(14, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 15: {
+            LogStep(15, "Over TransitionTime, DUT reads CurrentHue attribute from TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C03.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_4_5_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_4_5_SimulatedSuite() : TestCommand("Test_TC_CC_4_5_Simulated", 22)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("ConfigTransitionTime", 0, UINT16_MAX, &mConfigTransitionTime);
+    }
+
+    ~Test_TC_CC_4_5_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<uint16_t> mConfigTransitionTime;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 20:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "PreCondition: Set TH OnOff to On");
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT sends MoveToSaturation command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C03.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToSaturation::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads CurrentSaturation attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.C03.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 3: {
+            LogStep(3, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 4: {
+            LogStep(4, "DUT reads CurrentSaturation attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.C03.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT sends MoveSaturation command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C04.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveSaturation::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads CurrentSaturation attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C04.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 7: {
+            LogStep(7, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "DUT reads CurrentSaturation attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C04.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT sends StepSaturation command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C05.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepSaturation::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads CurrentSaturation attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C05.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 11: {
+            LogStep(11, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 12: {
+            LogStep(12, "DUT reads CurrentSaturation attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C05.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 13: {
+            LogStep(13, "DUT sends MoveToHueAndSaturation command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C06.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToHueAndSaturation::Id);
+        }
+        case 14: {
+            LogStep(14, "DUT reads CurrentSaturation attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C06.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 15: {
+            LogStep(15, "DUT reads CurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.C06.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 16: {
+            LogStep(16, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 17: {
+            LogStep(17, "DUT reads CurrentSaturation attribute from TH several times.");
+            VerifyOrDo(!ShouldSkip("CC.C.C06.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 18: {
+            LogStep(18, "DUT reads CurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.C06.Tx && CC.C.A0000 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentHue::Id);
+        }
+        case 19: {
+            LogStep(19, "DUT sends StopMoveStep command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id);
+        }
+        case 20: {
+            LogStep(20, "Wait for ConfigTransitionTime");
+            VerifyOrDo(!ShouldSkip("CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 21: {
+            LogStep(21, "Over TransitionTime, DUT reads CurrentSaturation attribute from TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A0001 && CC.C.F00"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_5_4_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_5_4_SimulatedSuite() : TestCommand("Test_TC_CC_5_4_Simulated", 9)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("ConfigTransitionTime", 0, UINT16_MAX, &mConfigTransitionTime);
+    }
+
+    ~Test_TC_CC_5_4_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mConfigTransitionTime;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 4:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 6:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 8:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "PreCondition: Set TH OnOff to On");
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT sends MoveToColor command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C07.Tx && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColor::Id);
+        }
+        case 2: {
+            LogStep(2, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 3: {
+            LogStep(3, "DUT sends MoveColor command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id);
+        }
+        case 4: {
+            LogStep(4, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 5: {
+            LogStep(5, "DUT sends StepColor command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C09.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColor::Id);
+        }
+        case 6: {
+            LogStep(6, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 7: {
+            LogStep(7, "DUT sends StopMoveStep command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id);
+        }
+        case 8: {
+            LogStep(8, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_6_4_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_6_4_SimulatedSuite() : TestCommand("Test_TC_CC_6_4_Simulated", 18)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("ConfigTransitionTime", 0, UINT16_MAX, &mConfigTransitionTime);
+    }
+
+    ~Test_TC_CC_6_4_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mConfigTransitionTime;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 5:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "PreCondition: Set TH OnOff to On");
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 1: {
+            LogStep(1,
+                    "* TH provides a server implementation of Color Control with F04(CT)=true and reasonable values of "
+                    "ColorTempPhysicalMinMireds (e.g. 153 (6500K), ColorTempPhysicalMaxMireds (e.g. 454 (2200K)) DUT read "
+                    "attribute ColorTempPhysicalMinMireds from TH");
+            VerifyOrDo(!ShouldSkip("CC.C.A400b && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTempPhysicalMinMireds::Id);
+        }
+        case 2: {
+            LogStep(2,
+                    "* TH provides a server implementation of Color Control with F04(CT)=true and reasonable values of "
+                    "ColorTempPhysicalMinMireds (e.g. 153 (6500K), ColorTempPhysicalMaxMireds (e.g. 454 (2200K)) DUT read "
+                    "attribute ColorTempPhysicalMaxMireds from TH");
+            VerifyOrDo(!ShouldSkip("CC.C.A400c && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTempPhysicalMaxMireds::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT sends MoveToColorTemperature command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C0a.Tx && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColorTemperature::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C0a.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 5: {
+            LogStep(5, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 6: {
+            LogStep(6, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C0a.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 7: {
+            LogStep(7, "DUT sends MoveColorTemperatureMireds command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C4b.Tx && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColorTemperature::Id);
+        }
+        case 8: {
+            LogStep(8, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C4b.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 9: {
+            LogStep(9, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 10: {
+            LogStep(10, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C4b.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 11: {
+            LogStep(11, "DUT sends StepColorTemperature command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C4c.Tx && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColorTemperature::Id);
+        }
+        case 12: {
+            LogStep(12, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C4c.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 13: {
+            LogStep(13, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 14: {
+            LogStep(14, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C4c.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        case 15: {
+            LogStep(15, "DUT sends StopMoveStep command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id);
+        }
+        case 16: {
+            LogStep(16, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 17: {
+            LogStep(17, "DUT reads CurrentColorTemperatureMireds attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A0007 && CC.C.F04"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorTemperatureMireds::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_7_5_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_7_5_SimulatedSuite() : TestCommand("Test_TC_CC_7_5_Simulated", 23)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("ConfigTransitionTime", 0, UINT16_MAX, &mConfigTransitionTime);
+    }
+
+    ~Test_TC_CC_7_5_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mConfigTransitionTime;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 3:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 16:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 21:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "PreCondition: Set TH OnOff to On");
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT sends MoveToEnhancedHue command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C40.Tx && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHue::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C40.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 3: {
+            LogStep(3, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 4: {
+            LogStep(4, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C40.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT sends MoveEnhanced Hue command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C41.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveHue::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C41.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 7: {
+            LogStep(7, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C41.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 9: {
+            LogStep(9, "DUT sends StepEnhanced command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C42.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedStepHue::Id);
+        }
+        case 10: {
+            LogStep(10, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C42.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 11: {
+            LogStep(11, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 12: {
+            LogStep(12, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C42.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 13: {
+            LogStep(13, "DUT sends EnhancedMoveToHueAndSaturation command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C43.Tx && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::EnhancedMoveToHueAndSaturation::Id);
+        }
+        case 14: {
+            LogStep(14, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C43.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 15: {
+            LogStep(15, "DUT reads CurrentSaturation attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C43.Tx && CC.C.A0001 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 16: {
+            LogStep(16, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 17: {
+            LogStep(17, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C43.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 18: {
+            LogStep(18, "DUT reads CurrentSaturation attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C43.Tx && CC.C.A0001 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id);
+        }
+        case 19: {
+            LogStep(19, "DUT sends StopMoveStep command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id);
+        }
+        case 20: {
+            LogStep(20, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 21: {
+            LogStep(21, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 22: {
+            LogStep(22, "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple times)");
+            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A4000 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_CC_9_4_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_CC_9_4_SimulatedSuite() : TestCommand("Test_TC_CC_9_4_Simulated", 19)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~Test_TC_CC_9_4_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<uint16_t> mTimeout;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        case 7:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 9:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 11:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 13:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 15:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 17:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "PreCondition: Set TH OnOff to On");
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT sends ColorLoopSet command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C44.Tx && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::ColorLoopSet::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT reads ColorLoopActive attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4002 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopActive::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT reads ColorLoopDirection attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4003 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopDirection::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT reads ColorLoopTime attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4004 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopTime::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT reads ColorLoopStartEnhancedHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4005 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::ColorLoopStartEnhancedHue::Id);
+        }
+        case 6: {
+            LogStep(6, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 7: {
+            LogStep(7, "Wait 5000ms");
+            VerifyOrDo(!ShouldSkip("CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 8: {
+            LogStep(8, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 9: {
+            LogStep(9, "Wait 5000ms");
+            VerifyOrDo(!ShouldSkip("CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 10: {
+            LogStep(10, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 11: {
+            LogStep(11, "Wait 5000ms");
+            VerifyOrDo(!ShouldSkip("CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 12: {
+            LogStep(12, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 13: {
+            LogStep(13, "Wait 5000ms");
+            VerifyOrDo(!ShouldSkip("CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 14: {
+            LogStep(14, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 15: {
+            LogStep(15, "Wait 5000ms");
+            VerifyOrDo(!ShouldSkip("CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 16: {
+            LogStep(16, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        case 17: {
+            LogStep(17, "Wait 5000ms");
+            VerifyOrDo(!ShouldSkip("CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = 5000UL;
+            return WaitForMs(kIdentityAlpha, value);
+        }
+        case 18: {
+            LogStep(18, "DUT reads EnhancedCurrentHue attribute from TH periodically");
+            VerifyOrDo(!ShouldSkip("CC.C.A4000 && CC.C.F02 && CC.C.F01"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::EnhancedCurrentHue::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_DGTHREAD_3_4_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_DGTHREAD_3_4_SimulatedSuite() : TestCommand("Test_TC_DGTHREAD_3_4_Simulated", 2)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_DGTHREAD_3_4_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "DUT sends ResetCounts command to TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(0), ThreadNetworkDiagnostics::Id, ThreadNetworkDiagnostics::Commands::ResetCounts::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT reads OverrunCount attribute value from TH");
+            VerifyOrDo(!ShouldSkip("DGTHREAD.C.A0006"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitAttribute(GetEndpoint(0), ThreadNetworkDiagnostics::Id,
+                                 ThreadNetworkDiagnostics::Attributes::OverrunCount::Id);
+        }
+        }
+        return CHIP_NO_ERROR;
+    }
+};
+
+class Test_TC_OO_3_2_SimulatedSuite : public TestCommand
+{
+public:
+    Test_TC_OO_3_2_SimulatedSuite() : TestCommand("Test_TC_OO_3_2_Simulated", 6)
+    {
+        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
+    }
+
+    ~Test_TC_OO_3_2_SimulatedSuite() {}
+
+private:
+    chip::Optional<chip::NodeId> mNodeId;
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint16_t> mTimeout;
+
+    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
+
+    //
+    // Tests methods
+    //
+
+    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
+    {
+        bool shouldContinue = false;
+
+        switch (mTestIndex - 1)
+        {
+        default:
+            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
+        }
+
+        if (shouldContinue)
+        {
+            ContinueOnChipMainThread(CHIP_NO_ERROR);
+        }
+    }
+
+    CHIP_ERROR DoTestStep(uint16_t testIndex) override
+    {
+        using namespace chip::app::Clusters;
+        switch (testIndex)
+        {
+        case 0: {
+            LogStep(0, "DUT issues an Off command to the TH");
+            VerifyOrDo(!ShouldSkip("OO.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::Off::Id);
+        }
+        case 1: {
+            LogStep(1, "DUT issues an On command to the TH");
+            VerifyOrDo(!ShouldSkip("OO.C.C01.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::On::Id);
+        }
+        case 2: {
+            LogStep(2, "DUT issues an Toggle command to the TH");
+            VerifyOrDo(!ShouldSkip("OO.C.C02.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::Toggle::Id);
+        }
+        case 3: {
+            LogStep(3, "DUT issues an OffWithEffect command to the TH");
+            VerifyOrDo(!ShouldSkip("OO.C.C40.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::OffWithEffect::Id);
+        }
+        case 4: {
+            LogStep(4, "DUT issues an OnWithRecallGlobalScene command to the TH");
+            VerifyOrDo(!ShouldSkip("OO.C.C41.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithRecallGlobalScene::Id);
+        }
+        case 5: {
+            LogStep(5, "DUT issues an OnWithTimedOff command to the TH");
+            VerifyOrDo(!ShouldSkip("OO.C.C42.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), OnOff::Id, OnOff::Commands::OnWithTimedOff::Id);
         }
         }
         return CHIP_NO_ERROR;
@@ -1389,69 +1634,65 @@ private:
 
 std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 {
-    if (testName == "Test_TC_BINFO_2_3_Simulated")
-    {
-        return std::unique_ptr<Test_TC_BINFO_2_3_SimulatedSuite>(new Test_TC_BINFO_2_3_SimulatedSuite());
-    }
-    if (testName == "Test_TC_DESC_2_2_Simulated")
-    {
-        return std::unique_ptr<Test_TC_DESC_2_2_SimulatedSuite>(new Test_TC_DESC_2_2_SimulatedSuite());
-    }
-    if (testName == "Test_TC_DGETH_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_DGETH_3_1_SimulatedSuite>(new Test_TC_DGETH_3_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_DGSW_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_DGSW_3_1_SimulatedSuite>(new Test_TC_DGSW_3_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_DGWIFI_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_DGWIFI_3_1_SimulatedSuite>(new Test_TC_DGWIFI_3_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_G_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_G_3_1_SimulatedSuite>(new Test_TC_G_3_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_RH_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_RH_3_1_SimulatedSuite>(new Test_TC_RH_3_1_SimulatedSuite());
-    }
     if (testName == "Test_TC_WNCV_5_1_Simulated")
     {
         return std::unique_ptr<Test_TC_WNCV_5_1_SimulatedSuite>(new Test_TC_WNCV_5_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_LCFG_3_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_LCFG_3_1_SimulatedSuite>(new Test_TC_LCFG_3_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_LUNIT_1_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_LUNIT_1_1_SimulatedSuite>(new Test_TC_LUNIT_1_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_LUNIT_2_1_Simulated")
-    {
-        return std::unique_ptr<Test_TC_LUNIT_2_1_SimulatedSuite>(new Test_TC_LUNIT_2_1_SimulatedSuite());
-    }
-    if (testName == "Test_TC_OCC_2_2_Simulated")
-    {
-        return std::unique_ptr<Test_TC_OCC_2_2_SimulatedSuite>(new Test_TC_OCC_2_2_SimulatedSuite());
     }
     if (testName == "Test_TC_OCC_2_4_Simulated")
     {
         return std::unique_ptr<Test_TC_OCC_2_4_SimulatedSuite>(new Test_TC_OCC_2_4_SimulatedSuite());
     }
-    if (testName == "Test_TC_ULABEL_3_1_Simulated")
+    if (testName == "Test_TC_DGSW_3_2_Simulated")
     {
-        return std::unique_ptr<Test_TC_ULABEL_3_1_SimulatedSuite>(new Test_TC_ULABEL_3_1_SimulatedSuite());
+        return std::unique_ptr<Test_TC_DGSW_3_2_SimulatedSuite>(new Test_TC_DGSW_3_2_SimulatedSuite());
     }
-    if (testName == "Test_TC_FLABEL_3_1_Simulated")
+    if (testName == "Test_TC_DGETH_3_2_Simulated")
     {
-        return std::unique_ptr<Test_TC_FLABEL_3_1_SimulatedSuite>(new Test_TC_FLABEL_3_1_SimulatedSuite());
+        return std::unique_ptr<Test_TC_DGETH_3_2_SimulatedSuite>(new Test_TC_DGETH_3_2_SimulatedSuite());
     }
-    if (testName == "Test_TC_LTIME_1_1_Simulated")
+    if (testName == "Test_TC_DGWIFI_3_2_Simulated")
     {
-        return std::unique_ptr<Test_TC_LTIME_1_1_SimulatedSuite>(new Test_TC_LTIME_1_1_SimulatedSuite());
+        return std::unique_ptr<Test_TC_DGWIFI_3_2_SimulatedSuite>(new Test_TC_DGWIFI_3_2_SimulatedSuite());
+    }
+    if (testName == "Test_TC_WNCV_6_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_WNCV_6_1_SimulatedSuite>(new Test_TC_WNCV_6_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_WNCV_7_1_Simulated")
+    {
+        return std::unique_ptr<Test_TC_WNCV_7_1_SimulatedSuite>(new Test_TC_WNCV_7_1_SimulatedSuite());
+    }
+    if (testName == "Test_TC_CC_3_4_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_3_4_SimulatedSuite>(new Test_TC_CC_3_4_SimulatedSuite());
+    }
+    if (testName == "Test_TC_CC_4_5_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_4_5_SimulatedSuite>(new Test_TC_CC_4_5_SimulatedSuite());
+    }
+    if (testName == "Test_TC_CC_5_4_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_5_4_SimulatedSuite>(new Test_TC_CC_5_4_SimulatedSuite());
+    }
+    if (testName == "Test_TC_CC_6_4_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_6_4_SimulatedSuite>(new Test_TC_CC_6_4_SimulatedSuite());
+    }
+    if (testName == "Test_TC_CC_7_5_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_7_5_SimulatedSuite>(new Test_TC_CC_7_5_SimulatedSuite());
+    }
+    if (testName == "Test_TC_CC_9_4_Simulated")
+    {
+        return std::unique_ptr<Test_TC_CC_9_4_SimulatedSuite>(new Test_TC_CC_9_4_SimulatedSuite());
+    }
+    if (testName == "Test_TC_DGTHREAD_3_4_Simulated")
+    {
+        return std::unique_ptr<Test_TC_DGTHREAD_3_4_SimulatedSuite>(new Test_TC_DGTHREAD_3_4_SimulatedSuite());
+    }
+    if (testName == "Test_TC_OO_3_2_Simulated")
+    {
+        return std::unique_ptr<Test_TC_OO_3_2_SimulatedSuite>(new Test_TC_OO_3_2_SimulatedSuite());
     }
 
     return nullptr;
@@ -1460,20 +1701,19 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 void PrintTestCommands()
 {
     ChipLogError(chipTool, "Supported commands:");
-    ChipLogError(chipTool, "\t* Test_TC_BINFO_2_3_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_DESC_2_2_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_DGETH_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_DGSW_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_DGWIFI_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_G_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_RH_3_1_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_WNCV_5_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_LCFG_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_LUNIT_1_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_LUNIT_2_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_OCC_2_2_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_OCC_2_4_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_ULABEL_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_FLABEL_3_1_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_LTIME_1_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGSW_3_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGETH_3_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGWIFI_3_2_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_WNCV_6_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_WNCV_7_1_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_3_4_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_4_5_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_5_4_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_6_4_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_7_5_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_CC_9_4_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_DGTHREAD_3_4_Simulated");
+    ChipLogError(chipTool, "\t* Test_TC_OO_3_2_Simulated");
 }

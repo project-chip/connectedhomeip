@@ -552,13 +552,13 @@ await devCtrl.WriteAttribute(1, [ (0, Clusters.AccessControl.Attributes.Acl( [
     authMode = Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
     subjects = [ 123, 456 ],
     targets = [
-      Clusters.AccessControl.Structs.Target(
+      Clusters.AccessControl.Structs.AccessControlTargetStruct(
         cluster = Clusters.OnOff.id,
       ),
-      Clusters.AccessControl.Structs.Target(
+      Clusters.AccessControl.Structs.AccessControlTargetStruct(
         endpoint = 1,
       ),
-      Clusters.AccessControl.Structs.Target(
+      Clusters.AccessControl.Structs.AccessControlTargetStruct(
         cluster = Clusters.LevelControl.id,
         endpoint = 2,
       ),

@@ -192,7 +192,11 @@ void DefaultOTARequestorDriver::ApplyTimerHandler(System::Layer * systemLayer, v
     DefaultOTARequestorDriver * driver = ToDriver(appState);
 
     VerifyOrDie(driver->mImageProcessor != nullptr);
-    driver->mImageProcessor->Apply();
+
+    if (driver->mImageProcessor->Apply() != CHIP_NO_ERROR)
+    {
+        driver->mRequestor->CancelImageUpdate();
+    }
 }
 
 void DefaultOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)

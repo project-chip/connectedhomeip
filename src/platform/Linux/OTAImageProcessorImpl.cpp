@@ -127,6 +127,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
     unlink(imageProcessor->mImageFile);
 
+    imageProcessor->mParams.downloadedBytes = 0;
+    imageProcessor->mParams.totalFileBytes  = 0;
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
@@ -236,7 +238,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if (!IsSpanUsable(block))
+    if (block.empty())
     {
         ReleaseBlock();
         return CHIP_NO_ERROR;

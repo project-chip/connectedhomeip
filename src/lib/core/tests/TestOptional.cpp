@@ -23,11 +23,13 @@
  *
  */
 
-#include <inttypes.h>
-#include <stdint.h>
-#include <string.h>
+#include <array>
+#include <cinttypes>
+#include <cstdint>
+#include <cstring>
 
 #include <lib/core/Optional.h>
+#include <lib/support/Span.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -64,10 +66,10 @@ struct CountMovable : public Count
 public:
     CountMovable(int i) : Count(i) {}
 
-    CountMovable(const CountMovable & o) = delete;
+    CountMovable(const CountMovable & o)           = delete;
     CountMovable & operator=(const CountMovable &) = delete;
 
-    CountMovable(CountMovable && o) = default;
+    CountMovable(CountMovable && o)           = default;
     CountMovable & operator=(CountMovable &&) = default;
 };
 
@@ -184,6 +186,39 @@ static void TestMove(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, Count::created == 4 && Count::destroyed == 4);
 }
 
+static void TestConversion(nlTestSuite * inSuite, void * inContext)
+{
+    // FixedSpan is implicitly convertible from std::array
+    using WidgetView    = FixedSpan<const bool, 10>;
+    using WidgetStorage = std::array<bool, 10>;
+
+    auto optStorage                   = MakeOptional<WidgetStorage>();
+    auto const & constOptStorage      = optStorage;
+    auto optOtherStorage              = MakeOptional<WidgetStorage>();
+    auto const & constOptOtherStorage = optOtherStorage;
+
+    NL_TEST_ASSERT(inSuite, optStorage.HasValue());
+    NL_TEST_ASSERT(inSuite, optOtherStorage.HasValue());
+
+    Optional<WidgetView> optView(constOptStorage);
+    NL_TEST_ASSERT(inSuite, optView.HasValue());
+    NL_TEST_ASSERT(inSuite, &optView.Value()[0] == &optStorage.Value()[0]);
+
+    optView = optOtherStorage;
+    optView = constOptOtherStorage;
+    NL_TEST_ASSERT(inSuite, optView.HasValue());
+    NL_TEST_ASSERT(inSuite, &optView.Value()[0] == &optOtherStorage.Value()[0]);
+
+    struct ExplicitBool
+    {
+        explicit ExplicitBool(bool) {}
+    };
+    Optional<ExplicitBool> e(Optional<bool>(true)); // OK, explicitly constructing the optional
+
+    // The following should not compile
+    // e = Optional<bool>(false); // relies on implicit conversion
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -195,7 +230,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("OptionalMake", TestMake),
     NL_TEST_DEF("OptionalCopy", TestCopy),
     NL_TEST_DEF("OptionalMove", TestMove),
-
+    NL_TEST_DEF("OptionalConversion", TestConversion),
     NL_TEST_SENTINEL()
 };
 // clang-format on

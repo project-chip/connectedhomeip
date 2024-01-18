@@ -197,7 +197,9 @@ if __name__ == '__main__':
 
     PROGRAM_ARGUMENTS = process_args
 
-    unittest.main(argv=unittest_args)
+    test_results = unittest.main(argv=unittest_args, exit=False)
+    if test_results.result.failures:
+        sys.exit(1)
 
     if process_args.stamp_file:
         open(process_args.stamp_file, "wb").close()

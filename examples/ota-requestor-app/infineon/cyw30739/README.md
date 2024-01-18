@@ -135,5 +135,5 @@ Put the CYW30739 in to the recovery mode before running the flash script.
         chip-tool pairing onnetwork-vendor 4321 20202021 9050
 
         # Announce the OTA provider to the requestor
-        chip-tool otasoftwareupdaterequestor announce-ota-provider 4321 9 0 0 1234 0
+        chip-tool otasoftwareupdaterequestor announce-otaprovider 4321 9 0 0 1234 0
         ```

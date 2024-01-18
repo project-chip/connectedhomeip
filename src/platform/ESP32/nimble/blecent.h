@@ -34,7 +34,6 @@
  * under the License.
  */
 #pragma once
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <host/ble_gatt.h>
 
 #ifdef __cplusplus
@@ -107,4 +106,3 @@ struct peer * peer_find(uint16_t conn_handle);
 #ifdef __cplusplus
 }
 #endif
-#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER

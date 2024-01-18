@@ -29,7 +29,9 @@ die() {
     exit 1
 }
 
-ORG=${DOCKER_RUN_ORG:-connectedhomeip}
+ORG=${DOCKER_RUN_ORG:-project-chip}
+
+GHCR_ORG="ghcr.io"
 
 # directory name is
 IMAGE=${DOCKER_RUN_IMAGE:-$(basename "$here")}
@@ -42,7 +44,7 @@ VERSION=${DOCKER_RUN_VERSION:-$(sed 's/ .*//' "$here/version")} ||
           DOCKER_RUN_VERSION"
 
 # full image name
-FULL_IMAGE_NAME="$ORG/$IMAGE${VERSION:+:${VERSION}}"
+FULL_IMAGE_NAME="$GHCR_ORG/$ORG/$IMAGE${VERSION:+:${VERSION}}"
 
 # where
 RUN_DIR=${DOCKER_RUN_DIR:-$(pwd)}

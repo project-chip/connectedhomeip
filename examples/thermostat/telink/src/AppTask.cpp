@@ -20,18 +20,26 @@
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
+namespace {
+k_timer sThermostatUpdateTimer;
+constexpr uint16_t kThermostatUpdateTimerPeriodMs = 30000; // 30s timer period
+} // namespace
+
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
+    CHIP_ERROR err;
+
     InitCommonParts();
 
-    CHIP_ERROR err = SensorMgr().Init();
+    err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("SensorMgr Init fail");
+        LOG_ERR("Init of the Sensor Manager failed");
         return err;
     }
+
     err = TempMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
@@ -39,14 +47,52 @@ CHIP_ERROR AppTask::Init(void)
         return err;
     }
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkThermo");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
+    // Initialize temperature measurement timer
+    k_timer_init(&sThermostatUpdateTimer, &AppTask::ThermostatUpdateTimerTimeoutCallback, nullptr);
+    k_timer_user_data_set(&sThermostatUpdateTimer, this);
+    k_timer_start(&sThermostatUpdateTimer, K_MSEC(kThermostatUpdateTimerPeriodMs), K_NO_WAIT);
 
     return CHIP_NO_ERROR;
+}
+
+void AppTask::ThermostatUpdateTimerTimeoutCallback(k_timer * timer)
+{
+    if (!timer)
+    {
+        return;
+    }
+
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = ThermostatUpdateTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::ThermostatUpdateTimerEventHandler(AppEvent * aEvent)
+{
+    CHIP_ERROR ret;
+    int16_t temperature;
+
+    if (aEvent->Type != AppEvent::kEventType_Timer)
+    {
+        return;
+    }
+
+    ret = SensorMgr().GetTempAndHumMeasurValue(&temperature, NULL);
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Update of the Temperature clusters failed");
+        return;
+    }
+
+    LOG_INF("Current temperature is (%d*0.01)°C", temperature);
+
+    PlatformMgr().LockChipStack();
+    app::Clusters::Thermostat::Attributes::LocalTemperature::Set(kExampleEndpointId, temperature);
+    PlatformMgr().UnlockChipStack();
+
+    // Start next timer to handle temp sensor.
+    k_timer_start(&sThermostatUpdateTimer, K_MSEC(kThermostatUpdateTimerPeriodMs), K_NO_WAIT);
 }
 
 void AppTask::UpdateThermoStatUI(void)
@@ -54,5 +100,3 @@ void AppTask::UpdateThermoStatUI(void)
     LOG_INF("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
             TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
 }
-
-void AppTask::UpdateClusterState() {}

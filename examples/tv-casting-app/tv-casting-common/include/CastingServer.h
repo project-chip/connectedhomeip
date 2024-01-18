@@ -22,6 +22,7 @@
 #include "ApplicationBasic.h"
 #include "ApplicationLauncher.h"
 #include "Channel.h"
+#include "CommissioningCallbacks.h"
 #include "ContentLauncher.h"
 #include "KeypadInput.h"
 #include "LevelControl.h"
@@ -31,36 +32,38 @@
 #include "TargetEndpointInfo.h"
 #include "TargetNavigator.h"
 #include "TargetVideoPlayerInfo.h"
+#include "WakeOnLan.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/AppDelegate.h>
 #include <app/server/Server.h>
+#include <controller/CHIPCluster.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <functional>
-#include <zap-generated/CHIPClientCallbacks.h>
-#include <zap-generated/CHIPClusters.h>
 
-constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
+inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = chip::System::Clock::Seconds16(3 * 60);
 
 /**
  * @brief Represents a TV Casting server that can get the casting app commissioned
  *  and then have it send TV Casting/Media related commands. This is to be instantiated
  *  as a singleton and is to be used across Linux, Android and iOS.
  */
-class CastingServer
+class CastingServer : public AppDelegate
 {
 public:
-    CastingServer(CastingServer & other) = delete;
+    CastingServer(CastingServer & other)  = delete;
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 
     CHIP_ERROR PreInit(AppParams * AppParams = nullptr);
     CHIP_ERROR Init(AppParams * AppParams = nullptr);
     CHIP_ERROR InitBindingHandlers();
+    void InitAppDelegation();
 
     CHIP_ERROR DiscoverCommissioners(chip::Controller::DeviceDiscoveryDelegate * deviceDiscoveryDelegate = nullptr);
     const chip::Dnssd::DiscoveredNodeData *
     GetDiscoveredCommissioner(int index, chip::Optional<TargetVideoPlayerInfo *> & outAssociatedConnectableVideoPlayer);
-    CHIP_ERROR OpenBasicCommissioningWindow(std::function<void(CHIP_ERROR)> commissioningCompleteCallback,
+    CHIP_ERROR OpenBasicCommissioningWindow(CommissioningCallbacks commissioningCallbacks,
                                             std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                             std::function<void(CHIP_ERROR)> onConnectionFailure,
                                             std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
@@ -98,6 +101,10 @@ public:
                                            std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
 
     void LogCachedVideoPlayers();
+    CHIP_ERROR AddVideoPlayer(TargetVideoPlayerInfo * targetVideoPlayerInfo);
+
+    CHIP_ERROR SendWakeOnLan(TargetVideoPlayerInfo & targetVideoPlayerInfo);
+
     CHIP_ERROR PurgeCache();
 
     /**
@@ -141,7 +148,7 @@ public:
     /**
      * @brief Level Control cluster
      */
-    CHIP_ERROR LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::StepMode stepMode,
+    CHIP_ERROR LevelControl_Step(TargetEndpointInfo * endpoint, chip::app::Clusters::LevelControl::StepModeEnum stepMode,
                                  uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride,
                                  std::function<void(CHIP_ERROR)> responseCallback);
     CHIP_ERROR LevelControl_MoveToLevel(TargetEndpointInfo * endpoint, uint8_t level, uint16_t transitionTime, uint8_t optionMask,
@@ -296,7 +303,7 @@ public:
     /**
      * @brief Keypad Input cluster
      */
-    CHIP_ERROR KeypadInput_SendKey(TargetEndpointInfo * endpoint, const chip::app::Clusters::KeypadInput::CecKeyCode keyCode,
+    CHIP_ERROR KeypadInput_SendKey(TargetEndpointInfo * endpoint, const chip::app::Clusters::KeypadInput::CECKeyCodeEnum keyCode,
                                    std::function<void(CHIP_ERROR)> responseCallback);
 
     /**
@@ -430,6 +437,16 @@ private:
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     void ReadServerClusters(chip::EndpointId endpointId);
 
+    void OnCommissioningSessionEstablishmentStarted() override;
+    void OnCommissioningSessionStarted() override;
+    void OnCommissioningSessionEstablishmentError(CHIP_ERROR err) override;
+    void OnCommissioningSessionStopped() override;
+    void OnCommissioningWindowOpened() override {}
+    void OnCommissioningWindowClosed() override {}
+
+    static void VerifyOrEstablishConnectionTask(chip::System::Layer * aSystemLayer, void * context);
+    CHIP_ERROR ReadMACAddress(TargetEndpointInfo * endpoint);
+
     /**
      * @brief Retrieve the IP Address to use for the UDC request.
      * This function will look for an IPv4 address in the list of IPAddresses passed in if available and return
@@ -446,18 +463,22 @@ private:
     PersistenceManager mPersistenceManager;
     bool mInited        = false;
     bool mUdcInProgress = false;
+    chip::Dnssd::DiscoveredNodeData mStrNodeDataList[kMaxCachedVideoPlayers];
     TargetVideoPlayerInfo mActiveTargetVideoPlayerInfo;
     TargetVideoPlayerInfo mCachedTargetVideoPlayerInfo[kMaxCachedVideoPlayers];
-    uint16_t mTargetVideoPlayerVendorId                                   = 0;
-    uint16_t mTargetVideoPlayerProductId                                  = 0;
-    chip::DeviceTypeId mTargetVideoPlayerDeviceType                       = 0;
-    char mTargetVideoPlayerDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
-    char mTargetVideoPlayerHostName[chip::Dnssd::kHostNameMaxLength + 1]  = {};
-    size_t mTargetVideoPlayerNumIPs                                       = 0; // number of valid IP addresses
+    uint16_t mTargetVideoPlayerVendorId                                                      = 0;
+    uint16_t mTargetVideoPlayerProductId                                                     = 0;
+    uint16_t mTargetVideoPlayerPort                                                          = 0;
+    chip::DeviceTypeId mTargetVideoPlayerDeviceType                                          = 0;
+    char mTargetVideoPlayerDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1]                    = {};
+    char mTargetVideoPlayerHostName[chip::Dnssd::kHostNameMaxLength + 1]                     = {};
+    char mTargetVideoPlayerInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
+    size_t mTargetVideoPlayerNumIPs                                                          = 0; // number of valid IP addresses
     chip::Inet::IPAddress mTargetVideoPlayerIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
 
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
-    std::function<void(CHIP_ERROR)> mCommissioningCompleteCallback;
+
+    CommissioningCallbacks mCommissioningCallbacks;
 
     std::function<void(TargetEndpointInfo *)> mOnNewOrUpdatedEndpoint;
     std::function<void(TargetVideoPlayerInfo *)> mOnConnectionSuccessClientCallback;
@@ -561,4 +582,9 @@ private:
     ChangeChannelCommand mChangeChannelCommand;
 
     LineupSubscriber mLineupSubscriber;
+
+    /**
+     * @brief WakeOnLan cluster
+     */
+    MACAddressReader mMACAddressReader;
 };

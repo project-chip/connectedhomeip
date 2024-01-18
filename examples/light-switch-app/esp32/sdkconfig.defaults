@@ -52,3 +52,9 @@ CONFIG_ENABLE_CHIP_SHELL=y
 
 # Disable softap support by default
 CONFIG_ESP_WIFI_SOFTAP_SUPPORT=n
+
+# Enable HKDF in mbedtls
+CONFIG_MBEDTLS_HKDF_C=y
+
+# Increase LwIP IPv6 address number
+CONFIG_LWIP_IPV6_NUM_ADDRESSES=6

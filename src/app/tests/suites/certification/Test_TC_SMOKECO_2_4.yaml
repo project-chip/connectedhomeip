@@ -1,0 +1,652 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    4.2.4. [TC-SMOKECO-2.4] Secondary Functionality - Mandatory with DUT as
+    Server
+
+PICS:
+    - SMOKECO.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Smoke CO Alarm"
+    endpoint: 1
+    timeout: 2910
+    TEST_EVENT_TRIGGER_KEY:
+        type: octet_string
+        defaultValue: "hex:00112233445566778899aabbccddeeff"
+    TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff00000095"
+    TEST_EVENT_TRIGGER_CRITICAL_BATTERY_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff0000009e"
+    TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a5"
+    TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff00000093"
+    TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000a3"
+    TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT:
+        type: int64u
+        defaultValue: "0xffffffff0000009a"
+    TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR:
+        type: int64u
+        defaultValue: "0xffffffff000000aa"
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Step 2: TH subscribes to BatteryAlert attribute from DUT"
+      PICS: SMOKECO.S.A0003
+      command: "subscribeAttribute"
+      attribute: "BatteryAlert"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 3: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "TH gets last event number from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+
+    - label:
+          "Step 4: TH reads TestEventTriggersEnabled attribute from General
+          Diagnostics Cluster"
+      PICS: DGGEN.S.A0008
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "TestEventTriggersEnabled"
+      response:
+          value: 1
+
+    - label:
+          "Step 5: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Warning Battery Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_WARNING_BATTERY_ALERT
+
+    - label:
+          "Step 6: TH waits for a report of BatteryAlert attribute from DUT with
+          a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 1
+          [1692340991.009882][1860:1862] CHIP:EM: <<< [E:56796i S:13603 M:58223585 (Ack:16238538)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 7: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 3
+          constraints:
+              type: enum8
+
+    - label: "Step 8: TH reads LowBattery event from DUT"
+      PICS: SMOKECO.S.E02
+      command: "readEvent"
+      event: "LowBattery"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: { AlarmSeverityLevel: 1 }
+
+    - label:
+          "Step 9: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Critical Battery Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_CRITICAL_BATTERY_ALERT
+
+    - label:
+          "Step 10: TH waits for a report of BatteryAlert attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 2
+          [1692340991.009882][1860:1862] CHIP:EM: <<< [E:56796i S:13603 M:58223585 (Ack:16238538)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 11: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 3
+          constraints:
+              type: enum8
+
+    - label: "Step 12: TH reads LowBattery event from DUT"
+      PICS: SMOKECO.S.E02
+      command: "readEvent"
+      event: "LowBattery"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: { AlarmSeverityLevel: 2 }
+
+    - label:
+          "Step 13: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Battery Alert Test Event Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_BATTERY_ALERT_CLEAR
+
+    - label:
+          "Step 14: TH waits for a report of BatteryAlert attribute from DUT
+          with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0003
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read battery-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
+          [TOO]   BatteryAlert: 0
+          [1692340991.009882][1860:1862] CHIP:EM: <<< [E:56796i S:13603 M:58223585 (Ack:16238538)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 15: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 16: TH reads AllClear event from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label: "Step 17: TH subscribes to HardwareFaultAlert attribute from DUT"
+      PICS: SMOKECO.S.A0006
+      command: "subscribeAttribute"
+      attribute: "HardwareFaultAlert"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label:
+          "Step 18: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT
+
+    - label:
+          "Step 19: TH waits for a report of HardwareFaultAlert attribute from
+          DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0006
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read hardware-fault-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
+          [TOO]   HardwareFaultAlert: TRUE
+          [1692341722.458322][1923:1925] CHIP:EM: <<< [E:13580i S:23647 M:42886390 (Ack:222437492)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 20: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 5
+          constraints:
+              type: enum8
+
+    - label: "Step 21: TH reads HardwareFault event from DUT"
+      PICS: SMOKECO.S.E03
+      command: "readEvent"
+      event: "HardwareFault"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label:
+          "Step 22: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for Hardware Fault Alert Test Event
+          Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_HARDWARE_FAULT_ALERT_CLEAR
+
+    - label:
+          "Step 23: TH waits for a report of HardwareFaultAlert attribute from
+          DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0006
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read hardware-fault-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
+          [TOO]   HardwareFaultAlert: FALSE
+          [1692341722.458322][1923:1925] CHIP:EM: <<< [E:13580i S:23647 M:42886390 (Ack:222437492)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 24: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 25: TH reads AllClear event from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label: "Step 26: TH subscribes to EndOfServiceAlert attribute from DUT"
+      PICS: SMOKECO.S.A0007
+      command: "subscribeAttribute"
+      attribute: "EndOfServiceAlert"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 27: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for End of Service Alert Test Event"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT
+
+    - label:
+          "Step 28: TH waits for a report of EndOfServiceAlert attribute from
+          DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0007
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read end-of-service-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
+          [TOO]   EndOfServiceAlert: 1
+          [1692342076.348701][1956:1958] CHIP:EM: <<< [E:51164i S:58720 M:186716445 (Ack:135114063)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 29: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 6
+          constraints:
+              type: enum8
+
+    - label: "Step 30: TH reads EndOfService event from DUT"
+      PICS: SMOKECO.S.E04
+      command: "readEvent"
+      event: "EndOfService"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label:
+          "Step 31: TH sends TestEventTrigger command to General Diagnostics
+          Cluster on Endpoint 0 with EnableKey field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
+          PIXIT.SMOKECO.TEST_EVENT_TRIGGER for End of Service Alert Test Event
+          Clear"
+      PICS: DGGEN.S.C00.Rsp
+      cluster: "General Diagnostics"
+      endpoint: 0
+      command: "TestEventTrigger"
+      arguments:
+          values:
+              - name: "EnableKey"
+                value: TEST_EVENT_TRIGGER_KEY
+              - name: "EventTrigger"
+                value: TEST_EVENT_TRIGGER_END_OF_SERVICE_ALERT_CLEAR
+
+    - label:
+          "Step 32: TH waits for a report of EndOfServiceAlert attribute from
+          DUT with a timeout of 300 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0007
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read end-of-service-alert 1 1
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
+          [TOO]   EndOfServiceAlert: 0
+          [1692342076.348701][1956:1958] CHIP:EM: <<< [E:51164i S:58720 M:186716445 (Ack:135114063)] (S) Msg TX to 1:0000000000000001 [3304] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 33: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 34: TH reads AllClear event from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label: "Step 35: TH subscribes to TestInProgress attribute from DUT"
+      PICS: SMOKECO.S.A0005
+      command: "subscribeAttribute"
+      attribute: "TestInProgress"
+      minInterval: 1
+      maxInterval: 900
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "Step 36: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 37: At the start of the next step, please manually initiate the
+          DUT self-test"
+      cluster: "LogCommands"
+      PICS: PICS_USER_PROMPT && SMOKECO.M.ManuallyControlledTest
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 38: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      timeout: 180
+      response:
+          value: 1
+          constraints:
+              type: boolean
+
+    - label: "Step 39: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000 && SMOKECO.M.ManuallyControlledTest
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 4
+          constraints:
+              type: enum8
+
+    - label:
+          "Step 40: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      timeout: 180
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "Step 41: TH reads SelfTestComplete event from DUT"
+      PICS: SMOKECO.S.E05 && SMOKECO.M.ManuallyControlledTest
+      command: "readEvent"
+      event: "SelfTestComplete"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label: "Step 42: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000 && SMOKECO.M.ManuallyControlledTest
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 43: TH reads AllClear event from DUT"
+      PICS: SMOKECO.S.E0a && SMOKECO.M.ManuallyControlledTest
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label: "Step 44: TH sends SelfTestRequest command to DUT"
+      PICS: SMOKECO.S.C00.Rsp
+      command: "SelfTestRequest"
+
+    - label:
+          "Step 45: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
+      PICS: PICS_SKIP_SAMPLE_APP && SMOKECO.S.A0005
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      verification: |
+          ./chip-tool smokecoalarm read test-in-progress 1 1
+
+          This step needs to be completed quickly
+
+          [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0005 DataVersion: 1795725838
+          [TOO]   TestInProgress: TRUE
+          [1690268959.715817][13732:13734] CHIP:EM: <<< [E:12324i S:6365 M:86298174 (Ack:6158737)] (S) Msg TX to 1:0000000000000001 [D1BB] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Step 46: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 4
+          constraints:
+              type: enum8
+
+    - label: "Step 47a: TH subscribes to TestInProgress attribute from DUT"
+      PICS: SMOKECO.S.A0005
+      command: "subscribeAttribute"
+      attribute: "TestInProgress"
+      minInterval: 1
+      maxInterval: 900
+
+    - label:
+          "Step 47b: TH waits for a report of TestInProgress attribute from DUT
+          with a timeout of 180 seconds"
+      PICS: SMOKECO.S.A0005
+      command: "waitForReport"
+      attribute: "TestInProgress"
+      timeout: 180
+      response:
+          value: 0
+          constraints:
+              type: boolean
+
+    - label: "Step 48: TH reads SelfTestComplete event from DUT"
+      PICS: SMOKECO.S.E05
+      command: "readEvent"
+      event: "SelfTestComplete"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}
+
+    - label: "Step 49: TH reads ExpressedState attribute from DUT"
+      PICS: SMOKECO.S.A0000
+      command: "readAttribute"
+      attribute: "ExpressedState"
+      response:
+          value: 0
+          constraints:
+              type: enum8
+
+    - label: "Step 50: TH reads AllClear event from DUT"
+      PICS: SMOKECO.S.E0a
+      command: "readEvent"
+      event: "AllClear"
+      eventNumber: "LastReceivedEventNumber + 1"
+      response:
+          value: {}

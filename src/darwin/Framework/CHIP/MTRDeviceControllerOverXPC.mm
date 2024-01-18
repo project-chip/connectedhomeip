@@ -179,7 +179,7 @@ static void SetupXPCQueue(void)
 
     dispatch_async(_workQueue, ^{
         dispatch_group_t group = dispatch_group_create();
-        if (!self.controllerID) {
+        if (!self.controllerXPCID) {
             dispatch_group_enter(group);
             [self.xpcConnection getProxyHandleWithCompletion:^(
                 dispatch_queue_t _Nonnull proxyQueue, MTRDeviceControllerXPCProxyHandle * _Nullable handle) {
@@ -188,7 +188,7 @@ static void SetupXPCQueue(void)
                         if (error) {
                             MTR_LOG_ERROR("Failed to fetch any shared remote controller");
                         } else {
-                            self.controllerID = controller;
+                            self.controllerXPCID = controller;
                             handleRetainer = handle;
                         }
                         dispatch_group_leave(group);
@@ -200,8 +200,8 @@ static void SetupXPCQueue(void)
             }];
         }
         dispatch_group_notify(group, queue, ^{
-            if (self.controllerID) {
-                completion(self.controllerID, handleRetainer, nil);
+            if (self.controllerXPCID) {
+                completion(self.controllerXPCID, handleRetainer, nil);
             } else {
                 completion(nil, nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             }
@@ -234,7 +234,7 @@ static void SetupXPCQueue(void)
                            workQueue:(dispatch_queue_t)queue
                        xpcConnection:(MTRDeviceControllerXPCConnection *)xpcConnection
 {
-    _controllerID = controllerID;
+    _controllerXPCID = controllerID;
     _workQueue = queue;
     _xpcConnection = xpcConnection;
     return self;

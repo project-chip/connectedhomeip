@@ -164,9 +164,15 @@ void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
         During commissioning, the key map will be modified multiples times subsequently.
         Commit the key map in nvm once it as stabilized.
     */
+#if SIWX_917 && CHIP_CONFIG_ENABLE_ICD_SERVER
+    // TODO: Remove this when RTC timer is added MATTER-2705
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<const uint8_t *>(mKvsKeyMap),
+                                      sizeof(mKvsKeyMap));
+#else
     SystemLayer().StartTimer(
         std::chrono::duration_cast<System::Clock::Timeout>(System::Clock::Seconds32(SILABS_KVS_SAVE_DELAY_SECONDS)),
         KeyValueStoreManagerImpl::OnScheduledKeyMapSave, NULL);
+#endif // defined(SIWX_917) && CHIP_CONFIG_ENABLE_ICD_SERVER
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
@@ -183,7 +189,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     // The user doesn't need the KeyString prefix, Read data after it
     size_t KeyStringLen = strlen(key);
     err                 = SilabsConfig::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen,
-                                           (offset_bytes + KeyStringLen));
+                                                           (offset_bytes + KeyStringLen));
     if (read_bytes_size)
     {
         *read_bytes_size = outLen;
@@ -300,5 +306,14 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
 }
 
 } // namespace PersistedStorage
+
+namespace Silabs {
+
+void MigrateKvsMap(void)
+{
+    PersistedStorage::KeyValueStoreMgrImpl().KvsMapMigration();
+}
+
+} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

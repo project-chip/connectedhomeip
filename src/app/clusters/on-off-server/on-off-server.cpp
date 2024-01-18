@@ -25,13 +25,21 @@
 #include <app/util/error-mapping.h>
 #include <app/util/util.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
-#include <app/clusters/scenes/scenes.h>
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+#include <app/clusters/scenes-server/scenes-server.h>
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
 #include <app/clusters/level-control/level-control.h>
 #endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
+
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+// nogncheck because the gn dependency checker does not understand
+// conditional includes, so will fail in an application that has an On/Off
+// cluster but no ModeBase-derived cluster.
+#include <app/clusters/mode-base-server/mode-base-cluster-objects.h> // nogncheck
+#include <app/clusters/mode-base-server/mode-base-server.h>          // nogncheck
+#endif                                                               // EMBER_AF_PLUGIN_MODE_BASE
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
@@ -41,14 +49,198 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+
+/**
+ * For all ModeBase alias clusters on the given endpoint, if the OnOff feature is supported and
+ * the OnMode attribute is set, update the CurrentMode attribute value to the OnMode value.
+ * @param endpoint
+ */
+void UpdateModeBaseCurrentModeToOnMode(EndpointId endpoint)
+{
+    for (auto & modeBaseInstance : ModeBase::GetModeBaseInstanceList())
+    {
+        if (modeBaseInstance.GetEndpointId() == endpoint)
+        {
+            if (modeBaseInstance.HasFeature(ModeBase::Feature::kOnOff))
+            {
+                ModeBase::Attributes::OnMode::TypeInfo::Type onMode = modeBaseInstance.GetOnMode();
+                if (!onMode.IsNull())
+                {
+                    Status status = modeBaseInstance.UpdateCurrentMode(onMode.Value());
+                    if (status == Status::Success)
+                    {
+                        ChipLogProgress(Zcl, "Changed the Current Mode to %x", onMode.Value());
+                    }
+                    else
+                    {
+                        ChipLogError(Zcl, "Failed to Changed the Current Mode to %x: %u", onMode.Value(), to_underlying(status));
+                    }
+                }
+            }
+        }
+    }
+}
+
+#endif // EMBER_AF_PLUGIN_MODE_BASE
+
+} // namespace
+
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
+{
+    if (!emberAfContainsServer(endpoint, LevelControl::Id))
+    {
+        return false;
+    }
+
+    return LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff);
+}
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
+
+static constexpr size_t kOnOffMaxEnpointCount =
+    EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+static void sceneOnOffCallback(EndpointId endpoint);
+using OnOffEndPointPair = scenes::DefaultSceneHandlerImpl::EndpointStatePair<bool>;
+using OnOffTransitionTimeInterface =
+    scenes::DefaultSceneHandlerImpl::TransitionTimeInterface<kOnOffMaxEnpointCount, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT>;
+
+class DefaultOnOffSceneHandler : public scenes::DefaultSceneHandlerImpl
+{
+public:
+    DefaultSceneHandlerImpl::StatePairBuffer<bool, kOnOffMaxEnpointCount> mSceneEndpointStatePairs;
+    // As per spec, 1 attribute is scenable in the on off cluster
+    static constexpr uint8_t scenableAttributeCount = 1;
+
+    DefaultOnOffSceneHandler() = default;
+    ~DefaultOnOffSceneHandler() override {}
+
+    // Default function for OnOff cluster, only puts the OnOff cluster ID in the span if supported on the given endpoint
+    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
+    {
+        ClusterId * buffer = clusterBuffer.data();
+        if (emberAfContainsServer(endpoint, OnOff::Id) && clusterBuffer.size() >= 1)
+        {
+            buffer[0] = OnOff::Id;
+            clusterBuffer.reduce_size(1);
+        }
+        else
+        {
+            clusterBuffer.reduce_size(0);
+        }
+    }
+
+    // Default function for OnOff cluster, only checks if OnOff is enabled on the endpoint
+    bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
+    {
+        return (cluster == OnOff::Id) && (emberAfContainsServer(endpoint, OnOff::Id));
+    }
+
+    /// @brief Serialize the Cluster's EFS value
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serializedBytes data to serialize into EFS
+    /// @return CHIP_NO_ERROR if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT otherwise
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) override
+    {
+        using AttributeValuePair = ScenesManagement::Structs::AttributeValuePair::Type;
+
+        bool currentValue;
+        // read current on/off value
+        EmberAfStatus status = Attributes::OnOff::Get(endpoint, &currentValue);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(Zcl, "ERR: reading on/off %x", status);
+            return CHIP_ERROR_READ_FAILED;
+        }
+
+        AttributeValuePair pairs[scenableAttributeCount];
+
+        pairs[0].attributeID    = Attributes::OnOff::Id;
+        pairs[0].attributeValue = currentValue;
+
+        app::DataModel::List<AttributeValuePair> attributeValueList(pairs);
+
+        return EncodeAttributeValueList(attributeValueList, serializedBytes);
+    }
+
+    /// @brief Default EFS interaction when applying scene to the OnOff Cluster
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serializedBytes Data from nvm
+    /// @param timeMs transition time in ms
+    /// @return CHIP_NO_ERROR if value as expected, CHIP_ERROR_INVALID_ARGUMENT otherwise
+    CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+                          scenes::TransitionTimeMs timeMs) override
+    {
+        app::DataModel::DecodableList<ScenesManagement::Structs::AttributeValuePair::DecodableType> attributeValueList;
+
+        VerifyOrReturnError(cluster == OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+
+        ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
+
+        size_t attributeCount = 0;
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        auto pair_iterator = attributeValueList.begin();
+        while (pair_iterator.Next())
+        {
+            auto & decodePair = pair_iterator.GetValue();
+            VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+            ReturnErrorOnFailure(
+                mSceneEndpointStatePairs.InsertPair(OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.attributeValue))));
+        }
+        // Verify that the EFS was completely read
+        CHIP_ERROR err = pair_iterator.GetStatus();
+        if (CHIP_NO_ERROR != err)
+        {
+            mSceneEndpointStatePairs.RemovePair(endpoint);
+            return err;
+        }
+
+        // This handler assumes it is being used with the default handler for the level control. Therefore if the level control
+        // cluster with on off feature is present on the endpoint and the level control handler is registered, it assumes this
+        // handler will take action on the on-off state. This assumes the level control attributes were also saved in the scene.
+        // This is to prevent a behavior where the on off state is set by this handler, and then the level control handler or vice
+        // versa.
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+        if (!(LevelControlWithOnOffFeaturePresent(endpoint) &&
+              ScenesManagement::ScenesServer::Instance().IsHandlerRegistered(endpoint, LevelControlServer::GetSceneHandler())))
+#endif
+        {
+            OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    OnOffTransitionTimeInterface mTransitionTimeInterface = OnOffTransitionTimeInterface(Attributes::OnOff::Id, sceneOnOffCallback);
+};
+static DefaultOnOffSceneHandler sOnOffSceneHandler;
+
+static void sceneOnOffCallback(EndpointId endpoint)
+{
+    OnOffEndPointPair savedState;
+    ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.GetPair(endpoint, savedState));
+    CommandId command = (savedState.mValue) ? Commands::On::Id : Commands::Off::Id;
+    OnOffServer::Instance().setOnOffValue(endpoint, command, false);
+    ReturnOnFailure(sOnOffSceneHandler.mSceneEndpointStatePairs.RemovePair(endpoint));
+}
+#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+
 /**********************************************************
  * Attributes Definition
  *********************************************************/
 
 static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
-
-static EmberEventControl gEventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
+static EmberEventControl gEventControls[kOnOffMaxEnpointCount];
 
 /**********************************************************
  * Function definition
@@ -83,7 +275,7 @@ void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 
 void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 {
-    auto control = OnOffServer::getEventControl(endpoint);
+    auto control = OnOffServer::getEventControl(endpoint, Span<EmberEventControl>(gEventControls));
     if (control)
     {
         cancelEndpointTimerCallback(control);
@@ -92,7 +284,7 @@ void OnOffServer::cancelEndpointTimerCallback(EndpointId endpoint)
 
 void MatterOnOffClusterServerShutdownCallback(EndpointId endpoint)
 {
-    emberAfOnOffClusterPrintln("Shuting down on/off server cluster on endpoint %d", endpoint);
+    ChipLogProgress(Zcl, "Shuting down on/off server cluster on endpoint %d", endpoint);
     OnOffServer::Instance().cancelEndpointTimerCallback(endpoint);
 }
 
@@ -105,7 +297,17 @@ OnOffServer & OnOffServer::Instance()
     return instance;
 }
 
-bool OnOffServer::HasFeature(chip::EndpointId endpoint, OnOffFeature feature)
+chip::scenes::SceneHandler * OnOffServer::GetSceneHandler()
+{
+
+#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+    return &sOnOffSceneHandler;
+#else
+    return nullptr;
+#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+}
+
+bool OnOffServer::HasFeature(chip::EndpointId endpoint, Feature feature)
 {
     bool success;
     uint32_t featureMap;
@@ -120,25 +322,13 @@ EmberAfStatus OnOffServer::getOnOffValue(chip::EndpointId endpoint, bool * curre
     EmberAfStatus status = Attributes::OnOff::Get(endpoint, currentOnOffValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfOnOffClusterPrintln("ERR: reading on/off %x", status);
+        ChipLogProgress(Zcl, "ERR: reading on/off %x", status);
     }
 
-    emberAfOnOffClusterPrintln("On/Off ep%d value: %d", endpoint, *currentOnOffValue);
+    ChipLogProgress(Zcl, "On/Off ep%d value: %d", endpoint, *currentOnOffValue);
 
     return status;
 }
-
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
-static bool LevelControlWithOnOffFeaturePresent(EndpointId endpoint)
-{
-    if (!emberAfContainsServer(endpoint, LevelControl::Id))
-    {
-        return false;
-    }
-
-    return LevelControlHasFeature(endpoint, LevelControl::LevelControlFeature::kOnOff);
-}
-#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
 /** @brief On/off Cluster Set Value
  *
@@ -158,21 +348,21 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     status = Attributes::OnOff::Get(endpoint, &currentValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        emberAfOnOffClusterPrintln("ERR: reading on/off %x", status);
+        ChipLogProgress(Zcl, "ERR: reading on/off %x", status);
         return status;
     }
 
     // if the value is already what we want to set it to then do nothing
     if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
     {
-        emberAfOnOffClusterPrintln("Endpoint %x On/off already set to new value", endpoint);
+        ChipLogProgress(Zcl, "Endpoint %x On/off already set to new value", endpoint);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
     // we either got a toggle, or an on when off, or an off when on,
     // so we need to swap the value
     newValue = !currentValue;
-    emberAfOnOffClusterPrintln("Toggle ep%x on/off from state %x to %x", endpoint, currentValue, newValue);
+    ChipLogProgress(Zcl, "Toggle ep%x on/off from state %x to %x", endpoint, currentValue, newValue);
 
     // the sequence of updating on/off attribute and kick off level change effect should
     // be depend on whether we are turning on or off. If we are turning on the light, we
@@ -188,15 +378,15 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
 
             if (onTime == 0)
             {
-                emberAfOnOffClusterPrintln("On Command - OffWaitTime :  0");
+                ChipLogProgress(Zcl, "On Command - OffWaitTime :  0");
                 Attributes::OffWaitTime::Set(endpoint, 0);
 
                 // Stop timer on the endpoint
-                EmberEventControl * event = getEventControl(endpoint);
+                EmberEventControl * event = getEventControl(endpoint, Span<EmberEventControl>(gEventControls));
                 if (event != nullptr)
                 {
                     cancelEndpointTimerCallback(event);
-                    emberAfOnOffClusterPrintln("On/Toggle Command - Stop Timer");
+                    ChipLogProgress(Zcl, "On/Toggle Command - Stop Timer");
                 }
             }
 
@@ -207,7 +397,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
         status = Attributes::OnOff::Set(endpoint, newValue);
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
-            emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
+            ChipLogProgress(Zcl, "ERR: writing on/off %x", status);
             return status;
         }
 
@@ -227,10 +417,14 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
             if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
             {
-                emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+                ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
             }
         }
+#endif
+#ifdef EMBER_AF_PLUGIN_MODE_BASE
+        // If OnMode is not a null value, then change the current mode to it.
+        UpdateModeBaseCurrentModeToOnMode(endpoint);
 #endif
     }
     else // Set Off
@@ -249,27 +443,25 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             status = Attributes::OnOff::Set(endpoint, newValue);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
             {
-                emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
+                ChipLogProgress(Zcl, "ERR: writing on/off %x", status);
                 return status;
             }
 
             if (SupportsLightingApplications(endpoint))
             {
-                emberAfOnOffClusterPrintln("Off completed. reset OnTime to  0");
+                ChipLogProgress(Zcl, "Off completed. reset OnTime to  0");
                 Attributes::OnTime::Set(endpoint, 0); // Reset onTime
             }
         }
     }
 
-#ifdef EMBER_AF_PLUGIN_SCENES
-    // the scene has been changed (the value of on/off has changed) so
-    // the current scene as described in the attribute table is invalid,
-    // so mark it as invalid (just writes the valid/invalid attribute)
-    if (emberAfContainsServer(endpoint, Scenes::Id))
-    {
-        emberAfScenesClusterMakeInvalidCallback(endpoint);
-    }
-#endif // EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
+    //  the scene has been changed (the value of on/off has changed) so
+    //  the current scene as described in the attribute table is invalid,
+    //  so mark it as invalid (just writes the valid/invalid attribute)
+
+    ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 
     // The returned status is based solely on the On/Off cluster.  Errors in the
     // Level Control and/or Scenes cluster are ignored.
@@ -307,6 +499,12 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             status = setOnOffValue(endpoint, onOffValueForStartUp, true);
         }
 
+#if defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+        // Registers Scene handlers for the On/Off cluster on the server
+        app::Clusters::ScenesManagement::ScenesServer::Instance().RegisterSceneHandler(endpoint,
+                                                                                       OnOffServer::Instance().GetSceneHandler());
+#endif // defined(EMBER_AF_PLUGIN_SCENES_MANAGEMENT) && CHIP_CONFIG_SCENES_USE_DEFAULT_HANDLERS
+
 #ifdef EMBER_AF_PLUGIN_MODE_SELECT
         // If OnMode is not a null value, then change the current mode to it.
         if (onOffValueForStartUp && emberAfContainsServer(endpoint, ModeSelect::Id) &&
@@ -315,13 +513,14 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             ModeSelect::Attributes::OnMode::TypeInfo::Type onMode;
             if (ModeSelect::Attributes::OnMode::Get(endpoint, onMode) == EMBER_ZCL_STATUS_SUCCESS && !onMode.IsNull())
             {
-                emberAfOnOffClusterPrintln("Changing Current Mode to %x", onMode.Value());
+                ChipLogProgress(Zcl, "Changing Current Mode to %x", onMode.Value());
                 status = ModeSelect::Attributes::CurrentMode::Set(endpoint, onMode.Value());
             }
         }
 #endif
     }
 #endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
+
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
 
@@ -334,7 +533,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
  */
 EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bool & onOffValueForStartUp)
 {
-    app::DataModel::Nullable<OnOff::OnOffStartUpOnOff> startUpOnOff;
+    app::DataModel::Nullable<OnOff::StartUpOnOffEnum> startUpOnOff;
     EmberAfStatus status = Attributes::StartUpOnOff::Get(endpoint, startUpOnOff);
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -347,13 +546,13 @@ EmberAfStatus OnOffServer::getOnOffValueForStartUp(chip::EndpointId endpoint, bo
             {
                 switch (startUpOnOff.Value())
                 {
-                case OnOff::OnOffStartUpOnOff::kOff:
+                case OnOff::StartUpOnOffEnum::kOff:
                     updatedOnOff = false; // Off
                     break;
-                case OnOff::OnOffStartUpOnOff::kOn:
+                case OnOff::StartUpOnOffEnum::kOn:
                     updatedOnOff = true; // On
                     break;
-                case OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff:
+                case OnOff::StartUpOnOffEnum::kToggle:
                     updatedOnOff = !updatedOnOff;
                     break;
                 default:
@@ -401,9 +600,9 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 
     if (SupportsLightingApplications(endpoint))
     {
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
         FabricIndex fabric = commandObj->GetAccessingFabricIndex();
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
         bool globalSceneControl = false;
         OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
 
@@ -412,16 +611,15 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 
         if (globalSceneControl)
         {
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
             GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
             if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
             {
                 groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
             }
-
-            emberAfScenesClusterStoreCurrentSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
-#endif // EMBER_AF_PLUGIN_SCENES
-
+            ScenesManagement::ScenesServer::Instance().StoreCurrentScene(fabric, endpoint, groupId,
+                                                                         ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
         }
 
@@ -460,9 +658,9 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
         return true;
     }
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     FabricIndex fabric = commandObj->GetAccessingFabricIndex();
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 
     bool globalSceneControl = false;
     OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
@@ -473,15 +671,15 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
         return true;
     }
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     GroupId groupId = ZCL_SCENES_GLOBAL_SCENE_GROUP_ID;
     if (commandObj->GetExchangeContext()->IsGroupExchangeContext())
     {
         groupId = commandObj->GetExchangeContext()->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
     }
 
-    emberAfScenesClusterRecallSavedSceneCallback(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
-#endif // EMBER_AF_PLUGIN_SCENES
+    ScenesManagement::ScenesServer::Instance().RecallScene(fabric, endpoint, groupId, ZCL_SCENES_GLOBAL_SCENE_SCENE_ID);
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 
     OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
     setOnOffValue(endpoint, Commands::On::Id, false);
@@ -493,19 +691,19 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand(app::CommandHandler * commandOb
 uint32_t OnOffServer::calculateNextWaitTimeMS()
 {
     const chip::System::Clock::Timestamp currentTime = chip::System::SystemClock().GetMonotonicTimestamp();
-    chip::System::Clock::Timestamp waitTime          = UPDATE_TIME_MS;
+    chip::System::Clock::Timestamp waitTime          = ON_OFF_UPDATE_TIME_MS;
     chip::System::Clock::Timestamp latency;
 
     if (currentTime > nextDesiredOnWithTimedOffTimestamp)
     {
         latency = currentTime - nextDesiredOnWithTimedOffTimestamp;
-        if (latency >= UPDATE_TIME_MS)
+        if (latency >= ON_OFF_UPDATE_TIME_MS)
             waitTime = chip::System::Clock::Milliseconds32(1);
         else
             waitTime -= latency;
     }
 
-    nextDesiredOnWithTimedOffTimestamp += UPDATE_TIME_MS;
+    nextDesiredOnWithTimedOffTimestamp += ON_OFF_UPDATE_TIME_MS;
 
     return (uint32_t) waitTime.count();
 }
@@ -513,14 +711,14 @@ uint32_t OnOffServer::calculateNextWaitTimeMS()
 bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                         const Commands::OnWithTimedOff::DecodableType & commandData)
 {
-    BitFlags<OnOffControl> onOffControl = commandData.onOffControl;
-    uint16_t onTime                     = commandData.onTime;
-    uint16_t offWaitTime                = commandData.offWaitTime;
-    Status status                       = Status::Success;
-    chip::EndpointId endpoint           = commandPath.mEndpointId;
-    bool isOn                           = false;
-    uint16_t currentOffWaitTime         = MAX_TIME_VALUE;
-    uint16_t currentOnTime              = 0;
+    BitFlags<OnOffControlBitmap> onOffControl = commandData.onOffControl;
+    uint16_t onTime                           = commandData.onTime;
+    uint16_t offWaitTime                      = commandData.offWaitTime;
+    Status status                             = Status::Success;
+    chip::EndpointId endpoint                 = commandPath.mEndpointId;
+    bool isOn                                 = false;
+    uint16_t currentOffWaitTime               = MAX_ON_OFF_TIME_VALUE;
+    uint16_t currentOnTime                    = 0;
 
     EmberEventControl * event = configureEventControl(endpoint);
     VerifyOrExit(event != nullptr, status = Status::UnsupportedEndpoint);
@@ -529,7 +727,7 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
 
     // OnOff is off and the commands is only accepted if on
-    if (onOffControl.Has(OnOffControl::kAcceptOnlyWhenOn) && !isOn)
+    if (onOffControl.Has(OnOffControlBitmap::kAcceptOnlyWhenOn) && !isOn)
     {
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
@@ -557,12 +755,12 @@ bool OnOffServer::OnWithTimedOffCommand(app::CommandHandler * commandObj, const 
         currentOffWaitTime = offWaitTime;
     }
 
-    emberAfOnOffClusterPrintln("On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
+    ChipLogProgress(Zcl, "On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
 
-    if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
+    if (currentOnTime < MAX_ON_OFF_TIME_VALUE && currentOffWaitTime < MAX_ON_OFF_TIME_VALUE)
     {
-        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + UPDATE_TIME_MS;
-        scheduleTimerCallbackMs(configureEventControl(endpoint), (uint32_t) UPDATE_TIME_MS.count());
+        nextDesiredOnWithTimedOffTimestamp = chip::System::SystemClock().GetMonotonicTimestamp() + ON_OFF_UPDATE_TIME_MS;
+        scheduleTimerCallbackMs(configureEventControl(endpoint), ON_OFF_UPDATE_TIME_MS.count());
     }
 
 exit:
@@ -577,7 +775,7 @@ exit:
  */
 void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 {
-    emberAfOnOffClusterPrintln("Timer callback - Entering callbackc");
+    ChipLogDetail(Zcl, "Timer callback - Entering callback");
 
     bool isOn = false;
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
@@ -588,9 +786,9 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         scheduleTimerCallbackMs(configureEventControl(endpoint), calculateNextWaitTimeMS());
 
         // Update onTime values
-        uint16_t onTime = MIN_TIME_VALUE;
+        uint16_t onTime = MIN_ON_OFF_TIME_VALUE;
         OnOff::Attributes::OnTime::Get(endpoint, &onTime);
-        emberAfOnOffClusterPrintln("Timer callback - On Time:  %d", onTime);
+        ChipLogDetail(Zcl, "Timer callback - On Time:  %d", onTime);
 
         if (onTime > 0)
         {
@@ -600,7 +798,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 
         if (onTime == 0)
         {
-            emberAfOnOffClusterPrintln("Timer callback - Turning off OnOff");
+            ChipLogDetail(Zcl, "Timer callback - Turning off OnOff");
 
             OnOff::Attributes::OffWaitTime::Set(endpoint, 0);
             setOnOffValue(endpoint, Commands::Off::Id, false);
@@ -618,7 +816,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
             OnOff::Attributes::OffWaitTime::Set(endpoint, offWaitTime);
         }
 
-        emberAfOnOffClusterPrintln("Timer Callback - wait Off Time:  %d", offWaitTime);
+        ChipLogDetail(Zcl, "Timer Callback - wait Off Time:  %d", offWaitTime);
 
         // Validate if necessary to restart timer
         if (offWaitTime > 0)
@@ -628,10 +826,10 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         }
         else
         {
-            emberAfOnOffClusterPrintln("Timer  Callback - wait Off Time cycle finished");
+            ChipLogProgress(Zcl, "Timer  Callback - wait Off Time cycle finished");
 
             // Stop timer on the endpoint
-            cancelEndpointTimerCallback(getEventControl(endpoint));
+            cancelEndpointTimerCallback(getEventControl(endpoint, Span<EmberEventControl>(gEventControls)));
         }
     }
 }
@@ -647,28 +845,31 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
 /**
  * @brief event control object for an endpoint
  *
- * @param[in] endpoint
+ * @param[in] endpoint target endpoint
+ * @param[in] eventControlArray Array where to find the event control
+ * @param[in] eventControlArraySize Size of the event control array
  * @return EmberEventControl* configured event control
  */
-EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
+EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint, const Span<EmberEventControl> & eventControlArray)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
-    if (index >= ArraySize(gEventControls))
+    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, OnOff::Id, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT);
+    if (index >= eventControlArray.size())
     {
         return nullptr;
     }
-    return &gEventControls[index];
+
+    return &eventControlArray[index];
 }
 
 /**
- * @brief Configures EnventControl callback when using XY colors
+ * @brief Configures EventControl callback when using XY colors
  *
  * @param[in] endpoint endpoint to start timer for
  * @return EmberEventControl* configured event control
  */
 EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 {
-    EmberEventControl * controller = getEventControl(endpoint);
+    EmberEventControl * controller = getEventControl(endpoint, Span<EmberEventControl>(gEventControls));
     VerifyOrReturnError(controller != nullptr, nullptr);
 
     controller->endpoint = endpoint;
@@ -723,7 +924,7 @@ static inline void unreg(OnOffEffect * inst)
 }
 
 OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
-                         OnOffEffectIdentifier effectIdentifier, uint8_t effectVariant) :
+                         EffectIdentifierEnum effectIdentifier, uint8_t effectVariant) :
     mEndpoint(endpoint),
     mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
 {

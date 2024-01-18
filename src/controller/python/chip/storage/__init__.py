@@ -23,7 +23,7 @@ import copy
 import ctypes
 import json
 import logging
-from ctypes import *
+from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_char_p, c_uint16, c_void_p, py_object
 from typing import Dict
 
 import chip.exceptions
@@ -111,7 +111,7 @@ class PersistentStorage:
         if (path is not None):
             self.logger().warn(f"Initializing persistent storage from file: {path}")
         else:
-            self.logger().warn(f"Initializing persistent storage from dict")
+            self.logger().warn("Initializing persistent storage from dict")
 
         self._handle = chip.native.GetLibraryHandle()
         self._isActive = True
@@ -138,11 +138,11 @@ class PersistentStorage:
             self._jsonData = jsonData
 
         if ('sdk-config' not in self._jsonData):
-            logging.warn(f"No valid SDK configuration present - clearing out configuration")
+            logging.warn("No valid SDK configuration present - clearing out configuration")
             self._jsonData['sdk-config'] = {}
 
         if ('repl-config' not in self._jsonData):
-            logging.warn(f"No valid REPL configuration present - clearing out configuration")
+            logging.warn("No valid REPL configuration present - clearing out configuration")
             self._jsonData['repl-config'] = {}
 
         # Clear out the file so that calling 'Commit' will re-open the file at that time in write mode.
@@ -150,7 +150,9 @@ class PersistentStorage:
 
         self._handle.pychip_Storage_InitializeStorageAdapter.restype = c_void_p
         self._handle.pychip_Storage_InitializeStorageAdapter.argtypes = [ctypes.py_object,
-                                                                         _SyncSetKeyValueCbFunct, _SyncGetKeyValueCbFunct, _SyncDeleteKeyValueCbFunct]
+                                                                         _SyncSetKeyValueCbFunct,
+                                                                         _SyncGetKeyValueCbFunct,
+                                                                         _SyncDeleteKeyValueCbFunct]
 
         self._closure = self._handle.pychip_Storage_InitializeStorageAdapter(ctypes.py_object(
             self), _OnSyncSetKeyValueCb, _OnSyncGetKeyValueCb, _OnSyncDeleteKeyValueCb)

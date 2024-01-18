@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -43,6 +43,12 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
+     *  @brief Performs underlying StructBuilder::Init, but reserves memory need in
+     *  EndOfInvokeResponses() with underlying TLVWriter.
+     */
+    CHIP_ERROR InitWithEndBufferReserved(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
+
+    /**
      *  @brief Initialize a InvokeResponseIB::Builder for writing into the TLV stream
      *
      *  @return A reference to InvokeResponseIB::Builder
@@ -57,12 +63,20 @@ public:
     /**
      *  @brief Mark the end of this InvokeResponseIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    InvokeResponseIBs::Builder & EndOfInvokeResponses();
+    CHIP_ERROR EndOfInvokeResponses();
+
+    /**
+     *  @brief Get number of bytes required in the buffer by EndOfInvokeResponses()
+     *
+     *  @return Expected number of bytes required in the buffer by EndOfInvokeResponses()
+     */
+    uint32_t GetSizeToEndInvokeResponses();
 
 private:
     InvokeResponseIB::Builder mInvokeResponse;
+    bool mIsEndBufferReserved = false;
 };
 } // namespace InvokeResponseIBs
 } // namespace app

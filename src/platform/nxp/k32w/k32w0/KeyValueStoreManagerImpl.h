@@ -24,7 +24,7 @@
 
 #pragma once
 
-#include <platform/nxp/k32w/common/RamStorage.h>
+#include <platform/nxp/k32w/k32w0/RamStorage.h>
 
 namespace chip {
 namespace DeviceLayer {

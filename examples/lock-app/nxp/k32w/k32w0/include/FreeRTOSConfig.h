@@ -41,7 +41,7 @@
 
 #define configUSE_PREEMPTION 1
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(chip_with_low_power) && (chip_with_low_power == 1)
 #define configUSE_TICKLESS_IDLE 1
 #else
 #define configUSE_TICKLESS_IDLE 0
@@ -51,7 +51,7 @@
 #define configTICK_RATE_HZ ((TickType_t) 100)
 #define configMAX_PRIORITIES (8)
 
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
+#if defined(configUSE_TICKLESS_IDLE) && (configUSE_TICKLESS_IDLE == 1)
 #define configMINIMAL_STACK_SIZE ((unsigned short) 250)
 #else
 #define configMINIMAL_STACK_SIZE ((unsigned short) 450)
@@ -84,7 +84,7 @@
 /* Memory allocation related definitions. */
 #define configSUPPORT_STATIC_ALLOCATION 0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configTOTAL_HEAP_SIZE ((size_t)(gTotalHeapSize_c))
+#define configTOTAL_HEAP_SIZE ((size_t) (gTotalHeapSize_c))
 #define configAPPLICATION_ALLOCATED_HEAP 1
 
 #define configUSE_IDLE_HOOK 1

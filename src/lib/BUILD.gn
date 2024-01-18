@@ -19,7 +19,6 @@ static_library("lib") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/ble",
-    "${chip_root}/src/controller",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/asn1",
@@ -28,10 +27,16 @@ static_library("lib") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
+    "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
   ]
+
+  # See src/lib/lib.gni for declaration of this build arg.
+  if (chip_build_controller) {
+    public_deps += [ "${chip_root}/src/controller" ]
+  }
 
   # Only include the shell if it is being used. The shell is
   # a debug feature mostly useful for embedded examples.

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -57,9 +57,9 @@ public:
     /**
      *  @brief Mark the end of this EventFilterIBs
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    EventFilterIBs::Builder & EndOfEventFilters();
+    CHIP_ERROR EndOfEventFilters();
 
     /**
      *  @brief Generate single event filter

@@ -65,7 +65,7 @@ static bool FetchCerts(MTRCertificateDERBytes __strong & cert, MTRCertificateTLV
         return nil;
     }
 
-    _rootPublicKey = [NSData dataWithBytes:publicKey.ConstBytes() length:publicKey.Length()];
+    _rootPublicKey = AsData(ByteSpan(publicKey.ConstBytes(), publicKey.Length()));
 
     _vendorID = @(fabricInfo.GetVendorId());
     _fabricID = @(fabricInfo.GetFabricId());

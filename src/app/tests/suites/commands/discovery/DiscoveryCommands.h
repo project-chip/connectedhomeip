@@ -24,7 +24,7 @@
 
 #include <app-common/zap-generated/tests/simulated-cluster-objects.h>
 
-class DiscoveryCommands : public chip::Dnssd::CommissioningResolveDelegate, public chip::Dnssd::OperationalResolveDelegate
+class DiscoveryCommands : public chip::Dnssd::CommissioningResolveDelegate
 {
 public:
     DiscoveryCommands(){};
@@ -63,10 +63,6 @@ public:
 
     /////////// CommissioningDelegate Interface /////////
     void OnNodeDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-
-    /////////// OperationalDelegate Interface /////////
-    void OnOperationalNodeResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override{};
-    void OnOperationalNodeResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override{};
 
 private:
     bool mReady = false;

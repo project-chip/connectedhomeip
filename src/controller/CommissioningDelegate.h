@@ -17,6 +17,7 @@
  */
 
 #pragma once
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/OperationalSessionSetup.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <credentials/attestation_verifier/DeviceAttestationDelegate.h>
@@ -33,9 +34,14 @@ enum CommissioningStage : uint8_t
 {
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
-    kReadCommissioningInfo,      ///< Query General Commissioning Attributes and Network Features
+    kReadCommissioningInfo,      ///< Query General Commissioning Attributes, Network Features and Time Synchronization Cluster
+    kReadCommissioningInfo2,     ///< Query SupportsConcurrentConnection, ICD state, check for matching fabric
     kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
+    kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
+    kConfigureTimeZone,          ///< Configure a time zone if one is required and available
+    kConfigureDSTOffset,         ///< Configure DST offset if one is required and available
+    kConfigureDefaultNTP,        ///< Configure a default NTP server if one is required and available
     kSendPAICertificateRequest,  ///< Send PAI CertificateChainRequest (0x3E:2) command to the device
     kSendDACCertificateRequest,  ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
     kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
@@ -45,6 +51,10 @@ enum CommissioningStage : uint8_t
     kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
     kSendTrustedRootCert,        ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
     kSendNOC,                    ///< Send AddNOC (0x3E:6) command to the device
+    kConfigureTrustedTimeSource, ///< Configure a trusted time source if one is required and available (must be done after SendNOC)
+    kICDGetRegistrationInfo,     ///< Waiting for the higher layer to provide ICD registraion informations.
+    kICDRegistration,            ///< Register for ICD management
+    kICDSendStayActive,          ///< Send Keep Alive to ICD
     kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
     kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
     kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
@@ -62,6 +72,13 @@ enum CommissioningStage : uint8_t
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
     /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
+};
+
+enum ICDRegistrationStrategy : uint8_t
+{
+    kIgnore,         ///< Do not check whether the device is an ICD during commissioning
+    kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
+                     ///< Controller should provide a ICDKey manager for generating symmetric key
 };
 
 const char * StageToString(CommissioningStage stage);
@@ -85,15 +102,15 @@ struct CompletionStatus
     CHIP_ERROR err;
     Optional<CommissioningStage> failedStage;
     Optional<Credentials::AttestationVerificationResult> attestationResult;
-    Optional<app::Clusters::GeneralCommissioning::CommissioningError> commissioningError;
-    Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> networkCommissioningStatus;
+    Optional<app::Clusters::GeneralCommissioning::CommissioningErrorEnum> commissioningError;
+    Optional<app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> networkCommissioningStatus;
 };
 
-constexpr uint16_t kDefaultFailsafeTimeout = 60;
+inline constexpr uint16_t kDefaultFailsafeTimeout = 60;
 
 // Per spec, all commands that are sent with the failsafe armed need at least
 // a 30s timeout.
-constexpr System::Clock::Timeout kMinimumCommissioningStepTimeout = System::Clock::Seconds16(30);
+inline constexpr System::Clock::Timeout kMinimumCommissioningStepTimeout = System::Clock::Seconds16(30);
 
 class CommissioningParameters
 {
@@ -125,13 +142,45 @@ public:
     // (from GetLocationCapability - see below). If the regulatory location is not supplied, this will fall back to the location in
     // GetDefaultRegulatoryLocation and then to Outdoor (most restrictive).
     // This value should be set before calling PerformCommissioningStep for the kConfigRegulatory step.
-    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetDeviceRegulatoryLocation() const
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> GetDeviceRegulatoryLocation() const
     {
         return mDeviceRegulatoryLocation;
     }
 
+    // Value to determine whether the node supports Concurrent Connections as read from the GeneralCommissioning cluster.
+    // In the AutoCommissioner, this is automatically set from from the kReadCommissioningInfo2 stage.
+    Optional<bool> GetSupportsConcurrentConnection() const { return mSupportsConcurrentConnection; }
+
     // The country code to be used for the node, if set.
     Optional<CharSpan> GetCountryCode() const { return mCountryCode; }
+
+    // Time zone to set for the node
+    // If required, this will be truncated to fit the max size allowable on the node
+    Optional<app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>> GetTimeZone() const
+    {
+        return mTimeZone;
+    }
+
+    // DST offset list. If required, this will be truncated to fit the max size allowable on the node
+    // DST list will only be sent if the commissionee requires DST offsets, as indicated in the SetTimeZone response
+    Optional<app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>> GetDSTOffsets() const
+    {
+        return mDSTOffsets;
+    }
+
+    // Default NTP to set on the node if supported and required
+    // Default implementation will not overide a value already set on the commissionee
+    // TODO: Add a force option?
+    Optional<app::DataModel::Nullable<CharSpan>> GetDefaultNTP() const { return mDefaultNTP; }
+
+    // Trusted time source
+    // Default implementation will not override a value already set on the commissionee
+    // TODO: Add a force option?
+    Optional<app::DataModel::Nullable<app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>>
+    GetTrustedTimeSource() const
+    {
+        return mTrustedTimeSource;
+    }
 
     // Nonce sent to the node to use during the CSR request.
     // When using the AutoCommissioner, this value will be ignored in favour of the value supplied by the
@@ -228,7 +277,7 @@ public:
     // Default regulatory location set by the node, as read from the GeneralCommissioning cluster. In the AutoCommissioner, this is
     // automatically set from report from the kReadCommissioningInfo stage.
     // This should be set before calling PerformCommissioningStep for the kConfigRegulatory step.
-    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetDefaultRegulatoryLocation() const
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> GetDefaultRegulatoryLocation() const
     {
         return mDefaultRegulatoryLocation;
     }
@@ -236,7 +285,7 @@ public:
     // Location capabilities of the node, as read from the GeneralCommissioning cluster. In the AutoCommissioner, this is
     // automatically set from report from the kReadCommissioningInfo stage.
     // This should be set before calling PerformCommissioningStep for the kConfigRegulatory step.
-    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> GetLocationCapability() const
+    const Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> GetLocationCapability() const
     {
         return mLocationCapability;
     }
@@ -257,9 +306,15 @@ public:
         return *this;
     }
 
-    CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
+    CommissioningParameters & SetDeviceRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum location)
     {
         mDeviceRegulatoryLocation.SetValue(location);
+        return *this;
+    }
+
+    CommissioningParameters & SetSupportsConcurrentConnection(bool concurrentConnection)
+    {
+        mSupportsConcurrentConnection.SetValue(concurrentConnection);
         return *this;
     }
 
@@ -268,6 +323,37 @@ public:
     CommissioningParameters & SetCountryCode(CharSpan countryCode)
     {
         mCountryCode.SetValue(countryCode);
+        return *this;
+    }
+
+    // The lifetime of the list buffer needs to exceed the lifetime of the CommissioningParameters object.
+    CommissioningParameters &
+    SetTimeZone(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone)
+    {
+        mTimeZone.SetValue(timeZone);
+        return *this;
+    }
+
+    // The lifetime of the list buffer needs to exceed the lifetime of the CommissioningParameters object.
+    CommissioningParameters &
+    SetDSTOffsets(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> dstOffsets)
+    {
+        mDSTOffsets.SetValue(dstOffsets);
+        return *this;
+    }
+
+    // The lifetime of the char span needs to exceed the lifetime of the CommissioningParameters
+    CommissioningParameters & SetDefaultNTP(app::DataModel::Nullable<CharSpan> defaultNTP)
+    {
+        mDefaultNTP.SetValue(defaultNTP);
+        return *this;
+    }
+
+    CommissioningParameters & SetTrustedTimeSource(
+        app::DataModel::Nullable<app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>
+            trustedTimeSource)
+    {
+        mTrustedTimeSource.SetValue(trustedTimeSource);
         return *this;
     }
 
@@ -368,12 +454,12 @@ public:
         mRemoteProductId = MakeOptional(id);
         return *this;
     }
-    CommissioningParameters & SetDefaultRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationType location)
+    CommissioningParameters & SetDefaultRegulatoryLocation(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum location)
     {
         mDefaultRegulatoryLocation = MakeOptional(location);
         return *this;
     }
-    CommissioningParameters & SetLocationCapability(app::Clusters::GeneralCommissioning::RegulatoryLocationType capability)
+    CommissioningParameters & SetLocationCapability(app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum capability)
     {
         mLocationCapability = MakeOptional(capability);
         return *this;
@@ -427,6 +513,34 @@ public:
         return *this;
     }
 
+    ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
+    CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
+    {
+        mICDRegistrationStrategy = icdRegistrationStrategy;
+        return *this;
+    }
+
+    Optional<NodeId> GetICDCheckInNodeId() const { return mICDCheckInNodeId; }
+    CommissioningParameters & SetICDCheckInNodeId(NodeId icdCheckInNodeId)
+    {
+        mICDCheckInNodeId = MakeOptional(icdCheckInNodeId);
+        return *this;
+    }
+
+    Optional<uint64_t> GetICDMonitoredSubject() const { return mICDMonitoredSubject; }
+    CommissioningParameters & SetICDMonitoredSubject(uint64_t icdMonitoredSubject)
+    {
+        mICDMonitoredSubject = MakeOptional(icdMonitoredSubject);
+        return *this;
+    }
+
+    Optional<ByteSpan> GetICDSymmetricKey() const { return mICDSymmetricKey; }
+    CommissioningParameters & SetICDSymmetricKey(ByteSpan icdSymmetricKey)
+    {
+        mICDSymmetricKey = MakeOptional(icdSymmetricKey);
+        return *this;
+    }
+
     // Clear all members that depend on some sort of external buffer.  Can be
     // used to make sure that we are not holding any dangling pointers.
     void ClearExternalBufferDependentValues()
@@ -445,13 +559,22 @@ public:
         mAttestationSignature.ClearValue();
         mPAI.ClearValue();
         mDAC.ClearValue();
+        mTimeZone.ClearValue();
+        mDSTOffsets.ClearValue();
+        mDefaultNTP.ClearValue();
+        mICDSymmetricKey.ClearValue();
     }
 
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
     Optional<uint16_t> mCASEFailsafeTimerSeconds;
-    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDeviceRegulatoryLocation;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mDeviceRegulatoryLocation;
+    Optional<app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>> mTimeZone;
+    Optional<app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>> mDSTOffsets;
+    Optional<app::DataModel::Nullable<CharSpan>> mDefaultNTP;
+    Optional<app::DataModel::Nullable<app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>>
+        mTrustedTimeSource;
     Optional<ByteSpan> mCSRNonce;
     Optional<ByteSpan> mAttestationNonce;
     Optional<WiFiCredentials> mWiFiCreds;
@@ -471,15 +594,22 @@ private:
     Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
-    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDefaultRegulatoryLocation;
-    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mLocationCapability;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mDefaultRegulatoryLocation;
+    Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> mLocationCapability;
+    Optional<bool> mSupportsConcurrentConnection;
     CompletionStatus completionStatus;
     Credentials::DeviceAttestationDelegate * mDeviceAttestationDelegate =
         nullptr; // Delegate to handle device attestation failures during commissioning
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    bool mCheckForMatchingFabric = false;
+
+    Optional<NodeId> mICDCheckInNodeId;
+    Optional<uint64_t> mICDMonitoredSubject;
+    Optional<ByteSpan> mICDSymmetricKey;
+
+    ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
+    bool mCheckForMatchingFabric                     = false;
 };
 
 struct RequestedCertificate
@@ -542,11 +672,31 @@ struct GeneralCommissioningInfo
 {
     uint64_t breadcrumb          = 0;
     uint16_t recommendedFailsafe = 0;
-    app::Clusters::GeneralCommissioning::RegulatoryLocationType currentRegulatoryLocation =
-        app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
-    app::Clusters::GeneralCommissioning::RegulatoryLocationType locationCapability =
-        app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor;
+    app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum currentRegulatoryLocation =
+        app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
+    app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum locationCapability =
+        app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
     ;
+};
+
+// ICDManagementClusterInfo is populated when the controller reads information from
+// the ICD Management cluster, and is used to communicate that information.
+struct ICDManagementClusterInfo
+{
+    // Whether the ICD is capable of functioning as a LIT device.  If false, the ICD can only be a SIT device.
+    bool isLIT;
+    // Whether the ICD supports the check-in protocol.  LIT devices have to support it, but SIT devices
+    // might or might not.
+    bool checkInProtocolSupport;
+
+    // userActiveModeTriggerHint indicates which user action(s) will trigger the ICD to switch to Active mode.
+    // For a LIT: The device is required to provide a value for the bitmap.
+    // For a SIT: The device may not provide a value.  In that case, none of the bits will be set.
+    //
+    // userActiveModeTriggerInstruction may provide additional information for users for some specific
+    // userActiveModeTriggerHint values.
+    BitMask<app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
+    CharSpan userActiveModeTriggerInstruction;
 };
 
 struct ReadCommissioningInfo
@@ -554,7 +704,20 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
-    NodeId nodeId = kUndefinedNodeId;
+    bool requiresUTC                  = false;
+    bool requiresTimeZone             = false;
+    bool requiresDefaultNTP           = false;
+    bool requiresTrustedTimeSource    = false;
+    uint8_t maxTimeZoneSize           = 1;
+    uint8_t maxDSTSize                = 1;
+    NodeId remoteNodeId               = kUndefinedNodeId;
+    bool supportsConcurrentConnection = true;
+    ICDManagementClusterInfo icd;
+};
+
+struct TimeZoneResponseInfo
+{
+    bool requiresDSTOffsets;
 };
 
 struct AttestationErrorInfo
@@ -565,16 +728,16 @@ struct AttestationErrorInfo
 
 struct CommissioningErrorInfo
 {
-    CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningError result) : commissioningError(result) {}
-    app::Clusters::GeneralCommissioning::CommissioningError commissioningError;
+    CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningErrorEnum result) : commissioningError(result) {}
+    app::Clusters::GeneralCommissioning::CommissioningErrorEnum commissioningError;
 };
 
 struct NetworkCommissioningStatusInfo
 {
-    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatus result) :
+    NetworkCommissioningStatusInfo(app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum result) :
         networkCommissioningStatus(result)
     {}
-    app::Clusters::NetworkCommissioning::NetworkCommissioningStatus networkCommissioningStatus;
+    app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum networkCommissioningStatus;
 };
 
 class CommissioningDelegate
@@ -582,9 +745,14 @@ class CommissioningDelegate
 public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
-     * kReadCommissioningInfo - ReadCommissioningInfo
+     * kReadCommissioningInfo: Reported together with ReadCommissioningInfo2
+     * kReadCommissioningInfo2: ReadCommissioningInfo
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
+     * kConfigureUTCTime: None
+     * kConfigureTimeZone: TimeZoneResponseInfo
+     * kConfigureDSTOffset: None
+     * kConfigureDefaultNTP: None
      * kSendPAICertificateRequest: RequestedCertificate
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
@@ -593,6 +761,7 @@ public:
      * kGenerateNOCChain: NocChain
      * kSendTrustedRootCert: None
      * kSendNOC: none
+     * kConfigureTrustedTimeSource: None
      * kWiFiNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkSetup: NetworkCommissioningStatusInfo if there is an error
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
@@ -603,7 +772,7 @@ public:
      */
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo>
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

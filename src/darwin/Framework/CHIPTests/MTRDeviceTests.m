@@ -24,6 +24,7 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/Matter.h>
 
+#import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -75,6 +76,13 @@ static MTRBaseDevice * GetConnectedDevice(void)
 #ifdef DEBUG
 @interface MTRBaseDevice (Test)
 - (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion;
+
+// Test function for whitebox testing
++ (id)CHIPEncodeAndDecodeNSObject:(id)object;
+@end
+
+@interface MTRDevice (Test)
+- (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 @end
 #endif
 
@@ -96,10 +104,11 @@ static MTRBaseDevice * GetConnectedDevice(void)
 {
     XCTAssertEqual(error.code, 0);
 
+    __auto_type * params = [[MTRCommissioningParameters alloc] init];
+    params.countryCode = @("au");
+
     NSError * commissionError = nil;
-    [sController commissionNodeWithID:@(kDeviceId)
-                  commissioningParams:[[MTRCommissioningParameters alloc] init]
-                                error:&commissionError];
+    [sController commissionNodeWithID:@(kDeviceId) commissioningParams:params error:&commissionError];
     XCTAssertNil(commissionError);
 
     // Keep waiting for controller:commissioningComplete:
@@ -117,19 +126,20 @@ static MTRBaseDevice * GetConnectedDevice(void)
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
 
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
-@property (nonatomic) dispatch_block_t onSubscriptionEstablished;
+@property (nonatomic) dispatch_block_t onReachable;
+@property (nonatomic, nullable) dispatch_block_t onNotReachable;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onAttributeDataReceived;
 @property (nonatomic, nullable) MTRDeviceTestDelegateDataHandler onEventDataReceived;
-@property (nonatomic, nullable) dispatch_block_t onSubscriptionDropped;
+@property (nonatomic, nullable) dispatch_block_t onReportEnd;
 @end
 
 @implementation MTRDeviceTestDelegate
 - (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
 {
     if (state == MTRDeviceStateReachable) {
-        self.onSubscriptionEstablished();
-    } else if (state == MTRDeviceStateUnknown && self.onSubscriptionDropped != nil) {
-        self.onSubscriptionDropped();
+        self.onReachable();
+    } else if (state != MTRDeviceStateReachable && self.onNotReachable != nil) {
+        self.onNotReachable();
     }
 }
 
@@ -145,6 +155,19 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
     if (self.onEventDataReceived != nil) {
         self.onEventDataReceived(eventReport);
     }
+}
+
+- (void)unitTestReportEndForDevice:(MTRDevice *)device
+{
+    if (self.onReportEnd != nil) {
+        self.onReportEnd();
+    }
+}
+
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
+{
+    // Make sure our subscriptions time out in finite time.
+    return @(2); // seconds
 }
 
 @end
@@ -293,6 +316,19 @@ static BOOL sNeedsStackShutdown = YES;
                                           XCTAssertNil(result[@"error"]);
                                           XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                           XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Array"]);
+
+                                          __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result
+                                                                                                             error:nil];
+                                          XCTAssertNotNil(report);
+                                          XCTAssertEqualObjects(report.path.cluster, @(29));
+                                          XCTAssertEqualObjects(report.path.attribute, @(0));
+                                          XCTAssertNil(report.error);
+                                          XCTAssertNotNil(report.value);
+                                          XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+
+                                          for (id entry in report.value) {
+                                              XCTAssertTrue([entry isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+                                          }
                                       }
                                       XCTAssertTrue([resultArray count] > 0);
                                   }
@@ -465,16 +501,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
+
+        __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+        XCTAssertNotNil(report);
+        XCTAssertEqualObjects(report.path.endpoint, @(1));
+        XCTAssertEqualObjects(report.path.cluster, @(6));
+        XCTAssertEqualObjects(report.path.attribute, @(0));
+        XCTAssertNil(report.error);
+        XCTAssertNotNil(report.value);
+        XCTAssertEqualObjects(report.value, @(YES));
+
         MTRAttributePath * path = result[@"attributePath"];
         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
         XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
         XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
         XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == YES) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
-        }
+        XCTAssertTrue([result[@"data"][@"value"] boolValue]);
+        [reportExpectation fulfill];
+        globalReportHandler = nil;
     };
 
     // Send commands to trigger attribute change
@@ -517,16 +562,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
         NSDictionary * result = values[0];
+
+        __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+        XCTAssertNotNil(report);
+        XCTAssertEqualObjects(report.path.endpoint, @(1));
+        XCTAssertEqualObjects(report.path.cluster, @(6));
+        XCTAssertEqualObjects(report.path.attribute, @(0));
+        XCTAssertNil(report.error);
+        XCTAssertNotNil(report.value);
+        XCTAssertEqualObjects(report.value, @(NO));
+
         MTRAttributePath * path = result[@"attributePath"];
         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
         XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
         XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
         XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == NO) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
-        }
+        XCTAssertFalse([result[@"data"][@"value"] boolValue]);
+        [reportExpectation fulfill];
+        globalReportHandler = nil;
     };
 
     // Send command to trigger attribute change
@@ -592,6 +646,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                       XCTAssertEqual([resultArray count], 1);
                                       NSDictionary * result = resultArray[0];
 
+                                      __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+                                      XCTAssertNotNil(report);
+                                      XCTAssertEqualObjects(report.path.endpoint, @(0));
+                                      XCTAssertEqualObjects(report.path.cluster, @(10000));
+                                      XCTAssertEqualObjects(report.path.attribute, @(0));
+                                      XCTAssertNotNil(report.error);
+                                      XCTAssertNil(report.value);
+                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:report.error],
+                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+
                                       MTRAttributePath * path = result[@"attributePath"];
                                       XCTAssertEqual(path.endpoint.unsignedIntegerValue, 0);
                                       XCTAssertEqual(path.cluster.unsignedIntegerValue, 10000);
@@ -654,7 +718,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device
         invokeCommandWithEndpointID:@1
                           clusterID:@8
-                          commandID:@40000
+                          commandID:@(0xff)
                       commandFields:fields
                  timedInvokeTimeout:nil
                               queue:queue
@@ -672,7 +736,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test009_SubscribeFailure
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
     // Set up expectation for report
@@ -715,11 +778,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         }
         subscriptionEstablished:^{
             NSLog(@"subscribe attribute: OnOff established");
-            [expectation fulfill];
+            XCTFail("Should not get subscriptionEstablished in the error case");
         }];
 
     // Wait till establishment and error report
-    [self waitForExpectations:[NSArray arrayWithObjects:expectation, errorReportExpectation, nil] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ errorReportExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test010_ReadAllAttribute
@@ -926,6 +989,16 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               NSLog(@"Read attribute cache value: %@, error %@", values, error);
                               XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
                               XCTAssertEqual([values count], 1);
+
+                              __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:values[0] error:nil];
+                              XCTAssertNotNil(report);
+                              XCTAssertEqualObjects(report.path.endpoint, @(1));
+                              XCTAssertEqualObjects(report.path.cluster, @(6));
+                              XCTAssertEqualObjects(report.path.attribute, @(0));
+                              XCTAssertNil(report.error);
+                              XCTAssertNotNil(report.value);
+                              XCTAssertEqualObjects(report.value, @(NO));
+
                               MTRAttributePath * path = values[0][@"attributePath"];
                               XCTAssertEqual([path.endpoint unsignedShortValue], 1);
                               XCTAssertEqual([path.cluster unsignedLongValue], 6);
@@ -951,6 +1024,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
                               XCTAssertTrue([values count] > 0);
                               for (NSDictionary<NSString *, id> * value in values) {
+                                  __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:nil];
+                                  XCTAssertNotNil(report);
+                                  XCTAssertEqualObjects(report.path.cluster, @(6));
+                                  XCTAssertEqualObjects(report.path.attribute, @(0));
+                                  XCTAssertNil(report.error);
+                                  XCTAssertNotNil(report.value);
+                                  XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+
                                   MTRAttributePath * path = value[@"attributePath"];
                                   XCTAssertEqual([path.cluster unsignedLongValue], 6);
                                   XCTAssertEqual([path.attribute unsignedLongValue], 0);
@@ -1213,6 +1294,17 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      };
                                      XCTAssertEqualObjects(result[MTRDataKey], expectedResult);
                                      XCTAssertNil(result[MTRErrorKey]);
+
+                                     // Now check our strong-typed parsing bits.
+                                     NSError * parseError;
+                                     __auto_type * response =
+                                         [[MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams alloc]
+                                             initWithResponseValue:result
+                                                             error:&parseError];
+                                     XCTAssertNil(parseError);
+                                     XCTAssertNotNil(response);
+                                     XCTAssertEqual(response.groupKeySetIDs.count, 1);
+                                     XCTAssertEqualObjects(response.groupKeySetIDs[0], @(0));
                                  }
                                  XCTAssertEqual([resultArray count], 1);
                              }
@@ -1289,8 +1381,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1343,8 +1434,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1353,10 +1443,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
+    // Given reachable state becomes true before underlying OnSubscriptionEstablished callback, this expectation is necessary but
+    // not sufficient as a mark to the end of reports
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
 
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
-    delegate.onSubscriptionEstablished = ^() {
+    delegate.onReachable = ^() {
         [subscriptionExpectation fulfill];
     };
 
@@ -1365,7 +1457,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         attributeReportsReceived += data.count;
     };
 
+    // This is dependent on current implementation that priming reports send attributes and events in that order, and also that
+    // events in this test would fit in one report. So receiving events would mean all attributes and events have been received, and
+    // can satisfy the test below.
+    XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Attribute and Event reports have been received"];
     __block unsigned eventReportsReceived = 0;
+    __block BOOL reportEnded = NO;
+    __block BOOL gotOneNonPrimingEvent = NO;
+    XCTestExpectation * gotNonPrimingEventExpectation = [self expectationWithDescription:@"Received event outside of priming report"];
     delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
         eventReportsReceived += eventReport.count;
 
@@ -1380,27 +1479,66 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             } else if (eventTimeType == MTREventTimeTypeTimestampDate) {
                 XCTAssertNotNil(eventDict[MTREventTimestampDateKey]);
             }
+
+            if (!reportEnded) {
+                NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+                XCTAssertTrue(reportIsHistorical.boolValue);
+            } else {
+                if (!gotOneNonPrimingEvent) {
+                    NSNumber * reportIsHistorical = eventDict[MTREventIsHistoricalKey];
+                    XCTAssertFalse(reportIsHistorical.boolValue);
+                    gotOneNonPrimingEvent = YES;
+                    [gotNonPrimingEventExpectation fulfill];
+                }
+            }
         }
+    };
+    delegate.onReportEnd = ^() {
+        reportEnded = YES;
+        [gotReportsExpectation fulfill];
+#ifdef DEBUG
+        [device unitTestInjectEventReport:@[ @{
+            MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(1)],
+            MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+            MTREventTimestampDateKey : [NSDate date]
+        } ]];
+#endif
     };
 
     [device setDelegate:delegate queue:queue];
 
-    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+    // Test batching and duplicate check
+    //   - Read 13 different attributes in a row, expect that the 1st to go out by itself, the next 9 batch, and then the 3 after
+    //     are correctly queued in one batch
+    //   - Then read 3 duplicates and expect them to be filtered
+    //   - Note that these tests can only be verified via logs
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(0) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(1) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(2) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(3) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(5) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(6) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(7) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(0) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(1) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(2) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(3) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
+
+    [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation, gotNonPrimingEventExpectation ] timeout:60];
+
+    delegate.onReportEnd = nil;
 
     XCTAssertNotEqual(attributeReportsReceived, 0);
-
-    attributeReportsReceived = 0;
-    eventReportsReceived = 0;
-
-    XCTestExpectation * resubscriptionExpectation = [self expectationWithDescription:@"Resubscription has happened"];
-    delegate.onSubscriptionEstablished = ^() {
-        [resubscriptionExpectation fulfill];
-    };
-
-    XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
-    delegate.onSubscriptionDropped = ^() {
-        [subscriptionDroppedExpectation fulfill];
-    };
+    XCTAssertNotEqual(eventReportsReceived, 0);
 
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
@@ -1437,9 +1575,43 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // nonexistent attribute
     [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
 
+    // Test if errors are properly received
+    XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
+            if (attributeReponseValue[MTRErrorKey]) {
+                [attributeReportErrorExpectation fulfill];
+            }
+        }
+    };
+    // use the nonexistent attribute and expect read error
+    [device readAttributeWithEndpointID:testEndpointID clusterID:testClusterID attributeID:testAttributeID params:nil];
+    [self waitForExpectations:@[ attributeReportErrorExpectation ] timeout:10];
+
+    // Resubscription test setup
+    XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
+    delegate.onNotReachable = ^() {
+        [subscriptionDroppedExpectation fulfill];
+    };
+    XCTestExpectation * resubscriptionReachableExpectation =
+        [self expectationWithDescription:@"Resubscription has become reachable"];
+    delegate.onReachable = ^() {
+        [resubscriptionReachableExpectation fulfill];
+    };
+    XCTestExpectation * resubscriptionGotReportsExpectation = [self expectationWithDescription:@"Resubscription got reports"];
+    delegate.onReportEnd = ^() {
+        [resubscriptionGotReportsExpectation fulfill];
+    };
+
     // reset the onAttributeDataReceived to validate the following resubscribe test
+    attributeReportsReceived = 0;
+    eventReportsReceived = 0;
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
         attributeReportsReceived += data.count;
+    };
+
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * eventReport) {
+        eventReportsReceived += eventReport.count;
     };
 
     // Now trigger another subscription which will cause ours to drop; we should re-subscribe after that.
@@ -1458,16 +1630,20 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      clientQueue:queue
                                    reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                    }
-                         subscriptionEstablished:^() {
-                         }];
+                         subscriptionEstablished:^() {}];
 
-    [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionExpectation ] timeout:60 enforceOrder:YES];
+    [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
+
+    // Check that device resets start time on subscription drop
+    XCTAssertNil(device.estimatedStartTime);
+
+    [self waitForExpectations:@[ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ] timeout:60];
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
-    delegate.onSubscriptionEstablished = ^() {
+    delegate.onReachable = ^() {
     };
-    delegate.onSubscriptionDropped = nil;
+    delegate.onNotReachable = nil;
     delegate.onAttributeDataReceived = nil;
     delegate.onEventDataReceived = nil;
 
@@ -1475,9 +1651,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // with data versions) during the resubscribe.
     XCTAssertEqual(attributeReportsReceived, 0);
     XCTAssertEqual(eventReportsReceived, 0);
-
-    // Check that device resets start time on subscription drop
-    XCTAssertNil(device.estimatedStartTime);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing
@@ -1532,8 +1705,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1545,6 +1717,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * opcredsCluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
     __auto_type * onOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
     __auto_type * badOnOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    // Ensure our existing fabric label is not "Test".  This uses a "base"
+    // cluster to ensure read-through to the other side.
+    __auto_type * baseOpCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:GetConnectedDevice() endpointID:@(0) queue:queue];
+    XCTestExpectation * readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label first time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertNotEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Read current fabric index"];
+    __block NSNumber * currentFabricIndex;
+    [baseOpCredsCluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        currentFabricIndex = value;
+        [readFabricIndexExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation, readFabricIndexExpectation ] timeout:kTimeoutInSeconds];
 
     XCTestExpectation * onExpectation = [self expectationWithDescription:@"On command executed"];
     [onOffCluster onWithParams:nil
@@ -1576,17 +1772,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                          XCTAssertNotNil(data);
                                          XCTAssertEqualObjects(data.statusCode, @(0));
                                          XCTAssertNotNil(data.fabricIndex);
+                                         XCTAssertEqualObjects(data.fabricIndex, currentFabricIndex);
                                          [updateLabelExpectation fulfill];
                                      }];
 
     XCTestExpectation * offExpectation = [self expectationWithDescription:@"Off command executed"];
-    [onOffCluster offWithParams:nil
-                 expectedValues:nil
-          expectedValueInterval:nil
-                     completion:^(NSError * _Nullable error) {
-                         XCTAssertNil(error);
-                         [offExpectation fulfill];
-                     }];
+    // Send this one via MTRDevice, to test that codepath.
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)
+                          commandFields:nil
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [offExpectation fulfill];
+                             }];
 
     XCTestExpectation * onFailedExpectation = [self expectationWithDescription:@"On command failed"];
     [badOnOffCluster onWithParams:nil
@@ -1615,6 +1817,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ]
                       timeout:60
                  enforceOrder:YES];
+
+    // Now make sure our fabric label got updated.
+    readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label second time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test020_ReadMultipleAttributes
@@ -1636,8 +1851,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@7]
     ];
 
-    NSArray<MTREventRequestPath *> * eventPaths =
-        [NSArray arrayWithObjects:[MTREventRequestPath requestPathWithEndpointID:nil clusterID:@40 eventID:@0], nil];
+    NSArray<MTREventRequestPath *> * eventPaths = @[ [MTREventRequestPath requestPathWithEndpointID:nil clusterID:@40 eventID:@0] ];
 
     [device readAttributePaths:attributePaths
                     eventPaths:eventPaths
@@ -1656,15 +1870,104 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                         for (NSDictionary * result in resultArray) {
                             if ([result objectForKey:@"eventPath"]) {
                                 ++eventResultCount;
+
+                                __auto_type * report = [[MTREventReport alloc] initWithResponseValue:result error:nil];
+                                XCTAssertNotNil(report);
+                                XCTAssertNotNil(report.path);
+                                XCTAssertEqualObjects(report.path.endpoint, @(0));
+                                XCTAssertEqualObjects(report.path.cluster, @(40));
+                                XCTAssertEqualObjects(report.path.event, @(0));
+                                XCTAssertNotNil(report.eventNumber);
+                                XCTAssertEqualObjects(report.priority, @(MTREventPriorityCritical));
+                                XCTAssertEqual(report.eventTimeType, MTREventTimeTypeTimestampDate);
+                                XCTAssertNotNil(report.timestampDate);
+                                XCTAssertNotNil(report.value);
+                                XCTAssertTrue([report.value isKindOfClass:[MTRBasicInformationClusterStartUpEvent class]]);
+                                XCTAssertNil(report.error);
+
                                 MTREventPath * path = result[@"eventPath"];
                                 XCTAssertEqualObjects(path.endpoint, @0);
                                 XCTAssertEqualObjects(path.cluster, @40);
                                 XCTAssertEqualObjects(path.event, @0);
-                                XCTAssertNotNil(result[@"data"]);
                                 XCTAssertNil(result[@"error"]);
+
+                                XCTAssertNotNil(result[@"data"]);
                                 XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+
+                                XCTAssertNotNil(result[@"eventNumber"]);
+                                XCTAssertTrue([result[@"eventNumber"] isKindOfClass:[NSNumber class]]);
+
+                                XCTAssertNotNil(result[@"eventPriority"]);
+                                XCTAssertTrue([result[@"eventPriority"] isKindOfClass:[NSNumber class]]);
+                                XCTAssertEqualObjects(result[@"eventPriority"], @(MTREventPriorityCritical));
+
+                                XCTAssertNotNil(result[@"eventTimeType"]);
+                                XCTAssertTrue([result[@"eventTimeType"] isKindOfClass:[NSNumber class]]);
+
+                                XCTAssertTrue(result[@"eventSystemUpTime"] != nil || result[@"eventTimestampDate"] != nil);
+                                if (result[@"eventSystemUpTime"] != nil) {
+                                    XCTAssertTrue([result[@"eventSystemUpTime"] isKindOfClass:[NSNumber class]]);
+                                } else {
+                                    XCTAssertTrue([result[@"eventTimestampDate"] isKindOfClass:[NSDate class]]);
+                                }
                             } else if ([result objectForKey:@"attributePath"]) {
                                 ++attributeResultCount;
+
+                                __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:result error:nil];
+                                XCTAssertNotNil(report);
+                                XCTAssertNil(report.error);
+                                XCTAssertNotNil(report.value);
+                                switch ([report.path.attribute unsignedLongValue]) {
+                                case 0:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[MTRDescriptorClusterDeviceTypeStruct class]]);
+                                    }
+                                    break;
+                                case 1:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[NSNumber class]]);
+                                    }
+                                    break;
+                                case 2:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[NSNumber class]]);
+                                    }
+                                    break;
+                                case 3:
+                                    XCTAssertEqualObjects(report.path.cluster, @29);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSArray class]]);
+                                    for (id entry in report.value) {
+                                        XCTAssertTrue([entry isKindOfClass:[NSNumber class]]);
+                                    }
+                                    break;
+                                case 4:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+                                    break;
+                                case 5:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSString class]]);
+                                    break;
+                                case 6:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSString class]]);
+                                    break;
+                                case 7:
+                                    XCTAssertEqualObjects(report.path.cluster, @40);
+                                    XCTAssertEqualObjects(report.path.endpoint, @0);
+                                    XCTAssertTrue([report.value isKindOfClass:[NSNumber class]]);
+                                    break;
+                                }
+
                                 MTRAttributePath * path = result[@"attributePath"];
                                 if ([path.attribute unsignedIntegerValue] < 4) {
                                     XCTAssertEqualObjects(path.cluster, @29);
@@ -1840,12 +2143,66 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
 
-    NSArray<MTRAttributeRequestPath *> * attributePaths =
-        [NSArray arrayWithObjects:[MTRAttributeRequestPath requestPathWithEndpointID:@1 clusterID:@6 attributeID:@0],
-                 [MTRAttributeRequestPath requestPathWithEndpointID:@0 clusterID:@40 attributeID:@5], nil];
+    NSNumber * failClusterId = @5678;
+    NSNumber * failEndpointId = @1000;
+
+    NSArray<MTRAttributeRequestPath *> * attributePaths = @[
+        [MTRAttributeRequestPath requestPathWithEndpointID:@1 clusterID:@6 attributeID:@0],
+        [MTRAttributeRequestPath requestPathWithEndpointID:@1 clusterID:failClusterId attributeID:@1],
+    ];
+
+    NSArray<MTREventRequestPath *> * eventPaths = @[ [MTREventRequestPath requestPathWithEndpointID:failEndpointId
+                                                                                          clusterID:@40
+                                                                                            eventID:@0] ];
+
+    XCTestExpectation * onOffReportExpectation = [self expectationWithDescription:@"report OnOff attribute"];
+    XCTestExpectation * attributeErrorReportExpectation = [self expectationWithDescription:@"report nonexistent attribute"];
+    XCTestExpectation * eventErrorReportExpectation = [self expectationWithDescription:@"report nonexistent event"];
+    globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+
+        for (NSDictionary * result in values) {
+            if (result[@"attributePath"] != nil) {
+                MTRAttributePath * path = result[@"attributePath"];
+
+                if ([path.attribute isEqualToNumber:@0]) {
+                    XCTAssertEqualObjects(path.endpoint, @1);
+                    XCTAssertEqualObjects(path.cluster, @6);
+                    XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+                    XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+                    XCTAssertEqualObjects(result[@"data"][@"value"], @NO);
+                    [onOffReportExpectation fulfill];
+                } else if ([path.attribute isEqualToNumber:@1]) {
+                    XCTAssertEqualObjects(path.endpoint, @1);
+                    XCTAssertEqualObjects(path.cluster, failClusterId);
+                    XCTAssertNil(result[@"data"]);
+                    XCTAssertNotNil(result[@"error"]);
+                    XCTAssertEqual(
+                        [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedCluster);
+                    [attributeErrorReportExpectation fulfill];
+                } else {
+                    XCTFail("Unexpected attribute value");
+                }
+            } else if (result[@"eventPath"] != nil) {
+                MTREventPath * path = result[@"eventPath"];
+                XCTAssertEqualObjects(path.endpoint, failEndpointId);
+                XCTAssertEqualObjects(path.cluster, @40);
+                XCTAssertEqualObjects(path.event, @0);
+                XCTAssertNil(result[@"data"]);
+                XCTAssertNotNil(result[@"error"]);
+                XCTAssertEqual(
+                    [MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]], MTRInteractionErrorCodeUnsupportedEndpoint);
+                [eventErrorReportExpectation fulfill];
+            } else {
+                XCTFail("Unexpected result dictionary");
+            }
+        }
+    };
 
     [device subscribeToAttributePaths:attributePaths
-        eventPaths:nil
+        eventPaths:eventPaths
         params:params
         queue:queue
         reportHandler:^(id _Nullable values, NSError * _Nullable error) {
@@ -1863,31 +2220,37 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         resubscriptionScheduled:nil];
 
     // Wait till establishment
-    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ onOffReportExpectation, attributeErrorReportExpectation, eventErrorReportExpectation, expectation ]
+                      timeout:kTimeoutInSeconds];
 
     // Set up expectation for report
     XCTestExpectation * reportExpectation = [self expectationWithDescription:@"report received"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-        NSDictionary * result = values[0];
-        MTRAttributePath * path = result[@"attributePath"];
-        if (path.endpoint.unsignedShortValue == 1) {
-            XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
-            XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+
+        for (NSDictionary * result in values) {
+            // Note: we will get updates for our event subscription too, each time
+            // with errors.
+            if (result[@"eventPath"] != nil) {
+                continue;
+            }
+
+            MTRAttributePath * path = result[@"attributePath"];
+            XCTAssertNotNil(path);
+
+            // We will only be getting incremental attribute reports for the OnOff attribute.
+            XCTAssertEqualObjects(path.endpoint, @1);
+            XCTAssertEqualObjects(path.cluster, @6);
+            XCTAssertEqualObjects(path.attribute, @0);
+
             XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
             XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
             if ([result[@"data"][@"value"] boolValue] == YES) {
                 [reportExpectation fulfill];
                 globalReportHandler = nil;
             }
-        } else if (path.endpoint.unsignedShortValue == 0) {
-            XCTAssertEqual([path.cluster unsignedIntegerValue], 40);
-            XCTAssertEqual([path.attribute unsignedIntegerValue], 5);
-            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"UTF8String"]);
-        } else {
-            XCTAssertTrue(NO);
         }
     };
 
@@ -1909,12 +2272,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
+                                     XCTAssertEqual(resultArray.count, 1);
                                      for (NSDictionary * result in resultArray) {
                                          MTRCommandPath * path = result[@"commandPath"];
-                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
-                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
-                                         XCTAssertEqual([path.command unsignedIntegerValue], 1);
+                                         XCTAssertEqualObjects(path.endpoint, @1);
+                                         XCTAssertEqualObjects(path.cluster, @6);
+                                         XCTAssertEqualObjects(path.command, @1);
                                          XCTAssertNil(result[@"error"]);
+                                         // This command just has a status response.
+                                         XCTAssertNil(result[@"value"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -1929,18 +2295,29 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Set up expectation for 2nd report
     reportExpectation = [self expectationWithDescription:@"receive OnOff attribute report"];
     globalReportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
         XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
         XCTAssertTrue([values isKindOfClass:[NSArray class]]);
-        NSDictionary * result = values[0];
-        MTRAttributePath * path = result[@"attributePath"];
-        XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
-        XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
-        XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
-        XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
-        XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
-        if ([result[@"data"][@"value"] boolValue] == NO) {
-            [reportExpectation fulfill];
-            globalReportHandler = nil;
+
+        for (NSDictionary * result in values) {
+            // Note: we will get updates for our event subscription too, each time
+            // with errors.
+            if (result[@"eventPath"] != nil) {
+                continue;
+            }
+
+            MTRAttributePath * path = result[@"attributePath"];
+            XCTAssertNotNil(path);
+
+            XCTAssertEqualObjects(path.endpoint, @1);
+            XCTAssertEqualObjects(path.cluster, @6);
+            XCTAssertEqualObjects(path.attribute, @0);
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+            XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Boolean"]);
+            if ([result[@"data"][@"value"] boolValue] == NO) {
+                [reportExpectation fulfill];
+                globalReportHandler = nil;
+            }
         }
     };
 
@@ -1963,9 +2340,9 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      NSArray * resultArray = values;
                                      for (NSDictionary * result in resultArray) {
                                          MTRCommandPath * path = result[@"commandPath"];
-                                         XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
-                                         XCTAssertEqual([path.cluster unsignedIntegerValue], 6);
-                                         XCTAssertEqual([path.command unsignedIntegerValue], 0);
+                                         XCTAssertEqualObjects(path.endpoint, @1);
+                                         XCTAssertEqualObjects(path.cluster, @6);
+                                         XCTAssertEqualObjects(path.command, @0);
                                          XCTAssertNil(result[@"error"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
@@ -1981,6 +2358,278 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                        [expectation fulfill];
                                    }];
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test024_SubscribeMultipleAttributesAllErrors
+{
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Subscribe
+    XCTestExpectation * errorExpectation = [self expectationWithDescription:@"subscribe failure"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
+
+    NSNumber * failClusterId = @5678;
+    NSNumber * failEndpointId = @1000;
+
+    // All the paths are invalid, so we will just get an INVALID_ACTION error.
+    NSArray<MTRAttributeRequestPath *> * attributePaths = @[
+        [MTRAttributeRequestPath requestPathWithEndpointID:failEndpointId clusterID:@6 attributeID:@0],
+        [MTRAttributeRequestPath requestPathWithEndpointID:@1 clusterID:failClusterId attributeID:@1],
+    ];
+
+    [device subscribeToAttributePaths:attributePaths
+        eventPaths:nil
+        params:params
+        queue:queue
+        reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+            XCTAssertNotNil(error);
+            XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], MTRInteractionErrorCodeInvalidAction);
+            XCTAssertNil(values);
+            [errorExpectation fulfill];
+        }
+        subscriptionEstablished:^{
+            XCTFail("This subscription should never be established");
+        }
+        resubscriptionScheduled:nil];
+
+    [self waitForExpectations:@[ errorExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test025_SubscribeMultipleEvents
+{
+    MTRBaseDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // Subscribe
+    XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe multiple events"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+
+    NSArray<MTREventRequestPath *> * eventPaths = @[
+        // Startup event.
+        [MTREventRequestPath requestPathWithEndpointID:@0 clusterID:@40 eventID:@0],
+        // Shutdown event.
+        [MTREventRequestPath requestPathWithEndpointID:@0 clusterID:@40 eventID:@1],
+    ];
+
+    XCTestExpectation * startupEventExpectation = [self expectationWithDescription:@"report startup event"];
+    __auto_type reportHandler = ^(id _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
+        XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+
+        for (NSDictionary * result in values) {
+            XCTAssertNotNil(result[@"eventPath"]);
+
+            MTREventPath * path = result[@"eventPath"];
+            // We only expect to see a Startup event here.
+            XCTAssertEqualObjects(path.endpoint, @0);
+            XCTAssertEqualObjects(path.cluster, @40);
+            XCTAssertEqualObjects(path.event, @0);
+
+            XCTAssertNil(result[@"error"]);
+
+            XCTAssertNotNil(result[@"data"]);
+            XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
+
+            XCTAssertNotNil(result[@"eventNumber"]);
+            XCTAssertTrue([result[@"eventNumber"] isKindOfClass:[NSNumber class]]);
+
+            XCTAssertNotNil(result[@"eventPriority"]);
+            XCTAssertTrue([result[@"eventPriority"] isKindOfClass:[NSNumber class]]);
+            XCTAssertEqualObjects(result[@"eventPriority"], @(MTREventPriorityCritical));
+
+            XCTAssertNotNil(result[@"eventTimeType"]);
+            XCTAssertTrue([result[@"eventTimeType"] isKindOfClass:[NSNumber class]]);
+
+            XCTAssertTrue(result[@"eventSystemUpTime"] != nil || result[@"eventTimestampDate"] != nil);
+            if (result[@"eventSystemUpTime"] != nil) {
+                XCTAssertTrue([result[@"eventSystemUpTime"] isKindOfClass:[NSNumber class]]);
+            } else {
+                XCTAssertTrue([result[@"eventTimestampDate"] isKindOfClass:[NSDate class]]);
+            }
+
+            [startupEventExpectation fulfill];
+        }
+    };
+
+    [device subscribeToAttributePaths:nil
+                           eventPaths:eventPaths
+                               params:params
+                                queue:queue
+                        reportHandler:reportHandler
+              subscriptionEstablished:^{
+                  NSLog(@"subscribe complete");
+                  [expectation fulfill];
+              }
+              resubscriptionScheduled:nil];
+
+    // Wait till establishment
+    [self waitForExpectations:@[ startupEventExpectation, expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test026_LocationAttribute
+{
+    __auto_type * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read Basic Information Location attribute"];
+
+    __auto_type * cluster = [[MTRBaseClusterBasicInformation alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    [cluster readAttributeLocationWithCompletion:^(NSString * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+
+        // Matches what we passed in during commissioning.
+        XCTAssertEqualObjects(value, @"au");
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test027_AttestationChallenge
+{
+    // Check that we have an attestation challenge result in
+    // MTROperationalCredentialsClusterAttestationResponseParams.
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We don't care about our nonce being random here, so just all-0 is fine.
+    __auto_type * nonce = [[NSMutableData alloc] initWithLength:32];
+    __auto_type * params = [[MTROperationalCredentialsClusterAttestationRequestParams alloc] init];
+    params.attestationNonce = nonce;
+
+    __auto_type * baseDevice = GetConnectedDevice();
+    __auto_type * baseCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice endpointID:@(0) queue:queue];
+    XCTestExpectation * attestationRequestedViaBaseCluster = [self expectationWithDescription:@"Invoked AttestationRequest via base cluster"];
+    [baseCluster attestationRequestWithParams:params completion:^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        XCTAssertNotNil(data.attestationChallenge);
+        [attestationRequestedViaBaseCluster fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaBaseCluster ] timeout:kTimeoutInSeconds];
+
+    __auto_type * requestFields = @{
+        MTRTypeKey : MTRStructureValueType,
+        MTRValueKey : @[
+            @{
+                MTRContextTagKey : @(0), // AttestationNonce
+                MTRDataKey : @ {
+                    MTRTypeKey : MTROctetStringValueType,
+                    MTRValueKey : nonce,
+                },
+            },
+        ],
+    };
+
+    XCTestExpectation * attestationRequestedViaBaseDevice = [self expectationWithDescription:@"Invoked AttestationRequest via base device"];
+    [baseDevice invokeCommandWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeOperationalCredentialsID) commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID) commandFields:requestFields timedInvokeTimeout:nil queue:queue completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(values);
+        XCTAssertEqual(values.count, 1);
+        __auto_type * response = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] initWithResponseValue:values[0] error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(response);
+        XCTAssertNotNil(response.attestationChallenge);
+        [attestationRequestedViaBaseDevice fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaBaseDevice ] timeout:kTimeoutInSeconds];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    __auto_type * cluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    XCTestExpectation * attestationRequestedViaCluster = [self expectationWithDescription:@"Invoked AttestationRequest via cluster"];
+    [cluster attestationRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        XCTAssertNotNil(data.attestationChallenge);
+        [attestationRequestedViaCluster fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaCluster ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * attestationRequestedViaDevice = [self expectationWithDescription:@"Invoked AttestationRequest via device"];
+    [device invokeCommandWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeOperationalCredentialsID) commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID) commandFields:requestFields expectedValues:nil expectedValueInterval:nil timedInvokeTimeout:nil queue:queue completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(values);
+        XCTAssertEqual(values.count, 1);
+        __auto_type * response = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] initWithResponseValue:values[0] error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(response);
+        XCTAssertNotNil(response.attestationChallenge);
+        [attestationRequestedViaDevice fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaDevice ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test028_TimeZoneAndDST
+{
+    // Time synchronization is marked provisional so far, so we can only test it
+    // when MTR_ENABLE_PROVISIONAL is set.
+#if MTR_ENABLE_PROVISIONAL
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = GetConnectedDevice();
+    __auto_type * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    XCTestExpectation * readTimeZoneExpectation = [self expectationWithDescription:@"Read TimeZone attribute"];
+    __block NSArray<MTRTimeSynchronizationClusterTimeZoneStruct *> * timeZone;
+    [cluster readAttributeTimeZoneWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        timeZone = value;
+        [readTimeZoneExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readTimeZoneExpectation ] timeout:kTimeoutInSeconds];
+
+    __block NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> * dstOffset;
+    XCTestExpectation * readDSTOffsetExpectation = [self expectationWithDescription:@"Read DSTOffset attribute"];
+    [cluster readAttributeDSTOffsetWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        dstOffset = value;
+        [readDSTOffsetExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readDSTOffsetExpectation ] timeout:kTimeoutInSeconds];
+
+    // Check that the first DST offset entry matches what we expect.  If we
+    // happened to cross a DST boundary during execution of this function, some
+    // of these checks will fail, but that seems pretty low-probability.
+
+    XCTAssertTrue(dstOffset.count > 0);
+    MTRTimeSynchronizationClusterDSTOffsetStruct * currentDSTOffset = dstOffset[0];
+
+    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    __auto_type * dateComponents = [[NSDateComponents alloc] init];
+    dateComponents.timeZone = utcTz;
+    dateComponents.year = 2000;
+    dateComponents.month = 1;
+    dateComponents.day = 1;
+    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDate * matterEpoch = [gregorianCalendar dateFromComponents:dateComponents];
+
+    NSDate * nextReportedDSTTransition;
+    if (currentDSTOffset.validUntil == nil) {
+        nextReportedDSTTransition = nil;
+    } else {
+        double validUntilMicroSeconds = currentDSTOffset.validUntil.doubleValue;
+        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:matterEpoch];
+    }
+
+    __auto_type * tz = [NSTimeZone localTimeZone];
+    NSDate * nextDSTTransition = tz.nextDaylightSavingTimeTransition;
+    XCTAssertEqualObjects(nextReportedDSTTransition, nextDSTTransition);
+
+    XCTAssertEqual(currentDSTOffset.offset.intValue, tz.daylightSavingTimeOffset);
+
+    // Now check the timezone info we got.  We always set exactly one timezone.
+    XCTAssertEqual(timeZone.count, 1);
+    MTRTimeSynchronizationClusterTimeZoneStruct * currentTimeZone = timeZone[0];
+    XCTAssertEqual(tz.secondsFromGMT, currentTimeZone.offset.intValue + currentDSTOffset.offset.intValue);
+#endif // MTR_ENABLE_PROVISIONAL
 }
 
 - (void)test900_SubscribeAllAttributes
@@ -2156,17 +2805,99 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
 }
 
+- (void)test029_PathsBehavior
+{
+    __auto_type * commandPath1 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(3)];
+    __auto_type * commandPath2 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(4)];
+    __auto_type * commandPath3 = [MTRCommandPath commandPathWithEndpointID:@(2) clusterID:@(2) commandID:@(3)];
+    __auto_type * commandPath4 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(1) commandID:@(3)];
+    __auto_type * commandPath5 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(3)];
+
+    __auto_type * eventPath1 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(3)];
+    __auto_type * eventPath2 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(4)];
+    __auto_type * eventPath3 = [MTREventPath eventPathWithEndpointID:@(2) clusterID:@(2) eventID:@(3)];
+    __auto_type * eventPath4 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(3)];
+    __auto_type * eventPath5 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(3)];
+
+    __auto_type * attributePath1 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)];
+    __auto_type * attributePath2 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(4)];
+    __auto_type * attributePath3 = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(2) attributeID:@(3)];
+    __auto_type * attributePath4 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(3)];
+    __auto_type * attributePath5 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)];
+
+    __auto_type * clusterPath1 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
+    __auto_type * clusterPath2 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)];
+    __auto_type * clusterPath3 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
+    __auto_type * clusterPath4 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
+
+    // Command paths
+    XCTAssertTrue([commandPath1 isEqual:commandPath5]);
+    XCTAssertEqualObjects(commandPath1, commandPath5);
+
+    XCTAssertFalse([commandPath1 isEqual:commandPath2]);
+    XCTAssertNotEqualObjects(commandPath1, commandPath2);
+
+    XCTAssertFalse([commandPath1 isEqual:commandPath3]);
+    XCTAssertNotEqualObjects(commandPath1, commandPath3);
+
+    XCTAssertFalse([commandPath1 isEqual:commandPath4]);
+    XCTAssertNotEqualObjects(commandPath1, commandPath4);
+
+    // Event paths
+    XCTAssertTrue([eventPath1 isEqual:eventPath5]);
+    XCTAssertEqualObjects(eventPath1, eventPath5);
+
+    XCTAssertFalse([eventPath1 isEqual:eventPath2]);
+    XCTAssertNotEqualObjects(eventPath1, eventPath2);
+
+    XCTAssertFalse([eventPath1 isEqual:eventPath3]);
+    XCTAssertNotEqualObjects(eventPath1, eventPath3);
+
+    XCTAssertFalse([eventPath1 isEqual:eventPath4]);
+    XCTAssertNotEqualObjects(eventPath1, eventPath4);
+
+    // Attribute paths
+    XCTAssertTrue([attributePath1 isEqual:attributePath5]);
+    XCTAssertEqualObjects(attributePath1, attributePath5);
+
+    XCTAssertFalse([attributePath1 isEqual:attributePath2]);
+    XCTAssertNotEqualObjects(attributePath1, attributePath2);
+
+    XCTAssertFalse([attributePath1 isEqual:attributePath3]);
+    XCTAssertNotEqualObjects(attributePath1, attributePath3);
+
+    XCTAssertFalse([attributePath1 isEqual:attributePath4]);
+    XCTAssertNotEqualObjects(attributePath1, attributePath4);
+
+    // Clusters
+    XCTAssertTrue([clusterPath1 isEqual:clusterPath4]);
+    XCTAssertEqualObjects(clusterPath1, clusterPath4);
+
+    XCTAssertFalse([clusterPath1 isEqual:clusterPath2]);
+    XCTAssertNotEqualObjects(clusterPath1, clusterPath2);
+
+    XCTAssertFalse([clusterPath1 isEqual:clusterPath3]);
+    XCTAssertNotEqualObjects(clusterPath1, clusterPath3);
+
+    // Mix
+    XCTAssertFalse([commandPath1 isEqual:eventPath1]);
+    XCTAssertFalse([eventPath1 isEqual:commandPath1]);
+
+    XCTAssertFalse([commandPath1 isEqual:attributePath1]);
+    XCTAssertFalse([attributePath1 isEqual:commandPath1]);
+
+    XCTAssertFalse([attributePath1 isEqual:eventPath1]);
+    XCTAssertFalse([eventPath1 isEqual:attributePath1]);
+    XCTAssertFalse([clusterPath1 isEqual:attributePath1]);
+    XCTAssertFalse([clusterPath1 isEqual:eventPath1]);
+}
+
 - (void)test999_TearDown
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);
     [[self class] shutdownStack];
 }
 
-@end
-
-@interface MTRBaseDevice (Test)
-// Test function for whitebox testing
-+ (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase

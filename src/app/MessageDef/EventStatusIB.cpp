@@ -117,10 +117,10 @@ StatusIB::Builder & EventStatusIB::Builder::CreateErrorStatus()
     return mErrorStatus;
 }
 
-EventStatusIB::Builder & EventStatusIB::Builder::EndOfEventStatusIB()
+CHIP_ERROR EventStatusIB::Builder::EndOfEventStatusIB()
 {
     EndOfContainer();
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

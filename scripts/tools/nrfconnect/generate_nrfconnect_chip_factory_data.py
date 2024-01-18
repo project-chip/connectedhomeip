@@ -61,6 +61,10 @@ HEX_PREFIX = "hex:"
 PUB_KEY_PREFIX = b'\x04'
 INVALID_PASSCODES = [00000000, 11111111, 22222222, 33333333, 44444444,
                      55555555, 66666666, 77777777, 88888888, 99999999, 12345678, 87654321]
+PRODUCT_FINISH_ENUM = {"other": 0, "matte": 1, "satin": 2, "polished": 3, "rugged": 4, "fabric": 5}
+PRODUCT_COLOR_ENUM = {"black": 0, "navy": 1, "green": 2, "teal": 3, "maroon": 4, "purple": 5, "olive": 6, "gray": 7, "blue": 8, "lime": 9,
+                      "aqua": 10, "red": 11, "fuchsia": 12, "yellow": 13, "white": 14, "nickel": 15, "chrome": 16, "brass": 18, "cooper": 19,
+                      "silver": 19, "gold": 20}
 
 sys.path.insert(0, os.path.join(MATTER_ROOT, 'scripts', 'tools', 'spake2p'))
 from spake2p import generate_verifier  # noqa: E402 isort:skip
@@ -325,6 +329,10 @@ class FactoryDataGenerator:
                 self._add_entry("rd_uid", rd_uid)
             if self._args.enable_key:
                 self._add_entry("enable_key", HEX_PREFIX + self._args.enable_key)
+            if self._args.product_finish:
+                self._add_entry("product_finish", PRODUCT_FINISH_ENUM[self._args.product_finish])
+            if self._args.product_color:
+                self._add_entry("primary_color", PRODUCT_COLOR_ENUM[self._args.product_color])
             if self._args.user:
                 self._add_entry("user", self._user_data)
 
@@ -516,6 +524,10 @@ def main():
     optional_arguments.add_argument("--generate_onboarding", action="store_true",
                                     help=("Generate a Manual Code and QR Code according to provided factory data set."
                                           "As a result a PNG image containing QRCode and a .txt file containing Manual Code will be available within output directory"))
+    optional_arguments.add_argument("--product_finish", type=str, choices=PRODUCT_FINISH_ENUM.keys(),
+                                    help="[string] Provide one of the product finishes")
+    optional_arguments.add_argument("--product_color", type=str, choices=PRODUCT_COLOR_ENUM.keys(),
+                                    help="[string] Provide one of the product colors.")
     args = parser.parse_args()
 
     if args.verbose:
@@ -533,13 +545,13 @@ def main():
         log.error(("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
                   "Install only the module by invoking: pip3 install jsonschema \n"
                    "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
-                   "-r ./scripts/requirements.nrfconnect.txt from the Matter root directory."))
+                   "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
         return
 
     if args.generate_onboarding and no_onboarding_modules:
         log.error(("Requested generation of onboarding codes, but the some modules are not installed. \n"
                   "Install all dependencies for Matter by invoking: pip3 install "
-                   "-r ./scripts/requirements.nrfconnect.txt from the Matter root directory."))
+                   "-r ./scripts/setup/requirements.nrfconnect.txt from the Matter root directory."))
         return
 
     generator = FactoryDataGenerator(args)

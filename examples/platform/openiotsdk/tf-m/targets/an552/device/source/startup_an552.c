@@ -176,22 +176,22 @@ DEFAULT_IRQ_HANDLER(UART5_Handler)
 
 extern const VECTOR_TABLE_Type __VECTOR_TABLE[];
 const VECTOR_TABLE_Type __VECTOR_TABLE[] __VECTOR_TABLE_ATTRIBUTE = {
-    (VECTOR_TABLE_Type)(&__INITIAL_SP), /*      Initial Stack Pointer */
-    Reset_Handler,                      /*      Reset Handler */
-    NMI_Handler,                        /* -14: NMI Handler */
-    HardFault_Handler,                  /* -13: Hard Fault Handler */
-    MemManage_Handler,                  /* -12: MPU Fault Handler */
-    BusFault_Handler,                   /* -11: Bus Fault Handler */
-    UsageFault_Handler,                 /* -10: Usage Fault Handler */
-    SecureFault_Handler,                /*  -9: Secure Fault Handler */
-    0,                                  /*      Reserved */
-    0,                                  /*      Reserved */
-    0,                                  /*      Reserved */
-    SVC_Handler,                        /*  -5: SVCall Handler */
-    DebugMon_Handler,                   /*  -4: Debug Monitor Handler */
-    0,                                  /*      Reserved */
-    PendSV_Handler,                     /*  -2: PendSV Handler */
-    SysTick_Handler,                    /*  -1: SysTick Handler */
+    (VECTOR_TABLE_Type) (&__INITIAL_SP), /*      Initial Stack Pointer */
+    Reset_Handler,                       /*      Reset Handler */
+    NMI_Handler,                         /* -14: NMI Handler */
+    HardFault_Handler,                   /* -13: Hard Fault Handler */
+    MemManage_Handler,                   /* -12: MPU Fault Handler */
+    BusFault_Handler,                    /* -11: Bus Fault Handler */
+    UsageFault_Handler,                  /* -10: Usage Fault Handler */
+    SecureFault_Handler,                 /*  -9: Secure Fault Handler */
+    0,                                   /*      Reserved */
+    0,                                   /*      Reserved */
+    0,                                   /*      Reserved */
+    SVC_Handler,                         /*  -5: SVCall Handler */
+    DebugMon_Handler,                    /*  -4: Debug Monitor Handler */
+    0,                                   /*      Reserved */
+    PendSV_Handler,                      /*  -2: PendSV Handler */
+    SysTick_Handler,                     /*  -1: SysTick Handler */
 
     NONSEC_WATCHDOG_RESET_REQ_Handler, /*   0: Non-Secure Watchdog Reset Request Handler */
     NONSEC_WATCHDOG_Handler,           /*   1: Non-Secure Watchdog Handler */
@@ -340,10 +340,10 @@ void Reset_Handler(void)
 #if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
     __disable_irq();
 #endif
-    __set_PSP((uint32_t)(&__INITIAL_SP));
+    __set_PSP((uint32_t) (&__INITIAL_SP));
 
-    __set_MSPLIM((uint32_t)(&__STACK_LIMIT));
-    __set_PSPLIM((uint32_t)(&__STACK_LIMIT));
+    __set_MSPLIM((uint32_t) (&__STACK_LIMIT));
+    __set_PSPLIM((uint32_t) (&__STACK_LIMIT));
 
 #if defined(__ARM_FEATURE_CMSE) && (__ARM_FEATURE_CMSE == 3U)
     __TZ_set_STACKSEAL_S((uint32_t *) (&__STACK_SEAL));

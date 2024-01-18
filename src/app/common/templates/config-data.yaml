@@ -1,38 +1,42 @@
-WeakEnums:
-    # Allow-list of enums that we generate as enums, not enum classes.
-    # The goal is to drive this down to 0.
-    - BarrierControlBarrierPosition
-    - BarrierControlMovingState
-    - ColorControlOptions
-    - ColorMode
-    - EnhancedColorMode
-    - IdentifyEffectIdentifier
-    - IdentifyEffectVariant
-    - IdentifyIdentifyType
-    - InterfaceTypeEnum
-    - MoveMode
-    - NetworkFaultEnum
-    - PHYRateEnum
-    - RadioFaultEnum
-    - RoutingRole
-    - StepMode
-
-DefineBitmaps:
-    # Allow-list of bitmaps that we generates as #define as well as enum classes.
-    # The goal is to drive this down to 0.
-    - BarrierControlCapabilities
-    - BarrierControlSafetyStatus
+EnumsNotUsedAsTypeInXML:
+    # List of enums that are not used as a type in XML. By adding an enum
+    # to this list you prevent incorrectly assuming from code that you are
+    # able to use kUnknownEnumValue safely. This happens for derived clusters
+    # such as ModeBase where there are CommonTag, DerivedClusterTags, MfgTags.
+    - "DishwasherMode::ModeTag"
+    - "LaundryWasherMode::ModeTag"
+    - "RefrigeratorAndTemperatureControlledCabinetMode::ModeTag"
+    - "RvcRunMode::ModeTag"
+    - "RvcRunMode::StatusCode"
+    - "RvcCleanMode::ModeTag"
+    - "RvcCleanMode::StatusCode"
+    - "RvcOperationalState::OperationalStateEnum"
+    - "RvcOperationalState::ErrorStateEnum"
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
     # CommandHandlerInterface and hence do not need generated command dispatch.
     # This uses asUpperCamelCase versions of the cluster name.
-    - NetworkCommissioning
+    - Network Commissioning
+    - Scenes Management
+    - RVC Run Mode
+    - RVC Clean Mode
+    - Dishwasher Mode
+    - Laundry Washer Mode
+    - Oven Mode
+    - Refrigerator And Temperature Controlled Cabinet Mode
+    - Operational State
+    - Activated Carbon Filter Monitoring
+    - HEPA Filter Monitoring
+    - RVC Operational State
+    - Sample MEI
+    - Microwave Oven Control
+    - Energy EVSE
+    - Device Energy Management
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
 ClustersWithInitFunctions:
-    - Basic
     - Color Control
     - Groups
     - Identify
@@ -41,10 +45,11 @@ ClustersWithInitFunctions:
     - Occupancy Sensing
     - On/Off
     - Pump Configuration and Control
-    - Scenes
     - Time Format Localization
     - Thermostat
     - Mode Select
+    - Sample MEI
+    - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -60,6 +65,8 @@ ClustersWithShutdownFunctions:
     - Door Lock
     - Level Control
     - Color Control
+    - Sample MEI
+    - Scenes Management
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
@@ -70,3 +77,5 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+    - Laundry Washer Controls
+    - Laundry Dryer Controls

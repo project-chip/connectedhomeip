@@ -20,7 +20,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/scenes-server/SceneTable.h>
 #include <app/util/af-types.h>
+#include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -30,32 +32,30 @@
  * Defines and Macros
  *********************************************************/
 
-#define UPDATE_TIME_MS 100
-#define TRANSITION_TIME_1S 10
+static constexpr chip::System::Clock::Milliseconds32 TRANSITION_UPDATE_TIME_MS = chip::System::Clock::Milliseconds32(100);
+static constexpr uint16_t TRANSITION_STEPS_PER_1S                              = 10;
 
-#define MIN_CIE_XY_VALUE 0
-#define MAX_CIE_XY_VALUE 0xfeff // this value comes directly from the ZCL specification table 5.3
+static constexpr uint16_t MIN_CIE_XY_VALUE = 0;
+static constexpr uint16_t MAX_CIE_XY_VALUE = 0xfeff; // this value comes directly from the ZCL specification table 5.3
 
-#define MIN_TEMPERATURE_VALUE 0
-#define MAX_TEMPERATURE_VALUE 0xfeff
+static constexpr uint16_t MIN_TEMPERATURE_VALUE = 0;
+static constexpr uint16_t MAX_TEMPERATURE_VALUE = 0xfeff;
 
-#define MIN_HUE_VALUE 0
-#define MAX_HUE_VALUE 254
+static constexpr uint8_t MIN_HUE_VALUE = 0;
+static constexpr uint8_t MAX_HUE_VALUE = 254;
 
-#define MIN_SATURATION_VALUE 0
-#define MAX_SATURATION_VALUE 254
+static constexpr uint8_t MIN_SATURATION_VALUE = 0;
+static constexpr uint8_t MAX_SATURATION_VALUE = 254;
 
-#define HALF_MAX_UINT8T 127
-#define HALF_MAX_UINT16T 0x7FFF
+static constexpr uint8_t HALF_MAX_UINT8T   = 127;
+static constexpr uint16_t HALF_MAX_UINT16T = 0x7FFF;
 
-#define MAX_ENHANCED_HUE_VALUE 0xFFFF
+static constexpr uint16_t MAX_ENHANCED_HUE_VALUE = 0xFFFF;
 
-#define MIN_CURRENT_LEVEL 0x01
-#define MAX_CURRENT_LEVEL 0xFE
+static constexpr uint8_t MIN_CURRENT_LEVEL = 0x01;
+static constexpr uint8_t MAX_CURRENT_LEVEL = 0xFE;
 
-#define REPORT_FAILED 0xFF
-
-using chip::app::Clusters::ColorControl::ColorControlFeature;
+static constexpr uint8_t REPORT_FAILED = 0xFF;
 
 /**
  * @brief color-control-server class
@@ -69,13 +69,14 @@ public:
     using HueStepMode  = chip::app::Clusters::ColorControl::HueStepMode;
     using HueMoveMode  = chip::app::Clusters::ColorControl::HueMoveMode;
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
+    using Feature      = chip::app::Clusters::ColorControl::Feature;
 
-    enum ColorMode
+    enum EnhancedColorMode : uint8_t
     {
-        COLOR_MODE_HSV         = 0x00,
-        COLOR_MODE_CIE_XY      = 0x01,
-        COLOR_MODE_TEMPERATURE = 0x02,
-        COLOR_MODE_EHSV        = 0x03
+        kCurrentHueAndCurrentSaturation         = 0,
+        kCurrentXAndCurrentY                    = 1,
+        kColorTemperature                       = 2,
+        kEnhancedCurrentHueAndCurrentSaturation = 3,
     };
 
     enum Conversion
@@ -102,6 +103,9 @@ public:
         uint8_t finalHue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        // The amount of time remaining until the transition completes. Measured in tenths of a second.
+        // When the transition repeats indefinitely, this will hold the maximum value possible.
+        uint16_t timeRemaining;
         uint16_t initialEnhancedHue;
         uint16_t currentEnhancedHue;
         uint16_t finalEnhancedHue;
@@ -118,6 +122,8 @@ public:
         uint16_t finalValue;
         uint16_t stepsRemaining;
         uint16_t stepsTotal;
+        // The amount of time remaining until the transition completes. Measured in tenths of a second.
+        uint16_t timeRemaining;
         uint16_t lowLimit;
         uint16_t highLimit;
         chip::EndpointId endpoint;
@@ -128,7 +134,9 @@ public:
      *********************************************************/
     static ColorControlServer & Instance();
 
-    bool HasFeature(chip::EndpointId endpoint, ColorControlFeature feature);
+    chip::scenes::SceneHandler * GetSceneHandler();
+
+    bool HasFeature(chip::EndpointId endpoint, Feature feature);
     chip::Protocols::InteractionModel::Status stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint8_t optionsMask, uint8_t optionsOverride);
@@ -202,6 +210,10 @@ private:
     void cancelEndpointTimerCallback(EmberEventControl * control);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
+    chip::Protocols::InteractionModel::Status moveToSaturation(uint8_t saturation, uint16_t transitionTime,
+                                                               chip::EndpointId endpoint);
+    chip::Protocols::InteractionModel::Status moveToHueAndSaturation(uint16_t hue, uint8_t saturation, uint16_t transitionTime,
+                                                                     bool isEnhanced, chip::EndpointId endpoint);
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getSaturationTransitionState(chip::EndpointId endpoint);
     uint8_t getSaturation(chip::EndpointId endpoint);
@@ -220,6 +232,8 @@ private:
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
+    chip::Protocols::InteractionModel::Status moveToColor(uint16_t colorX, uint16_t colorY, uint16_t transitionTime,
+                                                          chip::EndpointId endpoint);
     Color16uTransitionState * getXTransitionState(chip::EndpointId endpoint);
     Color16uTransitionState * getYTransitionState(chip::EndpointId endpoint);
     uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
@@ -238,22 +252,27 @@ private:
      * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
+    static constexpr size_t kColorControlClusterServerMaxEndpointCount =
+        EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    static_assert(kColorControlClusterServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "ColorControl endpoint count error");
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-    ColorHueTransitionState colorHueTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-    Color16uTransitionState colorSatTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    ColorHueTransitionState colorHueTransitionStates[kColorControlClusterServerMaxEndpointCount];
+    Color16uTransitionState colorSatTransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
-    Color16uTransitionState colorXtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-    Color16uTransitionState colorYtransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorXtransitionStates[kColorControlClusterServerMaxEndpointCount];
+    Color16uTransitionState colorYtransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    Color16uTransitionState colorTempTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    Color16uTransitionState colorTempTransitionStates[kColorControlClusterServerMaxEndpointCount];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-    EmberEventControl eventControls[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
+    EmberEventControl eventControls[kColorControlClusterServerMaxEndpointCount];
+
+    friend class DefaultColorControlSceneHandler;
 };
 
 /**********************************************************

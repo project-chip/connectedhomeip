@@ -1,0 +1,74 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 198.2.1. [TC-DISHALM-2.1] Attributes with DUT as Server
+
+PICS:
+    - DISHALM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Step 1: Commission DUT to TH"
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the Mask attribute"
+      PICS: DISHALM.S.A0000
+      verification: |
+          ./chip-tool dishwasheralarm read mask 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit value.
+
+           [1689842323.840486][2610:2612] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0000 DataVersion: 3155962179
+           [1689842323.840542][2610:2612] CHIP:TOO: Mask: 47
+           [1689842323.840664][2610:2612] CHIP:EM: <<< [E:45223i S:40488 M:16127435 (Ack:224755341)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the Latch attribute"
+      PICS: DISHALM.S.F00 && DISHALM.S.A0001
+      verification: |
+          ./chip-tool dishwasheralarm read latch 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit.
+
+           [1689842371.478172][2614:2616] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0001 DataVersion: 3155962179
+           [1689842371.478244][2614:2616] CHIP:TOO: Latch: 3
+           [1689842371.478410][2614:2616] CHIP:EM: <<< [E:35394i S:46214 M:140335917 (Ack:184279491)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the State attribute"
+      PICS: DISHALM.S.A0002
+      verification: |
+          ./chip-tool dishwasheralarm read state 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit value.
+
+           [1689842479.694724][2624:2626] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0002 DataVersion: 3155962179
+           [1689842479.694781][2624:2626] CHIP:TOO: State: 7
+           [1689842479.694921][2624:2626] CHIP:EM: <<< [E:40120i S:46763 M:178458342 (Ack:246107556)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the Supported attribute"
+      PICS: DISHALM.S.A0003
+      verification: |
+          ./chip-tool dishwasheralarm read supported 1 1
+           On TH(chip-tool), Verify that the DUT response contains a 32-bit value.
+
+           [1689842542.000773][2629:2631] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0003 DataVersion: 3155962179
+           [1689842542.000839][2629:2631] CHIP:TOO: Supported: 47
+           [1689842542.000982][2629:2631] CHIP:EM: <<< [E:28372i S:5416 M:234677238 (Ack:122316593)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true

@@ -18,14 +18,16 @@
 
 #include "CastingUtils.h"
 
+#include "CommissioningCallbacks.h"
+
 using namespace chip;
 using namespace chip::System;
 using namespace chip::DeviceLayer;
 using namespace chip::Dnssd;
 
 // TODO: Accept these values over CLI
-const char * kContentUrl        = "https://www.test.com/videoid";
-const char * kContentDisplayStr = "Test video";
+const char kContentUrl[]        = "https://www.test.com/videoid";
+const char kContentDisplayStr[] = "Test video";
 int gInitialContextVal          = 121212;
 
 CHIP_ERROR DiscoverCommissioners()
@@ -62,8 +64,10 @@ void PrepareForCommissioning(const Dnssd::DiscoveredNodeData * selectedCommissio
 {
     CastingServer::GetInstance()->Init();
 
-    CastingServer::GetInstance()->OpenBasicCommissioningWindow(HandleCommissioningCompleteCallback, OnConnectionSuccess,
-                                                               OnConnectionFailure, OnNewOrUpdatedEndpoint);
+    CommissioningCallbacks commissioningCallbacks;
+    commissioningCallbacks.commissioningComplete = HandleCommissioningCompleteCallback;
+    CastingServer::GetInstance()->OpenBasicCommissioningWindow(commissioningCallbacks, OnConnectionSuccess, OnConnectionFailure,
+                                                               OnNewOrUpdatedEndpoint);
 
     // Display onboarding payload
     chip::DeviceLayer::ConfigurationMgr().LogDeviceConfig();
@@ -96,7 +100,8 @@ void InitCommissioningFlow(intptr_t commandArg)
             CastingServer::GetInstance()->GetDiscoveredCommissioner(i, associatedConnectableVideoPlayer);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount++);
+            ChipLogProgress(AppServer, "Discovered Commissioner #%d", commissionerCount);
+            commissionerCount++;
             commissioner->LogDetail();
             if (associatedConnectableVideoPlayer.HasValue())
             {

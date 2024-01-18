@@ -27,8 +27,8 @@
 // Include module header
 #include <system/SystemError.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/DLLUtil.h>
-#include <lib/support/ErrorStr.h>
 
 #include <lib/core/CHIPConfig.h>
 
@@ -108,7 +108,7 @@ bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
-            NULL;
+            nullptr;
 #else
             DescribeErrorPOSIX(err);
 #endif
@@ -178,9 +178,9 @@ DLL_EXPORT const char * DescribeErrorLwIP(CHIP_ERROR aError)
 /**
  * Register a text error formatter for LwIP errors.
  */
-void RegisterLwIPErrorFormatter(void)
+void RegisterLwIPErrorFormatter()
 {
-    static ErrorFormatter sLwIPErrorFormatter = { FormatLwIPError, NULL };
+    static ErrorFormatter sLwIPErrorFormatter = { FormatLwIPError, nullptr };
 
     RegisterErrorFormatter(&sLwIPErrorFormatter);
 }
@@ -203,17 +203,14 @@ bool FormatLwIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     {
         const char * desc =
 #if CHIP_CONFIG_SHORT_ERROR_STR
-            NULL;
+            nullptr;
 #else
             DescribeErrorLwIP(err);
 #endif
         chip::FormatError(buf, bufSize, "LwIP", err, desc);
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

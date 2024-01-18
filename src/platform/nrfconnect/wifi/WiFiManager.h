@@ -74,12 +74,12 @@ public:
         return T2{};
     }
 
-    Map()            = delete;
-    Map(const Map &) = delete;
-    Map(Map &&)      = delete;
+    Map()                        = delete;
+    Map(const Map &)             = delete;
+    Map(Map &&)                  = delete;
     Map & operator=(const Map &) = delete;
-    Map & operator=(Map &&) = delete;
-    ~Map()                  = default;
+    Map & operator=(Map &&)      = delete;
+    ~Map()                       = default;
 
 private:
     Pair mMap[N];
@@ -127,7 +127,7 @@ public:
 
     struct WiFiInfo
     {
-        ByteSpan mBssId{};
+        uint8_t mBssId[DeviceLayer::Internal::kWiFiBSSIDLength];
         app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum mSecurityType{};
         app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum mWiFiVersion{};
         uint16_t mChannel{};
@@ -174,14 +174,6 @@ public:
     static constexpr uint32_t kConnectionRecoveryJitterMs          = CONFIG_CHIP_WIFI_CONNECTION_RECOVERY_JITTER;
     static constexpr uint32_t kConnectionRecoveryMaxRetries        = CONFIG_CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER;
 
-    static_assert(kConnectionRecoveryMinIntervalMs < kConnectionRecoveryMaxIntervalMs);
-    static_assert(kConnectionRecoveryJitterMs <= kConnectionRecoveryMaxIntervalMs);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    static constexpr uint8_t kDefaultDTIMInterval = 3;
-    static constexpr uint8_t kBeaconIntervalMs    = 100;
-#endif
-
     CHIP_ERROR Init();
     CHIP_ERROR Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
                     bool internalScan = false);
@@ -192,6 +184,7 @@ public:
     CHIP_ERROR GetWiFiInfo(WiFiInfo & info) const;
     CHIP_ERROR GetNetworkStatistics(NetworkStatistics & stats) const;
     void AbortConnectionRecovery();
+    CHIP_ERROR SetLowPowerMode(bool onoff);
 
 private:
     using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>);
@@ -240,10 +233,10 @@ private:
     bool mSsidFound{ false };
     uint32_t mConnectionRecoveryCounter{ 0 };
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
-    bool mRecoveryTimerAborted{ false };
+    bool mApplicationDisconnectRequested{ false };
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
-    static const Map<uint32_t, NetEventHandler, 4> sEventHandlerMap;
+    static const Map<uint32_t, NetEventHandler, 5> sEventHandlerMap;
 };
 
 } // namespace DeviceLayer

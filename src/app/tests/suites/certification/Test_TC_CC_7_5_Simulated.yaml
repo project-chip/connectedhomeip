@@ -1,0 +1,180 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.3.22. [TC-CC-7.5] Enhanced Hue functionality with client as DUT
+
+PICS:
+    - CC.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Color Control"
+    timeout: 500
+    endpoint: 1
+    ConfigTransitionTime:
+        type: int16u
+        defaultValue: 3000
+
+tests:
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
+
+    - label: "PreCondition: Set TH OnOff to On"
+      cluster: "On/Off"
+      wait: "On"
+
+    - label: "DUT sends MoveToEnhancedHue command to TH"
+      PICS: CC.C.C40.Tx && CC.C.F01
+      wait: "EnhancedMoveToHue"
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C40.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C40.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "DUT sends MoveEnhanced Hue command to TH"
+      PICS: CC.C.C41.Tx
+      wait: "EnhancedMoveHue"
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C41.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C41.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "DUT sends StepEnhanced command to TH"
+      PICS: CC.C.C42.Tx
+      wait: "EnhancedStepHue"
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C42.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C42.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "DUT sends EnhancedMoveToHueAndSaturation command to TH"
+      PICS: CC.C.C43.Tx && CC.C.F01
+      wait: "EnhancedMoveToHueAndSaturation"
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C43.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label:
+          "DUT reads CurrentSaturation attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C43.Tx && CC.C.A0001 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C43.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label:
+          "DUT reads CurrentSaturation attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C43.Tx && CC.C.A0001 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "CurrentSaturation"
+
+    - label: "DUT sends StopMoveStep command to TH"
+      PICS: CC.C.C47.Tx && CC.C.F01
+      wait: "StopMoveStep"
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C47.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"
+
+    - label: "Wait for ConfigTransitionTime"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: ConfigTransitionTime
+
+    - label:
+          "DUT reads EnhancedCurrentHue attribute from TH (potentially multiple
+          times)"
+      PICS: CC.C.C47.Tx && CC.C.A4000 && CC.C.F01
+      wait: "readAttribute"
+      attribute: "EnhancedCurrentHue"

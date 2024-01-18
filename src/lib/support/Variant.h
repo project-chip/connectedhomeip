@@ -225,6 +225,10 @@ public:
         return *reinterpret_cast<const T *>(&mData);
     }
 
+    // Ideally we would suppress this from within Optional.h, where this false positive is coming from. That said suppressing
+    // here is okay since mTypeId would seemingly only be uninitialized when Variant is in a union.
+    //
+    // NOLINTNEXTLINE(clang-analyzer-core.CallAndMessage): Only in a false positive is mTypeId uninitialized.
     ~Variant() { Curry::Destroy(mTypeId, &mData); }
 };
 

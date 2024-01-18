@@ -27,8 +27,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <platform/KeyValueStoreManager.h>
-
-#include CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE
+#include <platform/openiotsdk/KVPsaPsStore.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -44,6 +43,11 @@ CHIP_ERROR KeyValueStoreManagerImpl::ToKeyValueStoreManagerError(CHIP_ERROR err)
 CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 {
     return KVStoreConfig::Init();
+}
+
+CHIP_ERROR KeyValueStoreManagerImpl::Shutdown(void)
+{
+    return KVStoreConfig::Shutdown();
 }
 
 CHIP_ERROR

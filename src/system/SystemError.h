@@ -59,7 +59,7 @@ extern const char * DescribeErrorPOSIX(CHIP_ERROR code);
 extern void RegisterPOSIXErrorFormatter();
 extern bool FormatPOSIXError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
-#if __ZEPHYR__
+#ifdef __ZEPHYR__
 extern CHIP_ERROR MapErrorZephyr(int code);
 #endif // __ZEPHYR__
 

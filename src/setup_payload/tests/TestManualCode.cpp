@@ -46,7 +46,14 @@ bool CheckGenerator(const PayloadContents & payload, std::string expectedResult,
     std::string result;
     ManualSetupPayloadGenerator generator(payload);
     generator.SetAllowInvalidPayload(allowInvalidPayload);
-    generator.payloadDecimalStringRepresentation(result);
+
+    CHIP_ERROR err = generator.payloadDecimalStringRepresentation(result);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Failed to generate decimal representation with error: %s\n", ErrorStr(err));
+        return false;
+    }
 
     if (!expectedResult.empty())
     {
@@ -103,18 +110,6 @@ void TestDecimalRepresentation_FullPayloadWithZeros(nlTestSuite * inSuite, void 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
 
-void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, void * inContext)
-{
-    PayloadContents payload   = GetDefaultPayload();
-    payload.commissioningFlow = CommissioningFlow::kCustom;
-    payload.vendorID          = 45367;
-    payload.productID         = 14526;
-
-    std::string expectedResult = "64129507534536714526";
-
-    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
-}
-
 void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(nlTestSuite * inSuite, void * inContext)
 {
     PayloadContents payload = GetDefaultPayload();
@@ -126,29 +121,16 @@ void TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow(
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
 }
 
-void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
+void TestDecimalRepresentation_FullPayloadWithoutZeros(nlTestSuite * inSuite, void * inContext)
 {
-    PayloadContents payload;
-    payload.setUpPINCode = 0;
-    payload.discriminator.SetLongValue(0);
+    PayloadContents payload   = GetDefaultPayload();
+    payload.commissioningFlow = CommissioningFlow::kCustom;
+    payload.vendorID          = 45367;
+    payload.productID         = 14526;
 
-    std::string expectedResult;
+    std::string expectedResult = "64129507534536714526";
 
     NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult));
-}
-
-void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
-{
-    PayloadContents payload;
-    payload.setUpPINCode = 0x7FFFFFF;
-    payload.discriminator.SetLongValue(0xFFF);
-    payload.commissioningFlow = CommissioningFlow::kCustom;
-    payload.vendorID          = 65535;
-    payload.productID         = 65535;
-
-    std::string expectedResult = "76553581916553565535";
-
-    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult, /*allowInvalidPayload*/ true));
 }
 
 void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, const PayloadContents & payload,
@@ -202,6 +184,31 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
         assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, discriminator, payload.vendorID,
                             payload.productID);
     }
+}
+
+void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadContents payload;
+    payload.setUpPINCode = 0;
+    payload.discriminator.SetLongValue(0);
+
+    std::string expectedResult;
+
+    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult) == false);
+}
+
+void TestDecimalRepresentation_AllOnes(nlTestSuite * inSuite, void * inContext)
+{
+    PayloadContents payload;
+    payload.setUpPINCode = 0x7FFFFFF;
+    payload.discriminator.SetLongValue(0xFFF);
+    payload.commissioningFlow = CommissioningFlow::kCustom;
+    payload.vendorID          = 65535;
+    payload.productID         = 65535;
+
+    std::string expectedResult = "76553581916553565535";
+
+    NL_TEST_ASSERT(inSuite, CheckGenerator(payload, expectedResult, /*allowInvalidPayload*/ true));
 }
 
 char ComputeCheckChar(const std::string & str)

@@ -119,6 +119,9 @@ private:
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    CHIP_ERROR _SetPollingInterval(System::Clock::Milliseconds32 pollingInterval);
+#endif
     // ===== Private members reserved for use by this class only.
 
     System::Clock::Timestamp mLastStationConnectFailTime;
@@ -163,6 +166,12 @@ private:
     void OnStationIPv4AddressLost(void);
     void OnStationIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+    void OnEthernetIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
+    void OnEthernetIPv4AddressLost(void);
+    void OnEthernetIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
     // ===== Members for internal use by the following friends.
 

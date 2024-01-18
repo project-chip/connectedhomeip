@@ -47,6 +47,24 @@ namespace Minimal {
 
 namespace Internal {
 
+// Flags for keeping track of items having been sent as DNSSD responses
+//
+// We rely on knowing Matter DNSSD only sends the same set of data
+// for some instances like A/AAAA always being the same.
+//
+enum class ResponseItemsSent : uint8_t
+{
+    // DNSSD may have different servers referenced by IP addresses,
+    // however we know the matter dnssd server name is fixed and
+    // the same even across SRV records.
+    kIPv4Addresses = 0x01,
+    kIPv6Addresses = 0x02,
+
+    // Boot time advertisement filters. We allow multiple of these
+    // however we also allow filtering them out at response start
+    kServiceListingData = 0x04,
+};
+
 /// Represents the internal state for sending a currently active request
 class ResponseSendingState
 {
@@ -60,6 +78,7 @@ public:
         mSource       = packet;
         mSendError    = CHIP_NO_ERROR;
         mResourceType = ResourceType::kAnswer;
+        mSentItems.ClearAll();
     }
 
     void SetResourceType(ResourceType resourceType) { mResourceType = resourceType; }
@@ -88,12 +107,16 @@ public:
     const chip::Inet::IPAddress & GetSourceAddress() const { return mSource->SrcAddress; }
     chip::Inet::InterfaceId GetSourceInterfaceId() const { return mSource->Interface; }
 
+    bool GetWasSent(ResponseItemsSent item) const { return mSentItems.Has(item); }
+    void MarkWasSent(ResponseItemsSent item) { mSentItems.Set(item); }
+
 private:
     const QueryData * mQuery                 = nullptr;               // query being replied to
     const chip::Inet::IPPacketInfo * mSource = nullptr;               // Where to send the reply (if unicast)
     uint16_t mMessageId                      = 0;                     // message id for the reply
     ResourceType mResourceType               = ResourceType::kAnswer; // what is being sent right now
     CHIP_ERROR mSendError                    = CHIP_NO_ERROR;
+    chip::BitFlags<ResponseItemsSent> mSentItems;
 };
 
 } // namespace Internal
@@ -117,6 +140,8 @@ public:
 
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;
+    bool ShouldSend(const Responder &) const override;
+    void ResponsesAdded(const Responder &) override;
 
     void SetServer(ServerBase * server) { mServer = server; }
 

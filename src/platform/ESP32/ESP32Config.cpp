@@ -85,7 +85,6 @@ const ESP32Config::Key ESP32Config::kConfigKey_PairedAccountId    = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_ServiceId          = { kConfigNamespace_ChipConfig, "service-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
-const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "reg-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_UniqueId           = { kConfigNamespace_ChipConfig, "unique-id" };
@@ -371,10 +370,10 @@ bool ESP32Config::ConfigValueExists(Key key)
 {
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
     nvs_iterator_t iterator = NULL;
-    esp_err_t err           = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY, &iterator);
+    esp_err_t err           = nvs_entry_find(GetPartitionLabelByNamespace(key.Namespace), key.Namespace, NVS_TYPE_ANY, &iterator);
     for (; iterator && err == ESP_OK; err = nvs_entry_next(&iterator))
 #else
-    nvs_iterator_t iterator = nvs_entry_find(NVS_DEFAULT_PART_NAME, key.Namespace, NVS_TYPE_ANY);
+    nvs_iterator_t iterator = nvs_entry_find(GetPartitionLabelByNamespace(key.Namespace), key.Namespace, NVS_TYPE_ANY);
     for (; iterator; iterator = nvs_entry_next(iterator))
 #endif
     {

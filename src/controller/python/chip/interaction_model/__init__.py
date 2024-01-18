@@ -26,9 +26,17 @@ import enum
 
 from chip.exceptions import ChipStackException
 
-from .delegate import AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct
+from .delegate import (AttributePath, AttributePathIBstruct, DataVersionFilterIBstruct, EventPath, EventPathIBstruct,
+                       PyInvokeRequestData, PyWriteAttributeData, SessionParameters, SessionParametersStruct,
+                       TestOnlyPyBatchCommandsOverrides)
 
-__all__ = ["Status", "InteractionModelError"]
+__all__ = ["AttributePath", "AttributePathIBstruct", "DataVersionFilterIBstruct",
+           "EventPath", "EventPathIBstruct", "InteractionModelError", "PyInvokeRequestData",
+           "PyWriteAttributeData", "SessionParameters", "SessionParametersStruct", "Status", "TestOnlyPyBatchCommandsOverrides"]
+
+
+# defined src/controller/python/chip/interaction_model/Delegate.h
+kUndefinedClusterStatus: int = 0xFF
 
 
 class Status(enum.IntEnum):
@@ -76,15 +84,29 @@ class Status(enum.IntEnum):
     PathsExhausted = 0xc8
     TimedRequestMismatch = 0xc9
     FailsafeRequired = 0xca
+    InvalidInState = 0xcb
+    NoCommandResponse = 0xcc
 
 
 class InteractionModelError(ChipStackException):
-    def __init__(self, status: Status):
+    def __init__(self, status: Status, clusterStatus: int = kUndefinedClusterStatus):
         self._status = status
+        self._clusterStatus = clusterStatus
 
     def __str__(self):
-        return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
+        if self.hasClusterStatus:
+            return f"InteractionModelError: {self._status.name} (0x{self._status.value:x}, clusterStatus: {self._clusterStatus})"
+        else:
+            return f"InteractionModelError: {self._status.name} (0x{self._status.value:x})"
+
+    @property
+    def hasClusterStatus(self) -> bool:
+        return self._clusterStatus != kUndefinedClusterStatus
 
     @property
     def status(self) -> Status:
         return self._status
+
+    @property
+    def clusterStatus(self) -> int:
+        return self._clusterStatus

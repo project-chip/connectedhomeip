@@ -60,7 +60,7 @@ def try_apply_yaml_unrepresentable_integer_for_javascript_fixes(value):
     if type(value) is str:
         try:
             value = int(value)
-        except:
+        except ValueError:
             pass
     return value
 

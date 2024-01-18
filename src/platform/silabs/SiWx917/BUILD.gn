@@ -53,25 +53,28 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
     "${silabs_platform_dir}/SystemPlatformConfig.h",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatform.h",
+    "${silabs_platform_dir}/platformAbstraction/SilabsPlatformBase.h",
+    "${silabs_platform_dir}/platformAbstraction/WiseMcuSpam.cpp",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
+    "../rs911x/BLEManagerImpl.cpp",
+    "../rs911x/rsi_ble_config.h",
+    "../rs911x/wfx_sl_ble_init.c",
+    "../rs911x/wfx_sl_ble_init.h",
     "ConfigurationManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
-    "bluetooth/rsi_ble_config.h",
-    "bluetooth/wfx_sl_ble_init.c",
-    "bluetooth/wfx_sl_ble_init.h",
   ]
 
-  # TODO: OTA on CCP platform
   if (chip_enable_ota_requestor) {
     sources += [
-      #"OTAImageProcessorImpl.cpp",
-      #"${silabs_platform_dir}/OTAImageProcessorImpl.h",
+      "${silabs_platform_dir}/OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.cpp",
     ]
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {

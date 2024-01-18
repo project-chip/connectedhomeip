@@ -29,6 +29,16 @@
 
 #import "MTRBaseDevice.h"
 #import "MTRDeviceController.h"
+#import "MTRDeviceControllerDataStore.h"
+
+#import <Matter/MTRDefines.h>
+#import <Matter/MTRDeviceControllerStartupParams.h>
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTRDeviceControllerStorageDelegate.h>
+#else
+#import "MTRDeviceControllerStorageDelegate_Wrapper.h"
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
+#import <Matter/MTROTAProviderDelegate.h>
 
 @class MTRDeviceControllerStartupParamsInternal;
 @class MTRDeviceControllerFactory;
@@ -45,6 +55,13 @@ namespace Controller {
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceController ()
+
+#if !MTR_PER_CONTROLLER_STORAGE_ENABLED
+/**
+ * The ID assigned to this controller at creation time.
+ */
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier;
+#endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #pragma mark - MTRDeviceControllerFactory methods
 
@@ -71,14 +88,32 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * This property MUST be gotten from the Matter work queue.
  */
-@property (readonly, nullable) NSNumber * compressedFabricID;
+@property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
+
+/**
+ * The per-controller data store this controller was initialized with, if any.
+ */
+@property (nonatomic, readonly, nullable) MTRDeviceControllerDataStore * controllerDataStore;
+
+/**
+ * OTA delegate and its queue, if this controller supports OTA.  Either both
+ * will be non-nil or both will be nil.
+ */
+@property (nonatomic, readonly, nullable) id<MTROTAProviderDelegate> otaProviderDelegate;
+@property (nonatomic, readonly, nullable) dispatch_queue_t otaProviderDelegateQueue;
 
 /**
  * Init a newly created controller.
  *
  * Only MTRDeviceControllerFactory should be calling this.
  */
-- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory queue:(dispatch_queue_t)queue;
+- (instancetype)initWithFactory:(MTRDeviceControllerFactory *)factory
+                          queue:(dispatch_queue_t)queue
+                storageDelegate:(id<MTRDeviceControllerStorageDelegate> _Nullable)storageDelegate
+           storageDelegateQueue:(dispatch_queue_t _Nullable)storageDelegateQueue
+            otaProviderDelegate:(id<MTROTAProviderDelegate> _Nullable)otaProviderDelegate
+       otaProviderDelegateQueue:(dispatch_queue_t _Nullable)otaProviderDelegateQueue
+               uniqueIdentifier:(NSUUID *)uniqueIdentifier;
 
 /**
  * Check whether this controller is running on the given fabric, as represented

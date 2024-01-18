@@ -35,9 +35,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/StringSplitter.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-constexpr const char * kOptionalArgumentPrefix = "--";
+constexpr char kOptionalArgumentPrefix[]       = "--";
 constexpr size_t kOptionalArgumentPrefixLength = 2;
 
 bool Command::InitArguments(int argc, char ** argv)
@@ -60,7 +61,7 @@ bool Command::InitArguments(int argc, char ** argv)
         }
     }
 
-    VerifyOrExit((size_t)(argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
+    VerifyOrExit((size_t) (argc) >= mandatoryArgsCount && (argvExtraArgsCount == 0 || (argvExtraArgsCount && optionalArgsCount)),
                  ChipLogError(chipTool, "InitArgs: Wrong arguments number: %d instead of %u", argc,
                               static_cast<unsigned int>(mandatoryArgsCount)));
 
@@ -211,6 +212,9 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
     switch (arg.type)
     {
     case ArgumentType::Complex: {
+        // Complex arguments may be optional, but they are not currently supported via the <chip::Optional> class.
+        // Instead, they must be explicitly specified as optional using the kOptional flag,
+        // and the base TypedComplexArgument<T> class is still referenced.
         auto complexArgument = static_cast<ComplexArgument *>(arg.value);
         return CHIP_NO_ERROR == complexArgument->Parse(arg.name, argValue);
     }
@@ -220,6 +224,29 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         return CHIP_NO_ERROR == customArgument->Parse(arg.name, argValue);
     }
 
+    case ArgumentType::VectorString: {
+        std::vector<std::string> vectorArgument;
+
+        chip::StringSplitter splitter(argValue, ',');
+        chip::CharSpan value;
+
+        while (splitter.Next(value))
+        {
+            vectorArgument.push_back(std::string(value.data(), value.size()));
+        }
+
+        if (arg.flags == Argument::kOptional)
+        {
+            auto argument = static_cast<chip::Optional<std::vector<std::string>> *>(arg.value);
+            argument->SetValue(vectorArgument);
+        }
+        else
+        {
+            auto argument = static_cast<std::vector<std::string> *>(arg.value);
+            *argument     = vectorArgument;
+        }
+        return true;
+    }
     case ArgumentType::VectorBool: {
         // Currently only chip::Optional<std::vector<bool>> is supported.
         if (arg.flags != Argument::kOptional)
@@ -320,8 +347,9 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
             // By default the parameter separator is ";" in order to not collapse with the argument itself if it contains commas
             // (e.g a struct argument with multiple fields). In case one needs to use ";" it can be overriden with the following
             // environment variable.
-            constexpr const char * kSeparatorVariable = "CHIPTOOL_CUSTOM_ARGUMENTS_SEPARATOR";
-            getline(ss, valueAsString, getenv(kSeparatorVariable) ? getenv(kSeparatorVariable)[0] : ';');
+            static constexpr char kSeparatorVariable[] = "CHIPTOOL_CUSTOM_ARGUMENTS_SEPARATOR";
+            char * getenvSeparatorVariableResult       = getenv(kSeparatorVariable);
+            getline(ss, valueAsString, getenvSeparatorVariableResult ? getenvSeparatorVariableResult[0] : ';');
 
             CustomArgument * customArgument = new CustomArgument();
             vectorArgument->push_back(customArgument);
@@ -706,13 +734,13 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, chip::
     return AddArgumentToList(std::move(arg));
 }
 
-size_t Command::AddArgument(const char * name, ComplexArgument * value, const char * desc)
+size_t Command::AddArgument(const char * name, ComplexArgument * value, const char * desc, uint8_t flags)
 {
     Argument arg;
     arg.type  = ArgumentType::Complex;
     arg.name  = name;
     arg.value = static_cast<void *>(value);
-    arg.flags = 0;
+    arg.flags = flags;
     arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
@@ -792,6 +820,30 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.min   = min;
     arg.max   = max;
     arg.flags = flags;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, std::vector<std::string> * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorString;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = 0;
+    arg.desc  = desc;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, chip::Optional<std::vector<std::string>> * value, const char * desc)
+{
+    Argument arg;
+    arg.type  = ArgumentType::VectorString;
+    arg.name  = name;
+    arg.value = static_cast<void *>(value);
+    arg.flags = Argument::kOptional;
     arg.desc  = desc;
 
     return AddArgumentToList(std::move(arg));
@@ -906,13 +958,20 @@ void Command::ResetArguments()
             switch (type)
             {
             case ArgumentType::Complex: {
-                // No optional complex arguments so far.
-                VerifyOrDie(false);
+                // Optional Complex arguments are not currently supported via the <chip::Optional> class.
+                // Instead, they must be explicitly specified as optional using the kOptional flag,
+                // and the base TypedComplexArgument<T> class is referenced.
+                auto argument = static_cast<ComplexArgument *>(arg.value);
+                argument->Reset();
                 break;
             }
             case ArgumentType::Custom: {
                 // No optional custom arguments so far.
                 VerifyOrDie(false);
+                break;
+            }
+            case ArgumentType::VectorString: {
+                ResetOptionalArg<std::vector<std::string>>(arg);
                 break;
             }
             case ArgumentType::VectorBool: {

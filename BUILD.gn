@@ -37,6 +37,10 @@ import("${build_root}/config/compiler/compiler.gni")
 
 import("//src/crypto/crypto.gni")
 
+if (chip_with_lwip) {
+  import("//build_overrides/lwip.gni")
+}
+
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
@@ -54,6 +58,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/credentials/tests:fuzz-chip-cert",
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing",
+        "${chip_root}/src/lib/format/tests:fuzz-payload-decoder",
       ]
     }
   }
@@ -145,13 +150,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
-      if (current_os == "android") {
+      if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
       }
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip" ]
+      deps += [ "${lwip_root}:lwip" ]
     }
 
     if (chip_build_tools) {
@@ -179,8 +184,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
       deps += [
         "${chip_root}/src/app/server/java",
         "${chip_root}/src/controller/java",
+        "${chip_root}/src/controller/java:onboarding_payload",
         "${chip_root}/src/platform/android:java",
-        "${chip_root}/src/setup_payload/java",
       ]
     }
 
@@ -275,6 +280,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable genio builds by default.
     enable_genio_builds = false
+
+    # Set this to true to enable stm32 builds by default.
+    enable_stm32_builds = false
   }
 
   # Pigweed does not provide a clang in some configurations.
@@ -347,6 +355,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the Linux lock app example.
     enable_linux_lock_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux LIT ICD example.
+    enable_linux_lit_icd_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
@@ -602,6 +614,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     extra_build_deps += [ ":linux_lock_app" ]
   }
 
+  if (enable_linux_lit_icd_app_build) {
+    group("linux_lit_icd_app") {
+      deps =
+          [ "${chip_root}/examples/lit-icd-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_lit_icd_app" ]
+  }
+
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
@@ -677,10 +698,14 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   if (enable_tizen_builds) {
     group("check:tizen") {
       testonly = true
-      deps = [ "${chip_root}/src/test_driver/tizen/integration-tests:check" ]
+      deps = [ "${chip_root}/src/test_driver/tizen:check(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
     }
 
-    extra_check_deps += [ ":check:tizen" ]
+    # Include Tizen check target only if BLE is not enabled, since
+    # currently, QEMU-based Tizen does not support Bluetooth.
+    if (!chip_config_network_layer_ble) {
+      extra_check_deps += [ ":check:tizen" ]
+    }
   }
 
   if (enable_mw320_shell_build) {

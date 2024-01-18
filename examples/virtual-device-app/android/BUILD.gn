@@ -1,0 +1,103 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/tools.gni")
+
+shared_library("jni") {
+  output_name = "libDeviceApp"
+
+  sources = [
+    "${chip_root}/examples/virtual-device-app/virtual-device-common/include/CHIPProjectAppConfig.h",
+    "java/AppImpl.cpp",
+    "java/AppImpl.h",
+    "java/ClusterChangeAttribute.cpp",
+    "java/ColorControlManager.cpp",
+    "java/ColorControlManager.h",
+    "java/DeviceApp-JNI.cpp",
+    "java/DoorLockManager.cpp",
+    "java/DoorLockManager.h",
+    "java/JNIDACProvider.cpp",
+    "java/JNIDACProvider.h",
+    "java/OnOffManager.cpp",
+    "java/OnOffManager.h",
+    "java/PowerSourceManager.cpp",
+    "java/PowerSourceManager.h",
+  ]
+
+  deps = [
+    "${chip_root}/examples/platform/linux:commissioner-main",
+    "${chip_root}/examples/virtual-device-app/virtual-device-common",
+    "${chip_root}/src/app/server/java:jni",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/support/jsontlv",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+
+  ldflags = [ "-Wl,--gc-sections" ]
+}
+
+android_library("java") {
+  output_name = "DeviceApp.jar"
+
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
+
+  data_deps = [
+    ":jni",
+    "${chip_root}/build/chip/java:shared_cpplib",
+  ]
+
+  sources = [
+    "java/src/com/matter/virtual/device/app/Clusters.java",
+    "java/src/com/matter/virtual/device/app/ColorControlManager.java",
+    "java/src/com/matter/virtual/device/app/DACProvider.java",
+    "java/src/com/matter/virtual/device/app/DeviceApp.java",
+    "java/src/com/matter/virtual/device/app/DeviceAppCallback.java",
+    "java/src/com/matter/virtual/device/app/DeviceEventType.java",
+    "java/src/com/matter/virtual/device/app/DoorLockManager.java",
+    "java/src/com/matter/virtual/device/app/OnOffManager.java",
+    "java/src/com/matter/virtual/device/app/PowerSourceManager.java",
+  ]
+
+  javac_flags = [ "-Xlint:deprecation" ]
+
+  # TODO: add classpath support (we likely need to add something like
+  #  ..../platforms/android-26/android.jar to access BLE items)
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
+}
+
+group("default") {
+  deps = [
+    ":android",
+    ":java",
+    ":jni",
+    "${chip_root}/src/app/server/java",
+    "${chip_root}/src/controller/java:onboarding_payload",
+    "${chip_root}/src/platform/android:java",
+  ]
+}

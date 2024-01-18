@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include "K32W0FactoryDataProvider.h"
+#include <platform/nxp/k32w/k32w0/FactoryDataProviderImpl.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -27,26 +27,21 @@ namespace DeviceLayer {
  *        provider based on this example.
  */
 
-class CustomFactoryDataProvider : public K32W0FactoryDataProvider
+class CustomFactoryDataProvider
 {
 public:
-    /* Custom IDs should start from FactoryDataId::kMaxId, which is
+    /* Custom IDs should start from at least FactoryDataId::kMaxId, which is
      * the next available valid ID. Last default ID is kMaxId - 1.
      */
     enum CustomFactoryIds
     {
-        kCustomId1 = FactoryDataId::kMaxId,
+        kCustomId1 = 200, // Random id that is greater than FactoryDataId::kMaxId.
         kCustomId2,
         kCustomId3,
         kCustomMaxId
     };
 
-    static CustomFactoryDataProvider & GetDefaultInstance();
-
-    CustomFactoryDataProvider() {}
-
-    /* SetCustomIds() must be implemented in order to define custom IDs. */
-    CHIP_ERROR SetCustomIds() override;
+    CustomFactoryDataProvider();
 
     /* Declare here custom functions to be implemented. */
     CHIP_ERROR ParseFunctionExample();

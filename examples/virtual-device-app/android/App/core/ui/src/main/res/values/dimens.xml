@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="toolbar_title_text_size">17sp</dimen>
+    <dimen name="toolbar_more_menu_button_margin_end">20dp</dimen>
+
+    <dimen name="device_item_margin_horizontal">12dp</dimen>
+    <dimen name="device_item_bottom_space_height">25dp</dimen>
+    <dimen name="device_item_padding_start">20dp</dimen>
+    <dimen name="device_item_padding_end">20dp</dimen>
+    <dimen name="device_item_padding_top">20dp</dimen>
+    <dimen name="device_item_padding_bottom">20dp</dimen>
+    <dimen name="device_item_margin_top">12dp</dimen>
+    <dimen name="device_item_button_width">36dp</dimen>
+    <dimen name="device_item_button_height">36dp</dimen>
+    <dimen name="device_item_text_no_title_size">20sp</dimen>
+    <dimen name="device_item_value_text_width">75dp</dimen>
+    <dimen name="device_item_seekbar_width">0dp</dimen>
+    <dimen name="device_item_seekbar_height">36dp</dimen>
+</resources>

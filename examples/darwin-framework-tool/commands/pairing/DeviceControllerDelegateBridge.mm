@@ -19,11 +19,8 @@
 #include "DeviceControllerDelegateBridge.h"
 #import <Matter/Matter.h>
 
-@interface CHIPToolDeviceControllerDelegate ()
-@end
-
 @implementation CHIPToolDeviceControllerDelegate
-- (void)onStatusUpdate:(MTRCommissioningStatus)status
+- (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     NSLog(@"Pairing Status Update: %tu", status);
     switch (status) {

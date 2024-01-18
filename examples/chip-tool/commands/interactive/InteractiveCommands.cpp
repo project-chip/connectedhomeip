@@ -22,12 +22,12 @@
 
 #include <editline.h>
 
-constexpr const char * kInteractiveModePrompt          = ">>> ";
-constexpr const char * kInteractiveModeHistoryFilePath = "/tmp/chip_tool_history";
-constexpr const char * kInteractiveModeStopCommand     = "quit()";
-constexpr const char * kCategoryError                  = "Error";
-constexpr const char * kCategoryProgress               = "Info";
-constexpr const char * kCategoryDetail                 = "Debug";
+constexpr char kInteractiveModePrompt[]          = ">>> ";
+constexpr char kInteractiveModeHistoryFileName[] = "chip_tool_history";
+constexpr char kInteractiveModeStopCommand[]     = "quit()";
+constexpr char kCategoryError[]                  = "Error";
+constexpr char kCategoryProgress[]               = "Info";
+constexpr char kCategoryDetail[]                 = "Debug";
 
 namespace {
 
@@ -65,6 +65,7 @@ struct InteractiveServerResult
 {
     bool mEnabled       = false;
     bool mIsAsyncReport = false;
+    uint16_t mTimeout   = 0;
     int mStatus         = EXIT_SUCCESS;
     std::vector<std::string> mResults;
     std::vector<InteractiveServerResultLog> mLogs;
@@ -92,18 +93,31 @@ struct InteractiveServerResult
     // protected by a mutex.
     std::mutex mMutex;
 
-    void Setup(bool isAsyncReport)
+    void Setup(bool isAsyncReport, uint16_t timeout)
     {
         auto lock      = ScopedLock(mMutex);
         mEnabled       = true;
         mIsAsyncReport = isAsyncReport;
+        mTimeout       = timeout;
+
+        if (mIsAsyncReport && mTimeout)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(StartAsyncTimeout, reinterpret_cast<intptr_t>(this));
+        }
     }
 
     void Reset()
     {
-        auto lock      = ScopedLock(mMutex);
+        auto lock = ScopedLock(mMutex);
+
+        if (mIsAsyncReport && mTimeout)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(StopAsyncTimeout, reinterpret_cast<intptr_t>(this));
+        }
+
         mEnabled       = false;
         mIsAsyncReport = false;
+        mTimeout       = 0;
         mStatus        = EXIT_SUCCESS;
         mResults.clear();
         mLogs.clear();
@@ -153,50 +167,74 @@ struct InteractiveServerResult
     {
         auto lock = ScopedLock(mMutex);
 
-        std::string resultsStr;
+        std::stringstream content;
+        content << "{";
+
+        content << "  \"results\": [";
         if (mResults.size())
         {
             for (const auto & result : mResults)
             {
-                resultsStr = resultsStr + result + ",";
+                content << result << ",";
             }
 
             // Remove last comma.
-            resultsStr.pop_back();
+            content.seekp(-1, std::ios_base::end);
         }
 
         if (mStatus != EXIT_SUCCESS)
         {
-            if (resultsStr.size())
+            if (mResults.size())
             {
-                resultsStr = resultsStr + ",";
+                content << ",";
             }
-            resultsStr = resultsStr + "{ \"error\": \"FAILURE\" }";
+            content << "{ \"error\": \"FAILURE\" }";
         }
+        content << "],";
 
-        std::string logsStr;
+        content << "\"logs\": [";
         if (mLogs.size())
         {
             for (const auto & log : mLogs)
             {
-                logsStr = logsStr + "{";
-                logsStr = logsStr + "  \"module\": \"" + log.module + "\",";
-                logsStr = logsStr + "  \"category\": \"" + log.messageType + "\",";
-                logsStr = logsStr + "  \"message\": \"" + log.message + "\"";
-                logsStr = logsStr + "},";
+                content << "{"
+                           "  \"module\": \"" +
+                        log.module +
+                        "\","
+                        "  \"category\": \"" +
+                        log.messageType +
+                        "\","
+                        "  \"message\": \"" +
+                        log.message +
+                        "\""
+                        "},";
             }
 
             // Remove last comma.
-            logsStr.pop_back();
+            content.seekp(-1, std::ios_base::end);
         }
+        content << "]";
 
-        std::string jsonLog;
-        jsonLog = jsonLog + "{";
-        jsonLog = jsonLog + "  \"results\": [" + resultsStr + "],";
-        jsonLog = jsonLog + "  \"logs\": [" + logsStr + "]";
-        jsonLog = jsonLog + "}";
+        content << "}";
+        return content.str();
+    }
 
-        return jsonLog;
+    static void StartAsyncTimeout(intptr_t arg)
+    {
+        auto self    = reinterpret_cast<InteractiveServerResult *>(arg);
+        auto timeout = chip::System::Clock::Seconds16(self->mTimeout);
+        chip::DeviceLayer::SystemLayer().StartTimer(timeout, OnAsyncTimeout, self);
+    }
+
+    static void StopAsyncTimeout(intptr_t arg)
+    {
+        auto self = reinterpret_cast<InteractiveServerResult *>(arg);
+        chip::DeviceLayer::SystemLayer().CancelTimer(OnAsyncTimeout, self);
+    }
+
+    static void OnAsyncTimeout(chip::System::Layer *, void * appState)
+    {
+        RemoteDataModelLogger::LogErrorAsJSON(CHIP_ERROR_TIMEOUT);
     }
 };
 
@@ -219,7 +257,9 @@ void ENFORCE_FORMAT(3, 0) InteractiveServerLoggingCallback(const char * module, 
     gInteractiveServerResult.MaybeAddLog(module, category, base64Message);
 }
 
-char * GetCommand(char * command)
+} // namespace
+
+char * InteractiveStartCommand::GetCommand(char * command)
 {
     if (command != nullptr)
     {
@@ -233,12 +273,32 @@ char * GetCommand(char * command)
     if (command != nullptr && *command)
     {
         add_history(command);
-        write_history(kInteractiveModeHistoryFilePath);
+        write_history(GetHistoryFilePath().c_str());
     }
 
     return command;
 }
-} // namespace
+
+std::string InteractiveStartCommand::GetHistoryFilePath() const
+{
+    std::string storageDir;
+    if (GetStorageDirectory().HasValue())
+    {
+        storageDir = GetStorageDirectory().Value();
+    }
+    else
+    {
+        // Match what GetFilename in ExamplePersistentStorage.cpp does.
+        const char * dir = getenv("TMPDIR");
+        if (dir == nullptr)
+        {
+            dir = "/tmp";
+        }
+        storageDir = dir;
+    }
+
+    return storageDir + "/" + kInteractiveModeHistoryFileName;
+}
 
 CHIP_ERROR InteractiveServerCommand::RunCommand()
 {
@@ -257,7 +317,19 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
 bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
 {
     bool isAsyncReport = strlen(msg) == 0;
-    gInteractiveServerResult.Setup(isAsyncReport);
+    uint16_t timeout   = 0;
+    if (!isAsyncReport && strlen(msg) <= 5 /* Only look for numeric values <= 65535 */)
+    {
+        std::stringstream ss;
+        ss << msg;
+        ss >> timeout;
+        if (!ss.fail())
+        {
+            isAsyncReport = true;
+        }
+    }
+
+    gInteractiveServerResult.Setup(isAsyncReport, timeout);
     VerifyOrReturnValue(!isAsyncReport, true);
 
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
@@ -279,7 +351,7 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
 
 CHIP_ERROR InteractiveStartCommand::RunCommand()
 {
-    read_history(kInteractiveModeHistoryFilePath);
+    read_history(GetHistoryFilePath().c_str());
 
     // Logs needs to be redirected in order to refresh the screen appropriately when something
     // is dumped to stdout while the user is typing a command.
@@ -319,7 +391,7 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 
     ClearLine();
 
-    *status = mHandler->RunInteractive(command);
+    *status = mHandler->RunInteractive(command, GetStorageDirectory(), NeedsOperationalAdvertising());
 
     return true;
 }

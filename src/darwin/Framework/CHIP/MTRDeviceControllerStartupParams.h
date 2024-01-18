@@ -17,6 +17,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCertificates.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -32,31 +33,38 @@ NS_ASSUME_NONNULL_BEGIN
  * Prepare to initialize a controller given a keypair to use for signing
  * operational certificates.
  *
+ * A controller created from MTRDeviceControllerStartupParams initialized with
+ * this method will be able to issue operational certificates to devices it
+ * commissions, using nocSigner to sign them.
+
  * @param ipk The Identity Protection Key, must be 16 bytes in length
  * @param fabricID The fabric identifier, must be non-zero.
  */
 - (instancetype)initWithIPK:(NSData *)ipk
                    fabricID:(NSNumber *)fabricID
-                  nocSigner:(id<MTRKeypair>)nocSigner API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                  nocSigner:(id<MTRKeypair>)nocSigner MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * Prepare to initialize a controller with a complete operational certificate
- * chain.  This initialization method should be used when none of the
- * certificate-signing private keys are available locally.
+ * Prepare to initialize a controller that is not able to sign operational
+ * certificates itself, and therefore needs to be provided with a complete
+ * operational certificate chain.  This initialization method should be used
+ * when none of the certificate-signing private keys are available locally.
  *
- * The fabric id and node id to use will be derived from the provided
+ * A controller created from MTRDeviceControllerStartupParams initialized with
+ * this method will not be able to commission devices unless
+ * operationalCertificateIssuer and operationalCertificateIssuerQueue are set.
+ *
+ * The fabric id and node id to use for the controller will be derived from the provided
  * operationalCertificate.
  *
  * @param ipk The Identity Protection Key, must be 16 bytes in length
  * @param intermediateCertificate may be nil if operationalCertificate is directly signed by rootCertificate.
- *
- * ipk must be 16 bytes in length.
  */
 - (instancetype)initWithIPK:(NSData *)ipk
          operationalKeypair:(id<MTRKeypair>)operationalKeypair
      operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
     intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes)rootCertificate API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Keypair used to sign operational certificates.  This is the root CA keypair
@@ -81,7 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, copy, readonly) NSNumber * fabricID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, readonly) NSNumber * fabricID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
@@ -105,7 +113,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (nonatomic, copy, nullable) NSNumber * vendorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, nullable) NSNumber * vendorID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Node id for this controller.
@@ -135,7 +143,7 @@ NS_ASSUME_NONNULL_BEGIN
  *    either the operationalKeypair if that is provided or a new randomly
  *    generated operational key, and using the provided caseAuthenticatedTags.
  */
-@property (nonatomic, copy, nullable) NSNumber * nodeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, nullable) NSNumber * nodeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * CASE authenticated tags to use for this controller's operational certificate.
@@ -147,7 +155,8 @@ NS_ASSUME_NONNULL_BEGIN
  * If not nil, must contain at most 3 numbers, which are expected to be 32-bit
  * unsigned Case Authenticated Tag values.
  */
-@property (nonatomic, copy, nullable) NSSet<NSNumber *> * caseAuthenticatedTags MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable)
+    NSSet<NSNumber *> * caseAuthenticatedTags MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * Root certificate, in X.509 DER form, to use.
@@ -242,7 +251,7 @@ NS_ASSUME_NONNULL_BEGIN
  * does not issue operational certificates at all or internally generates the
  * certificates to be issued.  In the latter case, nocSigner must not be nil.
  */
-@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer API_AVAILABLE(
+@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer MTR_AVAILABLE(
     ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
@@ -250,7 +259,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Allowed to be nil if and only if operationalCertificateIssuer is nil.
  */
 @property (nonatomic, strong, nullable)
-    dispatch_queue_t operationalCertificateIssuerQueue API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    dispatch_queue_t operationalCertificateIssuerQueue MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 

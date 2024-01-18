@@ -37,7 +37,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
     
     switch (aPath.mClusterId)
     {
-        {{#all_user_clusters side='client'}}
+        {{#zcl_clusters}}
         case app::Clusters::{{asUpperCamelCase name}}::Id: {
             using namespace app::Clusters::{{asUpperCamelCase name}};
             switch (aPath.mEventId)
@@ -51,7 +51,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         return nullptr;
                     }
                     {{#zcl_event_fields}}
-                    {{>decode_value target=(concat "value_" (asLowerCamelCase name)) source=(concat "cppValue." (asLowerCamelCase name)) cluster=(asUpperCamelCase parent.parent.name) depth=0 earlyReturn="nullptr"}}
+                    {{>decode_value target=(concat "value_" (asLowerCamelCase name)) source=(concat "cppValue." (asLowerCamelCase name)) cluster=parent.parent.name depth=0 earlyReturn="nullptr"}}
 
                     {{/zcl_event_fields}}
                     jclass {{asLowerCamelCase name}}StructClass;
@@ -60,9 +60,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                         ChipLogError(Zcl, "Could not find class ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event");
                         return nullptr;
                     }
-                    jmethodID {{asLowerCamelCase name}}StructCtor = env->GetMethodID({{asLowerCamelCase name}}StructClass, "<init>"
-                        , "({{#zcl_event_fields}}{{asJniSignature type null (asUpperCamelCase parent.parent.name) true}}{{/zcl_event_fields}})V");
-                    if ({{asLowerCamelCase name}}StructCtor == nullptr) {
+
+                    jmethodID {{asLowerCamelCase name}}StructCtor;
+                    err = chip::JniReferences::GetInstance().FindMethod(
+                       env, {{asLowerCamelCase name}}StructClass, "<init>",
+                       "({{#zcl_event_fields}}{{asJniSignature type null (asUpperCamelCase parent.parent.name) true}}{{/zcl_event_fields}})V",
+                       &{{asLowerCamelCase name}}StructCtor);
+                    if (err != CHIP_NO_ERROR || {{asLowerCamelCase name}}StructCtor == nullptr) {
                         ChipLogError(Zcl, "Could not find ChipEventStructs${{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event constructor");
                         return nullptr;
                     }
@@ -82,7 +86,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
             break;
         }
-        {{/all_user_clusters}}
+        {{/zcl_clusters}}
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;

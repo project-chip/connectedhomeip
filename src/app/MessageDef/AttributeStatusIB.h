@@ -22,7 +22,7 @@
 #include "StructBuilder.h"
 #include "StructParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
@@ -88,9 +88,9 @@ public:
     /**
      *  @brief Mark the end of this AttributeStatusIB
      *
-     *  @return A reference to *this
+     *  @return The builder's final status.
      */
-    AttributeStatusIB::Builder & EndOfAttributeStatusIB();
+    CHIP_ERROR EndOfAttributeStatusIB();
 
 private:
     AttributePathIB::Builder mPath;

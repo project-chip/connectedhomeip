@@ -18,6 +18,7 @@
 
 #include "pw_rpc/server.h"
 #include "pw_rpc_system_server/rpc_server.h"
+#include "pw_rpc_system_server/socket.h"
 
 #include <thread>
 
@@ -80,7 +81,7 @@ Lighting lighting_service;
 #endif // defined(PW_RPC_LIGHTING_SERVICE) && PW_RPC_LIGHTING_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-pw::trace::TraceService trace_service;
+pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
 void RegisterServices(pw::rpc::Server & server)
@@ -116,9 +117,10 @@ void RunRpcService()
     pw::rpc::system_server::Start();
 }
 
-int Init()
+int Init(uint16_t rpcServerPort)
 {
     int err = 0;
+    pw::rpc::system_server::set_socket_port(rpcServerPort);
     std::thread rpc_service(RunRpcService);
     rpc_service.detach();
     return err;

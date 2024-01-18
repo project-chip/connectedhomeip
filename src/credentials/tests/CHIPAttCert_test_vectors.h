@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2022 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,81 @@
 
 namespace chip {
 namespace TestCerts {
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey;
+
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_SKID;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PublicKey;
+extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey;
 
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_Cert;
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_SKID;
@@ -238,7 +313,7 @@ extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey;
 
-extern const ByteSpan sTestCert_PAA_FFF1_Cert;
+// Cert is provided in the PAA store file as it is used in the default verifier.
 extern const ByteSpan sTestCert_PAA_FFF1_SKID;
 extern const ByteSpan sTestCert_PAA_FFF1_PublicKey;
 extern const ByteSpan sTestCert_PAA_FFF1_PrivateKey;
@@ -253,7 +328,7 @@ extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_SKID;
 extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_PublicKey;
 extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_PrivateKey;
 
-extern const ByteSpan sTestCert_PAA_NoVID_Cert;
+// Cert is provided in the PAA store file as it is used in the default verifier.
 extern const ByteSpan sTestCert_PAA_NoVID_SKID;
 extern const ByteSpan sTestCert_PAA_NoVID_PublicKey;
 extern const ByteSpan sTestCert_PAA_NoVID_PrivateKey;

@@ -64,6 +64,7 @@ using chip::DeviceLayer::OTAImageProcessorImpl;
 using chip::System::Layer;
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -108,6 +109,7 @@ OTAImageProcessorImpl gImageProcessor;
 } // namespace
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace chip::TLV;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
@@ -141,7 +143,7 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 },
     OnIdentifyStart,
     OnIdentifyStop,
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_NONE,
+    Clusters::Identify::IdentifyTypeEnum::kNone,
 };
 
 static void InitServer(intptr_t context)
@@ -251,22 +253,6 @@ void AppTask::lockMgr_Init()
         appError(err);
     }
 
-    // Initialise WSTK buttons PB0 and PB1 (including debounce).
-    ButtonHandler::Init();
-
-    // Create FreeRTOS sw timer for Function Selection.
-    sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
-                                  1,                // == default timer period (mS)
-                                  false,            // no timer reload (==one-shot)
-                                  (void *) this,    // init timer id = app task obj context
-                                  TimerEventHandler // timer callback handler
-    );
-    if (sFunctionTimer == NULL)
-    {
-        P6_LOG("funct timer create failed");
-        appError(APP_ERROR_CREATE_TIMER_FAILED);
-    }
-
     LockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Initialize LEDs
@@ -296,9 +282,25 @@ void AppTask::Init()
     if (rc != 0)
     {
         P6_LOG("boot_set_confirmed failed");
-        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+        appError(CHIP_ERROR_UNINITIALIZED);
     }
 #endif
+    // Initialise WSTK buttons PB0 and PB1 (including debounce).
+    ButtonHandler::Init();
+
+    // Create FreeRTOS sw timer for Function Selection.
+    sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
+                                  1,                // == default timer period (mS)
+                                  false,            // no timer reload (==one-shot)
+                                  (void *) this,    // init timer id = app task obj context
+                                  TimerEventHandler // timer callback handler
+    );
+    if (sFunctionTimer == NULL)
+    {
+        P6_LOG("funct timer create failed");
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
+    }
+
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {

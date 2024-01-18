@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,23 @@
  *    limitations under the License.
  */
 
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/server/Server.h>
 #include <platform/telink/OTAImageProcessorImpl.h>
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+#endif
+
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
 
 namespace {
 
@@ -44,4 +52,22 @@ void InitBasicOTARequestor()
     sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
+}
+
+#endif
+
+void OtaConfirmNewImage()
+{
+    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+    {
+        int img_confirmation = boot_write_img_confirmed();
+        if (img_confirmation)
+        {
+            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
+        }
+        else
+        {
+            LOG_INF("Image confirmed");
+        }
+    }
 }

@@ -105,7 +105,7 @@ def main():
                 pass
     else:
         for target in targets:
-            generateOne(target)
+            convertOne(target)
 
 
 if __name__ == '__main__':

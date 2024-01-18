@@ -76,7 +76,7 @@ CHIP_ERROR TLVPacketBufferBackingStore::FinalizeBuffer(chip::TLV::TLVWriter & wr
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mCurrentBuffer->SetDataLength(static_cast<uint16_t>(length));
+    mCurrentBuffer->SetDataLength(static_cast<uint16_t>(length), mHeadBuffer);
 
     return CHIP_NO_ERROR;
 }

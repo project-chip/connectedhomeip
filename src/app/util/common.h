@@ -22,7 +22,3 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/util.h>
-
-// the variables used to setup and send responses to cluster messages
-extern uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
-extern uint16_t appResponseLength;

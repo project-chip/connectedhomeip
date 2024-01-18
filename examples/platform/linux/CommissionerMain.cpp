@@ -19,6 +19,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <string>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -54,10 +56,6 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <platform/KeyValueStoreManager.h>
-
-#if defined(PW_RPC_ENABLED)
-#include <CommonRpc.h>
-#endif
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "TraceHandlers.h"
@@ -185,7 +183,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     params.controllerICAC     = icacSpan;
     params.controllerNOC      = nocSpan;
 
-    params.defaultCommissioner = &gAutoCommissioner;
+    params.defaultCommissioner      = &gAutoCommissioner;
+    params.enableServerInteractions = true;
 
     // assign prefered feature settings
     CommissioningParameters commissioningParams = gAutoCommissioner.GetCommissioningParameters();
@@ -252,6 +251,7 @@ public:
     void OnCommissioningStatusUpdate(PeerId peerId, CommissioningStage stageCompleted, CHIP_ERROR error) override;
 
     void OnReadCommissioningInfo(const ReadCommissioningInfo & info) override;
+    void OnFabricCheck(NodeId matchingNodeId) override;
 
 private:
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -344,14 +344,36 @@ void PairingCommand::OnCommissioningStatusUpdate(PeerId peerId, CommissioningSta
     }
 }
 
-void PairingCommand::OnReadCommissioningInfo(const ReadCommissioningInfo & info)
+void PairingCommand::OnReadCommissioningInfo(const Controller::ReadCommissioningInfo & info)
 {
     ChipLogProgress(AppServer, "OnReadCommissioningInfo - vendorId=0x%04X productId=0x%04X", info.basic.vendorId,
                     info.basic.productId);
 
-    if (info.nodeId != kUndefinedNodeId)
+    // The string in CharSpan received from the device is not null-terminated, we use std::string here for coping and
+    // appending a numm-terminator at the end of the string.
+    std::string userActiveModeTriggerInstruction;
+
+    // Note: the callback doesn't own the buffer, should make a copy if it will be used it later.
+    if (info.icd.userActiveModeTriggerInstruction.size() != 0)
     {
-        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(info.nodeId));
+        userActiveModeTriggerInstruction =
+            std::string(info.icd.userActiveModeTriggerInstruction.data(), info.icd.userActiveModeTriggerInstruction.size());
+    }
+
+    if (info.icd.userActiveModeTriggerHint.HasAny())
+    {
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerHint=0x%08x",
+                        info.icd.userActiveModeTriggerHint.Raw());
+        ChipLogProgress(AppServer, "OnReadCommissioningInfo - LIT UserActiveModeTriggerInstruction=%s",
+                        userActiveModeTriggerInstruction.c_str());
+    }
+}
+
+void PairingCommand::OnFabricCheck(NodeId matchingNodeId)
+{
+    if (matchingNodeId != kUndefinedNodeId)
+    {
+        ChipLogProgress(AppServer, "ALREADY ON FABRIC WITH nodeId=0x" ChipLogFormatX64, ChipLogValueX64(matchingNodeId));
         // wait until attestation verification before cancelling so we can validate vid/pid
     }
 }

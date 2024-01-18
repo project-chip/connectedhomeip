@@ -77,6 +77,8 @@ protected:
 class GroupOutgoingCounters
 {
 public:
+    static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFFF; ///< 28-bit mask
+
     GroupOutgoingCounters(){};
     GroupOutgoingCounters(chip::PersistentStorageDelegate * storage_delegate);
     CHIP_ERROR Init(chip::PersistentStorageDelegate * storage_delegate);

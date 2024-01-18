@@ -23,6 +23,10 @@
 
 #include <zephyr/kernel.h>
 
+#ifdef CONFIG_USB_DEVICE_STACK
+#include <zephyr/usb/usb_device.h>
+#endif /* CONFIG_USB_DEVICE_STACK */
+
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
 #endif
@@ -33,8 +37,71 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
+static constexpr char kFactoryResetOnBootStoreKey[]       = "TelinkFactoryResetOnBootCnt";
+static constexpr uint32_t kFactoryResetUsualBootTimeoutMs = 5000;
+
+static k_timer FactoryResetUsualBootTimer;
+
+static void FactoryResetUsualBoot(struct k_timer * dummy)
+{
+    (void) dummy;
+    (void) chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Delete(kFactoryResetOnBootStoreKey);
+    LOG_INF("Schedule factory counter deleted");
+}
+
+static void FactoryResetOnBoot(void)
+{
+    uint32_t FactoryResetOnBootCnt;
+    CHIP_ERROR FactoryResetOnBootErr = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(
+        kFactoryResetOnBootStoreKey, &FactoryResetOnBootCnt, sizeof(FactoryResetOnBootCnt));
+
+    if (FactoryResetOnBootErr == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        FactoryResetOnBootCnt = 1;
+        if (chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFactoryResetOnBootStoreKey, &FactoryResetOnBootCnt,
+                                                                        sizeof(FactoryResetOnBootCnt)) != CHIP_NO_ERROR)
+        {
+            LOG_ERR("FactoryResetOnBootCnt write fail");
+        }
+        else
+        {
+            LOG_INF("Schedule factory counter %u", FactoryResetOnBootCnt);
+        }
+    }
+    else if (FactoryResetOnBootErr == CHIP_NO_ERROR)
+    {
+        FactoryResetOnBootCnt++;
+        if (chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kFactoryResetOnBootStoreKey, &FactoryResetOnBootCnt,
+                                                                        sizeof(FactoryResetOnBootCnt)) != CHIP_NO_ERROR)
+        {
+            LOG_ERR("FactoryResetOnBootCnt write fail");
+        }
+        else
+        {
+            LOG_INF("Schedule factory counter %u", FactoryResetOnBootCnt);
+            if (FactoryResetOnBootCnt >= kFactoryResetOnBootMaxCnt)
+            {
+                GetAppTask().PowerOnFactoryReset();
+            }
+        }
+    }
+    else
+    {
+        LOG_ERR("FactoryResetOnBootCnt read fail");
+    }
+    k_timer_init(&FactoryResetUsualBootTimer, FactoryResetUsualBoot, nullptr);
+    k_timer_start(&FactoryResetUsualBootTimer, K_MSEC(kFactoryResetUsualBootTimeoutMs), K_NO_WAIT);
+}
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
+
 int main(void)
 {
+#if defined(CONFIG_USB_DEVICE_STACK) && !defined(CONFIG_CHIP_PW_RPC)
+    usb_enable(NULL);
+#endif /* CONFIG_USB_DEVICE_STACK */
+
     CHIP_ERROR err = CHIP_NO_ERROR;
 
 #ifdef CONFIG_CHIP_PW_RPC
@@ -61,7 +128,9 @@ int main(void)
         LOG_ERR("StartEventLoopTask fail");
         goto exit;
     }
-
+#ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
+    FactoryResetOnBoot();
+#endif /* CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET */
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -69,12 +138,14 @@ int main(void)
         goto exit;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD_SED
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#else
+#if defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_ROUTER)
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
+#error THREAD_DEVICE_ROLE not selected
 #endif
     if (err != CHIP_NO_ERROR)
     {

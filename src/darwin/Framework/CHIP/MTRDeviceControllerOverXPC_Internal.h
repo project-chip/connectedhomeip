@@ -25,7 +25,7 @@ typedef void (^MTRFetchControllerIDCompletion)(
 
 @interface MTRDeviceControllerOverXPC ()
 
-@property (nonatomic, readwrite, strong) id<NSCopying> _Nullable controllerID;
+@property (nonatomic, readwrite, strong) id<NSCopying> _Nullable controllerXPCID;
 @property (nonatomic, readonly, strong) dispatch_queue_t workQueue;
 @property (nonatomic, readonly, strong) MTRDeviceControllerXPCConnection * xpcConnection;
 

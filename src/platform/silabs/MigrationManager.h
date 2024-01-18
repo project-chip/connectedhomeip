@@ -24,8 +24,6 @@ namespace Silabs {
 
 class MigrationManager
 {
-    friend class KeyValueStoreManagerImpl;
-
 public:
     /**
      * The Silabs migration manager is implemented as a singleton
@@ -38,6 +36,13 @@ private:
     MigrationManager(){};
     ~MigrationManager(){};
 };
+
+/**
+ * Migration functions. These definitions allow the MigrationManager
+ * to be agnostic of the specifics of each individual migration.
+ */
+void MigrateKvsMap(void);
+void MigrateDacProvider(void);
 
 } // namespace Silabs
 } // namespace DeviceLayer

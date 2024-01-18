@@ -196,7 +196,7 @@ ReadRequestMessage::Builder & ReadRequestMessage::Builder::IsFabricFiltered(cons
     return *this;
 }
 
-ReadRequestMessage::Builder & ReadRequestMessage::Builder::EndOfReadRequestMessage()
+CHIP_ERROR ReadRequestMessage::Builder::EndOfReadRequestMessage()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -206,7 +206,7 @@ ReadRequestMessage::Builder & ReadRequestMessage::Builder::EndOfReadRequestMessa
     {
         EndOfContainer();
     }
-    return *this;
+    return GetError();
 }
 } // namespace app
 } // namespace chip

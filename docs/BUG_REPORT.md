@@ -100,10 +100,10 @@ report is different here. Some examples:
 
 -   `Specification changed this attribute from optional to mandatory so this may be the cause of the issue`
 
--   `This issue may be related to #1234 as the same error is seen, however the reproduction steps seemed distinct enough that I openend a new issue`
+-   `This issue may be related to #1234 as the same error is seen, however the reproduction steps seemed distinct enough that I opened a new issue`
 
 -   `While running this, I observed 100% CPU before the operation finally timed out`
 
 -   `While running this test, I observed device under test rebooting, logs attached.`
 
--   `This only happens intermitently - I see it about 30% of the time`
+-   `This only happens intermittently - I see it about 30% of the time`

@@ -21,13 +21,13 @@
 // ---- Pump Example App Config ----
 
 #define APP_USE_EXAMPLE_START_BUTTON 1
-#define APP_USE_THREAD_START_BUTTON 1
+#define APP_USE_BLE_START_BUTTON 0
+#define APP_USE_THREAD_START_BUTTON 0
 #define APP_SET_DEVICE_INFO_PROVIDER 1
 #define APP_SET_NETWORK_COMM_ENDPOINT_SEC 0
-#define APP_USE_IDENTIFY_PWM 1 // APP_USE_IDENTIFY_PWM must be defined before including "AppConfigCommon.h"
+#if defined(CONFIG_BOARD_TLSR9518ADK80D) || defined(CONFIG_BOARD_TLSR9528A)
+#define APP_USE_IDENTIFY_PWM 1
+#endif
 
-#include "AppConfigCommon.h"
-
-#define PUMP_STATE_LED 6
 // Time it takes in ms for the simulated pump to move from one state to another.
 #define PUMP_START_PERIOS_MS 2000

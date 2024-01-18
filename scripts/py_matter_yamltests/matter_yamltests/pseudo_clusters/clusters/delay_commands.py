@@ -58,7 +58,7 @@ class DelayCommands(PseudoCluster):
                 duration_in_ms = argument['value']
 
         sys.stdout.flush()
-        time.sleep(duration_in_ms / 1000)
+        time.sleep(int(duration_in_ms) / 1000)
 
     async def WaitForMessage(self, request):
         AccessoryServerBridge.waitForMessage(request)

@@ -56,7 +56,7 @@ void PrettyPrintIMBlankLine()
         if (sizeof(gLineBuffer) > gCurLineBufferSize)
         {
             size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            size_t ret      = (size_t) (snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
             if (ret > 0)
             {
                 gCurLineBufferSize += std::min(ret, sizeLeft);
@@ -78,7 +78,7 @@ void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
         size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t ret      = (size_t) (vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);
@@ -138,6 +138,8 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
         ReturnErrorOnFailure(aReader.Get(value_s64));
 
+        // TODO: Figure out how to not use PRId64 here, since it's not supported
+        // on all libcs.
         PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
         break;
     }
@@ -147,6 +149,8 @@ CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLa
 
         ReturnErrorOnFailure(aReader.Get(value_u64));
 
+        // TODO: Figure out how to not use PRIu64 here, since it's not supported
+        // on all libcs.
         PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
         break;
     }

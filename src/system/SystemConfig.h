@@ -121,7 +121,7 @@
 #error "FORBIDDEN: CHIP_SYSTEM_CONFIG_MULTICAST_HOMING CAN ONLY BE USED WITH SOCKET IMPL"
 #endif
 
-#if CHIP_SYSTEM_CONFIG_MULTICAST_HOMING && CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#if CHIP_SYSTEM_CONFIG_MULTICAST_HOMING && CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__)
 #error "FORBIDDEN: CHIP_SYSTEM_CONFIG_MULTICAST_HOMING WAS NOT TESTED WITH ZEPHYR"
 #endif
 
@@ -293,23 +293,17 @@
 #endif // CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING && CHIP_SYSTEM_CONFIG_NO_LOCKING
 
 /**
- *  @def CHIP_SYSTEM_HEADER_RESERVE_SIZE
+ *  @def CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
  *
  *  @brief
  *      The number of bytes to reserve in a network packet buffer to contain
- *      the CHIP message and exchange headers.
+ *      the Matter crypto headers.
  *
- *      This number was calculated as follows:
- *
- *      CHIP Crypto Header:
- *
- *          4 -- Length of encrypted block
- *          4 -- Reserve
- *          8 -- Initialization Vector
- *          8 -- Encryption Tag
+ *      This is 0, because Matter does not have any crypto headers.  This define
+ *      is still here only for backwards compatibility.
  */
 #ifndef CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 24
+#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE 0
 #endif
 
 /**
@@ -317,31 +311,39 @@
  *
  *  @brief
  *      The number of bytes to reserve in a network packet buffer to contain
- *      the CHIP message and exchange headers.
+ *      the CHIP message and payload headers.
  *
  *      This number was calculated as follows:
  *
- *      CHIP Message Header:
+ *      Matter Message Header:
  *
  *          2 -- Frame Length
- *          2 -- Message Header
- *          4 -- Message Id
- *          8 -- Source Node Id
- *          8 -- Destination Node Id
- *          2 -- Key Id
+ *          1 -- Message Flags
+ *          2 -- Session ID
+ *          1 -- Security Flags
+ *          4 -- Message Counter
+ *          8 -- Source Node ID
+ *          8 -- Destination Node ID
  *
- *      CHIP Exchange Header:
+ *      Total: 26 bytes.
  *
- *          1 -- Application Version
- *          1 -- Message Type
- *          2 -- Exchange Id
- *          4 -- Profile Id
- *          4 -- Acknowledged Message Id
+ *      Matter Payload Header:
  *
- *    @note A number of these fields are optional or not presently used. So most headers will be considerably smaller than this.
+ *          1 -- Exhange Flags
+ *          1 -- Protocol Opcode
+ *          2 -- Exchange ID
+ *          2 -- Protocol Vendor ID
+ *          2 -- Protocol ID
+ *          4 -- Acknowledged MEssage Counter
+ *
+ *      Total: 12 bytes.
+ *
+ *    @note A number of these fields are optional or not presently used. So most
+ *          headers will be considerably smaller than this.
+ *    @note This calculation assumes ther are no Message Extensions or Secured Extensions.
  */
 #ifndef CHIP_SYSTEM_HEADER_RESERVE_SIZE
-#define CHIP_SYSTEM_HEADER_RESERVE_SIZE (38 + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
+#define CHIP_SYSTEM_HEADER_RESERVE_SIZE (26 + 12 + CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE)
 #endif /* CHIP_SYSTEM_HEADER_RESERVE_SIZE */
 
 /**
@@ -357,15 +359,21 @@
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+ *  @def CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
  *
  *  @brief
- *      LwIP @pbuf_type for System::PacketBuffer allocations.
+ *      In LwIP builds, this selects whether to use LwIP @pbuf_type @PBUF_RAM (1)
+ *      or @PBUF_POOL (0) for System::PacketBuffer allocations.
  *
  *      Note that this does not affect allocations by LwIP itself, e.g. the normal receive path.
  */
-#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
-#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE PBUF_POOL
+#ifndef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM 0
+#endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM */
+
+// Catch configurations attempting to use the former method (see issue #29208).
+#ifdef CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE
+#error "See CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM"
 #endif /* CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_TYPE */
 
 /**
@@ -637,7 +645,7 @@ struct LwIPEvent;
  *  Defaults to enabled if the system is using sockets (except for Zephyr RTOS).
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
-#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !__ZEPHYR__ && !__MBED__
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !defined(__ZEPHYR__) && !defined(__MBED__)
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE 0
@@ -656,7 +664,7 @@ struct LwIPEvent;
  *  Defaults to enabled on Zephyr platforms using sockets
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__)
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS 0
@@ -677,7 +685,7 @@ struct LwIPEvent;
  *  Defaults to enabled on Zephyr platforms using sockets
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__)
 #define CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API 0
@@ -693,7 +701,7 @@ struct LwIPEvent;
  *  Defaults to enabled on Zephyr platforms using sockets
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && __ZEPHYR__
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__)
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF 0
@@ -709,9 +717,57 @@ struct LwIPEvent;
  *  Defaults to enabled on Unix/Linux platforms using sockets
  */
 #ifndef CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !__ZEPHYR__
+#if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && !defined(__ZEPHYR__)
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 0
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+ *
+ *  @brief
+ *      Use Zephyr socket API.
+ *
+ *  Defaults to enabled on Zephyr platforms that do not enable Zephyr POSIX layer.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__) && defined(CONFIG_NET_SOCKETS_POSIX_NAMES)
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS 1
+#else
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS 0
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
+ *
+ *  @brief
+ *      Use POSIX socket API.
+ *
+ *  Defaults to enabled on platforms that use sockets other than Zephyr sockets.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
+#define CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS 1
+#else
+#define CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS 0
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_POSIX_SOCKETS
+
+/**
+ *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
+ *
+ *  @brief
+ *      Use Zephyr eventfd API.
+ *
+ *  Defaults to enabled on Zephyr platforms that enable CONFIG_EVENTFD.
+ */
+#ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
+#if defined(__ZEPHYR__) && defined(CONFIG_EVENTFD)
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 1
+#else
+#define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 0
+#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD

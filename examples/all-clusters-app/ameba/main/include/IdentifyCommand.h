@@ -96,8 +96,8 @@ void ProcessIdentifyUnicastBindingCommand(BindingCommandData * data, const Ember
         break;
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
-        triggerEffectCommand.effectIdentifier = static_cast<EmberAfIdentifyEffectIdentifier>(data->args[0]);
-        triggerEffectCommand.effectVariant    = static_cast<EmberAfIdentifyEffectVariant>(data->args[1]);
+        triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
+        triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
         Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(), binding.remote,
                                          triggerEffectCommand, onSuccess, onFailure);
         break;
@@ -119,8 +119,8 @@ void ProcessIdentifyGroupBindingCommand(BindingCommandData * data, const EmberBi
         break;
 
     case Clusters::Identify::Commands::TriggerEffect::Id:
-        triggerEffectCommand.effectIdentifier = static_cast<EmberAfIdentifyEffectIdentifier>(data->args[0]);
-        triggerEffectCommand.effectVariant    = static_cast<EmberAfIdentifyEffectVariant>(data->args[1]);
+        triggerEffectCommand.effectIdentifier = static_cast<Clusters::Identify::EffectIdentifierEnum>(data->args[0]);
+        triggerEffectCommand.effectVariant    = static_cast<Clusters::Identify::EffectVariantEnum>(data->args[1]);
         Controller::InvokeGroupCommandRequest(&exchangeMgr, binding.fabricIndex, binding.groupId, triggerEffectCommand);
         break;
     }

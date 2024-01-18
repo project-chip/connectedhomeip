@@ -35,8 +35,8 @@ public:
     virtual ~KvsPersistentStorageDelegate() = default;
 
     // No copy, move or assignment.
-    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &)  = delete;
-    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &&) = delete;
+    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &)             = delete;
+    KvsPersistentStorageDelegate(const KvsPersistentStorageDelegate &&)            = delete;
     KvsPersistentStorageDelegate & operator=(const KvsPersistentStorageDelegate &) = delete;
 
     CHIP_ERROR Init(DeviceLayer::PersistedStorage::KeyValueStoreManager * kvsManager)

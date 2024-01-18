@@ -22,9 +22,38 @@
 
 #include <platform/NetworkCommissioning.h>
 
+#include "CHIPDevicePlatformConfig.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
+
+template <typename T>
+class TizenScanResponseIterator : public Iterator<T>
+{
+public:
+    TizenScanResponseIterator(std::vector<T> * apScanResponse) : mpScanResponse(apScanResponse) {}
+    size_t Count() override { return mpScanResponse != nullptr ? mpScanResponse->size() : 0; }
+    bool Next(T & item) override
+    {
+        if (mpScanResponse == nullptr || currentIterating >= mpScanResponse->size())
+        {
+            return false;
+        }
+        item = (*mpScanResponse)[currentIterating];
+        currentIterating++;
+        return true;
+    }
+    void Release() override
+    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the ownership in OnFinished for
+         scan. */
+    }
+
+private:
+    size_t currentIterating = 0;
+    // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copyable.
+    std::vector<T> * mpScanResponse;
+};
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 class TizenWiFiDriver final : public WiFiDriver
@@ -72,6 +101,7 @@ public:
     Status AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
+    uint32_t GetSupportedWiFiBandsMask() const override;
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
@@ -118,6 +148,8 @@ public:
     // ThreadDriver
     Status AddOrUpdateNetwork(ByteSpan operationalDataset, MutableCharSpan & outDebugText, uint8_t & outNetworkIndex) override;
     void ScanNetworks(ThreadDriver::ScanCallback * callback) override;
+    ThreadCapabilities GetSupportedThreadFeatures() override;
+    uint16_t GetThreadVersion() override;
 
 private:
     ThreadNetworkIterator mThreadIterator = ThreadNetworkIterator(this);

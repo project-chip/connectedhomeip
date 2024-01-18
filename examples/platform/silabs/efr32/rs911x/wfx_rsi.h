@@ -51,6 +51,7 @@
 #define WFX_RSI_ST_STA_READY (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE)
 #define WFX_RSI_ST_STARTED (0x200)     /* RSI task started			*/
 #define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
+#define WFX_RSI_ST_SLEEP_READY (0x800) /* Notify the M4 to go to sleep*/
 
 struct wfx_rsi
 {
@@ -83,7 +84,6 @@ extern "C" {
 #endif
 void wfx_rsidev_init(void);
 void wfx_rsi_task(void * arg);
-void efr32Log(const char * aFormat, ...);
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -91,7 +91,9 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
-#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
+#if SL_ICD_ENABLED
+int32_t wfx_rsi_power_save();
+#endif /* SL_ICD_ENABLED */
 
 #ifdef __cplusplus
 }

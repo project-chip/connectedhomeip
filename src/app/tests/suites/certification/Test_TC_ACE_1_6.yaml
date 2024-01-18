@@ -1,0 +1,368 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 49.1.6. [TC-ACE-1.6] Group auth mode
+
+PICS:
+    - MCORE.ROLE.COMMISSIONEE
+    - G.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Access Control"
+    endpoint: 0
+
+    #PIXIT.G.ENDPOINT
+    Groups.Endpoint: 1
+
+tests:
+    - label: "Step 0: Wait for the commissioned device to be retrieved for TH1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH reads the fabric index and saves for future use."
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: FabricIndexValue
+
+    - label: "TH reads the commissioner nodeID and saves for future use."
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: commissionerNodeId
+
+    - label:
+          "Step 1a: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: GroupKeySetID: 0x01a3
+          GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
+          d2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "hex:d1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "hex:d2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 2220002,
+                    }
+    - label:
+          "Step 1b: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: GroupKeySetID: 0x01a1
+          GroupKeySecurityPolicy: TrustFirst (0) EpochKey0:
+          a0d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime0: 2220000 EpochKey1:
+          b1d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime1: 2220001 EpochKey2:
+          c2d1d2d3d4d5d6d7d8d9dadbdcdddedf EpochStartTime2: 2220002"
+      cluster: "Group Key Management"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: GroupKeySet
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "hex:a0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "hex:b1d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "hex:c2d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+                        EpochStartTime2: 2220002,
+                    }
+
+    - label:
+          "Step 2: TH binds GroupId to GroupKeySet with entries as follows: List
+          item 1: GroupId: 0x0103, GroupKeySetId: 0x01a3, List item 2: GroupId:
+          0x0104, GroupKeySetId: 0x01a4, List item 3: GroupId: 0x0105,
+          GroupKeySetId: 0x01a3"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 0, GroupId: 0x0102, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 0, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label:
+          "Step 3: TH sends a AddGroup Command to the Groups cluster on Endpoint
+          PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0103 and
+          the GroupName set to an empty string"
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0103
+              - name: GroupName
+                value: ""
+
+    - label:
+          "Step 4: TH writes The ACL attribute in the Access Control cluster to
+          add Manage privileges for group 0x0103 and maintain the current
+          administrative privileges for the TH on the Access Control cluster.
+          The following access control list shall be used: List item 1 (TH
+          admin): Privilege: Administer (5) AuthMode: CASE (2) Subjects: [N1]
+          Targets: [{Cluster: AccessControl (0x001f), Endpoint: 0}] List item 2
+          (group Manage access): Privilege: Manage (4) AuthMode: Group (3)
+          Subjects: group 0x0103 ([0x0103]) Targets: {Cluster: Groups (0x0004),
+          Endpoint: PIXIT.G.ENDPOINT}"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, #Administer
+                      AuthMode: 2, #CASE
+                      Subjects: [commissionerNodeId],
+                      Targets:
+                          [
+                              {
+                                  Cluster: 0x001f,
+                                  Endpoint: endpoint,
+                                  DeviceType: null,
+                              },
+                          ],
+                  },
+                  {
+                      FabricIndex: 0,
+                      Privilege: 4, #Manage
+                      AuthMode: 3, #Group
+                      Subjects: [0x0103], #group 0x0103
+                      Targets:
+                          [
+                              {
+                                  Cluster: 0x0004,
+                                  Endpoint: Groups.Endpoint,
+                                  DeviceType: null,
+                              },
+                          ],
+                  },
+              ]
+
+    - label:
+          "Step 5: TH sends a AddGroup Command to the Groups cluster on Endpoint
+          PIXIT.G.ENDPOINT over CASE with the GroupID field set to 0x0101 and
+          the GroupName set to an empty string"
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: ""
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Step 6: TH sends a AddGroup Command to the Groups cluster with the
+          GroupID field set to 0x0101 and the GroupName set to an empty string.
+          The command is sent as a group command using GroupID 0x0103"
+      cluster: "Groups"
+      groupId: 0x0103
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: ""
+
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for AddGroup"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "Step 7: TH sends a AddGroup Command to the Groups cluster with the
+          GroupID field set to 0x0102 and the GroupName set to an empty string.
+          The command is sent as a group command using GroupID 0x0101"
+      cluster: "Groups"
+      groupId: 0x0101
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0102
+              - name: GroupName
+                value: ""
+
+    # multicast if the unicast packet is sent immediately after the multicast one.
+    - label: "Wait for AddGroup"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label:
+          "Step 8: TH writes The ACL attribute in the Access Control cluster to
+          revoke groups Management access and restore full access over CASE by
+          setting the following ACL list items: List item 1 (TH admin):
+          Privilege: Administer (5) AuthMode: CASE (2) Subjects: [N1] Targets:
+          null"
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: [
+                  {
+                      FabricIndex: 0,
+                      Privilege: 5, #Administer
+                      AuthMode: 2, #CASE
+                      Subjects: [commissionerNodeId],
+                      Targets: null,
+                  },
+              ]
+
+    - label:
+          "Step 9: TH sends a ViewGroup Command to the Groups cluster on
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0101 to
+          confirm that the AddGroup command from step 6 was successful"
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0101
+      response:
+          values:
+              - name: Status
+                value: 0
+              - name: GroupID
+                value: 0x0101
+              - name: GroupName
+                value: ""
+
+    - label:
+          "Step 10: TH sends a ViewGroup Command to the Groups cluster on
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0102 to
+          confirm that the AddGroup command from step 7 was not successful"
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0102
+      response:
+          values:
+              - name: Status
+                value: 139
+              - name: GroupID
+                value: 0x0102
+              - name: GroupName
+                value: ""
+
+    - label:
+          "Step 11: TH sends a AddGroup Command to the Groups cluster with the
+          GroupID field set to 0x0105 and the GroupName set to an empty string.
+          The command is sent as a group command using GroupID 0x0103"
+      cluster: "Groups"
+      groupId: 0x0103
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0105
+              - name: GroupName
+                value: ""
+
+    - label:
+          "Step 12: TH sends a ViewGroup Command to the Groups cluster on
+          Endpoint PIXIT.G.ENDPOINT over CASE with the GroupID set to 0x0105 to
+          confirm that the AddGroup command from step 11 was not successful"
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: GroupID
+                value: 0x0105
+      response:
+          values:
+              - name: Status
+                value: 139
+              - name: GroupID
+                value: 0x0105
+              - name: GroupName
+                value: ""
+
+    - label:
+          "Step 13: TH sends the RemoveAllGroups Command to the Groups cluster
+          on Endpoint PIXIT.G.ENDPOINT over CASE"
+      cluster: "Groups"
+      endpoint: Groups.Endpoint
+      command: "RemoveAllGroups"
+
+    - label:
+          "Step 14: TH resets the GroupKeyMap attribute list on
+          GroupKeyManagement cluster by writing the GroupKeyMap attribute with
+          an empty list"
+      cluster: "Group Key Management"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: []
+
+    - label:
+          "Step 15: TH resets the key set by sending the KeySetRemove command to
+          the GroupKeyManagement cluster over CASE with the following fields:
+          GroupKeySetID: 0x01a3"
+      cluster: "Group Key Management"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a3
+
+    - label:
+          "Step 16: TH resets the key set by sending the KeySetRemove command to
+          the GroupKeyManagement cluster over CASE with the following fields:
+          GroupKeySetID: 0x01a1"
+      cluster: "Group Key Management"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: GroupKeySetID
+                value: 0x01a1

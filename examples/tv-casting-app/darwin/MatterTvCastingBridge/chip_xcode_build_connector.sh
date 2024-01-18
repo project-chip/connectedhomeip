@@ -91,6 +91,8 @@ done
     target_cflags+=',"-flto"'
 }
 
+target_cflags+=',"-fno-c++-static-destructors"'
+
 declare -a args=(
     'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="mbedtls"'

@@ -18,7 +18,6 @@
 #include "identify-server.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -35,10 +34,6 @@
 
 #if CHIP_DEVICE_LAYER_NONE
 #error "identify requrires a device layer"
-#endif
-
-#ifndef emberAfIdentifyClusterPrintln
-#define emberAfIdentifyClusterPrintln(...) ChipLogProgress(Zcl, __VA_ARGS__);
 #endif
 
 using namespace chip;
@@ -96,7 +91,7 @@ void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
     Identify * identify = inst(endpoint);
     if (identify != nullptr)
     {
-        (void) Clusters::Identify::Attributes::IdentifyType::Set(endpoint, identify->mIdentifyType);
+        (void) Attributes::IdentifyType::Set(endpoint, identify->mIdentifyType);
     }
 }
 
@@ -109,13 +104,12 @@ static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appS
     {
         EndpointId endpoint = identify->mEndpoint;
 
-        if (EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime) &&
-            0 != identifyTime)
+        if (EMBER_ZCL_STATUS_SUCCESS == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 != identifyTime)
         {
             identifyTime = static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1);
             // This tick writes the new attribute, which will trigger the Attribute
             // Changed callback.
-            (void) Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, identifyTime);
+            (void) Attributes::IdentifyTime::Set(endpoint, identifyTime);
         }
     }
 }
@@ -140,7 +134,7 @@ static inline void identify_deactivate(Identify * identify)
 
 void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    if (attributePath.mAttributeId == Clusters::Identify::Attributes::IdentifyTime::Id)
+    if (attributePath.mAttributeId == Attributes::IdentifyTime::Id)
     {
         EndpointId endpoint = attributePath.mEndpointId;
         Identify * identify = inst(endpoint);
@@ -151,7 +145,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
             return;
         }
 
-        if (EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime))
+        if (EMBER_ZCL_STATUS_SUCCESS == Attributes::IdentifyTime::Get(endpoint, &identifyTime))
         {
             /* effect identifier changed during identify */
             if (identify->mTargetEffectIdentifier != identify->mCurrentEffectIdentifier)
@@ -159,21 +153,21 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
                 identify->mCurrentEffectIdentifier = identify->mTargetEffectIdentifier;
 
                 /* finish identify process */
-                if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
+                if (EffectIdentifierEnum::kFinishEffect == identify->mCurrentEffectIdentifier && identifyTime > 0)
                 {
-                    Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, 1);
+                    Attributes::IdentifyTime::Set(endpoint, 1);
                 }
                 /* stop identify process */
-                if (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT == identify->mCurrentEffectIdentifier && identifyTime > 0)
+                if (EffectIdentifierEnum::kStopEffect == identify->mCurrentEffectIdentifier && identifyTime > 0)
                 {
-                    Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, 0);
+                    Attributes::IdentifyTime::Set(endpoint, 0);
                     identify_deactivate(identify);
                 }
                 /* change from e.g. Breathe to Blink during identify */
                 else
                 {
                     /* cancel identify */
-                    Clusters::Identify::Attributes::IdentifyTime::Set(endpoint, 0);
+                    Attributes::IdentifyTime::Set(endpoint, 0);
                     identify_deactivate(identify);
 
                     /* trigger effect identifier callback */
@@ -199,7 +193,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
     }
 }
 
-bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::Identify::DecodableType & commandData)
 {
     auto & identifyTime = commandData.identifyTime;
@@ -210,7 +204,7 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const a
     return true;
 }
 
-bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                  const Commands::TriggerEffect::DecodableType & commandData)
 {
     auto & effectIdentifier = commandData.effectIdentifier;
@@ -219,23 +213,23 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
     EndpointId endpoint = commandPath.mEndpointId;
 
     // cmd TriggerEffect
-    Identify * identify                      = inst(endpoint);
-    uint16_t identifyTime                    = 0;
-    EmberAfIdentifyEffectIdentifier effectId = static_cast<EmberAfIdentifyEffectIdentifier>(effectIdentifier);
+    Identify * identify   = inst(endpoint);
+    uint16_t identifyTime = 0;
 
-    emberAfIdentifyClusterPrintln("RX identify:trigger effect 0x%X variant 0x%X", effectId, effectVariant);
+    ChipLogProgress(Zcl, "RX identify:trigger effect identifier 0x%X variant 0x%X", to_underlying(effectIdentifier),
+                    to_underlying(effectVariant));
 
     if (identify == nullptr)
     {
         return false;
     }
 
-    identify->mTargetEffectIdentifier = effectId;
+    identify->mTargetEffectIdentifier = effectIdentifier;
     identify->mEffectVariant          = effectVariant;
 
     /* only call the callback if no identify is in progress */
     if (nullptr != identify->mOnEffectIdentifier &&
-        EMBER_ZCL_STATUS_SUCCESS == Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 == identifyTime)
+        EMBER_ZCL_STATUS_SUCCESS == Attributes::IdentifyTime::Get(endpoint, &identifyTime) && 0 == identifyTime)
     {
         identify->mCurrentEffectIdentifier = identify->mTargetEffectIdentifier;
         identify->mOnEffectIdentifier(identify);
@@ -245,13 +239,13 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
     return true;
 }
 
-Identify::Identify(chip::EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
-                   EmberAfIdentifyIdentifyType identifyType, onEffectIdentifierCb onEffectIdentifier,
-                   EmberAfIdentifyEffectIdentifier effectIdentifier, EmberAfIdentifyEffectVariant effectVariant) :
+Identify::Identify(EndpointId endpoint, onIdentifyStartCb onIdentifyStart, onIdentifyStopCb onIdentifyStop,
+                   IdentifyTypeEnum identifyType, onEffectIdentifierCb onEffectIdentifier, EffectIdentifierEnum effectIdentifier,
+                   EffectVariantEnum effectVariant) :
     mEndpoint(endpoint),
     mOnIdentifyStart(onIdentifyStart), mOnIdentifyStop(onIdentifyStop), mIdentifyType(identifyType),
     mOnEffectIdentifier(onEffectIdentifier), mCurrentEffectIdentifier(effectIdentifier), mTargetEffectIdentifier(effectIdentifier),
-    mEffectVariant(static_cast<uint8_t>(effectVariant))
+    mEffectVariant(effectVariant)
 {
     reg(this);
 };

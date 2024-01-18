@@ -74,7 +74,7 @@ public:
         CHIP_ERROR error = status.ToChipError();
         if (CHIP_NO_ERROR != error)
         {
-            ReturnOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
+            LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(path, status));
 
             ChipLogError(chipTool, "Response Failure: %s", chip::ErrorStr(error));
             mError = error;
@@ -83,7 +83,7 @@ public:
 
         if (data != nullptr)
         {
-            ReturnOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
+            LogErrorOnFailure(RemoteDataModelLogger::LogCommandAsJSON(path, data));
 
             error = DataModelLogger::LogCommand(path, data);
             if (CHIP_NO_ERROR != error)
@@ -97,7 +97,7 @@ public:
 
     virtual void OnError(const chip::app::CommandSender * client, CHIP_ERROR error) override
     {
-        ReturnOnFailure(RemoteDataModelLogger::LogErrorAsJSON(error));
+        LogErrorOnFailure(RemoteDataModelLogger::LogErrorAsJSON(error));
 
         ChipLogProgress(chipTool, "Error: %s", chip::ErrorStr(error));
         mError = error;

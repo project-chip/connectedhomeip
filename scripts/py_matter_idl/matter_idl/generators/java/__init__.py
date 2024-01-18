@@ -17,12 +17,12 @@ import dataclasses
 import enum
 import logging
 import os
-from typing import List, Set, Union
+from typing import List, Optional, Set
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
-                                         ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
+from matter_idl.generators.type_definitions import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                                    ParseDataType, TypeLookupContext)
+from matter_idl.matter_idl_types import (Attribute, Cluster, Command, DataType, Field, FieldQuality, Idl, Struct, StructQuality,
                                          StructTag)
 from stringcase import capitalcase
 
@@ -35,46 +35,45 @@ class GenerateTarget:
 
 @dataclasses.dataclass
 class GlobalType:
-    name: str       # java name
+    name: str      # java name
     cpp_type: str  # underlying type
+    idl_type: str  # assumed IDL type
 
 
 # types that java should see globally
 _GLOBAL_TYPES = [
-    GlobalType("Boolean", "bool"),
-    GlobalType("CharString", "const chip::CharSpan"),
-    GlobalType("Double", "double"),
-    GlobalType("Float", "float"),
-    GlobalType("Int8s", "int8_t"),
-    GlobalType("Int8u", "uint8_t"),
-    GlobalType("Int16s", "int16_t"),
-    GlobalType("Int16u", "uint16_t"),
-    GlobalType("Int32s", "int32_t"),
-    GlobalType("Int32u", "uint32_t"),
-    GlobalType("Int64s", "int64_t"),
-    GlobalType("Int64u", "uint64_t"),
-    GlobalType("OctetString", "const chip::ByteSpan"),
+    GlobalType("Boolean", "bool", "boolean"),
+    GlobalType("CharString", "const chip::CharSpan", "char_string"),
+    GlobalType("Double", "double", "double"),
+    GlobalType("Float", "float", "single"),
+    GlobalType("Int8s", "int8_t", "int8s"),
+    GlobalType("Int8u", "uint8_t", "int8u"),
+    GlobalType("Int16s", "int16_t", "int16s"),
+    GlobalType("Int16u", "uint16_t", "int16u"),
+    GlobalType("Int32s", "int32_t", "int32s"),
+    GlobalType("Int32u", "uint32_t", "int32u"),
+    GlobalType("Int64s", "int64_t", "int64s"),
+    GlobalType("Int64u", "uint64_t", "int64u"),
+    GlobalType("OctetString", "const chip::ByteSpan", "octet_string"),
 ]
 
 
-def _UnderlyingType(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def _UnderlyingType(field: Field, context: TypeLookupContext) -> Optional[str]:
     actual = ParseDataType(field.data_type, context)
-    if type(actual) == IdlEnumType:
-        actual = actual.base_type
-    elif type(actual) == IdlBitmapType:
+    if isinstance(actual, (IdlEnumType, IdlBitmapType)):
         actual = actual.base_type
 
-    if type(actual) == BasicString:
+    if isinstance(actual, BasicString):
         if actual.is_binary:
             return 'OctetString'
         else:
             return 'CharString'
-    elif type(actual) == BasicInteger:
+    elif isinstance(actual, BasicInteger):
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
         else:
             return "Int{}u".format(actual.power_of_two_bits)
-    elif type(actual) == FundamentalType:
+    elif isinstance(actual, FundamentalType):
         if actual == FundamentalType.BOOL:
             return 'Boolean'
         elif actual == FundamentalType.FLOAT:
@@ -87,7 +86,7 @@ def _UnderlyingType(field: Field, context: TypeLookupContext) -> Union[str, None
     return None
 
 
-def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Optional[str]:
     """Global names are used for generic callbacks shared across
     all clusters (e.g. for bool/float/uint32 and similar)
     """
@@ -127,12 +126,10 @@ _KNOWN_DECODABLE_TYPES = {
     # non-named enums
     'enum8': 'uint8_t',
     'enum16': 'uint16_t',
-    'enum32': 'uint32_t',
-    'enum64': 'uint64_t',
 }
 
 
-def _CppType(field: Field, context: TypeLookupContext) -> Union[str, None]:
+def _CppType(field: Field, context: TypeLookupContext) -> str:
     if field.data_type.name.lower() in _KNOWN_DECODABLE_TYPES:
         return _KNOWN_DECODABLE_TYPES[field.data_type.name.lower()]
 
@@ -168,11 +165,17 @@ def _CppType(field: Field, context: TypeLookupContext) -> Union[str, None]:
 def DecodableJniType(field: Field, context: TypeLookupContext) -> str:
     actual = _CppType(field, context)
 
+    needsConstRef = False
     if field.is_list:
-        return f"const chip::app::DataModel::DecodableList<{actual}> &"
+        needsConstRef = True
+        actual = f"chip::app::DataModel::DecodableList<{actual}>"
 
     if field.is_nullable:
-        return f"const chip::app::DataModel::Nullable<{actual}> &"
+        needsConstRef = True
+        actual = f"chip::app::DataModel::Nullable<{actual}>"
+
+    if needsConstRef:
+        actual = f"const {actual} &"
 
     return actual
 
@@ -240,13 +243,44 @@ def CommandCallbackName(command: Command, cluster: Cluster):
     return '{}Cluster{}'.format(cluster.name, command.output_param)
 
 
+def JavaCommandCallbackName(command: Command):
+    if command.output_param.lower() == 'defaultsuccess':
+        return 'DefaultCluster'
+    return '{}'.format(command.output_param)
+
+
+def IsCommandNotDefaultCallback(command: Command) -> bool:
+    return command.output_param.lower() != 'defaultsuccess'
+
+
+def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when building a *AttributeCallback
+    in java codegen.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return '{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
+
+
+def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
+    global_name = FieldToGlobalName(field, context)
+    if global_name:
+        return True
+
+    return False
+
+
 def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
     for attr in attrs:
         # Attributes will be generated for all types
         # except non-list structures
         if not attr.definition.is_list:
             underlying = ParseDataType(attr.definition.data_type, context)
-            if type(underlying) == IdlType:
+            if isinstance(underlying, IdlType):
                 continue
 
         yield attr
@@ -284,8 +318,6 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
         "int64u",
         "enum8",
         "enum16",
-        "enum32",
-        "enum64",
         "bitmap8",
         "bitmap16",
         "bitmap32",
@@ -383,7 +415,11 @@ class EncodableValue:
 
     @property
     def is_bitmap(self):
-        self.context.is_bitmap_type(self.data_type.name)
+        return self.context.is_bitmap_type(self.data_type.name)
+
+    @property
+    def is_untyped_bitmap(self):
+        return self.context.is_untyped_bitmap_type(self.data_type.name)
 
     def clone(self):
         return EncodableValue(self.context, self.data_type, self.attrs)
@@ -416,10 +452,27 @@ class EncodableValue:
         return e
 
     @property
+    def jni_fundamental_type(self):
+        java_type = self.boxed_java_type
+
+        if java_type == 'Boolean':
+            return 'jboolean'
+        elif java_type == 'Float':
+            return 'jfloat'
+        elif java_type == 'Double':
+            return 'jdouble'
+        elif java_type == 'Long':
+            return 'jlong'
+        elif java_type == 'Integer':
+            return 'jint'
+
+        raise Exception("Unknown jni fundamental type.")
+
+    @property
     def boxed_java_type(self):
         t = ParseDataType(self.data_type, self.context)
 
-        if type(t) == FundamentalType:
+        if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Boolean"
             elif t == FundamentalType.FLOAT:
@@ -428,29 +481,127 @@ class EncodableValue:
                 return "Double"
             else:
                 raise Exception("Unknown fundamental type")
-        elif type(t) == BasicInteger:
+        elif isinstance(t, BasicInteger):
             # the >= 3 will include int24_t to be considered "long"
             if t.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
-        elif type(t) == BasicString:
+        elif isinstance(t, BasicString):
             if t.is_binary:
                 return "byte[]"
             else:
                 return "String"
-        elif type(t) == IdlEnumType:
+        elif isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
-        elif type(t) == IdlBitmapType:
+        elif isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
         else:
             return "Object"
+
+    @property
+    def java_tlv_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            # the >= 3 will include int24_t to be considered "long"
+            if t.is_signed:
+                return "Int"
+            else:
+                return "UInt"
+        elif isinstance(t, BasicString):
+            if t.is_binary:
+                return "ByteArray"
+            else:
+                return "String"
+        elif isinstance(t, IdlEnumType):
+            return "UInt"
+        elif isinstance(t, IdlBitmapType):
+            return "UInt"
+        else:
+            return "Any"
+
+    @property
+    def kotlin_type(self):
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Boolean"
+            elif t == FundamentalType.FLOAT:
+                return "Float"
+            elif t == FundamentalType.DOUBLE:
+                return "Double"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            # the >= 3 will include int24_t to be considered "long"
+            if t.is_signed:
+                if t.byte_count >= 3:
+                    return "Long"
+                else:
+                    return "Int"
+            else:
+                if t.byte_count >= 3:
+                    return "ULong"
+                else:
+                    return "UInt"
+        elif isinstance(t, BasicString):
+            if t.is_binary:
+                return "ByteArray"
+            else:
+                return "String"
+        elif isinstance(t, IdlEnumType):
+            if t.base_type.byte_count >= 3:
+                return "ULong"
+            else:
+                return "UInt"
+        elif isinstance(t, IdlBitmapType):
+            if t.base_type.byte_count >= 3:
+                return "ULong"
+            else:
+                return "UInt"
+        else:
+            return "Any"
+
+    @property
+    def unboxed_java_signature(self):
+        if self.is_optional or self.is_list:
+            raise Exception("Not a basic type: %r" % self)
+
+        t = ParseDataType(self.data_type, self.context)
+
+        if isinstance(t, FundamentalType):
+            if t == FundamentalType.BOOL:
+                return "Z"
+            elif t == FundamentalType.FLOAT:
+                return "F"
+            elif t == FundamentalType.DOUBLE:
+                return "D"
+            else:
+                raise Exception("Unknown fundamental type")
+        elif isinstance(t, BasicInteger):
+            if t.byte_count >= 3:
+                return "J"
+            else:
+                return "I"
+        else:
+            raise Exception("Not a basic type: %r" % self)
 
     @property
     def boxed_java_signature(self):
@@ -463,7 +614,7 @@ class EncodableValue:
 
         t = ParseDataType(self.data_type, self.context)
 
-        if type(t) == FundamentalType:
+        if isinstance(t, FundamentalType):
             if t == FundamentalType.BOOL:
                 return "Ljava/lang/Boolean;"
             elif t == FundamentalType.FLOAT:
@@ -472,28 +623,35 @@ class EncodableValue:
                 return "Ljava/lang/Double;"
             else:
                 raise Exception("Unknown fundamental type")
-        elif type(t) == BasicInteger:
+        elif isinstance(t, BasicInteger):
             if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
-        elif type(t) == BasicString:
+        elif isinstance(t, BasicString):
             if t.is_binary:
                 return "[B"
             else:
                 return "Ljava/lang/String;"
-        elif type(t) == IdlEnumType:
+        elif isinstance(t, IdlEnumType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
-        elif type(t) == IdlBitmapType:
+        elif isinstance(t, IdlBitmapType):
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
+
+
+def GlobalEncodableValueFrom(typeName: str, context: TypeLookupContext) -> EncodableValue:
+    """
+    Filter to convert a global type name to an encodable value
+    """
+    return EncodableValue(context, DataType(name=typeName), set())
 
 
 def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableValue:
@@ -518,7 +676,7 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
     return EncodableValue(context, field.data_type, attrs)
 
 
-def CreateLookupContext(idl: Idl, cluster: Cluster) -> TypeLookupContext:
+def CreateLookupContext(idl: Idl, cluster: Optional[Cluster]) -> TypeLookupContext:
     """
     A filter to mark a lookup context to be within a specific cluster.
 
@@ -544,6 +702,14 @@ def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return not lookup.is_struct_type(attr.definition.data_type.name)
 
 
+def IsFabricScopedList(attr: Attribute, lookup: TypeLookupContext) -> bool:
+    if not attr.definition.is_list:
+        return False
+
+    struct = lookup.find_struct(attr.definition.data_type.name)
+    return struct and struct.qualities == StructQuality.FABRIC_SCOPED
+
+
 def IsResponseStruct(s: Struct) -> bool:
     return s.tag == StructTag.RESPONSE
 
@@ -567,16 +733,22 @@ class __JavaCodeGenerator(CodeGenerator):
         self.jinja_env.filters['chipClustersCallbackName'] = ChipClustersCallbackName
         self.jinja_env.filters['delegatedCallbackName'] = DelegatedCallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
+        self.jinja_env.filters['javaCommandCallbackName'] = JavaCommandCallbackName
+        self.jinja_env.filters['isCommandNotDefaultCallback'] = IsCommandNotDefaultCallback
+        self.jinja_env.filters['javaAttributeCallbackName'] = JavaAttributeCallbackName
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
+        self.jinja_env.filters['globalAsEncodable'] = GlobalEncodableValueFrom
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
         self.jinja_env.filters['decodableJniType'] = DecodableJniType
+        self.jinja_env.filters['isFabricScopedList'] = IsFabricScopedList
 
         self.jinja_env.tests['is_response_struct'] = IsResponseStruct
         self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback
+        self.jinja_env.tests['is_field_global_name'] = IsFieldGlobalName
 
 
 class JavaJNIGenerator(__JavaCodeGenerator):
@@ -594,7 +766,9 @@ class JavaJNIGenerator(__JavaCodeGenerator):
             GenerateTarget(template="CHIPCallbackTypes.jinja",
                            output_name="jni/CHIPCallbackTypes.h"),
             GenerateTarget(template="CHIPReadCallbacks_h.jinja",
-                           output_name="jni/CHIPReadCallbacks.h")
+                           output_name="jni/CHIPReadCallbacks.h"),
+            GenerateTarget(template="CHIPGlobalCallbacks_cpp.jinja",
+                           output_name="jni/CHIPGlobalCallbacks.cpp"),
         ]
 
         for target in large_targets:
@@ -603,7 +777,7 @@ class JavaJNIGenerator(__JavaCodeGenerator):
                 output_file_name=target.output_name,
                 vars={
                     'idl': self.idl,
-                    'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                    'clientClusters': self.idl.clusters,
                     'globalTypes': _GLOBAL_TYPES,
                 }
             )
@@ -620,16 +794,13 @@ class JavaJNIGenerator(__JavaCodeGenerator):
             output_file_name="jni/CHIPCallbackTypes.h",
             vars={
                 'idl': self.idl,
-                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                'clientClusters': self.idl.clusters,
             }
         )
 
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             for target in cluster_targets:
                 self.internal_render_one_output(
                     template_path=target.template,
@@ -654,8 +825,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
-        clientClusters = [
-            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+        clientClusters = self.idl.clusters
 
         self.internal_render_one_output(
             template_path="ClusterReadMapping.jinja",
@@ -674,3 +844,94 @@ class JavaClassGenerator(__JavaCodeGenerator):
                 'clientClusters': clientClusters,
             }
         )
+
+        self.internal_render_one_output(
+            template_path="ClusterIDMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterIDMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipClusters_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipClusters.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipStructs_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipStructs.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipEventStructs_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipEventStructs.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ClusterInfoMapping_java.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterInfoMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipStructFiles_gni.jinja",
+            output_file_name="java/chip/devicecontroller/cluster/files.gni",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        # Every cluster has its own impl, to avoid
+        # very large compilations (running out of RAM)
+        for cluster in self.idl.clusters:
+            for struct in cluster.structs:
+                if struct.tag:
+                    continue
+
+                output_name = "java/chip/devicecontroller/cluster/structs/{cluster_name}Cluster{struct_name}.kt"
+                self.internal_render_one_output(
+                    template_path="ChipStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        struct_name=struct.name),
+                    vars={
+                        'cluster': cluster,
+                        'struct': struct,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )
+
+            for event in cluster.events:
+                if not event.fields:
+                    continue
+
+                output_name = "java/chip/devicecontroller/cluster/eventstructs/{cluster_name}Cluster{event_name}Event.kt"
+                self.internal_render_one_output(
+                    template_path="ChipEventStructs.jinja",
+                    output_file_name=output_name.format(
+                        cluster_name=cluster.name,
+                        event_name=event.name),
+                    vars={
+                        'cluster': cluster,
+                        'event': event,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                    }
+                )

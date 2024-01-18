@@ -31,7 +31,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/mw320/MW320Config.h>
 
-//#include "core_cm7.h"
+// #include "core_cm7.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,7 +53,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     uint32_t rebootCount = 0;
-    bool failSafeArmed;
 
     // Initialize the generic implementation base class.
     // err = Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>::Init();
@@ -73,12 +72,6 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         // The first boot after factory reset of the Node.
         err = StoreRebootCount(1);
         SuccessOrExit(err);
-    }
-    // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
-    if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
-    {
-        ChipLogProgress(DeviceLayer, "Detected fail-safe armed on reboot; initiating factory reset");
-        InitiateFactoryReset();
     }
 
     if (!MW320Config::ConfigValueExists(MW320Config::kCounterKey_BootReason))

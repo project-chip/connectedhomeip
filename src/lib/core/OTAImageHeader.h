@@ -26,7 +26,7 @@
 namespace chip {
 
 /// File signature (aka magic number) of a valid Matter OTA image
-constexpr uint32_t kOTAImageFileIdentifier = 0x1BEEF11E;
+inline constexpr uint32_t kOTAImageFileIdentifier = 0x1BEEF11E;
 
 enum class OTAImageDigestType : uint8_t
 {

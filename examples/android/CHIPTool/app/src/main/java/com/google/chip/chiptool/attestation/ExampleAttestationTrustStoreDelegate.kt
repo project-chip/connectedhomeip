@@ -1,7 +1,6 @@
 package com.google.chip.chiptool.attestation
 
 import android.util.Base64
-import android.util.Log
 import chip.devicecontroller.AttestationTrustStoreDelegate
 import chip.devicecontroller.ChipDeviceController
 import java.util.*
@@ -14,7 +13,9 @@ class ExampleAttestationTrustStoreDelegate(val chipDeviceController: ChipDeviceC
   override fun getProductAttestationAuthorityCert(skid: ByteArray): ByteArray? {
     return paaCerts
       .map { Base64.decode(it, Base64.DEFAULT) }
-      .firstOrNull { cert -> Arrays.equals(chipDeviceController.extractSkidFromPaaCert(cert), skid) }
+      .firstOrNull { cert ->
+        Arrays.equals(chipDeviceController.extractSkidFromPaaCert(cert), skid)
+      }
   }
 
   companion object {

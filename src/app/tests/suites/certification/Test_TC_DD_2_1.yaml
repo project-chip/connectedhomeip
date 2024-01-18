@@ -35,8 +35,8 @@ tests:
       disabled: true
 
     - label:
-          "If TH is aware of the DUT's Discovery Capability Bitmask, it SHALL
-          initiate Device Discovery in any order of priority on all the
+          "Step 1: If TH is aware of the DUT's Discovery Capability Bitmask, it
+          SHALL initiate Device Discovery in any order of priority on all the
           networking technologies that are supported by both the TH and the DUT
           If TH is unaware of the DUT's Discovery Capability Bitmask, it SHALL
           initiate Device Discovery in any order on all the networking
@@ -48,7 +48,7 @@ tests:
       disabled: true
 
     - label:
-          "If (MCORE.DD.CHIP_DEV) then If !(MCORE.DD.CHIP_DEV) then If
+          "Step 2: If (MCORE.DD.CHIP_DEV) then If !(MCORE.DD.CHIP_DEV) then If
           (MCORE.DD.DEV_LOCK) then If (MCORE.DD.DEV_BARRIER) then"
       PICS:
           MCORE.DD.CHIP_DEV || !(MCORE.DD.CHIP_DEV) || MCORE.DD.DEV_LOCK ||
@@ -83,8 +83,8 @@ tests:
       disabled: true
 
     - label:
-          "DUT begins sending ADVs. TH does not respond to these DUT ADVs so
-          that the DUT can keep sending ADVs"
+          "Step 3: DUT begins sending ADVs. TH does not respond to these DUT
+          ADVs so that the DUT can keep sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -103,7 +103,7 @@ tests:
           0x00 = Additional Data Flag
       disabled: true
 
-    - label: "TH does not respond to DUT and DUT keeps sending ADVs"
+    - label: "Step 4: TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -114,7 +114,7 @@ tests:
           HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)+++
       disabled: true
 
-    - label: "TH does not respond to DUT and DUT keeps sending ADVs"
+    - label: "Step 5: TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -127,7 +127,7 @@ tests:
           ->For 30s and 15mins we have to get advertisement range between 150ms to 1200ms
       disabled: true
 
-    - label: "TH does not respond to DUT. User power cycles the DUT"
+    - label: "Step 6: TH does not respond to DUT. User power cycles the DUT"
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -136,8 +136,8 @@ tests:
       disabled: true
 
     - label:
-          "TH does not respond to DUT and DUT keeps sending ADVs. TH waits at
-          least 15 minutes"
+          "Step 7: TH does not respond to DUT and DUT keeps sending ADVs. TH
+          waits at least 15 minutes"
       PICS: MCORE.COM.BLE
       verification: |
           No applicable TH logs.
@@ -150,36 +150,36 @@ tests:
           3. After DUT has been advertising for 15min, check that the DUT has stopped advertising over BLE
       disabled: true
 
-    - label: "TH scans and finds the DUT SSID"
+    - label: "Step 8: TH scans and finds the DUT SSID"
       PICS: MCORE.COM.WIFI
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
     - label:
-          "TH scans and finds the DUT SSID TH sends to DUT a 1st power cycle
-          command (or reset manually) TH sends to DUT a 2nd power cycle command
-          (or reset manually)"
+          "Step 9: TH scans and finds the DUT SSID TH sends to DUT a 1st power
+          cycle command (or reset manually) TH sends to DUT a 2nd power cycle
+          command (or reset manually)"
       PICS: MCORE.COM.WIFI
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
-    - label: "TH scans and finds the DUT SSID"
+    - label: "Step 10: TH scans and finds the DUT SSID"
       PICS: MCORE.COM.WIFI && MCORE.DD.IE
       verification: |
-          Out of Scope for V1.0
+          Out of Scope
           SoftAP commissioning not currently supported on TH=chip-tool
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network through vendor-unique
-          means or by commissioning the DUT onto the Matter network and opening
-          a commissioning window. The DUT is sending mandatory Commissionable
-          Node Discovery service records over DNS-SD.|DUT is able to be
-          discovered over DNS-SD."
+          "Step 11: TH and DUT are connected to the same network through
+          vendor-unique means or by commissioning the DUT onto the Matter
+          network and opening a commissioning window. The DUT is sending
+          mandatory Commissionable Node Discovery service records over
+          DNS-SD.|DUT is able to be discovered over DNS-SD."
       verification: |
           ./chip-all-clusters-app
           ...
@@ -197,7 +197,7 @@ tests:
           [1646286638.377915][11651:11651] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
           [1646286638.377986][11651:11651] CHIP:SVR: Manual pairing code: [34970112332]
 
-          ./chip-tool discover commissionables
+           ./chip-tool discover commissionables
           Verify in TH (CHIP-TOOL)
 
           Example output using all-clusters-app's advertisements:
@@ -219,8 +219,9 @@ tests:
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          optional Commissionable Node Discovery service records over DNS-SD."
+          "Step 12a: TH and DUT are connected to the same network and the DUT is
+          sending optional Commissionable Node Discovery service records over
+          DNS-SD."
       PICS: MCORE.DD.TXT_KEY_VP
       verification: |
           $ ./chip-tool discover commissionables
@@ -253,15 +254,16 @@ tests:
 
           Example output using all-clusters-app's advertisements:
           =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
-            hostname = [010203040506.local]
-            address = [fe80::3d59:5ecc:1961:27b0]
-            port = [5540]
-            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+             hostname = [010203040506.local]
+             address = [fe80::3d59:5ecc:1961:27b0]
+             port = [5540]
+             txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          optional Commissionable Node Discovery service records over DNS-SD."
+          "Step 12b: TH and DUT are connected to the same network and the DUT is
+          sending optional Commissionable Node Discovery service records over
+          DNS-SD."
       PICS: MCORE.DD.TXT_KEY_DT
       verification: |
           $ ./chip-tool discover commissionables
@@ -294,15 +296,16 @@ tests:
 
           Example output using all-clusters-app's advertisements:
           =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
-            hostname = [010203040506.local]
-            address = [fe80::3d59:5ecc:1961:27b0]
-            port = [5540]
-            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+             hostname = [010203040506.local]
+             address = [fe80::3d59:5ecc:1961:27b0]
+             port = [5540]
+             txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          optional Commissionable Node Discovery service records over DNS-SD."
+          "Step 12c: TH and DUT are connected to the same network and the DUT is
+          sending optional Commissionable Node Discovery service records over
+          DNS-SD."
       PICS: MCORE.DD.TXT_KEY_DN
       verification: |
           $ ./chip-tool discover commissionables
@@ -335,15 +338,16 @@ tests:
 
           Example output using all-clusters-app's advertisements:
           =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
-            hostname = [010203040506.local]
-            address = [fe80::3d59:5ecc:1961:27b0]
-            port = [5540]
-            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+             hostname = [010203040506.local]
+             address = [fe80::3d59:5ecc:1961:27b0]
+             port = [5540]
+             txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          optional Commissionable Node Discovery service records over DNS-SD."
+          "Step 12d: TH and DUT are connected to the same network and the DUT is
+          sending optional Commissionable Node Discovery service records over
+          DNS-SD."
       PICS: MCORE.DD.TXT_KEY_RI
       verification: |
           $ ./chip-tool discover commissionables
@@ -376,15 +380,16 @@ tests:
 
           Example output using all-clusters-app's advertisements:
           =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
-            hostname = [010203040506.local]
-            address = [fe80::3d59:5ecc:1961:27b0]
-            port = [5540]
-            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+             hostname = [010203040506.local]
+             address = [fe80::3d59:5ecc:1961:27b0]
+             port = [5540]
+             txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          optional Commissionable Node Discovery service records over DNS-SD."
+          "Step 12e: TH and DUT are connected to the same network and the DUT is
+          sending optional Commissionable Node Discovery service records over
+          DNS-SD."
       PICS: MCORE.DD.TXT_KEY_PH
       verification: |
           $ ./chip-tool discover commissionables
@@ -424,8 +429,9 @@ tests:
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          optional Commissionable Node Discovery service records over DNS-SD."
+          "Step 12f: TH and DUT are connected to the same network and the DUT is
+          sending optional Commissionable Node Discovery service records over
+          DNS-SD."
       PICS: MCORE.DD.TXT_KEY_PI
       verification: |
           $ ./chip-tool discover commissionables
@@ -458,13 +464,13 @@ tests:
 
           Example output using all-clusters-app's advertisements:
           =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
-            hostname = [010203040506.local]
-            address = [fe80::3d59:5ecc:1961:27b0]
-            port = [5540]
-            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+             hostname = [010203040506.local]
+             address = [fe80::3d59:5ecc:1961:27b0]
+             port = [5540]
+             txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
-    - label: "Place the DUT device into a non-commissionable state"
+    - label: "Step 13: Place the DUT device into a non-commissionable state"
       PICS: MCORE.DD.EXTENDED_DISCOVERY
       verification: |
           1. Vendor specific, take DUT out of commissioning mode
@@ -477,8 +483,8 @@ tests:
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending a
-          Commissionable Node Discovery service record over DNS-SD."
+          "Step 14a: TH and DUT are connected to the same network and the DUT is
+          sending a Commissionable Node Discovery service record over DNS-SD."
       verification: |
           ./chip-tool discover commissionables
           Verify in TH (CHIP-TOOL)
@@ -502,7 +508,7 @@ tests:
       disabled: true
 
     - label:
-          "Mandatory Commissioning Subtypes: Send a browse request for
+          "Step 14b: Mandatory Commissioning Subtypes: Send a browse request for
           '_services._dns-sd._udp' using a DNS-SD records command-line test tool
           (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
           _services._dns-sd._udp -r')"
@@ -517,20 +523,20 @@ tests:
       disabled: true
 
     - label:
-          "Optional Commissioning Subtypes: Send a browse request for
+          "Step 14c: Optional Commissioning Subtypes: Send a browse request for
           '_services._dns-sd._udp' using a DNS-SD records command-line test tool
           (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
           _services._dns-sd._udp -r')"
       PICS: MCORE.DD.COMMISSIONING_SUBTYPE_V || MCORE.DD.COMMISSIONING_SUBTYPE_T
       verification: |
           Vendor specific, take DUT out of commissioning mode
-          dns-sd -B _services._dns-sd._udp
+           dns-sd -B _services._dns-sd._udp
 
           Example output using all-clusters-app's advertisements found on the TH commissioner:
           11:56:29.770  Add        3   7 .                    _sub.local.          _V65521
       disabled: true
 
-    - label: "Place the DUT device into Commissioning mode"
+    - label: "Step 15a: Place the DUT device into Commissioning mode"
       verification: |
           $  ./chip-tool discover commissionables
           Verify in TH as commissioner side:
@@ -554,8 +560,8 @@ tests:
       disabled: true
 
     - label:
-          "Send a browse request for '_matterc._udp' using a DNS-SD records
-          command-line test tool (i.e. 'dns-sd -B _matterc._udp' or
+          "Step 15b: Send a browse request for '_matterc._udp' using a DNS-SD
+          records command-line test tool (i.e. 'dns-sd -B _matterc._udp' or
           'avahi-browse _matterc._udp -r')"
       verification: |
           Verify using the DNS-SD records command-line test tool:
@@ -571,8 +577,8 @@ tests:
           $ avahi-browse _matterc._udp -r
           +   eth0 IPv4 A043306EF9D2CB3F                              _matterc._udp        local
           =   eth0 IPv4 A043306EF9D2CB3F                              _matterc._udp        local
-            hostname = [88665A0BE29E.local]
-            address = [17.112.82.171]
-            port = [5540]
-            txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "VP=65521+32769"]
+             hostname = [88665A0BE29E.local]
+             address = [17.112.82.171]
+             port = [5540]
+             txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "VP=65521+32769"]
       disabled: true

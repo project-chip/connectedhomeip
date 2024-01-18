@@ -50,10 +50,8 @@ constexpr FabricIndex kTestAccessingFabricIndex2 = 2;
 
 static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
 {
-#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
     CHIP_ERROR err = PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 }
 
 static void TestFailSafeContext_ArmFailSafe(nlTestSuite * inSuite, void * inContext)
@@ -123,9 +121,7 @@ int TestFailSafeContext_Setup(void * inContext)
  */
 int TestFailSafeContext_Teardown(void * inContext)
 {
-#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
     PlatformMgr().Shutdown();
-#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
@@ -139,7 +135,7 @@ int TestFailSafeContext()
 {
     nlTestSuite theSuite = { "FailSafeContext tests", &sTests[0], TestFailSafeContext_Setup, TestFailSafeContext_Teardown };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

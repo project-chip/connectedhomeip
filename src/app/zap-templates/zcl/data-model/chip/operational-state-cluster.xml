@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="OperationalStateEnum" type="enum8">
+    <cluster code="0x0060"/>
+    <cluster code="0x0048"/>
+    <item name="Stopped" value="0x00"/>
+    <item name="Running" value="0x01"/>
+    <item name="Paused"  value="0x02"/>
+    <item name="Error"   value="0x03"/>
+  </enum>
+
+  <enum name="ErrorStateEnum" type="enum8">
+    <cluster code="0x0060"/>
+    <cluster code="0x0048"/>
+    <item name="NoError"                    value="0x00"/>
+    <item name="UnableToStartOrResume"      value="0x01"/>
+    <item name="UnableToCompleteOperation"  value="0x02"/>
+    <item name="CommandInvalidInState"      value="0x03"/>
+  </enum>
+
+  <struct name="OperationalStateStruct">
+    <cluster code="0x0060"/>
+    <cluster code="0x0061"/>
+    <cluster code="0x0048"/>
+    <item name="OperationalStateID"    type="enum8" optional="false"/>
+    <item name="OperationalStateLabel" type="char_string" optional="true" length="64"/>
+  </struct>
+
+  <struct name="ErrorStateStruct">
+    <cluster code="0x0060"/>
+    <cluster code="0x0061"/>
+    <cluster code="0x0048"/>
+    <item name="ErrorStateID" type="enum8" optional="false" />
+    <item name="ErrorStateLabel" type="char_string" optional="true" length="64" />
+    <item name="ErrorStateDetails" type="char_string" optional="true" length="64" />
+  </struct>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Operational State</name>
+    <code>0x0060</code>
+    <define>OPERATIONAL_STATE_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.</description>
+
+    <globalAttribute side="either" code="0xFFFD" value="1" />
+
+    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="array" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
+    <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0x00" max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
+    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="array" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
+    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="OperationalStateEnum"                                              writable="false"                    optional="false">OperationalState</attribute>
+    <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
+
+    <command source="client" code="0x00" name="Pause" response="OperationalCommandResponse" optional="true">
+      <description>Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server.</description>
+    </command>
+
+    <command source="client" code="0x01" name="Stop" response="OperationalCommandResponse" optional="true">
+      <description>Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted.</description>
+    </command>
+
+    <command source="client" code="0x02" name="Start" response="OperationalCommandResponse" optional="true">
+      <description>Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started.</description>
+    </command>
+
+    <command source="client" code="0x03" name="Resume" response="OperationalCommandResponse" optional="true">
+      <description>Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press).</description>
+    </command>
+
+    <command source="server" code="0x04" name="OperationalCommandResponse" optional="true">
+      <description>This command SHALL be generated in response to any of the Start, Stop, Pause, or Resume commands.</description>
+      <arg name="CommandResponseState" type="ErrorStateStruct"/>
+    </command>
+
+    <event side="server" code="0x00" priority="critical" name="OperationalError" optional="false">
+      <description>OperationalError</description>
+      <field id="0" name="ErrorState" type="ErrorStateStruct" />
+    </event>
+
+     <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
+      <description>OperationCompletion</description>
+      <field id="0" name="CompletionErrorCode"  type="enum8" />
+      <field id="1" name="TotalOperationalTime" type="elapsed_s" isNullable="true" optional="true"/>
+      <field id="2" name="PausedTime"           type="elapsed_s" isNullable="true" optional="true"/>
+    </event>
+
+  </cluster>
+</configurator>

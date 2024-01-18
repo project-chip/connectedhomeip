@@ -375,7 +375,10 @@ class V1Comment:
                     cols, rows = memdf.util.markdown.read_hierified(body)
                     break
         logging.debug('REC: read %d rows', len(rows))
-        df = df.append(pd.DataFrame(data=rows, columns=cols).astype(df.dtypes))
+        attrs = df.attrs
+        df = pd.concat([df, pd.DataFrame(data=rows, columns=cols).astype(df.dtypes)],
+                       ignore_index=True)
+        df.attrs = attrs
         return df.sort_values(
             by=['platform', 'target', 'config', 'section']).drop_duplicates()
 

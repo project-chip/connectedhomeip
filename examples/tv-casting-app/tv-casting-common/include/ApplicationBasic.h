@@ -19,7 +19,9 @@
 #include "MediaReadBase.h"
 #include "MediaSubscriptionBase.h"
 
-#include <zap-generated/CHIPClusters.h>
+#include <controller/CHIPCluster.h>
+
+#include <app-common/zap-generated/cluster-objects.h>
 
 // SUBSCRIBER CLASSES
 class VendorNameSubscriber : public MediaSubscriptionBase<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>

@@ -83,14 +83,15 @@ static const uint8_t _svc_uuid[16]         = { 0xF6, 0xFF, 0, 0, 0x0, 0x0, 0, 0,
     {                                                                                                                              \
         0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18                             \
     }
-//#define UUID_CHIPoBLECharact_RX   { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x11
-//}
+// #define UUID_CHIPoBLECharact_RX   { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D,
+// 0x11
+// }
 #define ChipUUID_CHIPoBLECharact_TX                                                                                                \
     {                                                                                                                              \
         0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18                             \
     }
-//#define ChipUUID_CHIPoBLECharact_TX   { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D,
-// 0x12 }
+// #define ChipUUID_CHIPoBLECharact_TX   { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D,
+//  0x12 }
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 #define UUID_CHIPoBLEChar_C3                                                                                                       \
     {                                                                                                                              \
@@ -268,8 +269,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int notificationsEnabled
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
-                                                                  : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type                    = (indicationsEnabled || notificationsEnabled) ? DeviceEventType::kCHIPoBLESubscribe
+                                                                                     : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = conn_id;
         PlatformMgr().PostEventOrDie(&event);
     }

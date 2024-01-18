@@ -1,0 +1,61 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
+
+import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/fuzz_test.gni")
+
+chip_test_suite_using_nltest("tests") {
+  output_name = "libFormatTests"
+
+  test_sources = [
+    "TestDecoding.cpp",
+    "TestFlatTree.cpp",
+    "TestFlatTreePosition.cpp",
+  ]
+
+  sources = [
+    "sample_data.cpp",
+    "sample_data.h",
+  ]
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/format:flat-tree",
+    "${chip_root}/src/lib/format:protocol-decoder",
+    "${chip_root}/src/lib/format:protocol-tlv-metadata",
+    "${chip_root}/src/lib/support:testing_nlunit",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+}
+
+if (enable_fuzz_test_targets) {
+  chip_fuzz_target("fuzz-payload-decoder") {
+    sources = [ "FuzzPayloadDecoder.cpp" ]
+    public_deps = [
+      "${chip_root}/src/controller/data_model:cluster-tlv-metadata",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/format:flat-tree",
+      "${chip_root}/src/lib/format:protocol-decoder",
+      "${chip_root}/src/lib/format:protocol-tlv-metadata",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/platform/logging:stdio",
+    ]
+  }
+}
