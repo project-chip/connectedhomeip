@@ -27,12 +27,30 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace OperationalState {
+namespace RvcOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
-class GenericOperationalStateDelegateImpl : public Delegate
+class RvcOperationalStateDelegate : public Delegate
 {
+private:
+    const Clusters::OperationalState::GenericOperationalState rvcOpStateList[7] = {
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
+    };
+
+    Span<const OperationalState::GenericOperationalState> mOperationalStateList =
+        Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
+    Span<const CharSpan> mOperationalPhaseList;
+
 public:
+    RvcOperationalStateDelegate() {}
+
     /**
      * Get the countdown time. This attribute is not used in this application.
      * @return The current countdown time.
@@ -47,19 +65,15 @@ public:
      * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, OperationalState::GenericOperationalState & operationalState) override;
 
     /**
-     * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
+     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
-     *
-     * If CHIP_ERROR_NOT_FOUND is returned for index 0, that indicates that the PhaseList attribute is null
-     * (there are no phases defined at all).
-     *
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
      * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
-     * @param operationalPhase  The MutableCharSpan is filled.
+     * @param operationalPhase  The GenericOperationalPhase is filled.
      */
     CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) override;
 
@@ -68,54 +82,38 @@ public:
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
      */
-    void HandlePauseStateCallback(GenericOperationalError & err) override;
+    void HandlePauseStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
      */
-    void HandleResumeStateCallback(GenericOperationalError & err) override;
+    void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(GenericOperationalError & err) override;
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
      */
-    void HandleStopStateCallback(GenericOperationalError & err) override;
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
 
-protected:
-    Span<const GenericOperationalState> mOperationalStateList;
-    Span<const CharSpan> mOperationalPhaseList;
+    /**
+     * Handle the GoHome command.
+     * @param err
+     */
+    void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) override;
 };
-
-// This is an application level delegate to handle operational state commands according to the specific business logic.
-class OperationalStateDelegate : public GenericOperationalStateDelegateImpl
-{
-private:
-    const GenericOperationalState opStateList[4] = {
-        GenericOperationalState(to_underlying(OperationalStateEnum::kStopped)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kRunning)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kPaused)),
-        GenericOperationalState(to_underlying(OperationalStateEnum::kError)),
-    };
-
-public:
-    OperationalStateDelegate()
-    {
-        GenericOperationalStateDelegateImpl::mOperationalStateList = Span<const GenericOperationalState>(opStateList);
-    }
-};
-
-Instance * GetOperationalStateInstance();
 
 void Shutdown();
 
-} // namespace OperationalState
+Instance * GetRvcOperationalStateInstance();
+
+} // namespace RvcOperationalState
 } // namespace Clusters
 } // namespace app
 } // namespace chip

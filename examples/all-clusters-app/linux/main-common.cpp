@@ -30,6 +30,7 @@
 #include "oven-modes.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
+#include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
