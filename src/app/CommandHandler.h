@@ -449,7 +449,7 @@ private:
     /**
      * Rollback the state to before encoding the current ResponseData (before calling PrepareInvokeResponseCommand / PrepareStatus)
      *
-     * Requires CreateBackupForResponseRollback to called at the start of PrepareInvokeResponseCommand / PrepareStatus
+     * Requires CreateBackupForResponseRollback to be called at the start of PrepareInvokeResponseCommand / PrepareStatus
      */
     CHIP_ERROR RollbackResponse();
 
