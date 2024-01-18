@@ -5737,6 +5737,12 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000080: {
+                "commandId": 0x00000080,
+                "commandName": "GoHome",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
