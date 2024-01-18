@@ -458,6 +458,17 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                         // AD type : Service Data
     advData[index++] = ShortUUID_CHIPoBLEService[0];                                            // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];
+
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    // check for extended advertisment interval
+    if (BLEMgrImpl().Internal_Slow_Advertising_MIN == CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL) {
+        mDeviceIdInfo.SetVendorId(0x0000);
+        mDeviceIdInfo.SetProductId(0x0000);
+        mDeviceIdInfo.SetAdditionalDataFlag(true);
+        mDeviceIdInfo.SetExtendedAnnouncementFlag(true);
+    }
+#endif
+
     memcpy(&advData[index], (void *) &mDeviceIdInfo, mDeviceIdInfoLength); // AD value
     index += mDeviceIdInfoLength;
 
