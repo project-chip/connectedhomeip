@@ -19,8 +19,8 @@
 #include <lib/support/Scoped.h>
 #include <lib/support/UnitTestRegistration.h>
 
-#include <string.h>
 #include <nlunit-test.h>
+#include <string.h>
 
 namespace {
 
@@ -48,7 +48,6 @@ void TestScopedChangeOnly(nlTestSuite * inSuite, void * inContext)
 {
     ScopedChangeOnly<int> intValue(123);
     ScopedChangeOnly<const char *> strValue("abc");
-
 
     NL_TEST_ASSERT(inSuite, intValue == 123);
     NL_TEST_ASSERT(inSuite, strcmp(strValue, "abc") == 0);
