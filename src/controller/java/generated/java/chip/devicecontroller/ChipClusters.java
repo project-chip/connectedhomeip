@@ -29984,8 +29984,6 @@ public class ChipClusters {
     private static final long MAXIMUM_DISCHARGE_CURRENT_ATTRIBUTE_ID = 8L;
     private static final long USER_MAXIMUM_CHARGE_CURRENT_ATTRIBUTE_ID = 9L;
     private static final long RANDOMIZATION_DELAY_WINDOW_ATTRIBUTE_ID = 10L;
-    private static final long NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID = 33L;
-    private static final long NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID = 34L;
     private static final long NEXT_CHARGE_START_TIME_ATTRIBUTE_ID = 35L;
     private static final long NEXT_CHARGE_TARGET_TIME_ATTRIBUTE_ID = 36L;
     private static final long NEXT_CHARGE_REQUIRED_ENERGY_ATTRIBUTE_ID = 37L;
@@ -30088,17 +30086,13 @@ public class ChipClusters {
     }
 
 
-    public void setTargets(DefaultClusterCallback callback, Integer dayOfWeekforSequence, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets, int timedInvokeTimeoutMs) {
+    public void setTargets(DefaultClusterCallback callback, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long dayOfWeekforSequenceFieldID = 0L;
-      BaseTLVType dayOfWeekforSequencetlvValue = new UIntType(dayOfWeekforSequence);
-      elements.add(new StructElement(dayOfWeekforSequenceFieldID, dayOfWeekforSequencetlvValue));
-
-      final long chargingTargetsFieldID = 1L;
-      BaseTLVType chargingTargetstlvValue = ArrayType.generateArrayType(chargingTargets, (elementchargingTargets) -> elementchargingTargets.encodeTlv());
-      elements.add(new StructElement(chargingTargetsFieldID, chargingTargetstlvValue));
+      final long chargingTargetSchedulesFieldID = 0L;
+      BaseTLVType chargingTargetSchedulestlvValue = ArrayType.generateArrayType(chargingTargetSchedules, (elementchargingTargetSchedules) -> elementchargingTargetSchedules.encodeTlv());
+      elements.add(new StructElement(chargingTargetSchedulesFieldID, chargingTargetSchedulestlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -30109,36 +30103,25 @@ public class ChipClusters {
     }
 
 
-    public void getTargets(GetTargetsResponseCallback callback, Integer daysToReturn, int timedInvokeTimeoutMs) {
+    public void getTargets(GetTargetsResponseCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long daysToReturnFieldID = 0L;
-      BaseTLVType daysToReturntlvValue = new UIntType(daysToReturn);
-      elements.add(new StructElement(daysToReturnFieldID, daysToReturntlvValue));
-
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long dayOfWeekforSequenceFieldID = 0L;
-          Integer dayOfWeekforSequence = null;
-          final long chargingTargetsFieldID = 1L;
-          ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets = null;
+          final long chargingTargetSchedulesFieldID = 0L;
+          ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == dayOfWeekforSequenceFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                dayOfWeekforSequence = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == chargingTargetsFieldID) {
+            if (element.contextTagNum() == chargingTargetSchedulesFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Array) {
                 ArrayType castingValue = element.value(ArrayType.class);
-                chargingTargets = castingValue.map((elementcastingValue) -> ChipStructs.EnergyEvseClusterChargingTargetStruct.decodeTlv(elementcastingValue));
+                chargingTargetSchedules = castingValue.map((elementcastingValue) -> ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct.decodeTlv(elementcastingValue));
               }
             }
           }
-          callback.onSuccess(dayOfWeekforSequence, chargingTargets);
+          callback.onSuccess(chargingTargetSchedules);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
@@ -30156,7 +30139,7 @@ public class ChipClusters {
     }
 
     public interface GetTargetsResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer dayOfWeekforSequence, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets);
+      void onSuccess(ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules);
     }
 
     public interface StateAttributeCallback extends BaseAttributeCallback {
@@ -30526,56 +30509,6 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, RANDOMIZATION_DELAY_WINDOW_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNumberOfWeeklyTargetsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNumberOfWeeklyTargetsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNumberOfDailyTargetsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNumberOfDailyTargetsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNextChargeStartTimeAttribute(

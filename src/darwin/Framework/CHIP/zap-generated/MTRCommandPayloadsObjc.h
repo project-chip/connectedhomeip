@@ -5846,9 +5846,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterGetTargetsResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekforSequence MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSArray * _Nonnull chargingTargets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull chargingTargetSchedules MTR_PROVISIONALLY_AVAILABLE;
 
 /**
  * Initialize an MTREnergyEVSEClusterGetTargetsResponseParams with a response-value dictionary
@@ -5989,9 +5987,7 @@ MTR_PROVISIONALLY_AVAILABLE
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterSetTargetsParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull dayOfWeekforSequence MTR_PROVISIONALLY_AVAILABLE;
-
-@property (nonatomic, copy) NSArray * _Nonnull chargingTargets MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nonnull chargingTargetSchedules MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -6020,8 +6016,6 @@ MTR_PROVISIONALLY_AVAILABLE
 
 MTR_PROVISIONALLY_AVAILABLE
 @interface MTREnergyEVSEClusterGetTargetsParams : NSObject <NSCopying>
-
-@property (nonatomic, copy) NSNumber * _Nonnull daysToReturn MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

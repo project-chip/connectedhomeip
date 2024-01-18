@@ -7734,7 +7734,9 @@ MTR_PROVISIONALLY_AVAILABLE
  *
  * Allows a client to retrieve the user specified charging targets.
  */
-- (void)getTargetsWithParams:(MTREnergyEVSEClusterGetTargetsParams *)params completion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)getTargetsWithParams:(MTREnergyEVSEClusterGetTargetsParams * _Nullable)params completion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)getTargetsWithCompletion:(void (^)(MTREnergyEVSEClusterGetTargetsResponseParams * _Nullable data, NSError * _Nullable error))completion
+    MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command ClearTargets
  *
@@ -7813,18 +7815,6 @@ MTR_PROVISIONALLY_AVAILABLE
                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeRandomizationDelayWindowWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeNumberOfWeeklyTargetsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeNumberOfWeeklyTargetsWithParams:(MTRSubscribeParams *)params
-                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeNumberOfWeeklyTargetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeNumberOfDailyTargetsWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeNumberOfDailyTargetsWithParams:(MTRSubscribeParams *)params
-                                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeNumberOfDailyTargetsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeNextChargeStartTimeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeNextChargeStartTimeWithParams:(MTRSubscribeParams *)params
