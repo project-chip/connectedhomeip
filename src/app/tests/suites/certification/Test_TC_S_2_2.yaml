@@ -520,7 +520,7 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-  
+
     - label:
           "Step 8b: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
