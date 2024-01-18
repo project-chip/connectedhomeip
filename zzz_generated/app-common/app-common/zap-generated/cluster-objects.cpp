@@ -167,6 +167,133 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace ModeOptionStruct
 
+namespace MeasurementAccuracyRangeStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kRangeMin), rangeMin);
+    encoder.Encode(to_underlying(Fields::kRangeMax), rangeMax);
+    encoder.Encode(to_underlying(Fields::kPercentMax), percentMax);
+    encoder.Encode(to_underlying(Fields::kPercentMin), percentMin);
+    encoder.Encode(to_underlying(Fields::kPercentTypical), percentTypical);
+    encoder.Encode(to_underlying(Fields::kFixedMax), fixedMax);
+    encoder.Encode(to_underlying(Fields::kFixedMin), fixedMin);
+    encoder.Encode(to_underlying(Fields::kFixedTypical), fixedTypical);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kRangeMin))
+        {
+            err = DataModel::Decode(reader, rangeMin);
+        }
+        else if (__context_tag == to_underlying(Fields::kRangeMax))
+        {
+            err = DataModel::Decode(reader, rangeMax);
+        }
+        else if (__context_tag == to_underlying(Fields::kPercentMax))
+        {
+            err = DataModel::Decode(reader, percentMax);
+        }
+        else if (__context_tag == to_underlying(Fields::kPercentMin))
+        {
+            err = DataModel::Decode(reader, percentMin);
+        }
+        else if (__context_tag == to_underlying(Fields::kPercentTypical))
+        {
+            err = DataModel::Decode(reader, percentTypical);
+        }
+        else if (__context_tag == to_underlying(Fields::kFixedMax))
+        {
+            err = DataModel::Decode(reader, fixedMax);
+        }
+        else if (__context_tag == to_underlying(Fields::kFixedMin))
+        {
+            err = DataModel::Decode(reader, fixedMin);
+        }
+        else if (__context_tag == to_underlying(Fields::kFixedTypical))
+        {
+            err = DataModel::Decode(reader, fixedTypical);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace MeasurementAccuracyRangeStruct
+
+namespace MeasurementAccuracyStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kMeasurementType), measurementType);
+    encoder.Encode(to_underlying(Fields::kMeasured), measured);
+    encoder.Encode(to_underlying(Fields::kMinMeasuredValue), minMeasuredValue);
+    encoder.Encode(to_underlying(Fields::kMaxMeasuredValue), maxMeasuredValue);
+    encoder.Encode(to_underlying(Fields::kAccuracyRanges), accuracyRanges);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kMeasurementType))
+        {
+            err = DataModel::Decode(reader, measurementType);
+        }
+        else if (__context_tag == to_underlying(Fields::kMeasured))
+        {
+            err = DataModel::Decode(reader, measured);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinMeasuredValue))
+        {
+            err = DataModel::Decode(reader, minMeasuredValue);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxMeasuredValue))
+        {
+            err = DataModel::Decode(reader, maxMeasuredValue);
+        }
+        else if (__context_tag == to_underlying(Fields::kAccuracyRanges))
+        {
+            err = DataModel::Decode(reader, accuracyRanges);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace MeasurementAccuracyStruct
+
 namespace ApplicationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -13862,21 +13989,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace Events
 
 } // namespace ValveConfigurationAndControl
-namespace ElectricalEnergyMeasurement {
+namespace ElectricalPowerMeasurement {
 namespace Structs {
 
-namespace MeasurementAccuracyRangeStruct {
+namespace HarmonicMeasurementStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kRangeMin), rangeMin);
-    encoder.Encode(to_underlying(Fields::kRangeMax), rangeMax);
-    encoder.Encode(to_underlying(Fields::kPercentMax), percentMax);
-    encoder.Encode(to_underlying(Fields::kPercentMin), percentMin);
-    encoder.Encode(to_underlying(Fields::kPercentTypical), percentTypical);
-    encoder.Encode(to_underlying(Fields::kFixedMax), fixedMax);
-    encoder.Encode(to_underlying(Fields::kFixedMin), fixedMin);
-    encoder.Encode(to_underlying(Fields::kFixedTypical), fixedTypical);
+    encoder.Encode(to_underlying(Fields::kOrder), order);
+    encoder.Encode(to_underlying(Fields::kMeasurement), measurement);
     return encoder.Finalize();
 }
 
@@ -13894,37 +14015,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kRangeMin))
+        if (__context_tag == to_underlying(Fields::kOrder))
         {
-            err = DataModel::Decode(reader, rangeMin);
+            err = DataModel::Decode(reader, order);
         }
-        else if (__context_tag == to_underlying(Fields::kRangeMax))
+        else if (__context_tag == to_underlying(Fields::kMeasurement))
         {
-            err = DataModel::Decode(reader, rangeMax);
-        }
-        else if (__context_tag == to_underlying(Fields::kPercentMax))
-        {
-            err = DataModel::Decode(reader, percentMax);
-        }
-        else if (__context_tag == to_underlying(Fields::kPercentMin))
-        {
-            err = DataModel::Decode(reader, percentMin);
-        }
-        else if (__context_tag == to_underlying(Fields::kPercentTypical))
-        {
-            err = DataModel::Decode(reader, percentTypical);
-        }
-        else if (__context_tag == to_underlying(Fields::kFixedMax))
-        {
-            err = DataModel::Decode(reader, fixedMax);
-        }
-        else if (__context_tag == to_underlying(Fields::kFixedMin))
-        {
-            err = DataModel::Decode(reader, fixedMin);
-        }
-        else if (__context_tag == to_underlying(Fields::kFixedTypical))
-        {
-            err = DataModel::Decode(reader, fixedTypical);
+            err = DataModel::Decode(reader, measurement);
         }
         else
         {
@@ -13934,17 +14031,23 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace MeasurementAccuracyRangeStruct
+} // namespace HarmonicMeasurementStruct
 
-namespace MeasurementAccuracyStruct {
+namespace MeasurementRangeStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kMeasurementType), measurementType);
-    encoder.Encode(to_underlying(Fields::kMeasured), measured);
-    encoder.Encode(to_underlying(Fields::kMinMeasuredValue), minMeasuredValue);
-    encoder.Encode(to_underlying(Fields::kMaxMeasuredValue), maxMeasuredValue);
-    encoder.Encode(to_underlying(Fields::kAccuracyRanges), accuracyRanges);
+    encoder.Encode(to_underlying(Fields::kMin), min);
+    encoder.Encode(to_underlying(Fields::kMax), max);
+    encoder.Encode(to_underlying(Fields::kStartTimestamp), startTimestamp);
+    encoder.Encode(to_underlying(Fields::kEndTimestamp), endTimestamp);
+    encoder.Encode(to_underlying(Fields::kMinTimestamp), minTimestamp);
+    encoder.Encode(to_underlying(Fields::kMaxTimestamp), maxTimestamp);
+    encoder.Encode(to_underlying(Fields::kStartSystime), startSystime);
+    encoder.Encode(to_underlying(Fields::kEndSystime), endSystime);
+    encoder.Encode(to_underlying(Fields::kMinSystime), minSystime);
+    encoder.Encode(to_underlying(Fields::kMaxSystime), maxSystime);
     return encoder.Finalize();
 }
 
@@ -13966,21 +14069,45 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, measurementType);
         }
-        else if (__context_tag == to_underlying(Fields::kMeasured))
+        else if (__context_tag == to_underlying(Fields::kMin))
         {
-            err = DataModel::Decode(reader, measured);
+            err = DataModel::Decode(reader, min);
         }
-        else if (__context_tag == to_underlying(Fields::kMinMeasuredValue))
+        else if (__context_tag == to_underlying(Fields::kMax))
         {
-            err = DataModel::Decode(reader, minMeasuredValue);
+            err = DataModel::Decode(reader, max);
         }
-        else if (__context_tag == to_underlying(Fields::kMaxMeasuredValue))
+        else if (__context_tag == to_underlying(Fields::kStartTimestamp))
         {
-            err = DataModel::Decode(reader, maxMeasuredValue);
+            err = DataModel::Decode(reader, startTimestamp);
         }
-        else if (__context_tag == to_underlying(Fields::kAccuracyRanges))
+        else if (__context_tag == to_underlying(Fields::kEndTimestamp))
         {
-            err = DataModel::Decode(reader, accuracyRanges);
+            err = DataModel::Decode(reader, endTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinTimestamp))
+        {
+            err = DataModel::Decode(reader, minTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxTimestamp))
+        {
+            err = DataModel::Decode(reader, maxTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kStartSystime))
+        {
+            err = DataModel::Decode(reader, startSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kEndSystime))
+        {
+            err = DataModel::Decode(reader, endSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kMinSystime))
+        {
+            err = DataModel::Decode(reader, minSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kMaxSystime))
+        {
+            err = DataModel::Decode(reader, maxSystime);
         }
         else
         {
@@ -13990,7 +14117,113 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace MeasurementAccuracyStruct
+} // namespace MeasurementRangeStruct
+} // namespace Structs
+
+namespace Commands {} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::PowerMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, powerMode);
+    case Attributes::NumberOfMeasurementTypes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, numberOfMeasurementTypes);
+    case Attributes::Accuracy::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, accuracy);
+    case Attributes::Ranges::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, ranges);
+    case Attributes::Voltage::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, voltage);
+    case Attributes::ActiveCurrent::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, activeCurrent);
+    case Attributes::ReactiveCurrent::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, reactiveCurrent);
+    case Attributes::ApparentCurrent::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, apparentCurrent);
+    case Attributes::ActivePower::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, activePower);
+    case Attributes::ReactivePower::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, reactivePower);
+    case Attributes::ApparentPower::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, apparentPower);
+    case Attributes::RMSVoltage::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, RMSVoltage);
+    case Attributes::RMSCurrent::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, RMSCurrent);
+    case Attributes::RMSPower::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, RMSPower);
+    case Attributes::Frequency::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, frequency);
+    case Attributes::HarmonicCurrents::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, harmonicCurrents);
+    case Attributes::HarmonicPhases::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, harmonicPhases);
+    case Attributes::PowerFactor::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, powerFactor);
+    case Attributes::NeutralCurrent::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, neutralCurrent);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {
+namespace MeasurementPeriodRanges {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kRanges), ranges));
+    return aWriter.EndContainer(outer);
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kRanges))
+        {
+            err = DataModel::Decode(reader, ranges);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace MeasurementPeriodRanges.
+} // namespace Events
+
+} // namespace ElectricalPowerMeasurement
+namespace ElectricalEnergyMeasurement {
+namespace Structs {
 
 namespace EnergyMeasurementStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -25999,465 +26232,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace ContentAppObserver
-namespace ElectricalMeasurement {
-
-namespace Commands {
-namespace GetProfileInfoResponseCommand {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kProfileCount), profileCount);
-    encoder.Encode(to_underlying(Fields::kProfileIntervalPeriod), profileIntervalPeriod);
-    encoder.Encode(to_underlying(Fields::kMaxNumberOfIntervals), maxNumberOfIntervals);
-    encoder.Encode(to_underlying(Fields::kListOfAttributes), listOfAttributes);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kProfileCount))
-        {
-            err = DataModel::Decode(reader, profileCount);
-        }
-        else if (__context_tag == to_underlying(Fields::kProfileIntervalPeriod))
-        {
-            err = DataModel::Decode(reader, profileIntervalPeriod);
-        }
-        else if (__context_tag == to_underlying(Fields::kMaxNumberOfIntervals))
-        {
-            err = DataModel::Decode(reader, maxNumberOfIntervals);
-        }
-        else if (__context_tag == to_underlying(Fields::kListOfAttributes))
-        {
-            err = DataModel::Decode(reader, listOfAttributes);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace GetProfileInfoResponseCommand.
-namespace GetProfileInfoCommand {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace GetProfileInfoCommand.
-namespace GetMeasurementProfileResponseCommand {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStartTime), startTime);
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kProfileIntervalPeriod), profileIntervalPeriod);
-    encoder.Encode(to_underlying(Fields::kNumberOfIntervalsDelivered), numberOfIntervalsDelivered);
-    encoder.Encode(to_underlying(Fields::kAttributeId), attributeId);
-    encoder.Encode(to_underlying(Fields::kIntervals), intervals);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kStartTime))
-        {
-            err = DataModel::Decode(reader, startTime);
-        }
-        else if (__context_tag == to_underlying(Fields::kStatus))
-        {
-            err = DataModel::Decode(reader, status);
-        }
-        else if (__context_tag == to_underlying(Fields::kProfileIntervalPeriod))
-        {
-            err = DataModel::Decode(reader, profileIntervalPeriod);
-        }
-        else if (__context_tag == to_underlying(Fields::kNumberOfIntervalsDelivered))
-        {
-            err = DataModel::Decode(reader, numberOfIntervalsDelivered);
-        }
-        else if (__context_tag == to_underlying(Fields::kAttributeId))
-        {
-            err = DataModel::Decode(reader, attributeId);
-        }
-        else if (__context_tag == to_underlying(Fields::kIntervals))
-        {
-            err = DataModel::Decode(reader, intervals);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace GetMeasurementProfileResponseCommand.
-namespace GetMeasurementProfileCommand {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kAttributeId), attributeId);
-    encoder.Encode(to_underlying(Fields::kStartTime), startTime);
-    encoder.Encode(to_underlying(Fields::kNumberOfIntervals), numberOfIntervals);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kAttributeId))
-        {
-            err = DataModel::Decode(reader, attributeId);
-        }
-        else if (__context_tag == to_underlying(Fields::kStartTime))
-        {
-            err = DataModel::Decode(reader, startTime);
-        }
-        else if (__context_tag == to_underlying(Fields::kNumberOfIntervals))
-        {
-            err = DataModel::Decode(reader, numberOfIntervals);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace GetMeasurementProfileCommand.
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::MeasurementType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measurementType);
-    case Attributes::DcVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcVoltage);
-    case Attributes::DcVoltageMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcVoltageMin);
-    case Attributes::DcVoltageMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcVoltageMax);
-    case Attributes::DcCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcCurrent);
-    case Attributes::DcCurrentMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcCurrentMin);
-    case Attributes::DcCurrentMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcCurrentMax);
-    case Attributes::DcPower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcPower);
-    case Attributes::DcPowerMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcPowerMin);
-    case Attributes::DcPowerMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcPowerMax);
-    case Attributes::DcVoltageMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcVoltageMultiplier);
-    case Attributes::DcVoltageDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcVoltageDivisor);
-    case Attributes::DcCurrentMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcCurrentMultiplier);
-    case Attributes::DcCurrentDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcCurrentDivisor);
-    case Attributes::DcPowerMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcPowerMultiplier);
-    case Attributes::DcPowerDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dcPowerDivisor);
-    case Attributes::AcFrequency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acFrequency);
-    case Attributes::AcFrequencyMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acFrequencyMin);
-    case Attributes::AcFrequencyMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acFrequencyMax);
-    case Attributes::NeutralCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, neutralCurrent);
-    case Attributes::TotalActivePower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, totalActivePower);
-    case Attributes::TotalReactivePower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, totalReactivePower);
-    case Attributes::TotalApparentPower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, totalApparentPower);
-    case Attributes::Measured1stHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured1stHarmonicCurrent);
-    case Attributes::Measured3rdHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured3rdHarmonicCurrent);
-    case Attributes::Measured5thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured5thHarmonicCurrent);
-    case Attributes::Measured7thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured7thHarmonicCurrent);
-    case Attributes::Measured9thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured9thHarmonicCurrent);
-    case Attributes::Measured11thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measured11thHarmonicCurrent);
-    case Attributes::MeasuredPhase1stHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredPhase1stHarmonicCurrent);
-    case Attributes::MeasuredPhase3rdHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredPhase3rdHarmonicCurrent);
-    case Attributes::MeasuredPhase5thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredPhase5thHarmonicCurrent);
-    case Attributes::MeasuredPhase7thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredPhase7thHarmonicCurrent);
-    case Attributes::MeasuredPhase9thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredPhase9thHarmonicCurrent);
-    case Attributes::MeasuredPhase11thHarmonicCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredPhase11thHarmonicCurrent);
-    case Attributes::AcFrequencyMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acFrequencyMultiplier);
-    case Attributes::AcFrequencyDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acFrequencyDivisor);
-    case Attributes::PowerMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerMultiplier);
-    case Attributes::PowerDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerDivisor);
-    case Attributes::HarmonicCurrentMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, harmonicCurrentMultiplier);
-    case Attributes::PhaseHarmonicCurrentMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, phaseHarmonicCurrentMultiplier);
-    case Attributes::InstantaneousVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, instantaneousVoltage);
-    case Attributes::InstantaneousLineCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, instantaneousLineCurrent);
-    case Attributes::InstantaneousActiveCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, instantaneousActiveCurrent);
-    case Attributes::InstantaneousReactiveCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, instantaneousReactiveCurrent);
-    case Attributes::InstantaneousPower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, instantaneousPower);
-    case Attributes::RmsVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltage);
-    case Attributes::RmsVoltageMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageMin);
-    case Attributes::RmsVoltageMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageMax);
-    case Attributes::RmsCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrent);
-    case Attributes::RmsCurrentMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentMin);
-    case Attributes::RmsCurrentMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentMax);
-    case Attributes::ActivePower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePower);
-    case Attributes::ActivePowerMin::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerMin);
-    case Attributes::ActivePowerMax::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerMax);
-    case Attributes::ReactivePower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactivePower);
-    case Attributes::ApparentPower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, apparentPower);
-    case Attributes::PowerFactor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerFactor);
-    case Attributes::AverageRmsVoltageMeasurementPeriod::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsVoltageMeasurementPeriod);
-    case Attributes::AverageRmsUnderVoltageCounter::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsUnderVoltageCounter);
-    case Attributes::RmsExtremeOverVoltagePeriod::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeOverVoltagePeriod);
-    case Attributes::RmsExtremeUnderVoltagePeriod::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeUnderVoltagePeriod);
-    case Attributes::RmsVoltageSagPeriod::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSagPeriod);
-    case Attributes::RmsVoltageSwellPeriod::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSwellPeriod);
-    case Attributes::AcVoltageMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acVoltageMultiplier);
-    case Attributes::AcVoltageDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acVoltageDivisor);
-    case Attributes::AcCurrentMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acCurrentMultiplier);
-    case Attributes::AcCurrentDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acCurrentDivisor);
-    case Attributes::AcPowerMultiplier::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acPowerMultiplier);
-    case Attributes::AcPowerDivisor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acPowerDivisor);
-    case Attributes::OverloadAlarmsMask::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overloadAlarmsMask);
-    case Attributes::VoltageOverload::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, voltageOverload);
-    case Attributes::CurrentOverload::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentOverload);
-    case Attributes::AcOverloadAlarmsMask::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acOverloadAlarmsMask);
-    case Attributes::AcVoltageOverload::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acVoltageOverload);
-    case Attributes::AcCurrentOverload::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acCurrentOverload);
-    case Attributes::AcActivePowerOverload::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acActivePowerOverload);
-    case Attributes::AcReactivePowerOverload::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acReactivePowerOverload);
-    case Attributes::AverageRmsOverVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsOverVoltage);
-    case Attributes::AverageRmsUnderVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsUnderVoltage);
-    case Attributes::RmsExtremeOverVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeOverVoltage);
-    case Attributes::RmsExtremeUnderVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeUnderVoltage);
-    case Attributes::RmsVoltageSag::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSag);
-    case Attributes::RmsVoltageSwell::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSwell);
-    case Attributes::LineCurrentPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lineCurrentPhaseB);
-    case Attributes::ActiveCurrentPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeCurrentPhaseB);
-    case Attributes::ReactiveCurrentPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactiveCurrentPhaseB);
-    case Attributes::RmsVoltagePhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltagePhaseB);
-    case Attributes::RmsVoltageMinPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageMinPhaseB);
-    case Attributes::RmsVoltageMaxPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageMaxPhaseB);
-    case Attributes::RmsCurrentPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentPhaseB);
-    case Attributes::RmsCurrentMinPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentMinPhaseB);
-    case Attributes::RmsCurrentMaxPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentMaxPhaseB);
-    case Attributes::ActivePowerPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerPhaseB);
-    case Attributes::ActivePowerMinPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerMinPhaseB);
-    case Attributes::ActivePowerMaxPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerMaxPhaseB);
-    case Attributes::ReactivePowerPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactivePowerPhaseB);
-    case Attributes::ApparentPowerPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, apparentPowerPhaseB);
-    case Attributes::PowerFactorPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerFactorPhaseB);
-    case Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsVoltageMeasurementPeriodPhaseB);
-    case Attributes::AverageRmsOverVoltageCounterPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsOverVoltageCounterPhaseB);
-    case Attributes::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsUnderVoltageCounterPhaseB);
-    case Attributes::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeOverVoltagePeriodPhaseB);
-    case Attributes::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeUnderVoltagePeriodPhaseB);
-    case Attributes::RmsVoltageSagPeriodPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSagPeriodPhaseB);
-    case Attributes::RmsVoltageSwellPeriodPhaseB::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSwellPeriodPhaseB);
-    case Attributes::LineCurrentPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lineCurrentPhaseC);
-    case Attributes::ActiveCurrentPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeCurrentPhaseC);
-    case Attributes::ReactiveCurrentPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactiveCurrentPhaseC);
-    case Attributes::RmsVoltagePhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltagePhaseC);
-    case Attributes::RmsVoltageMinPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageMinPhaseC);
-    case Attributes::RmsVoltageMaxPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageMaxPhaseC);
-    case Attributes::RmsCurrentPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentPhaseC);
-    case Attributes::RmsCurrentMinPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentMinPhaseC);
-    case Attributes::RmsCurrentMaxPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsCurrentMaxPhaseC);
-    case Attributes::ActivePowerPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerPhaseC);
-    case Attributes::ActivePowerMinPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerMinPhaseC);
-    case Attributes::ActivePowerMaxPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePowerMaxPhaseC);
-    case Attributes::ReactivePowerPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactivePowerPhaseC);
-    case Attributes::ApparentPowerPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, apparentPowerPhaseC);
-    case Attributes::PowerFactorPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerFactorPhaseC);
-    case Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsVoltageMeasurementPeriodPhaseC);
-    case Attributes::AverageRmsOverVoltageCounterPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsOverVoltageCounterPhaseC);
-    case Attributes::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageRmsUnderVoltageCounterPhaseC);
-    case Attributes::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeOverVoltagePeriodPhaseC);
-    case Attributes::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsExtremeUnderVoltagePeriodPhaseC);
-    case Attributes::RmsVoltageSagPeriodPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSagPeriodPhaseC);
-    case Attributes::RmsVoltageSwellPeriodPhaseC::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rmsVoltageSwellPeriodPhaseC);
-    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
-    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
-    case Attributes::EventList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, eventList);
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
-    default:
-        return CHIP_NO_ERROR;
-    }
-}
-} // namespace Attributes
-
-namespace Events {} // namespace Events
-
-} // namespace ElectricalMeasurement
 namespace UnitTesting {
 namespace Structs {
 
@@ -29577,13 +29351,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
-        switch (aCommand)
-        {
-        default:
-            return false;
-        }
-    }
-    case Clusters::ElectricalMeasurement::Id: {
         switch (aCommand)
         {
         default:

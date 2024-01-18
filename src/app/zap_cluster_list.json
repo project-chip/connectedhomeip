@@ -180,6 +180,9 @@
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [
             "electrical-energy-measurement-server"
         ],
+        "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
+            "electrical-power-measurement-server"
+        ],
         "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
         "ENERGY_EVSE_MODE_CLUSTER": ["mode-base-server"],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
