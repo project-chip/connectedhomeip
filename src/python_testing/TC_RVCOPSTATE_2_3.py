@@ -80,74 +80,181 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         asserts.assert_true(all(id in state_ids for id in defined_states), "OperationalStateList is missing a required entry")
 
-        self.print_step(4, "Send Pause command")
+        self.print_step(4, "Read OperationalState")
+        old_opstate_dut = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                       attribute=attributes.OperationalState)
+        logging.info("OperationalState: %s" % old_opstate_dut)
+
+        self.print_step(5, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(5, "Read OperationalState attribute")
+        self.print_step(6, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                          attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
+        logging.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
                              "OperationalState(%s) should be Paused(0x02)" % operational_state)
 
-        if self.check_pics("RVCOPSTATE.S.A0002"):
-            self.print_step(6, "Read CountdownTime attribute")
+        if self.check_pics("OPSTATE.S.A0002"):
+            self.print_step(7, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.CountdownTime)
-            logging.info("CountdownTime: %s" % (initial_countdown_time))
+            logging.info("CountdownTime: %s" % initial_countdown_time)
             if initial_countdown_time is not NullValue:
                 in_range = (1 <= initial_countdown_time <= 259200)
             asserts.assert_true(initial_countdown_time is NullValue or in_range,
-                                "invalid CountdownTime(%s). Must be in between 1 and 259200, or null" % initial_countdown_time)
+                                "invalid CountdownTime(%s). Must be in between 1 and 259200, or null " % initial_countdown_time)
 
-            self.print_step(7, "Waiting for 5 seconds")
+            self.print_step(8, "Waiting for 5 seconds")
             time.sleep(5)
 
-            self.print_step(8, "Read CountdownTime attribute")
+            self.print_step(9, "Read CountdownTime attribute")
             countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CountdownTime)
-            logging.info("CountdownTime: %s" % (countdown_time))
+            logging.info("CountdownTime: %s" % countdown_time)
             asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
                                 "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
-            asserts.assert_equal(countdown_time, initial_countdown_time,
-                                 "CountdownTime(%s) does not equal to the intial CountdownTime (%s)" % (countdown_time, initial_countdown_time))
+            asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) does not equal to the intial CountdownTime(%s)"
+                                 % (countdown_time, initial_countdown_time))
 
-        self.print_step(9, "Send Pause command")
+        self.print_step(10, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(10, "Send Resume command")
+        self.print_step(11, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(11, "Read OperationalState attribute")
+        self.print_step(12, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                          attribute=attributes.OperationalState)
-        logging.info("OperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
-                             "OperationalState(%s) should be Running(0x01)" % operational_state)
+        logging.info("OperationalState: %s" % operational_state)
+        asserts.assert_equal(operational_state, old_opstate_dut,
+                             "OperationalState(%s) should be the state before pause (%s)" % operational_state, old_opstate_dut)
 
-        self.print_step(12, "Send Resume command")
+        self.print_step(13, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(13, "Manually put the device in a state where it cannot receive a Pause command")
+        if self.check_pics("OPSTATE.S.M.RESUME_AFTER_ERR"):
+            self.print_step(16, "Manually put the device in the Running state")
+            input("Press Enter when done.\n")
+
+            self.print_step(17, "Read OperationalState attribute")
+            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                             attribute=attributes.OperationalState)
+            logging.info("OperationalState: %s" % operational_state)
+            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
+                                 "OperationalState(%s) should be Running(0x01)" % operational_state)
+
+            self.print_step(18, "Manually cause the device to pause running due to an error, and be able to resume after clearing the error")
+            input("Press Enter when done.\n")
+
+            self.print_step(19, "Read OperationalState attribute")
+            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                             attribute=attributes.OperationalState)
+            logging.info("OperationalState: %s" % operational_state)
+            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kError,
+                                 "OperationalState(%s) should be Error(0x03)" % operational_state)
+
+            self.print_step(20, "Manually clear the error")
+            input("Press Enter when done.\n")
+
+            self.print_step(21, "Read OperationalState attribute")
+            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                             attribute=attributes.OperationalState)
+            logging.info("OperationalState: %s" % operational_state)
+            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
+                                 "OperationalState(%s) should be Paused(0x02)" % operational_state)
+
+            self.print_step(22, "Send Resume command")
+            ret = await self.send_resume_cmd()
+            asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OperationalState.Enums.ErrorStateEnum.kNoError,
+                                 "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
+
+            self.print_step(23, "Read OperationalState attribute")
+            operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
+                                                                             attribute=attributes.OperationalState)
+            logging.info("OperationalState: %s" % operational_state)
+            asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kRunning,
+                                 "OperationalState(%s) should be Running(0x01)" % operational_state)
+
+        self.print_step(24, "Manually put the device in the Stopped(0x00) operational state")
         input("Press Enter when done.\n")
 
-        self.print_step(14, "Send Pause command")
+        self.print_step(25, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
                              "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(15, "Manually put the device in a state where it cannot receive a Resume command")
+        self.print_step(26, "Send Resume command")
+        ret = await self.send_resume_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(27, "Manually put the device in the Error(0x03) operational state")
         input("Press Enter when done.\n")
 
-        self.print_step(16, "Send Resume command")
+        self.print_step(28, "Send Pause command")
+        ret = await self.send_pause_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(29, "Send Resume command")
+        ret = await self.send_resume_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(30, "Manually put the device in the Charging(0x41) operational state")
+        input("Press Enter when done.\n")
+
+        self.print_step(31, "Send Pause command")
+        ret = await self.send_pause_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(32, "Manually put the device in the Charging(0x41) operational state and RVC Run "
+                            "Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+        input("Press Enter when done.\n")
+
+        self.print_step(33, "Send Resume command")
+        ret = await self.send_resume_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(34, "Manually put the device in the Docked(0x42) operational state")
+        input("Press Enter when done.\n")
+
+        self.print_step(35, "Send Pause command")
+        ret = await self.send_pause_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(36, "Manually put the device in the Docked(0x42) operational state and RVC Run "
+                            "Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+        input("Press Enter when done.\n")
+
+        self.print_step(37, "Send Resume command")
+        ret = await self.send_resume_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID,
+                             Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
+                             "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
+
+        self.print_step(38, "Manually put the device in the SeekingCharger(0x40) operational state")
+        input("Press Enter when done.\n")
+
+        self.print_step(39, "Send Resume command")
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID,
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
