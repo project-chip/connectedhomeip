@@ -534,7 +534,7 @@ private:
      *  Updates the type (LIT ICD or not) of the peer.
      *
      *  When the subscription is active, this function will just set the flag. When the subscription is an InactiveICDSubscription,
-     * Setting the peer type to SIT or normal devices will also trigger resubscription.
+     * setting the peer type to SIT or normal devices will also trigger a resubscription attempt.
      *
      */
     void OnPeerTypeChange(PeerType aType);
