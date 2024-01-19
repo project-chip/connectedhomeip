@@ -571,11 +571,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
                 interval_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
                 interval_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
             }
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
             else
             {
                 interval_min = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN;
                 interval_max = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX;
             }
+#endif
         }
 
         ret = sl_bt_advertiser_set_timing(advertising_set_handle, interval_min, interval_max, 0, 0);
