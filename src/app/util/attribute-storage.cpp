@@ -69,6 +69,10 @@ static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttr
 // otherwise number of client clusters on the endpoint at the given index.
 static uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
 
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
+
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
