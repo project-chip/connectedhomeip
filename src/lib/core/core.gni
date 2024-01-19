@@ -99,6 +99,8 @@ declare_args() {
   chip_tlv_validate_char_string_on_write = true
   chip_tlv_validate_char_string_on_read = false
 
+  chip_max_paths_per_invoke = 1
+
   chip_enable_sending_batch_commands =
       current_os == "linux" || current_os == "mac" || current_os == "ios"
 }
