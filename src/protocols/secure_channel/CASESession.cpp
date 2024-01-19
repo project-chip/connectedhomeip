@@ -550,9 +550,9 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     MATTER_TRACE_SCOPE("OnResponseTimeout", "CASESession");
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
-    MATTER_TRACE_COUNTER("casetimeout", "CASESession");
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
                  to_underlying(mState));
+    MATTER_TRACE_COUNTER("CASETimeout", "CASESession");
     // Discard the exchange so that Clear() doesn't try aborting it.  The
     // exchange will handle that.
     DiscardExchange();
@@ -649,7 +649,6 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
-    MATTER_TRACE_COUNTER("Sendsigmacnt", "CASESession");
     size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,          // initiatorRandom
                                                   sizeof(uint16_t),                     // initiatorSessionId,
                                                   kSHA256_Hash_Length,                  // destinationId
@@ -751,8 +750,6 @@ CHIP_ERROR CASESession::SendSigma1()
 CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
-    MATTER_TRACE_COUNTER("sigma1cnt", "CASESession");
-
     ReturnErrorOnFailure(HandleSigma1(std::move(msg)));
 
     return CHIP_NO_ERROR;
@@ -848,6 +845,7 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     ByteSpan initiatorRandom;
 
     ChipLogProgress(SecureChannel, "Received Sigma1 msg");
+    MATTER_TRACE_COUNTER("Sigma1", "CASESession");
 
     bool sessionResumptionRequested = false;
     ByteSpan resumptionId;
@@ -974,7 +972,6 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 CHIP_ERROR CASESession::SendSigma2()
 {
     MATTER_TRACE_SCOPE("SendSigma2", "CASESession");
-    MATTER_TRACE_COUNTER("sigma2cnt", "CASESession");
 
     VerifyOrReturnError(GetLocalSessionId().HasValue(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1105,6 +1102,7 @@ CHIP_ERROR CASESession::SendSigma2()
     mState = State::kSentSigma2;
 
     ChipLogProgress(SecureChannel, "Sent Sigma2 msg");
+    MATTER_TRACE_COUNTER("Sigma2", "CASESession");
 
     return CHIP_NO_ERROR;
 }
@@ -1121,6 +1119,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     uint32_t decodeTagIdSeq = 0;
 
     ChipLogDetail(SecureChannel, "Received Sigma2Resume msg");
+    MATTER_TRACE_COUNTER("Sigma2Resume", "CASESession");
 
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
 
@@ -1570,7 +1569,6 @@ exit:
 CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma3", "CASESession");
-    MATTER_TRACE_COUNTER("sigma3cnt", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVReader decryptedDataTlvReader;
@@ -1591,6 +1589,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
     uint8_t msg_salt[kIPKSize + kSHA256_Hash_Length];
 
     ChipLogProgress(SecureChannel, "Received Sigma3 msg");
+    MATTER_TRACE_COUNTER("Sigma3", "CASESession");
 
     auto helper = WorkHelper<HandleSigma3Data>::Create(*this, &HandleSigma3b, &CASESession::HandleSigma3c);
     VerifyOrExit(helper, err = CHIP_ERROR_NO_MEMORY);
