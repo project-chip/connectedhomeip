@@ -309,8 +309,8 @@ public:
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
      *
-     * @param[in] addResponseFunction  A lambda function responsible for adding the
-     *                response to the current InvokeResponseMessage.
+     * @param [in] addResponseFunction A lambda function responsible for adding the
+     *             response to the current InvokeResponseMessage.
      */
     template <typename Function>
     CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
@@ -563,7 +563,10 @@ private:
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
-     * @param [in] aData the data for the response.
+     * @param [in] aResponseCommandPath the concrete path of the command we are
+     *             responding to.
+     * @param [in] encodeCommandDataFunction A lambda function responsible for
+     *             encoding the CommandData field.
      */
     template <typename Function>
     CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath,
