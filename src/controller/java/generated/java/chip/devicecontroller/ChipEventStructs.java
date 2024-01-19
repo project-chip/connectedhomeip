@@ -3921,13 +3921,18 @@ public static class DeviceEnergyManagementClusterPausedEvent {
   }
 }
 public static class DeviceEnergyManagementClusterResumedEvent {
+  public Integer cause;
+  private static final long CAUSE_ID = 0L;
 
   public DeviceEnergyManagementClusterResumedEvent(
+    Integer cause
   ) {
+    this.cause = cause;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(CAUSE_ID, new UIntType(cause)));
 
     return new StructType(values);
   }
@@ -3936,7 +3941,17 @@ public static class DeviceEnergyManagementClusterResumedEvent {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
+    Integer cause = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == CAUSE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          cause = castingValue.value(Integer.class);
+        }
+      }
+    }
     return new DeviceEnergyManagementClusterResumedEvent(
+      cause
     );
   }
 
@@ -3944,6 +3959,9 @@ public static class DeviceEnergyManagementClusterResumedEvent {
   public String toString() {
     StringBuilder output = new StringBuilder();
     output.append("DeviceEnergyManagementClusterResumedEvent {\n");
+    output.append("\tcause: ");
+    output.append(cause);
+    output.append("\n");
     output.append("}\n");
     return output.toString();
   }

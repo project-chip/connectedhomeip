@@ -81,6 +81,10 @@ both values from this cluster and from the base cluster.
       <arg name="CommandResponseState" type="ErrorStateStruct"/>
     </command>
 
+    <command source="client" code="0x80" name="GoHome" response="OperationalCommandResponse" optional="true">
+      <description>On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device.</description>
+    </command>
+
     <event side="server" code="0x00" priority="critical" name="OperationalError" optional="false">
       <description>OperationalError</description>
       <field id="0" name="ErrorState" type="ErrorStateStruct" />

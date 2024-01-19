@@ -12871,6 +12871,79 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRRVCOperationalStateClusterGoHomeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRRVCOperationalStateClusterGoHomeParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRRVCOperationalStateClusterGoHomeParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::RvcOperationalState::Commands::GoHome::Type encodableStruct;
+    ListFreer listFreer;
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
 @implementation MTRScenesManagementClusterAddSceneParams
 - (instancetype)init
 {
@@ -15830,6 +15903,8 @@ NS_ASSUME_NONNULL_BEGIN
         _power = @(0);
 
         _duration = @(0);
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15842,6 +15917,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.power = self.power;
     other.duration = self.duration;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -15850,7 +15926,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: power:%@; duration:%@; >", NSStringFromClass([self class]), _power, _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: power:%@; duration:%@; cause:%@; >", NSStringFromClass([self class]), _power, _duration, _cause];
     return descriptionString;
 }
 
@@ -15867,6 +15943,9 @@ NS_ASSUME_NONNULL_BEGIN
     }
     {
         encodableStruct.duration = self.duration.unsignedIntValue;
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -15986,6 +16065,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _requestedStartTime = @(0);
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -15997,6 +16078,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDeviceEnergyManagementClusterStartTimeAdjustRequestParams alloc] init];
 
     other.requestedStartTime = self.requestedStartTime;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16005,7 +16087,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestedStartTime:%@; >", NSStringFromClass([self class]), _requestedStartTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: requestedStartTime:%@; cause:%@; >", NSStringFromClass([self class]), _requestedStartTime, _cause];
     return descriptionString;
 }
 
@@ -16019,6 +16101,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.requestedStartTime = self.requestedStartTime.unsignedIntValue;
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16065,6 +16150,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _duration = @(0);
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16076,6 +16163,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDeviceEnergyManagementClusterPauseRequestParams alloc] init];
 
     other.duration = self.duration;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16084,7 +16172,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: duration:%@; >", NSStringFromClass([self class]), _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: duration:%@; cause:%@; >", NSStringFromClass([self class]), _duration, _cause];
     return descriptionString;
 }
 
@@ -16098,6 +16186,9 @@ NS_ASSUME_NONNULL_BEGIN
     ListFreer listFreer;
     {
         encodableStruct.duration = self.duration.unsignedIntValue;
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16219,6 +16310,8 @@ NS_ASSUME_NONNULL_BEGIN
         _forecastId = @(0);
 
         _slotAdjustments = [NSArray array];
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16231,6 +16324,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.forecastId = self.forecastId;
     other.slotAdjustments = self.slotAdjustments;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16239,7 +16333,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; slotAdjustments:%@; >", NSStringFromClass([self class]), _forecastId, _slotAdjustments];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; slotAdjustments:%@; cause:%@; >", NSStringFromClass([self class]), _forecastId, _slotAdjustments, _cause];
     return descriptionString;
 }
 
@@ -16279,6 +16373,9 @@ NS_ASSUME_NONNULL_BEGIN
                 encodableStruct.slotAdjustments = ListType_0();
             }
         }
+    }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
@@ -16325,6 +16422,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _constraints = [NSArray array];
+
+        _cause = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16336,6 +16435,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDeviceEnergyManagementClusterRequestConstraintBasedForecastParams alloc] init];
 
     other.constraints = self.constraints;
+    other.cause = self.cause;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16344,7 +16444,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: constraints:%@; >", NSStringFromClass([self class]), _constraints];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: constraints:%@; cause:%@; >", NSStringFromClass([self class]), _constraints, _cause];
     return descriptionString;
 }
 
@@ -16393,6 +16493,82 @@ NS_ASSUME_NONNULL_BEGIN
             }
         }
     }
+    {
+        encodableStruct.cause = static_cast<std::remove_reference_t<decltype(encodableStruct.cause)>>(self.cause.unsignedCharValue);
+    }
+
+    auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
+    if (buffer.IsNull()) {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    chip::System::PacketBufferTLVWriter writer;
+    // Commands never need chained buffers, since they cannot be chunked.
+    writer.Init(std::move(buffer), /* useChainedBuffers = */ false);
+
+    ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::AnonymousTag(), encodableStruct));
+
+    ReturnErrorOnFailure(writer.Finalize(&buffer));
+
+    reader.Init(std::move(buffer));
+    return reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag());
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error
+{
+    chip::System::PacketBufferTLVReader reader;
+    CHIP_ERROR err = [self _encodeToTLVReader:reader];
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    auto decodedObj = MTRDecodeDataValueDictionaryFromCHIPTLV(&reader);
+    if (decodedObj == nil) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE];
+        }
+    }
+    return decodedObj;
+}
+@end
+
+@implementation MTRDeviceEnergyManagementClusterCancelRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRDeviceEnergyManagementClusterCancelRequestParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementClusterCancelRequestParams (InternalMethods)
+
+- (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
+{
+    chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Type encodableStruct;
+    ListFreer listFreer;
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {
@@ -16437,9 +16613,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekforSequence = @(0);
-
-        _chargingTargets = [NSArray array];
+        _chargingTargetSchedules = [NSArray array];
     }
     return self;
 }
@@ -16448,15 +16622,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterGetTargetsResponseParams alloc] init];
 
-    other.dayOfWeekforSequence = self.dayOfWeekforSequence;
-    other.chargingTargets = self.chargingTargets;
+    other.chargingTargetSchedules = self.chargingTargetSchedules;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekforSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekforSequence, _chargingTargets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chargingTargetSchedules:%@; >", NSStringFromClass([self class]), _chargingTargetSchedules];
     return descriptionString;
 }
 
@@ -16507,26 +16680,39 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType &)decodableStruct
 {
     {
-        self.dayOfWeekforSequence = [NSNumber numberWithUnsignedChar:decodableStruct.dayOfWeekforSequence.Raw()];
-    }
-    {
         { // Scope for our temporary variables
             auto * array_0 = [NSMutableArray new];
-            auto iter_0 = decodableStruct.chargingTargets.begin();
+            auto iter_0 = decodableStruct.chargingTargetSchedules.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                MTREnergyEVSEClusterChargingTargetStruct * newElement_0;
-                newElement_0 = [MTREnergyEVSEClusterChargingTargetStruct new];
-                newElement_0.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_0.targetTimeMinutesPastMidnight];
-                if (entry_0.targetSoC.HasValue()) {
-                    newElement_0.targetSoC = [NSNumber numberWithUnsignedChar:entry_0.targetSoC.Value()];
-                } else {
-                    newElement_0.targetSoC = nil;
-                }
-                if (entry_0.addedEnergy.HasValue()) {
-                    newElement_0.addedEnergy = [NSNumber numberWithLongLong:entry_0.addedEnergy.Value()];
-                } else {
-                    newElement_0.addedEnergy = nil;
+                MTREnergyEVSEClusterChargingTargetScheduleStruct * newElement_0;
+                newElement_0 = [MTREnergyEVSEClusterChargingTargetScheduleStruct new];
+                newElement_0.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:entry_0.dayOfWeekForSequence.Raw()];
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = entry_0.chargingTargets.begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        MTREnergyEVSEClusterChargingTargetStruct * newElement_2;
+                        newElement_2 = [MTREnergyEVSEClusterChargingTargetStruct new];
+                        newElement_2.targetTimeMinutesPastMidnight = [NSNumber numberWithUnsignedShort:entry_2.targetTimeMinutesPastMidnight];
+                        if (entry_2.targetSoC.HasValue()) {
+                            newElement_2.targetSoC = [NSNumber numberWithUnsignedChar:entry_2.targetSoC.Value()];
+                        } else {
+                            newElement_2.targetSoC = nil;
+                        }
+                        if (entry_2.addedEnergy.HasValue()) {
+                            newElement_2.addedEnergy = [NSNumber numberWithLongLong:entry_2.addedEnergy.Value()];
+                        } else {
+                            newElement_2.addedEnergy = nil;
+                        }
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        return err;
+                    }
+                    newElement_0.chargingTargets = array_2;
                 }
                 [array_0 addObject:newElement_0];
             }
@@ -16534,7 +16720,7 @@ NS_ASSUME_NONNULL_BEGIN
             if (err != CHIP_NO_ERROR) {
                 return err;
             }
-            self.chargingTargets = array_0;
+            self.chargingTargetSchedules = array_0;
         }
     }
     return CHIP_NO_ERROR;
@@ -16879,9 +17065,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _dayOfWeekforSequence = @(0);
-
-        _chargingTargets = [NSArray array];
+        _chargingTargetSchedules = [NSArray array];
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -16892,8 +17076,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterSetTargetsParams alloc] init];
 
-    other.dayOfWeekforSequence = self.dayOfWeekforSequence;
-    other.chargingTargets = self.chargingTargets;
+    other.chargingTargetSchedules = self.chargingTargetSchedules;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -16902,7 +17085,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekforSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekforSequence, _chargingTargets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: chargingTargetSchedules:%@; >", NSStringFromClass([self class]), _chargingTargetSchedules];
     return descriptionString;
 }
 
@@ -16915,37 +17098,56 @@ NS_ASSUME_NONNULL_BEGIN
     chip::app::Clusters::EnergyEvse::Commands::SetTargets::Type encodableStruct;
     ListFreer listFreer;
     {
-        encodableStruct.dayOfWeekforSequence = static_cast<std::remove_reference_t<decltype(encodableStruct.dayOfWeekforSequence)>>(self.dayOfWeekforSequence.unsignedCharValue);
-    }
-    {
         {
-            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.chargingTargets)>;
+            using ListType_0 = std::remove_reference_t<decltype(encodableStruct.chargingTargetSchedules)>;
             using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (self.chargingTargets.count != 0) {
-                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.chargingTargets.count);
+            if (self.chargingTargetSchedules.count != 0) {
+                auto * listHolder_0 = new ListHolder<ListMemberType_0>(self.chargingTargetSchedules.count);
                 if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                     return CHIP_ERROR_INVALID_ARGUMENT;
                 }
                 listFreer.add(listHolder_0);
-                for (size_t i_0 = 0; i_0 < self.chargingTargets.count; ++i_0) {
-                    if (![self.chargingTargets[i_0] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
+                for (size_t i_0 = 0; i_0 < self.chargingTargetSchedules.count; ++i_0) {
+                    if (![self.chargingTargetSchedules[i_0] isKindOfClass:[MTREnergyEVSEClusterChargingTargetScheduleStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (MTREnergyEVSEClusterChargingTargetStruct *) self.chargingTargets[i_0];
-                    listHolder_0->mList[i_0].targetTimeMinutesPastMidnight = element_0.targetTimeMinutesPastMidnight.unsignedShortValue;
-                    if (element_0.targetSoC != nil) {
-                        auto & definedValue_2 = listHolder_0->mList[i_0].targetSoC.Emplace();
-                        definedValue_2 = element_0.targetSoC.unsignedCharValue;
-                    }
-                    if (element_0.addedEnergy != nil) {
-                        auto & definedValue_2 = listHolder_0->mList[i_0].addedEnergy.Emplace();
-                        definedValue_2 = element_0.addedEnergy.longLongValue;
+                    auto element_0 = (MTREnergyEVSEClusterChargingTargetScheduleStruct *) self.chargingTargetSchedules[i_0];
+                    listHolder_0->mList[i_0].dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].dayOfWeekForSequence)>>(element_0.dayOfWeekForSequence.unsignedCharValue);
+                    {
+                        using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].chargingTargets)>;
+                        using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                        if (element_0.chargingTargets.count != 0) {
+                            auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.chargingTargets.count);
+                            if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                return CHIP_ERROR_INVALID_ARGUMENT;
+                            }
+                            listFreer.add(listHolder_2);
+                            for (size_t i_2 = 0; i_2 < element_0.chargingTargets.count; ++i_2) {
+                                if (![element_0.chargingTargets[i_2] isKindOfClass:[MTREnergyEVSEClusterChargingTargetStruct class]]) {
+                                    // Wrong kind of value.
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                auto element_2 = (MTREnergyEVSEClusterChargingTargetStruct *) element_0.chargingTargets[i_2];
+                                listHolder_2->mList[i_2].targetTimeMinutesPastMidnight = element_2.targetTimeMinutesPastMidnight.unsignedShortValue;
+                                if (element_2.targetSoC != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].targetSoC.Emplace();
+                                    definedValue_4 = element_2.targetSoC.unsignedCharValue;
+                                }
+                                if (element_2.addedEnergy != nil) {
+                                    auto & definedValue_4 = listHolder_2->mList[i_2].addedEnergy.Emplace();
+                                    definedValue_4 = element_2.addedEnergy.longLongValue;
+                                }
+                            }
+                            listHolder_0->mList[i_0].chargingTargets = ListType_2(listHolder_2->mList, element_0.chargingTargets.count);
+                        } else {
+                            listHolder_0->mList[i_0].chargingTargets = ListType_2();
+                        }
                     }
                 }
-                encodableStruct.chargingTargets = ListType_0(listHolder_0->mList, self.chargingTargets.count);
+                encodableStruct.chargingTargetSchedules = ListType_0(listHolder_0->mList, self.chargingTargetSchedules.count);
             } else {
-                encodableStruct.chargingTargets = ListType_0();
+                encodableStruct.chargingTargetSchedules = ListType_0();
             }
         }
     }
@@ -16992,8 +17194,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _daysToReturn = @(0);
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -17004,7 +17204,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTREnergyEVSEClusterGetTargetsParams alloc] init];
 
-    other.daysToReturn = self.daysToReturn;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
     other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
@@ -17013,7 +17212,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: daysToReturn:%@; >", NSStringFromClass([self class]), _daysToReturn];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
     return descriptionString;
 }
 
@@ -17025,9 +17224,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     chip::app::Clusters::EnergyEvse::Commands::GetTargets::Type encodableStruct;
     ListFreer listFreer;
-    {
-        encodableStruct.daysToReturn = static_cast<std::remove_reference_t<decltype(encodableStruct.daysToReturn)>>(self.daysToReturn.unsignedCharValue);
-    }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
     if (buffer.IsNull()) {

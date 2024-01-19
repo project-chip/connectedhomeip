@@ -46,6 +46,9 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                             "Unexpected return type for Resume")
         return ret
 
+    def TC_RVCOPSTATE_2_3(self) -> list[str]:
+        return ["RVCOPSTATE.S"]
+
     @async_test_body
     async def test_TC_RVCOPSTATE_2_3(self):
 
