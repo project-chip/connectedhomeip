@@ -1133,7 +1133,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     }
     else
     {
-         ChipLogError(DeviceLayer, "Failed to get the MAC address of station netif");
+        ChipLogError(DeviceLayer, "Failed to get the MAC address of station netif");
     }
 #endif // CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
 
