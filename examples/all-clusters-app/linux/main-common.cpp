@@ -20,7 +20,9 @@
 #include "ValveControlDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
+#include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
+#include "energy-evse-modes.h"
 #include "include/tv-callbacks.h"
 #include "laundry-dryer-controls-delegate-impl.h"
 #include "laundry-washer-controls-delegate-impl.h"
@@ -250,6 +252,9 @@ void ApplicationShutdown()
     Clusters::RvcOperationalState::Shutdown();
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
+
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::EnergyEvseMode::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

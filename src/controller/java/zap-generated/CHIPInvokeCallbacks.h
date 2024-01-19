@@ -673,6 +673,37 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPEnergyEvseModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPEnergyEvseModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPEnergyEvseModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPEnergyEvseModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
     : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
