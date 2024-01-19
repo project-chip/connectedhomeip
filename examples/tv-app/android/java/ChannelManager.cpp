@@ -363,205 +363,29 @@ void ChannelManager::HandleGetProgramGuide(
     const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
     const chip::Optional<chip::ByteSpan> & data)
 {
+    // 1. Decode received parameters
+    // 2. Perform search
+    // 3. Return results
     ProgramGuideResponseType response;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::HandleGetProgramGuide");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetProgramGuideMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    {
-        UtfString jData(env, "");  // TODO: convert from ByteSpan data
-        UtfString jToken(env, ""); // TODO: get paging token
-
-        // Todo: make channelsArray java
-        jobjectArray channelsArray = nullptr;
-        // Todo: make externalIDListArray java
-        jobjectArray externalIDListArray = nullptr;
-
-        jobject resp = env->CallObjectMethod(
-            mChannelManagerObject, mGetProgramGuideMethod, static_cast<jlong>(startTime.ValueOr(0)),
-            static_cast<jlong>(endTime.ValueOr(0)), channelsArray, jToken.jniValue(),
-            static_cast<jboolean>(recordingFlag.ValueOr(0).Raw() != 0), externalIDListArray, jData.jniValue());
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(Zcl, "Java exception in ChannelManager::HandleGetProgramGuide");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            err = CHIP_ERROR_INCORRECT_STATE;
-            goto exit;
-        }
-
-        VerifyOrExit(resp != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-        jclass respCls       = env->GetObjectClass(resp);
-        jfieldID programsFid = env->GetFieldID(respCls, "programs", "[Lcom/matter/tv/server/tvapp/ChannelProgramInfo;");
-        VerifyOrExit(programsFid != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
-        // TODO: change this to list?
-        jobjectArray programsArray = (jobjectArray) env->GetObjectField(resp, programsFid);
-
-        std::vector<ProgramType> tempPrograms;
-
-        jint size = env->GetArrayLength(programsArray);
-        // for (int i = 0; i < size; i++)
-        // {
-        //     jstring jAcceptedHeader = (jstring) env->GetObjectArrayElement(programsArray, i);
-        //     JniUtfString acceptedHeader(env, jAcceptedHeader);
-        //     ReturnErrorOnFailure(encoder.Encode(acceptedHeader.charSpan()));
-        // }
-
-        for (jint i = 0; i < size; i++)
-        {
-            ProgramType program;
-            jobject programObject = env->GetObjectArrayElement(programsArray, i);
-            jclass programClass   = env->GetObjectClass(programObject);
-
-            jfieldID getIdentifierField = env->GetFieldID(programClass, "identifier", "Ljava/lang/String;");
-            jstring jidentifier         = static_cast<jstring>(env->GetObjectField(programObject, getIdentifierField));
-            JniUtfString identifier(env, jidentifier);
-            if (jidentifier != nullptr)
-            {
-                program.identifier = identifier.charSpan();
-            }
-            // program.channel    = abc;
-            jfieldID getTitleField = env->GetFieldID(programClass, "title", "Ljava/lang/String;");
-            jstring jtitle         = static_cast<jstring>(env->GetObjectField(programObject, getTitleField));
-            JniUtfString title(env, jtitle);
-            if (jtitle != nullptr)
-            {
-                program.title = title.charSpan();
-            }
-            jfieldID getSubTitleField = env->GetFieldID(programClass, "subTitle", "Ljava/lang/String;");
-            jstring jsubTitle         = static_cast<jstring>(env->GetObjectField(programObject, getSubTitleField));
-            JniUtfString subTitle(env, jsubTitle);
-            if (jsubTitle != nullptr)
-            {
-                program.subtitle = Optional<CharSpan>(subTitle.charSpan());
-            }
-            jfieldID getDescriptionField = env->GetFieldID(programClass, "description", "Ljava/lang/String;");
-            jstring jdescription         = static_cast<jstring>(env->GetObjectField(programObject, getDescriptionField));
-            JniUtfString description(env, jdescription);
-            if (jdescription != nullptr)
-            {
-                program.description = Optional<CharSpan>(description.charSpan());
-            }
-
-            jfieldID startTimeField = env->GetFieldID(programClass, "startTime", "J");
-            jlong jstartTime        = env->GetLongField(programObject, startTimeField);
-            program.startTime       = static_cast<uint32_t>(jstartTime);
-
-            jfieldID endTimeField = env->GetFieldID(programClass, "endTime", "J");
-            jlong jendTime        = env->GetLongField(programObject, endTimeField);
-            program.endTime       = static_cast<uint32_t>(jendTime);
-
-            uint32_t recordFlag               = 0;
-            jfieldID recordFlagScheduledField = env->GetFieldID(programClass, "recordFlagScheduled", "Z");
-            jboolean jrecordFlagScheduled     = env->GetBooleanField(programObject, recordFlagScheduledField);
-            if (jrecordFlagScheduled)
-            {
-                recordFlag |= 1;
-            }
-            jfieldID recordFlagSeriesField = env->GetFieldID(programClass, "recordFlagSeries", "Z");
-            jboolean jrecordFlagSeries     = env->GetBooleanField(programObject, recordFlagSeriesField);
-            if (jrecordFlagSeries)
-            {
-                recordFlag |= 2;
-            }
-            jfieldID recordFlagRecordedField = env->GetFieldID(programClass, "recordFlagRecorded", "Z");
-            jboolean jrecordFlagRecorded     = env->GetBooleanField(programObject, recordFlagRecordedField);
-            if (jrecordFlagRecorded)
-            {
-                recordFlag |= 4;
-            }
-
-            program.recordingFlag = MakeOptional(static_cast<uint32_t>(recordFlag));
-
-            tempPrograms.push_back(program);
-        }
-
-        response.programList = DataModel::List<const ProgramType>(tempPrograms.data(), tempPrograms.size());
-
-        err = helper.Success(response);
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ChannelManager::HandleGetProgramGuide status error: %s", err.AsString());
-    }
+    // response.channelPagingStruct;
+    // response.programList;
+    helper.Success(response);
 }
 
 bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
                                          const DataModel::DecodableList<AdditionalInfo> & externalIdList,
                                          const chip::ByteSpan & data)
 {
-    jboolean ret = JNI_FALSE;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::HandleRecordProgram");
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
-    VerifyOrExit(mRecordProgramMethod != nullptr, ChipLogError(Zcl, "mRecordProgramMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
-
-    env->ExceptionClear();
-
-    {
-        UtfString jIdentifier(env, programIdentifier);
-        UtfString jData(env, ""); // TODO: convert data to string
-
-        // Todo: make externalIDListArray java
-        jobjectArray externalIDListArray = nullptr;
-
-        ret = env->CallBooleanMethod(mChannelManagerObject, mRecordProgramMethod, jIdentifier.jniValue(),
-                                     static_cast<jboolean>(shouldRecordSeries), externalIDListArray, jData.jniValue());
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(DeviceLayer, "Java exception in ChannelManager::HandleRecordProgram");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return false;
-        }
-    }
-
-exit:
-    return static_cast<bool>(ret);
+    // Start recording
+    return true;
 }
 
 bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
                                                const DataModel::DecodableList<AdditionalInfo> & externalIdList,
                                                const chip::ByteSpan & data)
 {
-    jboolean ret = JNI_FALSE;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::HandleCancelRecordProgram");
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
-    VerifyOrExit(mCancelRecordProgramMethod != nullptr, ChipLogError(Zcl, "mCancelRecordProgramMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
-
-    env->ExceptionClear();
-
-    {
-        UtfString jIdentifier(env, programIdentifier);
-        UtfString jData(env, ""); // TODO: convert data to string
-
-        // Todo: make externalIDListArray java
-        jobjectArray externalIDListArray = nullptr;
-
-        ret = env->CallBooleanMethod(mChannelManagerObject, mCancelRecordProgramMethod, jIdentifier.jniValue(),
-                                     static_cast<jboolean>(shouldRecordSeries), externalIDListArray, jData.jniValue());
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(DeviceLayer, "Java exception in ChannelManager::HandleCancelRecordProgram");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return false;
-        }
-    }
-
-exit:
-    return static_cast<bool>(ret);
+    // Cancel recording
+    return true;
 }
 
 void ChannelManager::InitializeWithObjects(jobject managerObject)
@@ -615,31 +439,6 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
     if (mSkipChannelMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'skipChannel' method");
-        env->ExceptionClear();
-    }
-
-    mGetProgramGuideMethod = env->GetMethodID(managerClass, "getProgramGuide",
-                                              "(JJ[Lcom/matter/tv/server/tvapp/ChannelInfo;Ljava/lang/String;Z[Ljava/util/"
-                                              "Map.Entry;Ljava/lang/String;)Lcom/matter/tv/server/tvapp/ChannelProgramResponse;");
-    if (mGetProgramGuideMethod == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access ChannelManager 'getProgramGuide' method");
-        env->ExceptionClear();
-    }
-
-    mRecordProgramMethod =
-        env->GetMethodID(managerClass, "recordProgram", "(Ljava/lang/String;Z[Ljava/util/Map.Entry;Ljava/lang/String;)Z");
-    if (mRecordProgramMethod == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access ChannelManager 'recordProgram' method");
-        env->ExceptionClear();
-    }
-
-    mCancelRecordProgramMethod =
-        env->GetMethodID(managerClass, "cancelRecordProgram", "(Ljava/lang/String;Z[Ljava/util/Map.Entry;Ljava/lang/String;)Z");
-    if (mCancelRecordProgramMethod == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access ChannelManager 'cancelRecordProgram' method");
         env->ExceptionClear();
     }
 }
