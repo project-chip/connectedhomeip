@@ -35,7 +35,6 @@ class GnBuilder(Builder):
 
         If used, returns a list of arguments.
         """
-
         return None
 
     def GnBuildEnv(self):
@@ -68,7 +67,7 @@ class GnBuilder(Builder):
         if self.options.pregen_dir:
             extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
-        extra_args.extend(self.GnBuildArgs() || [])
+        extra_args.extend(self.GnBuildArgs() or [])
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 
