@@ -868,6 +868,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRRVCOperationalStateClusterGoHomeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRScenesManagementClusterAddSceneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1085,6 +1091,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRDeviceEnergyManagementClusterRequestConstraintBasedForecastParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRDeviceEnergyManagementClusterCancelRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

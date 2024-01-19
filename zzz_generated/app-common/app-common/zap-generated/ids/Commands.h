@@ -808,6 +808,10 @@ namespace OperationalCommandResponse {
 static constexpr CommandId Id = 0x00000004;
 } // namespace OperationalCommandResponse
 
+namespace GoHome {
+static constexpr CommandId Id = 0x00000080;
+} // namespace GoHome
+
 } // namespace Commands
 } // namespace RvcOperationalState
 
@@ -997,6 +1001,10 @@ static constexpr CommandId Id = 0x00000005;
 namespace RequestConstraintBasedForecast {
 static constexpr CommandId Id = 0x00000006;
 } // namespace RequestConstraintBasedForecast
+
+namespace CancelRequest {
+static constexpr CommandId Id = 0x00000007;
+} // namespace CancelRequest
 
 } // namespace Commands
 } // namespace DeviceEnergyManagement

@@ -2618,6 +2618,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAbsMaxPowerID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRAttributeIDTypeClusterDeviceEnergyManagementAttributePowerAdjustmentCapabilityID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeForecastID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeOptOutStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
     MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -2637,8 +2638,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterEnergyEVSEAttributeMaximumDischargeCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000008,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeUserMaximumChargeCurrentID MTR_PROVISIONALLY_AVAILABLE = 0x00000009,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeRandomizationDelayWindowID MTR_PROVISIONALLY_AVAILABLE = 0x0000000A,
-    MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfWeeklyTargetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000021,
-    MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfDailyTargetsID MTR_PROVISIONALLY_AVAILABLE = 0x00000022,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeStartTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000023,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeTargetTimeID MTR_PROVISIONALLY_AVAILABLE = 0x00000024,
     MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeRequiredEnergyID MTR_PROVISIONALLY_AVAILABLE = 0x00000025,
@@ -6170,6 +6169,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterRVCOperationalStateCommandStartID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000003,
     MTRCommandIDTypeClusterRVCOperationalStateCommandOperationalCommandResponseID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000004,
+    MTRCommandIDTypeClusterRVCOperationalStateCommandGoHomeID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,
 
     // Cluster ScenesManagement commands
     MTRCommandIDTypeClusterScenesManagementCommandAddSceneID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6221,6 +6221,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterDeviceEnergyManagementCommandResumeRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterDeviceEnergyManagementCommandModifyForecastRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
     MTRCommandIDTypeClusterDeviceEnergyManagementCommandRequestConstraintBasedForecastID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterDeviceEnergyManagementCommandCancelRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
 
     // Cluster EnergyEVSE commands
     MTRCommandIDTypeClusterEnergyEVSECommandGetTargetsResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
