@@ -35,7 +35,7 @@ using namespace ::chip::app;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
-static const char * TAG = "app-task";
+static const char TAG[] = "app-task";
 
 LEDWidget AppLED;
 

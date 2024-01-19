@@ -24,9 +24,9 @@ limitations under the License.
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
-    <globalAttribure side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="ARRAY" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="array" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
     <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="SupportedProtocolsBitmap" default="0"                       writable="false"  optional="true">SupportedStreamingProtocols</attribute>
 
     <command source="client" code="0x00" name="LaunchContent" response="LauncherResponse" optional="true">
@@ -34,6 +34,8 @@ limitations under the License.
       <arg name="Search" type="ContentSearchStruct"/>
       <arg name="AutoPlay" type="boolean"/>
       <arg name="Data" type="char_string" optional="true"/>
+      <arg name="PlaybackPreferences" type="PlaybackPreferencesStruct" optional="true"/>
+      <arg name="UseCurrentContext" type="boolean" optional="true"/>
     </command>
 
     <command source="client" code="0x01" name="LaunchURL" response="LauncherResponse" optional="true">
@@ -111,6 +113,9 @@ limitations under the License.
     <item name="SportsTeam" value="0x00B"/>
     <item name="Type" value="0x0C"/>
     <item name="Video" value="0x0D"/>
+    <item name="Season" value="0x0E"/>
+    <item name="Episode" value="0x0F"/>
+    <item name="Any" value="0x10"/>
   </enum>
 
   <enum name="StatusEnum" type="enum8">
@@ -118,6 +123,8 @@ limitations under the License.
     <item name="Success" value="0x00"/>
     <item name="URLNotAvailable" value="0x01"/>
     <item name="AuthFailed" value="0x02"/>
+    <item name="TextTrackNotAvailable" value="0x03"/>
+    <item name="AudioTrackNotAvailable" value="0x04"/>
   </enum>
 
   <struct name="ParameterStruct">
@@ -127,15 +134,55 @@ limitations under the License.
     <item name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
   </struct>
 
+  <struct name="PlaybackPreferencesStruct">
+    <cluster code="0x050a"/>
+    <item name="PlaybackPosition" type="int64u"/>
+    <item name="TextTrack" type="TrackPreferenceStruct"/>
+    <item name="AudioTracks" type="TrackPreferenceStruct" array="true" optional="true"/>
+  </struct>
+
+  <struct name="TrackPreferenceStruct">
+    <cluster code="0x050a"/>
+    <item name="LanguageCode" type="char_string" length="32" optional="false"/>
+    <item name="Characteristics" type="CharacteristicEnum" array="true" optional="true"/>
+    <item name="AudioOutputIndex" type="int8u"/>
+  </struct>
+
+  <enum name="CharacteristicEnum" type="enum8">
+    <cluster code="0x050a"/>
+    <item value="0x00" name="ForcedSubtitles"/>
+    <item value="0x01" name="DescribesVideo" />
+    <item value="0x02" name="EasyToRead"/>
+    <item value="0x03" name="FrameBased"/>
+    <item value="0x04" name="MainProgram"/>
+    <item value="0x05" name="OriginalContent"/>
+    <item value="0x06" name="VoiceOverTranslation"/>
+    <item value="0x07" name="Caption"/>
+    <item value="0x08" name="Subtitle"/>
+    <item value="0x09" name="Alternate"/>
+    <item value="0x0A" name="Supplementary"/>
+    <item value="0x0B" name="Commentary"/>
+    <item value="0x0C" name="DubbedTranslation"/>
+    <item value="0x0D" name="Description"/>
+    <item value="0x0E" name="Metadata"/>
+    <item value="0x0F" name="EnhancedAudioIntelligibility"/>
+    <item value="0x10" name="Emergency"/>
+    <item value="0x11" name="Karaoke"/>
+  </enum>
+
   <bitmap name="SupportedProtocolsBitmap" type="bitmap32">
     <cluster code="0x050a"/>
     <field name="DASH" mask="0x1"/>
     <field name="HLS" mask="0x2"/>
+    <field name="WebRTC" mask="0x2"/>
   </bitmap>
 
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x050a"/>
     <field name="ContentSearch" mask="0x1"/>
     <field name="URLPlayback" mask="0x2"/>
+    <field name="AdvancedSeek" mask="0x3"/>
+    <field name="TextTracks" mask="0x4"/>
+    <field name="AudioTracks" mask="0x5"/>
   </bitmap>
 </configurator>

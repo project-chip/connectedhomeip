@@ -26,9 +26,10 @@
 #pragma once
 
 #include <access/AccessControl.h>
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
+#include <app/SubscriptionResumptionSessionEstablisher.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -239,6 +240,22 @@ public:
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     /**
+     *  Activate the idle subscriptions.
+     *
+     *  When subscribing to ICD and liveness timeout reached, the read client will move to `InactiveICDSubscription` state and
+     * resubscription can be triggered via OnActiveModeNotification().
+     */
+    void OnActiveModeNotification(ScopedNodeId aPeer);
+
+    /**
+     *  Used to notify when a peer becomes LIT ICD or vice versa.
+     *
+     *  ReadClient will call this function when it finds any updates of the OperatingMode attribute from ICD management
+     * cluster. The application doesn't need to call this function, usually.
+     */
+    void OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType);
+
+    /**
      * Add a read client to the internally tracked list of weak references. This list is used to
      * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
      */
@@ -305,6 +322,9 @@ public:
     SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mpSubscriptionResumptionStorage; };
 
     CHIP_ERROR ResumeSubscriptions();
+
+    // Check if a given subject (CAT or NodeId) has at least 1 active subscription
+    bool SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subject);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     //
@@ -377,6 +397,7 @@ private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     friend class TestInteractionModelEngine;
+    friend class SubscriptionResumptionSessionEstablisher;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;

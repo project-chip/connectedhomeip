@@ -69,14 +69,11 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/ZclCallbacks.cpp
-               src/BoltLockManager.cpp
+               src/LockManager.cpp
+               src/LockSettingsStorage.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
@@ -88,3 +85,7 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
 )
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()

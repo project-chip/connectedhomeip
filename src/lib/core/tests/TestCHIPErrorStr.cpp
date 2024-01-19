@@ -67,15 +67,16 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_UNKNOWN_KEY_TYPE,
     CHIP_ERROR_KEY_NOT_FOUND,
     CHIP_ERROR_WRONG_ENCRYPTION_TYPE,
+    CHIP_ERROR_INVALID_UTF8,
     CHIP_ERROR_INTEGRITY_CHECK_FAILED,
     CHIP_ERROR_INVALID_SIGNATURE,
+    CHIP_ERROR_INVALID_TLV_CHAR_STRING,
     CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE,
     CHIP_ERROR_INVALID_MESSAGE_LENGTH,
     CHIP_ERROR_BUFFER_TOO_SMALL,
     CHIP_ERROR_DUPLICATE_KEY_ID,
     CHIP_ERROR_WRONG_KEY_TYPE,
-    CHIP_ERROR_WELL_UNINITIALIZED,
-    CHIP_ERROR_WELL_EMPTY,
+    CHIP_ERROR_UNINITIALIZED,
     CHIP_ERROR_INVALID_STRING_LENGTH,
     CHIP_ERROR_INVALID_LIST_LENGTH,
     CHIP_END_OF_TLV,
@@ -224,14 +225,14 @@ int TestCHIPErrorStr()
     // clang-format off
     nlTestSuite theSuite =
 	{
-        "Core-Error-Strings",
+        "Test CHIP_ERROR string conversions",
         &sTests[0],
         nullptr,
         nullptr
     };
     // clang-format on
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
 
     return nlTestRunnerStats(&theSuite);

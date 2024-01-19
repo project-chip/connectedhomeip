@@ -51,6 +51,7 @@
 #define WFX_RSI_ST_STA_READY (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE)
 #define WFX_RSI_ST_STARTED (0x200)     /* RSI task started			*/
 #define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
+#define WFX_RSI_ST_SLEEP_READY (0x800) /* Notify the M4 to go to sleep*/
 
 struct wfx_rsi
 {

@@ -196,6 +196,7 @@ static_library("support") {
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
+    "Scoped.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
     "SetupDiscriminator.h",
@@ -214,6 +215,8 @@ static_library("support") {
     "logging/BinaryLogging.cpp",
     "logging/BinaryLogging.h",
     "logging/CHIPLogging.h",
+    "utf8.cpp",
+    "utf8.h",
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
@@ -249,7 +252,8 @@ static_library("support") {
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/platform:platform_buildconfig",
+    "${chip_root}/src/platform:platform_config_header",
+    "${chip_root}/src/system:system_config_header",
     "${nlassert_root}:nlassert",
     "${nlio_root}:nlio",
   ]
@@ -294,7 +298,18 @@ static_library("support") {
   }
 }
 
-static_library("testing") {
+static_library("test_utils") {
+  output_name = "libTestUtils"
+  output_dir = "${root_out_dir}/lib"
+  deps = [ "${chip_root}/src/platform" ]
+
+  sources = [
+    "UnitTestUtils.cpp",
+    "UnitTestUtils.h",
+  ]
+}
+
+static_library("testing_nlunit") {
   output_name = "libSupportTesting"
   output_dir = "${root_out_dir}/lib"
 
@@ -302,13 +317,12 @@ static_library("testing") {
     "UnitTestExtendedAssertions.h",
     "UnitTestRegistration.cpp",
     "UnitTestRegistration.h",
-    "UnitTestUtils.cpp",
-    "UnitTestUtils.h",
   ]
 
   public_deps = [
     ":support",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
     "${nlassert_root}:nlassert",
     "${nlunit_test_root}:nlunit-test",
   ]

@@ -55,43 +55,82 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x050f" name="Microwave Oven Control" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005F" name="Microwave Oven Control" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="MWOCTRL" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PWRNUM" name="Power as a number" summary="Power is specified as a unitless number or a percentage">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="1" code="WATTS" name="Power in Watts" summary="Power is specified in Watts">
+      <optionalConform choice="a"/>
+    </feature>
+  </features>
   <attributes>
-    <attribute id="0x0001" name="CookTime" type="elapsed-s" default="30">
+    <attribute id="0x0000" name="CookTime" type="elapsed-s" default="30">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="between" from="1" to="65535"/>
+      <constraint type="between" from="1" to="MaxCookTime"/>
     </attribute>
-    <attribute id="0x0002" name="PowerSetting" type="uint8" default="MS">
+    <attribute id="0x0001" name="MaxCookTime" type="elapsed-s" default="MS">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
+      <constraint type="between" from="1" to="86400"/>
+    </attribute>
+    <attribute id="0x0002" name="PowerSetting" type="uint8" default="desc">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="PWRNUM"/>
+      </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
     <attribute id="0x0003" name="MinPower" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <optionalConform/>
-      <constraint type="between" from="1" to="MaxPower"/>
+      <optionalConform choice="a" count="3">
+        <feature name="PWRNUM"/>
+      </optionalConform>
+      <constraint type="min" value="1"/>
     </attribute>
     <attribute id="0x0004" name="MaxPower" type="uint8" default="100">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <attribute name="MinPower"/>
-      </mandatoryConform>
-      <constraint type="between" from="MinPower" to="100"/>
+      <optionalConform choice="a" count="3">
+        <feature name="PWRNUM"/>
+      </optionalConform>
+      <constraint type="max" value="100"/>
     </attribute>
     <attribute id="0x0005" name="PowerStep" type="uint8" default="10">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <attribute name="MinPower"/>
-      </mandatoryConform>
+      <optionalConform choice="a" count="3">
+        <feature name="PWRNUM"/>
+      </optionalConform>
       <constraint type="between" from="1" to="MaxPower"/>
+    </attribute>
+    <attribute id="0x0006" name="SupportedWatts" type="list" default="MS">
+      <entry type="uint16"/>
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="WATTS"/>
+      </mandatoryConform>
+      <constraint type="countBetween" from="1" to="10"/>
+    </attribute>
+    <attribute id="0x0007" name="SelectedWattIndex" type="uint8" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="WATTS"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0008" name="WattRating" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <optionalConform/>
     </attribute>
   </attributes>
   <commands>
@@ -102,13 +141,24 @@ Davis, CA 95616, USA
         <optionalConform choice="a" more="true"/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="CookTime" type="elapsed-s" default="MS">
+      <field id="1" name="CookTime" type="elapsed-s" default="30">
         <optionalConform choice="a" more="true"/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint type="between" from="1" to="MaxCookTime"/>
       </field>
       <field id="2" name="PowerSetting" type="uint8" default="MaxPower">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true">
+          <feature name="PWRNUM"/>
+        </optionalConform>
         <constraint type="between" from="MinPower" to="MaxPower"/>
+      </field>
+      <field id="3" name="WattSettingIndex" type="uint8" default="MS">
+        <optionalConform choice="a" more="true">
+          <feature name="WATTS"/>
+        </optionalConform>
+        <constraint type="between" from="0" to="len(SupportedWatts)-1"/>
+      </field>
+      <field id="4" name="StartAfterSetting" type="bool" default="false">
+        <optionalConform/>
       </field>
     </command>
     <command id="0x01" name="AddMoreTime" response="Y">
@@ -116,7 +166,7 @@ Davis, CA 95616, USA
       <optionalConform/>
       <field id="0" name="TimeToAdd" type="elapsed-s">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint type="between" from="1" to="MaxCookTime"/>
       </field>
     </command>
   </commands>

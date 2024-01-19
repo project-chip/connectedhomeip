@@ -98,7 +98,7 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetProductId(Optional<uint16_t>(897))
         .SetRotatingDeviceId(Optional<const char *>("id_that_spins"))
         .SetTcpSupported(Optional<bool>(true))
-        .SetICDOperatingAsLIT(Optional<bool>(true))
+        .SetICDOperatingAsLIT(Optional<bool>(false))
         // 3600005 is over the max, so this should be adjusted by the platform
         .SetLocalMRPConfig(Optional<ReliableMessageProtocolConfig>::Value(3600000_ms32, 3600005_ms32, 65535_ms16));
 
@@ -115,7 +115,7 @@ test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .AddTxt("PI", "Pair me")
                                                   .AddTxt("PH", "3")
                                                   .AddTxt("T", "1")
-                                                  .AddTxt("ICD", "1")
+                                                  .AddTxt("ICD", "0")
                                                   .AddTxt("SII", "3600000")
                                                   .AddTxt("SAI", "3600000")
                                                   .AddTxt("SAT", "65535")

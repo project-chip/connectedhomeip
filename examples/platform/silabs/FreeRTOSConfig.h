@@ -122,7 +122,7 @@ extern uint32_t SystemCoreClock;
 #include "sl_component_catalog.h"
 #endif
 
-#if SL_SYSTEM_VIEW
+#if SL_CATALOG_SYSTEMVIEW_TRACE_PRESENT
 #include "SEGGER_SYSVIEW_FreeRTOS.h"
 #endif
 
@@ -232,7 +232,11 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
+#ifdef SIWX_917
+#define configTOTAL_HEAP_SIZE ((size_t) ((75 + EXTRA_HEAP_k) * 1024))
+#else
 #define configTOTAL_HEAP_SIZE ((size_t) ((68 + EXTRA_HEAP_k) * 1024))
+#endif // SIWX_917
 #else
 #define configTOTAL_HEAP_SIZE ((size_t) ((42 + EXTRA_HEAP_k) * 1024))
 #endif // DIC

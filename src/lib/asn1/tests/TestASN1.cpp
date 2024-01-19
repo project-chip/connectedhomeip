@@ -67,8 +67,8 @@ enum
 // clang-format off
 static uint8_t kTestVal_09_BitString_AsOctetString[] = { 0xE7, 0xC0 };
 static uint8_t kTestVal_20_OctetString[]        = { 0x01, 0x03, 0x05, 0x07, 0x10, 0x30, 0x50, 0x70, 0x00 };
-static const char * kTestVal_21_PrintableString = "Sudden death in Venice";
-static const char * kTestVal_22_UTFString       = "Ond bra\xCC\x8A""d do\xCC\x88""d i Venedig";
+static const char kTestVal_21_PrintableString[] = "Sudden death in Venice";
+static const char kTestVal_22_UTFString[]       = "Ond bra\xCC\x8A""d do\xCC\x88""d i Venedig";
 // clang-format on
 
 // Manually copied from ASN1OID.h for testing.
@@ -304,6 +304,17 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
 
     encodedLen = writer.GetLengthWritten();
     NL_TEST_ASSERT(inSuite, encodedLen == 0);
+
+    // Methods that take a reader should still read from it,
+    // even if the output is suppressed by the null writer.
+    TLVReader emptyTlvReader;
+    emptyTlvReader.Init(ByteSpan());
+    err = writer.PutBitString(0, emptyTlvReader);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
+
+    emptyTlvReader.Init(ByteSpan());
+    err = writer.PutOctetString(kASN1TagClass_ContextSpecific, 123, emptyTlvReader);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
 }
 
 static void TestASN1_ASN1UniversalTime(nlTestSuite * inSuite, void * inContext)

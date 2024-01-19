@@ -18,6 +18,7 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/src/app/icd/icd.gni")
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 
 static_library("helpers") {
@@ -95,6 +96,8 @@ source_set("scenes-table-test-srcs") {
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSets.h",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/ExtensionFieldSetsImpl.h",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.cpp",
+    "${chip_root}/src/app/clusters/scenes-server/SceneHandlerImpl.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTable.h",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.cpp",
     "${chip_root}/src/app/clusters/scenes-server/SceneTableImpl.h",
@@ -126,6 +129,7 @@ chip_test_suite_using_nltest("tests") {
     "TestAttributePersistenceProvider.cpp",
     "TestAttributeValueDecoder.cpp",
     "TestAttributeValueEncoder.cpp",
+    "TestBasicCommandPathRegistry.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
     "TestClusterInfo.cpp",
@@ -159,6 +163,11 @@ chip_test_suite_using_nltest("tests") {
   }
 
   test_sources += [ "TestAclAttribute.cpp" ]
+
+  # DefaultICDClientStorage assumes that raw AES key is used by the application
+  if (chip_crypto != "psa") {
+    test_sources += [ "TestDefaultICDClientStorage.cpp" ]
+  }
 
   #
   # On NRF platforms, the allocation of a large number of pbufs in this test
@@ -198,10 +207,12 @@ chip_test_suite_using_nltest("tests") {
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/app/icd:manager",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
 

@@ -27,6 +27,8 @@
 
 #include <nlunit-test.h>
 
+#include <array>
+
 using namespace chip;
 
 static void TestByteSpan(nlTestSuite * inSuite, void * inContext)
@@ -274,7 +276,7 @@ static void TestFromZclString(nlTestSuite * inSuite, void * inContext)
     // Purposefully larger size than data.
     constexpr uint8_t array[16] = { 3, 0x41, 0x63, 0x45 };
 
-    constexpr char str[] = "AcE";
+    static constexpr char str[] = "AcE";
 
     ByteSpan s1 = ByteSpan::fromZclString(array);
     NL_TEST_ASSERT(inSuite, s1.data_equal(ByteSpan(&array[1], 3)));
@@ -285,7 +287,7 @@ static void TestFromZclString(nlTestSuite * inSuite, void * inContext)
 
 static void TestFromCharString(nlTestSuite * inSuite, void * inContext)
 {
-    constexpr char str[] = "AcE";
+    static constexpr char str[] = "AcE";
 
     CharSpan s1 = CharSpan::fromCharString(str);
     NL_TEST_ASSERT(inSuite, s1.data_equal(CharSpan(str, 3)));
@@ -297,6 +299,11 @@ static void TestLiteral(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, literal.size() == 3);
     NL_TEST_ASSERT(inSuite, literal.data_equal(CharSpan::fromCharString("HI!")));
     NL_TEST_ASSERT(inSuite, ""_span.size() == 0);
+
+    // These should be compile errors -- if they were allowed they would produce
+    // a CharSpan that includes the trailing '\0' byte in the value.
+    // constexpr CharSpan disallowed1("abcd");
+    // constexpr CharSpan disallowed2{ "abcd" };
 }
 
 static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
@@ -324,6 +331,31 @@ static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
     Span<Foo> span6(testSpan2);
 
     FixedSpan<Foo, 2> span7(testSpan2);
+
+    std::array<Bar, 3> array;
+    const auto & constArray = array;
+    FixedSpan<Foo, 3> span9(array);
+    FixedSpan<const Foo, 3> span10(constArray);
+    Span<Foo> span11(array);
+    Span<const Foo> span12(constArray);
+
+    // Various places around the code base expect these conversions to be implicit
+    ([](FixedSpan<Foo, 3> f) {})(array);
+    ([](Span<Foo> f) {})(array);
+    ([](FixedSpan<const Foo, 3> f) {})(constArray);
+    ([](Span<const Foo> f) {})(constArray);
+
+    NL_TEST_ASSERT(inSuite, span10.data_equal(span10));
+    NL_TEST_ASSERT(inSuite, span10.data_equal(span9));
+    NL_TEST_ASSERT(inSuite, span10.data_equal(array));
+    NL_TEST_ASSERT(inSuite, span10.data_equal(constArray));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(span9));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(span10));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(array));
+    NL_TEST_ASSERT(inSuite, span9.data_equal(constArray));
+
+    // The following should not compile
+    // Span<const Foo> error1 = std::array<Foo, 3>(); // Span would point into a temporary value
 }
 
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
@@ -347,7 +379,7 @@ int TestSpan()
 {
     nlTestSuite theSuite = { "CHIP Span tests", &sTests[0], nullptr, nullptr };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

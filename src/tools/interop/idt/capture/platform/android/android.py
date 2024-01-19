@@ -14,65 +14,60 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 import asyncio
 import ipaddress
 import os
+import traceback
 import typing
+from asyncio import Task
 
 from capture.base import PlatformLogStreamer
-from capture.file_utils import create_standard_log_name
-from capture.shell_utils import Bash
+from utils.shell import Bash, log
+
+from . import config, streams
+from .capabilities import Capabilities
+
+logger = log.get_logger(__file__)
 
 
 class Android(PlatformLogStreamer):
-    """
-    Class that supports:
-    - Running synchronous adb commands
-    - Maintaining a singleton logcat stream
-    - Maintaining a singleton screen recording
-    """
 
     def __init__(self, artifact_dir: str) -> None:
-
+        self.logger = logger
         self.artifact_dir = artifact_dir
-
         self.device_id: str | None = None
         self.adb_devices: typing.Dict[str, bool] = {}
-        self._authorize_adb()
-
-        self.logcat_output_path = os.path.join(
-            self.artifact_dir, create_standard_log_name(
-                'logcat', 'txt'))
-        self.logcat_command = f'adb -s {self.device_id} logcat -T 1 >> {self.logcat_output_path}'
-        self.logcat_proc = Bash(self.logcat_command)
-
-        screen_cast_name = create_standard_log_name('screencast', 'mp4')
-        self.screen_cap_output_path = os.path.join(
-            self.artifact_dir, screen_cast_name)
-        self.check_screen_command = "shell dumpsys deviceidle | grep mScreenOn"
-        self.screen_path = f'/sdcard/Movies/{screen_cast_name}'
-        self.screen_command = f'adb -s {self.device_id} shell screenrecord --bugreport {self.screen_path}'
-        self.screen_proc = Bash(self.screen_command)
-        self.pull_screen = False
-        self.screen_pull_command = f'pull {self.screen_path} {self.screen_cap_output_path}'
+        self.capabilities: None | Capabilities = None
+        self.streams = {}
+        self.connected = False
 
     def run_adb_command(
             self,
             command: str,
-            capture_output: bool = False) -> Bash:
+            capture_output: bool = False,
+            cwd=None) -> Bash:
         """
         Run an adb command synchronously
         Capture_output must be true to call get_captured_output() later
         """
-        return Bash(
+        bash_command = Bash(
             f'adb -s {self.device_id} {command}',
             sync=True,
-            capture_output=capture_output)
+            capture_output=capture_output,
+            cwd=cwd)
+        bash_command.start_command()
+        return bash_command
+
+    def get_adb_background_command(
+            self,
+            command: str,
+            cwd=None) -> Bash:
+        return Bash(f'adb -s {self.device_id} {command}', cwd=cwd)
 
     def get_adb_devices(self) -> typing.Dict[str, bool]:
         """Returns a dict of device ids and whether they are authorized"""
         adb_devices = Bash('adb devices', sync=True, capture_output=True)
+        adb_devices.start_command()
         adb_devices_output = adb_devices.get_captured_output().split('\n')
         devices_auth = {}
         header_done = False
@@ -83,11 +78,11 @@ class Android(PlatformLogStreamer):
                 device_is_auth = line_parsed[1] == "device"
                 if line_parsed[1] == "offline":
                     disconnect_command = f"adb disconnect {device_id}"
-                    print(f"Device {device_id} is offline, trying disconnect!")
+                    self.logger.warning(f"Device {device_id} is offline, trying disconnect!")
                     Bash(
                         disconnect_command,
                         sync=True,
-                        capture_output=False)
+                        capture_output=False).start_command()
                 else:
                     devices_auth[device_id] = device_is_auth
             header_done = True
@@ -103,11 +98,11 @@ class Android(PlatformLogStreamer):
     def _set_device_if_only_one_connected(self) -> None:
         if self._only_one_device_connected():
             self.device_id = self._get_first_connected_device()
-            print(f'Only one device detected; using {self.device_id}')
+            self.logger.warning(f'Only one device detected; using {self.device_id}')
 
     def _log_adb_devices(self) -> None:
         for dev in self.adb_devices:
-            print(dev)
+            self.logger.info(dev)
 
     @staticmethod
     def _is_connection_str(adb_input_str: str) -> bool:
@@ -134,22 +129,23 @@ class Android(PlatformLogStreamer):
     def _check_connect_wireless_adb(self, temp_device_id: str) -> None:
         if Android._is_connection_str(temp_device_id):
             connect_command = f"adb connect {temp_device_id}"
-            print(
+            self.logger.warning(
                 f"Detected connection string; attempting to connect: {connect_command}")
-            Bash(connect_command, sync=True, capture_output=False)
+            Bash(connect_command, sync=True, capture_output=False).start_command()
             self.get_adb_devices()
 
     def _device_id_user_input(self) -> None:
-        print('If there is no output below, press enter after connecting your phone under test OR')
-        print('Enter (copy paste) the target device id from the list of available devices below OR')
-        print('Enter $IP4:$PORT to connect wireless debugging.')
+        self.logger.error('Connect additional android devices via USB and press enter OR')
+        self.logger.error('Enter (copy paste) the target device id from the list of available devices below OR')
+        self.logger.error('Enter $IP4:$PORT to connect wireless debugging.')
         self._log_adb_devices()
         temp_device_id = input('').strip()
         self._check_connect_wireless_adb(temp_device_id)
+        self.get_adb_devices()
         if self._only_one_device_connected():
             self._set_device_if_only_one_connected()
         elif temp_device_id not in self.adb_devices:
-            print('Entered device not in adb devices!')
+            self.logger.warning('Entered device not in adb devices!')
         else:
             self.device_id = temp_device_id
 
@@ -161,7 +157,7 @@ class Android(PlatformLogStreamer):
         self._set_device_if_only_one_connected()
         while self.device_id not in self.get_adb_devices():
             self._device_id_user_input()
-        print(f'Selected device {self.device_id}')
+        self.logger.info(f'Selected device {self.device_id}')
 
     def _authorize_adb(self) -> None:
         """
@@ -170,48 +166,61 @@ class Android(PlatformLogStreamer):
         self.get_adb_devices()
         self._choose_device_id()
         while not self.get_adb_devices()[self.device_id]:
-            print('Confirming authorization, press enter after auth')
+            self.logger.info('Confirming authorization, press enter after auth')
             input('')
-        print(f'Target android device ID is authorized: {self.device_id}')
+        self.logger.info(f'Target android device ID is authorized: {self.device_id}')
 
-    def check_screen(self) -> bool:
-        screen_cmd_output = self.run_adb_command(
-            self.check_screen_command, capture_output=True)
-        return "true" in screen_cmd_output.get_captured_output()
+    async def connect(self) -> None:
+        if not self.connected:
+            self._authorize_adb()
+            self.capabilities = Capabilities(self)
+            self.capabilities.check_capabilities()
+            for stream in streams.__all__:
+                self.streams[stream] = getattr(streams, stream)(self)
+            self.connected = True
 
-    async def prepare_screen_recording(self) -> None:
-        if self.screen_proc.command_is_running():
-            return
-        try:
-            async with asyncio.timeout_at(asyncio.get_running_loop().time() + 20.0):
-                screen_on = self.check_screen()
-                print("Please turn the screen on so screen recording can start!")
-                while not screen_on:
-                    await asyncio.sleep(2)
-                    screen_on = self.check_screen()
-                    if not screen_on:
-                        print("Screen is still not on for recording!")
-        except TimeoutError:
-            print("WARNING screen recording timeout")
-            return
+    async def handle_stream_action(self, action: str) -> None:
+        had_error = False
+        for stream_name, stream in self.streams.items():
+            self.logger.info(f"Doing {action} for {stream_name}!")
+            try:
+                await getattr(stream, action)()
+            except Exception:
+                self.logger.error(traceback.format_exc())
+                had_error = True
+        if had_error:
+            raise Exception("Propagating to controller!")
 
     async def start_streaming(self) -> None:
-        await self.prepare_screen_recording()
-        if self.check_screen():
-            self.pull_screen = True
-            self.screen_proc.start_command()
-        self.logcat_proc.start_command()
+        await self.handle_stream_action("start")
 
-    async def pull_screen_recording(self) -> None:
-        if self.pull_screen:
-            self.screen_proc.stop_command()
-            print("screen proc stopped")
-            await asyncio.sleep(3)
-            self.run_adb_command(self.screen_pull_command)
-            print("screen recording pull attempted")
-            self.pull_screen = False
+    async def run_observers(self) -> None:
+        try:
+            observer_tasks: [Task] = []
+            for stream_name, stream in self.streams.items():
+                observer_tasks.append(asyncio.create_task(stream.run_observer()))
+            while True:
+                self.logger.info("Android root observer task checking sub tasks")
+                for task in observer_tasks:
+                    if task.done() or task.cancelled():
+                        self.logger.error(f"An android monitoring task has died, consider restarting! {task.__str__()}")
+                await asyncio.sleep(30)
+        except asyncio.CancelledError:
+            self.logger.info("Cancelling observer tasks")
+            for observer_tasks in observer_tasks:
+                observer_tasks.cancel()
 
     async def stop_streaming(self) -> None:
-        await self.pull_screen_recording()
-        self.logcat_proc.stop_command()
-        print("logcat stopped")
+        await self.handle_stream_action("stop")
+        if config.enable_bug_report:
+            found = False
+            for item in os.listdir(self.artifact_dir):
+                if "bugreport" in item and ".zip" in item:
+                    found = True
+            if not found:
+                self.logger.info("Taking bugreport")
+                self.run_adb_command("bugreport", cwd=self.artifact_dir)
+            else:
+                self.logger.warning("bugreport already taken")
+        else:
+            self.logger.critical("bugreport disabled in settings!")

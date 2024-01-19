@@ -78,7 +78,9 @@ limitations under the License.
                 <requireAttribute>HOUR_FORMAT</requireAttribute>
             </include>
             <include cluster="Unit Localization" client="false" server="true" clientLocked="true" serverLocked="false"></include>
-            <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>UP_TIME</requireAttribute>
+            </include>
             <include cluster="Diagnostic Logs" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Software Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -217,7 +219,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="false" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="false" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -305,7 +307,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -390,7 +392,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -491,7 +493,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -594,7 +596,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -675,7 +677,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -760,7 +762,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -839,7 +841,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -900,7 +902,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -962,7 +964,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
                 <requireCommand>AddScene</requireCommand>
                 <requireCommand>AddSceneResponse</requireCommand>
@@ -1010,7 +1012,7 @@ limitations under the License.
             </include>
             <include cluster="Groups" client="true" server="false" clientLocked="true" serverLocked="true">
             </include>
-            <include cluster="Scenes" client="true" server="false" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="true" server="false" clientLocked="true" serverLocked="true">
             </include>
             <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Level Control" client="true" server="false" clientLocked="true" serverLocked="true"></include>
@@ -1057,7 +1059,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1332,7 +1334,7 @@ limitations under the License.
                 <requireAttribute>BINDING</requireAttribute>
             </include>
             <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true"></include>
             <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Color Control" client="false" server="false" clientLocked="false" serverLocked="true"></include>
@@ -1408,7 +1410,7 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1469,7 +1471,7 @@ limitations under the License.
             <include cluster="Binding" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="false" serverLocked="true"></include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Groups" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Window Covering" client="true" server="false" clientLocked="true" serverLocked="true"></include>
         </clusters>
@@ -1512,7 +1514,7 @@ limitations under the License.
                 <requireCommand>RemoveAllGroups</requireCommand>
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1563,7 +1565,7 @@ limitations under the License.
             <include cluster="Binding" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false">
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -1869,8 +1871,9 @@ limitations under the License.
             </include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Scenes" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -1896,6 +1899,7 @@ limitations under the License.
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Carbon Monoxide" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1967,6 +1971,36 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
+     <deviceType>
+        <name>MA-oven</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Oven</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007B</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-microwave-oven</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Microwave Oven</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0079</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Microwave Oven Mode"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Microwave Oven Control"  client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
     <deviceType>
         <name>MA-refrigerator</name>
         <domain>CHIP</domain>
@@ -2000,6 +2034,40 @@ limitations under the License.
             <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
+        <deviceType>
+        <name>MA-laundry-dryer</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Laundry Dryer</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007C</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Washer Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Laundry Dryer Controls" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Operational State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-extractor-hood</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Extractor Hood</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x007A</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="HEPA Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Activated Carbon Filter Monitoring" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
     <deviceType>
         <name>MA-robotic-vacuum-cleaner</name>
         <domain>CHIP</domain>
@@ -2030,6 +2098,79 @@ limitations under the License.
             <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Refrigerator And Temperature Controlled Cabinet Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Oven Mode" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Oven Cavity Operational State" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-freeze-detector</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Freeze Detector</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0041</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-valve</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Valve</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0042</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Valve Configuration and Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-water-leak-detector</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Water Leak Detector</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0043</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-rain-sensor</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Rain Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0044</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-network-infrastructure-manager</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Network Infrastructure Manager</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xFFF10010</deviceId><!-- TODO: ID-TBD -->
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"/>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2170,7 +2311,7 @@ limitations under the License.
                 <requireCommand>On</requireCommand>
                 <requireCommand>Toggle</requireCommand>
             </include>
-            <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="Scenes Management" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>SCENE_COUNT</requireAttribute>
                 <requireAttribute>CURRENT_SCENE</requireAttribute>
                 <requireAttribute>CURRENT_GROUP</requireAttribute>
@@ -2207,6 +2348,35 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>Cooktop</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Cooktop</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0078</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Identify" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>Cook Surface</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Cook Surface</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0077</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
 </configurator>

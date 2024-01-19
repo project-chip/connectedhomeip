@@ -123,6 +123,12 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::DataVersion is expected to be uint32_t, change this when necessary");
         return ZCL_INT32U_ATTRIBUTE_TYPE;
 
+    case ZCL_AMPERAGE_MA_ATTRIBUTE_TYPE: // Amperage milliamps
+    case ZCL_ENERGY_MWH_ATTRIBUTE_TYPE:  // Energy milliwatt-hours
+    case ZCL_POWER_MW_ATTRIBUTE_TYPE:    // Power milliwatts
+    case ZCL_VOLTAGE_MV_ATTRIBUTE_TYPE:  // Voltage millivolts
+        return ZCL_INT64S_ATTRIBUTE_TYPE;
+
     case ZCL_EVENT_NO_ATTRIBUTE_TYPE:   // Event Number
     case ZCL_FABRIC_ID_ATTRIBUTE_TYPE:  // Fabric Id
     case ZCL_NODE_ID_ATTRIBUTE_TYPE:    // Node Id
@@ -497,6 +503,28 @@ Protocols::InteractionModel::Status UnsupportedAttributeStatus(const ConcreteAtt
     return Status::UnsupportedAttribute;
 }
 
+// Will set at most one of the out-params (aAttributeCluster or
+// aAttributeMetadata) to non-null.  Both null means attribute not supported,
+// aAttributeCluster non-null means this is a supported global attribute that
+// does not have metadata.
+void FindAttributeMetadata(const ConcreteAttributePath & aPath, const EmberAfCluster ** aAttributeCluster,
+                           const EmberAfAttributeMetadata ** aAttributeMetadata)
+{
+    *aAttributeCluster  = nullptr;
+    *aAttributeMetadata = nullptr;
+
+    for (auto & attr : GlobalAttributesNotInMetadata)
+    {
+        if (attr == aPath.mAttributeId)
+        {
+            *aAttributeCluster = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
+            return;
+        }
+    }
+
+    *aAttributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+}
+
 } // anonymous namespace
 
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
@@ -524,22 +552,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
 
     const EmberAfCluster * attributeCluster            = nullptr;
     const EmberAfAttributeMetadata * attributeMetadata = nullptr;
-
-    bool isGlobalAttributeNotInMetadata = false;
-    for (auto & attr : GlobalAttributesNotInMetadata)
-    {
-        if (attr == aPath.mAttributeId)
-        {
-            isGlobalAttributeNotInMetadata = true;
-            attributeCluster               = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
-            break;
-        }
-    }
-
-    if (!isGlobalAttributeNotInMetadata)
-    {
-        attributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-    }
+    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
 
     if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
@@ -966,14 +979,19 @@ const EmberAfAttributeMetadata * GetAttributeMetadata(const ConcreteAttributePat
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    const EmberAfAttributeMetadata * attributeMetadata = GetAttributeMetadata(aPath);
+    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
+    // mandatory global attributes (which just check for cluster on endpoint).
+    const EmberAfCluster * attributeCluster            = nullptr;
+    const EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    FindAttributeMetadata(aPath, &attributeCluster, &attributeMetadata);
 
-    if (attributeMetadata == nullptr)
+    if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
         return apWriteHandler->AddStatus(aPath, UnsupportedAttributeStatus(aPath));
     }
 
-    if (attributeMetadata->IsReadOnly())
+    // All the global attributes we don't have metadata for are readonly.
+    if (attributeMetadata == nullptr || attributeMetadata->IsReadOnly())
     {
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::UnsupportedWrite);
     }

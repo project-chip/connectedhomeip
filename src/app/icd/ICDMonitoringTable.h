@@ -33,7 +33,7 @@ using SymmetricKeystore = SessionKeystore;
 
 namespace chip {
 
-inline constexpr size_t kICDMonitoringBufferSize = 40;
+inline constexpr size_t kICDMonitoringBufferSize = 60;
 
 struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
@@ -54,7 +54,6 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
         this->symmetricKeystore = keyStore;
     }
 
-    bool IsValid() { return this->checkInNodeID != kUndefinedNodeId && this->fabricIndex != kUndefinedFabricIndex; }
     CHIP_ERROR UpdateKey(StorageKeyName & key) override;
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
@@ -77,6 +76,13 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      */
     CHIP_ERROR SetKey(ByteSpan keyData);
     CHIP_ERROR DeleteKey(void);
+    inline bool IsValid()
+    {
+        return (symmetricKeystore != nullptr && keyHandleValid && fabricIndex != kUndefinedFabricIndex &&
+                checkInNodeID != kUndefinedNodeId);
+    }
+
+    ICDMonitoringEntry & operator=(const ICDMonitoringEntry & icdMonitoringEntry);
 
     /**
      * @brief Implement the key verification needed by the ICDManagement Server.
@@ -98,7 +104,8 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
     chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
     chip::NodeId checkInNodeID                    = kUndefinedNodeId;
     uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
-    Crypto::Aes128KeyHandle key                   = Crypto::Aes128KeyHandle();
+    Crypto::Aes128KeyHandle aesKeyHandle          = Crypto::Aes128KeyHandle();
+    Crypto::Hmac128KeyHandle hmacKeyHandle        = Crypto::Hmac128KeyHandle();
     bool keyHandleValid                           = false;
     uint16_t index                                = 0;
     Crypto::SymmetricKeystore * symmetricKeystore = nullptr;

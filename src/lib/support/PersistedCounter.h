@@ -95,7 +95,8 @@ public:
         // Compiler should optimize these branches.
         if (is_same_v<decltype(T), uint64_t>)
         {
-            ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x%" PRIx64 " startValue 0x%" PRIx64, aEpoch, startValue);
+            ChipLogDetail(EventLogging, "PersistedCounter::Init() aEpoch 0x" ChipLogFormatX64 " startValue 0x" ChipLogFormatX64,
+                          ChipLogValueX64(aEpoch), ChipLogValueX64(startValue));
         }
         else if (is_same_v<decltype(T), uint32_t>)
         {
@@ -153,7 +154,8 @@ private:
         // Compiler should optimize these branches.
         if (is_same_v<decltype(T), uint64_t>)
         {
-            ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x%" PRIx64, aStartValue);
+            ChipLogDetail(EventLogging, "PersistedCounter::WriteStartValue() aStartValue 0x" ChipLogFormatX64,
+                          ChipLogValueX64(aStartValue));
         }
         else
         {

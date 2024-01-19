@@ -27,7 +27,7 @@ void SecureSessionDeleter::Release(SecureSession * entry)
 }
 
 void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId & peerNode, CATValues peerCATs,
-                             uint16_t peerSessionId, const ReliableMessageProtocolConfig & config)
+                             uint16_t peerSessionId, const SessionParameters & sessionParameters)
 {
     VerifyOrDie(mState == State::kEstablishing);
     VerifyOrDie(peerNode.GetFabricIndex() == localNode.GetFabricIndex());
@@ -40,11 +40,11 @@ void SecureSession::Activate(const ScopedNodeId & localNode, const ScopedNodeId 
     VerifyOrDie(!((mSecureSessionType == Type::kCASE) &&
                   (!IsOperationalNodeId(peerNode.GetNodeId()) || !IsOperationalNodeId(localNode.GetNodeId()))));
 
-    mPeerNodeId      = peerNode.GetNodeId();
-    mLocalNodeId     = localNode.GetNodeId();
-    mPeerCATs        = peerCATs;
-    mPeerSessionId   = peerSessionId;
-    mRemoteMRPConfig = config;
+    mPeerNodeId          = peerNode.GetNodeId();
+    mLocalNodeId         = localNode.GetNodeId();
+    mPeerCATs            = peerCATs;
+    mPeerSessionId       = peerSessionId;
+    mRemoteSessionParams = sessionParameters;
     SetFabricIndex(peerNode.GetFabricIndex());
     MarkActiveRx(); // Initialize SessionTimestamp and ActiveTimestamp per spec.
 

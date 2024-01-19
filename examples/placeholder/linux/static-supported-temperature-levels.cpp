@@ -18,7 +18,6 @@
 
 #include <app/util/config.h>
 #include <static-supported-temperature-levels.h>
-#include <zap-generated/gen_config.h>
 
 using namespace std;
 using namespace chip;
@@ -27,8 +26,7 @@ using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
 // TODO: Configure your options for each endpoint
-CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { CharSpan("Hot", 3), CharSpan("Warm", 4),
-                                                                              CharSpan("Cold", 4) };
+CharSpan AppSupportedTemperatureLevelsDelegate::temperatureLevelOptions[] = { "Hot"_span, "Warm"_span, "Cold"_span };
 
 const AppSupportedTemperatureLevelsDelegate::EndpointPair AppSupportedTemperatureLevelsDelegate::supportedOptionsByEndpoints
     [EMBER_AF_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {

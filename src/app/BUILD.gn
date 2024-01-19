@@ -57,17 +57,24 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_PERSIST_SUBSCRIPTIONS=${chip_persist_subscriptions}",
     "CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION=${chip_subscription_timeout_resumption}",
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
-    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
-    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
-    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
+  ]
+
+  visibility = [ ":app_config" ]
+}
+
+source_set("revision_info") {
+  sources = [
+    "DataModelRevision.h",
+    "InteractionModelRevision.h",
+    "SpecificationVersion.h",
   ]
 }
 
 source_set("app_config") {
   sources = [ "AppConfig.h" ]
 
-  public_deps = [ ":app_buildconfig" ]
+  deps = [ ":app_buildconfig" ]
 }
 
 static_library("app") {
@@ -88,6 +95,7 @@ static_library("app") {
     "ChunkedWriteCallback.h",
     "CommandHandler.cpp",
     "CommandResponseHelper.h",
+    "CommandResponseSender.cpp",
     "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
@@ -101,7 +109,6 @@ static_library("app") {
     "FailSafeContext.h",
     "GlobalAttributes.h",
     "InteractionModelEngine.cpp",
-    "InteractionModelRevision.h",
     "InteractionModelTimeout.h",
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
@@ -226,6 +233,13 @@ static_library("app") {
     ]
   }
 
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
+    ]
+  }
+
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",
@@ -237,19 +251,24 @@ static_library("app") {
 
   public_deps = [
     ":app_config",
+    ":revision_info",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:notifier",
+    "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:manager" ]
+    public_deps += [
+      "${chip_root}/src/app/icd:manager",
+      "${chip_root}/src/app/icd:notifier",
+    ]
   }
 
   cflags = [ "-Wconversion" ]

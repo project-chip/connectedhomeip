@@ -58,12 +58,36 @@ public:
     // should be used to construct empty Spans. All other cases involving null are invalid.
     Span(std::nullptr_t null, size_t size) = delete;
 
-    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    // Creates a Span view of a plain array.
+    //
+    // Note that this constructor template explicitly excludes `const char[]`, see below.
+    template <
+        class U, size_t N,
+        std::enable_if_t<!std::is_same_v<U, const char> && sizeof(U) == sizeof(T) && std::is_convertible_v<U *, T *>, bool> = true>
     constexpr explicit Span(U (&databuf)[N]) : mDataBuf(databuf), mDataLen(N)
     {}
 
+    // Explicitly disallow the creation of a CharSpan from a `const char[]` to prevent the
+    // creation of spans from string literals that incorrectly include the trailing '\0' byte.
+    // If CharSpan("Hi!") were allowed, it would be a span of length 4, not 3 as intended.
+    //
+    // To create a CharSpan literal, use the `_span` operator instead, e.g. "Hi!"_span.
+    template <
+        class U, size_t N,
+        std::enable_if_t<std::is_same_v<U, const char> && 1 == sizeof(T) && std::is_convertible_v<const char *, T *>, bool> = true>
+    constexpr explicit Span(U (&databuf)[N]) = delete;
+
+    // Creates a (potentially mutable) Span view of an std::array
     template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr Span(std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
+    {}
+
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    constexpr Span(std::array<U, N> && arr) = delete; // would be a view of an rvalue
+
+    // Creates a Span view of an std::array
+    template <class U, size_t N, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<const U *, T *>::value>>
+    constexpr Span(const std::array<U, N> & arr) : mDataBuf(arr.data()), mDataLen(N)
     {}
 
     template <size_t N>
@@ -106,13 +130,10 @@ public:
     reference front() const { return (*this)[0]; }
     reference back() const { return (*this)[size() - 1]; }
 
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const Span<U> & other) const
+    bool data_equal(const Span<const T> & other) const
     {
         return (size() == other.size()) && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0));
     }
-    template <class U, size_t N, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    inline bool data_equal(const FixedSpan<U, N> & other) const;
 
     Span SubSpan(size_t offset, size_t length) const
     {
@@ -265,8 +286,17 @@ public:
         static_assert(M >= N, "Passed-in buffer too small for FixedSpan");
     }
 
+    // Creates a (potentially mutable) FixedSpan view of an std::array
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr FixedSpan(std::array<U, N> & arr) : mDataBuf(arr.data())
+    {}
+
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
+    constexpr FixedSpan(std::array<U, N> && arr) = delete; // would be a view of an rvalue
+
+    // Creates a FixedSpan view of an std::array
+    template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<const U *, T *>::value>>
+    constexpr FixedSpan(const std::array<U, N> & arr) : mDataBuf(arr.data())
     {}
 
     // Allow implicit construction from a FixedSpan of sufficient size over a
@@ -296,15 +326,7 @@ public:
     reference front() const { return (*this)[0]; }
     reference back() const { return (*this)[size() - 1]; }
 
-    // Allow data_equal for spans that are over the same type up to const-ness.
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const FixedSpan<U, N> & other) const
-    {
-        return (memcmp(data(), other.data(), N * sizeof(T)) == 0);
-    }
-
-    template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
-    bool data_equal(const Span<U> & other) const
+    bool data_equal(const Span<const T> & other) const
     {
         return (N == other.size() && memcmp(data(), other.data(), N * sizeof(T)) == 0);
     }
@@ -325,13 +347,6 @@ template <class T>
 template <class U, size_t N, typename>
 constexpr Span<T>::Span(const FixedSpan<U, N> & other) : mDataBuf(other.data()), mDataLen(other.size())
 {}
-
-template <class T>
-template <class U, size_t N, typename>
-inline bool Span<T>::data_equal(const FixedSpan<U, N> & other) const
-{
-    return other.data_equal(*this);
-}
 
 template <typename T>
 [[deprecated("Use !empty()")]] inline bool IsSpanUsable(const Span<T> & span)

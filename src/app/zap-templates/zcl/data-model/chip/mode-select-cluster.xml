@@ -44,7 +44,7 @@ limitations under the License.
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="MODE_DESCRIPTION"   type="char_string"                        length="64"  writable="false" optional="false" isNullable="false">Description</attribute>
     <attribute side="server" code="0x0001" define="STANDARD_NAMESPACE" type="enum16"                                          writable="false" optional="false" isNullable="true">StandardNamespace</attribute>
-    <attribute side="server" code="0x0002" define="SUPPORTED_MODES"    type="ARRAY" entryType="ModeOptionStruct" length="255" writable="false" optional="false" isNullable="false">SupportedModes</attribute>
+    <attribute side="server" code="0x0002" define="SUPPORTED_MODES"    type="array" entryType="ModeOptionStruct" length="255" writable="false" optional="false" isNullable="false">SupportedModes</attribute>
     <attribute side="server" code="0x0003" define="CURRENT_MODE"       type="int8u"                                           writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
     <attribute side="server" code="0x0004" define="START_UP_MODE"      type="int8u"                                           writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
     <attribute side="server" code="0x0005" define="ON_MODE"            type="int8u"                                           writable="true"  optional="true"  isNullable="true">OnMode</attribute>

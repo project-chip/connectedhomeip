@@ -175,7 +175,7 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <struct name="NetworkInterface">
-      <field id="0" name="Name" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="0" name="Name" type="ref_DataTypeString">
         <access read="true"/>
         <mandatoryConform/>
         <constraint type="max" value="32"/>
@@ -198,12 +198,12 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="5" name="IPv4Addresses" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_Ipv4Adr&gt;&gt;]">
+      <field id="5" name="IPv4Addresses" type="ref_DataTypeList[ref_Ipv4Adr]">
         <access read="true"/>
         <mandatoryConform/>
         <constraint type="max" value="4"/>
       </field>
-      <field id="6" name="IPv6Addresses" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_Ipv6Adr&gt;&gt;]">
+      <field id="6" name="IPv6Addresses" type="ref_DataTypeList[ref_Ipv6Adr]">
         <access read="true"/>
         <mandatoryConform/>
         <constraint type="max" value="8"/>
@@ -215,7 +215,7 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="NetworkInterfaces" type="&lt;&lt;ref_DataTypeList&gt;&gt;[NetworkInterface Type]">
+    <attribute id="0x0000" name="NetworkInterfaces" type="ref_DataTypeList[NetworkInterface Type]">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
       <constraint type="max" value="8"/>
@@ -239,17 +239,17 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0005" name="ActiveHardwareFaults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[HardwareFaultEnum Type]">
+    <attribute id="0x0005" name="ActiveHardwareFaults" type="ref_DataTypeList[HardwareFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="max" value="11"/>
     </attribute>
-    <attribute id="0x0006" name="ActiveRadioFaults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[RadioFaultEnum Type]">
+    <attribute id="0x0006" name="ActiveRadioFaults" type="ref_DataTypeList[RadioFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="max" value="7"/>
     </attribute>
-    <attribute id="0x0007" name="ActiveNetworkFaults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[NetworkFaultEnum Type]">
+    <attribute id="0x0007" name="ActiveNetworkFaults" type="ref_DataTypeList[NetworkFaultEnum Type]">
       <access read="true" readPrivilege="view"/>
       <optionalConform/>
       <constraint type="max" value="4"/>
@@ -258,12 +258,15 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
+    <attribute id="0x0009" name="DoNotUse">
+      <disallowConform/>
+    </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="TestEventTrigger" response="Y">
       <access invokePrivilege="manage"/>
       <mandatoryConform/>
-      <field id="0" name="EnableKey" type="octets">
+      <field id="0" name="EnableKey" type="octstr">
         <mandatoryConform/>
         <constraint type="maxLength" value="16"/>
       </field>
@@ -278,10 +281,10 @@ Davis, CA 95616, USA
     <command id="0x02" name="TimeSnapshotResponse" direction="responseFromServer">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
-      <field id="0" name="SystemTimeUs" type="&lt;&lt;ref_DataTypeSystemTimeUs&gt;&gt;" default="MS">
+      <field id="0" name="SystemTimeMs" type="ref_DataTypeSystemTimeMs" default="MS">
         <mandatoryConform/>
       </field>
-      <field id="1" name="UTCTimeUs" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;" default="null">
+      <field id="1" name="PosixTimeMs" type="ref_DataTypePosixMs" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
       </field>
@@ -291,11 +294,11 @@ Davis, CA 95616, USA
     <event id="0x00" name="HardwareFaultChange" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="&lt;&lt;ref_DataTypeList&gt;&gt;[HardwareFaultEnum Type]">
+      <field id="0" name="Current" type="ref_DataTypeList[HardwareFaultEnum Type]">
         <mandatoryConform/>
         <constraint type="max" value="11"/>
       </field>
-      <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[HardwareFaultEnum Type]">
+      <field id="1" name="Previous" type="ref_DataTypeList[HardwareFaultEnum Type]">
         <mandatoryConform/>
         <constraint type="max" value="11"/>
       </field>
@@ -303,11 +306,11 @@ Davis, CA 95616, USA
     <event id="0x01" name="RadioFaultChange" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="&lt;&lt;ref_DataTypeList&gt;&gt;[RadioFaultEnum Type]">
+      <field id="0" name="Current" type="ref_DataTypeList[RadioFaultEnum Type]">
         <mandatoryConform/>
         <constraint type="max" value="7"/>
       </field>
-      <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[RadioFaultEnum Type]">
+      <field id="1" name="Previous" type="ref_DataTypeList[RadioFaultEnum Type]">
         <mandatoryConform/>
         <constraint type="max" value="7"/>
       </field>
@@ -315,11 +318,11 @@ Davis, CA 95616, USA
     <event id="0x02" name="NetworkFaultChange" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-      <field id="0" name="Current" type="&lt;&lt;ref_DataTypeList&gt;&gt;[NetworkFaultEnum Type]">
+      <field id="0" name="Current" type="ref_DataTypeList[NetworkFaultEnum Type]">
         <mandatoryConform/>
         <constraint type="max" value="4"/>
       </field>
-      <field id="1" name="Previous" type="&lt;&lt;ref_DataTypeList&gt;&gt;[NetworkFaultEnum Type]">
+      <field id="1" name="Previous" type="ref_DataTypeList[NetworkFaultEnum Type]">
         <mandatoryConform/>
         <constraint type="max" value="4"/>
       </field>

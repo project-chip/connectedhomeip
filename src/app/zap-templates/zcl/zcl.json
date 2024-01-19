@@ -24,6 +24,7 @@
         "basic-information-cluster.xml",
         "binding-cluster.xml",
         "boolean-state-cluster.xml",
+        "boolean-state-configuration-cluster.xml",
         "actions-cluster.xml",
         "bridged-device-basic-information.xml",
         "chip-ota.xml",
@@ -32,13 +33,22 @@
         "color-control-cluster.xml",
         "concentration-measurement-cluster.xml",
         "content-launch-cluster.xml",
+        "content-app-observer-cluster.xml",
+        "content-control-cluster.xml",
         "descriptor-cluster.xml",
+        "device-energy-management-cluster.xml",
+        "device-energy-management-mode-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
         "microwave-oven-mode-cluster.xml",
         "door-lock-cluster.xml",
+        "electrical-energy-measurement-cluster.xml",
+        "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
+        "energy-evse-cluster.xml",
+        "energy-evse-mode-cluster.xml",
+        "energy-preference-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
         "fault-injection-cluster.xml",
@@ -55,6 +65,7 @@
         "input-output-value-clusters.xml",
         "keypad-input-cluster.xml",
         "laundry-washer-mode-cluster.xml",
+        "laundry-dryer-controls-cluster.xml",
         "level-control-cluster.xml",
         "localization-configuration-cluster.xml",
         "low-power-cluster.xml",
@@ -68,7 +79,9 @@
         "onoff-switch-configuration-cluster.xml",
         "operational-credentials-cluster.xml",
         "operational-state-cluster.xml",
+        "operational-state-oven-cluster.xml",
         "operational-state-rvc-cluster.xml",
+        "oven-mode-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
         "power-source-configuration-cluster.xml",
@@ -98,15 +111,16 @@
         "thread-network-diagnostics-cluster.xml",
         "time-format-localization-cluster.xml",
         "time-synchronization-cluster.xml",
+        "timer-cluster.xml",
         "user-label-cluster.xml",
         "unit-localization-cluster.xml",
+        "valve-configuration-and-control-cluster.xml",
         "wake-on-lan-cluster.xml",
         "washer-controls-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
-        "types/color-control.xml",
         "types/door-lock.xml",
         "types/occupancy-sensing.xml",
         "types/thermostat-user-interface-configuration.xml"
@@ -158,10 +172,55 @@
             "SerialNumber",
             "UniqueID",
             "CapabilityMinima",
-            "ProductAppearance"
+            "ProductAppearance",
+            "SpecificationVersion",
+            "MaxPathsPerInvoke"
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Descriptor": ["ClusterRevision"],
+        "Device Energy Management": [
+            "ESAType",
+            "ESACanGenerate",
+            "ESAState",
+            "AbsMinPower",
+            "AbsMaxPower",
+            "PowerAdjustmentCapability",
+            "Forecast",
+            "OptOutState",
+            "FeatureMap"
+        ],
+        "Device Energy Management Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
+        "Energy EVSE": [
+            "State",
+            "SupplyState",
+            "FaultState",
+            "ChargingEnabledUntil",
+            "DischargingEnabledUntil",
+            "CircuitCapacity",
+            "MinimumChargeCurrent",
+            "MaximumChargeCurrent",
+            "MaximumDischargeCurrent",
+            "UserMaximumChargeCurrent",
+            "RandomizationDelayWindow",
+            "NextChargeStartTime",
+            "NextChargeTargetTime",
+            "NextChargeRequiredEnergy",
+            "NextChargeTargetSoC",
+            "ApproximateEVEfficiency",
+            "StateOfCharge",
+            "BatteryCapacity",
+            "VehicleID",
+            "SessionID",
+            "SessionDuration",
+            "SessionEnergyCharged",
+            "SessionEnergyDischarged",
+            "FeatureMap"
+        ],
+        "Energy EVSE Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -201,9 +260,7 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric",
-            "UserActiveModeTriggerHint",
-            "UserActiveModeTriggerInstruction"
+            "ClientsSupportedPerFabric"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
@@ -217,7 +274,6 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Scenes": ["SceneCount", "RemainingCapacity"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",
@@ -302,7 +358,11 @@
             "OverrunCount"
         ],
         "Channel": ["Lineup", "CurrentChannel"],
-        "Media Playback": ["SampledPosition"],
+        "Media Playback": [
+            "SampledPosition",
+            "ActiveAudioTrack",
+            "ActiveTextTrack"
+        ],
         "Application Launcher": ["CurrentApp"],
         "Application Basic": ["Application"],
         "Time Synchronization": [
@@ -325,6 +385,18 @@
             "FeatureMap"
         ],
         "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Microwave Oven Control": [
+            "CookTime",
+            "MaxCookTime",
+            "PowerSetting",
+            "MinPower",
+            "MaxPower",
+            "PowerStep",
+            "SupportedWatts",
+            "SelectedWattIndex",
+            "WattRating",
+            "FeatureMap"
+        ],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",
@@ -358,6 +430,12 @@
             "CountdownTime"
         ],
         "RVC Operational State": [
+            "OperationalState",
+            "OperationalError",
+            "CurrentPhase",
+            "CountdownTime"
+        ],
+        "Oven Cavity Operational State": [
             "OperationalState",
             "OperationalError",
             "CurrentPhase",
@@ -521,7 +599,17 @@
             "LevelValue",
             "FeatureMap"
         ],
-        "Air Quality": ["AirQuality", "FeatureMap"]
+        "Air Quality": ["AirQuality", "FeatureMap"],
+        "Thermostat": ["QueuedPreset"],
+        "Electrical Energy Measurement": [
+            "Accuracy",
+            "CumulativeEnergyImported",
+            "CumulativeEnergyExported",
+            "PeriodicEnergyImported",
+            "PeriodicEnergyExported"
+        ],
+        "Valve Configuration and Control": ["RemainingDuration"],
+        "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },
     "defaultReportingPolicy": "mandatory",
     "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],

@@ -177,7 +177,6 @@ Note:
   <mapping code="0x1097" translation="SyChip/Murata"/>
   <mapping code="0x1098" translation="OpenPeak"/>
   <mapping code="0x1099" translation="PassiveSystems"/>
-  <mapping code="0x109B" translation="Pioneer Corp"/>
   <mapping code="0x109A" translation="MMB Research"/>
   <mapping code="0x109B" translation="Leviton Manufacturing Company"/>
   <mapping code="0x109C" translation="Korea Electric Power Data Network Co., Ltd."/>

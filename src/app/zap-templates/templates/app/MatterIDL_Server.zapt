@@ -2,11 +2,7 @@
 // It is for view/code review purposes only.
 
 {{#all_user_clusters~}}
-{{#if (is_client side)~}}
-{{>idl_cluster_definition generateClientCluster=1}}
-{{else~}}
-{{>idl_cluster_definition generateClientCluster=0}}
-{{/if}}
+{{>idl_cluster_definition}}
 {{/all_user_clusters}}
 {{#user_endpoints}}
 endpoint {{endpointId}} {

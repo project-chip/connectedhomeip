@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 

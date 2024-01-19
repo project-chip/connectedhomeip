@@ -1,0 +1,94 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 260.1.1. [TC-OTCCM-1.1] Global attributes with DUT as Server
+
+PICS:
+    - OTCCM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
+      verification: |
+
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
+      verification: |
+          ./chip-tool ovenmode read cluster-revision 1 1
+
+          [1705647221.295875][50041:50047] CHIP:DMG: }
+          [1705647221.296007][50041:50047] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFFD DataVersion: 3240184500
+          [1705647221.296039][50041:50047] CHIP:TOO:   ClusterRevision: 1
+      disabled: true
+
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+      verification: |
+          ./chip-tool ovenmode read feature-map 1 1
+
+          [1705647273.001229][53151:53158] CHIP:DMG: }
+          [1705647273.001266][53151:53158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFFC DataVersion: 3240184500
+          [1705647273.001279][53151:53158] CHIP:TOO:   FeatureMap: 1
+      disabled: true
+
+    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
+      verification: |
+          ./chip-tool ovenmode read attribute-list 1 1
+
+          [1705647386.476019][60066:60072] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFFB DataVersion: 3240184500
+          [1705647386.476098][60066:60072] CHIP:TOO:   AttributeList: 7 entries
+          [1705647386.476117][60066:60072] CHIP:TOO:     [1]: 0
+          [1705647386.476130][60066:60072] CHIP:TOO:     [2]: 1
+          [1705647386.476139][60066:60072] CHIP:TOO:     [3]: 65528
+          [1705647386.476151][60066:60072] CHIP:TOO:     [4]: 65529
+          [1705647386.476162][60066:60072] CHIP:TOO:     [5]: 65531
+          [1705647386.476171][60066:60072] CHIP:TOO:     [6]: 65532
+          [1705647386.476183][60066:60072] CHIP:TOO:     [7]: 65533
+      disabled: true
+
+    - label: "Step 5*: TH reads from the DUT the EventList attribute."
+      verification: |
+          ./chip-tool ovenmode read event-list 1 1
+
+
+          [1705647422.713386][62252:62257] CHIP:DMG: 				StatusIB =
+          [1705647422.713399][62252:62257] CHIP:DMG: 				{
+          [1705647422.713411][62252:62257] CHIP:DMG: 					status = 0x86 (UNSUPPORTED_ATTRIBUTE),
+          [1705647422.713420][62252:62257] CHIP:DMG: 				},
+      disabled: true
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
+      verification: |
+          ./chip-tool ovenmode read accepted-command-list 1 1
+
+          [1705647458.520722][64406:64412] CHIP:DMG: }
+          [1705647458.520764][64406:64412] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFF9 DataVersion: 3240184500
+          [1705647458.520776][64406:64412] CHIP:TOO:   AcceptedCommandList: 0 entries
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
+      verification: |
+          ./chip-tool ovenmode read generated-command-list 1 1
+
+          [1705647658.986480][76560:76567] CHIP:DMG: }
+          [1705647658.986529][76560:76567] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFF8 DataVersion: 3240184500
+          [1705647658.986540][76560:76567] CHIP:TOO:   GeneratedCommandList: 0 entries
+      disabled: true

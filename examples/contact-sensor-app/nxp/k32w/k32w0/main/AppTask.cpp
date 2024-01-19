@@ -45,6 +45,8 @@
 #include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
+#include "BLEManagerImpl.h"
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
@@ -83,7 +85,10 @@ using namespace chip::app;
 
 AppTask AppTask::sAppTask;
 #if CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
-static AppTask::FactoryDataProvider sFactoryDataProvider;
+static chip::DeviceLayer::FactoryDataProviderImpl sFactoryDataProvider;
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+static chip::DeviceLayer::CustomFactoryDataProvider sCustomFactoryDataProvider;
+#endif
 #endif
 
 static Identify gIdentify = { chip::EndpointId{ 1 }, AppTask::OnIdentifyStart, AppTask::OnIdentifyStop,
@@ -121,6 +126,18 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     return err;
+}
+
+static void app_gap_callback(gapGenericEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
+}
+
+static void app_gatt_callback(deviceId_t id, gattServerEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -185,6 +202,9 @@ CHIP_ERROR AppTask::Init()
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
     SetCommissionableDataProvider(&sFactoryDataProvider);
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    sCustomFactoryDataProvider.ParseFunctionExample();
+#endif
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
@@ -239,6 +259,17 @@ CHIP_ERROR AppTask::Init()
     err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    /* SSBL will always be seen as booting from address 0, thanks to the remapping mechanism.
+     * This means the SSBL version will always offset from address 0. */
+    extern uint32_t __MATTER_SSBL_VERSION_START[];
+    K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t *) __MATTER_SSBL_VERSION_START),
+             (uint32_t) __MATTER_SSBL_VERSION_START);
+#endif
+
+    auto & bleManager = chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager.RegisterAppCallbacks(app_gap_callback, app_gatt_callback);
 
     return err;
 }
