@@ -88,8 +88,7 @@ CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
     // failure, the caller bears the responsibility of closing the exchange.
     ReturnErrorOnFailure(SendCommandResponse());
 
-    bool moreToSend = !mChunks.IsNull();
-    if (moreToSend)
+    if (HasMoreToSend())
     {
         MoveToState(State::AwaitingStatusResponse);
         mExchangeCtx->SetDelegate(this);
@@ -103,12 +102,18 @@ CHIP_ERROR CommandResponseSender::StartSendingCommandResponses()
 
 CHIP_ERROR CommandResponseSender::SendCommandResponse()
 {
-    VerifyOrReturnError(!mChunks.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(HasMoreToSend(), CHIP_ERROR_INCORRECT_STATE);
+    if (mChunks.IsNull())
+    {
+        VerifyOrReturnError(mReportResponseDropped, CHIP_ERROR_INCORRECT_STATE);
+        SendStatusResponse(Status::ResourceExhausted);
+        mReportResponseDropped = false;
+        return CHIP_NO_ERROR;
+    }
     System::PacketBufferHandle commandResponsePayload = mChunks.PopHead();
 
-    bool moreToSend               = !mChunks.IsNull();
     Messaging::SendFlags sendFlag = Messaging::SendMessageFlags::kNone;
-    if (moreToSend)
+    if (HasMoreToSend())
     {
         sendFlag = Messaging::SendMessageFlags::kExpectResponse;
         mExchangeCtx->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
