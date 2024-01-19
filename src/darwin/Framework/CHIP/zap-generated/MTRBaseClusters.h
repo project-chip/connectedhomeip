@@ -17022,8 +17022,8 @@ typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {
     MTRTemperatureControlFeatureTemperatureStep MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRRefrigeratorAlarmAlarmMap) {
-    MTRRefrigeratorAlarmAlarmMapDoorOpen MTR_PROVISIONALLY_AVAILABLE = 0x1,
+typedef NS_OPTIONS(uint32_t, MTRRefrigeratorAlarmAlarmBitmap) {
+    MTRRefrigeratorAlarmAlarmBitmapDoorOpen MTR_PROVISIONALLY_AVAILABLE = 0x1,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint16_t, MTRDishwasherModeModeTag) {
@@ -17099,13 +17099,13 @@ typedef NS_OPTIONS(uint32_t, MTRSmokeCOAlarmFeature) {
     MTRSmokeCOAlarmFeatureCOAlarm MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmAlarmMap) {
-    MTRDishwasherAlarmAlarmMapInflowError MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRDishwasherAlarmAlarmMapDrainError MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRDishwasherAlarmAlarmMapDoorError MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRDishwasherAlarmAlarmMapTempTooLow MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRDishwasherAlarmAlarmMapTempTooHigh MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRDishwasherAlarmAlarmMapWaterLevelError MTR_PROVISIONALLY_AVAILABLE = 0x20,
+typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmAlarmBitmap) {
+    MTRDishwasherAlarmAlarmBitmapInflowError MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRDishwasherAlarmAlarmBitmapDrainError MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRDishwasherAlarmAlarmBitmapDoorError MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRDishwasherAlarmAlarmBitmapTempTooLow MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRDishwasherAlarmAlarmBitmapTempTooHigh MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRDishwasherAlarmAlarmBitmapWaterLevelError MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRDishwasherAlarmFeature) {
