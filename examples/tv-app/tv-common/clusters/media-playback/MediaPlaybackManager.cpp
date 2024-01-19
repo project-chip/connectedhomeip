@@ -311,8 +311,8 @@ bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackI
         if (strcmp(nextidString.c_str(), idString.c_str()) == 0)
         {
             ChipLogError(Controller, "HandleActivateTextTrack - match");
-            mActiveTextTrack  = availableTextTrack;
-            foundMatch        = true;
+            mActiveTextTrack = availableTextTrack;
+            foundMatch       = true;
             break;
         }
     }
