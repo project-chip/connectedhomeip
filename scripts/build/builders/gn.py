@@ -68,7 +68,7 @@ class GnBuilder(Builder):
         if self.options.pregen_dir:
             extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
-        extra_args.extend(self.GnBuildArgs())
+        extra_args.extend(self.GnBuildArgs() || [])
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 
