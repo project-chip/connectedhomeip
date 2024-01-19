@@ -30,7 +30,6 @@ namespace ElectricalPowerMeasurement {
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement::Structs;
 
-
 using chip::Protocols::InteractionModel::Status;
 
 class Delegate
@@ -40,25 +39,25 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    virtual PowerModeEnum GetPowerMode()                                                          = 0;
-    virtual uint8_t GetNumberOfMeasurementTypes()                                                 = 0;
-	virtual DataModel::List<const Structs::MeasurementAccuracyStruct::Type> GetAccuracy()         = 0;
-	virtual DataModel::List<const Structs::MeasurementRangeStruct::Type> GetRanges()              = 0;
-	virtual DataModel::Nullable<int64_t> GetVoltage()                                             = 0;
-	virtual DataModel::Nullable<int64_t> GetActiveCurrent()                                       = 0;
-	virtual DataModel::Nullable<int64_t> GetReactiveCurrent()                                     = 0;
-	virtual DataModel::Nullable<int64_t> GetApparentCurrent()                                     = 0;
-	virtual DataModel::Nullable<int64_t> GetActivePower()                                         = 0;
-	virtual DataModel::Nullable<int64_t> GetReactivePower()                                       = 0;
-	virtual DataModel::Nullable<int64_t> GetApparentPower()                                       = 0;
-	virtual DataModel::Nullable<int64_t> GetRMSVoltage()                                          = 0;
-	virtual DataModel::Nullable<int64_t> GetRMSCurrent()                                          = 0;
-	virtual DataModel::Nullable<int64_t> GetRMSPower()                                            = 0;
-	virtual DataModel::Nullable<int64_t> GetFrequency()                                           = 0;
-	virtual DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicCurrents() = 0;
-	virtual DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicPhases()   = 0;
-	virtual DataModel::Nullable<int64_t> GetPowerFactor()                                         = 0;
-	virtual DataModel::Nullable<int64_t> GetNeutralCurrent()                                      = 0;
+    virtual PowerModeEnum GetPowerMode()                                                                         = 0;
+    virtual uint8_t GetNumberOfMeasurementTypes()                                                                = 0;
+    virtual DataModel::List<const Structs::MeasurementAccuracyStruct::Type> GetAccuracy()                        = 0;
+    virtual DataModel::List<const Structs::MeasurementRangeStruct::Type> GetRanges()                             = 0;
+    virtual DataModel::Nullable<int64_t> GetVoltage()                                                            = 0;
+    virtual DataModel::Nullable<int64_t> GetActiveCurrent()                                                      = 0;
+    virtual DataModel::Nullable<int64_t> GetReactiveCurrent()                                                    = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentCurrent()                                                    = 0;
+    virtual DataModel::Nullable<int64_t> GetActivePower()                                                        = 0;
+    virtual DataModel::Nullable<int64_t> GetReactivePower()                                                      = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentPower()                                                      = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSVoltage()                                                         = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSCurrent()                                                         = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSPower()                                                           = 0;
+    virtual DataModel::Nullable<int64_t> GetFrequency()                                                          = 0;
+    virtual DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicCurrents() = 0;
+    virtual DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicPhases()   = 0;
+    virtual DataModel::Nullable<int64_t> GetPowerFactor()                                                        = 0;
+    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()                                                     = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -85,24 +84,25 @@ class Instance : public AttributeAccessInterface
 {
 public:
     Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttributes) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature), mOptionalAttrs(aOptionalAttributes)
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
+        mOptionalAttrs(aOptionalAttributes)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
     }
     ~Instance() { Shutdown(); }
 
-	CHIP_ERROR Init();
+    CHIP_ERROR Init();
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
     bool SupportsOptAttr(OptionalAttributes aOptionalAttrs) const;
 
 private:
-	Delegate & mDelegate;
+    Delegate & mDelegate;
     BitMask<Feature> mFeature;
     BitMask<OptionalAttributes> mOptionalAttrs;
- 	
+
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
