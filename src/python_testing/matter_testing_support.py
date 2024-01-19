@@ -361,6 +361,12 @@ def cluster_id_str(id):
 
 
 @dataclass
+class CustomCommissioningParameters:
+    commissioningParameters: CommissioningParameters
+    randomDiscriminator: int
+
+
+@dataclass
 class AttributePathLocation:
     endpoint_id: int
     cluster_id: Optional[int] = None
@@ -549,6 +555,12 @@ def hex_from_bytes(b: bytes) -> str:
 
 
 @dataclass
+class CommissioningCustomParameters:
+    commissioning_parameters: CommissioningParameters
+    discriminator: str
+
+
+@dataclass
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
@@ -709,14 +721,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics_key = pics_key.strip().upper()
         return pics_key in picsd and picsd[pics_key]
 
-    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CommissioningParameters:
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
         rnd_discriminator = random.randint(0, 4095)
         try:
             commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
                                                                     discriminator=rnd_discriminator, option=1)
-            discriminator_dict = {"random_discriminator": rnd_discriminator}
-            params = (commissioning_params, discriminator_dict)
-
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
 
         except InteractionModelError as e:

@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,36 +26,35 @@ from mobly import asserts
 
 class TC_ACE_1_5(MatterBaseTest):
 
-    async def read_currentfabricindex_expected_success(self, th) -> int:
+    async def read_currentfabricindex_expected_success(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
-    async def write_acl(self, acl, th):
-        # This returns an attribute status
+    async def write_acl(self, acl: Clusters.AccessControl, th: ChipDeviceCtrl):
         result = await th.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
-    async def read_descriptor_expect_success(self, th):
+    async def read_descriptor_expect_success(self, th: ChipDeviceCtrl):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_check_success(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
-    async def read_basic_expect_success(self, th):
+    async def read_basic_expect_success(self, th: ChipDeviceCtrl):
         cluster = Clusters.Objects.BasicInformation
         attribute = Clusters.BasicInformation.Attributes.VendorID
         await self.read_single_attribute_check_success(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
 
-    async def read_basic_expect_unsupported_access(self, th):
+    async def read_basic_expect_unsupported_access(self, th: ChipDeviceCtrl):
         cluster = Clusters.Objects.BasicInformation
         attribute = Clusters.BasicInformation.Attributes.VendorID
         await self.read_single_attribute_expect_error(
             dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
-    async def read_descriptor_expect_unsupported_access(self, th):
+    async def read_descriptor_expect_unsupported_access(self, th: ChipDeviceCtrl):
         cluster = Clusters.Objects.Descriptor
         attribute = Clusters.Descriptor.Attributes.DeviceTypeList
         await self.read_single_attribute_expect_error(
@@ -66,7 +65,7 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(1, "Comissioning, already done")
         self.th1 = self.default_controller
 
-        # TODO: Creates a controller on a new fabric and commissions all in one go.
+        # TODO: move into base class and adjust tests (#31521)
         new_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
         new_fabric_admin = new_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.matter_test_config.fabric_id + 1)
 
@@ -80,8 +79,8 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(2, "TH1 opens the commissioning window on the DUT")
 
         errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=params[0].setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params[1]["random_discriminator"])
+            nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
 
