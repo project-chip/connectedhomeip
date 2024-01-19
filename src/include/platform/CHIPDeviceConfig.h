@@ -667,7 +667,8 @@
 #define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 1936
 #endif
 
-static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX, "Max Extended Advertising Interval cannot be smaller or equal to the Min Extended Advertising Interval");
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
+              "Max Extended Advertising Interval cannot be smaller or equal to the Min Extended Advertising Interval");
 
 #endif
 
