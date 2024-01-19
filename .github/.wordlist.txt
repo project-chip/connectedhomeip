@@ -17,6 +17,7 @@ ables
 AccessControl
 AccessControlEntry
 accessor
+Accessors
 AccountLogin
 acdbc
 ack
@@ -31,7 +32,9 @@ AddNOC
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddResponse
 AddThreadNetwork
+AddStatus
 adk
 AdministratorCommissioning
 adoc
@@ -97,6 +100,7 @@ att
 attId
 attr
 attrib
+AttributeAccessInterface
 attributeValue
 attrListName
 attrMask
@@ -130,6 +134,7 @@ BarrierControl
 BasicCHIPRegression
 BasicInformation
 baudrate
+BCM
 BD
 BDX
 BDXDownloader
@@ -248,12 +253,14 @@ CKIT
 CLA
 clapre
 CLI
+CLIs
 cloudbuild
 CLRF
 clusterAttrs
 clusterId
 clusterList
 clusterListName
+ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
@@ -264,6 +271,7 @@ CMS
 CMSIS
 CMVH
 cn
+COAP
 codeaurora
 codebase
 codegen
@@ -273,6 +281,8 @@ codelabs
 ColorControl
 Comcast
 Commandline
+CommandHandlerInterface
+CommandName
 Commissionable
 CommissionableDataProvider
 commissionables
@@ -286,6 +296,7 @@ configs
 configTOTAL
 ConfigurationManager
 ConfigurationManagerImpl
+conformant
 connectedhomeip
 ConnectionData
 ConnectIP
@@ -298,8 +309,8 @@ connstring
 conntype
 const
 ContentApp
-ContentAppPlatform
 ContentApp's
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -487,8 +498,11 @@ eg
 EjQ
 elftools
 elock
+emberAf
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EmberAfInitializeAttributes
+emberAfSetDynamicEndpoint
 EnableNetwork
 EnableWiFiNetwork
 endian
@@ -516,8 +530,11 @@ EthyleneOxideConcentrationMeasurement
 EvalCode
 EvalCodeWithName
 EvalFrameDefault
+EV
 EVB
+EventLogging
 evk
+EVSE
 exceptfds
 ExchangeContext
 exe
@@ -589,6 +606,7 @@ GetDeviceInfo
 GetDns
 GetIP
 getManualTests
+GetSafeAttributePersistenceProvider
 getstarted
 getTests
 GH
@@ -624,6 +642,7 @@ Gv
 gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
+HandleCommand
 hardcoded
 hardknott
 hardwarever
@@ -655,13 +674,13 @@ iaszone
 ibb
 ICA
 ICD
+ICDs
 iCloud
 ICMP
 IDF
 IDL
 IDLs
 idt
-IDT
 idx
 ifconfig
 ifdef
@@ -695,6 +714,7 @@ installDebug
 instantiation
 integrations
 IntelliSense
+InteractionModelEngine
 InteractionModelVersion
 Interoperable
 introvideos
@@ -793,13 +813,13 @@ LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
 lladdr
-LLADDR
 LocalConfigDisabled
 localedef
 localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+LogEvent
 loopback
 LowPower
 LPC
@@ -828,6 +848,7 @@ matterc
 MatterCustomTrace
 matterd
 MatterLock
+MatterReportingAttributeChangeCallback
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
@@ -914,6 +935,7 @@ namespacing
 nano
 natively
 navpad
+NCP
 ncs
 nding
 NDK
@@ -1021,6 +1043,7 @@ PairDevice
 PAIs
 PAKE
 palletsprojects
+PANID
 pankore
 param
 params
@@ -1059,6 +1082,7 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+PluginServerCallback
 png
 Podman
 PollControl
@@ -1146,6 +1170,8 @@ recommand
 recommanded
 recurse
 regen
+registerAttributeAccessOverride
+RegisterCommandHandler
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1155,10 +1181,11 @@ RendezvousParameters
 RendezVousTest
 REPL
 repo
+repos
 req
 Requestor
-RequestorCanConsent
 Requestor's
+RequestorCanConsent
 Requestors
 responder
 RestrictedEvent
@@ -1213,8 +1240,8 @@ SDB
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1227,6 +1254,7 @@ SendNewInputEvent
 sendto
 seqdiag
 SERIALDEVICE
+serialno
 SerialNumber
 ServiceId
 SetDns
@@ -1336,12 +1364,14 @@ systime
 sysv
 TargetNavigator
 TBD
+tbody
 tcl
 TCP
 teardown
 Telink
 TemperatureMeasurement
 templating
+Tera
 testability
 TestArray
 TestCluster
@@ -1470,6 +1500,7 @@ utils
 UUID
 ux
 validator
+vcom
 VCP
 Vectorcall
 VendorID
@@ -1497,6 +1528,7 @@ WantedBy
 watchdogTimeout
 watchOS
 webpage
+wf
 wg
 wget
 whde

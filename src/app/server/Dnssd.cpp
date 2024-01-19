@@ -38,7 +38,6 @@
 #include <setup_payload/SetupPayload.h>
 #include <system/TimeSource.h>
 
-#include <app/server/Server.h>
 #include <system/DurationTimer.h>
 
 namespace chip {
@@ -150,11 +149,13 @@ CHIP_ERROR DnssdServer::SetEphemeralDiscriminator(Optional<uint16_t> discriminat
 template <class AdvertisingParams>
 void DnssdServer::AddICDKeyToAdvertisement(AdvertisingParams & advParams)
 {
+    VerifyOrDieWithMsg(mICDManager != nullptr, Discovery,
+                       "Invalid pointer to the ICDManager which is required for the LIT operating mode");
+
     // Only advertise the ICD key if the device can operate as a LIT
-    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
+    if (mICDManager->SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
-        advParams.SetICDOperatingAsLIT(
-            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+        advParams.SetICDOperatingAsLIT(Optional<bool>(mICDManager->GetICDMode() == ICDConfigurationData::ICDMode::LIT));
     }
 }
 #endif
@@ -330,13 +331,20 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
             }
         }
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+    else
+    {
+        advertiseParameters.SetCommissionerPasscodeSupported(Optional<bool>(true));
+    }
+#endif
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u",
+    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u",
                     advertiseParameters.GetVendorId().ValueOr(0), advertiseParameters.GetProductId().ValueOr(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
-                    to_underlying(advertiseParameters.GetCommissioningMode()));
+                    to_underlying(advertiseParameters.GetCommissioningMode()),
+                    advertiseParameters.GetCommissionerPasscodeSupported().ValueOr(false) ? 1 : 0);
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 

@@ -220,11 +220,11 @@ public:
      * This function finds the device corresponding to deviceId, and establishes
      * a CASE session with it.
      *
-     * Once the CASE session is successfully established the `onConnectedDevice`
+     * Once the CASE session is successfully established the `onConnection`
      * callback is called. This can happen before GetConnectedDevice returns if
      * there is an existing CASE session.
      *
-     * If a CASE sessions fails to be established, the `onError` callback will
+     * If a CASE sessions fails to be established, the `onFailure` callback will
      * be called.  This can also happen before GetConnectedDevice returns.
      *
      * An error return from this function means that neither callback has been
@@ -235,6 +235,30 @@ public:
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure);
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * This function finds the device corresponding to deviceId, and establishes
+     * a CASE session with it.
+     *
+     * Once the CASE session is successfully established the `onConnection`
+     * callback is called. This can happen before GetConnectedDevice returns if
+     * there is an existing CASE session.
+     *
+     * If a CASE sessions fails to be established, the `onSetupFailure` callback will
+     * be called.  This can also happen before GetConnectedDevice returns.
+     *
+     * An error return from this function means that neither callback has been
+     * called yet, and neither callback will be called in the future.
+     */
+    CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure)
+    {
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection,
+                                                               onSetupFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -612,6 +636,22 @@ public:
 
     /**
      * @brief
+     *   This function is called by the DevicePairingDelegate to indicate that ICD registration info (ICDSymmetricKey,
+     * ICDCheckInNodeId and ICDMonitoredSubject) have been set on the CommissioningParameters of the CommissioningDelegate
+     * using CommissioningDelegate.SetCommissioningParameters(). As a result, commissioning can advance to the next stage.
+     *
+     * The DevicePairingDelegate may call this method from the OnICDRegistrationInfoRequired callback, or it may call this
+     * method after obtaining required parameters for ICD registration using asyncronous methods (like RPC call etc).
+     *
+     * When the ICD Registration completes, OnICDRegistrationComplete will be called.
+     *
+     * @return CHIP_ERROR   The return status. Returns CHIP_ERROR_INCORRECT_STATE if not in the correct state
+     * (kICDGetRegistrationInfo).
+     */
+    CHIP_ERROR ICDRegistrationInfoReady();
+
+    /**
+     * @brief
      *  This function returns the current CommissioningStage for this commissioner.
      */
     CommissioningStage GetCommissioningStage() { return mCommissioningStage; }
@@ -870,6 +910,9 @@ private:
         void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
     static void OnFailedToExtendedArmFailSafeDeviceAttestation(void * context, CHIP_ERROR error);
 
+    static void OnICDManagementRegisterClientResponse(
+        void * context, const app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
+
     /**
      * @brief
      *   This function processes the CSR sent by the device.
@@ -933,12 +976,14 @@ private:
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
                                       app::AttributePathParams * readPaths, size_t readPathsSize);
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
-    // Parsers for the two different read clients
     void ParseCommissioningInfo();
-    void ParseCommissioningInfo2();
+    // Parsing attributes read in kReadCommissioningInfo stage.
+    CHIP_ERROR ParseCommissioningInfo1(ReadCommissioningInfo & info);
+    // Parsing attributes read in kReadCommissioningInfo2 stage.
+    CHIP_ERROR ParseCommissioningInfo2(ReadCommissioningInfo & info);
     // Called by ParseCommissioningInfo2
-    CHIP_ERROR ParseFabrics(ReadCommissioningInfo2 & info);
-    CHIP_ERROR ParseICDInfo(ReadCommissioningInfo2 & info);
+    CHIP_ERROR ParseFabrics(ReadCommissioningInfo & info);
+    CHIP_ERROR ParseICDInfo(ReadCommissioningInfo & info);
     // Called by ParseCommissioningInfo
     void ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT

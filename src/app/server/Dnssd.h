@@ -17,6 +17,10 @@
 
 #pragma once
 
+#include <app/icd/ICDConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDManager.h> // nogncheck
+#endif
 #include <app/icd/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
@@ -89,6 +93,8 @@ public:
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     template <class AdvertisingParams>
     void AddICDKeyToAdvertisement(AdvertisingParams & advParams);
+
+    void SetICDManager(ICDManager * manager) { mICDManager = manager; };
 #endif
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
@@ -148,6 +154,10 @@ private:
 
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    ICDManager * mICDManager = nullptr;
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     uint16_t mSecuredPort          = CHIP_PORT;
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;

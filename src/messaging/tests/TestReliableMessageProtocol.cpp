@@ -45,6 +45,10 @@
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#endif
+
 namespace {
 
 using namespace chip;
@@ -53,8 +57,6 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 using namespace chip::System::Clock::Literals;
-
-using TestContext = Test::LoopbackMessagingContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -65,6 +67,19 @@ const char PAYLOAD[] = "Hello!";
 // This adds extra I/O time to account for this. See the documentation for
 // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST for more details.
 constexpr auto retryBoosterTimeout = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+
+class TestContext : public chip::Test::LoopbackMessagingContext
+{
+public:
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override
+    {
+        ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
+        GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
+        GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
+        return CHIP_NO_ERROR;
+    }
+};
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
@@ -322,7 +337,6 @@ public:
     static void CheckGetBackoff(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseNeverComes(nlTestSuite * inSuite, void * inContext);
-    static int InitializeTestCase(void * inContext);
 };
 
 void TestReliableMessageProtocol::CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
@@ -1832,7 +1846,7 @@ void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * 
             auto maxBackoff = test.backoffMax + retryBoosterTimeout;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
             // If running as an ICD, increase maxBackoff to account for the polling interval
-            maxBackoff += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+            maxBackoff += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 #endif
             NL_TEST_ASSERT(inSuite, backoff <= maxBackoff);
         }
@@ -2130,14 +2144,6 @@ void TestReliableMessageProtocol::CheckApplicationResponseNeverComes(nlTestSuite
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-int TestReliableMessageProtocol::InitializeTestCase(void * inContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(inContext);
-    ctx.GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
-    ctx.GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
-    return SUCCESS;
-}
-
 /**
  * TODO: A test that we should have but can't write with the existing
  * infrastructure we have:
@@ -2199,9 +2205,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize,
-    TestReliableMessageProtocol::InitializeTestCase,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 

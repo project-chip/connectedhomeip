@@ -15,7 +15,7 @@
 import os
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Command, Field, Idl
+from matter_idl.matter_idl_types import Cluster, Command, Field, Idl
 
 
 def toUpperSnakeCase(s):
@@ -56,7 +56,7 @@ def toEnumEntryName(enumEntry, enumName):
 def toProtobufType(zapType: str) -> str:
     """ Convert zap type to protobuf type """
     u32Types = [
-        "uint32", "enum8", "enum16", "enum32", "bitmap8",
+        "uint32", "enum8", "enum16", "bitmap8",
         "bitmap16", "bitmap32", "cluster_id", "attrib_id",
         "event_id", "command_id", "endpoint_no", "group_id",
         "devtype_id", "fabric_idx", "vendor_id", "status_code",
@@ -201,7 +201,8 @@ class CustomGenerator(CodeGenerator):
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         if 'package' not in kargs:
-            raise Exception('Please provide a "--option package:<name>" argument')
+            raise Exception(
+                'Please provide a "--option package:<name>" argument')
         self.package = kargs['package']
 
         # String helpers
@@ -230,9 +231,6 @@ class CustomGenerator(CodeGenerator):
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
-            if cluster.side != ClusterSide.CLIENT:
-                continue
-
             filename = "proto/%s_cluster.proto" % toLowerSnakeCase(
                 cluster.name)
 

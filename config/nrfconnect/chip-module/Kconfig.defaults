@@ -341,9 +341,6 @@ config MBEDTLS_ENABLE_HEAP
 config MBEDTLS_HEAP_SIZE
     default 8192
 
-config MBEDTLS_TLS_LIBRARY
-    default y
-
 config NRF_SECURITY_ADVANCED
     default y
 
@@ -360,9 +357,6 @@ config MBEDTLS_CTR_DRBG_C
     default y
 
 config MBEDTLS_CIPHER_MODE_CTR
-    default y
-
-config MBEDTLS_ECJPAKE_C
     default y
 
 config MBEDTLS_SHA256_C

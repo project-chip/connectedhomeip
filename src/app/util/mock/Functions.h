@@ -26,15 +26,24 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIB.h>
+#include <app/util/mock/MockNodeConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
 namespace Test {
+
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
                                      app::AttributeReportIBs::Builder & aAttributeReports,
                                      app::AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 void BumpVersion();
 DataVersion GetVersion();
+
+/// Configures the singular global mock attribute storage to use the specified configuration.
+void SetMockNodeConfig(const MockNodeConfig & config);
+
+/// Resets the mock attribute storage to the default configuration.
+void ResetMockNodeConfig();
+
 } // namespace Test
 } // namespace chip

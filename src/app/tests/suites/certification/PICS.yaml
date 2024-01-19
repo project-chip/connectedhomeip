@@ -757,6 +757,12 @@ PICS:
           "Does the device implement an Application Device Type on any endpoint"
       id: APPDEVICE.S
 
+    # Content App Observer Cluster
+    - label:
+          "Does the device implement the Content App Observer cluster as a
+          server?"
+      id: APPOBSERVER.S
+
     # Actions Cluster Test Plan
     - label: "Does the device implement the Actions cluster as a server?"
       id: ACT.S
@@ -891,7 +897,7 @@ PICS:
     - label:
           "Can the StateValue attribute be changed by manual operation at the
           DUT?"
-      id: BOOL.M.ManuallyControlled
+      id: BOOL.S.M.ManuallyControlled
 
     #
     # client / manually
@@ -2005,6 +2011,12 @@ PICS:
 
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BINFO.S.A0014
+
+    - label: "Does the DUT(server) support the SpecificationVersion attribute?"
+      id: BINFO.S.A0015
+
+    - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
+      id: BINFO.S.A0016
 
     #####
     - label: "Does the DUT(server) support the NOC list attribute?"
@@ -6066,10 +6078,10 @@ PICS:
     #
     - label:
           "Does the DUT support reading attribute to get switch state (polling)?"
-      id: SWTCH.C.M.RA
+      id: SWTCH.C.M.SwitchStatePolling
 
     - label: "Does the DUT support eventing to get switch state changes?"
-      id: SWTCH.C.M.EV
+      id: SWTCH.C.M.SwitchStateEventing
 
     - label: "Write all supported optional attributes"
       id: SWTCH.C.AO-WRITE
@@ -7132,6 +7144,12 @@ PICS:
 
     - label: "Does the DUT (Client) support 24 Hr Hour Format ?"
       id: LTIME.C.A0000.24HR
+
+    #Features
+    - label:
+          "Can the device be configured to use different calendar formats when
+          conveying values to a user ?"
+      id: LTIME.S.F00
 
     # Unit Localization Cluster Test Plan
     - label: "Does the device implement the Unit Localization as a server?"
@@ -8877,6 +8895,44 @@ PICS:
           "Does the device implement sending the ChangeToModeResponse command?"
       id: LWM.S.C01.Tx
 
+    #  Laundry DRYER Mode Cluster
+
+    - label: "Does the device implement the Dryer cluster as a server?"
+      id: DRYERCTRL.S
+
+    #- label: "Does the DUT support testing the failed ChangeToMode command?"
+    #  id: DRYERCTRL.S.M.CAN_TEST_MODE_FAILURE
+
+    #- label:
+    #      "Id of mode the device will fail to transition to, given its current
+    #      state"
+    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_FAIL
+
+    #- label:
+    #      "Id of mode the device will successfully transition to, given its
+    #      current state"
+    #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_OK
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: DRYERCTRL.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: DRYERCTRL.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: DRYERCTRL.S.A0001
+
+    - label: "Can the device be controlled manually?"
+      id: DRYERCTRL.S.M.ManuallyControlled
+
     # RVC Clean Mode Cluster
 
     - label: "Does the device implement the RVCCLEANM cluster as a server?"
@@ -9311,3 +9367,136 @@ PICS:
 
     - label: "Does the device implement sending the Resume command?"
       id: RVCOPSTATE.C.C04.Tx
+
+    #
+    #Boolean State Configuration
+    #
+    - label:
+          "Does the device implement the Boolean State Configuration cluster as
+          a server?"
+      id: BOOLCFG.S
+
+    #Features
+    - label: "Does the device support visual alarms?"
+      id: BOOLCFG.S.F00
+
+    - label: "Does the device support audible alarms??"
+      id: BOOLCFG.S.F01
+
+    - label:
+          "Does the device support the ability to suppress or acknowledge
+          alarms?"
+      id: BOOLCFG.S.F02
+
+    - label:
+          "Does the device support the ability to set level of threshold
+          detection sensitivity?"
+      id: BOOLCFG.S.F03
+
+    #Attributes
+    - label: "Does the device implement the CurrentSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0000
+
+    - label:
+          "Does the device implement the SupportedSensitivityLevels attribute?"
+      id: BOOLCFG.S.A0001
+
+    - label: "Does the device implement the DefaultSensitivityLevel attribute?"
+      id: BOOLCFG.S.A0002
+
+    - label: "Does the device implement the AlarmsActive attribute?"
+      id: BOOLCFG.S.A0003
+
+    - label: "Does the device implement the AlarmsSuppressed attribute?"
+      id: BOOLCFG.S.A0004
+
+    - label: "Does the device implement the AlarmsEnabled attribute?"
+      id: BOOLCFG.S.A0005
+
+    - label: "Does the device implement the AlarmsSupported attribute?"
+      id: BOOLCFG.S.A0006
+
+    - label: "Does the device implement the SensorFault attribute?"
+      id: BOOLCFG.S.A0007
+
+    #Commands received
+    - label: "Does the device implement receiving the SuppressAlarm command?"
+      id: BOOLCFG.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the EnableDisableAlarm command?"
+      id: BOOLCFG.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the AlarmsStateChanged event?"
+      id: BOOLCFG.S.E00
+
+    - label: "Does the device implement the SensorFault event?"
+      id: BOOLCFG.S.E01
+
+    #
+    #Valve Configuration and Control
+    #
+    - label:
+          "Does the device implement the Valve Configuration and Control cluster
+          as a server?"
+      id: VALCC.S
+
+    #Features
+    - label:
+          "Does the device support the ability to use UTC time is used for time
+          indications?"
+      id: VALCC.S.F00
+
+    - label:
+          "Does the device support the ability to setting the specific position
+          of the valve?"
+      id: VALCC.S.F01
+
+    #Attributes
+    - label: "Does the device implement the OpenDuration attribute?"
+      id: VALCC.S.A0000
+
+    - label: "Does the device implement the DefaultOpenDuration attribute?"
+      id: VALCC.S.A0001
+
+    - label: "Does the device implement the AutoCloseTime attribute?"
+      id: VALCC.S.A0002
+
+    - label: "Does the device implement the RemainingDuration attribute?"
+      id: VALCC.S.A0003
+
+    - label: "Does the device implement the CurrentState attribute?"
+      id: VALCC.S.A0004
+
+    - label: "Does the device implement the TargetState attribute?"
+      id: VALCC.S.A0005
+
+    - label: "Does the device implement the CurrentLevel attribute?"
+      id: VALCC.S.A0006
+
+    - label: "Does the device implement the TargetLevel attribute?"
+      id: VALCC.S.A0007
+
+    - label: "Does the device implement the DefaultOpenLevel attribute?"
+      id: VALCC.S.A0008
+
+    - label: "Does the device implement the ValveFault attribute?"
+      id: VALCC.S.A0009
+
+    - label: "Does the device implement the LevelStep attribute?"
+      id: VALCC.S.A000a
+
+    #Commands received
+    - label: "Does the device implement receiving the Open command?"
+      id: VALCC.S.C00.Rsp
+
+    - label: "Does the device implement receiving the Close command?"
+      id: VALCC.S.C01.Rsp
+
+    #Events
+    - label: "Does the device implement the ValveStateChanged event?"
+      id: VALCC.S.E00
+
+    - label: "Does the device implement the ValveFault event?"
+      id: VALCC.S.E01

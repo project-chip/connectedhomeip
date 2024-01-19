@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+#include <limits>
 
 #include "network-commissioning.h"
 
@@ -35,8 +37,8 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <tracing/macros.h>
 #include <system/DurationTimer.h>
+#include <tracing/macros.h>
 
 #include <array>
 #include <utility>
@@ -54,6 +56,8 @@ namespace {
 
 // For WiFi and Thread scan results, each item will cost ~60 bytes in TLV, thus 15 is a safe upper bound of scan results.
 constexpr size_t kMaxNetworksInScanResponse = 15;
+
+constexpr uint16_t kCurrentClusterRevision = 2;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 constexpr size_t kPossessionNonceSize = 32;
@@ -173,11 +177,18 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveNetwork(ctx, req); });
         return;
 
-    case Commands::ConnectNetwork::Id:
+    case Commands::ConnectNetwork::Id: {
         VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
+#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // If commissionee does not support Concurrent Connections, request the BLE to be stopped.
+        // Start the ConnectNetwork, but this will not complete until the BLE is off.
+        ChipLogProgress(NetworkProvisioning, "Closing BLE connections due to non-concurrent mode");
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+#endif
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
+    }
 
     case Commands::ReorderNetwork::Id:
         VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
@@ -192,8 +203,6 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
         return;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     }
-
-   
 }
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -263,6 +272,79 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mFeatureFlags);
 
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(kCurrentClusterRevision);
+
+    case Attributes::SupportedWiFiBands::Id: {
+#if (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
+        // This is a case of shared zap config where mandatory wifi attributes are enabled for a thread platform (e.g
+        // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
+        // product. Temporarily return an list of 1 element of value 0 when wifi is not supported or WiFiNetworkInterface is not
+        // enabled until a solution is implemented with the attribute list.
+        // Final implementation will return UnsupportedAttribute if we get here without the needed WiFi support .
+        // VerifyOrReturnError(mFeatureFlags.Has(Feature::kWiFiNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
+        {
+            return aEncoder.EncodeList([this](const auto & encoder) {
+                uint32_t bands = mpDriver.Get<WiFiDriver *>()->GetSupportedWiFiBandsMask();
+
+                // Extract every band from the bitmap of supported bands, starting positionally on the right.
+                for (uint32_t band_bit_pos = 0; band_bit_pos < std::numeric_limits<uint32_t>::digits; ++band_bit_pos)
+                {
+                    uint32_t band_mask = static_cast<uint32_t>(1UL << band_bit_pos);
+                    if ((bands & band_mask) != 0)
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(static_cast<WiFiBandEnum>(band_bit_pos)));
+                    }
+                }
+                return CHIP_NO_ERROR;
+            });
+        }
+#endif
+        return aEncoder.EncodeList([](const auto & encoder) {
+            WiFiBandEnum bands = WiFiBandEnum::k2g4;
+            ReturnErrorOnFailure(encoder.Encode(bands));
+            return CHIP_NO_ERROR;
+        });
+    }
+    break;
+    case Attributes::SupportedThreadFeatures::Id: {
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431
+        BitMask<ThreadCapabilities> ThreadCapabilities = 0;
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+        // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
+        // all-cluster-app). Real world product must only enable the attributes tied to the network technology supported by their
+        // product. Temporarily encode a value of 0 reflecting no thread capabilities hen CHIP_DEVICE_CONFIG_ENABLE_THREAD or
+        // ThreadNetworkInterface are not enabled until a solution is implemented with the attribute list.
+        // Final implementation will return UnsupportedAttribute if we get here without the needed thread support
+        // VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+        {
+            ThreadCapabilities = mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures();
+        }
+#endif
+        return aEncoder.Encode(ThreadCapabilities);
+    }
+    break;
+    case Attributes::ThreadVersion::Id: {
+        // TODO https://github.com/project-chip/connectedhomeip/issues/31431ß
+        uint16_t threadVersion = 0;
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+        // This is a case of shared zap config where mandatory thread attributes are enabled for a wifi platform (e.g
+        // all-cluster-app) Real world product must only enable the attributes tied to the network technology supported by their
+        // product. Temporarily encode a value of 0 reflecting no thread version when CHIP_DEVICE_CONFIG_ENABLE_THREAD or
+        // ThreadNetworkInterface are not enabled until a solution is implemented with the attribute list.
+        // Final implementation will return UnsupportedAttribute if we get here without the needed thread support
+        // VerifyOrReturnError(mFeatureFlags.Has(Feature::kThreadNetworkInterface), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        if (mFeatureFlags.Has(Feature::kThreadNetworkInterface))
+        {
+            threadVersion = mpDriver.Get<ThreadDriver *>()->GetThreadVersion();
+        }
+#endif
+        return aEncoder.Encode(threadVersion);
+    }
+    break;
     default:
         return CHIP_NO_ERROR;
     }
@@ -277,13 +359,13 @@ CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeVal
         ReturnErrorOnFailure(aDecoder.Decode(value));
         return mpBaseDriver->SetEnabled(value);
     default:
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        return CHIP_IM_GLOBAL_STATUS(InvalidAction);
     }
 }
 
 void Instance::OnNetworkingStatusChange(Status aCommissioningError, Optional<ByteSpan> aNetworkId, Optional<int32_t> aConnectStatus)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: OnNetworkingStatusChange ");
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance("NetworkCommissioning: OnNetworkingStatusChange ");
     timer.start();
     if (aNetworkId.HasValue() && aNetworkId.Value().size() > kMaxNetworkIDLen)
     {
@@ -313,7 +395,7 @@ void Instance::OnNetworkingStatusChange(Status aCommissioningError, Optional<Byt
 
 void Instance::HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: HandleScanNetwork ");
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance("NetworkCommissioning: HandleScanNetwork ");
     timer.start();
     MATTER_TRACE_SCOPE("HandleScanNetwork", "NetworkCommissioning");
     if (mFeatureFlags.Has(Feature::kWiFiNetworkInterface))
@@ -387,7 +469,8 @@ bool CheckFailSafeArmed(CommandHandlerInterface::HandlerContext & ctx)
 
 void Instance::HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: HandleAddOrUpdateWiFiNetwork ");
+    chip::timing::DurationTimer timer =
+        chip::timing::GetDefaultTimingInstance("NetworkCommissioning: HandleAddOrUpdateWiFiNetwork ");
     timer.start();
 
     MATTER_TRACE_SCOPE("HandleAddOrUpdateWiFiNetwork", "NetworkCommissioning");
@@ -571,7 +654,8 @@ exit:
 
 void Instance::HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: HandleAddOrUpdateThreadNetwork ");
+    chip::timing::DurationTimer timer =
+        chip::timing::GetDefaultTimingInstance("NetworkCommissioning: HandleAddOrUpdateThreadNetwork ");
     timer.start();
     MATTER_TRACE_SCOPE("HandleAddOrUpdateThreadNetwork", "NetworkCommissioning");
 
@@ -608,7 +692,7 @@ void Instance::CommitSavedBreadcrumb()
 
 void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveNetwork::DecodableType & req)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: HandleRemoveNetwork ");
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance("NetworkCommissioning: HandleRemoveNetwork ");
     timer.start();
 
     MATTER_TRACE_SCOPE("HandleRemoveNetwork", "NetworkCommissioning");
@@ -632,7 +716,7 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: HandleConnectNetwork ");
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance("NetworkCommissioning: HandleConnectNetwork ");
     timer.start();
 
     MATTER_TRACE_SCOPE("HandleConnectNetwork", "NetworkCommissioning");
@@ -648,14 +732,27 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
     mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
     mCurrentOperationBreadcrumb = req.breadcrumb;
+
+// In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
+// network has been fully brought up and kWiFiDeviceAvailable is delivered.
+// mConnectingNetworkIDLen and mConnectingNetworkID contains the received SSID
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
+#endif
 
     timer.stop();
 }
 
+void Instance::HandleNonConcurrentConnectNetwork()
+{
+    ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
+    ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork() SSID=%s", mConnectingNetworkID);
+    mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
+}
+
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
 {
-    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "NetworkCommissioning: HandleReorderNetwork ");
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance("NetworkCommissioning: HandleReorderNetwork ");
     timer.start();
 
     MATTER_TRACE_SCOPE("HandleReorderNetwork", "NetworkCommissioning");
@@ -790,7 +887,13 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
+#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
+    // Do not send the ConnectNetworkResponse if in non-concurrent mode
+    // Issue #30576 raised to modify CommandHandler to notify it if no response required
+#else
     commandHandle->AddResponse(mPath, response);
+#endif
     if (commissioningError == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
@@ -820,8 +923,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, ThreadScanResponseI
     size_t scanResponseArrayLength = 0;
     uint8_t extendedAddressBuffer[Thread::kSizeExtendedPanId];
 
-    SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
@@ -932,8 +1037,10 @@ void Instance::OnFinished(Status status, CharSpan debugText, WiFiScanResponseIte
     WiFiScanResponse scanResponse;
     size_t networksEncoded = 0;
 
-    SuccessOrExit(err = commandHandle->PrepareCommand(
-                      ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id)));
+    const CommandHandler::InvokeResponseParameters prepareParams(mPath);
+    SuccessOrExit(
+        err = commandHandle->PrepareInvokeResponseCommand(
+            ConcreteCommandPath(mPath.mEndpointId, NetworkCommissioning::Id, Commands::ScanNetworksResponse::Id), prepareParams));
     VerifyOrExit((writer = commandHandle->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(Commands::ScanNetworksResponse::Fields::kNetworkingStatus), status));
@@ -986,6 +1093,10 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         this_->OnFailSafeTimerExpired();
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable)
+    {
+        this_->HandleNonConcurrentConnectNetwork();
     }
 }
 

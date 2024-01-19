@@ -25,6 +25,7 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   chip_software_version = 0
+  chip_simple_hash_verification = 0
 }
 
 if (chip_pw_tokenizer_logging) {
@@ -92,10 +93,7 @@ k32w0_executable("contact_sensor_app") {
       "${k32w0_platform_dir}/common/CustomFactoryDataProvider.h",
     ]
 
-    defines = [
-      "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1",
-      "CHIP_DEVICE_CONFIG_CUSTOM_PROVIDER_NUMBER_IDS=3",
-    ]
+    defines = [ "CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER=1" ]
   }
 
   deps = [
@@ -177,6 +175,10 @@ action("binsign") {
   script = "${k32w0_platform_dir}/scripts/sign-outdir.py"
   output_name = "bignsign.log"
   outputs = [ "${root_build_dir}/${output_name}" ]
+
+  if (chip_simple_hash_verification == 1) {
+    args = [ "--simple-hash" ]
+  }
 }
 
 group("default") {

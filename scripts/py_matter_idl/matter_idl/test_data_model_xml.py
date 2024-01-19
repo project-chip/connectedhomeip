@@ -204,6 +204,8 @@ class TestXmlParser(unittest.TestCase):
 
         expected_idl = IdlTextToIdl('''
             client cluster DishwasherMode = 89 {
+               revision 2;
+
                bitmap Feature: bitmap32 {
                    kOnOff = 0x1;
                }
@@ -214,15 +216,13 @@ class TestXmlParser(unittest.TestCase):
                   ModeTagStruct modeTags[] = 2;
                }
 
+               readonly attribute ModeOptionStruct supportedModes[] = 0;
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
                readonly attribute command_id acceptedCommandList[] = 65529;
                readonly attribute command_id generatedCommandList[] = 65528;
                readonly attribute bitmap32 featureMap = 65532;
                readonly attribute int16u clusterRevision = 65533;
-
-               // baseline inserted after, so to pass the test add this at the end
-               readonly attribute ModeOptionStruct supportedModes[] = 0;
            }
         ''')
 
@@ -415,6 +415,19 @@ class TestXmlParser(unittest.TestCase):
                     <access read="true" write="true"/>
                     <mandatoryConform/>
                   </field>
+                  <field id="3" name="NominalPower" type="power-mW">
+                    <access read="true" write="true"/>
+                    <mandatoryConform>
+                      <feature name="PFR"/>
+                    </mandatoryConform>
+                    <constraint type="desc"/>
+                  </field>
+                  <field id="4" name="MaximumEnergy" type="energy-mWh">
+                    <access read="true" write="true"/>
+                    <mandatoryConform>
+                      <feature name="PFR"/>
+                    </mandatoryConform>
+                  </field>
                 </struct>
               </dataTypes>
               <attributes>
@@ -443,10 +456,13 @@ class TestXmlParser(unittest.TestCase):
                   char_string id = 0;
                   int8u items[] = 1;
                   endpoint_no endpoints[] = 2;
+                  optional power_mw nominalPower = 3;
+                  optional energy_mwh maximumEnergy = 4;
                }
 
                readonly attribute OutputInfoStruct outputList[] = 0;
                readonly attribute optional enum8 testConform = 1;
+
 
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;

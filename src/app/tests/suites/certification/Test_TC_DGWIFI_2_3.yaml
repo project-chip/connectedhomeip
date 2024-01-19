@@ -38,7 +38,7 @@ tests:
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp
       command: "ResetCounts"
 
-    - label: "Step 2a: Reads BeaconLostCount attribute from DUT"
+    - label: "Step 2a: TH reads BeaconLostCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0005
       command: "readAttribute"
       attribute: "BeaconLostCount"
@@ -48,7 +48,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Step 2b: Reads BeaconRxCount attribute from DUT"
+    - label: "Step 2b: TH reads BeaconRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0006
       command: "readAttribute"
       attribute: "BeaconRxCount"
@@ -58,7 +58,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Step 2c: Reads PacketMulticastRxCount attribute from DUT"
+    - label: "Step 2c: TH reads PacketMulticastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0007
       command: "readAttribute"
       attribute: "PacketMulticastRxCount"
@@ -68,7 +68,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Step 2d: Reads PacketMulticastTxCount attribute from DUT"
+    - label: "Step 2d: TH reads PacketMulticastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0008
       command: "readAttribute"
       attribute: "PacketMulticastTxCount"
@@ -78,7 +78,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Step 2e: Reads PacketUnicastRxCount attribute from DUT"
+    - label: "Step 2e: TH reads PacketUnicastRxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A0009
       command: "readAttribute"
       attribute: "PacketUnicastRxCount"
@@ -88,7 +88,7 @@ tests:
               minValue: 0
               maxValue: 4294967295
 
-    - label: "Step 2f: Reads PacketUnicastTxCount attribute from DUT"
+    - label: "Step 2f: TH reads PacketUnicastTxCount attribute from DUT"
       PICS: PICS_SKIP_SAMPLE_APP && DGWIFI.S.C00.Rsp && DGWIFI.S.A000a
       command: "readAttribute"
       attribute: "PacketUnicastTxCount"

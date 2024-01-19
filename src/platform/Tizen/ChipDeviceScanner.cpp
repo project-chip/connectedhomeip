@@ -41,8 +41,8 @@ namespace DeviceLayer {
 namespace Internal {
 
 // CHIPoBLE UUID strings
-const char * chip_service_uuid       = "0000FFF6-0000-1000-8000-00805F9B34FB";
-const char * chip_service_uuid_short = "FFF6";
+const char chip_service_uuid[]       = "0000FFF6-0000-1000-8000-00805F9B34FB";
+const char chip_service_uuid_short[] = "FFF6";
 
 ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate) {}
 

@@ -38,8 +38,6 @@
 #include <nlunit-test.h>
 #include <utility>
 
-using TestContext = chip::Test::AppContext;
-
 namespace {
 
 uint8_t attributeDataTLV[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
@@ -53,7 +51,40 @@ chip::TestPersistentStorageDelegate gTestStorage;
 chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
+class TestContext : public chip::Test::AppContext
+{
+public:
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override
+    {
+        ReturnErrorOnFailure(chip::Test::AppContext::SetUp());
+
+        gTestStorage.ClearStorage();
+        gGroupsProvider.SetStorageDelegate(&gTestStorage);
+        gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
+        ReturnErrorOnFailure(gGroupsProvider.Init());
+        chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        uint8_t buf[sizeof(chip::CompressedFabricId)];
+        chip::MutableByteSpan span(buf);
+        ReturnErrorOnFailure(GetBobFabric()->GetCompressedFabricIdBytes(span));
+        ReturnErrorOnFailure(chip::GroupTesting::InitData(&gGroupsProvider, GetBobFabricIndex(), span));
+
+        return CHIP_NO_ERROR;
+    }
+
+    // Performs teardown for each individual test in the test suite
+    void TearDown() override
+    {
+        chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
+        if (provider != nullptr)
+            provider->Finish();
+        chip::Test::AppContext::TearDown();
+    }
+};
+
 } // namespace
+
 namespace chip {
 namespace app {
 class TestWriteInteraction
@@ -379,8 +410,8 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
     attributePathParams.mClusterId   = 3;
     attributePathParams.mAttributeId = 4;
 
-    const uint8_t byteSpanData[] = { 0xde, 0xad, 0xbe, 0xef };
-    const char charSpanData[]    = "a simple test string";
+    const uint8_t byteSpanData[]     = { 0xde, 0xad, 0xbe, 0xef };
+    static const char charSpanData[] = "a simple test string";
 
     app::Clusters::UnitTesting::Structs::SimpleStruct::Type dataTx;
     dataTx.a = 12;
@@ -1030,59 +1061,14 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-// clang-format off
-
-/**
- *  Set up the test suite.
- */
-int Test_Setup(void * inContext)
-{
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-
-    VerifyOrReturnError(TestContext::Initialize(inContext) == SUCCESS, FAILURE);
-
-    TestContext & ctx = *static_cast<TestContext *>(inContext);
-    gTestStorage.ClearStorage();
-    gGroupsProvider.SetStorageDelegate(&gTestStorage);
-    gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
-    VerifyOrReturnError(CHIP_NO_ERROR == gGroupsProvider.Init(), FAILURE);
-    chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
-
-    uint8_t buf[sizeof(chip::CompressedFabricId)];
-    chip::MutableByteSpan span(buf);
-    VerifyOrReturnError(CHIP_NO_ERROR == ctx.GetBobFabric()->GetCompressedFabricIdBytes(span), FAILURE);
-    VerifyOrReturnError(CHIP_NO_ERROR == chip::GroupTesting::InitData(&gGroupsProvider, ctx.GetBobFabricIndex(), span), FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Tear down the test suite.
- */
-int Test_Teardown(void * inContext)
-{
-    chip::Platform::MemoryShutdown();
-    chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
-    if (nullptr != provider)
-    {
-        provider->Finish();
-    }
-
-
-    VerifyOrReturnError(TestContext::Finalize(inContext) == SUCCESS, FAILURE);
-
-
-    return SUCCESS;
-}
-
-nlTestSuite sSuite =
-{
+nlTestSuite sSuite = {
     "TestWriteInteraction",
     &sTests[0],
-    &Test_Setup,
-    &Test_Teardown
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
-// clang-format on
 
 } // namespace
 

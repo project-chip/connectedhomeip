@@ -17,7 +17,7 @@ import enum
 import logging
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
-from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, ClusterSide, Command, Enum, Event, Field, Idl, Struct
+from matter_idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
 
 
 class Compatibility(enum.Enum):
@@ -47,17 +47,16 @@ def group_list_by_name(items: List[NAMED]) -> Dict[str, NAMED]:
     return group_list(items, lambda x: x.name)
 
 
-def full_cluster_name(cluster: Cluster) -> str:
-    "Builds a unique cluster name considering the side as well"
-    if cluster.side == ClusterSide.CLIENT:
-        return f"{cluster.name}/client"
-    else:
-        return f"{cluster.name}/server"
-
-
 def attribute_name(attribute: Attribute) -> str:
     """Get the name of an attribute."""
     return attribute.definition.name
+
+
+def not_stable(maturity: ApiMaturity):
+    """Determine if the given api maturity allows binary/api changes or not."""
+    # TODO: internal and deprecated not currently widely used,
+    #       so we enforce stability on them for now.
+    return maturity == ApiMaturity.PROVISIONAL
 
 
 class CompatibilityChecker:
@@ -275,24 +274,28 @@ class CompatibilityChecker:
                 cluster_name, attribute, updated_attributes.get(attribute_name(attribute)))
 
     def _check_cluster_list_compatible(self, original: List[Cluster], updated: List[Cluster]):
-        updated_clusters = group_list(updated, full_cluster_name)
+        updated_clusters = group_list(updated, lambda c: c.name)
 
         for original_cluster in original:
-            updated_cluster = updated_clusters.get(
-                full_cluster_name(original_cluster))
+            updated_cluster = updated_clusters.get(original_cluster.name)
+
+            if not_stable(updated_cluster.api_maturity) or not_stable(original_cluster.api_maturity):
+                # no point in checking
+                continue
+
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
     def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
         self.logger.debug(
-            f"Checking cluster {full_cluster_name(original_cluster)}")
+            f"Checking cluster {original_cluster.name}")
         if not updated_cluster:
             self._mark_incompatible(
-                f"Cluster {full_cluster_name(original_cluster)} was deleted")
+                f"Cluster {original_cluster.name} was deleted")
             return
 
         if original_cluster.code != updated_cluster.code:
             self._mark_incompatible(
-                f"Cluster {full_cluster_name(original_cluster)} has different codes {original_cluster.code} != {updated_cluster.code}")
+                f"Cluster {original_cluster.name} has different codes {original_cluster.code} != {updated_cluster.code}")
 
         self._check_enum_list_compatible(
             original_cluster.name, original_cluster.enums, updated_cluster.enums)

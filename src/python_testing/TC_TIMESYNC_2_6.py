@@ -35,10 +35,13 @@ class TC_TIMESYNC_2_6(MatterBaseTest):
     async def send_set_default_ntp_cmd_expect_error(self, ntp: typing.Union[Nullable, str], error: Status) -> None:
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDefaultNTP(defaultNTP=ntp))
-            asserts.assert_true(False, "Unexpected SetTimeZone command success")
+            asserts.assert_true(False, "Unexpected SetDefaultNTP command success")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
             pass
+
+    def pics_TC_TIMESYNC_2_6(self) -> list[str]:
+        return ["TIMESYNC.S.F01"]
 
     @async_test_body
     async def test_TC_TIMESYNC_2_6(self):

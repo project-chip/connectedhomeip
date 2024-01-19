@@ -59,6 +59,11 @@ declare_args() {
 declare_args() {
   chip_openthread_ftd = chip_enable_openthread
 
+  # Set platform define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+  # Users should ensure that it sets their thread stack define OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE
+  # or that their setting matches.
+  chip_openthread_border_router = false
+
   # Enable wifi support.
   chip_enable_wifi =
       chip_device_platform == "linux" || chip_device_platform == "esp32" ||
@@ -204,6 +209,7 @@ if (chip_device_platform != "external") {
     chip_inet_platform_config_include = ""
     chip_system_platform_config_include = ""
     chip_system_layer_impl_config_file = ""
+    chip_external_platform_include_dir = ""
   }
 }
 

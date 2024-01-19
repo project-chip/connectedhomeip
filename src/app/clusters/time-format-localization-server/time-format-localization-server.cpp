@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-enums-check.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -52,44 +53,47 @@ private:
     CHIP_ERROR ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder);
 };
 
+class AutoReleaseIterator
+{
+public:
+    using Iterator = DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator;
+
+    AutoReleaseIterator(Iterator * value) : mIterator(value) {}
+    ~AutoReleaseIterator()
+    {
+        if (mIterator != nullptr)
+        {
+            mIterator->Release();
+        }
+    }
+
+    bool IsValid() const { return mIterator != nullptr; }
+    bool Next(CalendarTypeEnum & value) { return (mIterator == nullptr) ? false : mIterator->Next(value); }
+
+private:
+    Iterator * mIterator;
+};
+
 TimeFormatLocalizationAttrAccess gAttrAccess;
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::ReadSupportedCalendarTypes(AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
 
-    if (provider)
-    {
-        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), aEncoder.EncodeEmptyList());
 
-        if (it)
+    return aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
+        CalendarTypeEnum type;
+
+        while (it.Next(type))
         {
-            err = aEncoder.EncodeList([&it](const auto & encoder) -> CHIP_ERROR {
-                CalendarTypeEnum type;
-
-                while (it->Next(type))
-                {
-                    ReturnErrorOnFailure(encoder.Encode(type));
-                }
-
-                return CHIP_NO_ERROR;
-            });
-
-            it->Release();
+            ReturnErrorOnFailure(encoder.Encode(type));
         }
-        else
-        {
-            err = aEncoder.EncodeEmptyList();
-        }
-    }
-    else
-    {
-        err = aEncoder.EncodeEmptyList();
-    }
 
-    return err;
+        return CHIP_NO_ERROR;
+    });
 }
 
 CHIP_ERROR TimeFormatLocalizationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -114,31 +118,33 @@ bool IsSupportedCalendarType(CalendarTypeEnum newType, CalendarTypeEnum & validT
     validType = CalendarTypeEnum::kBuddhist;
 
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
+    VerifyOrReturnValue(provider != nullptr, false);
 
-    if (provider)
+    AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
+    VerifyOrReturnValue(it.IsValid(), false);
+
+    CalendarTypeEnum type;
+    while (it.Next(type))
     {
-        DeviceLayer::DeviceInfoProvider::SupportedCalendarTypesIterator * it = provider->IterateSupportedCalendarTypes();
-
-        if (it)
+        validType = type;
+        if (validType == newType)
         {
-            CalendarTypeEnum type;
-
-            while (it->Next(type))
-            {
-                validType = type;
-
-                if (validType == newType)
-                {
-                    it->Release();
-                    return true;
-                }
-            }
-
-            it->Release();
+            return true;
         }
     }
 
     return false;
+}
+
+template <typename E>
+Optional<E> SafeCast(uint8_t value)
+{
+    E val = static_cast<E>(value);
+    if (EnsureKnownEnumValue(val) == E::kUnknownEnumValue)
+    {
+        return NullOptional;
+    }
+    return MakeOptional(val);
 }
 
 } // anonymous namespace
@@ -151,7 +157,7 @@ static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOn
                                                                                                    CalendarTypeEnum newType)
 {
     Protocols::InteractionModel::Status res;
-    CalendarTypeEnum validType = CalendarTypeEnum::kBuddhist;
+    CalendarTypeEnum validType = CalendarTypeEnum::kUseActiveLocale;
 
     if (IsSupportedCalendarType(newType, validType))
     {
@@ -166,38 +172,30 @@ static Protocols::InteractionModel::Status emberAfPluginTimeFormatLocalizationOn
     return res;
 }
 
-static Protocols::InteractionModel::Status
-emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(EndpointId EndpointId, EmberAfAttributeType attrType,
-                                                              uint16_t attrSize, uint8_t * attrValue)
-{
-    return Protocols::InteractionModel::Status::Success;
-}
-
 Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
     const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    Protocols::InteractionModel::Status res;
-
     switch (attributePath.mAttributeId)
     {
-    case ActiveCalendarType::Id:
-        if (sizeof(uint8_t) == size)
-        {
-            res = emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId,
-                                                                          static_cast<CalendarTypeEnum>(*value));
-        }
-        else
-        {
-            res = Protocols::InteractionModel::Status::InvalidValue;
-        }
-        break;
+    case ActiveCalendarType::Id: {
+        VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-    default:
-        res = emberAfPluginTimeFormatLocalizationOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
-        break;
+        auto calendarType = SafeCast<CalendarTypeEnum>(*value);
+        VerifyOrReturnValue(calendarType.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
+
+        return emberAfPluginTimeFormatLocalizationOnCalendarTypeChange(attributePath.mEndpointId, calendarType.Value());
     }
+    case HourFormat::Id: {
+        VerifyOrReturnValue(sizeof(uint8_t) == size, Protocols::InteractionModel::Status::InvalidValue);
 
-    return res;
+        auto hourFormat = SafeCast<HourFormatEnum>(*value);
+        VerifyOrReturnValue(hourFormat.HasValue(), Protocols::InteractionModel::Status::ConstraintError);
+
+        return Protocols::InteractionModel::Status::Success;
+    }
+    default:
+        return Protocols::InteractionModel::Status::Success;
+    }
 }
 
 void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)

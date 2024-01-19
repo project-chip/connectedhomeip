@@ -19,10 +19,12 @@ private:
     ModeBase::Instance mCleanModeInstance;
 
     RvcOperationalState::RvcOperationalStateDelegate mOperationalStateDelegate;
-    OperationalState::Instance mOperationalStateInstance;
+    RvcOperationalState::Instance mOperationalStateInstance;
 
     bool mDocked   = false;
     bool mCharging = false;
+
+    uint8_t mStateBeforePause = 0;
 
 public:
     /**
@@ -33,7 +35,7 @@ public:
     explicit RvcDevice(EndpointId aRvcClustersEndpoint) :
         mRunModeDelegate(), mRunModeInstance(&mRunModeDelegate, aRvcClustersEndpoint, RvcRunMode::Id, 0), mCleanModeDelegate(),
         mCleanModeInstance(&mCleanModeDelegate, aRvcClustersEndpoint, RvcCleanMode::Id, 0), mOperationalStateDelegate(),
-        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint, RvcOperationalState::Id)
+        mOperationalStateInstance(&mOperationalStateDelegate, aRvcClustersEndpoint)
     {
         // set the current-mode at start-up
         mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);

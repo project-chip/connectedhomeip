@@ -56,7 +56,7 @@ OptionDef sProgramOptionDefs[] = {
     {}
 };
 
-const char * sProgramOptionHelp = "  --source <filepath>\n"
+const char sProgramOptionHelp[] = "  --source <filepath>\n"
                                   "       The log file to decode.\n"
                                   // Protocol
                                   "  --disable-protocol-secure-channel\n"
