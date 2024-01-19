@@ -8826,7 +8826,7 @@ PICS:
           "Does the device implement the Operational State cluster as a client?"
       id: OVENOPSTATE.C
 
-    # ManuallyControlled
+    #ManuallyControlled
 
     - label: "Does the DUT support testing the Stopped(0x00) operational state"
       id: OVENOPSTATE.S.M.ST_STOPPED
