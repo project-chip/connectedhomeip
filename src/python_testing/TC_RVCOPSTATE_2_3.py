@@ -78,6 +78,10 @@ def error_enum_to_text(error_enum):
 
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
+    def __init__(self, *args):
+        super().__init__(args)
+        self.endpoint = 0
+
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)

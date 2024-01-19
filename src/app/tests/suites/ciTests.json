@@ -12,6 +12,7 @@
         "Test_TC_ACL_2_9",
         "Test_TC_ACL_2_10"
     ],
+    "ContentAppObserver": [],
     "AccessControlEnforcement": ["Test_TC_ACE_1_1", "Test_TC_ACE_1_5"],
     "BooleanState": ["Test_TC_BOOL_1_1", "Test_TC_BOOL_2_1"],
     "Binding": ["Test_TC_BIND_1_1"],
@@ -63,8 +64,6 @@
         "Test_TC_FAN_2_2",
         "Test_TC_FAN_2_3",
         "Test_TC_FAN_2_4",
-        "Test_TC_FAN_3_1",
-        "Test_TC_FAN_3_2",
         "Test_TC_FAN_3_6"
     ],
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
@@ -382,6 +381,7 @@
         "Binding",
         "ColorControl",
         "ConcentrationMeasurement",
+        "ContentAppObserver",
         "DeviceManagement",
         "Descriptor",
         "DiagnosticsLogs",

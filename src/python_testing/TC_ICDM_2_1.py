@@ -29,6 +29,9 @@ class TC_ICDM_2_1(MatterBaseTest):
         cluster = Clusters.Objects.IcdManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    def pics_TC_ICDM_2_1(self) -> list[str]:
+        return ["ICDM.S"]
+
     @async_test_body
     async def test_TC_ICDM_2_1(self):
 
