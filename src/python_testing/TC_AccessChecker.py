@@ -8,7 +8,7 @@ from basic_composition_support import BasicCompositionTests
 from chip.interaction_model import Status
 from chip.tlv import uint
 from global_attribute_ids import GlobalAttributeIds
-from matter_testing_support import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, async_test_body,
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, MatterBaseTest, TestStep, async_test_body,
                                     default_matter_test_main)
 from spec_parsing_support import XmlCluster, build_xml_clusters
 
@@ -16,6 +16,10 @@ from spec_parsing_support import XmlCluster, build_xml_clusters
 class AccessTestType(Enum):
     READ = auto()
     WRITE = auto()
+
+
+def step_number_with_privilege(step: int, substep: str, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
+    return f'{step}{substep}_{privilege.name}'
 
 
 def operation_allowed(spec_requires: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
@@ -60,6 +64,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def setup_test(self):
+        super().setup_test()
         self.success = True
 
     @async_test_body
@@ -187,16 +192,26 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
 
     async def run_access_test(self, test_type: AccessTestType):
+        # Step 1 and 2 are handled in the class setup, but need to be marked for every test
+        self.step(1)
+        self.step(2)
         # Read all the attributes on TH2 using admin access
+        check_step = 3
         if test_type == AccessTestType.WRITE:
+            self.step(3)
             await self._setup_acl(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
+            self.step(4)
             wildcard_read = await self.TH2.Read(self.dut_node_id, [()])
+            check_step = 5
 
+        self.step(check_step)
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
+            self.step(step_number_with_privilege(check_step, 'a', privilege))
             await self._setup_acl(privilege=privilege)
+            self.step(step_number_with_privilege(check_step, 'b', privilege))
             for endpoint_id, endpoint in self.endpoints_tlv.items():
                 for cluster_id, device_cluster_data in endpoint.items():
                     if cluster_id > 0x7FFF or cluster_id not in self.xml_clusters or cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
@@ -212,12 +227,46 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         if not self.success:
             self.fail_current_test("One or more access violations was found")
 
-    @async_test_body
-    async def test_read_access(self):
-        await self.run_access_test(AccessTestType.READ)
+    def steps_TC_ACE_2_1(self):
+        steps = [TestStep(1, "TH_commissioner performs a wildcard read"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute"),
+                 TestStep(3, "Repeat steps 3a and 3b for each permission level")]
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        for p in privilege_enum:
+            steps.append(TestStep(step_number_with_privilege(3, 'a', p),
+                         "TH_commissioner gives TH_second_commissioner the specified privilege"))
+            steps.append(TestStep(step_number_with_privilege(3, 'b', p),
+                         "TH_second_controller reads all the attributes and checks for appropriate permission errors"))
+        return steps
+
+    def desc_TC_ACE_2_1(self):
+        return "[TC-ACE-2.1] Attribute read privilege enforcement - [DUT as Server]"
 
     @async_test_body
-    async def test_write_access(self):
+    async def test_TC_ACE_2_1(self):
+        await self.run_access_test(AccessTestType.READ)
+
+    def steps_TC_ACE_2_2(self):
+        steps = [TestStep(1, "TH_commissioner performs a wildcard read"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute"),
+                 TestStep(3, "TH_commissioner grants TH_second_controller admin permission"),
+                 TestStep(4, "TH_second_controller performs a wildcard read"),
+                 TestStep(5, "Repeat steps 5a and 5b for each permission level")]
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
+        for p in privilege_enum:
+            steps.append(TestStep(step_number_with_privilege(5, 'a', p),
+                         "TH_commissioner gives TH_second_commissioner the specified privilege"))
+            steps.append(TestStep(step_number_with_privilege(5, 'b', p),
+                         "TH_second_commissioner writes all the attributes and checks for appropriate permission errors"))
+        return steps
+
+    def desc_TC_ACE_2_2(self):
+        return "[TC-ACE-2.2] Attribute write privilege enforcement - [DUT as Server]"
+
+    @async_test_body
+    async def test_TC_ACE_2_2(self):
         await self.run_access_test(AccessTestType.WRITE)
 
 
