@@ -146,6 +146,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         attributes = Clusters.RvcOperationalState.Attributes
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
+        rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum
         op_errors = Clusters.OperationalState.Enums.ErrorStateEnum
 
         self.print_step(1, "Commissioning, already done")
@@ -229,41 +230,53 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         if self.check_pics("RVCOPSTATE.S.M.ST_STOPPED"):
             self.print_instruction(24, "Manually put the device in the Stopped(0x00) operational state")
 
-            await self.send_pause_cmd_with_check(25, op_errors.kCommandInvalidInState)
+            await self.read_operational_state_with_check(25, op_states.kStopped)
 
-            await self.send_resume_cmd_with_check(26, op_errors.kCommandInvalidInState)
+            await self.send_pause_cmd_with_check(26, op_errors.kCommandInvalidInState)
+
+            await self.send_resume_cmd_with_check(27, op_errors.kCommandInvalidInState)
 
         if self.check_pics("RVCOPSTATE.S.M.ST_ERROR"):
-            self.print_instruction(27, "Manually put the device in the Error(0x03) operational state")
+            self.print_instruction(28, "Manually put the device in the Error(0x03) operational state")
 
-            await self.send_pause_cmd_with_check(28, op_errors.kCommandInvalidInState)
+            await self.read_operational_state_with_check(29, op_states.kError)
 
-            await self.send_resume_cmd_with_check(29, op_errors.kCommandInvalidInState)
+            await self.send_pause_cmd_with_check(30, op_errors.kCommandInvalidInState)
+
+            await self.send_resume_cmd_with_check(31, op_errors.kCommandInvalidInState)
 
         if self.check_pics("RVCOPSTATE.S.M.ST_CHARGING"):
-            self.print_instruction(30, "Manually put the device in the Charging(0x41) operational state")
+            self.print_instruction(32, "Manually put the device in the Charging(0x41) operational state")
 
-            await self.send_pause_cmd_with_check(31, op_errors.kCommandInvalidInState)
+            await self.read_operational_state_with_check(33, rvc_op_states.kCharging)
 
-            self.print_instruction(
-                32, "Manually put the device in the Charging(0x41) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
-
-            await self.send_resume_cmd_with_check(33, op_errors.kCommandInvalidInState)
-
-        if self.check_pics("RVCOPSTATE.S.M.ST_DOCKED"):
-            self.print_instruction(34, "Manually put the device in the Docked(0x42) operational state")
-
-            await self.send_pause_cmd_with_check(35, op_errors.kCommandInvalidInState)
+            await self.send_pause_cmd_with_check(34, op_errors.kCommandInvalidInState)
 
             self.print_instruction(
-                36, "Manually put the device in the Docked(0x42) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+                35, "Manually put the device in the Charging(0x41) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+
+            await self.read_operational_state_with_check(36, rvc_op_states.kCharging)
 
             await self.send_resume_cmd_with_check(37, op_errors.kCommandInvalidInState)
 
-        if self.check_pics("RVCOPSTATE.S.M.ST_SEEKING_CHARGER"):
-            self.print_instruction(38, "Manually put the device in the SeekingCharger(0x40) operational state")
+        if self.check_pics("RVCOPSTATE.S.M.ST_DOCKED"):
+            self.print_instruction(38, "Manually put the device in the Docked(0x42) operational state")
 
-            await self.send_resume_cmd_with_check(39, op_errors.kCommandInvalidInState)
+            await self.read_operational_state_with_check(39, rvc_op_states.kDocked)
+
+            await self.send_pause_cmd_with_check(40, op_errors.kCommandInvalidInState)
+
+            self.print_instruction(
+                41, "Manually put the device in the Docked(0x42) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+
+            await self.send_resume_cmd_with_check(42, op_errors.kCommandInvalidInState)
+
+        if self.check_pics("RVCOPSTATE.S.M.ST_SEEKING_CHARGER"):
+            self.print_instruction(43, "Manually put the device in the SeekingCharger(0x40) operational state")
+
+            await self.read_operational_state_with_check(44, rvc_op_states.kSeekingCharger)
+
+            await self.send_resume_cmd_with_check(45, op_errors.kCommandInvalidInState)
 
 
 if __name__ == "__main__":
