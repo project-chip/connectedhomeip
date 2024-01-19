@@ -159,15 +159,11 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-// Note the difference in implementation from emberAfGetNthCluster().
-// emberAfGetClusterByIndex() retrieves the cluster by index regardless of server/client
-// and those indexes may be DIFFERENT than the indexes returned from
-// emberAfGetNthCluster().  In other words:
-//
+// Note the difference in for server filtering.
+// This method will return the cluster count for BOTH client and server
+// and those do NOT work with NthCluster/NthClusterId
 //  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster() emberAfGetNthClusterId()
-//  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
 //
-// Don't mix them.
 uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 
 //
