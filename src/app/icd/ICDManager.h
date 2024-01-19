@@ -136,7 +136,7 @@ private:
      * @return false None of the registration would require a Check-In message either because there are no registration or because
      *               they all have associated subscriptions.
      */
-    bool VerifyIfCheckInMessagesWouldBeSent();
+    bool CheckInMessagesWouldBeSent();
 
     KeepActiveFlags mKeepActiveFlags{ 0 };
 

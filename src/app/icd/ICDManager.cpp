@@ -274,7 +274,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         // unless the device would need to send a Check-In messages
         // TODO(#30281) : Verify how persistant subscriptions affects this at ICDManager::Init
-        if (ICDConfigurationData::GetInstance().GetActiveModeDurationMs() > 0 || VerifyIfCheckInMessagesWouldBeSent())
+        if (ICDConfigurationData::GetInstance().GetActiveModeDurationMs() > 0 || CheckInMessagesWouldBeSent())
         {
             uint32_t idleModeDuration = ICDConfigurationData::GetInstance().GetIdleModeDurationSec();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
@@ -541,7 +541,7 @@ void ICDManager::postObserverEvent(ObserverEventType event)
     });
 }
 
-bool ICDManager::VerifyIfCheckInMessagesWouldBeSent()
+bool ICDManager::CheckInMessagesWouldBeSent()
 {
     for (const auto & fabricInfo : *mFabricTable)
     {
