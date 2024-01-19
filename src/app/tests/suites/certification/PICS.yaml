@@ -4273,6 +4273,10 @@ PICS:
       id: APPOBSERVER.C
 
     - label:
+          "Does the device implement the Content Control cluster as a server?"
+      id: CONCON.S
+
+    - label:
           "Does the DUT support the Content Launcher server cluster, Content
           Search feature?"
       id: CONTENTLAUNCHER.S.F00
@@ -9790,21 +9794,21 @@ PICS:
     #  Features
 
     - label: "Does the device support this specific cluster feature?"
-      id: EVSE.S.F00
+      id: EEVSE.S.F00
 
     - label:
           "Does the DUT support the Content Control server cluster, PIN
           Management feature?"
-      id: EVSE.S.F01
+      id: EEVSE.S.F01
 
     - label: "Does the device support this specific cluster feature?"
-      id: EVSE.S.F02
+      id: EEVSE.S.F02
 
     - label: "Does the device support this specific cluster feature?"
-      id: EVSE.S.F03
+      id: EEVSE.S.F03
 
     - label: "Does the device support this specific cluster feature?"
-      id: EVSE.S.F04
+      id: EEVSE.S.F04
 
     # Commands received
     - label: "Does the device implement receiving the Disable command?"
@@ -9852,7 +9856,6 @@ PICS:
       id: EEVSE.S.E05
 
     #  Manual controllable
-
     - label:
           "Can the EEVSE.S.A0000(State) attribute changed by plugging and
           unplugging the EV?"

@@ -2543,6 +2543,7 @@ FAN.S.C00.Rsp=1
 
 #Server
 ICDM.S=1
+ICDM.C=1
 
 #Server Attribute
 ICDM.S.A0000=1
@@ -2574,8 +2575,14 @@ ICDM.S.F02=1
 ICDM.S.C00.Rsp=1
 ICDM.S.C02.Rsp=1
 ICDM.S.C03.Rsp=1
-ICDM.C.C00.Rsp=1
 ICDM.S.C01.Tx=1
+
+ICDM.C.C01.Rsp=0
+ICDM.C.C04.Rsp=0
+ICDM.S.C00.Tx=0
+ICDM.S.C02.Tx=0
+ICDM.S.C03.Tx=0
+ICDM.S.C04.Tx=0
 
 # Smoke CO Alarm Cluster
 SMOKECO.S=1
@@ -2713,7 +2720,7 @@ VALCC.S.C01.Rsp=1
 
 #Device Energy Management cluster
 # Server
-DEM.S
+DEM.S=0
 DEM.S.A0000=0
 DEM.S.A0001=0
 DEM.S.A0002=0
