@@ -30,12 +30,18 @@ class GnBuilder(Builder):
 
         self.build_command = None
 
-    def GnBuildArgs(self):
+    def GnBuildArgsLocal(self):
         """Extra gn build `--args`
 
         If used, returns a list of arguments.
         """
-        return None
+
+        extra_args = []
+
+        if "/lock-app" in self.root:
+            extra_args.append("chip_enable_icd_server=true")
+
+        return extra_args
 
     def GnBuildEnv(self):
         """Extra environment variables needed for the GN build to run.
@@ -67,7 +73,7 @@ class GnBuilder(Builder):
         if self.options.pregen_dir:
             extra_args.append('chip_code_pre_generated_directory="%s"' % self.options.pregen_dir)
 
-        extra_args.extend(self.GnBuildArgs() or [])
+        extra_args.extend(self.GnBuildArgsLocal())
         if extra_args:
             cmd += ['--args=%s' % ' '.join(extra_args)]
 
