@@ -31,6 +31,7 @@
 #include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <tracing/macros.h>
 
 #if CHIP_DEVICE_LAYER_NONE
 #error "identify requrires a device layer"
@@ -196,6 +197,7 @@ void MatterIdentifyClusterServerAttributeChangedCallback(const app::ConcreteAttr
 bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                             const Commands::Identify::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("IdentifyCommand", "Identify");
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
@@ -207,6 +209,7 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const C
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                  const Commands::TriggerEffect::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("TriggerEffect", "Identify");
     auto & effectIdentifier = commandData.effectIdentifier;
     auto & effectVariant    = commandData.effectVariant;
 

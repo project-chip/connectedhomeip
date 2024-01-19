@@ -137,20 +137,35 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     async def _run_write_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, cluster, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, wildcard_read):
         for attribute_id in checkable_attributes(cluster_id, cluster, xml_cluster):
             spec_requires = xml_cluster.attributes[attribute_id].write_access
-            if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
-                # not writeable
-                continue
+            is_optional_write = xml_cluster.attributes[attribute_id].write_optional
+
             attribute = Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id][attribute_id]
             cluster_class = Clusters.ClusterObjects.ALL_CLUSTERS[cluster_id]
             location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
             test_name = f'Write access checker - {privilege}'
+            logging.info(f"Testing attribute {attribute} on endpoint {endpoint_id}")
+            if attribute == Clusters.AccessControl.Attributes.Acl and privilege == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister:
+                logging.info("Skipping ACL attribute check for admin privilege as this is known to be writeable and is being used for this test")
+                continue
 
-            print(f"Testing attribute {attribute} on endpoint {endpoint_id}")
             # Because we read everything with admin, we should have this in the wildcard read
             # This will only not work if we end up with write-only attributes. We do not currently have any of these.
             val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+            if isinstance(val, list):
+                # Use an empty list for writes in case the list is large and does not fit
+                val = []
+
             resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
-            if operation_allowed(spec_requires, privilege):
+            if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+                # not writeable - expect an unsupported write response
+                if resp[0].Status != Status.UnsupportedWrite:
+                    self.record_error(test_name=test_name, location=location,
+                                      problem=f"Unexpected error writing non-writeable attribute - expected Unsupported Write, got {resp[0].Status}")
+                    self.success = False
+            elif is_optional_write and resp[0].Status == Status.UnsupportedWrite:
+                # unsupported optional writeable attribute - this is fine, no error
+                continue
+            elif operation_allowed(spec_requires, privilege):
                 # Write the default attribute. We don't care if this fails, as long as it fails with a DIFFERENT error than the access
                 # This is OK because access is required to be checked BEFORE any other thing to avoid leaking device information.
                 # For example, because we don't have any range information, we might be writing an out of range value, but this will
@@ -166,13 +181,19 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                                       problem=f"Unexpected error writing attribute - expected Unsupported Access, got {resp[0].Status}")
                     self.success = False
 
+            if resp[0].Status == Status.Success and isinstance(val, list):
+                # Reset the value to the original if we managed to write an empty list
+                val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+                await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
+
     async def run_access_test(self, test_type: AccessTestType):
         # Read all the attributes on TH2 using admin access
         if test_type == AccessTestType.WRITE:
             await self._setup_acl(privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
             wildcard_read = await self.TH2.Read(self.dut_node_id, [()])
 
-        privilege_enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+        privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
         for privilege in privilege_enum:
             logging.info(f"Testing for {privilege}")
             await self._setup_acl(privilege=privilege)

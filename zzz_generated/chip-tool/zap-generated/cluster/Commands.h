@@ -18818,11 +18818,11 @@ void registerClusterRefrigeratorAlarm(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>>(
             Id, "mask", 0, UINT32_MAX, Attributes::Mask::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>>(
             Id, "state", 0, UINT32_MAX, Attributes::State::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>>(
             Id, "supported", 0, UINT32_MAX, Attributes::Supported::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
@@ -19143,13 +19143,13 @@ void registerClusterDishwasherAlarm(Commands & commands, CredentialIssuerCommand
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>>(
             Id, "mask", 0, UINT32_MAX, Attributes::Mask::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>>(
             Id, "latch", 0, UINT32_MAX, Attributes::Latch::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>>(
             Id, "state", 0, UINT32_MAX, Attributes::State::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>>(
             Id, "supported", 0, UINT32_MAX, Attributes::Supported::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,

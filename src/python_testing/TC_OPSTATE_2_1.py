@@ -49,6 +49,9 @@ class TC_OPSTATE_2_1(MatterBaseTest):
         asserts.assert_equal(operational_error.errorStateID, expected_error,
                              "errorStateID(%s) should equal %s" % (operational_error.errorStateID, expected_error))
 
+    def pics_TC_OPSTATE_2_1(self) -> list[str]:
+        return ["OPSTATE.S"]
+
     @async_test_body
     async def test_TC_OPSTATE_2_1(self):
 
