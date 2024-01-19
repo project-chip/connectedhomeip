@@ -180,7 +180,7 @@ private:
     bool mIsBatchedCommands;
 };
 
-PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
+PyChipError SendBatchCommandsInternal(PyObject * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
                                       uint16_t interactionTimeoutMs, uint16_t busyWaitMs, bool suppressResponse,
                                       python::TestOnlyPyBatchCommandsOverrides * testOnlyOverrides,
                                       python::PyInvokeRequestData * batchCommandData, size_t length)
@@ -381,9 +381,9 @@ PyChipError pychip_CommandSender_SendBatchCommands(PyObject * appContext, Device
                                      testOnlyOverrides, batchCommandData, length);
 }
 
-PyChipError pychip_CommandSender_TestOnlySendBatchCommands(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
-                                                           uint16_t interactionTimeoutMs, uint16_t busyWaitMs,
-                                                           bool suppressResponse,
+PyChipError pychip_CommandSender_TestOnlySendBatchCommands(PyObject * appContext, DeviceProxy * device,
+                                                           uint16_t timedRequestTimeoutMs, uint16_t interactionTimeoutMs,
+                                                           uint16_t busyWaitMs, bool suppressResponse,
                                                            python::TestOnlyPyBatchCommandsOverrides testOnlyOverrides,
                                                            python::PyInvokeRequestData * batchCommandData, size_t length)
 {
