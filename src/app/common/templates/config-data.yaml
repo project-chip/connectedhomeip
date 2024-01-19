@@ -24,6 +24,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Dishwasher Mode
     - Laundry Washer Mode
     - Oven Mode
+    - Oven Cavity Operational State
     - Refrigerator And Temperature Controlled Cabinet Mode
     - Operational State
     - Activated Carbon Filter Monitoring

@@ -132,27 +132,30 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
             (err = writer.PutBytes(chip::TLV::ContextTag(kRotatingIdTag), mRotatingId, static_cast<uint8_t>(mRotatingIdLen))),
         LogErrorOnFailure(err));
 
-    // AppVendorIdList
-    VerifyOrExit(
-        CHIP_NO_ERROR ==
-            (err = writer.StartContainer(chip::TLV::ContextTag(kTargetAppListTag), chip::TLV::kTLVType_List, listContainerType)),
-        LogErrorOnFailure(err));
-    for (size_t i = 0; i < mNumTargetAppInfos; i++)
+    if (mNumTargetAppInfos > 0)
     {
-        // start the TargetApp structure
+        // AppVendorIdList
         VerifyOrExit(CHIP_NO_ERROR ==
-                         (err = writer.StartContainer(chip::TLV::ContextTag(kTargetAppTag), chip::TLV::kTLVType_Structure,
-                                                      outerContainerType)),
+                         (err = writer.StartContainer(chip::TLV::ContextTag(kTargetAppListTag), chip::TLV::kTLVType_List,
+                                                      listContainerType)),
                      LogErrorOnFailure(err));
-        // add the vendor Id
-        VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kAppVendorIdTag), mTargetAppInfos[i].vendorId)),
-                     LogErrorOnFailure(err));
-        VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kAppProductIdTag), mTargetAppInfos[i].productId)),
-                     LogErrorOnFailure(err));
-        // end the TargetApp structure
-        VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
+        for (size_t i = 0; i < mNumTargetAppInfos; i++)
+        {
+            // start the TargetApp structure
+            VerifyOrExit(CHIP_NO_ERROR ==
+                             (err = writer.StartContainer(chip::TLV::ContextTag(kTargetAppTag), chip::TLV::kTLVType_Structure,
+                                                          outerContainerType)),
+                         LogErrorOnFailure(err));
+            // add the vendor Id
+            VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kAppVendorIdTag), mTargetAppInfos[i].vendorId)),
+                         LogErrorOnFailure(err));
+            VerifyOrExit(CHIP_NO_ERROR == (err = writer.Put(chip::TLV::ContextTag(kAppProductIdTag), mTargetAppInfos[i].productId)),
+                         LogErrorOnFailure(err));
+            // end the TargetApp structure
+            VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
+        }
+        VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(listContainerType)), LogErrorOnFailure(err));
     }
-    VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(listContainerType)), LogErrorOnFailure(err));
 
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.PutBoolean(chip::TLV::ContextTag(kNoPasscodeTag), mNoPasscode)),
                  LogErrorOnFailure(err));
@@ -169,9 +172,10 @@ uint32_t IdentificationDeclaration::WritePayload(uint8_t * payloadBuffer, size_t
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.EndContainer(outerContainerType)), LogErrorOnFailure(err));
     VerifyOrExit(CHIP_NO_ERROR == (err = writer.Finalize()), LogErrorOnFailure(err));
 
-    return writer.GetLengthWritten();
+    return writer.GetLengthWritten() + static_cast<uint32_t>(sizeof(mInstanceName));
 
 exit:
+    ChipLogError(AppServer, "IdentificationDeclaration::WritePayload exiting early error %" CHIP_ERROR_FORMAT, err.Format());
     return 0;
 }
 

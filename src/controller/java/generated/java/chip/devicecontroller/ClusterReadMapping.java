@@ -9336,6 +9336,17 @@ public class ClusterReadMapping {
           readDeviceEnergyManagementPowerAdjustmentCapabilityCommandParams
         );
         result.put("readPowerAdjustmentCapabilityAttribute", readDeviceEnergyManagementPowerAdjustmentCapabilityAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readDeviceEnergyManagementOptOutStateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readDeviceEnergyManagementOptOutStateAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.DeviceEnergyManagementCluster) cluster).readOptOutStateAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readDeviceEnergyManagementOptOutStateCommandParams
+        );
+        result.put("readOptOutStateAttribute", readDeviceEnergyManagementOptOutStateAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readDeviceEnergyManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readDeviceEnergyManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -9527,28 +9538,6 @@ public class ClusterReadMapping {
           readEnergyEvseRandomizationDelayWindowCommandParams
         );
         result.put("readRandomizationDelayWindowAttribute", readEnergyEvseRandomizationDelayWindowAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readEnergyEvseNumberOfWeeklyTargetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readEnergyEvseNumberOfWeeklyTargetsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.EnergyEvseCluster) cluster).readNumberOfWeeklyTargetsAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readEnergyEvseNumberOfWeeklyTargetsCommandParams
-        );
-        result.put("readNumberOfWeeklyTargetsAttribute", readEnergyEvseNumberOfWeeklyTargetsAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readEnergyEvseNumberOfDailyTargetsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readEnergyEvseNumberOfDailyTargetsAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.EnergyEvseCluster) cluster).readNumberOfDailyTargetsAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readEnergyEvseNumberOfDailyTargetsCommandParams
-        );
-        result.put("readNumberOfDailyTargetsAttribute", readEnergyEvseNumberOfDailyTargetsAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readEnergyEvseNextChargeStartTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readEnergyEvseNextChargeStartTimeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

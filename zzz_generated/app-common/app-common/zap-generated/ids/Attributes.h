@@ -3812,6 +3812,10 @@ namespace Forecast {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace Forecast
 
+namespace OptOutState {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace OptOutState
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -3885,14 +3889,6 @@ static constexpr AttributeId Id = 0x00000009;
 namespace RandomizationDelayWindow {
 static constexpr AttributeId Id = 0x0000000A;
 } // namespace RandomizationDelayWindow
-
-namespace NumberOfWeeklyTargets {
-static constexpr AttributeId Id = 0x00000021;
-} // namespace NumberOfWeeklyTargets
-
-namespace NumberOfDailyTargets {
-static constexpr AttributeId Id = 0x00000022;
-} // namespace NumberOfDailyTargets
 
 namespace NextChargeStartTime {
 static constexpr AttributeId Id = 0x00000023;

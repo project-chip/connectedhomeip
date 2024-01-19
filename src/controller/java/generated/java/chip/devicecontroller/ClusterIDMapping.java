@@ -8227,7 +8227,8 @@ public class ClusterIDMapping {
             Pause(0L),
             Stop(1L),
             Start(2L),
-            Resume(3L),;
+            Resume(3L),
+            GoHome(128L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9358,6 +9359,7 @@ public class ClusterIDMapping {
             AbsMaxPower(4L),
             PowerAdjustmentCapability(5L),
             Forecast(6L),
+            OptOutState(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9414,7 +9416,8 @@ public class ClusterIDMapping {
             PauseRequest(3L),
             ResumeRequest(4L),
             ModifyForecastRequest(5L),
-            RequestConstraintBasedForecast(6L),;
+            RequestConstraintBasedForecast(6L),
+            CancelRequest(7L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9432,7 +9435,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PowerAdjustRequestCommandField {Power(0),Duration(1),;
+        }public enum PowerAdjustRequestCommandField {Power(0),Duration(1),Cause(2),;
                     private final int id;
                     PowerAdjustRequestCommandField(int id) {
                         this.id = id;
@@ -9449,7 +9452,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum StartTimeAdjustRequestCommandField {RequestedStartTime(0),;
+                }public enum StartTimeAdjustRequestCommandField {RequestedStartTime(0),Cause(1),;
                     private final int id;
                     StartTimeAdjustRequestCommandField(int id) {
                         this.id = id;
@@ -9466,7 +9469,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum PauseRequestCommandField {Duration(0),;
+                }public enum PauseRequestCommandField {Duration(0),Cause(1),;
                     private final int id;
                     PauseRequestCommandField(int id) {
                         this.id = id;
@@ -9483,7 +9486,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),;
+                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),Cause(2),;
                     private final int id;
                     ModifyForecastRequestCommandField(int id) {
                         this.id = id;
@@ -9500,7 +9503,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum RequestConstraintBasedForecastCommandField {Constraints(0),;
+                }public enum RequestConstraintBasedForecastCommandField {Constraints(0),Cause(1),;
                     private final int id;
                     RequestConstraintBasedForecastCommandField(int id) {
                         this.id = id;
@@ -9565,8 +9568,6 @@ public class ClusterIDMapping {
             MaximumDischargeCurrent(8L),
             UserMaximumChargeCurrent(9L),
             RandomizationDelayWindow(10L),
-            NumberOfWeeklyTargets(33L),
-            NumberOfDailyTargets(34L),
             NextChargeStartTime(35L),
             NextChargeTargetTime(36L),
             NextChargeRequiredEnergy(37L),
@@ -9689,7 +9690,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum SetTargetsCommandField {DayOfWeekforSequence(0),ChargingTargets(1),;
+                }public enum SetTargetsCommandField {ChargingTargetSchedules(0),;
                     private final int id;
                     SetTargetsCommandField(int id) {
                         this.id = id;
@@ -9700,23 +9701,6 @@ public class ClusterIDMapping {
                     }
                     public static SetTargetsCommandField value(int id) throws NoSuchFieldError {
                         for (SetTargetsCommandField field : SetTargetsCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GetTargetsCommandField {DaysToReturn(0),;
-                    private final int id;
-                    GetTargetsCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetTargetsCommandField value(int id) throws NoSuchFieldError {
-                        for (GetTargetsCommandField field : GetTargetsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

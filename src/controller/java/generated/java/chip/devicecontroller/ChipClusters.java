@@ -25491,6 +25491,32 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
+    public void goHome(OperationalCommandResponseCallback callback) {
+      goHome(callback, 0);
+    }
+
+    public void goHome(OperationalCommandResponseCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 128L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      StructType value = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long commandResponseStateFieldID = 0L;
+          ChipStructs.RvcOperationalStateClusterErrorStateStruct commandResponseState = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == commandResponseStateFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+                StructType castingValue = element.value(StructType.class);
+                commandResponseState = ChipStructs.RvcOperationalStateClusterErrorStateStruct.decodeTlv(castingValue);
+              }
+            }
+          }
+          callback.onSuccess(commandResponseState);
+        }}, commandId, value, timedInvokeTimeoutMs);
+    }
+
     public interface OperationalCommandResponseCallback extends BaseClusterCallback {
       void onSuccess(ChipStructs.RvcOperationalStateClusterErrorStateStruct commandResponseState);
     }
@@ -29437,6 +29463,7 @@ public class ChipClusters {
     private static final long ABS_MAX_POWER_ATTRIBUTE_ID = 4L;
     private static final long POWER_ADJUSTMENT_CAPABILITY_ATTRIBUTE_ID = 5L;
     private static final long FORECAST_ATTRIBUTE_ID = 6L;
+    private static final long OPT_OUT_STATE_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -29454,11 +29481,11 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void powerAdjustRequest(DefaultClusterCallback callback, Long power, Long duration) {
-      powerAdjustRequest(callback, power, duration, 0);
+    public void powerAdjustRequest(DefaultClusterCallback callback, Long power, Long duration, Integer cause) {
+      powerAdjustRequest(callback, power, duration, cause, 0);
     }
 
-    public void powerAdjustRequest(DefaultClusterCallback callback, Long power, Long duration, int timedInvokeTimeoutMs) {
+    public void powerAdjustRequest(DefaultClusterCallback callback, Long power, Long duration, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -29469,6 +29496,10 @@ public class ChipClusters {
       final long durationFieldID = 1L;
       BaseTLVType durationtlvValue = new UIntType(duration);
       elements.add(new StructElement(durationFieldID, durationtlvValue));
+
+      final long causeFieldID = 2L;
+      BaseTLVType causetlvValue = new UIntType(cause);
+      elements.add(new StructElement(causeFieldID, causetlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -29494,17 +29525,21 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void startTimeAdjustRequest(DefaultClusterCallback callback, Long requestedStartTime) {
-      startTimeAdjustRequest(callback, requestedStartTime, 0);
+    public void startTimeAdjustRequest(DefaultClusterCallback callback, Long requestedStartTime, Integer cause) {
+      startTimeAdjustRequest(callback, requestedStartTime, cause, 0);
     }
 
-    public void startTimeAdjustRequest(DefaultClusterCallback callback, Long requestedStartTime, int timedInvokeTimeoutMs) {
+    public void startTimeAdjustRequest(DefaultClusterCallback callback, Long requestedStartTime, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long requestedStartTimeFieldID = 0L;
       BaseTLVType requestedStartTimetlvValue = new UIntType(requestedStartTime);
       elements.add(new StructElement(requestedStartTimeFieldID, requestedStartTimetlvValue));
+
+      final long causeFieldID = 1L;
+      BaseTLVType causetlvValue = new UIntType(cause);
+      elements.add(new StructElement(causeFieldID, causetlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -29514,17 +29549,21 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void pauseRequest(DefaultClusterCallback callback, Long duration) {
-      pauseRequest(callback, duration, 0);
+    public void pauseRequest(DefaultClusterCallback callback, Long duration, Integer cause) {
+      pauseRequest(callback, duration, cause, 0);
     }
 
-    public void pauseRequest(DefaultClusterCallback callback, Long duration, int timedInvokeTimeoutMs) {
+    public void pauseRequest(DefaultClusterCallback callback, Long duration, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long durationFieldID = 0L;
       BaseTLVType durationtlvValue = new UIntType(duration);
       elements.add(new StructElement(durationFieldID, durationtlvValue));
+
+      final long causeFieldID = 1L;
+      BaseTLVType causetlvValue = new UIntType(cause);
+      elements.add(new StructElement(causeFieldID, causetlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -29550,11 +29589,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments) {
-      modifyForecastRequest(callback, forecastId, slotAdjustments, 0);
+    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause) {
+      modifyForecastRequest(callback, forecastId, slotAdjustments, cause, 0);
     }
 
-    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, int timedInvokeTimeoutMs) {
+    public void modifyForecastRequest(DefaultClusterCallback callback, Long forecastId, ArrayList<ChipStructs.DeviceEnergyManagementClusterSlotAdjustmentStruct> slotAdjustments, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -29566,6 +29605,10 @@ public class ChipClusters {
       BaseTLVType slotAdjustmentstlvValue = ArrayType.generateArrayType(slotAdjustments, (elementslotAdjustments) -> elementslotAdjustments.encodeTlv());
       elements.add(new StructElement(slotAdjustmentsFieldID, slotAdjustmentstlvValue));
 
+      final long causeFieldID = 2L;
+      BaseTLVType causetlvValue = new UIntType(cause);
+      elements.add(new StructElement(causeFieldID, causetlvValue));
+
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -29574,11 +29617,11 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void requestConstraintBasedForecast(DefaultClusterCallback callback, ArrayList<ChipStructs.DeviceEnergyManagementClusterConstraintsStruct> constraints) {
-      requestConstraintBasedForecast(callback, constraints, 0);
+    public void requestConstraintBasedForecast(DefaultClusterCallback callback, ArrayList<ChipStructs.DeviceEnergyManagementClusterConstraintsStruct> constraints, Integer cause) {
+      requestConstraintBasedForecast(callback, constraints, cause, 0);
     }
 
-    public void requestConstraintBasedForecast(DefaultClusterCallback callback, ArrayList<ChipStructs.DeviceEnergyManagementClusterConstraintsStruct> constraints, int timedInvokeTimeoutMs) {
+    public void requestConstraintBasedForecast(DefaultClusterCallback callback, ArrayList<ChipStructs.DeviceEnergyManagementClusterConstraintsStruct> constraints, Integer cause, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -29586,6 +29629,26 @@ public class ChipClusters {
       BaseTLVType constraintstlvValue = ArrayType.generateArrayType(constraints, (elementconstraints) -> elementconstraints.encodeTlv());
       elements.add(new StructElement(constraintsFieldID, constraintstlvValue));
 
+      final long causeFieldID = 1L;
+      BaseTLVType causetlvValue = new UIntType(cause);
+      elements.add(new StructElement(causeFieldID, causetlvValue));
+
+      StructType value = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, value, timedInvokeTimeoutMs);
+    }
+
+    public void cancelRequest(DefaultClusterCallback callback) {
+      cancelRequest(callback, 0);
+    }
+
+    public void cancelRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
@@ -29793,6 +29856,31 @@ public class ChipClusters {
         }, FORECAST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
+    public void readOptOutStateAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPT_OUT_STATE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, OPT_OUT_STATE_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeOptOutStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OPT_OUT_STATE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, OPT_OUT_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, GENERATED_COMMAND_LIST_ATTRIBUTE_ID);
@@ -29958,8 +30046,6 @@ public class ChipClusters {
     private static final long MAXIMUM_DISCHARGE_CURRENT_ATTRIBUTE_ID = 8L;
     private static final long USER_MAXIMUM_CHARGE_CURRENT_ATTRIBUTE_ID = 9L;
     private static final long RANDOMIZATION_DELAY_WINDOW_ATTRIBUTE_ID = 10L;
-    private static final long NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID = 33L;
-    private static final long NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID = 34L;
     private static final long NEXT_CHARGE_START_TIME_ATTRIBUTE_ID = 35L;
     private static final long NEXT_CHARGE_TARGET_TIME_ATTRIBUTE_ID = 36L;
     private static final long NEXT_CHARGE_REQUIRED_ENERGY_ATTRIBUTE_ID = 37L;
@@ -30062,17 +30148,13 @@ public class ChipClusters {
     }
 
 
-    public void setTargets(DefaultClusterCallback callback, Integer dayOfWeekforSequence, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets, int timedInvokeTimeoutMs) {
+    public void setTargets(DefaultClusterCallback callback, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules, int timedInvokeTimeoutMs) {
       final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long dayOfWeekforSequenceFieldID = 0L;
-      BaseTLVType dayOfWeekforSequencetlvValue = new UIntType(dayOfWeekforSequence);
-      elements.add(new StructElement(dayOfWeekforSequenceFieldID, dayOfWeekforSequencetlvValue));
-
-      final long chargingTargetsFieldID = 1L;
-      BaseTLVType chargingTargetstlvValue = ArrayType.generateArrayType(chargingTargets, (elementchargingTargets) -> elementchargingTargets.encodeTlv());
-      elements.add(new StructElement(chargingTargetsFieldID, chargingTargetstlvValue));
+      final long chargingTargetSchedulesFieldID = 0L;
+      BaseTLVType chargingTargetSchedulestlvValue = ArrayType.generateArrayType(chargingTargetSchedules, (elementchargingTargetSchedules) -> elementchargingTargetSchedules.encodeTlv());
+      elements.add(new StructElement(chargingTargetSchedulesFieldID, chargingTargetSchedulestlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
@@ -30083,36 +30165,25 @@ public class ChipClusters {
     }
 
 
-    public void getTargets(GetTargetsResponseCallback callback, Integer daysToReturn, int timedInvokeTimeoutMs) {
+    public void getTargets(GetTargetsResponseCallback callback, int timedInvokeTimeoutMs) {
       final long commandId = 6L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long daysToReturnFieldID = 0L;
-      BaseTLVType daysToReturntlvValue = new UIntType(daysToReturn);
-      elements.add(new StructElement(daysToReturnFieldID, daysToReturntlvValue));
-
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {
           @Override
           public void onResponse(StructType invokeStructValue) {
-          final long dayOfWeekforSequenceFieldID = 0L;
-          Integer dayOfWeekforSequence = null;
-          final long chargingTargetsFieldID = 1L;
-          ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets = null;
+          final long chargingTargetSchedulesFieldID = 0L;
+          ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules = null;
           for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == dayOfWeekforSequenceFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-                UIntType castingValue = element.value(UIntType.class);
-                dayOfWeekforSequence = castingValue.value(Integer.class);
-              }
-            } else if (element.contextTagNum() == chargingTargetsFieldID) {
+            if (element.contextTagNum() == chargingTargetSchedulesFieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.Array) {
                 ArrayType castingValue = element.value(ArrayType.class);
-                chargingTargets = castingValue.map((elementcastingValue) -> ChipStructs.EnergyEvseClusterChargingTargetStruct.decodeTlv(elementcastingValue));
+                chargingTargetSchedules = castingValue.map((elementcastingValue) -> ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct.decodeTlv(elementcastingValue));
               }
             }
           }
-          callback.onSuccess(dayOfWeekforSequence, chargingTargets);
+          callback.onSuccess(chargingTargetSchedules);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
@@ -30130,7 +30201,7 @@ public class ChipClusters {
     }
 
     public interface GetTargetsResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer dayOfWeekforSequence, ArrayList<ChipStructs.EnergyEvseClusterChargingTargetStruct> chargingTargets);
+      void onSuccess(ArrayList<ChipStructs.EnergyEvseClusterChargingTargetScheduleStruct> chargingTargetSchedules);
     }
 
     public interface StateAttributeCallback extends BaseAttributeCallback {
@@ -30500,56 +30571,6 @@ public class ChipClusters {
             Long value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, RANDOMIZATION_DELAY_WINDOW_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNumberOfWeeklyTargetsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNumberOfWeeklyTargetsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, NUMBER_OF_WEEKLY_TARGETS_ATTRIBUTE_ID, minInterval, maxInterval);
-    }
-
-    public void readNumberOfDailyTargetsAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID);
-
-      readAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-            callback.onSuccess(value);
-          }
-        }, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID, true);
-    }
-
-    public void subscribeNumberOfDailyTargetsAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID);
-
-      subscribeAttribute(new ReportCallbackImpl(callback, path) {
-          @Override
-          public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
-          }
-        }, NUMBER_OF_DAILY_TARGETS_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readNextChargeStartTimeAttribute(

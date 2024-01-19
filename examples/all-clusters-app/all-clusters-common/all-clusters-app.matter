@@ -2592,6 +2592,72 @@ cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster supports remotely monitoring and, where supported, changing the operational state of an Oven. */
+provisional cluster OvenCavityOperationalState = 72 {
+  revision 1;
+
+  enum ErrorStateEnum : enum8 {
+    kNoError = 0;
+    kUnableToStartOrResume = 1;
+    kUnableToCompleteOperation = 2;
+    kCommandInvalidInState = 3;
+  }
+
+  enum OperationalStateEnum : enum8 {
+    kStopped = 0;
+    kRunning = 1;
+    kPaused = 2;
+    kError = 3;
+  }
+
+  struct ErrorStateStruct {
+    enum8 errorStateID = 0;
+    optional char_string<64> errorStateLabel = 1;
+    optional char_string<64> errorStateDetails = 2;
+  }
+
+  struct OperationalStateStruct {
+    enum8 operationalStateID = 0;
+    optional char_string<64> operationalStateLabel = 1;
+  }
+
+  critical event OperationalError = 0 {
+    ErrorStateStruct errorState = 0;
+  }
+
+  info event OperationCompletion = 1 {
+    enum8 completionErrorCode = 0;
+    optional nullable elapsed_s totalOperationalTime = 1;
+    optional nullable elapsed_s pausedTime = 2;
+  }
+
+  readonly attribute nullable char_string phaseList[] = 0;
+  readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute optional nullable elapsed_s countdownTime = 2;
+  readonly attribute OperationalStateStruct operationalStateList[] = 3;
+  readonly attribute OperationalStateEnum operationalState = 4;
+  readonly attribute ErrorStateStruct operationalError = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  response struct OperationalCommandResponse = 4 {
+    ErrorStateStruct commandResponseState = 0;
+  }
+
+  /** Upon receipt, the device SHALL pause its operation if it is possible based on the current function of the server. */
+  command Pause(): OperationalCommandResponse = 0;
+  /** Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted. */
+  command Stop(): OperationalCommandResponse = 1;
+  /** Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started. */
+  command Start(): OperationalCommandResponse = 2;
+  /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
+  command Resume(): OperationalCommandResponse = 3;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 provisional cluster OvenMode = 73 {
   revision 1;
@@ -3420,6 +3486,8 @@ cluster RvcOperationalState = 97 {
   command Start(): OperationalCommandResponse = 2;
   /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
   command Resume(): OperationalCommandResponse = 3;
+  /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
+  command GoHome(): OperationalCommandResponse = 128;
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
@@ -3922,13 +3990,19 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 2;
+  revision 3;
+
+  enum AdjustmentCauseEnum : enum8 {
+    kLocalOptimization = 0;
+    kGridOptimization = 1;
+  }
 
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
     kOffline = 1;
     kFault = 2;
     kUserOptOut = 3;
+    kCancelled = 4;
   }
 
   enum CostTypeEnum : enum8 {
@@ -3942,9 +4016,8 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOffline = 0;
     kOnline = 1;
     kFault = 2;
-    kUserOptOut = 3;
-    kPowerAdjustActive = 4;
-    kPaused = 5;
+    kPowerAdjustActive = 3;
+    kPaused = 4;
   }
 
   enum ESATypeEnum : enum8 {
@@ -3965,11 +4038,27 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOther = 255;
   }
 
+  enum ForecastUpdateReasonEnum : enum8 {
+    kInternalOptimization = 0;
+    kLocalOptimization = 1;
+    kGridOptimization = 2;
+  }
+
+  enum OptOutStateEnum : enum8 {
+    kNoOptOut = 0;
+    kLocalOptOut = 1;
+    kGridOptOut = 2;
+    kOptOut = 3;
+  }
+
   bitmap Feature : bitmap32 {
     kPowerAdjustment = 0x1;
     kPowerForecastReporting = 0x2;
     kStateForecastReporting = 0x4;
-    kForecastAdjustment = 0x8;
+    kStartTimeAdjustment = 0x8;
+    kPausable = 0x10;
+    kForecastAdjustment = 0x20;
+    kConstraintBasedAdjustment = 0x40;
   }
 
   struct CostStruct {
@@ -3985,9 +4074,9 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s defaultDuration = 2;
     elapsed_s elapsedSlotTime = 3;
     elapsed_s remainingSlotTime = 4;
-    boolean slotIsPauseable = 5;
-    elapsed_s minPauseDuration = 6;
-    elapsed_s maxPauseDuration = 7;
+    optional boolean slotIsPauseable = 5;
+    optional elapsed_s minPauseDuration = 6;
+    optional elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
     optional power_mw nominalPower = 9;
     optional power_mw minPower = 10;
@@ -4009,6 +4098,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional epoch_s latestEndTime = 5;
     boolean isPauseable = 6;
     SlotStruct slots[] = 7;
+    ForecastUpdateReasonEnum forecastUpdateReason = 8;
   }
 
   struct ConstraintsStruct {
@@ -4045,6 +4135,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   info event Resumed = 3 {
+    CauseEnum cause = 0;
   }
 
   readonly attribute ESATypeEnum ESAType = 0;
@@ -4054,6 +4145,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute power_mw absMaxPower = 4;
   readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
+  readonly attribute optional OptOutStateEnum optOutState = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4064,23 +4156,28 @@ provisional cluster DeviceEnergyManagement = 152 {
   request struct PowerAdjustRequestRequest {
     power_mw power = 0;
     elapsed_s duration = 1;
+    AdjustmentCauseEnum cause = 2;
   }
 
   request struct StartTimeAdjustRequestRequest {
     epoch_s requestedStartTime = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   request struct PauseRequestRequest {
     elapsed_s duration = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   request struct ModifyForecastRequestRequest {
     int32u forecastId = 0;
     SlotAdjustmentStruct slotAdjustments[] = 1;
+    AdjustmentCauseEnum cause = 2;
   }
 
   request struct RequestConstraintBasedForecastRequest {
     ConstraintsStruct constraints[] = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
@@ -4097,6 +4194,8 @@ provisional cluster DeviceEnergyManagement = 152 {
   command ModifyForecastRequest(ModifyForecastRequestRequest): DefaultSuccess = 5;
   /** Allows a client to ask the ESA to recompute its Forecast based on power and time constraints. */
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
+  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command */
+  command CancelRequest(): DefaultSuccess = 7;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
@@ -4171,6 +4270,11 @@ provisional cluster EnergyEvse = 153 {
     optional energy_mwh addedEnergy = 2;
   }
 
+  struct ChargingTargetScheduleStruct {
+    TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
+    ChargingTargetStruct chargingTargets[] = 1;
+  }
+
   info event EVConnected = 0 {
     int32u sessionID = 0;
   }
@@ -4218,8 +4322,6 @@ provisional cluster EnergyEvse = 153 {
   readonly attribute optional amperage_ma maximumDischargeCurrent = 8;
   attribute access(write: manage) optional amperage_ma userMaximumChargeCurrent = 9;
   attribute access(write: manage) optional elapsed_s randomizationDelayWindow = 10;
-  readonly attribute optional int8u numberOfWeeklyTargets = 33;
-  readonly attribute optional int8u numberOfDailyTargets = 34;
   readonly attribute optional nullable epoch_s nextChargeStartTime = 35;
   readonly attribute optional nullable epoch_s nextChargeTargetTime = 36;
   readonly attribute optional nullable energy_mwh nextChargeRequiredEnergy = 37;
@@ -4240,8 +4342,7 @@ provisional cluster EnergyEvse = 153 {
   readonly attribute int16u clusterRevision = 65533;
 
   response struct GetTargetsResponse = 0 {
-    TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
-    ChargingTargetStruct chargingTargets[] = 1;
+    ChargingTargetScheduleStruct chargingTargetSchedules[] = 0;
   }
 
   request struct EnableChargingRequest {
@@ -4256,12 +4357,7 @@ provisional cluster EnergyEvse = 153 {
   }
 
   request struct SetTargetsRequest {
-    TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
-    ChargingTargetStruct chargingTargets[] = 1;
-  }
-
-  request struct GetTargetsRequest {
-    TargetDayOfWeekBitmap daysToReturn = 0;
+    ChargingTargetScheduleStruct chargingTargetSchedules[] = 0;
   }
 
   /** Allows a client to disable the EVSE from charging and discharging. */
@@ -4275,7 +4371,7 @@ provisional cluster EnergyEvse = 153 {
   /** Allows a client to set the user specified charging targets. */
   timed command SetTargets(SetTargetsRequest): DefaultSuccess = 5;
   /** Allows a client to retrieve the user specified charging targets. */
-  timed command GetTargets(GetTargetsRequest): GetTargetsResponse = 6;
+  timed command GetTargets(): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
 }
@@ -6740,7 +6836,8 @@ internal cluster UnitTesting = 4294048773 {
     int8u fillCharacter = 2;
   }
 
-  /** Simple command without any parameters and without a specific response */
+  /** Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults. */
   command Test(): DefaultSuccess = 0;
   /** Simple command without any parameters and without a specific response not handled by the server */
   command TestNotHandled(): DefaultSuccess = 1;
@@ -7530,6 +7627,20 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 
+  server cluster OvenCavityOperationalState {
+    callback attribute phaseList;
+    callback attribute currentPhase;
+    callback attribute operationalStateList;
+    callback attribute operationalState;
+    callback attribute operationalError;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+  }
+
   server cluster OvenMode {
     callback attribute supportedModes;
     ram      attribute currentMode;
@@ -7786,6 +7897,7 @@ endpoint 1 {
     handle command Pause;
     handle command Resume;
     handle command OperationalCommandResponse;
+    handle command GoHome;
   }
 
   server cluster ScenesManagement {
@@ -7928,12 +8040,13 @@ endpoint 1 {
     callback attribute absMaxPower;
     callback attribute powerAdjustmentCapability;
     callback attribute forecast;
+    callback attribute optOutState;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 2;
+    ram      attribute clusterRevision default = 3;
 
     handle command PowerAdjustRequest;
     handle command CancelPowerAdjustRequest;
@@ -7942,9 +8055,16 @@ endpoint 1 {
     handle command ResumeRequest;
     handle command ModifyForecastRequest;
     handle command RequestConstraintBasedForecast;
+    handle command CancelRequest;
   }
 
   server cluster EnergyEvse {
+    emits event EVConnected;
+    emits event EVNotDetected;
+    emits event EnergyTransferStarted;
+    emits event EnergyTransferStopped;
+    emits event Fault;
+    emits event RFID;
     callback attribute state;
     callback attribute supplyState;
     callback attribute faultState;
@@ -7956,8 +8076,6 @@ endpoint 1 {
     callback attribute maximumDischargeCurrent;
     callback attribute userMaximumChargeCurrent;
     callback attribute randomizationDelayWindow;
-    callback attribute numberOfWeeklyTargets default = 0;
-    callback attribute numberOfDailyTargets default = 1;
     callback attribute nextChargeStartTime;
     callback attribute nextChargeTargetTime;
     callback attribute nextChargeRequiredEnergy;
@@ -8101,13 +8219,6 @@ endpoint 1 {
     ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
-    handle command SetActiveScheduleRequest;
-    handle command SetActivePresetRequest;
-    handle command StartPresetsSchedulesEditRequest;
-    handle command CancelPresetsSchedulesEditRequest;
-    handle command CommitPresetsSchedulesRequest;
-    handle command CancelSetActivePresetRequest;
-    handle command SetTemperatureSetpointHoldPolicy;
   }
 
   server cluster FanControl {
