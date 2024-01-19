@@ -1047,6 +1047,34 @@ static constexpr CommandId Id = 0x00000007;
 } // namespace Commands
 } // namespace EnergyEvse
 
+namespace EnergyEvseMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace EnergyEvseMode
+
+namespace DeviceEnergyManagementMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace DeviceEnergyManagementMode
+
 namespace DoorLock {
 namespace Commands {
 
