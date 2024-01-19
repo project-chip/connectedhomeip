@@ -761,6 +761,13 @@
 #define CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                           \
+    { chip::app::Clusters::ElectricalMeasurement::Id, "Electrical Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_UNIT_TESTING_CLUSTER_SERVER) || defined(ZCL_USING_UNIT_TESTING_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER { chip::app::Clusters::UnitTesting::Id, "Unit Testing" },
 #else
@@ -892,6 +899,7 @@
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER                                                                                 \
+    CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_SAMPLE_MEI_CLUSTER

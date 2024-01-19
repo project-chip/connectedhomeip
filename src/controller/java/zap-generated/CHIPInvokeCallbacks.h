@@ -925,6 +925,38 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback
+    : public Callback::Callback<CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType>
+{
+public:
+    CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(jobject javaCallback);
+
+    ~CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback
+    : public Callback::Callback<CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType>
+{
+public:
+    CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(jobject javaCallback);
+
+    ~CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback();
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPUnitTestingClusterTestSpecificResponseCallback
     : public Callback::Callback<CHIPUnitTestingClusterTestSpecificResponseCallbackType>
 {
