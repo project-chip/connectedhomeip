@@ -31,6 +31,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <tracing/macros.h>
 
 using SceneTableEntry   = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId    = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
@@ -40,12 +41,12 @@ using ExtensionFieldSet = chip::scenes::ExtensionFieldSet;
 using GroupDataProvider = chip::Credentials::GroupDataProvider;
 using SceneTable        = chip::scenes::SceneTable<chip::scenes::ExtensionFieldSetsImpl>;
 using AuthMode          = chip::Access::AuthMode;
-using ScenesServer      = chip::app::Clusters::Scenes::ScenesServer;
+using ScenesServer      = chip::app::Clusters::ScenesManagement::ScenesServer;
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Scenes {
+namespace ScenesManagement {
 
 namespace {
 
@@ -259,7 +260,8 @@ CHIP_ERROR ScenesServer::FabricSceneInfo::FindFabricSceneInfoIndex(EndpointId en
 {
     VerifyOrReturnError(kInvalidEndpointId != endpoint, CHIP_ERROR_INVALID_ARGUMENT);
 
-    uint16_t index = emberAfGetClusterServerEndpointIndex(endpoint, Scenes::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
+    uint16_t index =
+        emberAfGetClusterServerEndpointIndex(endpoint, ScenesManagement::Id, EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT);
 
     if (index < ArraySize(mSceneInfoStructs))
     {
@@ -811,16 +813,19 @@ void ScenesServer::RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex
 
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("AddScene", "Scenes");
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleViewScene(HandlerContext & ctx, const Commands::ViewScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("ViewScene", "Scenes");
     ViewSceneParse<Commands::ViewScene::DecodableType, Commands::ViewSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::RemoveScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RemoveScene", "Scenes");
     Commands::RemoveSceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -877,6 +882,7 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
 
 void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::RemoveAllScenes::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RemoveAllScenes", "Scenes");
     Commands::RemoveAllScenesResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -926,6 +932,7 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
 
 void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("StoreScene", "Scenes");
     Commands::StoreSceneResponse::Type response;
 
     // Response data
@@ -946,6 +953,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 
 void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RecallScene", "Scenes");
     CHIP_ERROR err = RecallSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                       req.sceneID, req.transitionTime, mGroupProvider);
 
@@ -967,6 +975,7 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 
 void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands::GetSceneMembership::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("GetSceneMembership", "Scenes");
     Commands::GetSceneMembershipResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -1013,15 +1022,18 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
 
 void ScenesServer::HandleEnhancedAddScene(HandlerContext & ctx, const Commands::EnhancedAddScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("EnhancedAddScene", "Scenes");
     AddSceneParse<Commands::EnhancedAddScene::DecodableType, Commands::EnhancedAddSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("EnhancedViewScene", "Scenes");
     ViewSceneParse<Commands::EnhancedViewScene::DecodableType, Commands::EnhancedViewSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("CopyScene", "Scenes");
     Commands::CopySceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -1055,7 +1067,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
     // Checks if we copy a single scene or all of them
-    if (req.mode.GetField(app::Clusters::Scenes::CopyModeBitmap::kCopyAllScenes))
+    if (req.mode.GetField(app::Clusters::ScenesManagement::CopyModeBitmap::kCopyAllScenes))
     {
         // Scene Table interface data
         SceneId scenesInGroup[scenes::kMaxScenesPerFabric];
@@ -1121,16 +1133,16 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-} // namespace Scenes
+} // namespace ScenesManagement
 } // namespace Clusters
 } // namespace app
 } // namespace chip
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Scenes;
+using namespace chip::app::Clusters::ScenesManagement;
 
-void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
+void emberAfScenesManagementClusterServerInitCallback(EndpointId endpoint)
 {
     uint32_t featureMap  = 0;
     EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
@@ -1173,7 +1185,7 @@ void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterScenesClusterServerShutdownCallback(EndpointId endpoint)
+void MatterScenesManagementClusterServerShutdownCallback(EndpointId endpoint)
 {
     uint16_t endpointTableSize = 0;
     ReturnOnFailure(Attributes::SceneTableSize::Get(endpoint, &endpointTableSize));
@@ -1183,7 +1195,7 @@ void MatterScenesClusterServerShutdownCallback(EndpointId endpoint)
     sceneTable->RemoveEndpoint();
 }
 
-void MatterScenesPluginServerInitCallback()
+void MatterScenesManagementPluginServerInitCallback()
 {
     CHIP_ERROR err = ScenesServer::Instance().Init();
     if (err != CHIP_NO_ERROR)

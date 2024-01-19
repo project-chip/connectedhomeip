@@ -17,6 +17,7 @@
  */
 
 #include "AllClustersCommandDelegate.h"
+#include "ValveControlDelegate.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "dishwasher-mode.h"
@@ -27,8 +28,10 @@
 #include "microwave-oven-mode.h"
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
+#include "oven-operational-state-delegate.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
+#include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -38,6 +41,8 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/time-synchronization-server/time-synchronization-server.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -64,6 +69,8 @@ AllClustersCommandDelegate sAllClustersCommandDelegate;
 Clusters::WindowCovering::WindowCoveringManager sWindowCoveringManager;
 
 Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
+Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
+Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon = 7;
@@ -218,6 +225,9 @@ void ApplicationInit()
 #endif
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
+    Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
+    Clusters::TimeSynchronization::SetDefaultDelegate(&sTimeSyncDelegate);
+
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
@@ -239,6 +249,7 @@ void ApplicationShutdown()
     Clusters::OperationalState::Shutdown();
     Clusters::RvcOperationalState::Shutdown();
     Clusters::OvenMode::Shutdown();
+    Clusters::OvenCavityOperationalState::Shutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

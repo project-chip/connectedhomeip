@@ -163,8 +163,10 @@ CHIP_ERROR CastingPlayer::SendUserDirectedCommissioningRequest()
 
     ReturnErrorOnFailure(support::ChipDeviceEventHandler::SetUdcStatus(true));
 
+    // TODO: expose options to the higher layer
+    chip::Protocols::UserDirectedCommissioning::IdentificationDeclaration id;
     ReturnErrorOnFailure(chip::Server::GetInstance().SendUserDirectedCommissioningRequest(
-        chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId)));
+        chip::Transport::PeerAddress::UDP(*ipAddressToUse, mAttributes.port, mAttributes.interfaceId), id));
 
     return CHIP_NO_ERROR;
 }

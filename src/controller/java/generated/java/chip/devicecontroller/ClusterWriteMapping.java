@@ -52,8 +52,6 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("identify", writeIdentifyInteractionInfo);
     Map<String, InteractionInfo> writeGroupsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("groups", writeGroupsInteractionInfo);
-    Map<String, InteractionInfo> writeScenesInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("scenes", writeScenesInteractionInfo);
     Map<String, InteractionInfo> writeOnOffInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeOnOffOnTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo onOffonTimeCommandParameterInfo =
@@ -1116,6 +1114,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
+    Map<String, InteractionInfo> writeScenesManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("scenesManagement", writeScenesManagementInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeHepaFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo hepaFilterMonitoringlastChangedTimeCommandParameterInfo =
