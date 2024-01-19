@@ -17,6 +17,7 @@ ables
 AccessControl
 AccessControlEntry
 accessor
+Accessors
 AccountLogin
 acdbc
 ack
@@ -31,7 +32,9 @@ AddNOC
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
 addr
+AddResponse
 AddThreadNetwork
+AddStatus
 adk
 AdministratorCommissioning
 adoc
@@ -97,6 +100,7 @@ att
 attId
 attr
 attrib
+AttributeAccessInterface
 attributeValue
 attrListName
 attrMask
@@ -256,6 +260,7 @@ clusterAttrs
 clusterId
 clusterList
 clusterListName
+ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
@@ -276,6 +281,8 @@ codelabs
 ColorControl
 Comcast
 Commandline
+CommandHandlerInterface
+CommandName
 Commissionable
 CommissionableDataProvider
 commissionables
@@ -289,6 +296,7 @@ configs
 configTOTAL
 ConfigurationManager
 ConfigurationManagerImpl
+conformant
 connectedhomeip
 ConnectionData
 ConnectIP
@@ -490,8 +498,11 @@ eg
 EjQ
 elftools
 elock
+emberAf
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+EmberAfInitializeAttributes
+emberAfSetDynamicEndpoint
 EnableNetwork
 EnableWiFiNetwork
 endian
@@ -521,6 +532,7 @@ EvalCodeWithName
 EvalFrameDefault
 EV
 EVB
+EventLogging
 evk
 EVSE
 exceptfds
@@ -594,6 +606,7 @@ GetDeviceInfo
 GetDns
 GetIP
 getManualTests
+GetSafeAttributePersistenceProvider
 getstarted
 getTests
 GH
@@ -629,6 +642,7 @@ Gv
 gz
 gzbf
 HaloaceticAcidsConcentrationMeasurement
+HandleCommand
 hardcoded
 hardknott
 hardwarever
@@ -700,6 +714,7 @@ installDebug
 instantiation
 integrations
 IntelliSense
+InteractionModelEngine
 InteractionModelVersion
 Interoperable
 introvideos
@@ -804,6 +819,7 @@ localhost
 LocalizationConfiguration
 localstatedir
 LockingState
+LogEvent
 loopback
 LowPower
 LPC
@@ -832,6 +848,7 @@ matterc
 MatterCustomTrace
 matterd
 MatterLock
+MatterReportingAttributeChangeCallback
 matterSdkSourceBuild
 matterSourceBuildAbiFilters
 matterUTestLib
@@ -1065,6 +1082,7 @@ plaintext
 PlatformManager
 PlatformManagerImpl
 plt
+PluginServerCallback
 png
 Podman
 PollControl
@@ -1152,6 +1170,8 @@ recommand
 recommanded
 recurse
 regen
+registerAttributeAccessOverride
+RegisterCommandHandler
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
@@ -1161,6 +1181,7 @@ RendezvousParameters
 RendezVousTest
 REPL
 repo
+repos
 req
 Requestor
 Requestor's

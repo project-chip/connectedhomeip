@@ -136,7 +136,7 @@ class TestMatterTestingSupport(MatterBaseTest):
     async def test_pics_support(self):
         pics_list = ['TEST.S.A0000=1',
                      'TEST.S.A0001=0',
-                     'lower.s.a0000=1',
+                     'TEST.S.A000a=1'
                      '',
                      ' ',
                      '# comment',
@@ -148,10 +148,9 @@ class TestMatterTestingSupport(MatterBaseTest):
 
         asserts.assert_true(self.check_pics("TEST.S.A0000"), "PICS parsed incorrectly for TEST.S.A0000")
         asserts.assert_false(self.check_pics("TEST.S.A0001"), "PICS parsed incorrectly for TEST.S.A0001")
-        asserts.assert_true(self.check_pics("LOWER.S.A0000"), "PICS pased incorrectly for LOWER.S.A0000")
+        asserts.assert_true(self.check_pics("TEST.S.A000a"), "PICS parsed incorrectly for TEST.S.A000a")
         asserts.assert_true(self.check_pics("SPACE.S.A0000"), "PICS parsed incorrectly for SPACE.S.A0000")
         asserts.assert_false(self.check_pics("NOT.S.A0000"), "PICS parsed incorrectly for NOT.S.A0000")
-        asserts.assert_true(self.check_pics(" test.s.a0000"), "PICS checker lowercase handled incorrectly")
 
         # invalid pics file should throw a value error
         pics_list.append("BAD.S.A000=5")

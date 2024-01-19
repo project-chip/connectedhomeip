@@ -62,7 +62,27 @@ class MyUserPrompter : public UserPrompter
     }
 
     // tv should override this with a dialog prompt
-    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    inline void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                            uint16_t pairingHint, const char * pairingInstruction) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override { return; }
+
+    // set to true when TV displays both QR and Passcode during Commissioner Passcode display.
+    inline bool DisplaysPasscodeAndQRCode() override { return true; }
+
+    // tv should override this with a dialog prompt
+    inline void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                               uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
         return;
     }
@@ -79,14 +99,26 @@ class MyUserPrompter : public UserPrompter
 
 MyUserPrompter gMyUserPrompter;
 
-class MyPincodeService : public PincodeService
+class MyPasscodeService : public PasscodeService
 {
-    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) override
     {
-        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+        return ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+    }
+
+    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    {
+        // TODO: randomly generate this value
+        return 12345678;
+    }
+
+    uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
     }
 };
-MyPincodeService gMyPincodeService;
+MyPasscodeService gMyPasscodeService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
@@ -558,7 +590,7 @@ CHIP_ERROR AppTvInit()
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
     if (cdc != nullptr)
     {
-        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetPasscodeService(&gMyPasscodeService);
         cdc->SetUserPrompter(&gMyUserPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

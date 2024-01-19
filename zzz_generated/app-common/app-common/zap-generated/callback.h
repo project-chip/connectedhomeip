@@ -5429,30 +5429,6 @@ bool emberAfTimerClusterReduceTimeCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::Timer::Commands::ReduceTime::DecodableType & commandData);
 /**
- * @brief Oven Cavity Operational State Cluster Pause Command callback (from client)
- */
-bool emberAfOvenCavityOperationalStateClusterPauseCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OvenCavityOperationalState::Commands::Pause::DecodableType & commandData);
-/**
- * @brief Oven Cavity Operational State Cluster Stop Command callback (from client)
- */
-bool emberAfOvenCavityOperationalStateClusterStopCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OvenCavityOperationalState::Commands::Stop::DecodableType & commandData);
-/**
- * @brief Oven Cavity Operational State Cluster Start Command callback (from client)
- */
-bool emberAfOvenCavityOperationalStateClusterStartCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OvenCavityOperationalState::Commands::Start::DecodableType & commandData);
-/**
- * @brief Oven Cavity Operational State Cluster Resume Command callback (from client)
- */
-bool emberAfOvenCavityOperationalStateClusterResumeCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OvenCavityOperationalState::Commands::Resume::DecodableType & commandData);
-/**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
 bool emberAfModeSelectClusterChangeToModeCallback(

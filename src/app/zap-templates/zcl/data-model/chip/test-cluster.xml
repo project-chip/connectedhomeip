@@ -240,7 +240,8 @@ limitations under the License.
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
       <description>
-        Simple command without any parameters and without a specific response
+        Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults.
       </description>
     </command>
 

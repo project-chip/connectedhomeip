@@ -31,9 +31,8 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 class DeviceEnergyManagementManager : public Instance
 {
 public:
-    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature,
-                                  OptionalCommands aOptionalCmds) :
-        DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature, aOptionalCmds)
+    DeviceEnergyManagementManager(EndpointId aEndpointId, DeviceEnergyManagementDelegate & aDelegate, Feature aFeature) :
+        DeviceEnergyManagement::Instance(aEndpointId, aDelegate, aFeature)
     {
         mDelegate = &aDelegate;
     }

@@ -150,7 +150,7 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
         if val not in ["1", "0"]:
             raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
 
-        pics[key.strip().upper()] = (val == "1")
+        pics[key.strip()] = (val == "1")
     return pics
 
 
@@ -725,7 +725,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip().upper()
+        pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
 
     async def read_single_attribute(
