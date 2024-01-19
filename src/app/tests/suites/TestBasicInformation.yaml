@@ -214,7 +214,7 @@ tests:
       attribute: "MaxPathsPerInvoke"
       response:
           # For now all-clusters-app only supports 1 max paths per invoke.
-          value: 1
+          value: 5
 
     - label: "Write global ClusterRevision attribute"
       command: "writeAttribute"
