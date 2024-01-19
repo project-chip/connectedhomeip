@@ -3247,20 +3247,20 @@ cluster TemperatureControl = 86 {
 cluster RefrigeratorAlarm = 87 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3465,7 +3465,7 @@ cluster SmokeCoAlarm = 92 {
 cluster DishwasherAlarm = 93 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
     kDoorError = 0x4;
@@ -3479,16 +3479,16 @@ cluster DishwasherAlarm = 93 {
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute optional AlarmMap latch = 1;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3497,11 +3497,11 @@ cluster DishwasherAlarm = 93 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ResetRequest {
-    AlarmMap alarms = 0;
+    AlarmBitmap alarms = 0;
   }
 
   request struct ModifyEnabledAlarmsRequest {
-    AlarmMap mask = 0;
+    AlarmBitmap mask = 0;
   }
 
   /** Reset alarm */
