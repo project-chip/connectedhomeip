@@ -11159,17 +11159,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case RefrigeratorAlarm::Attributes::Mask::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
         case RefrigeratorAlarm::Attributes::State::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
         }
         case RefrigeratorAlarm::Attributes::Supported::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Supported", 1, value);
         }
@@ -11409,22 +11409,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case DishwasherAlarm::Attributes::Mask::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
         case DishwasherAlarm::Attributes::Latch::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Latch", 1, value);
         }
         case DishwasherAlarm::Attributes::State::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
         }
         case DishwasherAlarm::Attributes::Supported::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Supported", 1, value);
         }

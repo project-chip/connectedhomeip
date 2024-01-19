@@ -11,14 +11,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     26.1.1. [TC-SC-5.1] Adding member to a group - TH as Admin and DUT as Group
     Member
 
 PICS:
-    - MCORE.ROLE.COMMISSIONEE
+    - GRPKEY.S
+    - G.S
 
 config:
     nodeId: 0x12344321
@@ -85,6 +85,7 @@ tests:
           00000000000000000000000000000001 4)EpochStartTime0: 111 5)EpochKey1:
           00000000000000000000000000000002 6)EpochStartTime1: 222 7)EpochKey2:
           00000000000000000000000000000003 8)EpochStartTime2: 333"
+      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -111,6 +112,7 @@ tests:
           d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
           18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
           8)EpochStartTime2: 18446744073709551614"
+      PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
       arguments:
@@ -132,7 +134,8 @@ tests:
           "Step 3: TH binds GroupId 0x0103 with GroupKeySetID 0x01a3 in the
           GroupKeyMap attribute list on GroupKeyManagement cluster by writing
           the GroupKeyMap attribute with one entry as follows: List item 1:
-          a)GroupId: 0x0103  b)GroupKeySetId: 0x01a3"
+          1)GroupId: 0x0103 2)GroupKeySetId: 0x01a3"
+      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
@@ -142,12 +145,14 @@ tests:
     - label:
           "Step 4: TH sends RemoveAllGroups command to the DUT on
           PIXIT.G.ENDPOINT "
+      PICS: G.S.C04.Rsp
       endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
     - label:
           "Step 5: TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the
-          the following settings : 1)GroupID: 0x0103 2)GroupName: 'Test Group'"
+          the following settings 1)GroupID: 0x0103 2)GroupName: 'Test Group'"
+      PICS: G.S.C00.Rsp
       endpoint: Groups.Endpoint
       command: "AddGroup"
       arguments:
@@ -160,7 +165,7 @@ tests:
     - label:
           "Step 6a: TH sends ViewGroup command with the GroupID to the Group
           cluster on the DUT on PIXIT.G.ENDPOINT"
-      PICS: G.S.F00
+      PICS: G.S.F00 && G.S.C01.Rsp
       endpoint: Groups.Endpoint
       command: "ViewGroup"
       arguments:
@@ -179,7 +184,7 @@ tests:
     - label:
           "Step 6b: TH sends ViewGroup command with the GroupID to the Group
           cluster on the DUT on PIXIT.G.ENDPOINT"
-      PICS: "!(G.S.F00)"
+      PICS: " !G.S.F00 && G.S.C01.Rsp "
       endpoint: Groups.Endpoint
       command: "ViewGroup"
       arguments:
@@ -198,6 +203,7 @@ tests:
     - label:
           "Step 7: TH sends KeySetRead command to GroupKeyManagement cluster
           with GroupKeySetID as 0x01a3"
+      PICS: GRPKEY.S.C01.Rsp
       cluster: "Group Key Management"
       command: "KeySetRead"
       arguments:
@@ -222,6 +228,7 @@ tests:
     - label:
           "Step 8: TH reads GroupKeyMap Attribute from the GroupKeyManagement
           cluster from DUT"
+      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       command: "readAttribute"
       attribute: "GroupKeyMap"
@@ -230,9 +237,9 @@ tests:
 
     - label:
           "Step 9a: TH reads GroupTable attribute from GroupKeyManagement
-          cluster on DUT using a fabric-filtered read"
+          cluster on DUT using a fabric-filtered read."
       cluster: "Group Key Management"
-      PICS: G.S.F00
+      PICS: G.S.F00 && GRPKEY.S.A0001
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -249,7 +256,7 @@ tests:
           "Step 9b: TH reads GroupTable attribute from GroupKeyManagement
           cluster on DUT using a fabric-filtered read"
       cluster: "Group Key Management"
-      PICS: " !G.S.F00 "
+      PICS: " !G.S.F00 && GRPKEY.S.A0001 "
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -260,6 +267,7 @@ tests:
           "Step 10: TH removes the Group key set that was added by sending a
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a3"
+      PICS: GRPKEY.S.C03.Rsp
       cluster: "Group Key Management"
       command: "KeySetRemove"
       arguments:
@@ -272,6 +280,7 @@ tests:
           the corresponding entries in the GroupKeyMap by Reading the
           GroupKeyMap attribute from the GroupKeyManagement cluster using a
           fabric-filtered read."
+      PICS: GRPKEY.S.A0000
       cluster: "Group Key Management"
       command: "readAttribute"
       attribute: "GroupKeyMap"
@@ -279,8 +288,9 @@ tests:
           value: []
 
     - label:
-          "Step 12: TH cleans up the groups by sending the RemoveAllGroups
-          command to the DUT on PIXIT.G.ENDPOINT"
+          "Step 12: TH cleans up groups using RemoveAllGroups command to the DUT
+          on PIXIT.G.ENDPOINT"
+      PICS: G.S.C04.Rsp
       endpoint: Groups.Endpoint
       command: "RemoveAllGroups"
 
@@ -288,6 +298,7 @@ tests:
           "Step 13: TH reads verifies the group has been removed by reading the
           GroupTable attribute from GroupKeyManagement cluster on DUT using a
           fabric-filtered read."
+      PICS: GRPKEY.S.A0001
       cluster: "Group Key Management"
       command: "readAttribute"
       attribute: "GroupTable"
@@ -298,8 +309,8 @@ tests:
           "Step 14: TH writes the ACL attribute in the Access Control cluster to
           remove Operate privileges for group 0x0103 and maintain the current
           administrative privileges for the TH. The following access control
-          list shall be used : List item 1 (TH admin): a)Privilege: Administer
-          (5) b)AuthMode: CASE (2) c)Subjects: TH node id ([N1]) d)Targets: all
+          list shall be used: List item 1 (TH admin): 1)Privilege: Administer
+          (5) 2)AuthMode: CASE (2) 3)Subjects: TH node id ([N1]) 4)Targets: all
           (null)"
       cluster: "Access Control"
       command: "writeAttribute"
