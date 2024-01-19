@@ -363,6 +363,7 @@ void ChannelManager::HandleGetProgramGuide(
     const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
     const chip::Optional<chip::ByteSpan> & data)
 {
+
     // 1. Decode received parameters
     // 2. Perform search
     // 3. Return results
