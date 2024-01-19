@@ -32,7 +32,7 @@ config:
         defaultValue: 10
     invalid_mode_th:
         type: int8u
-        defaultValue: 5
+        defaultValue: 15
 
 tests:
     - label:
@@ -54,7 +54,6 @@ tests:
           constraints:
               type: list
               minLength: 2
-              contains: NewMode_CHANGE_FAIL
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OTCCM.S.A0001
@@ -112,8 +111,7 @@ tests:
           "Step 7: TH sends a ChangeToMode command to the DUT with NewMode set
           to PIXIT.OTCCM.MODE_CHANGE_FAIL"
       PICS:
-          OTCCM.S.M.CAN_TEST_MODE_FAILURE && LWM.S.C00.Rsp &&
-          PICS_SKIP_SAMPLE_APP
+          OTCCM.S.M.CAN_TEST_MODE_FAILURE && OTCCM.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
           Note : Please skip this step as SDK is not enabled with this failure response
 

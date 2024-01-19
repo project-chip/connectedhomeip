@@ -60,7 +60,7 @@ tests:
       response:
           saveAs: on_mode_dut
           constraints:
-              type: int16u
+              type: int8u
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
       PICS: OTCCM.S.A0001 && OTCCM.S.F00
@@ -69,7 +69,7 @@ tests:
       response:
           saveAs: old_current_mode_dut
           constraints:
-              type: int16u
+              type: int8u
 
     - label:
           "If on_mode_dut is equal to old_current_mode_dut proceed to step 4.
@@ -82,10 +82,10 @@ tests:
                 value: on_mode_dut
               - name: "Value2"
                 value: old_current_mode_dut
-          response:
-              - values:
-                    - name: "Equals"
-                      saveAs: IsExpectedValue
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
 
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
       runIf: IsExpectedValue
@@ -127,4 +127,4 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-      value: on_mode_dut
+        value: on_mode_dut
