@@ -460,12 +460,11 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = ShortUUID_CHIPoBLEService[1];
 
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-    // check for extended advertisment interval
-    if (BLEMgrImpl().Internal_Slow_Advertising_MIN == CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL)
+    // Check for extended advertisement interval and redact VID/PID if past the initial period.
+    if (mFlags.Has(Flags::kExtAdvertisingEnabled)) {
     {
         mDeviceIdInfo.SetVendorId(0x0000);
         mDeviceIdInfo.SetProductId(0x0000);
-        mDeviceIdInfo.SetAdditionalDataFlag(true);
         mDeviceIdInfo.SetExtendedAnnouncementFlag(true);
     }
 #endif
@@ -566,13 +565,14 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
     else
     {
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-        interval_min = BLEMgrImpl().Internal_Slow_Advertising_MIN;
-        interval_max = BLEMgrImpl().Internal_Slow_Advertising_MAX;
-#else
-        interval_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        interval_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
-#endif
+        if (!(mFlags.Has(Flags::kExtAdvertisingEnabled))) {
+            interval_min = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
+            interval_max = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
+        }
+        else {
+            interval_min = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN;
+            interval_max = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX;
+        }
     }
 
     ret = sl_bt_advertiser_set_timing(advertising_set_handle, interval_min, interval_max, 0, 0);
@@ -967,26 +967,20 @@ uint8_t BLEManagerImpl::GetTimerHandle(uint8_t connectionHandle, bool allocate)
 
 void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {
-    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
-    {
+    if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled)) {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertissment");
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-        BLEMgrImpl().Internal_Slow_Advertising_MIN = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-        BLEMgrImpl().Internal_Slow_Advertising_MAX = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
-#endif
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+        BLEMgrImpl().mFlags.Clear(Flags::kExtAdvertisingEnabled);
         BLEMgrImpl().StartBleAdvTimeoutTimer(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME);
 #endif
     }
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-    else
-    {
+    else {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisment");
-        BLEMgrImpl().Internal_Slow_Advertising_MIN = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL;
-        BLEMgrImpl().Internal_Slow_Advertising_MAX = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL;
         BLEMgrImpl().mFlags.Set(Flags::kAdvertising);
+        BLEMgrImpl().mFlags.Set(Flags::kExtAdvertisingEnabled);
         BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
 #endif

@@ -60,7 +60,7 @@ public:
     static constexpr System::Clock::Seconds16 MaxCommissioningTimeout()
     {
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-        // per new spec change/extension - Extended Announcement Duration up to 48h
+        // Specification section 2.3.1 - Extended Announcement Duration up to 48h
         return System::Clock::Seconds16(60 * 60 * 48);
 #else
         // Specification section 5.4.2.3. Announcement Duration says 15 minutes.

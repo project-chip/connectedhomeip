@@ -617,18 +617,56 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+ *
+ * Optional configuration to enable Extended Announcement Duration up to 48h
+ * Should be used together with extending CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS past 15 minutes
+ * Disabled by default
+ */
+
 #ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
 #define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING 0
 #endif
 
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
 
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be switched from the slow
+ * advertising to the extended advertising, counting from the moment of advertisement commencement.
+ *
+ *  Defaults to 15 minutes measured in ms.
+ */
 #ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME
 #define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME (15 * 60 * 1000)
 #endif
 
-#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL
-#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL 1920
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN
+ *
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in extended advertising mode. The minimum interval should be smaller and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX.
+ *
+ * Defaults to 1920 (1200 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 1920
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
+ *
+ * The interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in extended advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN.
+ *
+ * Defaults to 1936 (1210 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 1936
 #endif
 
 #endif

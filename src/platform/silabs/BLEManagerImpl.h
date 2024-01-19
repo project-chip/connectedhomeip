@@ -151,6 +151,7 @@ private:
         kRestartAdvertising     = 0x0008,
         kEFRBLEStackInitialized = 0x0010,
         kDeviceNameSet          = 0x0020,
+        kExtAdvertisingEnabled  = 0x0040,
     };
 
     enum
@@ -208,11 +209,6 @@ private:
     static void DriveBLEState(intptr_t arg);
     static void BleAdvTimeoutHandler(TimerHandle_t xTimer);
     uint8_t GetTimerHandle(uint8_t connectionHandle, bool allocate);
-
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-    uint16_t Internal_Slow_Advertising_MIN = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
-    uint16_t Internal_Slow_Advertising_MAX = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
-#endif
 };
 
 /**
