@@ -26,8 +26,8 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-static DeviceEnergyManagementModeDelegate * gDeviceEnergyManagementModeDelegate = nullptr;
-static ModeBase::Instance * gDeviceEnergyManagementModeInstance                 = nullptr;
+static std::unique_ptr<DeviceEnergyManagementModeDelegate> gDeviceEnergyManagementModeDelegate;
+static std::unique_ptr<ModeBase::Instance> gDeviceEnergyManagementModeInstance;
 
 CHIP_ERROR DeviceEnergyManagementModeDelegate::Init()
 {
@@ -79,30 +79,22 @@ CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeTagsByIndex(uint8_t modeIn
 
 ModeBase::Instance * DeviceEnergyManagementMode::Instance()
 {
-    return gDeviceEnergyManagementModeInstance;
+    return gDeviceEnergyManagementModeInstance.get();
 }
 
 void DeviceEnergyManagementMode::Shutdown()
 {
-    if (gDeviceEnergyManagementModeInstance != nullptr)
-    {
-        delete gDeviceEnergyManagementModeInstance;
-        gDeviceEnergyManagementModeInstance = nullptr;
-    }
-    if (gDeviceEnergyManagementModeDelegate != nullptr)
-    {
-        delete gDeviceEnergyManagementModeDelegate;
-        gDeviceEnergyManagementModeDelegate = nullptr;
-    }
+    gDeviceEnergyManagementModeInstance.reset();
+    gDeviceEnergyManagementModeDelegate.reset();
 }
 
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gDeviceEnergyManagementModeDelegate == nullptr && gDeviceEnergyManagementModeInstance == nullptr);
-    gDeviceEnergyManagementModeDelegate = new DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate;
+    VerifyOrDie(!gDeviceEnergyManagementModeDelegate && !gDeviceEnergyManagementModeInstance);
+    gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
     gDeviceEnergyManagementModeInstance =
-        new ModeBase::Instance(gDeviceEnergyManagementModeDelegate, 0x1, DeviceEnergyManagementMode::Id,
-                               chip::to_underlying(DeviceEnergyManagementMode::Feature::kOnOff));
+        std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(), 0x1, DeviceEnergyManagementMode::Id,
+                                             chip::to_underlying(DeviceEnergyManagementMode::Feature::kOnOff));
     gDeviceEnergyManagementModeInstance->Init();
 }

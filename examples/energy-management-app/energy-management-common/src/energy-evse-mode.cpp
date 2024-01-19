@@ -26,8 +26,8 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-static EnergyEvseModeDelegate * gEnergyEvseModeDelegate = nullptr;
-static ModeBase::Instance * gEnergyEvseModeInstance     = nullptr;
+static std::unique_ptr<EnergyEvseModeDelegate> gEnergyEvseModeDelegate;
+static std::unique_ptr<ModeBase::Instance> gEnergyEvseModeInstance;
 
 CHIP_ERROR EnergyEvseModeDelegate::Init()
 {
@@ -78,28 +78,20 @@ CHIP_ERROR EnergyEvseModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mo
 
 ModeBase::Instance * EnergyEvseMode::Instance()
 {
-    return gEnergyEvseModeInstance;
+    return gEnergyEvseModeInstance.get();
 }
 
 void EnergyEvseMode::Shutdown()
 {
-    if (gEnergyEvseModeInstance != nullptr)
-    {
-        delete gEnergyEvseModeInstance;
-        gEnergyEvseModeInstance = nullptr;
-    }
-    if (gEnergyEvseModeDelegate != nullptr)
-    {
-        delete gEnergyEvseModeDelegate;
-        gEnergyEvseModeDelegate = nullptr;
-    }
+    gEnergyEvseModeInstance.reset();
+    gEnergyEvseModeDelegate.reset();
 }
 
 void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(gEnergyEvseModeDelegate == nullptr && gEnergyEvseModeInstance == nullptr);
-    gEnergyEvseModeDelegate = new EnergyEvseMode::EnergyEvseModeDelegate;
-    gEnergyEvseModeInstance = new ModeBase::Instance(gEnergyEvseModeDelegate, 0x1, EnergyEvseMode::Id,
-                                                     chip::to_underlying(EnergyEvseMode::Feature::kOnOff));
+    VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
+    gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
+    gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id,
+                                                                   chip::to_underlying(EnergyEvseMode::Feature::kOnOff));
     gEnergyEvseModeInstance->Init();
 }
