@@ -24,7 +24,6 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -66,143 +65,155 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 {
     switch (aPath.mAttributeId)
     {
-	case FeatureMap::Id:
+    case FeatureMap::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
         break;
-	case PowerMode::Id:
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetPowerMode()));
-		break;
+    case PowerMode::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetPowerMode()));
+        break;
     case NumberOfMeasurementTypes::Id:
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetNumberOfMeasurementTypes()));
-		break;
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetNumberOfMeasurementTypes()));
+        break;
     case Accuracy::Id:
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetAccuracy()));
-		break;
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetAccuracy()));
+        break;
     case Ranges::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRanges))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRanges))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRanges()));
-		break;
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRanges()));
+        break;
     case Voltage::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeVoltage))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeVoltage))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetVoltage()));
-		break;
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetVoltage()));
+        break;
     case ActiveCurrent::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveCurrent))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeActiveCurrent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetActiveCurrent()));
-		break;
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetActiveCurrent()));
+        break;
     case ReactiveCurrent::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeReactiveCurrent))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeReactiveCurrent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get ReactiveCurrent, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetReactiveCurrent()));
-		break;
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get ReactiveCurrent, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetReactiveCurrent()));
+        break;
     case ApparentCurrent::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeApparentCurrent))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeApparentCurrent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get ApparentCurrent, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetApparentCurrent()));
-		break;
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get ApparentCurrent, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetApparentCurrent()));
+        break;
     case ActivePower::Id:
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetActivePower()));
-		break;
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetActivePower()));
+        break;
     case ReactivePower::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeReactivePower))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeReactivePower))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get ReactivePower, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetReactivePower()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get ReactivePower, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetReactivePower()));
+        break;
     case ApparentPower::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeApparentPower))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeApparentPower))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get ApparentPower, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetApparentPower()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get ApparentPower, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetApparentPower()));
+        break;
     case RMSVoltage::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRMSVoltage))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRMSVoltage))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get RMSVoltage, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRMSVoltage()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get RMSVoltage, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRMSVoltage()));
+        break;
     case RMSCurrent::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRMSCurrent))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRMSCurrent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get RMSCurrent, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRMSCurrent()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get RMSCurrent, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRMSCurrent()));
+        break;
     case RMSPower::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRMSPower))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeRMSPower))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get RMSPower, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRMSPower()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get RMSPower, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetRMSPower()));
+        break;
     case Frequency::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeFrequency))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeFrequency))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get Frequency, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetFrequency()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get Frequency, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetFrequency()));
+        break;
     case HarmonicCurrents::Id:
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetHarmonicCurrents()));
-		break;
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kHarmonics), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicCurrents, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetHarmonicCurrents()));
+        break;
     case HarmonicPhases::Id:
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetHarmonicPhases()));
-		break;
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kPowerQuality), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetHarmonicPhases()));
+        break;
     case PowerFactor::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributePowerFactor))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributePowerFactor))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get PowerFactor, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetPowerFactor()));
-		break;
+        VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+                            CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+                            ChipLogError(Zcl, "Electrical Power Measurement: can not get PowerFactor, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetPowerFactor()));
+        break;
     case NeutralCurrent::Id:
-		if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeNeutralCurrent))
+        if (!SupportsOptAttr(OptionalAttributes::kOptionalAttributeNeutralCurrent))
         {
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
-		VerifyOrReturnError(HasFeature(ElectricalPowerMeasurement::Feature::kPolyphasePower), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
-					ChipLogError(Zcl, "Electrical Power Measurement: can not get NeutralCurrent, feature is not supported"));
-		ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetNeutralCurrent()));
-		break;
-	}
+        VerifyOrReturnError(
+            HasFeature(ElectricalPowerMeasurement::Feature::kPolyphasePower), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE,
+            ChipLogError(Zcl, "Electrical Power Measurement: can not get NeutralCurrent, feature is not supported"));
+        ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetNeutralCurrent()));
+        break;
+    }
     return CHIP_NO_ERROR;
 }
 
