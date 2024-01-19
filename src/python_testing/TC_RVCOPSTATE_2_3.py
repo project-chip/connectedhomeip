@@ -142,7 +142,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
         attributes = Clusters.RvcOperationalState.Attributes
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
-        rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum
         op_errors = Clusters.OperationalState.Enums.ErrorStateEnum
 
         self.print_step(1, "Commissioning, already done")
