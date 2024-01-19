@@ -127,4 +127,4 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-        value: on_mode_dut
+          value: on_mode_dut
