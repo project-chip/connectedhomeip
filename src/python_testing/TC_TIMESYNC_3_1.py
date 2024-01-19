@@ -22,6 +22,9 @@ from mobly import asserts
 
 class TC_TIMESYNC_3_1(MatterBaseTest):
 
+    def pics_TC_TIMESYNC_3_1(self) -> list[str]:
+        return ["TIMESYNC.S"]
+
     @async_test_body
     async def test_TC_TIMESYNC_3_1(self):
         self.print_step(1, "Wildcard read of time sync cluster")

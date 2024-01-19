@@ -16,10 +16,9 @@
  */
 #pragma once
 
-#include <app/AppConfig.h>
+#include <app/icd/ICDConfig.h>
 #include <lib/core/CHIPError.h>
-
-class ICDListener;
+#include <lib/support/BitFlags.h>
 
 namespace chip {
 namespace app {
@@ -38,11 +37,13 @@ static_assert(ICD_MAX_NOTIFICATION_SUBSCRIBERS > 0, "At least 1 Subscriber is re
 class ICDListener
 {
 public:
-    enum class KeepActiveFlags : uint8_t
+    enum class KeepActiveFlagsValues : uint8_t
     {
         kCommissioningWindowOpen = 0x01,
         kFailSafeArmed           = 0x02,
-        kExchangeContextOpen     = 0x03,
+        kExchangeContextOpen     = 0x04,
+        kCheckInInProgress       = 0x08,
+        kInvalidFlag             = 0x10, // Move up when adding more flags
     };
 
     enum class ICDManagementEvents : uint8_t
@@ -50,6 +51,9 @@ public:
         kTableUpdated              = 0x01,
         kStayActiveRequestReceived = 0x02,
     };
+
+    using KeepActiveFlags = BitFlags<KeepActiveFlagsValues>;
+    using KeepActiveFlag  = KeepActiveFlagsValues;
 
     virtual ~ICDListener() {}
 
@@ -100,6 +104,11 @@ public:
     void BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request);
     void BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
     void BroadcastICDManagementEvent(ICDListener::ICDManagementEvents event);
+
+    inline void BroadcastActiveRequest(ICDListener::KeepActiveFlags request, bool notify)
+    {
+        (notify) ? BroadcastActiveRequestNotification(request) : BroadcastActiveRequestWithdrawal(request);
+    }
 
     static ICDNotifier & GetInstance() { return sICDNotifier; }
 

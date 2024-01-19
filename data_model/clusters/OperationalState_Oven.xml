@@ -60,23 +60,4 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="OVENOPSTATE" scope="Endpoint"/>
-  <dataTypes>
-    <enum name="OperationalStateEnum">
-      <item value="1" name="Running" summary="The device is operating">
-        <disallowConform/>
-      </item>
-      <item value="64" name="Preheating" summary="The device is preheating the cavity">
-        <mandatoryConform/>
-      </item>
-      <item value="65" name="Preheated" summary="The device is finished preheating the cavity">
-        <mandatoryConform/>
-      </item>
-      <item value="66" name="CoolingDown" summary="The device is finished running and is cooling down">
-        <mandatoryConform/>
-      </item>
-      <item value="67" name="SelfCleaning" summary="The device is self-cleaning and the cavity cannot be opened">
-        <mandatoryConform/>
-      </item>
-    </enum>
-  </dataTypes>
 </cluster>

@@ -75,11 +75,6 @@ class EventQuality(enum.Flag):
     FABRIC_SENSITIVE = enum.auto()
 
 
-class ClusterSide(enum.Enum):
-    CLIENT = enum.auto()
-    SERVER = enum.auto()
-
-
 class StructTag(enum.Enum):
     REQUEST = enum.auto()
     RESPONSE = enum.auto()
@@ -220,7 +215,7 @@ class Command:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
     @property
     def is_timed_invoke(self):
@@ -229,9 +224,9 @@ class Command:
 
 @dataclass
 class Cluster:
-    side: ClusterSide
     name: str
     code: int
+    revision: int = 1
     enums: List[Enum] = field(default_factory=list)
     bitmaps: List[Bitmap] = field(default_factory=list)
     events: List[Event] = field(default_factory=list)
@@ -242,7 +237,7 @@ class Cluster:
     api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -252,7 +247,7 @@ class AttributeInstantiation:
     default: Optional[Union[str, int, bool]] = None
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -260,7 +255,7 @@ class CommandInstantiation:
     name: str
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass
@@ -271,7 +266,7 @@ class ServerClusterInstantiation:
     events_emitted: Set[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
-    parse_meta: Optional[ParseMetaData] = field(default=None)
+    parse_meta: Optional[ParseMetaData] = field(default=None, compare=False)
 
 
 @dataclass

@@ -169,6 +169,18 @@ enum PublicEventTypes
     kCHIPoBLEConnectionClosed,
 
     /**
+     * Request BLE connections to be closed.
+     * This is used in the supportsConcurrentConnection = False case.
+     */
+    kCloseAllBleConnections,
+
+    /**
+     * When supportsConcurrentConnection = False, the ConnectNetwork command cannot start until
+     * the BLE device is closed and the WiFi device has been started.
+     */
+    kWiFiDeviceAvailable,
+
+    /**
      * Thread State Change
      *
      * Signals that a state change has occurred in the Thread stack.

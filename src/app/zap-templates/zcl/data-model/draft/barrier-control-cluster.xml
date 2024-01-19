@@ -30,7 +30,8 @@ limitations under the License.
     <field name="positionFailure" mask="0x08"/>
   </bitmap>
 
-  <cluster>
+  <!-- Deprecated because this is a zigbee-only cluster -->
+  <cluster apiMaturity="deprecated">
     <name>Barrier Control</name>
     <domain>Closures</domain>
     <code>0x0103</code>

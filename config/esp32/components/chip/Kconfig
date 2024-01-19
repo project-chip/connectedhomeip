@@ -250,6 +250,13 @@ menu "CHIP Core"
             help
                 The delay time for OTA reboot on applying.
 
+        config CHIP_ENABLE_PAIRING_AUTOSTART
+            bool "Open commissioning window on boot"
+            default y
+            help
+                Opens the commissioning window automatically at application boot time if
+                the node is not yet commissioned.
+
     endmenu # "System Options"
 
     menu "Security Options"
@@ -867,6 +874,15 @@ menu "CHIP Device Layer"
                 then this option gets enabled.
                 Also, please disable ESP_SECURE_CERT_DS_PERIPHERAL from the menuconfig when this option is disabled
 
+        config ENABLE_SET_CERT_DECLARATION_API
+            depends on ENABLE_ESP32_FACTORY_DATA_PROVIDER || SEC_CERT_DAC_PROVIDER
+            bool "Enable Set CD API"
+            default n
+            help
+                By default, the implementation reads the Certification Declaration (CD) from the 'chip-factory'
+                NVS namespace. If this option is enabled, the application can use an API to set a CD,
+                the configured CD will be used for subsequent CD reads.
+
        config ENABLE_ESP_INSIGHTS_TRACE
            bool "Enable Matter ESP Insights"
            depends on ESP_INSIGHTS_ENABLED
@@ -876,6 +892,12 @@ menu "CHIP Device Layer"
                Enabling the above option will enable the esp32 specific tracing functionality and report the
                diagnostic information to the insights cloud.
 
+      config ENABLE_ESP_INSIGHTS_SYSTEM_STATS
+           bool "Enable System Stats for insights"
+           depends on ESP_INSIGHTS_ENABLED
+           default n
+           help
+               This option enables the system statistics to be sent to the insights cloud.
     endmenu
 
 
@@ -1047,6 +1069,12 @@ menu "CHIP Device Layer"
             depends on CHIP_ENABLE_EXTERNAL_PLATFORM
             help
                 The directory of the external platform.
+
+        config CHIP_EXTERNAL_PLATFORM_INCLUDE_DIR
+            string "The external platform including directory"
+            depends on CHIP_ENABLE_EXTERNAL_PLATFORM
+            help
+                The including directory of the external platform.
 
     endmenu
 

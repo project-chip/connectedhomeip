@@ -41,8 +41,8 @@
 
 namespace chip {
 
-extern const char * kSpake2pI2RSessionInfo;
-extern const char * kSpake2pR2ISessionInfo;
+extern const char kSpake2pI2RSessionInfo[];
+extern const char kSpake2pR2ISessionInfo[];
 
 inline constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
 

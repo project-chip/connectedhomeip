@@ -19,7 +19,6 @@
  * is meant to be included at the end of cluster-enums.h, after all the normal
  * enum definitions are available.
  */
-
 #pragma once
 
 namespace chip {
@@ -61,6 +60,8 @@ using ApplicationLauncherStatusEnum = StatusEnum;
 namespace KeypadInput {
 // https://github.com/project-chip/connectedhomeip/pull/30316 renamed this
 using KeypadInputStatusEnum = StatusEnum;
+// https://github.com/project-chip/connectedhomeip/pull/30497 renamed this
+using CecKeyCode = CECKeyCodeEnum;
 } // namespace KeypadInput
 
 namespace Channel {
@@ -78,6 +79,16 @@ using MoveMode            = MoveModeEnum;
 using StepMode            = StepModeEnum;
 using LevelControlOptions = OptionsBitmap;
 } // namespace LevelControl
+
+namespace RefrigeratorAlarm {
+// https://github.com/project-chip/connectedhomeip/pull/31517 renamed this
+using AlarmMap = AlarmBitmap;
+} // namespace RefrigeratorAlarm
+
+namespace DishwasherAlarm {
+// https://github.com/project-chip/connectedhomeip/pull/31517 renamed this
+using AlarmMap = AlarmBitmap;
+} // namespace DishwasherAlarm
 
 } // namespace Clusters
 } // namespace app

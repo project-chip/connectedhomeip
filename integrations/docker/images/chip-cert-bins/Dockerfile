@@ -187,6 +187,9 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-ota-requestor-ipv6only \
     --target linux-x64-lock-ipv6only \
     --target linux-x64-simulated-app1-ipv6only \
+    --target linux-x64-lit-icd-ipv6only \
+    --target linux-x64-energy-management-ipv6only \
+    --target linux-x64-microwave-oven-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -202,6 +205,9 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
     && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
+    && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
+    && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -221,6 +227,9 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-ota-requestor-ipv6only \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
+    --target linux-arm64-lit-icd-ipv6only \
+    --target linux-arm64-energy-management-ipv6only \
+    --target linux-arm64-microwave-oven-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -236,6 +245,9 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
     && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
+    && mv out/linux-arm64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
+    && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     ;; \
     *) ;; \
     esac
@@ -264,6 +276,9 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app chip-ota-requestor-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
 
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib

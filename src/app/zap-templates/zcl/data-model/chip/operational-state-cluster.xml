@@ -19,6 +19,7 @@ limitations under the License.
 
   <enum name="OperationalStateEnum" type="enum8">
     <cluster code="0x0060"/>
+    <cluster code="0x0048"/>
     <item name="Stopped" value="0x00"/>
     <item name="Running" value="0x01"/>
     <item name="Paused"  value="0x02"/>
@@ -27,6 +28,7 @@ limitations under the License.
 
   <enum name="ErrorStateEnum" type="enum8">
     <cluster code="0x0060"/>
+    <cluster code="0x0048"/>
     <item name="NoError"                    value="0x00"/>
     <item name="UnableToStartOrResume"      value="0x01"/>
     <item name="UnableToCompleteOperation"  value="0x02"/>
@@ -36,6 +38,7 @@ limitations under the License.
   <struct name="OperationalStateStruct">
     <cluster code="0x0060"/>
     <cluster code="0x0061"/>
+    <cluster code="0x0048"/>
     <item name="OperationalStateID"    type="enum8" optional="false"/>
     <item name="OperationalStateLabel" type="char_string" optional="true" length="64"/>
   </struct>
@@ -43,6 +46,7 @@ limitations under the License.
   <struct name="ErrorStateStruct">
     <cluster code="0x0060"/>
     <cluster code="0x0061"/>
+    <cluster code="0x0048"/>
     <item name="ErrorStateID" type="enum8" optional="false" />
     <item name="ErrorStateLabel" type="char_string" optional="true" length="64" />
     <item name="ErrorStateDetails" type="char_string" optional="true" length="64" />
@@ -57,12 +61,12 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation.</description>
 
-    <globalAttribute side="server" code="0xFFFD" value="1" />
+    <globalAttribute side="either" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
+    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="array" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
     <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
     <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0x00" max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
-    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
+    <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="array" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
     <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="OperationalStateEnum"                                              writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
 

@@ -43,7 +43,7 @@ namespace chip {
 namespace Protocols {
 namespace SecureChannel {
 
-inline constexpr const char * kProtocolName = "SecureChannel";
+inline constexpr char kProtocolName[] = "SecureChannel";
 
 /**
  * SecureChannel Protocol Message Types

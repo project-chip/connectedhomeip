@@ -31,7 +31,6 @@
 #include "FreeRTOS.h"
 #include "event_groups.h"
 #include "task.h"
-
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 

@@ -44,8 +44,10 @@ bool DefaultTimeSyncDelegate::IsNTPAddressValid(chip::CharSpan ntp)
 
 bool DefaultTimeSyncDelegate::IsNTPAddressDomain(chip::CharSpan ntp)
 {
-    // placeholder implementation
-    return false;
+    // For now, assume anything that includes a . is a domain name.
+    // Delegates are free to evaluate this properly if they actually HAVE domain
+    // name resolution, rather than just implementing a dummy for testing.
+    return !IsNTPAddressValid(ntp) && (memchr(ntp.data(), '.', ntp.size()) != nullptr);
 }
 
 CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback)
@@ -70,4 +72,9 @@ CHIP_ERROR DefaultTimeSyncDelegate::UpdateTimeUsingNTPFallback(const CharSpan & 
                                                                chip::Callback::Callback<OnFallbackNTPCompletion> * callback)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void DefaultTimeSyncDelegate::UTCTimeAvailabilityChanged(uint64_t time)
+{
+    // placeholder implementation
 }

@@ -45,6 +45,8 @@ shared_library("jni") {
     "AndroidClusterExceptions.h",
     "AndroidCommissioningWindowOpener.cpp",
     "AndroidCommissioningWindowOpener.h",
+    "AndroidConnectionFailureExceptions.cpp",
+    "AndroidConnectionFailureExceptions.h",
     "AndroidControllerExceptions.cpp",
     "AndroidControllerExceptions.h",
     "AndroidCurrentFabricRemover.cpp",
@@ -63,6 +65,8 @@ shared_library("jni") {
   ]
 
   deps = [
+    "${chip_root}/src/app/icd/client:handler",
+    "${chip_root}/src/app/icd/client:manager",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -351,7 +355,7 @@ kotlin_library("chipcluster_test") {
 
 kotlin_library("kotlin_matter_controller") {
   import(
-      "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/files.gni")
+      "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/files.gni")
 
   output_name = "KotlinMatterController.jar"
 
@@ -370,12 +374,14 @@ kotlin_library("kotlin_matter_controller") {
     "src/matter/controller/MatterControllerImpl.kt",
     "src/matter/controller/Messages.kt",
     "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/SubscriptionStates.kt",
     "src/matter/controller/model/Paths.kt",
     "src/matter/controller/model/States.kt",
   ]
 
   sources += matter_structs_sources
   sources += matter_eventstructs_sources
+  sources += matter_clusters_sources
 
   if (matter_enable_java_compilation) {
     deps += [
@@ -436,11 +442,15 @@ android_library("java") {
     "src/chip/devicecontroller/ChipCommandType.java",
     "src/chip/devicecontroller/ChipDeviceController.java",
     "src/chip/devicecontroller/ChipDeviceControllerException.java",
+    "src/chip/devicecontroller/ConnectionFailureException.java",
     "src/chip/devicecontroller/ControllerParams.java",
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
     "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
+    "src/chip/devicecontroller/ICDClientInfo.java",
+    "src/chip/devicecontroller/ICDDeviceInfo.java",
+    "src/chip/devicecontroller/ICDRegistrationInfo.java",
     "src/chip/devicecontroller/InvokeCallback.java",
     "src/chip/devicecontroller/InvokeCallbackJni.java",
     "src/chip/devicecontroller/KeypairDelegate.java",

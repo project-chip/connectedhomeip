@@ -160,18 +160,18 @@ Davis, CA 95616, USA
       <bitfield name="WEP" bit="1" summary="Supports Wi-Fi using WEP security">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA-PERSONAL" bit="2" summary="Supports Wi-Fi using WPA-Personal security">
+      <bitfield name="WPA" bit="2" summary="Supports Wi-Fi using WPA-Personal security">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA2-PERSONAL" bit="3" summary="Supports Wi-Fi using WPA2-Personal security">
+      <bitfield name="WPA2" bit="3" summary="Supports Wi-Fi using WPA2-Personal security">
         <mandatoryConform/>
       </bitfield>
-      <bitfield name="WPA3-PERSONAL" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
+      <bitfield name="WPA3" bit="4" summary="Supports Wi-Fi using WPA3-Personal security">
         <mandatoryConform/>
       </bitfield>
     </bitmap>
     <struct name="NetworkInfoStruct">
-      <field id="0" name="NetworkID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="between" from="1" to="32"/>
       </field>
@@ -191,7 +191,7 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </mandatoryConform>
       </field>
-      <field id="2" name="NetworkName" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="2" name="NetworkName" type="ref_DataTypeString">
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
@@ -229,13 +229,13 @@ Davis, CA 95616, USA
           <feature name="WI"/>
         </mandatoryConform>
       </field>
-      <field id="1" name="SSID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="1" name="SSID" type="ref_DataTypeOctstr">
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
         <constraint type="max" value="32"/>
       </field>
-      <field id="2" name="BSSID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="2" name="BSSID" type="ref_DataTypeOctstr">
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
@@ -265,7 +265,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <constraint type="min" value="1"/>
     </attribute>
-    <attribute id="0x0001" name="Networks" type="&lt;&lt;ref_DataTypeList&gt;&gt;[NetworkInfoStruct]" default="empty">
+    <attribute id="0x0001" name="Networks" type="ref_DataTypeList[NetworkInfoStruct Type]" default="empty">
       <access read="true" readPrivilege="admin"/>
       <mandatoryConform/>
       <constraint type="max" value="MaxNetworks"/>
@@ -302,7 +302,7 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0006" name="LastNetworkID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;" default="null">
+    <attribute id="0x0006" name="LastNetworkID" type="ref_DataTypeOctstr" default="null">
       <access read="true" readPrivilege="admin"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
@@ -313,7 +313,7 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0008" name="SupportedWiFiBands" type="&lt;&lt;ref_DataTypeList&gt;&gt;[WiFiBandEnum]" default="MS">
+    <attribute id="0x0008" name="SupportedWiFiBands" type="ref_DataTypeList[WiFiBandEnum Type]" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
@@ -328,7 +328,7 @@ Davis, CA 95616, USA
         <feature name="TH"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x000a" name="ThreadVersion" type="uint16" default="MS">
+    <attribute id="0x000A" name="ThreadVersion" type="uint16" default="MS">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
@@ -345,7 +345,7 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="SSID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;" default="null">
+      <field id="0" name="SSID" type="ref_DataTypeOctstr" default="null">
         <quality nullable="true"/>
         <optionalConform>
           <feature name="WI"/>
@@ -368,17 +368,17 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="DebugText" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="1" name="DebugText" type="ref_DataTypeString">
         <optionalConform/>
         <constraint type="max" value="512"/>
       </field>
-      <field id="2" name="WiFiScanResults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[WiFiInterfaceScanResultStruct Type]">
+      <field id="2" name="WiFiScanResults" type="ref_DataTypeList[WiFiInterfaceScanResultStruct Type]">
         <mandatoryConform>
           <feature name="WI"/>
         </mandatoryConform>
         <constraint type="desc"/>
       </field>
-      <field id="3" name="ThreadScanResults" type="&lt;&lt;ref_DataTypeList&gt;&gt;[ThreadInterfaceScanResultStruct Type]">
+      <field id="3" name="ThreadScanResults" type="ref_DataTypeList[ThreadInterfaceScanResultStruct Type]">
         <mandatoryConform>
           <feature name="TH"/>
         </mandatoryConform>
@@ -390,11 +390,11 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="WI"/>
       </mandatoryConform>
-      <field id="0" name="SSID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="0" name="SSID" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="max" value="32"/>
       </field>
-      <field id="1" name="Credentials" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="1" name="Credentials" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="max" value="64"/>
       </field>
@@ -407,7 +407,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TH"/>
       </mandatoryConform>
-      <field id="0" name="OperationalDataset" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="0" name="OperationalDataset" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="max" value="254"/>
       </field>
@@ -423,7 +423,7 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="NetworkID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="between" from="1" to="32"/>
       </field>
@@ -443,13 +443,13 @@ Davis, CA 95616, USA
         <mandatoryConform/>
         <constraint type="desc"/>
       </field>
-      <field id="1" name="DebugText" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="1" name="DebugText" type="ref_DataTypeString">
         <optionalConform/>
         <constraint type="max" value="512"/>
       </field>
       <field id="2" name="NetworkIndex" type="uint8">
         <optionalConform/>
-        <constraint type="between" from="0" to="(MaxNetworks"/>
+        <constraint type="between" from="0" to="(MaxNetworks - 1)"/>
       </field>
     </command>
     <command id="0x06" name="ConnectNetwork" response="ConnectNetworkResponse">
@@ -460,7 +460,7 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="NetworkID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="between" from="1" to="32"/>
       </field>
@@ -479,7 +479,7 @@ Davis, CA 95616, USA
       <field id="0" name="NetworkingStatus" type="NetworkCommissioningStatusEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="DebugText" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="1" name="DebugText" type="ref_DataTypeString">
         <optionalConform/>
       </field>
       <field id="2" name="ErrorValue" type="int32">
@@ -495,7 +495,7 @@ Davis, CA 95616, USA
           <feature name="TH"/>
         </orTerm>
       </mandatoryConform>
-      <field id="0" name="NetworkID" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="0" name="NetworkID" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="between" from="1" to="32"/>
       </field>

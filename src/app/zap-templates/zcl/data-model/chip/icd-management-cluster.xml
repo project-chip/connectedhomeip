@@ -53,6 +53,12 @@ limitations under the License.
         <!-- RESERVED = 0x03 -->
     </struct>
 
+    <enum name="OperatingModeEnum" type="enum8">
+    <cluster code="0x0046" />
+    <item value="0" name="SIT" />
+    <item value="1" name="LIT" />
+    </enum>
+
     <cluster>
         <domain>General</domain>
         <name>ICD Management</name>
@@ -68,7 +74,7 @@ limitations under the License.
         <attribute side="server" code="0x00" define="IDLE_MODE_DURATION" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeDuration</attribute>
         <attribute side="server" code="0x01" define="ACTIVE_MODE_DURATION" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeDuration</attribute>
         <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
-        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
+        <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="array" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
             <description>RegisteredClients</description>
             <access op="read" privilege="administer"/>
         </attribute>
@@ -79,9 +85,14 @@ limitations under the License.
         <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
         <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false">UserActiveModeTriggerHint</attribute>
         <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
+        <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false">OperatingMode</attribute>
+
+        <event side="server" code="0x00" priority="critical" name="OnTransitionToActiveMode" optional="true">
+            <description>OnTransitionToActiveMode</description>
+        </event>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
-            <description> Register a client to the end device </description>
+            <description>Register a client to the end device</description>
             <arg name="CheckInNodeID" type="node_id" optional="false"/>
             <arg name="MonitoredSubject" type="int64u" optional="false"/>
             <arg name="Key" type="octet_string" length="16" optional="false"/>
@@ -89,21 +100,26 @@ limitations under the License.
             <access op="invoke" privilege="manage"/>
         </command>
 
-        <command source="server" code="0x01" name="RegisterClientResponse" optional="false" disableDefaultResponse="true">
-            <description> RegisterClient response command </description>
+        <command source="server" code="0x01" name="RegisterClientResponse" optional="true" disableDefaultResponse="true">
+            <description>RegisterClient response command</description>
             <arg name="ICDCounter" type="int32u" isNullable="false"/>
         </command>
 
         <command source="client" code="0x02" name="UnregisterClient" isFabricScoped="true" optional="true">
-            <description> Unregister a client from an end device </description>
+            <description>Unregister a client from an end device</description>
             <arg name="CheckInNodeID" type="node_id"/>
             <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
             <access op="invoke" privilege="manage"/>
         </command>
 
-        <command source="client" code="0x03" name="StayActiveRequest" optional="true">
+        <command source="client" code="0x03" name="StayActiveRequest" response="StayActiveResponse" optional="true">
             <description>Request the end device to stay in Active Mode for an additional ActiveModeThreshold</description>
             <access op="invoke" privilege="manage"/>
+        </command>
+
+        <command source="server" code="0x04" name="StayActiveResponse" optional="true" disableDefaultResponse="true">
+            <description>StayActiveRequest response command</description>
+            <arg name="PromisedActiveDuration" type="int32u" isNullable="false"/>
         </command>
     </cluster>
 </configurator>

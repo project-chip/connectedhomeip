@@ -54,9 +54,10 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x0000002B, DeviceTypeClass::Simple, "Matter Fan" },
     { 0x0000002C, DeviceTypeClass::Simple, "Matter Air Quality Sensor" },
     { 0x0000002D, DeviceTypeClass::Simple, "Matter Air Purifier" },
-    { 0x00000041, DeviceTypeClass::Simple, "Matter Boolean Sensor" },
-    { 0x00000042, DeviceTypeClass::Simple, "Matter Valve" },
+    { 0x00000041, DeviceTypeClass::Simple, "Matter Water Freeze Detector" },
+    { 0x00000042, DeviceTypeClass::Simple, "Matter Water Valve" },
     { 0x00000043, DeviceTypeClass::Simple, "Matter Water Leak Detector" },
+    { 0x00000044, DeviceTypeClass::Simple, "Matter Rain Sensor" },
     { 0x00000070, DeviceTypeClass::Simple, "Matter Refrigerator" },
     { 0x00000071, DeviceTypeClass::Simple, "Matter Temperature Controlled Cabinet" },
     { 0x00000072, DeviceTypeClass::Simple, "Matter Room Air Conditioner" },
@@ -64,6 +65,11 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000074, DeviceTypeClass::Simple, "Matter Robotic Vacuum Cleaner" },
     { 0x00000075, DeviceTypeClass::Simple, "Matter Dishwasher" },
     { 0x00000076, DeviceTypeClass::Simple, "Matter Smoke CO Alarm" },
+    { 0x00000078, DeviceTypeClass::Simple, "Matter Cooktop" },
+    { 0x00000079, DeviceTypeClass::Simple, "Matter Microwave Oven" },
+    { 0x0000007A, DeviceTypeClass::Simple, "Matter Extractor Hood" },
+    { 0x0000007B, DeviceTypeClass::Simple, "Matter Oven" },
+    { 0x0000007C, DeviceTypeClass::Simple, "Matter Laundry Dryer" },
     { 0x00000100, DeviceTypeClass::Simple, "Matter On/Off Light" },
     { 0x00000101, DeviceTypeClass::Simple, "Matter Dimmable Light" },
     { 0x00000103, DeviceTypeClass::Simple, "Matter On/Off Light Switch" },
@@ -87,6 +93,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000307, DeviceTypeClass::Simple, "Matter Humidity Sensor" },
     { 0x00000840, DeviceTypeClass::Simple, "Matter Control Bridge" },
     { 0x00000850, DeviceTypeClass::Simple, "Matter On/Off Sensor" },
+    { 0xFFF10010, DeviceTypeClass::Simple, "Matter Network Infrastructure Manager" },
 };
 
 static_assert(ExtractVendorFromMEI(0xFFF10001) != 0, "Must have class defined for \"Matter Orphan Clusters\" if it's a standard device type");
