@@ -72,11 +72,13 @@ public:
     CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName);
     void Shutdown();
 
-    BluezAdapter1 * GetAdapter() const { return mpAdapter; }
+    void SetAdapter(BluezAdapter1 * apAdapter) { mpAdapter.reset(apAdapter); };
+    BluezAdapter1 * GetAdapter() const { return mpAdapter.get(); }
     const char * GetAdapterName() const { return mpAdapterName; }
 
     CHIP_ERROR RegisterGattApplication();
-    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot; }
+    GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mpRoot.get(); }
+    GDBusObjectManager * GetBluezObjectManager() const { return mpObjMgr.get(); }
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
@@ -140,21 +142,21 @@ private:
     char * mpServicePath = nullptr;
 
     // Objects (interfaces) subscribed to by this service
-    GDBusObjectManager * mpObjMgr = nullptr;
-    BluezAdapter1 * mpAdapter     = nullptr;
-    BluezDevice1 * mpDevice       = nullptr;
+    GAutoPtr<GDBusObjectManager> mpObjMgr;
+    GAutoPtr<BluezAdapter1> mpAdapter;
+    GAutoPtr<BluezDevice1> mpDevice;
 
     // Objects (interfaces) published by this service
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezGattService1 * mpService     = nullptr;
-    BluezGattCharacteristic1 * mpC1   = nullptr;
-    BluezGattCharacteristic1 * mpC2   = nullptr;
+    GAutoPtr<GDBusObjectManagerServer> mpRoot;
+    GAutoPtr<BluezGattService1> mpService;
+    GAutoPtr<BluezGattCharacteristic1> mpC1;
+    GAutoPtr<BluezGattCharacteristic1> mpC2;
     // additional data characteristics
-    BluezGattCharacteristic1 * mpC3 = nullptr;
+    GAutoPtr<BluezGattCharacteristic1> mpC3;
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
-    GCancellable * mpConnectCancellable = nullptr;
-    char * mpPeerDevicePath             = nullptr;
+    GAutoPtr<GCancellable> mpConnectCancellable;
+    char * mpPeerDevicePath = nullptr;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;

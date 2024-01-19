@@ -595,7 +595,7 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
@@ -668,7 +668,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     mBLEScanConfig.mBleScanState = scanType;
 
-    CHIP_ERROR err = mDeviceScanner.Init(mEndpoint.GetAdapter(), this);
+    CHIP_ERROR err = mDeviceScanner.Init(this);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;

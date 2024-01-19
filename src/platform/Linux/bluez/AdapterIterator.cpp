@@ -28,20 +28,9 @@ namespace Internal {
 
 AdapterIterator::~AdapterIterator()
 {
-    if (mManager != nullptr)
-    {
-        g_object_unref(mManager);
-    }
-
     if (mObjectList != nullptr)
     {
         g_list_free_full(mObjectList, g_object_unref);
-    }
-
-    if (mCurrent.adapter != nullptr)
-    {
-        g_object_unref(mCurrent.adapter);
-        mCurrent.adapter = nullptr;
     }
 }
 
@@ -54,15 +43,16 @@ CHIP_ERROR AdapterIterator::Initialize(AdapterIterator * self)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GAutoPtr<GError> error;
 
-    self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
+    self->mManager.reset(g_dbus_object_manager_client_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
         bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-        nullptr /*destroy notify */, nullptr /* cancellable */, &MakeUniquePointerReceiver(error).Get());
+        nullptr /*destroy notify */, nullptr /* cancellable */, &MakeUniquePointerReceiver(error).Get()));
 
-    VerifyOrExit(self->mManager != nullptr, ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters.");
+    VerifyOrExit(self->mManager.get() != nullptr,
+                 ChipLogError(DeviceLayer, "Failed to get DBUS object manager for listing adapters.");
                  err = CHIP_ERROR_INTERNAL);
 
-    self->mObjectList      = g_dbus_object_manager_get_objects(self->mManager);
+    self->mObjectList      = g_dbus_object_manager_get_objects(self->mManager.get());
     self->mCurrentListItem = self->mObjectList;
 
 exit:
@@ -102,18 +92,12 @@ bool AdapterIterator::Advance()
             index = 0;
         }
 
-        if (mCurrent.adapter != nullptr)
-        {
-            g_object_unref(mCurrent.adapter);
-            mCurrent.adapter = nullptr;
-        }
-
         mCurrent.index   = index;
         mCurrent.address = bluez_adapter1_get_address(adapter);
         mCurrent.alias   = bluez_adapter1_get_alias(adapter);
         mCurrent.name    = bluez_adapter1_get_name(adapter);
         mCurrent.powered = bluez_adapter1_get_powered(adapter);
-        mCurrent.adapter = adapter;
+        mCurrent.adapter.reset(adapter);
 
         mCurrentListItem = mCurrentListItem->next;
 

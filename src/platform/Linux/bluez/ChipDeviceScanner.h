@@ -26,9 +26,13 @@
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemLayer.h>
 
+#include "Types.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+class BluezEndpoint;
 
 /// Receives callbacks when chip devices are being scanned
 class ChipDeviceScannerDelegate
@@ -52,7 +56,7 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner()                                      = default;
+    ChipDeviceScanner(const BluezEndpoint & endpoint) : mEndpoint(endpoint){};
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
@@ -60,7 +64,7 @@ public:
     ~ChipDeviceScanner() { Shutdown(); }
 
     /// Initialize the scanner.
-    CHIP_ERROR Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
+    CHIP_ERROR Init(ChipDeviceScannerDelegate * delegate);
 
     /// Release any resources associated with the scanner.
     void Shutdown();
@@ -90,9 +94,8 @@ private:
     /// so that it can be re-discovered if it's still advertising.
     void RemoveDevice(BluezDevice1 & device);
 
-    GDBusObjectManager * mManager         = nullptr;
-    BluezAdapter1 * mAdapter              = nullptr;
-    GCancellable * mCancellable           = nullptr;
+    const BluezEndpoint & mEndpoint;
+    GAutoPtr<GCancellable> mCancellable;
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;

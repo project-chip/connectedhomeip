@@ -52,33 +52,14 @@ bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIden
 
 } // namespace
 
-CHIP_ERROR ChipDeviceScanner::Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
+CHIP_ERROR ChipDeviceScanner::Init(ChipDeviceScannerDelegate * delegate)
 {
 
     // Make this function idempotent by shutting down previously initialized state if any.
     Shutdown();
 
-    mAdapter     = BLUEZ_ADAPTER1(g_object_ref(adapter));
-    mCancellable = g_cancellable_new();
-    mDelegate    = delegate;
-
-    // Create the D-Bus object manager client object on the glib thread, so that all D-Bus signals
-    // will be delivered to the glib thread.
-    ReturnErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](ChipDeviceScanner * self) {
-            // When creating D-Bus proxy object, the thread default context must be initialized.
-            VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-            GAutoPtr<GError> err;
-            self->mManager = g_dbus_object_manager_client_new_for_bus_sync(
-                G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
-                bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
-                nullptr /* destroy notify */, self->mCancellable, &MakeUniquePointerReceiver(err).Get());
-            VerifyOrReturnError(self->mManager != nullptr, CHIP_ERROR_INTERNAL,
-                                ChipLogError(Ble, "Failed to get D-Bus object manager for device scanning: %s", err->message));
-            return CHIP_NO_ERROR;
-        },
-        this));
+    mCancellable.reset(g_cancellable_new());
+    mDelegate = delegate;
 
     mIsInitialized = true;
     return CHIP_NO_ERROR;
@@ -102,12 +83,7 @@ void ChipDeviceScanner::Shutdown()
     // released during a D-Bus signal being processed.
     PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](ChipDeviceScanner * self) {
-            if (self->mManager != nullptr)
-                g_object_unref(self->mManager);
-            if (self->mAdapter != nullptr)
-                g_object_unref(self->mAdapter);
-            if (self->mCancellable != nullptr)
-                g_object_unref(self->mCancellable);
+            self->mCancellable.reset();
             return CHIP_NO_ERROR;
         },
         this);
@@ -162,17 +138,17 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     VerifyOrReturnError(!mIsStopping, CHIP_NO_ERROR);
 
     mIsStopping = true;
-    g_cancellable_cancel(mCancellable); // in case we are currently running a scan
+    g_cancellable_cancel(mCancellable.get()); // in case we are currently running a scan
 
     if (mObjectAddedSignal)
     {
-        g_signal_handler_disconnect(mManager, mObjectAddedSignal);
+        g_signal_handler_disconnect(mEndpoint.GetBluezObjectManager(), mObjectAddedSignal);
         mObjectAddedSignal = 0;
     }
 
     if (mInterfaceChangedSignal)
     {
-        g_signal_handler_disconnect(mManager, mInterfaceChangedSignal);
+        g_signal_handler_disconnect(mEndpoint.GetBluezObjectManager(), mInterfaceChangedSignal);
         mInterfaceChangedSignal = 0;
     }
 
@@ -194,7 +170,7 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 {
     GAutoPtr<GError> error;
 
-    if (!bluez_adapter1_call_stop_discovery_sync(self->mAdapter, nullptr /* not cancellable */,
+    if (!bluez_adapter1_call_stop_discovery_sync(self->mEndpoint.GetAdapter(), nullptr /* not cancellable */,
                                                  &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to stop discovery %s", error->message);
@@ -224,7 +200,7 @@ void ChipDeviceScanner::SignalInterfaceChanged(GDBusObjectManagerClient * manage
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
 {
-    if (strcmp(bluez_device1_get_adapter(&device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mAdapter))) != 0)
+    if (strcmp(bluez_device1_get_adapter(&device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mEndpoint.GetAdapter()))) != 0)
     {
         return;
     }
@@ -242,7 +218,7 @@ void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
 
 void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
 {
-    if (strcmp(bluez_device1_get_adapter(&device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mAdapter))) != 0)
+    if (strcmp(bluez_device1_get_adapter(&device), g_dbus_proxy_get_object_path(G_DBUS_PROXY(mEndpoint.GetAdapter()))) != 0)
     {
         return;
     }
@@ -257,7 +233,8 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
     const auto devicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(&device));
     GAutoPtr<GError> error;
 
-    if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &MakeUniquePointerReceiver(error).Get()))
+    if (!bluez_adapter1_call_remove_device_sync(mEndpoint.GetAdapter(), devicePath, nullptr,
+                                                &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogDetail(Ble, "Failed to remove device %s: %s", StringOrNullMarker(devicePath), error->message);
     }
@@ -267,12 +244,13 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GAutoPtr<GError> error;
 
-    self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
-    self->mInterfaceChangedSignal =
-        g_signal_connect(self->mManager, "interface-proxy-properties-changed", G_CALLBACK(SignalInterfaceChanged), self);
+    self->mObjectAddedSignal =
+        g_signal_connect(self->mEndpoint.GetBluezObjectManager(), "object-added", G_CALLBACK(SignalObjectAdded), self);
+    self->mInterfaceChangedSignal = g_signal_connect(self->mEndpoint.GetBluezObjectManager(), "interface-proxy-properties-changed",
+                                                     G_CALLBACK(SignalInterfaceChanged), self);
 
     ChipLogProgress(Ble, "BLE removing known devices.");
-    for (BluezObject & object : BluezObjectList(self->mManager))
+    for (BluezObject & object : BluezObjectList(self->mEndpoint.GetBluezObjectManager()))
     {
         GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
         if (device.get() != nullptr)
@@ -292,7 +270,8 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
     GVariant * filter = g_variant_builder_end(&filterBuilder);
 
-    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable,
+    ChipLogProgress(Ble, "BLE setting discovery Name adapter. %s", self->mEndpoint.GetAdapterName());
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mEndpoint.GetAdapter(), filter, self->mCancellable.get(),
                                                        &MakeUniquePointerReceiver(error).Get()))
     {
         // Not critical: ignore if fails
@@ -301,7 +280,8 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
-    if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &MakeUniquePointerReceiver(error).Get()))
+    if (!bluez_adapter1_call_start_discovery_sync(self->mEndpoint.GetAdapter(), self->mCancellable.get(),
+                                                  &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
 

@@ -28,6 +28,8 @@
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <system/SystemPacketBuffer.h>
 
+#include "Types.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -38,7 +40,7 @@ class BluezConnection
 {
 public:
     BluezConnection(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice);
-    ~BluezConnection();
+    ~BluezConnection() = default;
 
     const char * GetPeerAddress() const;
 
@@ -115,20 +117,20 @@ private:
     static void UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
     static CHIP_ERROR UnsubscribeCharacteristicImpl(BluezConnection * apConn);
 
-    BluezDevice1 * mpDevice;
+    GAutoPtr<BluezDevice1> mpDevice;
 
     bool mNotifyAcquired = false;
     uint16_t mMtu        = 0;
 
-    BluezGattService1 * mpService = nullptr;
+    GAutoPtr<BluezGattService1> mpService;
 
-    BluezGattCharacteristic1 * mpC1 = nullptr;
-    IOChannel mC1Channel            = { 0 };
-    BluezGattCharacteristic1 * mpC2 = nullptr;
-    IOChannel mC2Channel            = { 0 };
+    GAutoPtr<BluezGattCharacteristic1> mpC1;
+    IOChannel mC1Channel = { 0 };
+    GAutoPtr<BluezGattCharacteristic1> mpC2;
+    IOChannel mC2Channel = { 0 };
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    BluezGattCharacteristic1 * mpC3 = nullptr;
-    IOChannel mC3Channel            = { 0 };
+    GAutoPtr<BluezGattCharacteristic1> mpC3;
+    IOChannel mC3Channel = { 0 };
 #endif
 };
 

@@ -38,10 +38,10 @@ class BluezEndpoint;
 class BluezAdvertisement
 {
 public:
-    BluezAdvertisement() = default;
+    BluezAdvertisement(const BluezEndpoint & endpoint) : mEndpoint(endpoint){};
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -68,18 +68,15 @@ private:
     void StopDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR StopImpl();
 
-    // Objects (interfaces) used by LE advertisement
-    GDBusObjectManagerServer * mpRoot = nullptr;
-    BluezAdapter1 * mpAdapter         = nullptr;
-    BluezLEAdvertisement1 * mpAdv     = nullptr;
+    const BluezEndpoint & mEndpoint;
+    GAutoPtr<BluezLEAdvertisement1> mpAdv;
 
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
     Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    char * mpAdvPath     = nullptr;
-    char * mpAdapterName = nullptr;
-    char * mpAdvUUID     = nullptr;
+    char * mpAdvPath = nullptr;
+    char * mpAdvUUID = nullptr;
     ChipAdvType mAdvType;
     uint16_t mAdvDurationMs = 0;
 };

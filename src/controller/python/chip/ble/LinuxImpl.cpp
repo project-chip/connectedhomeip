@@ -93,7 +93,13 @@ public:
         mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
-    CHIP_ERROR ScannerInit(BluezAdapter1 * adapter) { return mScanner.Init(adapter, this); }
+    CHIP_ERROR ScannerInit(BluezAdapter1 * adapter)
+    {
+        // It's a hack of sorts on how the python API works.
+        // One more thing to consider is what should the api implementation look like with BLEManager running?
+        mEndpoint.SetAdapter(adapter);
+        return mScanner.Init(this);
+    }
     CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout) { return mScanner.StartScan(timeout); }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
@@ -124,7 +130,8 @@ public:
     }
 
 private:
-    ChipDeviceScanner mScanner;
+    BluezEndpoint mEndpoint;
+    ChipDeviceScanner mScanner{ mEndpoint };
     PyObject * const mContext;
     const DeviceScannedCallback mScanCallback;
     const ScanCompleteCallback mCompleteCallback;
@@ -142,6 +149,7 @@ extern "C" void * pychip_ble_start_scanning(PyObject * context, void * adapter, 
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
 
     CHIP_ERROR err = delegate->ScannerInit(static_cast<BluezAdapter1 *>(adapter));
+
     VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
