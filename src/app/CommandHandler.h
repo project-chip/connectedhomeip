@@ -309,8 +309,8 @@ public:
      *  - Allocates a new InvokeResponseMessage.
      *  - Reattempts to add the InvokeResponse to the new InvokeResponseMessage.
      *
-     * addResponseFunction: A lambda function responsible for adding the response
-     *    to the current InvokeResponseMessage.
+     * @param[in] addResponseFunction  A lambda function responsible for adding the
+     *                response to the current InvokeResponseMessage.
      */
     template <typename Function>
     CHIP_ERROR TryAddingResponse(Function && addResponseFunction)
@@ -335,7 +335,7 @@ public:
         {
             return err;
         }
-        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndReadyNext());
+        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndPrepareNext());
         err = addResponseFunction();
         if (err != CHIP_NO_ERROR)
         {
@@ -516,7 +516,7 @@ private:
 
     CHIP_ERROR FinalizeLastInvokeResponseMessage() { return FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ false); }
 
-    CHIP_ERROR FinalizeInvokeResponseMessageAndReadyNext();
+    CHIP_ERROR FinalizeInvokeResponseMessageAndPrepareNext();
 
     CHIP_ERROR FinalizeInvokeResponseMessage(bool aHasMoreChunks);
 
@@ -610,6 +610,7 @@ private:
 
     State mState = State::Idle;
     State mBackupState;
+    ScopedChangeOnly<bool> mInternalCallToAddResponseData{false};
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
     bool mSentStatusResponse               = false;
@@ -617,9 +618,8 @@ private:
     bool mBufferAllocated                  = false;
     bool mReserveSpaceForMoreChunkMessages = false;
     // TODO(#30453): We should introduce breaking change where calls to add CommandData
-    // need to use AddResponse, and not CommandHandler primatives directly using
+    // need to use AddResponse, and not CommandHandler primitives directly using
     // GetCommandDataIBTLVWriter.
-    bool mInternalCallToAddResponseData = false;
     bool mRollbackBackupValid           = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any

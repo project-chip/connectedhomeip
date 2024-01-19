@@ -100,10 +100,12 @@ struct ForcedSizeBuffer
     {
         if (mBuffer.Alloc(size))
         {
+            // No significance with using 0x12, just using a value.
             memset(mBuffer.Get(), 0x12, size);
         }
     }
 
+    // No significance with using 0x12 as the CommandId, just using a value.
     static constexpr chip::CommandId GetCommandId() { return 0x12; }
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
@@ -312,11 +314,11 @@ public:
     static void TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext);
-    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
+    static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
                                                                                                  void * apContext);
-    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite,
+    static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite,
                                                                                                         void * apContext);
-    static void TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
+    static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
                                                                                                void * apContext);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -583,6 +585,7 @@ void TestCommandInteraction::FillCurrentInvokeResponseBuffer(nlTestSuite * apSui
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     uint32_t remainingSize = apCommandHandler->mInvokeResponseBuilder.GetWriter()->GetRemainingFreeLength();
 
+    // TODO(#30453): Have this value derived from IM layer similar to GetSizeToEndInvokeResponseMessage()
     // This number was derived by executing this method with aSizeToLeaveInBuffer = 100 and
     // subsequently analyzing the remaining size to determine the overhead associated with calling
     // AddResponseData with `ForcedSizeBuffer`.
@@ -1745,7 +1748,7 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     exchange->Close();
 }
 
-void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
+void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
                                                                                                               void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
@@ -1771,7 +1774,7 @@ void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereS
     NL_TEST_ASSERT(apSuite, remainingSize > sizeToLeave);
 }
 
-void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(
+void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(
     nlTestSuite * apSuite, void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
@@ -1797,7 +1800,7 @@ void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereS
     NL_TEST_ASSERT(apSuite, remainingSize > sizeToLeave);
 }
 
-void TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
+void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
                                                                                                             void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
@@ -1884,9 +1887,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef", chip::app::TestCommandInteraction::TestCommandHandlerRejectsMultipleCommandsWithIdenticalCommandRef),
     NL_TEST_DEF("TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne", chip::app::TestCommandInteraction::TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne),
     NL_TEST_DEF("TestCommandHandlerAcceptMultipleCommands", chip::app::TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands),
-    NL_TEST_DEF("TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse", chip::app::TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse),
-    NL_TEST_DEF("TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative", chip::app::TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative),
-    NL_TEST_DEF("TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse", chip::app::TestCommandInteraction::TestCommandHandlerFillUpInvokeResponseMessageWhereSecondResponseIsDataResponse),
+    NL_TEST_DEF("TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse", chip::app::TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse),
+    NL_TEST_DEF("TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative", chip::app::TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative),
+    NL_TEST_DEF("TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse", chip::app::TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse),
 
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST

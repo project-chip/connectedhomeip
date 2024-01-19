@@ -669,7 +669,7 @@ CHIP_ERROR CommandHandler::PrepareInvokeResponseCommand(const CommandPathRegistr
         // for legacy reasons. To maximize the likelihood of success, particularly when
         // handling large amounts of data, we try to obtain a new, completely empty
         // InvokeResponseMessage, as the existing one already has space occupied.
-        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndReadyNext());
+        ReturnErrorOnFailure(FinalizeInvokeResponseMessageAndPrepareNext());
     }
 
     CreateBackupForResponseRollback();
@@ -768,15 +768,9 @@ CHIP_ERROR CommandHandler::FinishStatus()
 
 void CommandHandler::CreateBackupForResponseRollback()
 {
-    if (mState != State::NewResponseMessage && mState != State::AddedCommand)
-    {
-        return;
-    }
-    if (mInvokeResponseBuilder.GetInvokeResponses().GetError() != CHIP_NO_ERROR ||
-        mInvokeResponseBuilder.GetError() != CHIP_NO_ERROR)
-    {
-        return;
-    }
+    VerifyOrReturn(mState == State::NewResponseMessage || mState == State::AddedCommand);
+    VerifyOrReturn(mInvokeResponseBuilder.GetInvokeResponses().GetError() == CHIP_NO_ERROR);
+    VerifyOrReturn(mInvokeResponseBuilder.GetError() == CHIP_NO_ERROR);
     mInvokeResponseBuilder.Checkpoint(mBackupWriter);
     mBackupState         = mState;
     mRollbackBackupValid = true;
@@ -841,7 +835,7 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
-CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndReadyNext()
+CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()
 {
     ReturnErrorOnFailure(FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true));
     CHIP_ERROR err = AllocateBuffer();
