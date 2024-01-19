@@ -714,7 +714,7 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
     {
         const EmberAfCluster * cluster = &(endpointType->cluster[i]);
 
-        if ((mask == 0 || ((cluster->mask & mask) != 0)))
+        if (mask == 0 || ((cluster->mask & mask) != 0))
         {
             if (cluster->clusterId == clusterId)
             {
