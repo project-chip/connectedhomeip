@@ -9858,8 +9858,7 @@ PICS:
           unplugging the EV?"
       id: EEVSE.S.M.ManuallyControlledPluggedIn
 
-     #  Commands generated
 
-    - label:
-          "Does the device implement sending the GetTargetsResponse command?"
+      #  Commands generated
+    - label: "Does the device implement sending the GetTargetsResponse command?"
       id: EEVSE.S.C00.Tx
