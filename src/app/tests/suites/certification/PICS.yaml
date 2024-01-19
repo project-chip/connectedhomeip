@@ -9710,7 +9710,7 @@ PICS:
 
     - label: "Can the mode change be manually controlled?"
       id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
-    
+
     #
     # Energy EVSE Cluster
     # server / attributes

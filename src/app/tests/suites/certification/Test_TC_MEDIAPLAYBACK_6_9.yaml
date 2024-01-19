@@ -36,7 +36,7 @@ tests:
           ./chip-tool mediaplayback  read active-audio-track 1 3
 
 
-          [1705510425.048787][16407:16409] CHIP:DMG:         SuppressResponse = true, 
+          [1705510425.048787][16407:16409] CHIP:DMG:         SuppressResponse = true,
           [1705510425.048793][16407:16409] CHIP:DMG:         InteractionModelRevision = 11
           [1705510425.048799][16407:16409] CHIP:DMG: }
           [1705510425.048880][16407:16409] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0007 DataVersion: 900375739
@@ -56,8 +56,8 @@ tests:
           ./chip-tool mediaplayback read available-audio-tracks 1 3
 
 
-          [1705510455.278768][16412:16414] CHIP:DMG:         
-          [1705510455.278774][16412:16414] CHIP:DMG:         SuppressResponse = true, 
+          [1705510455.278768][16412:16414] CHIP:DMG:
+          [1705510455.278774][16412:16414] CHIP:DMG:         SuppressResponse = true,
           [1705510455.278781][16412:16414] CHIP:DMG:         InteractionModelRevision = 11
           [1705510455.278786][16412:16414] CHIP:DMG: }
           [1705510455.278928][16412:16414] CHIP:TOO: Endpoint: 3 Cluster: 0x0000_0506 Attribute 0x0000_0008 DataVersion: 900375739
@@ -87,7 +87,7 @@ tests:
       verification: |
           ./chip-tool mediaplayback activate-text-track activeAudioTrackId_1 1 3
 
-          [1705510513.251669][16417:16419] CHIP:DMG:         
+          [1705510513.251669][16417:16419] CHIP:DMG:
           [1705510513.251677][16417:16419] CHIP:DMG:         InteractionModelRevision = 11
           [1705510513.251685][16417:16419] CHIP:DMG: },
           [1705510513.251722][16417:16419] CHIP:DMG: Received Command Response Status for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D Status=0x0

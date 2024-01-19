@@ -42,7 +42,7 @@ tests:
       verification: |
           ./chip-tool contentappobserver read feature-map 1 1
           On TH, verify that DUT sends the FeatureMap attribute has the value 0 or returns a general error that the attribute is not supported
-          [1702624956.728609][5896:5898] CHIP:DMG:         SuppressResponse = true, 
+          [1702624956.728609][5896:5898] CHIP:DMG:         SuppressResponse = true,
           [1702624956.728667][5896:5898] CHIP:DMG:         InteractionModelRevision = 11
           [1702624956.728720][5896:5898] CHIP:DMG: }
           [1702624956.729021][5896:5898] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFFC DataVersion: 2272699478
@@ -53,7 +53,7 @@ tests:
     - label: "Step 3: TH reads the AttributeList attribute from the DUT"
       verification: |
           ./chip-tool contentappobserver read  attribute-list 1 1
-          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) on the TH(Chip-tool) Log: 
+          Verify " AttributeList " value consists the list of mandatory attributes (65533, 65532, 65531, 65529, 65528) on the TH(Chip-tool) Log:
           [1702624983.367693][5900:5902] CHIP:DMG: }
           [1702624983.368044][5900:5902] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0510 Attribute 0x0000_FFFB DataVersion: 2272699478
           [1702624983.368485][5900:5902] CHIP:TOO:   AttributeList: 5 entries

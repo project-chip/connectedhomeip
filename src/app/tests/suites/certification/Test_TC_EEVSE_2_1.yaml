@@ -144,7 +144,7 @@ tests:
           [1703747211.562536][1880:1882] CHIP:DMG:                         {
           [1703747211.562599][1880:1882] CHIP:DMG:                                 status = 0x00 (SUCCESS),
           [1703747211.562629][1880:1882] CHIP:DMG:                         },
-          [1703747211.562677][1880:1882] CHIP:DMG:                         
+          [1703747211.562677][1880:1882] CHIP:DMG:
           [1703747211.562703][1880:1882] CHIP:DMG:                 },
       disabled: true
 
@@ -289,7 +289,7 @@ tests:
     - label: "Step 20: TH reads from the DUT the VehicleID attribute."
       PICS: EEVSE.S.A0032
       verification: |
-          ./chip-tool energyevse read vehicle-id 1 1 
+          ./chip-tool energyevse read vehicle-id 1 1
 
           On TH(chip-tool), Verify the VehicleID attribute contains a string value, or null.
 
@@ -300,7 +300,7 @@ tests:
     - label: "Step 21: TH reads from the DUT the SessionID attribute."
       PICS: EEVSE.S.A0040
       verification: |
-          ./chip-tool energyevse read session-id 1 1 
+          ./chip-tool energyevse read session-id 1 1
 
           On TH(chip-tool), Verify the SessionID attribute contains a uint32 value, or null.
           [1703747940.652133][1953:1955] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0099 Attribute 0x0000_0040 DataVersion: 1471857728

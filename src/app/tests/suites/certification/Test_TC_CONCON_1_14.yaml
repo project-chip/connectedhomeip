@@ -78,7 +78,7 @@ tests:
     - label: "Step 4: TH reads the AcceptedCommandList attribute from the DUT"
       verification: |
           ./chip-tool contentcontrol read accepted-command-list 1 1
-          [1704869442.419331][4306:4308] CHIP:DMG:         SuppressResponse = true, 
+          [1704869442.419331][4306:4308] CHIP:DMG:         SuppressResponse = true,
           [1704869442.419358][4306:4308] CHIP:DMG:         InteractionModelRevision = 11
           [1704869442.419382][4306:4308] CHIP:DMG: }
           [1704869442.419678][4306:4308] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050F Attribute 0x0000_FFF9 DataVersion: 1251967611
@@ -101,7 +101,7 @@ tests:
       verification: |
           ./chip-tool contentcontrol read generated-command-list 1 1
 
-          [1704869486.142562][4311:4313] CHIP:DMG:         SuppressResponse = true, 
+          [1704869486.142562][4311:4313] CHIP:DMG:         SuppressResponse = true,
           [1704869486.142591][4311:4313] CHIP:DMG:         InteractionModelRevision = 11
           [1704869486.142617][4311:4313] CHIP:DMG: }
           [1704869486.142837][4311:4313] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050F Attribute 0x0000_FFF8 DataVersion: 1251967611
@@ -129,19 +129,19 @@ tests:
           [1704869518.133764][4314:4316] CHIP:DMG: 					Cluster = 0x50f,
           [1704869518.133809][4314:4316] CHIP:DMG: 					Attribute = 0x0000_FFFA,
           [1704869518.133850][4314:4316] CHIP:DMG: 				}
-          [1704869518.133946][4314:4316] CHIP:DMG: 					
+          [1704869518.133946][4314:4316] CHIP:DMG:
           [1704869518.133988][4314:4316] CHIP:DMG: 				StatusIB =
           [1704869518.134031][4314:4316] CHIP:DMG: 				{
           [1704869518.134072][4314:4316] CHIP:DMG: 					status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1704869518.134144][4314:4316] CHIP:DMG: 				},
-          [1704869518.134189][4314:4316] CHIP:DMG: 				
+          [1704869518.134189][4314:4316] CHIP:DMG:
           [1704869518.134226][4314:4316] CHIP:DMG: 			},
-          [1704869518.134268][4314:4316] CHIP:DMG: 			
+          [1704869518.134268][4314:4316] CHIP:DMG:
           [1704869518.134324][4314:4316] CHIP:DMG: 		},
-          [1704869518.134368][4314:4316] CHIP:DMG: 		
+          [1704869518.134368][4314:4316] CHIP:DMG:
           [1704869518.134398][4314:4316] CHIP:DMG: 	],
-          [1704869518.134438][4314:4316] CHIP:DMG: 	
-          [1704869518.134469][4314:4316] CHIP:DMG: 	SuppressResponse = true, 
+          [1704869518.134438][4314:4316] CHIP:DMG:
+          [1704869518.134469][4314:4316] CHIP:DMG: 	SuppressResponse = true,
           [1704869518.134501][4314:4316] CHIP:DMG: 	InteractionModelRevision = 11
           [1704869518.134531][4314:4316] CHIP:DMG: }
           [1704869518.134726][4314:4316] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)

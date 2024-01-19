@@ -35,7 +35,7 @@ tests:
       verification: |
           ./chip-tool deviceenergymanagement read cluster-revision 1 1
 
-          On TH(chip-tool), Verify the ClusterRevision attribute value as 2: 
+          On TH(chip-tool), Verify the ClusterRevision attribute value as 2:
           Below mentioned log is based on the RPI implementation, Value may vary on real DUT
 
           [1705565332.698601][7061:7063] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0098 Attribute 0x0000_FFFD DataVersion: 1117764527
@@ -57,7 +57,7 @@ tests:
       verification: |
           ./chip-tool deviceenergymanagement  read attribute-list 1 1
 
-          Via the TH (chip-tool), verify that  the AttributeList attribute contains 
+          Via the TH (chip-tool), verify that  the AttributeList attribute contains
           - Mandatory entries:0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0xfff8, 0xfff9, 0xfffb, 0xfffc and 0xfffd
           - Based on feature support:- 0x0005, 0x0006, 0x0007
           Below mentioned log is based on the RPI implementation, Value may vary on real DUT
