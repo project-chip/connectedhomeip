@@ -25,6 +25,7 @@ from typing import Tuple
 #
 MIN_ZAP_VERSION = '2024.1.5'
 
+
 class ZapTool:
     def __init__(self):
         self.check_version = True
