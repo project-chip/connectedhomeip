@@ -30,11 +30,11 @@ namespace Clusters {
 
 namespace DeviceEnergyManagementMode {
 
-const uint8_t ModeNoOptimization             = 0;
-const uint8_t ModeDeviceOnlyOptimization     = 1;
-const uint8_t ModeDeviceAndLocalOptimization = 2;
-const uint8_t ModeDeviceAndGridOptimization  = 3;
-const uint8_t ModeAllOptimization            = 4;
+constexpr uint8_t kModeNoOptimization             = 0;
+constexpr uint8_t kModeDeviceOnlyOptimization     = 1;
+constexpr uint8_t kModeDeviceAndLocalOptimization = 2;
+constexpr uint8_t kModeDeviceAndGridOptimization  = 3;
+constexpr uint8_t kModeAllOptimization            = 4;
 
 /// This is an application level delegate to handle DeviceEnergyManagement modes.
 class DeviceEnergyManagementModeDelegate : public ModeBase::Delegate
@@ -53,22 +53,22 @@ private:
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[5] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("No energy management (forecast only)"),
-                                                 .mode     = ModeNoOptimization,
+                                                 .mode     = kModeNoOptimization,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsNoOptimization) },
         detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Device optimizes (no local or grid control)"),
-                                                 .mode  = ModeDeviceOnlyOptimization,
+                                                 .mode  = kModeDeviceOnlyOptimization,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsDeviceOnlyOptimization) },
         detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Optimized within building"),
-                                                 .mode  = ModeDeviceAndLocalOptimization,
+                                                 .mode  = kModeDeviceAndLocalOptimization,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsDeviceAndLocalOptimization) },
         detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Optimized for grid"),
-                                                 .mode  = ModeDeviceAndGridOptimization,
+                                                 .mode  = kModeDeviceAndGridOptimization,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsDeviceAndGridOptimization) },
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Optimized for grid and building"),
-                                                 .mode     = ModeAllOptimization,
+                                                 .mode     = kModeAllOptimization,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsAllOptimization) },
 
     };

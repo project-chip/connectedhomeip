@@ -30,10 +30,10 @@ namespace Clusters {
 
 namespace EnergyEvseMode {
 
-const uint8_t ModeManual                    = 0;
-const uint8_t ModeTimeOfUse                 = 1;
-const uint8_t ModeSolarCharging             = 2;
-const uint8_t ModeTimeOfUseAndSolarCharging = 3;
+constexpr uint8_t kModeManual                    = 0;
+constexpr uint8_t kModeTimeOfUse                 = 1;
+constexpr uint8_t kModeSolarCharging             = 2;
+constexpr uint8_t kModeTimeOfUseAndSolarCharging = 3;
 
 /// This is an application level delegate to handle EnergyEvse modes.
 class EnergyEvseModeDelegate : public ModeBase::Delegate
@@ -50,16 +50,16 @@ private:
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Manual"),
-                                                 .mode     = ModeManual,
+                                                 .mode     = kModeManual,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsManual) },
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Auto-scheduled"),
-                                                 .mode     = ModeTimeOfUse,
+                                                 .mode     = kModeTimeOfUse,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUse) },
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Solar"),
-                                                 .mode     = ModeSolarCharging,
+                                                 .mode     = kModeSolarCharging,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsSolarCharging) },
         detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Auto-scheduled with Solar charging"),
-                                                 .mode  = ModeTimeOfUseAndSolarCharging,
+                                                 .mode  = kModeTimeOfUseAndSolarCharging,
                                                  .modeTags =
                                                      DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUseAndSolarCharging) },
 
