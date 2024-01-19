@@ -33,10 +33,6 @@
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/gatt.h>
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#include "OTAUtil.h"
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -186,9 +182,6 @@ public:
                     NetworkCommissioning::ThreadScanResponseIterator * networks)
     {
         mBLEManagerImpl->StartAdvertisingProcess();
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-        OtaConfirmNewImage();
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
     };
 
 private:

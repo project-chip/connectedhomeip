@@ -13,14 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 123.2.3. [TC-S-2.3] Secondary functionality with server as DUT
+name: 123.2.3.  [TC-S-2.3] Secondary functionality with DUT as Server
 
 PICS:
     - S.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
     G1:
         type: group_id
@@ -75,8 +75,14 @@ tests:
                 value: maxScenesMinusOne / 2
 
     - label:
-          "Step 0a: preparation step for using commands from Groups cluster: Add
-          KeySet"
+          "Step 0a: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: 1)GroupKeySetID: 0x01a1
+          2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 2220000
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          2220001 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 2220002"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -96,8 +102,10 @@ tests:
                     }
 
     - label:
-          "Step 0b: Preparation step for using commands from Groups cluster:
-          Write Group Keys"
+          "Step 0b: TH binds GroupId G1 with GroupKeySetID 0x01a1 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with one entry as follows: List item 1:
+          1)FabricIndex: 1 2)GroupId :_G1_ 3)GroupKeySetId: 0x01a1"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"

@@ -48,6 +48,8 @@
 #include "OTAProviderDelegateBridge.h"
 #endif
 
+constexpr uint8_t kUserActiveModeTriggerInstructionBufferLen =
+    128 + 1; // 128bytes is max UserActiveModeTriggerInstruction size and 1 byte is for escape sequence.
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -256,6 +258,9 @@ private:
 #endif
     bool mDeviceIsICD = false;
     uint8_t mICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+    char mUserActiveModeTriggerInstructionBuffer[kUserActiveModeTriggerInstructionBufferLen];
+    chip::MutableCharSpan mUserActiveModeTriggerInstruction = chip::MutableCharSpan(mUserActiveModeTriggerInstructionBuffer);
+    chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> mUserActiveModeTriggerHint;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

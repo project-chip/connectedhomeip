@@ -44,17 +44,6 @@ typedef void (*GroupsEventListListAttributeCallback)(void * context,
                                                      const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*GroupsAttributeListListAttributeCallback)(void * context,
                                                          const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*ScenesFabricSceneInfoListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::SceneInfoStruct::DecodableType> & data);
-typedef void (*ScenesGeneratedCommandListListAttributeCallback)(void * context,
-                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ScenesAcceptedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*ScenesEventListListAttributeCallback)(void * context,
-                                                     const chip::app::DataModel::DecodableList<chip::EventId> & data);
-typedef void (*ScenesAttributeListListAttributeCallback)(void * context,
-                                                         const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OnOffGeneratedCommandListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*OnOffAcceptedCommandListListAttributeCallback)(void * context,
@@ -653,6 +642,8 @@ typedef void (*MicrowaveOvenModeEventListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*MicrowaveOvenModeAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*MicrowaveOvenControlSupportedWattsListAttributeCallback)(void * context,
+                                                                        const chip::app::DataModel::DecodableList<uint16_t> & data);
 typedef void (*MicrowaveOvenControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*MicrowaveOvenControlAcceptedCommandListListAttributeCallback)(
@@ -688,6 +679,18 @@ typedef void (*RvcOperationalStateAcceptedCommandListListAttributeCallback)(
 typedef void (*RvcOperationalStateEventListListAttributeCallback)(void * context,
                                                                   const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*RvcOperationalStateAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ScenesManagementFabricSceneInfoListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType> &
+        data);
+typedef void (*ScenesManagementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ScenesManagementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ScenesManagementEventListListAttributeCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ScenesManagementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*HepaFilterMonitoringReplacementProductListListAttributeCallback)(
     void * context,
@@ -793,6 +796,10 @@ typedef void (*EnergyPreferenceEventListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*EnergyPreferenceAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*DoorLockAliroExpeditedTransactionSupportedProtocolVersionsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+typedef void (*DoorLockAliroSupportedBLEUWBProtocolVersionsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 typedef void (*DoorLockGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DoorLockAcceptedCommandListListAttributeCallback)(void * context,
@@ -825,6 +832,18 @@ typedef void (*PumpConfigurationAndControlEventListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*PumpConfigurationAndControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ThermostatPresetTypesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType> & data);
+typedef void (*ThermostatScheduleTypesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType> & data);
+typedef void (*ThermostatPresetsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType> & data);
+typedef void (*ThermostatSchedulesListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType> & data);
 typedef void (*ThermostatGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ThermostatAcceptedCommandListListAttributeCallback)(

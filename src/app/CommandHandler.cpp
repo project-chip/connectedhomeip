@@ -43,7 +43,9 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
-CommandHandler::CommandHandler(Callback * apCallback) : mExchangeCtx(*this), mpCallback(apCallback), mSuppressResponse(false) {}
+CommandHandler::CommandHandler(Callback * apCallback) :
+    mpCallback(apCallback), mResponseSenderDone(HandleOnResponseSenderDone, this), mSuppressResponse(false)
+{}
 
 CommandHandler::CommandHandler(TestOnlyMarker aTestMarker, Callback * apCallback, CommandPathRegistry * apCommandPathRegistry) :
     CommandHandler(apCallback)
@@ -64,7 +66,20 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
 
-        mInvokeResponseBuilder.SuppressResponse(mSuppressResponse);
+        if (mReserveSpaceForMoreChunkMessages)
+        {
+            ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
+        }
+
+        // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
+        // It was never implemented in the SDK, and there are no command responses that expect a
+        // command response. This means we will never receive an InvokeResponse Message in response
+        // to an InvokeResponse Message that we are sending. This means that the only response
+        // we are expecting to receive in response to an InvokeResponse Message that we are
+        // sending-out is a status when we are chunking multiple responses. As a result, to satisfy the
+        // condition that we don't set SuppressResponse to true while also setting
+        // MoreChunkedMessages to true, we are hardcoding the value to false here.
+        mInvokeResponseBuilder.SuppressResponse(/* aSuppressResponse = */ false);
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
 
         mInvokeResponseBuilder.CreateInvokeResponses(/* aReserveEndBuffer = */ true);
@@ -86,20 +101,26 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
-    mExchangeCtx.Grab(ec);
+    mResponseSender.SetExchangeContext(ec);
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
     // TODO: This is broken!  If something under here returns error, we will try
-    // to SendCommandResponse(), and then our caller will try to send a status
+    // to StartSendingCommandResponses(), and then our caller will try to send a status
     // response too.  Figure out at what point it's our responsibility to
     // handler errors vs our caller's.
     Handle workHandle(this);
 
-    mExchangeCtx->WillSendMessage();
+    // TODO(#30453): It should be possible for SetExchangeContext to internally call WillSendMessage.
+    // Unfortunately, doing so would require us to either:
+    // * Make TestCommandInteraction a friend of CommandResponseSender to allow it to set the exchange
+    //   context without calling WillSendMessage, or
+    // * Understand why unit tests fail when WillSendMessage is called during the execution of
+    //   SetExchangeContext.
+    mResponseSender.WillSendMessage();
     status = ProcessInvokeRequest(std::move(payload), isTimedInvoke);
     if (status != Status::Success)
     {
-        StatusResponse::Send(status, mExchangeCtx.Get(), false /*aExpectResponse*/);
+        mResponseSender.SendStatusResponse(status);
         mSentStatusResponse = true;
     }
 
@@ -187,7 +208,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 #if CHIP_CONFIG_IM_PRETTY_PRINT
     invokeRequestMessage.PrettyPrint();
 #endif
-    if (mExchangeCtx->IsGroupExchangeContext())
+    if (mResponseSender.IsForGroup())
     {
         SetGroupRequest(true);
     }
@@ -195,7 +216,7 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
-    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::UnsupportedAccess);
+    VerifyOrReturnError(mTimedRequest == isTimedInvoke, Status::TimedRequestMismatch);
 
     {
         InvokeRequestMessage::Parser validationInvokeRequestMessage = invokeRequestMessage;
@@ -205,6 +226,14 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
 
     TLV::TLVReader invokeRequestsReader;
     invokeRequests.GetReader(&invokeRequestsReader);
+
+    size_t commandCount = 0;
+    VerifyOrReturnError(TLV::Utilities::Count(invokeRequestsReader, commandCount, false /* recurse */) == CHIP_NO_ERROR,
+                        Status::InvalidAction);
+    if (commandCount > 1)
+    {
+        mReserveSpaceForMoreChunkMessages = true;
+    }
 
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
@@ -236,14 +265,6 @@ Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payloa
     return Status::Success;
 }
 
-CHIP_ERROR CommandHandler::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                             System::PacketBufferHandle && aPayload)
-{
-    ChipLogDetail(DataManagement, "CommandHandler: Unexpected message type %d", aPayloadHeader.GetMessageType());
-    StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
-    return CHIP_ERROR_INVALID_MESSAGE_TYPE;
-}
-
 void CommandHandler::Close()
 {
     mSuppressResponse = false;
@@ -259,6 +280,14 @@ void CommandHandler::Close()
     {
         mpCallback->OnDone(*this);
     }
+}
+
+void CommandHandler::HandleOnResponseSenderDone(void * context)
+{
+    CommandHandler * const _this = static_cast<CommandHandler *>(context);
+    VerifyOrDie(_this != nullptr);
+
+    _this->Close();
 }
 
 void CommandHandler::IncrementHoldOff()
@@ -278,39 +307,52 @@ void CommandHandler::DecrementHoldOff()
 
     if (!mSentStatusResponse)
     {
-        if (!mExchangeCtx)
+        if (!mResponseSender.HasExchangeContext())
         {
             ChipLogProgress(DataManagement, "Skipping command response: exchange context is null");
         }
         else if (!IsGroupRequest())
         {
-            CHIP_ERROR err = SendCommandResponse();
+            CHIP_ERROR err = StartSendingCommandResponses();
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
+                // TODO(#30453): It should be our responsibility to send a Failure StatusResponse to the requestor
+                // if there is a SessionHandle, but legacy unit tests explicitly check the behavior where
+                // CommandHandler does not send any message. Changing this behavior should be done in a standalone
+                // PR where only that specific change is made. Here is a possible solution that should
+                // be done that fulfills our responsibility to send a Failure StatusResponse, but this causes unit
+                // tests to start failing.
+                //   ```
+                //   if (mResponseSender.HasSessionHandle())
+                //   {
+                //       mResponseSender.SendStatusResponse(Status::Failure);
+                //   }
+                //   Close();
+                //   return;
+                //   ```
             }
         }
     }
 
+    if (mResponseSender.AwaitingStatusResponse())
+    {
+        // If we are awaiting a status response, we want to call Close() only once the response sender is done.
+        // Therefore, register to be notified when CommandResponseSender is done.
+        mResponseSender.RegisterOnResponseSenderDoneCallback(&mResponseSenderDone);
+        return;
+    }
     Close();
 }
 
-CHIP_ERROR CommandHandler::SendCommandResponse()
+CHIP_ERROR CommandHandler::StartSendingCommandResponses()
 {
-    System::PacketBufferHandle commandPacket;
-
     VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mExchangeCtx, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mResponseSender.HasExchangeContext(), CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(Finalize(commandPacket));
-    ReturnErrorOnFailure(
-        mExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandResponse, std::move(commandPacket)));
-    // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
-    // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
-
-    MoveToState(State::CommandSent);
-
+    ReturnErrorOnFailure(FinalizeLastInvokeResponseMessage());
+    ReturnErrorOnFailure(mResponseSender.StartSendingCommandResponses());
     return CHIP_NO_ERROR;
 }
 
@@ -352,7 +394,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
         }
     }
 
-    VerifyOrExit(mExchangeCtx && mExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mResponseSender.HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Access::SubjectDescriptor subjectDescriptor = GetSubjectDescriptor();
@@ -441,7 +483,7 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     err = commandPath.GetGroupCommandPath(&clusterId, &commandId);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    groupId = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();
+    groupId = mResponseSender.GetGroupId();
     fabric  = GetAccessingFabricIndex();
 
     ChipLogDetail(DataManagement, "Received group command for Group=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
@@ -725,7 +767,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
     VerifyOrDie(!mGoneAsync);
-    return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
+    return mResponseSender.GetAccessingFabricIndex();
 }
 
 CommandHandler * CommandHandler::Handle::Get()
@@ -759,12 +801,23 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
-CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
+CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessage(bool aHasMoreChunks)
 {
+    System::PacketBufferHandle packet;
+
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses());
+    if (aHasMoreChunks)
+    {
+        // Unreserving space previously reserved for MoreChunkedMessages is done
+        // in the call to mInvokeResponseBuilder.MoreChunkedMessages.
+        mInvokeResponseBuilder.MoreChunkedMessages(aHasMoreChunks);
+        ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
+    }
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage());
-    return mCommandMessageWriter.Finalize(&commandPacket);
+    ReturnErrorOnFailure(mCommandMessageWriter.Finalize(&packet));
+    mResponseSender.AddInvokeResponseToSend(std::move(packet));
+    return CHIP_NO_ERROR;
 }
 
 const char * CommandHandler::GetStateStr() const
@@ -784,8 +837,8 @@ const char * CommandHandler::GetStateStr() const
     case State::AddedCommand:
         return "AddedCommand";
 
-    case State::CommandSent:
-        return "CommandSent";
+    case State::DispatchResponses:
+        return "DispatchResponses";
 
     case State::AwaitingDestruction:
         return "AwaitingDestruction";

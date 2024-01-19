@@ -844,6 +844,20 @@
 #define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+ *
+ * Enable or disable commissioner passcode feature.
+ * With this feature enabled, the commissioner can generate a commissioning passcode
+ * and display it to the user so that the user can enter it into a commissionable
+ * node, such as a phone app, during user directed commissioning.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE 0
+#endif
+
 // -------------------- Thread Configuration --------------------
 
 /**

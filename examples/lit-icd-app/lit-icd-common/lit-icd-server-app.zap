@@ -1781,7 +1781,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0000000000000000",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3614,6 +3614,15 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
+            }
+          ],
+          "events": [
+            {
+              "name": "OnTransitionToActiveMode",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
             }
           ]
         }

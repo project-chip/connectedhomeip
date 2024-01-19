@@ -131,6 +131,7 @@ lighting-app/qpg/APPLICATION
 :maxdepth: 1
 
 light-switch-app/**/README
+light-switch-app/qpg/APPLICATION
 ```
 
 ## Lock example
@@ -282,6 +283,7 @@ temperature-measurement-app/**/README
 
 thermostat/**/README
 thermostat/**/Readme
+thermostat/qpg/APPLICATION
 ```
 
 ## TV example

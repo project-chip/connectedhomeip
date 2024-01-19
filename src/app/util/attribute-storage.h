@@ -24,7 +24,6 @@
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #include <app/att-storage.h>
@@ -96,12 +95,8 @@ void emAfCallInits(void);
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
-EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
+EmberAfStatus emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                        uint8_t * buffer, uint16_t readLength, bool write);
-
-bool emAfMatchCluster(const EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
-bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
-                        EmberAfAttributeSearchRecord * attRecord);
 
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
@@ -157,14 +152,8 @@ const EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::Endpoi
 // cast it.
 EmberAfGenericClusterFunction emberAfFindClusterFunction(const EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
-// Public APIs for loading attributes
+// Loads attribute defaults and any non-volatile attributes stored
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
-void emberAfResetAttributes(chip::EndpointId endpoint);
-
-// Loads the attributes from built-in default and / or storage.  If
-// ignoreStorage is true, only defaults will be read, and the storage for
-// non-volatile attributes will be overwritten with those defaults.
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
 // After the RAM value has changed, code should call this function. If this
 // attribute has been tagged as non-volatile, its value will be stored.
@@ -177,10 +166,6 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 // Calls the attribute changed callback for a specific cluster.
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-// Checks a cluster mask byte against ticks passed bitmask
-// returns true if the mask matches a passed interval
-bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
 
 // Check whether there is an endpoint defined with the given endpoint id that is
 // enabled.

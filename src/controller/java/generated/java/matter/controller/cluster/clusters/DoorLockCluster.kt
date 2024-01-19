@@ -23,6 +23,7 @@ import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
 import matter.controller.BooleanSubscriptionState
+import matter.controller.ByteArraySubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
@@ -118,6 +119,66 @@ class DoorLockCluster(private val controller: MatterController, private val endp
     data class Error(val exception: Exception) : DoorStateAttributeSubscriptionState()
 
     object SubscriptionEstablished : DoorStateAttributeSubscriptionState()
+  }
+
+  class AliroReaderVerificationKeyAttribute(val value: ByteArray?)
+
+  sealed class AliroReaderVerificationKeyAttributeSubscriptionState {
+    data class Success(val value: ByteArray?) :
+      AliroReaderVerificationKeyAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      AliroReaderVerificationKeyAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AliroReaderVerificationKeyAttributeSubscriptionState()
+  }
+
+  class AliroReaderGroupIdentifierAttribute(val value: ByteArray?)
+
+  sealed class AliroReaderGroupIdentifierAttributeSubscriptionState {
+    data class Success(val value: ByteArray?) :
+      AliroReaderGroupIdentifierAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      AliroReaderGroupIdentifierAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AliroReaderGroupIdentifierAttributeSubscriptionState()
+  }
+
+  class AliroExpeditedTransactionSupportedProtocolVersionsAttribute(val value: List<ByteArray>?)
+
+  sealed class AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) :
+      AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState()
+
+    object SubscriptionEstablished :
+      AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState()
+  }
+
+  class AliroGroupResolvingKeyAttribute(val value: ByteArray?)
+
+  sealed class AliroGroupResolvingKeyAttributeSubscriptionState {
+    data class Success(val value: ByteArray?) : AliroGroupResolvingKeyAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : AliroGroupResolvingKeyAttributeSubscriptionState()
+
+    object SubscriptionEstablished : AliroGroupResolvingKeyAttributeSubscriptionState()
+  }
+
+  class AliroSupportedBLEUWBProtocolVersionsAttribute(val value: List<ByteArray>?)
+
+  sealed class AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState {
+    data class Success(val value: List<ByteArray>?) :
+      AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState()
+
+    object SubscriptionEstablished :
+      AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -1376,6 +1437,62 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
     val TAG_P_I_N_CODE_REQ: Int = 0
     PINCode?.let { tlvWriter.put(ContextSpecificTag(TAG_P_I_N_CODE_REQ), PINCode) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setAliroReaderConfig(
+    signingKey: ByteArray,
+    verificationKey: ByteArray,
+    groupIdentifier: ByteArray,
+    groupResolvingKey: ByteArray?,
+    timedInvokeTimeout: Duration
+  ) {
+    val commandId: UInt = 40u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SIGNING_KEY_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_SIGNING_KEY_REQ), signingKey)
+
+    val TAG_VERIFICATION_KEY_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_VERIFICATION_KEY_REQ), verificationKey)
+
+    val TAG_GROUP_IDENTIFIER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_GROUP_IDENTIFIER_REQ), groupIdentifier)
+
+    val TAG_GROUP_RESOLVING_KEY_REQ: Int = 3
+    groupResolvingKey?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_GROUP_RESOLVING_KEY_REQ), groupResolvingKey)
+    }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun clearAliroReaderConfig(timedInvokeTimeout: Duration) {
+    val commandId: UInt = 41u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -5415,6 +5532,926 @@ class DoorLockCluster(private val controller: MatterController, private val endp
 
           requireNotNull(attributeData) {
             "Expiringusertimeout attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroReaderVerificationKeyAttribute(): AliroReaderVerificationKeyAttribute {
+    val ATTRIBUTE_ID: UInt = 128u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Aliroreaderverificationkey attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ByteArray? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getByteArray(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return AliroReaderVerificationKeyAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAliroReaderVerificationKeyAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AliroReaderVerificationKeyAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 128u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AliroReaderVerificationKeyAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Aliroreaderverificationkey attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray? =
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getByteArray(AnonymousTag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let {
+            emit(AliroReaderVerificationKeyAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AliroReaderVerificationKeyAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroReaderGroupIdentifierAttribute(): AliroReaderGroupIdentifierAttribute {
+    val ATTRIBUTE_ID: UInt = 129u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Aliroreadergroupidentifier attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ByteArray? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getByteArray(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return AliroReaderGroupIdentifierAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAliroReaderGroupIdentifierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AliroReaderGroupIdentifierAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 129u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AliroReaderGroupIdentifierAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Aliroreadergroupidentifier attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray? =
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getByteArray(AnonymousTag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let {
+            emit(AliroReaderGroupIdentifierAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AliroReaderGroupIdentifierAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroReaderGroupSubIdentifierAttribute(): ByteArray? {
+    val ATTRIBUTE_ID: UInt = 130u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Aliroreadergroupsubidentifier attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ByteArray? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getByteArray(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeAliroReaderGroupSubIdentifierAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<ByteArraySubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 130u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            ByteArraySubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Aliroreadergroupsubidentifier attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getByteArray(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(ByteArraySubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(ByteArraySubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroExpeditedTransactionSupportedProtocolVersionsAttribute():
+    AliroExpeditedTransactionSupportedProtocolVersionsAttribute {
+    val ATTRIBUTE_ID: UInt = 131u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Aliroexpeditedtransactionsupportedprotocolversions attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ByteArray>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ByteArray> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return AliroExpeditedTransactionSupportedProtocolVersionsAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAliroExpeditedTransactionSupportedProtocolVersionsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 131u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Aliroexpeditedtransactionsupportedprotocolversions attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ByteArray>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ByteArray> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getByteArray(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let {
+            emit(
+              AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState.Success(
+                it
+              )
+            )
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(
+            AliroExpeditedTransactionSupportedProtocolVersionsAttributeSubscriptionState
+              .SubscriptionEstablished
+          )
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroGroupResolvingKeyAttribute(): AliroGroupResolvingKeyAttribute {
+    val ATTRIBUTE_ID: UInt = 132u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Alirogroupresolvingkey attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: ByteArray? =
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getByteArray(AnonymousTag)
+        } else {
+          null
+        }
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return AliroGroupResolvingKeyAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAliroGroupResolvingKeyAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AliroGroupResolvingKeyAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 132u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AliroGroupResolvingKeyAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Alirogroupresolvingkey attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: ByteArray? =
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                tlvReader.getByteArray(AnonymousTag)
+              } else {
+                null
+              }
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(AliroGroupResolvingKeyAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(AliroGroupResolvingKeyAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroSupportedBLEUWBProtocolVersionsAttribute():
+    AliroSupportedBLEUWBProtocolVersionsAttribute {
+    val ATTRIBUTE_ID: UInt = 133u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Alirosupportedbleuwbprotocolversions attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ByteArray>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ByteArray> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getByteArray(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return AliroSupportedBLEUWBProtocolVersionsAttribute(decodedValue)
+  }
+
+  suspend fun subscribeAliroSupportedBLEUWBProtocolVersionsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 133u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Alirosupportedbleuwbprotocolversions attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ByteArray>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ByteArray> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getByteArray(AnonymousTag))
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let {
+            emit(AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState.Success(it))
+          }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(
+            AliroSupportedBLEUWBProtocolVersionsAttributeSubscriptionState.SubscriptionEstablished
+          )
+        }
+      }
+    }
+  }
+
+  suspend fun readAliroBLEAdvertisingVersionAttribute(): UByte? {
+    val ATTRIBUTE_ID: UInt = 134u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Alirobleadvertisingversion attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUByte(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeAliroBLEAdvertisingVersionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 134u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Alirobleadvertisingversion attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUByte(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readNumberOfAliroCredentialIssuerKeysSupportedAttribute(): UShort? {
+    val ATTRIBUTE_ID: UInt = 135u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofalirocredentialissuerkeyssupported attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeNumberOfAliroCredentialIssuerKeysSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 135u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Numberofalirocredentialissuerkeyssupported attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readNumberOfAliroEndpointKeysSupportedAttribute(): UShort? {
+    val ATTRIBUTE_ID: UInt = 136u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) {
+      "Numberofaliroendpointkeyssupported attribute not found in response"
+    }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeNumberOfAliroEndpointKeysSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 136u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Numberofaliroendpointkeyssupported attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
