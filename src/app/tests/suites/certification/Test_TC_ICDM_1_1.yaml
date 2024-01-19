@@ -40,7 +40,7 @@ tests:
               type: int16u
 
     - label: "Step 3: TH reads FeatureMap attribute from DUT"
-      PICS: " !ICDM.S.F00 && !ICDM.S.F01 !ICDM.S.F02 "
+      PICS: " !ICDM.S.F00 && !ICDM.S.F01 && !ICDM.S.F02 "
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
