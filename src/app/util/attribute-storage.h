@@ -89,9 +89,6 @@ extern uint8_t attributeDefaults[]; // storage bucked for > 2b default values
 
 void emAfCallInits(void);
 
-#define emberAfClusterIsClient(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_CLIENT) != 0))
-#define emberAfClusterIsServer(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_SERVER) != 0))
-
 // Initial configuration
 void emberAfEndpointConfigure(void);
 
