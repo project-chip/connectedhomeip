@@ -119,7 +119,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("OPSTATE.S.C04.Rsp"), "OPSTATE.S.C04.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Rsp"), "RVCOPSTATE.S.C04.Rsp must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C128.Rsp"), "RVCOPSTATE.S.C128.Rsp must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum

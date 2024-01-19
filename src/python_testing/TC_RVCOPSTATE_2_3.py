@@ -138,7 +138,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C00.Rsp"), "RVCOPSTATE.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C03.Rsp"), "RVCOPSTATE.S.C03.Rsp must be supported")
         # This command SHALL be supported by an implementation if any of the other commands are supported (6.5)
-        asserts.assert_true(self.check_pics("OPSTATE.S.C04.Rsp"), "OPSTATE.S.C04.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Rsp"), "RVCOPSTATE.S.C04.Rsp must be supported")
 
         attributes = Clusters.RvcOperationalState.Attributes
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
