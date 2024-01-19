@@ -16,6 +16,7 @@
  */
 
 #include "ICDRefreshKeyInfo.h"
+#include "CheckInDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandPathParams.h>
 #include <app/InteractionModelEngine.h>
@@ -25,11 +26,47 @@
 namespace chip {
 namespace app {
 
-ICDRefreshKeyInfo::ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo aICDClientInfo) :
-    mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
+ICDRefreshKeyInfo::ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, const ICDClientInfo aICDClientInfo,
+                                     const ICDClientStorage * aICDClientStorage) :
+    mOnConnectedCallback(HandleDeviceConnected, this),
+    mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
-    mpCheckInDelegate = apCheckInDelegate;
-    mICDClientInfo    = aICDClientInfo;
+    mpCheckInDelegate  = apCheckInDelegate;
+    mICDClientInfo     = aICDClientInfo;
+    mpICDClientStorage = const_cast<ICDClientStorage *>(aICDClientStorage);
+}
+
+void ICDRefreshKeyInfo::OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
+                                   const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData)
+{
+    app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType responseData;
+    mError = DataModel::Decode(*aData, responseData);
+    if (mError != CHIP_NO_ERROR)
+    {
+        ChipLogError(ICD, "Failed to decode re-registration response data: %" CHIP_ERROR_FORMAT, mError.Format());
+        return;
+    }
+    // Update the ICDClientInfo with new key and start counter and store it to persistence
+    mICDClientInfo.start_icd_counter = responseData.ICDCounter;
+    mError                           = mpICDClientStorage->SetKey(mICDClientInfo, mNewKey.Span());
+    if (mError != CHIP_NO_ERROR)
+    {
+        ChipLogError(ICD, "Failed to store the new key after re-registration: %" CHIP_ERROR_FORMAT, mError.Format());
+    }
+}
+void ICDRefreshKeyInfo::OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError)
+{
+    mError = aError;
+}
+
+void ICDRefreshKeyInfo::OnDone(chip::app::CommandSender * apCommandSender)
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mpCheckInDelegate->OnRegistrationUpdateComplete(mICDClientInfo, this);
+        return;
+    }
+    mpCheckInDelegate->OnRegistrationUpdateFailure(this);
 }
 
 CHIP_ERROR ICDRefreshKeyInfo::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr,
@@ -38,6 +75,7 @@ CHIP_ERROR ICDRefreshKeyInfo::RegisterClientWithNewKey(Messaging::ExchangeManage
     using namespace Clusters::IcdManagement;
 
     mRegisterCommandSender.SetExchangeManager(&exchangeMgr);
+    mRegisterCommandSender.SetCommandSenderDelegate(this);
 
     auto commandPathParams = CommandPathParams(0, 0, Id, Commands::RegisterClient::Id, (CommandPathFlags::kEndpointIdValid));
 

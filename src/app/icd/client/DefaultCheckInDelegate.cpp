@@ -44,26 +44,44 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 #endif
 }
 
-ICDRefreshKeyInfo * DefaultCheckInDelegate::OnKeyRefreshNeeded(const ICDClientInfo & clientInfo)
+ICDRefreshKeyInfo * DefaultCheckInDelegate::OnKeyRefreshNeeded(const ICDClientInfo & clientInfo,
+                                                               const ICDClientStorage * clientStorage)
 {
-    if (mpICDRefreshKeyInfo != nullptr)
+    auto icdRefreshKeyInfo = CreateICDRefreshKeyInfo(clientInfo, clientStorage);
+
+    if (icdRefreshKeyInfo == nullptr)
     {
         return nullptr;
     }
 
-    mpICDRefreshKeyInfo = new ICDRefreshKeyInfo(this, clientInfo);
-    if (mpICDRefreshKeyInfo == nullptr)
-    {
-        return nullptr;
-    }
-
-    CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(mpICDRefreshKeyInfo->mNewKey.Bytes(), mpICDRefreshKeyInfo->mNewKey.Capacity());
+    CHIP_ERROR err = chip::Crypto::DRBG_get_bytes(icdRefreshKeyInfo->mNewKey.Bytes(), icdRefreshKeyInfo->mNewKey.Capacity());
     if (err != CHIP_NO_ERROR)
     {
         return nullptr;
     }
 
-    return mpICDRefreshKeyInfo;
+    return icdRefreshKeyInfo;
+}
+
+void DefaultCheckInDelegate::OnRegistrationUpdateComplete(const ICDClientInfo & clientInfo, ICDRefreshKeyInfo * icdRefreshKeyInfo)
+{
+    ChipLogProgress(ICD, "Re-registration with new key successful. New start counter = %d", clientInfo.start_icd_counter);
+    ReleaseICDRefreshKeyInfo(icdRefreshKeyInfo);
+}
+void DefaultCheckInDelegate::OnRegistrationUpdateFailure(ICDRefreshKeyInfo * icdRefreshKeyInfo)
+{
+    ReleaseICDRefreshKeyInfo(icdRefreshKeyInfo);
+}
+
+ICDRefreshKeyInfo * DefaultCheckInDelegate::CreateICDRefreshKeyInfo(const ICDClientInfo & clientInfo,
+                                                                    const ICDClientStorage * clientStorage)
+{
+    return chip::Platform::MakeUnique<ICDRefreshKeyInfo>(this, clientInfo, clientStorage).get();
+}
+void DefaultCheckInDelegate::ReleaseICDRefreshKeyInfo(ICDRefreshKeyInfo * icdRefreshKeyInfo)
+{
+    chip::Platform::Delete(icdRefreshKeyInfo);
+    icdRefreshKeyInfo = nullptr;
 }
 } // namespace app
 } // namespace chip

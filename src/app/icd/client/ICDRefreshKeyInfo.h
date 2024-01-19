@@ -18,6 +18,8 @@
 #pragma once
 
 #include "ICDClientInfo.h"
+#include "ICDClientStorage.h"
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandSender.h>
 #include <app/OperationalSessionSetup.h>
 
@@ -34,31 +36,22 @@ namespace app {
 typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
 
 class CheckInDelegate;
-
-class ICDRefreshKeyInfo
+/**
+ * @brief ICDRefreshKeyInfo contains all the data and methods needed for key refresh and re-registration of an ICD client.
+ */
+class ICDRefreshKeyInfo : public CommandSender::Callback
 {
 public:
-    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo aICDClientInfo);
-    // ICDRefreshKeyInfo(const ICDRefreshKeyInfo & other);
-    // ICDRefreshKeyInfo & operator=(const ICDRefreshKeyInfo & other);
+    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, const ICDClientInfo aICDClientInfo,
+                      const ICDClientStorage * aICDClientStorage);
 
-    class RegisterCommandSenderCallback : public CommandSender::Callback
-    {
-    public:
-        void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
-                        const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData) override
-        {
-            // TODO
-        }
-        void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mError = aError; }
-        void OnDone(chip::app::CommandSender * apCommandSender) override {}
+    // CommandSender callbacks
+    void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
+                    const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData) override;
+    void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+    void OnDone(chip::app::CommandSender * apCommandSender) override;
 
-        CHIP_ERROR mError = CHIP_NO_ERROR;
-    };
-
-    void SetCheckInDelegate(CheckInDelegate * apCheckInDelegate) { mpCheckInDelegate = apCheckInDelegate; }
-    void SetICDClientInfo(ICDClientInfo icdClientInfo) { mICDClientInfo = icdClientInfo; }
-    //   RefreshKeyBuffer GetNewKey() { return mNewKey; }
+    // CASE session callbacks
     /**
      * @brief Callback received on successfully establishing a CASE session in order to re-register the client with the peer node
      * using a new key to avoid counter rollover problems.
@@ -94,16 +87,19 @@ public:
      * ICD counter rollover. Returns error if we did not even manage to kick off a CASE attempt.
      */
     void EstablishSessionToPeer();
+
+    // TODO Making it private and adding a getter threw error as copy constructors are disabled for SensitiveDataBuffer. Making it
+    // public temporarily to continue development
     RefreshKeyBuffer mNewKey;
 
 private:
     ICDClientInfo mICDClientInfo;
-    CheckInDelegate * mpCheckInDelegate = nullptr;
-    RegisterCommandSenderCallback mCommandSenderDelegate;
+    ICDClientStorage * mpICDClientStorage = nullptr;
+    CheckInDelegate * mpCheckInDelegate   = nullptr;
     app::CommandSender mRegisterCommandSender;
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    CHIP_ERROR mError = CHIP_NO_ERROR;
 };
-
 } // namespace app
 } // namespace chip

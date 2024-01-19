@@ -453,6 +453,11 @@ void CommandSender::SetExchangeManager(Messaging::ExchangeManager * apExchangeMg
     mpExchangeMgr = apExchangeMgr;
 }
 
+void CommandSender::SetCommandSenderDelegate(Callback * apCallback)
+{
+    mpCallback = apCallback;
+}
+
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs)
 {
     ReturnErrorOnFailure(AllocateBuffer());
