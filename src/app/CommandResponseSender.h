@@ -159,7 +159,7 @@ private:
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
-    bool mCloseCalled = false;
+    bool mCloseCalled           = false;
     bool mReportResponseDropped = false;
 };
 
