@@ -1132,28 +1132,29 @@ CHIP_ERROR SetTagList(EndpointId endpoint, Span<const Clusters::Descriptor::Stru
 const EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool server)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    uint8_t c = 0;
-    const EmberAfCluster * cluster;
-
     if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
 
-    const EmberAfEndpointType *endpointType = emAfEndpoints[index].endpointType;
+    const EmberAfEndpointType endpointType = emAfEndpoints[index].endpointType;
     const EmberAfClusterMask cluster_mask = server ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
     const uint8_t clusterCount = endpointType->clusterCount;
 
+    uint8_t c = 0;
     for (uint8_t i = 0; i < clusterCount; i++)
     {
-        if ((endpointType->cluster[i].mask & cluster_mask) != 0)
+        if ((endpointType->cluster[i].mask & cluster_mask) == 0)
         {
-            if (c == n)
-            {
-                return cluster;
-            }
-            c++;
+            continue;
         }
+
+        if (c == n)
+        {
+           return cluster;
+        }
+
+        c++;
     }
     return nullptr;
 }
