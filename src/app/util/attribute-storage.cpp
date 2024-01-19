@@ -1026,17 +1026,9 @@ uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server)
 uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
 {
     const EmberAfClusterMask cluster_mask = server ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
-    uint8_t c                             = 0;
-    const uint8_t clusterCount            = type->clusterCount;
 
-    for (uint8_t i = 0; i < clusterCount; i++)
-    {
-        if ((type->cluster[i].mask & cluster_mask) != 0)
-        {
-            c++;
-        }
-    }
-    return c;
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](auto cluster) { return (cluster.mask & cluster_mask) != 0; }));
 }
 
 uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
