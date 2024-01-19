@@ -41,7 +41,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
                            0x8: 'Night',
                            0x9: 'Day'}
         self.runTags = [tag.value for tag in Clusters.RvcRunMode.Enums.ModeTag
-                   if tag is not Clusters.RvcRunMode.Enums.ModeTag.kUnknownEnumValue]
+                        if tag is not Clusters.RvcRunMode.Enums.ModeTag.kUnknownEnumValue]
         self.supported_modes_dut = []
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):

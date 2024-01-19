@@ -31,15 +31,15 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(args)
         self.commonTags = {0x0: 'Auto',
-                      0x1: 'Quick',
-                      0x2: 'Quiet',
-                      0x3: 'LowNoise',
-                      0x4: 'LowEnergy',
-                      0x5: 'Vacation',
-                      0x6: 'Min',
-                      0x7: 'Max',
-                      0x8: 'Night',
-                      0x9: 'Day'}
+                           0x1: 'Quick',
+                           0x2: 'Quiet',
+                           0x3: 'LowNoise',
+                           0x4: 'LowEnergy',
+                           0x5: 'Vacation',
+                           0x6: 'Min',
+                           0x7: 'Max',
+                           0x8: 'Night',
+                           0x9: 'Day'}
         self.cleanTags = [tag.value for tag in Clusters.RvcCleanMode.Enums.ModeTag
                           if tag is not Clusters.RvcCleanMode.Enums.ModeTag.kUnknownEnumValue]
         self.supported_modes_dut = []
