@@ -360,7 +360,14 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
+        // We are extracting the things needed by the CommandData template and keeping
+        // this function as minimal as possible to compiled code size.
+        ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
+                                             CommandData::GetCommandId() };
+        auto encodeCommandDataClosure = [&](TLV::TLVWriter & writer) -> CHIP_ERROR {
+            return DataModel::Encode(writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData);
+        };
+        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, responsePath, encodeCommandDataClosure); });
     }
 
     /**
@@ -557,8 +564,8 @@ private:
      *             responding to.
      * @param [in] aData the data for the response.
      */
-    template <typename CommandData>
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    template <typename Function>
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath, Function && encodeCommandDataFunction)
     {
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
@@ -566,13 +573,11 @@ private:
         InvokeResponseParameters prepareParams(aRequestCommandPath);
         prepareParams.SetStartOrEndDataStruct(false);
 
-        ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
-                                             CommandData::GetCommandId() };
         ScopedChange<bool> internalCallToAddResponse(mInternalCallToAddResponseData, true);
-        ReturnErrorOnFailure(PrepareInvokeResponseCommand(responsePath, prepareParams));
+        ReturnErrorOnFailure(PrepareInvokeResponseCommand(aResponseCommandPath, prepareParams));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
+        ReturnErrorOnFailure(encodeCommandDataFunction(*writer));
 
         return FinishCommand(/* aEndDataStruct = */ false);
     }
