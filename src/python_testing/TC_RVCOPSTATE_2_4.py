@@ -74,7 +74,7 @@ def error_enum_to_text(error_enum):
         return "MopCleaningPadMissing(0x47)"
 
 
-class TC_RVCOPSTATE_2_3(MatterBaseTest):
+class TC_RVCOPSTATE_2_4(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(args)
         self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
@@ -119,7 +119,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
                             "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C80.Rsp"), "RVCOPSTATE.S.C80.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C128.Rsp"), "RVCOPSTATE.S.C128.Rsp must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum
         rvc_op_states = Clusters.RvcOperationalState.Enums.OperationalStateEnum

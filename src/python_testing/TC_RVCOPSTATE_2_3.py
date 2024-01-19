@@ -97,7 +97,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(operational_state, Clusters.OperationalState.Enums.OperationalStateEnum.kPaused,
                              "OperationalState(%s) should be Paused(0x02)" % operational_state)
 
-        if self.check_pics("OPSTATE.S.A0002"):
+        if self.check_pics("RVCOPSTATE.S.A0002"):
             self.print_step(7, "Read CountdownTime attribute")
             initial_countdown_time = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
                                                                                   attribute=attributes.CountdownTime)
@@ -115,7 +115,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             logging.info("CountdownTime: %s" % countdown_time)
             asserts.assert_true(countdown_time != 0 or countdown_time == NullValue,
                                 "invalid CountdownTime(%s). Must be a non zero integer, or null" % countdown_time)
-            asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) does not equal to the intial CountdownTime(%s)"
+            asserts.assert_equal(countdown_time, initial_countdown_time, "CountdownTime(%s) not equal to the initial CountdownTime(%s)"
                                  % (countdown_time, initial_countdown_time))
 
         self.print_step(10, "Send Pause command")

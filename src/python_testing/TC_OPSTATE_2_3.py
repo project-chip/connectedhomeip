@@ -150,7 +150,7 @@ class TC_OPSTATE_2_3(MatterBaseTest):
                              Clusters.OperationalState.Enums.ErrorStateEnum.kCommandInvalidInState,
                              "errorStateID(%s) should be CommandInvalidInState(0x03)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(16, "Manually put the device in a the Error(0x03) operational state")
+        self.print_step(16, "Manually put the device in the Error(0x03) operational state")
         input("Press Enter when done.\n")
 
         self.print_step(17, "Send Pause command")
