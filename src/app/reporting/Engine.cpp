@@ -513,6 +513,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // Notify the ICDManager that we are about to send a subscription report before we prepare the Report payload.
+        // This allows the ICDManager to trigger any necessary updates and have the information in the report about to be sent.
+        app::ICDNotifier::GetInstance().BroadcastSubscriptionReport();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
         SubscriptionId subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
         reportDataBuilder.SubscriptionId(subscriptionId);
@@ -646,11 +652,6 @@ void Engine::Run()
 
         if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-            // Notify the ICDManager that we are about to send a subscription report before we prepare the Report payload.
-            // This allows the ICDManager to trigger any necessary updates and have the information in the report about to be sent.
-            app::ICDNotifier::GetInstance().BroadcastSubscriptionReport();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
