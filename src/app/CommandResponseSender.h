@@ -124,27 +124,9 @@ public:
     }
 
     /**
-     * @brief Queues a single, non-path-specific, error to be sent after all queued InvokeRequestMessages.
-     *
-     * Sends a single non-path-specific error to the client following the transmission of all queued
-     * InvokeRequestMessages.
-     *
-     * Behavior: If invoked multiple times, only the error set by the final call will be relayed
-     * to the client.
-     *
-     * @param aStatus InteractionModel Status. Cannot be success status.
-     * @return CHIP_NO_ERROR Successfully set IM failure status to send as final StatusResponse.
-     * @return CHIP_ERROR_INVALID_ARGUMENT provided with status that is success.
-     * @return CHIP_ERROR_INCORRECT_STATE
+     * @brief Called to indicate that response was dropped
      */
-    CHIP_ERROR SetFinalStatusResponseFailure(Protocols::InteractionModel::Status aStatus)
-    {
-        VerifyOrReturnError(aStatus != Protocols::InteractionModel::Status::Success, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mState != State::AllInvokeResponsesSent, CHIP_ERROR_INCORRECT_STATE);
-        VerifyOrReturnError(!mChunks.IsNull(), CHIP_ERROR_INCORRECT_STATE);
-        mFinalFailureStatus.SetValue(aStatus);
-        return CHIP_NO_ERROR;
-    }
+    void ResponseDropped() { mReportResponseDropped = true; }
 
     /**
      * @brief Registers a callback to be invoked when CommandResponseSender has finished sending responses.
@@ -167,19 +149,18 @@ private:
     const char * GetStateStr() const;
 
     CHIP_ERROR SendCommandResponse();
-    bool HasMoreToSend() { return !mChunks.IsNull() || mFinalFailureStatus.HasValue(); }
+    bool HasMoreToSend() { return !mChunks.IsNull() || mReportResponseDropped; }
     void Close();
 
     // A list of InvokeResponseMessages to be sent out by CommandResponseSender.
     System::PacketBufferHandle mChunks;
 
-    // When final status is set, we will send out this status as the final message in the interaction.
-    Optional<Protocols::InteractionModel::Status> mFinalFailureStatus;
     chip::Callback::Callback<OnResponseSenderDone> * mResponseSenderDoneCallback = nullptr;
     Messaging::ExchangeHolder mExchangeCtx;
     State mState = State::ReadyForInvokeResponses;
 
     bool mCloseCalled = false;
+    bool mReportResponseDropped = false;
 };
 
 } // namespace app

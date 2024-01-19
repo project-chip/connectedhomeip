@@ -780,8 +780,9 @@ CHIP_ERROR CommandHandler::RollbackResponse()
 {
     VerifyOrReturnError(mRollbackBackupValid, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::Preparing || mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    // TODO(#30453): Rollback of mInvokeResponseBuilder should handle resetting
+    // InvokeResponses.
     mInvokeResponseBuilder.GetInvokeResponses().ResetError();
-    mInvokeResponseBuilder.ResetError();
     mInvokeResponseBuilder.Rollback(mBackupWriter);
     MoveToState(mBackupState);
     mRollbackBackupValid = false;
@@ -838,14 +839,17 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
 CHIP_ERROR CommandHandler::FinalizeInvokeResponseMessageAndPrepareNext()
 {
     ReturnErrorOnFailure(FinalizeInvokeResponseMessage(/* aHasMoreChunks = */ true));
+    // After successfully finalizing InvokeResponseMessage, no buffer should remain
+    // allocated.
+    VerifyOrDie(!mBufferAllocated);
     CHIP_ERROR err = AllocateBuffer();
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        VerifyOrDie(mState == State::NewResponseMessage);
-    }
-    else
-    {
-        mResponseSender.SetFinalStatusResponseFailure(Protocols::InteractionModel::Status::ResourceExhausted);
+        // TODO(#30453): Improve ResponseDropped calls to occur only when dropping is
+        // definitively guaranteed.
+        // Response dropping is not yet definitive as a subsequent call
+        // to AllocateBuffer might succeed.
+        mResponseSender.ResponseDropped();
     }
     return err;
 }

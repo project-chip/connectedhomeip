@@ -360,8 +360,17 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        // We are extracting the things needed by the CommandData template and keeping
-        // this function as minimal as possible to compiled code size.
+        // This method, templated with CommandData, captures all the components needs
+        // from CommandData with as little code as possible. This in theory should
+        // reduce compiled code size.
+        //
+        // TODO(#30453): Verify the accuracy of the theory outlined below.
+        //
+        // Theory on code reduction: Previously, non-essential code was unnecessarily
+        // templated, leading to compilation and duplication N times. The lambda
+        // function below mitigates this issue by isolating only the code segments
+        // that genuinely require templating, thereby minimizing duplicate compiled
+        // code.
         ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
                                              CommandData::GetCommandId() };
         auto encodeCommandDataClosure    = [&](TLV::TLVWriter & writer) -> CHIP_ERROR {
@@ -563,8 +572,7 @@ private:
      *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
-     * @param [in] aResponseCommandPath the concrete path of the command we are
-     *             responding to.
+     * @param [in] aResponseCommandPath the concrete command response path.
      * @param [in] encodeCommandDataFunction A lambda function responsible for
      *             encoding the CommandData field.
      */

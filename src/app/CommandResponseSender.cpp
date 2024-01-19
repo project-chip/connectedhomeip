@@ -105,9 +105,9 @@ CHIP_ERROR CommandResponseSender::SendCommandResponse()
     VerifyOrReturnError(HasMoreToSend(), CHIP_ERROR_INCORRECT_STATE);
     if (mChunks.IsNull())
     {
-        VerifyOrReturnError(mFinalFailureStatus.HasValue(), CHIP_ERROR_INCORRECT_STATE);
-        SendStatusResponse(mFinalFailureStatus.Value());
-        mFinalFailureStatus.ClearValue();
+        VerifyOrReturnError(mReportResponseDropped, CHIP_ERROR_INCORRECT_STATE);
+        SendStatusResponse(Status::ResourceExhausted);
+        mReportResponseDropped = false;
         return CHIP_NO_ERROR;
     }
     System::PacketBufferHandle commandResponsePayload = mChunks.PopHead();
