@@ -3063,6 +3063,9 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAtt
     case Attributes::Forecast::Id: {
         return YES;
     }
+    case Attributes::OptOutState::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3121,12 +3124,6 @@ static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::RandomizationDelayWindow::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfWeeklyTargets::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfDailyTargets::Id: {
         return YES;
     }
     case Attributes::NextChargeStartTime::Id: {

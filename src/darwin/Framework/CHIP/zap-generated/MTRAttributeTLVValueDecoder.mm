@@ -8446,9 +8446,21 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
                     newElement_2.defaultDuration = [NSNumber numberWithUnsignedInt:entry_2.defaultDuration];
                     newElement_2.elapsedSlotTime = [NSNumber numberWithUnsignedInt:entry_2.elapsedSlotTime];
                     newElement_2.remainingSlotTime = [NSNumber numberWithUnsignedInt:entry_2.remainingSlotTime];
-                    newElement_2.slotIsPauseable = [NSNumber numberWithBool:entry_2.slotIsPauseable];
-                    newElement_2.minPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.minPauseDuration];
-                    newElement_2.maxPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.maxPauseDuration];
+                    if (entry_2.slotIsPauseable.HasValue()) {
+                        newElement_2.slotIsPauseable = [NSNumber numberWithBool:entry_2.slotIsPauseable.Value()];
+                    } else {
+                        newElement_2.slotIsPauseable = nil;
+                    }
+                    if (entry_2.minPauseDuration.HasValue()) {
+                        newElement_2.minPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.minPauseDuration.Value()];
+                    } else {
+                        newElement_2.minPauseDuration = nil;
+                    }
+                    if (entry_2.maxPauseDuration.HasValue()) {
+                        newElement_2.maxPauseDuration = [NSNumber numberWithUnsignedInt:entry_2.maxPauseDuration.Value()];
+                    } else {
+                        newElement_2.maxPauseDuration = nil;
+                    }
                     if (entry_2.manufacturerESAState.HasValue()) {
                         newElement_2.manufacturerESAState = [NSNumber numberWithUnsignedShort:entry_2.manufacturerESAState.Value()];
                     } else {
@@ -8531,7 +8543,19 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
                 }
                 value.slots = array_2;
             }
+            value.forecastUpdateReason = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().forecastUpdateReason)];
         }
+        return value;
+    }
+    case Attributes::OptOutState::Id: {
+        using TypeInfo = Attributes::OptOutState::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
         return value;
     }
     default: {
@@ -8677,28 +8701,6 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedInt:cppValue];
-        return value;
-    }
-    case Attributes::NumberOfWeeklyTargets::Id: {
-        using TypeInfo = Attributes::NumberOfWeeklyTargets::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
-        return value;
-    }
-    case Attributes::NumberOfDailyTargets::Id: {
-        using TypeInfo = Attributes::NumberOfDailyTargets::TypeInfo;
-        TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
     case Attributes::NextChargeStartTime::Id: {
