@@ -66,7 +66,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -126,7 +126,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -293,7 +293,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     NetworkInterface * head = nullptr;
@@ -456,7 +456,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -624,7 +624,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;

@@ -166,8 +166,8 @@ CHIP_ERROR GetWiFiParameter(int sock,            /* Socket to the kernel */
                             struct iwreq * pwrq) /* Fixed part of the request */
 {
     chip::Platform::CopyString(pwrq->ifr_name, ifname);
-    if (ioctl(sock, request, pwrq) < 0)
-        return CHIP_ERROR_BAD_REQUEST;
+    if (ioctl(sock, request, pwrq) == -1)
+        return CHIP_ERROR_POSIX(errno);
     return CHIP_NO_ERROR;
 }
 
@@ -228,12 +228,12 @@ CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
     struct ifreq req;
     Platform::CopyString(req.ifr_name, ifname);
-    VerifyOrExit(ioctl(sock, SIOCGIFHWADDR, &req) != -1, err = CHIP_ERROR_READ_FAILED;
+    VerifyOrExit(ioctl(sock, SIOCGIFHWADDR, &req) != -1, err = CHIP_ERROR_POSIX(errno);
                  ChipLogError(DeviceLayer, "Failed to get hardware address: %s", strerror(errno)));
 
     // Copy 48-bit IEEE MAC Address
@@ -255,7 +255,7 @@ CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInt
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     uint8_t index = 0;
@@ -297,7 +297,7 @@ CHIP_ERROR GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInt
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     uint8_t index = 0;
@@ -339,7 +339,7 @@ CHIP_ERROR GetWiFiInterfaceName(char * ifname, size_t bufSize)
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -364,7 +364,7 @@ CHIP_ERROR GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
     double freq;
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
     err = GetWiFiParameter(sock, ifname, SIOCGIWFREQ, &wrq);
@@ -386,7 +386,7 @@ CHIP_ERROR GetWiFiRssi(const char * ifname, int8_t & rssi)
     struct iw_statistics stats;
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
     err = GetWiFiStats(sock, ifname, &stats);
@@ -441,7 +441,7 @@ CHIP_ERROR GetWiFiBeaconLostCount(const char * ifname, uint32_t & beaconLostCoun
     struct iw_statistics stats;
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
     err = GetWiFiStats(sock, ifname, &stats);
@@ -460,7 +460,7 @@ CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
     struct iwreq wrq;
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
     err = GetWiFiParameter(sock, ifname, SIOCGIWRATE, &wrq);
@@ -482,7 +482,7 @@ CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize)
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces: %s", strerror(errno));
-        return err;
+        return CHIP_ERROR_POSIX(errno);
     }
 
     struct ifaddrs * ifa = nullptr;
@@ -512,10 +512,10 @@ CHIP_ERROR GetEthPHYRate(const char * ifname, PHYRateEnum & pHYRate)
     Platform::CopyString(ifr.ifr_name, ifname);
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    VerifyOrExit(ioctl(sock, SIOCETHTOOL, &ifr) != -1, err = CHIP_ERROR_READ_FAILED;
+    VerifyOrExit(ioctl(sock, SIOCETHTOOL, &ifr) != -1, err = CHIP_ERROR_POSIX(errno);
                  ChipLogError(DeviceLayer, "Cannot get device settings: %s", strerror(errno)));
 
     speed = (ecmd.speed_hi << 16) | ecmd.speed;
@@ -573,10 +573,10 @@ CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex)
     Platform::CopyString(ifr.ifr_name, ifname);
 
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
-    VerifyOrReturnError(sock != -1, CHIP_ERROR_OPEN_FAILED,
+    VerifyOrReturnError(sock != -1, CHIP_ERROR_POSIX(errno),
                         ChipLogError(DeviceLayer, "Failed to create INET socket: %s", strerror(errno)));
 
-    VerifyOrExit(ioctl(sock, SIOCETHTOOL, &ifr) != -1, err = CHIP_ERROR_READ_FAILED;
+    VerifyOrExit(ioctl(sock, SIOCETHTOOL, &ifr) != -1, err = CHIP_ERROR_POSIX(errno);
                  ChipLogError(DeviceLayer, "Cannot get device settings: %s", strerror(errno)));
 
     fullDuplex = ecmd.duplex == DUPLEX_FULL;

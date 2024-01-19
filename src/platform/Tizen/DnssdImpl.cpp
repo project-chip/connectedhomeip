@@ -230,7 +230,7 @@ CHIP_ERROR BrowseAsync(chip::Dnssd::BrowseContext * bCtx)
     else
     {
         char iface[IF_NAMESIZE + 1] = "";
-        VerifyOrReturnValue(if_indextoname(interfaceId, iface) != nullptr, CHIP_ERROR_INTERNAL,
+        VerifyOrReturnValue(if_indextoname(interfaceId, iface) != nullptr, CHIP_ERROR_POSIX(errno),
                             ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno)));
         ret = dnssd_browse_service(bCtx->mType, iface, &bCtx->mBrowserHandle, OnBrowse, bCtx);
     }
@@ -554,7 +554,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
         char iface[IF_NAMESIZE + 1] = "";
         VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
                      ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno));
-                     err = CHIP_ERROR_INTERNAL);
+                     err = CHIP_ERROR_POSIX(errno));
         ret = dnssd_service_set_interface(serviceHandle, iface);
         VerifyOrExit(ret == DNSSD_ERROR_NONE,
                      ChipLogError(DeviceLayer, "dnssd_service_set_interface() failed: %s", get_error_message(ret));
@@ -644,7 +644,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
         char iface[IF_NAMESIZE + 1] = "";
         VerifyOrExit(if_indextoname(interfaceId, iface) != nullptr,
                      ChipLogError(DeviceLayer, "if_indextoname() failed: %s", strerror(errno));
-                     err = CHIP_ERROR_INTERNAL);
+                     err = CHIP_ERROR_POSIX(errno));
         ret = dnssd_create_remote_service(fullType.c_str(), browseResult.mName, iface, &resolveCtx->mServiceHandle);
     }
 
