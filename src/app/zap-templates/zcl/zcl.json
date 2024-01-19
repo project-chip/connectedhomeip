@@ -184,6 +184,7 @@
             "AbsMaxPower",
             "PowerAdjustmentCapability",
             "Forecast",
+            "OptOutState",
             "FeatureMap"
         ],
         "Energy EVSE": [
