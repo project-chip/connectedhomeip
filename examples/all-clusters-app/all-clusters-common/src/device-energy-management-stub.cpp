@@ -50,10 +50,10 @@ void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointI
     gInstance = std::make_unique<DeviceEnergyManagementManager>(
         endpointId, *gDelegate,
         BitMask<DeviceEnergyManagement::Feature, uint32_t>(
-            DeviceEnergyManagement::Feature::kPowerForecastReporting, DeviceEnergyManagement::Feature::kStateForecastReporting,
-            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kForecastAdjustment),
-        BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsModifyForecastRequest,
-                                            OptionalCommands::kSupportsRequestConstraintBasedForecast));
+            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
+            DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+            DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+            DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
 
     if (!gInstance)
     {
