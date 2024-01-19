@@ -496,9 +496,10 @@ tests:
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 60 000 000 (60 000s) and no extension field sets. This should fail
+          to 7 000 000 (7 000s) and no extension field sets. This should fail
           and return a status of 0x85 (INVALID_COMMAND) because we exceed the
           max TransitionTime"
+      #TODO Add to chip-test-plan
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
@@ -508,7 +509,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 60000000
+                value: 7000000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"

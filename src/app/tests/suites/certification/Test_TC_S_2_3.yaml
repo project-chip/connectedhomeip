@@ -197,8 +197,7 @@ tests:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
           0x0001 (1s) and a set of extension fields appropriate to AC1."
-      # This step is overwriting Step 2a, we need to add PICS !S.S.C40.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
-      PICS: S.S.C00.Rsp && !S.S.C40.Rsp && PICS_SDK_CI_ONLY
+      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
           values:
@@ -284,8 +283,7 @@ tests:
           [1670970505.890774][5742:5744] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
-      # This step is overwriting Step 2a, we need to add PICS !S.S.C40.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
-      PICS: S.S.C00.Rsp && !S.S.C40.Rsp && PICS_SKIP_SAMPLE_APP
+      PICS: S.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -299,8 +297,7 @@ tests:
     - label:
           "Step 3: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      # This step is redundant with Step 3a, we should add PICS !S.S.C41.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
-      PICS: S.S.C01.Rsp && !S.S.C41.Rsp && PICS_SDK_CI_ONLY
+      PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
       command: "ViewScene"
       arguments:
           values:
@@ -336,8 +333,7 @@ tests:
     - label:
           "Step 3: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      # This step is redundant with Step 3a, we should add PICS !S.S.C41.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
-      PICS: S.S.C01.Rsp && !S.S.C41.Rsp && PICS_SKIP_SAMPLE_APP
+      PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
