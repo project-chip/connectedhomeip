@@ -2380,6 +2380,18 @@ enum class Feature : uint32_t
 
 namespace DeviceEnergyManagement {
 
+// Enum for AdjustmentCauseEnum
+enum class AdjustmentCauseEnum : uint8_t
+{
+    kLocalOptimization = 0x00,
+    kGridOptimization  = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
 // Enum for CauseEnum
 enum class CauseEnum : uint8_t
 {
@@ -2387,11 +2399,12 @@ enum class CauseEnum : uint8_t
     kOffline          = 0x01,
     kFault            = 0x02,
     kUserOptOut       = 0x03,
+    kCancelled        = 0x04,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 4,
+    kUnknownEnumValue = 5,
 };
 
 // Enum for CostTypeEnum
@@ -2414,14 +2427,13 @@ enum class ESAStateEnum : uint8_t
     kOffline           = 0x00,
     kOnline            = 0x01,
     kFault             = 0x02,
-    kUserOptOut        = 0x03,
-    kPowerAdjustActive = 0x04,
-    kPaused            = 0x05,
+    kPowerAdjustActive = 0x03,
+    kPaused            = 0x04,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 6,
+    kUnknownEnumValue = 5,
 };
 
 // Enum for ESATypeEnum
@@ -2449,13 +2461,43 @@ enum class ESATypeEnum : uint8_t
     kUnknownEnumValue = 14,
 };
 
+// Enum for ForecastUpdateReasonEnum
+enum class ForecastUpdateReasonEnum : uint8_t
+{
+    kInternalOptimization = 0x00,
+    kLocalOptimization    = 0x01,
+    kGridOptimization     = 0x02,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 3,
+};
+
+// Enum for OptOutStateEnum
+enum class OptOutStateEnum : uint8_t
+{
+    kNoOptOut    = 0x00,
+    kLocalOptOut = 0x01,
+    kGridOptOut  = 0x02,
+    kOptOut      = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kPowerAdjustment        = 0x1,
-    kPowerForecastReporting = 0x2,
-    kStateForecastReporting = 0x4,
-    kForecastAdjustment     = 0x8,
+    kPowerAdjustment           = 0x1,
+    kPowerForecastReporting    = 0x2,
+    kStateForecastReporting    = 0x4,
+    kStartTimeAdjustment       = 0x8,
+    kPausable                  = 0x10,
+    kForecastAdjustment        = 0x20,
+    kConstraintBasedAdjustment = 0x40,
 };
 } // namespace DeviceEnergyManagement
 

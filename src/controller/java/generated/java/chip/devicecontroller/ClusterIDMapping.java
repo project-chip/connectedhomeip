@@ -9365,6 +9365,7 @@ public class ClusterIDMapping {
             AbsMaxPower(4L),
             PowerAdjustmentCapability(5L),
             Forecast(6L),
+            OptOutState(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -9421,7 +9422,8 @@ public class ClusterIDMapping {
             PauseRequest(3L),
             ResumeRequest(4L),
             ModifyForecastRequest(5L),
-            RequestConstraintBasedForecast(6L),;
+            RequestConstraintBasedForecast(6L),
+            CancelRequest(7L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -9439,7 +9441,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PowerAdjustRequestCommandField {Power(0),Duration(1),;
+        }public enum PowerAdjustRequestCommandField {Power(0),Duration(1),Cause(2),;
                     private final int id;
                     PowerAdjustRequestCommandField(int id) {
                         this.id = id;
@@ -9456,7 +9458,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum StartTimeAdjustRequestCommandField {RequestedStartTime(0),;
+                }public enum StartTimeAdjustRequestCommandField {RequestedStartTime(0),Cause(1),;
                     private final int id;
                     StartTimeAdjustRequestCommandField(int id) {
                         this.id = id;
@@ -9473,7 +9475,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum PauseRequestCommandField {Duration(0),;
+                }public enum PauseRequestCommandField {Duration(0),Cause(1),;
                     private final int id;
                     PauseRequestCommandField(int id) {
                         this.id = id;
@@ -9490,7 +9492,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),;
+                }public enum ModifyForecastRequestCommandField {ForecastId(0),SlotAdjustments(1),Cause(2),;
                     private final int id;
                     ModifyForecastRequestCommandField(int id) {
                         this.id = id;
@@ -9507,7 +9509,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum RequestConstraintBasedForecastCommandField {Constraints(0),;
+                }public enum RequestConstraintBasedForecastCommandField {Constraints(0),Cause(1),;
                     private final int id;
                     RequestConstraintBasedForecastCommandField(int id) {
                         this.id = id;

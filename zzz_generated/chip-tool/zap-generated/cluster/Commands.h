@@ -6898,6 +6898,7 @@ private:
 | * ResumeRequest                                                     |   0x04 |
 | * ModifyForecastRequest                                             |   0x05 |
 | * RequestConstraintBasedForecast                                    |   0x06 |
+| * CancelRequest                                                     |   0x07 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ESAType                                                           | 0x0000 |
@@ -6907,6 +6908,7 @@ private:
 | * AbsMaxPower                                                       | 0x0004 |
 | * PowerAdjustmentCapability                                         | 0x0005 |
 | * Forecast                                                          | 0x0006 |
+| * OptOutState                                                       | 0x0007 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -6932,6 +6934,7 @@ public:
     {
         AddArgument("Power", INT64_MIN, INT64_MAX, &mRequest.power);
         AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
     }
 
@@ -7007,6 +7010,7 @@ public:
         ClusterCommand("start-time-adjust-request", credsIssuerConfig)
     {
         AddArgument("RequestedStartTime", 0, UINT32_MAX, &mRequest.requestedStartTime);
+        AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
     }
 
@@ -7045,6 +7049,7 @@ public:
         ClusterCommand("pause-request", credsIssuerConfig)
     {
         AddArgument("Duration", 0, UINT32_MAX, &mRequest.duration);
+        AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
     }
 
@@ -7121,6 +7126,7 @@ public:
     {
         AddArgument("ForecastId", 0, UINT32_MAX, &mRequest.forecastId);
         AddArgument("SlotAdjustments", &mComplex_SlotAdjustments);
+        AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
     }
 
@@ -7162,6 +7168,7 @@ public:
         ClusterCommand("request-constraint-based-forecast", credsIssuerConfig), mComplex_Constraints(&mRequest.constraints)
     {
         AddArgument("Constraints", &mComplex_Constraints);
+        AddArgument("Cause", 0, UINT8_MAX, &mRequest.cause);
         ClusterCommand::AddArguments();
     }
 
@@ -7193,6 +7200,43 @@ private:
     TypedComplexArgument<
         chip::app::DataModel::List<const chip::app::Clusters::DeviceEnergyManagement::Structs::ConstraintsStruct::Type>>
         mComplex_Constraints;
+};
+
+/*
+ * Command CancelRequest
+ */
+class DeviceEnergyManagementCancelRequest : public ClusterCommand
+{
+public:
+    DeviceEnergyManagementCancelRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("cancel-request", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::DeviceEnergyManagement::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::DeviceEnergyManagement::Commands::CancelRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -20254,6 +20298,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<DeviceEnergyManagementResumeRequest>(credsIssuerConfig),                  //
         make_unique<DeviceEnergyManagementModifyForecastRequest>(credsIssuerConfig),          //
         make_unique<DeviceEnergyManagementRequestConstraintBasedForecast>(credsIssuerConfig), //
+        make_unique<DeviceEnergyManagementCancelRequest>(credsIssuerConfig),                  //
         //
         // Attributes
         //
@@ -20266,6 +20311,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "power-adjustment-capability", Attributes::PowerAdjustmentCapability::Id,
                                    credsIssuerConfig),                                                                     //
         make_unique<ReadAttribute>(Id, "forecast", Attributes::Forecast::Id, credsIssuerConfig),                           //
+        make_unique<ReadAttribute>(Id, "opt-out-state", Attributes::OptOutState::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
@@ -20290,6 +20336,8 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type>>>(
             Id, "forecast", Attributes::Forecast::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum>>(
+            Id, "opt-out-state", 0, UINT8_MAX, Attributes::OptOutState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -20312,6 +20360,7 @@ void registerClusterDeviceEnergyManagement(Commands & commands, CredentialIssuer
         make_unique<SubscribeAttribute>(Id, "power-adjustment-capability", Attributes::PowerAdjustmentCapability::Id,
                                         credsIssuerConfig),                                                                     //
         make_unique<SubscribeAttribute>(Id, "forecast", Attributes::Forecast::Id, credsIssuerConfig),                           //
+        make_unique<SubscribeAttribute>(Id, "opt-out-state", Attributes::OptOutState::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //

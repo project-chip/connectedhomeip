@@ -188,6 +188,7 @@
             "AbsMaxPower",
             "PowerAdjustmentCapability",
             "Forecast",
+            "OptOutState",
             "FeatureMap"
         ],
         "Device Energy Management Mode": [
