@@ -114,19 +114,19 @@ tests:
       disabled: true
 
     - label: "Step 4a: TH reads from the DUT the SceneTableSize attribute"
-      PICS: S.S.A0006
+      PICS: S.S.A0001
       verification: |
           ./chip-tool scenes read scene-table-size 1 1
 
           [1688019474.695136][1726:1728] CHIP:DMG: }
           [1688019474.695335][1726:1728] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Attribute 0x0000_0006 DataVersion: 1550229741
-          [1688019474.695397][1726:1728] CHIP:TOO:   SceneTableSize: 0
+          [1688019474.695397][1726:1728] CHIP:TOO:   SceneTableSize: (Default table size: 16)
       disabled: true
 
     - label:
           "Step 4b: TH sends a subscription request action for FabricSceneInfo
           to the DUT."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -141,10 +141,10 @@ tests:
     - label:
           "Step 5a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 0x0014 (20s) and no extension field sets."
+          to 0x4E20 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x1 0x0014 scene1 [] 1 1
+          ./chip-tool scenes add-scene 0x0001 0x1 0x4E20 scene1 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -155,11 +155,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 5b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 5b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-1)."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -171,7 +172,7 @@ tests:
           8a."
       PICS: S.S.C04.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x2 0x0014 scene2 [] 1 1
+          ./chip-tool scenes store-scene 0x0001 0x2 0x4E20 scene2 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -182,11 +183,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 6b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 6b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-2)."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -194,19 +196,20 @@ tests:
     - label:
           "Step 7a: If RemainingCapacity is greater than 0, TH sends a AddScene
           command to DUT with the GroupID field set to G1, the SceneID field set
-          to 0x03, the TransitionTime field set to 0x0014 (20s) and no extension
+          to 0x03, the TransitionTime field set to 0x4E20 (20s) and no extension
           field sets. If RemainingCapacity is 0, continue to Step 8a."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0001 0x3 0x0014 scene3 [] 1 1
+          ./chip-tool scenes add-scene 0x0001 0x3 0x4E20 scene3 [] 1 1
       disabled: true
 
     - label:
-          "Step 7b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 7b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-3)."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -227,11 +230,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 8b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 8b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity-2)."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -251,11 +255,12 @@ tests:
       disabled: true
 
     - label:
-          "Step 9b: Verify that the DUT sends a report data for
-          RemainingCapacity after the MinIntervalFloor time; store this value
-          into RemainingCapacity; verify RemainingCapacity equals
+          "Step 9b: Verify that the DUT sends a report data for FabricSceneInfo
+          after the MinIntervalFloor time; store the RemainingCapacity field
+          from this fabric’s entry reported in FabricSceneInfo into
+          RemainingCapacity; verify RemainingCapacity equals
           (MaxRemainingCapacity)."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true

@@ -56,12 +56,12 @@ tests:
                     {
                         GroupKeySetID: 0x01a1,
                         GroupKeySecurityPolicy: 0,
-                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
-                        EpochStartTime0: 1110000,
-                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
-                        EpochStartTime1: 1110001,
-                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
-                        EpochStartTime2: 1110002,
+                        EpochKey0: "\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime0: 2220000,
+                        EpochKey1: "\xd1\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime1: 2220001,
+                        EpochKey2: "\xd2\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf",
+                        EpochStartTime2: 2220002,
                     }
 
     - label:
@@ -76,7 +76,7 @@ tests:
       arguments:
           value: [{ FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 }]
 
-    - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
+    - label: "Step 1: TH sends a RemoveAllGroups command to DUT."
       PICS: G.S.C04.Rsp
       cluster: "Groups"
       command: "RemoveAllGroups"
@@ -317,7 +317,7 @@ tests:
           Is DUT configured with AC2?
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
+      PICS: PICS_SKIP_SAMPLE_APP && PICS_SC_RECALL_SCENE_TRANSITION_TIME
       arguments:
           values:
               - name: "message"
@@ -330,8 +330,8 @@ tests:
     - label:
           "Step 6b: TH sends a RecallScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01 and the TransitionTime field
-          set to 5000 (5s)."
-      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
+          set to 0x1388 (5s)."
+      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME
       command: "RecallScene"
       arguments:
           values:
@@ -340,10 +340,10 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 5000
+                value: 0x1388
 
     - label: "Wait 5s"
-      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
+      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -352,9 +352,9 @@ tests:
                 value: 5500
 
     - label:
-          "TH confirm the DUT reached AC2 (on level control cluster) after 5s"
+          "TH confirm the DUT reached AC1 (on level control cluster) after 5s"
       PICS:
-          S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS &&
+          S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME &&
           PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "readAttribute"
@@ -423,6 +423,39 @@ tests:
                 value: 0x01
               - name: "TransitionTime"
                 value: null
+
+    - label: "Wait 20s"
+      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 20500
+
+    - label:
+          "TH confirm the DUT reached AC1 (on level control cluster) after 20s"
+      PICS:
+          S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME &&
+          PICS_SDK_CI_ONLY
+      cluster: "Level Control"
+      command: "readAttribute"
+      attribute: "CurrentLevel"
+      response:
+          value: 100
+
+    - label: "DUT transitions to AC2 over 20."
+      verification: |
+          Is the transition done over 20s?
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Please confirm that transition to AC2 was made over 5s"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 8: TH removes the Group key set that was added by sending a

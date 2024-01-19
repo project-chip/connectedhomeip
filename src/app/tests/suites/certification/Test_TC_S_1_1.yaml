@@ -110,7 +110,7 @@ tests:
               contains: [0, 1, 2, 3, 4, 6]
 
     - label:
-          "Step 7b: Read optional command(CopySceneResponse) in
+          "Step 7b: TH reads Read optional command(CopySceneResponse) in
           GeneratedCommandList (global attribute 65528)"
       PICS: S.S.C40.Rsp
       command: "readAttribute"

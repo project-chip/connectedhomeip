@@ -56,7 +56,7 @@ tests:
       disabled: true
 
     - label: "Step 2a: TH1 reads from the DUT the SceneTableSize attribute"
-      PICS: S.S.A0006
+      PICS: S.S.A0001
       verification: |
           ./chip-tool scenes read scene-table-size 1 1
 
@@ -67,7 +67,7 @@ tests:
     - label:
           "Step 2b: TH1 sends a subscription request action for FabricSceneInfo
           to the DUT."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -92,10 +92,10 @@ tests:
     - label:
           "Step 3a: TH1 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
-          set to 0x0014 (20s) and no extension field sets."
+          set to 0x4E20 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x1 0x0014 scene1 [] 1 1
+          ./chip-tool scenes add-scene 0x0000 0x1 0x4E20 scene1 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -111,7 +111,7 @@ tests:
           RemainingCapacity field from this fabric’s entry reported in
           FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
           equals (MaxRemainingCapacity-1)."
-      PICS: S.S.A0007
+      PICS: S.S.A0002
       verification: |
 
       disabled: true
@@ -122,7 +122,7 @@ tests:
           Remaining1stCapacity more times until reported value to TH1 (after
           MinIntervalFloor) for RemainingCapacity field from FabricSceneInfo
           becomes 0."
-      PICS: S.S.C00.Rsp && S.S.A0007
+      PICS: S.S.C00.Rsp && S.S.A0002
       verification: |
 
       disabled: true
@@ -130,11 +130,11 @@ tests:
     - label:
           "Step 4b: TH1 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 1 more than last value used in
-          step 4a, the TransitionTime field set to 0x0014 (20s) and no extension
+          step 4a, the TransitionTime field set to 0x4E20 (20s) and no extension
           field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x10 0x0014 scene101 [] 1 1
+          ./chip-tool scenes add-scene 0x0000 0x10 0x4E20 scene101 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -145,9 +145,9 @@ tests:
       disabled: true
 
     - label: "Step 5a: Repeat Step 4a with TH2"
-      PICS: S.S.C00.Rsp && S.S.A0007
+      PICS: S.S.C00.Rsp && S.S.A0002
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x1 0x0014 scene1 [] 2 1 --commissioner-name beta
+          ./chip-tool scenes add-scene 0x0000 0x1 0x4E20 scene1 [] 2 1 --commissioner-name beta
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
           CHIP:TOO:     status: 0
@@ -159,7 +159,7 @@ tests:
     - label: "Step 5b: Repeat Step 4b with TH2"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x11 0x0014 scene201 [] 2 1 --commissioner-name beta
+          ./chip-tool scenes add-scene 0x0000 0x11 0x4E20 scene201 [] 2 1 --commissioner-name beta
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -169,13 +169,25 @@ tests:
           CHIP:TOO:    }
       disabled: true
 
+    - label: "Step 6a: Repeat Step 4a with TH3"
+      PICS: S.S.C00.Rsp && S.S.A0002
+      verification: |
+          ./chip-tool scenes add-scene 0x0000 0x1 0x4E20 scene1 [] 2 1 --commissioner-name gamma
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
+          CHIP:TOO:   AddSceneResponse: {
+          CHIP:TOO:     status: 0
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 1
+          CHIP:TOO:    }
+      disabled: true
+
     - label:
-          "Step 6: TH3 sends a AddScene command to DUT with the GroupID field
+          "Step 6b: TH3 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
-          set to 0x0014 (20s) and no extension field sets."
+          set to 0x4E20 (20s) and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x12 0x0014 scene301 [] 3 1 --commissioner-name gamma
+          ./chip-tool scenes add-scene 0x0000 0x12 0x4E20 scene301 [] 3 1 --commissioner-name gamma
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -186,7 +198,39 @@ tests:
       disabled: true
 
     - label:
-          "Step 7a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
+          "Step 7: TH3 sends a StoreScene command to DUT with the GroupID field
+          set to 0x0000, the SceneID field set to 0x01."
+      PICS: S.S.C04.Rsp
+      verification: |
+          ./chip-tool scenes store-scene 0x0000 0xFE 0x4E20 sceneFE [] 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0004
+          CHIP:TOO:   StoreSceneResponse: {
+          CHIP:TOO:     status: 137
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 0xFE
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "TH sends a CopyScene command to DUT with the mode field set to 0x00,
+          the group identifier from field set to 0x0000, the scene identifier
+          from field set to 0x01, the group identifier to field set to 0x0000
+          and the scene identifier to field set to 0xFE."
+      PICS: S.S.C40.Rsp
+      verification: |
+          ./chip-tool scenes copy-scene 0 0x0000 0x01 0x4E20 sceneFE [] 1 1
+
+          CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0040
+          CHIP:TOO:   CopySceneResponse: {
+          CHIP:TOO:     status: 137
+          CHIP:TOO:     groupID: 0
+          CHIP:TOO:     sceneID: 0xFE
+          CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 9a: TH1 sends a RemoveAllScenes command to DUT with the GroupID
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
@@ -199,13 +243,17 @@ tests:
           CHIP:TOO:    }
       disabled: true
 
-    - label:
-          "Step 7b: Verify that the DUT sends a report data to TH1 for
+    - label: "Step 9b: Verify that the DUT sends a report data to TH1 for
           FabricSceneInfo after the MinIntervalFloor time; store the
-          RemainingCapacity field from this fabrics entry the reported in
+          RemainingCapacity field from this fabric’s entry the reported in
           FabricSceneInfo into Remaining1stCapacity; verify Remaining1stCapacity
-          equals (MaxRemainingCapacity)."
-      PICS: S.S.A0007
+          equals (MaxRemainingCapacity).
+
+          Verify that the DUT does not send report data to TH2 for
+          FabricSceneInfo after the MinIntervalFloor time with updated value (it
+          should send 'empty' report data since there is no update for this
+          attribute for TH2)."
+      PICS: S.S.A0002
       verification: |
           CHIP:DMG: ReportDataMessage =
           CHIP:DMG: {
@@ -215,7 +263,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 8a: TH2 sends a RemoveAllScenes command to DUT with the GroupID
+          "Step 10a: TH2 sends a RemoveAllScenes command to DUT with the GroupID
           field set to 0x0000."
       PICS: S.S.C03.Rsp
       verification: |
@@ -229,7 +277,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 8b: Verify that the DUT sends a report data to TH2 for
+          "Step 10b: Verify that the DUT sends a report data to TH2 for
           RemainingCapacity after the MinIntervalFloor time; store this value
           into RemainingCapacity2; verify RemainingCapacity2 equals
           (MaxRemainingCapacity)."
