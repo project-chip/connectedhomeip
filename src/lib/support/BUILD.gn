@@ -18,7 +18,9 @@ import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
+import("//build_overrides/pigweed.gni")
 
+import("$dir_pw_build/target_types.gni")
 import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
@@ -306,6 +308,22 @@ static_library("test_utils") {
   sources = [
     "UnitTestUtils.cpp",
     "UnitTestUtils.h",
+  ]
+}
+
+pw_static_library("testing_pw") {
+  if (chip_device_platform == "esp32") {
+    complete_static_lib = true
+  }
+  output_name = "libTestPW"
+  output_dir = "${root_out_dir}/lib"
+  public_deps = [
+    "$dir_pw_log:impl",
+    "$dir_pw_unit_test",
+  ]
+  sources = [
+    "UnitTest.cpp",
+    "UnitTest.h",
   ]
 }
 
