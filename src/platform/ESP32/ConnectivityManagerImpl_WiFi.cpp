@@ -1111,18 +1111,30 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
 
 #if CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
     uint8_t station_mac[6];
-    esp_wifi_get_mac(WIFI_IF_STA, station_mac);
-    char station_mac_str[12];
-    for (size_t i = 0; i < 6; ++i)
+    if (esp_wifi_get_mac(WIFI_IF_STA, station_mac) == ESP_OK)
     {
-        uint8_t dig1               = (station_mac[i] & 0xF0) >> 4;
-        uint8_t dig2               = station_mac[i] & 0x0F;
-        station_mac_str[2 * i]     = dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1);
-        station_mac_str[2 * i + 1] = dig2 > 9 ? ('A' + dig2 - 0xA) : ('0' + dig2);
+        static chip::Inet::ESP32EndpointQueueFilter sEndpointQueueFilter;
+        char station_mac_str[12];
+        for (size_t i = 0; i < 6; ++i)
+        {
+            uint8_t dig1               = (station_mac[i] & 0xF0) >> 4;
+            uint8_t dig2               = station_mac[i] & 0x0F;
+            station_mac_str[2 * i]     = dig1 > 9 ? ('A' + dig1 - 0xA) : ('0' + dig1);
+            station_mac_str[2 * i + 1] = dig2 > 9 ? ('A' + dig2 - 0xA) : ('0' + dig2);
+        }
+        if (sEndpointQueueFilter.SetMdnsHostName(chip::CharSpan(station_mac_str)) == CHIP_NO_ERROR)
+        {
+            chip::Inet::UDPEndPointImpl::SetQueueFilter(&sEndpointQueueFilter);
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to set mDNS hostname for endpoint queue filter");
+        }
     }
-    static chip::Inet::ESP32EndpointQueueFilter endpointQueueFilter;
-    endpointQueueFilter.SetMdnsHostName(chip::CharSpan(station_mac_str));
-    chip::Inet::UDPEndPointImpl::SetQueueFilter(&endpointQueueFilter);
+    else
+    {
+         ChipLogError(DeviceLayer, "Failed to get the MAC address of station netif");
+    }
 #endif // CONFIG_ENABLE_ENDPOINT_QUEUE_FILTER
 
 #if CONFIG_ENABLE_ROUTE_HOOK

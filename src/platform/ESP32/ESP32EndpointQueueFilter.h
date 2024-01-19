@@ -37,17 +37,17 @@ public:
     FilterOutcome FilterBeforeEnqueue(const void * endpoint, const IPPacketInfo & pktInfo,
                                       const chip::System::PacketBufferHandle & pktPayload) override
     {
-        if (IsMdnsBroadcastPacket(pktInfo))
+        if (!IsMdnsBroadcastPacket(pktInfo))
         {
-            // Drop the mDNS packets which don't contains 'matter' or '<device-hostname>'.
-            const uint8_t matterBytes[] = { 0x6D, 0x61, 0x74, 0x74, 0x65, 0x72 }; // 'm' 'a' 't' 't' 'e' 'r'
-            if (PayloadContains(pktPayload, ByteSpan(matterBytes)) || PayloadContains(pktPayload, ByteSpan(mHostNameBuffer)))
-            {
-                return FilterOutcome::kAllowPacket;
-            }
-            return FilterOutcome::kDropPacket;
+            return FilterOutcome::kAllowPacket;
         }
-        return FilterOutcome::kAllowPacket;
+        // Drop the mDNS packets which don't contain 'matter' or '<device-hostname>'.
+        const uint8_t matterBytes[] = { 'm', 'a', 't', 't', 'e', 'r' };
+        if (PayloadContains(pktPayload, ByteSpan(matterBytes)) || PayloadContains(pktPayload, ByteSpan(mHostNameBuffer)))
+        {
+            return FilterOutcome::kAllowPacket;
+        }
+        return FilterOutcome::kDropPacket;
     }
 
     FilterOutcome FilterAfterDequeue(const void * endpoint, const IPPacketInfo & pktInfo,
@@ -57,7 +57,8 @@ public:
     }
 
 private:
-    bool IsMdnsBroadcastPacket(const IPPacketInfo & pktInfo)
+    // TODO: Add unit tests for these static functions
+    static bool IsMdnsBroadcastPacket(const IPPacketInfo & pktInfo)
     {
 #if INET_CONFIG_ENABLE_IPV4
         if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == 5353)
@@ -77,13 +78,13 @@ private:
         return false;
     }
 
-    bool PayloadContains(const chip::System::PacketBufferHandle & payload, const chip::ByteSpan & byteSpan)
+    static bool PayloadContains(const chip::System::PacketBufferHandle & payload, const chip::ByteSpan & byteSpan)
     {
         if (payload->HasChainedBuffer())
         {
             return false;
         }
-        for (size_t i = 0; i < payload->TotalLength() - byteSpan.size(); ++i)
+        for (size_t i = 0; i <= payload->TotalLength() - byteSpan.size(); ++i)
         {
             if (memcmp(payload->Start() + i, byteSpan.data(), byteSpan.size()) == 0)
             {
@@ -93,7 +94,7 @@ private:
         return false;
     }
 
-    bool IsValidMdnsHostName(const chip::CharSpan & hostName)
+    static bool IsValidMdnsHostName(const chip::CharSpan & hostName)
     {
         for (size_t i = 0; i < hostName.size(); ++i)
         {
