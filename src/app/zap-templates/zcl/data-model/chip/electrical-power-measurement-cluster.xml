@@ -38,24 +38,24 @@ limitations under the License.
     <attribute code="0x0001" side="server" define="NUMBER_OF_MEASUREMENT_TYPES" type="int8u" min="1">NumberOfMeasurementTypes</attribute>
     <attribute code="0x0002" side="server" define="ACCURACY" type="array" entryType="MeasurementAccuracyStruct" minLength="1">Accuracy</attribute>
     <attribute code="0x0003" side="server" define="RANGES" type="array" optional="true" entryType="MeasurementRangeStruct" minLength="0">Ranges</attribute>
-    <attribute code="0x0004" side="server" define="VOLTAGE" type="voltage_mv" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">Voltage</attribute>
+    <attribute code="0x0004" side="server" define="VOLTAGE" type="voltage_mv" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">Voltage</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x0005" side="server" define="ACTIVE_CURRENT" type="amperage_ma" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">ActiveCurrent</attribute>
+    <attribute code="0x0005" side="server" define="ACTIVE_CURRENT" type="amperage_ma" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">ActiveCurrent</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x0006" side="server" define="REACTIVE_CURRENT" type="amperage_ma" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">ReactiveCurrent</attribute>
-    <attribute code="0x0007" side="server" define="APPARENT_CURRENT" type="amperage_ma" isNullable="true" min="0" max="2" optional="true" default="0x8000000000000000">ApparentCurrent</attribute>
+    <attribute code="0x0006" side="server" define="REACTIVE_CURRENT" type="amperage_ma" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">ReactiveCurrent</attribute>
+    <attribute code="0x0007" side="server" define="APPARENT_CURRENT" type="amperage_ma" isNullable="true" min="0" max="0x4000000000000000" optional="true" default="0x8000000000000000">ApparentCurrent</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x0008" side="server" define="ACTIVE_POWER" type="power_mw" isNullable="true" min="-2" max="2" default="0x8000000000000000">ActivePower</attribute>
+    <attribute code="0x0008" side="server" define="ACTIVE_POWER" type="power_mw" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" default="0x8000000000000000">ActivePower</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x0009" side="server" define="REACTIVE_POWER" type="power_mw" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">ReactivePower</attribute>
+    <attribute code="0x0009" side="server" define="REACTIVE_POWER" type="power_mw" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">ReactivePower</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x000A" side="server" define="APPARENT_POWER" type="power_mw" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">ApparentPower</attribute>
+    <attribute code="0x000A" side="server" define="APPARENT_POWER" type="power_mw" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">ApparentPower</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x000B" side="server" define="RMS_VOLTAGE" type="voltage_mv" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">RMSVoltage</attribute>
+    <attribute code="0x000B" side="server" define="RMS_VOLTAGE" type="voltage_mv" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">RMSVoltage</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x000C" side="server" define="RMS_CURRENT" type="amperage_ma" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">RMSCurrent</attribute>
+    <attribute code="0x000C" side="server" define="RMS_CURRENT" type="amperage_ma" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">RMSCurrent</attribute>
     <!--Conformance feature [ALTC] - for now optional-->
-    <attribute code="0x000D" side="server" define="RMS_POWER" type="power_mw" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">RMSPower</attribute>
+    <attribute code="0x000D" side="server" define="RMS_POWER" type="power_mw" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">RMSPower</attribute>
     <!--Conformance feature HARM - for now optional-->
     <attribute code="0x000E" side="server" define="FREQUENCY" type="int64s" isNullable="true" optional="true" min="0" max="1000000" default="0x8000000000000000">Frequency</attribute>
     <!--Conformance feature PWRQ - for now optional-->
@@ -64,8 +64,8 @@ limitations under the License.
     <attribute code="0x0010" side="server" define="HARMONIC_PHASES" type="array" isNullable="true" optional="true" entryType="HarmonicMeasurementStruct">HarmonicPhases</attribute>
     <!--Conformance feature [POLY] - for now optional-->
     <attribute code="0x0011" side="server" define="POWER_FACTOR" type="int64s" isNullable="true" min="-10000" max="10000" optional="true" default="0x8000000000000000">PowerFactor</attribute>
-    <attribute code="0x0012" side="server" type="amperage_ma" define="NEUTRAL_CURRENT" isNullable="true" min="-2" max="2" optional="true" default="0x8000000000000000">NeutralCurrent</attribute>
-    <event code="0x0000" name="MeasurementPeriodRanges" priority="info" apiMaturity="provisional" optional="true">
+    <attribute code="0x0012" side="server" type="amperage_ma" define="NEUTRAL_CURRENT" isNullable="true" min="0xC000000000000000" max="0x4000000000000000" optional="true" default="0x8000000000000000">NeutralCurrent</attribute>
+    <event code="0x0000" name="MeasurementPeriodRanges" priority="info" apiMaturity="provisional" optional="true" side="server">
       <description>MeasurementPeriodRanges</description>
       <field id="0" name="Ranges" array="true" type="MeasurementRangeStruct"/>
     </event>

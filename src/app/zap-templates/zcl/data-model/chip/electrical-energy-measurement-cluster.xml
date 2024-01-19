@@ -42,12 +42,12 @@ limitations under the License.
     <!--Conformance feature IMPE & PERE - for now optional-->
     <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
-    <event code="0x0000" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x0000" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true" side="server">
       <description>CumulativeEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
-    <event code="0x0001" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x0001" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true" side="server">
       <description>PeriodicEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
