@@ -3,6 +3,9 @@ MCORE.BRIDGECLIENT=0
 MCORE.DT_SW_COMP=0
 MCORE.UI.FACTORYRESET=1
 
+# Content App Observer Cluster
+APPOBSERVER.S=1
+
 # Relative Humidity cluster
 RH.S=1
 RH.S.A0000=1

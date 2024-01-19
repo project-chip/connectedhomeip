@@ -391,7 +391,7 @@ tests:
       verification: |
           On TH_CR2 send the below command
 
-          ./chip-tool pairing open-commissioning-window 2 1 PIXIT.CADMIN.CwDuration 1000 3840 --commissioner-name beta
+          ./chip-tool pairing open-commissioning-window nodeId2 endpoint PIXIT.CADMIN.CwDuration 1000 3840 --commissioner-name beta
 
           Verify the Open commisioning window on the DUT_CE(all-cluster-app) Log:
 
