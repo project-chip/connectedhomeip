@@ -26,7 +26,7 @@ from mobly import asserts
 
 class TC_ACE_1_5(MatterBaseTest):
 
-    async def read_currentfabricindex_expected_success(self, th: ChipDeviceCtrl) -> int:
+    async def read_currentfabricindex(self, th: ChipDeviceCtrl) -> int:
         cluster = Clusters.Objects.OperationalCredentials
         attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
@@ -35,30 +35,6 @@ class TC_ACE_1_5(MatterBaseTest):
     async def write_acl(self, acl: Clusters.AccessControl, th: ChipDeviceCtrl):
         result = await th.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
-
-    async def read_descriptor_expect_success(self, th: ChipDeviceCtrl):
-        cluster = Clusters.Objects.Descriptor
-        attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        await self.read_single_attribute_check_success(
-            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-
-    async def read_basic_expect_success(self, th: ChipDeviceCtrl):
-        cluster = Clusters.Objects.BasicInformation
-        attribute = Clusters.BasicInformation.Attributes.VendorID
-        await self.read_single_attribute_check_success(
-            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
-
-    async def read_basic_expect_unsupported_access(self, th: ChipDeviceCtrl):
-        cluster = Clusters.Objects.BasicInformation
-        attribute = Clusters.BasicInformation.Attributes.VendorID
-        await self.read_single_attribute_expect_error(
-            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
-
-    async def read_descriptor_expect_unsupported_access(self, th: ChipDeviceCtrl):
-        cluster = Clusters.Objects.Descriptor
-        attribute = Clusters.Descriptor.Attributes.DeviceTypeList
-        await self.read_single_attribute_expect_error(
-            dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute, error=Status.UnsupportedAccess)
 
     @async_test_body
     async def test_TC_ACE_1_5(self):
@@ -85,7 +61,7 @@ class TC_ACE_1_5(MatterBaseTest):
         self.print_step(3, "TH2 commissions DUT using admin node ID N2")
 
         self.print_step(4, "TH2 reads its fabric index from the Operational Credentials cluster CurrentFabricIndex attribute")
-        th2FabricIndex = await self.read_currentfabricindex_expected_success(self.th2)
+        th2FabricIndex = await self.read_currentfabricindex(self.th2)
 
         self.print_step(
             5, "TH1 writes DUT Endpoint 0 ACL cluster ACL attribute, value is list of ACLEntryStruct containing 2 elements")
@@ -120,16 +96,30 @@ class TC_ACE_1_5(MatterBaseTest):
         await self.write_acl(acl, self.th2)
 
         self.print_step(7, "TH1 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
-        await self.read_descriptor_expect_success(self.th1)
+        await self.read_single_attribute_check_success(
+            dev_ctrl=self.th1, endpoint=0,
+            cluster=Clusters.Objects.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.DeviceTypeList)
 
         self.print_step(8, "TH1 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
-        await self.read_basic_expect_unsupported_access(self.th1)
+        await self.read_single_attribute_expect_error(
+            dev_ctrl=self.th1, endpoint=0,
+            cluster=Clusters.Objects.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.VendorID,
+            error=Status.UnsupportedAccess)
 
         self.print_step(9, "TH2 reads DUT Endpoint 0 Descriptor cluster DeviceTypeList attribute")
-        await self.read_descriptor_expect_unsupported_access(self.th2)
+        await self.read_single_attribute_expect_error(
+            dev_ctrl=self.th2, endpoint=0,
+            cluster=Clusters.Objects.Descriptor,
+            attribute=Clusters.Descriptor.Attributes.DeviceTypeList,
+            error=Status.UnsupportedAccess)
 
         self.print_step(10, "TH2 reads DUT Endpoint 0 Basic Information cluster VendorID attribute")
-        await self.read_basic_expect_success(self.th2)
+        await self.read_single_attribute_check_success(
+            dev_ctrl=self.th2, endpoint=0,
+            cluster=Clusters.Objects.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.VendorID)
 
         self.print_step(11, "TH1 resets the ACLs to default value by writing DUT EP0")
         full_acl = Clusters.AccessControl.Structs.AccessControlEntryStruct(

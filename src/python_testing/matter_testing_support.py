@@ -555,12 +555,6 @@ def hex_from_bytes(b: bytes) -> str:
 
 
 @dataclass
-class CommissioningCustomParameters:
-    commissioning_parameters: CommissioningParameters
-    discriminator: str
-
-
-@dataclass
 class TestStep:
     test_plan_number: typing.Union[int, str]
     description: str
