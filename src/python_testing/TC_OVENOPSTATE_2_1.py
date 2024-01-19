@@ -34,18 +34,18 @@ class TC_OVENOPSTATE_2_1(MatterBaseTest):
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def read_and_validate_opstate(self, step, expected_state):
-        self.print_step(step, "Read OvenCavityOperationalState attribute")
+        self.print_step(step, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(
-            endpoint=self.endpoint, attribute=Clusters.OvenCavityOperationalState.Attributes.OvenCavityOperationalState)
-        logging.info("OvenCavityOperationalState: %s" % (operational_state))
+            endpoint=self.endpoint, attribute=Clusters.OvenCavityOperationalState.Attributes.OperationalState)
+        logging.info("OperationalState: %s" % (operational_state))
         asserts.assert_equal(operational_state, expected_state,
-                             "OvenCavityOperationalState(%s) should equal %s" % (operational_state, expected_state))
+                             "OperationalState(%s) should equal %s" % (operational_state, expected_state))
 
     async def read_and_validate_operror(self, step, expected_error):
         self.print_step(step, "Read OperationalError attribute")
         operational_error = await self.read_mod_attribute_expect_success(
-            endpoint=self.endpoint, attribute=Clusters.OvenCavityOperationalState.Attributes.OvenCavityOperationalError)
-        logging.info("OvenCavityOperationalError: %s" % (operational_error))
+            endpoint=self.endpoint, attribute=Clusters.OvenCavityOperationalState.Attributes.OperationalError)
+        logging.info("OperationalError: %s" % (operational_error))
         asserts.assert_equal(operational_error.errorStateID, expected_error,
                              "errorStateID(%s) should equal %s" % (operational_error.errorStateID, expected_error))
 
@@ -98,61 +98,61 @@ class TC_OVENOPSTATE_2_1(MatterBaseTest):
                                     "CountdownTime(%s) must be between 0 and 259200" % countdown_time)
 
         if self.check_pics("OVENOPSTATE.S.A0003"):
-            self.print_step(5, "Read OvenCavityOperationalStateList attribute")
+            self.print_step(5, "Read OperationalStateList attribute")
             operational_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                                  attribute=attributes.OvenCavityOperationalStateList)
+                                                                                  attribute=attributes.OperationalStateList)
 
-            logging.info("OvenCavityOperationalStateList: %s" % (operational_state_list))
+            logging.info("OperationalStateList: %s" % (operational_state_list))
 
-            defined_states = [state.value for state in Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum
-                              if state is not Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kUnknownEnumValue]
+            defined_states = [state.value for state in Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum
+                              if state is not Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
 
             for state in operational_state_list:
                 in_range = (0x80 <= state.operationalStateID <= 0xBF)
                 asserts.assert_true(state.operationalStateID in defined_states or in_range,
-                                    "Found a OvenCavityOperationalStateList entry with invalid ID value!")
+                                    "Found a OperationalStateList entry with invalid ID value!")
                 if in_range:
                     asserts.assert_true(state.operationalStateLabel is not None,
-                                        "The OvenCavityOperationalStateLabel should be populated")
-                if state.operationalStateID == Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kError:
+                                        "The OperationalStateLabel should be populated")
+                if state.operationalStateID == Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kError:
                     error_state_present = True
 
-            asserts.assert_true(error_state_present, "The OvenCavityOperationalStateList does not have an ID entry of Error(0x03)")
+            asserts.assert_true(error_state_present, "The OperationalStateList does not have an ID entry of Error(0x03)")
 
         if self.check_pics("OVENOPSTATE.S.A0004"):
-            self.print_step(6, "Read OvenCavityOperationalState attribute")
+            self.print_step(6, "Read OperationalState attribute")
             operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                             attribute=attributes.OvenCavityOperationalState)
+                                                                             attribute=attributes.OperationalState)
 
-            logging.info("OvenCavityOperationalState: %s" % (operational_state))
+            logging.info("OperationalState: %s" % (operational_state))
 
             in_range = (0x80 <= operational_state <= 0xBF)
             asserts.assert_true(operational_state in defined_states or in_range,
-                                "OvenCavityOperationalState has an invalid ID value!")
+                                "OperationalState has an invalid ID value!")
 
             if self.check_pics("OVENOPSTATE.S.M.ST_STOPPED"):
                 self.print_step("6a", "Manually put the device in the stopped state")
                 input("Press Enter when done.\n")
-                await self.read_and_validate_opstate(step="6b", expected_state=Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kStopped)
+                await self.read_and_validate_opstate(step="6b", expected_state=Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kStopped)
             if self.check_pics("OVENOPSTATE.S.M.ST_RUNNING"):
                 self.print_step("6c", "Manually put the device in the running state")
                 input("Press Enter when done.\n")
-                await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kRunning)
+                await self.read_and_validate_opstate(step="6d", expected_state=Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kRunning)
             if self.check_pics("OVENOPSTATE.S.M.ST_PAUSED"):
                 self.print_step("6e", "Manually put the device in the paused state")
                 input("Press Enter when done.\n")
-                await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kPaused)
+                await self.read_and_validate_opstate(step="6f", expected_state=Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kPaused)
             if self.check_pics("OVENOPSTATE.S.M.ST_ERROR"):
                 self.print_step("6g", "Manually put the device in the error state")
                 input("Press Enter when done.\n")
-                await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kError)
+                await self.read_and_validate_opstate(step="6h", expected_state=Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kError)
 
         if self.check_pics("OVENOPSTATE.S.A0005"):
-            self.print_step(7, "Read OvenCavityOperationalError attribute")
+            self.print_step(7, "Read OperationalError attribute")
             operational_error = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                             attribute=attributes.OvenCavityOperationalError)
+                                                                             attribute=attributes.OperationalError)
 
-            logging.info("OvenCavityOperationalError: %s" % (operational_error))
+            logging.info("OperationalError: %s" % (operational_error))
 
             # Defined Errors
             defined_errors = [error.value for error in Clusters.OvenCavityOperationalState.Enums.ErrorStateEnum

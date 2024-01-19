@@ -36,13 +36,13 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
 
     async def send_pause_cmd(self) -> Clusters.Objects.OvenCavityOperationalState.Commands.Pause:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.OvenCavityOperationalState.Commands.Pause(), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.OvenCavityOperationalState.Commands.OvenCavityOperationalCommandResponse),
+        asserts.assert_true(type_matches(ret, Clusters.Objects.OvenCavityOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for Pause")
         return ret
 
     async def send_resume_cmd(self) -> Clusters.Objects.OvenCavityOperationalState.Commands.Resume:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.OvenCavityOperationalState.Commands.Resume(), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.OvenCavityOperationalState.Commands.OvenCavityOperationalCommandResponse),
+        asserts.assert_true(type_matches(ret, Clusters.Objects.OvenCavityOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for Resume")
         return ret
 
@@ -67,31 +67,31 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
         self.print_step(2, "Manually put the device in a state where it can receive a Pause command")
         input("Press Enter when done.\n")
 
-        self.print_step(3, "Read OvenCavityOperationalStateList attribute")
+        self.print_step(3, "Read OperationalStateList attribute")
         op_state_list = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                     attribute=attributes.OvenCavityOperationalStateList)
+                                                                     attribute=attributes.OperationalStateList)
 
-        logging.info("OvenCavityOperationalStateList: %s" % (op_state_list))
+        logging.info("OperationalStateList: %s" % (op_state_list))
 
-        defined_states = [state.value for state in Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum
-                          if state is not Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kUnknownEnumValue]
+        defined_states = [state.value for state in Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum
+                          if state is not Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kUnknownEnumValue]
 
         state_ids = set([s.operationalStateID for s in op_state_list])
 
         asserts.assert_true(all(id in state_ids for id in defined_states),
-                            "OvenCavityOperationalStateList is missing a required entry")
+                            "OperationalStateList is missing a required entry")
 
         self.print_step(4, "Send Pause command")
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OvenCavityOperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(5, "Read OvenCavityOperationalState attribute")
+        self.print_step(5, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                         attribute=attributes.OvenCavityOperationalState)
-        logging.info("OvenCavityOperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kPaused,
-                             "OvenCavityOperationalState ID should be Paused(0x02)")
+                                                                         attribute=attributes.OperationalState)
+        logging.info("OperationalState: %s" % (operational_state))
+        asserts.assert_equal(operational_state, Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kPaused,
+                             "OperationalState ID should be Paused(0x02)")
 
         if self.check_pics("OVENOPSTATE.S.A0002"):
             self.print_step(6, "Read CountdownTime attribute")
@@ -124,11 +124,11 @@ class TC_OVENOPSTATE_2_3(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, Clusters.OvenCavityOperationalState.Enums.ErrorStateEnum.kNoError,
                              "errorStateID(%s) should be NoError(0x00)" % ret.commandResponseState.errorStateID)
 
-        self.print_step(11, "Read OvenCavityOperationalState attribute")
+        self.print_step(11, "Read OperationalState attribute")
         operational_state = await self.read_mod_attribute_expect_success(endpoint=self.endpoint,
-                                                                         attribute=attributes.OvenCavityOperationalState)
-        logging.info("OvenCavityOperationalState: %s" % (operational_state))
-        asserts.assert_equal(operational_state, Clusters.OvenCavityOperationalState.Enums.OvenCavityOperationalStateEnum.kRunning,
+                                                                         attribute=attributes.OperationalState)
+        logging.info("OperationalState: %s" % (operational_state))
+        asserts.assert_equal(operational_state, Clusters.OvenCavityOperationalState.Enums.OperationalStateEnum.kRunning,
                              "OperationalState(%s) should be Running(0x01)" % operational_state)
 
         self.print_step(12, "Send Resume command")
