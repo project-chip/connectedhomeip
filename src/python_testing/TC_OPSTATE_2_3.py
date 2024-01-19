@@ -59,6 +59,8 @@ class TC_OPSTATE_2_3(MatterBaseTest):
         asserts.assert_true(self.check_pics("OPSTATE.S.A0004"), "OPSTATE.S.A0004 must be supported")
         asserts.assert_true(self.check_pics("OPSTATE.S.C00.Rsp"), "OPSTATE.S.C00.Rsp must be supported")
         asserts.assert_true(self.check_pics("OPSTATE.S.C03.Rsp"), "OPSTATE.S.C03.Rsp must be supported")
+        # This command SHALL be supported by an implementation if any of the other commands are supported (6.5)
+        asserts.assert_true(self.check_pics("OPSTATE.S.C04.Rsp"), "OPSTATE.S.C04.Rsp must be supported")
 
         attributes = Clusters.OperationalState.Attributes
 
