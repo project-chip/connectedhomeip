@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -57,23 +58,21 @@ class PowerSourceClusterBatChargeFaultChangeType(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterBatChargeFaultChangeType {
       tlvReader.enterStructure(tlvTag)
-      val current =
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val previous =
-        buildList<UByte> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val current = buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val previous = buildList<UByte> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getUByte(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return PowerSourceClusterBatChargeFaultChangeType(current, previous)

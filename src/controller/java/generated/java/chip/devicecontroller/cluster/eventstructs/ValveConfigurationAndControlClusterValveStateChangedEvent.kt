@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ValveConfigurationAndControlClusterValveStateChangedEvent(
-  val valveState: UInt,
-  val valveLevel: Optional<UInt>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ValveConfigurationAndControlClusterValveStateChangedEvent (
+    val valveState: UInt,
+    val valveLevel: Optional<UInt>) {
+  override fun toString(): String  = buildString {
     append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n")
     append("\tvalveState : $valveState\n")
     append("\tvalveLevel : $valveLevel\n")
@@ -39,9 +41,9 @@ class ValveConfigurationAndControlClusterValveStateChangedEvent(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_VALVE_STATE), valveState)
       if (valveLevel.isPresent) {
-        val optvalveLevel = valveLevel.get()
-        put(ContextSpecificTag(TAG_VALVE_LEVEL), optvalveLevel)
-      }
+      val optvalveLevel = valveLevel.get()
+      put(ContextSpecificTag(TAG_VALVE_LEVEL), optvalveLevel)
+    }
       endStructure()
     }
   }
@@ -50,19 +52,15 @@ class ValveConfigurationAndControlClusterValveStateChangedEvent(
     private const val TAG_VALVE_STATE = 0
     private const val TAG_VALVE_LEVEL = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ValveConfigurationAndControlClusterValveStateChangedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ValveConfigurationAndControlClusterValveStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val valveState = tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_STATE))
-      val valveLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALVE_LEVEL))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_LEVEL)))
-        } else {
-          Optional.empty()
-        }
-
+      val valveLevel = if (tlvReader.isNextTag(ContextSpecificTag(TAG_VALVE_LEVEL))) {
+      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_VALVE_LEVEL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ValveConfigurationAndControlClusterValveStateChangedEvent(valveState, valveLevel)

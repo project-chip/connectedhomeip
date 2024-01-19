@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -72,34 +73,25 @@ class DeviceEnergyManagementClusterConstraintsStruct(
       tlvReader.enterStructure(tlvTag)
       val startTime = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
-      val nominalPower =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_POWER))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER)))
-        } else {
-          Optional.empty()
-        }
-      val maximumEnergy =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAXIMUM_ENERGY))) {
-          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_ENERGY)))
-        } else {
-          Optional.empty()
-        }
-      val loadControl =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOAD_CONTROL))) {
-          Optional.of(tlvReader.getByte(ContextSpecificTag(TAG_LOAD_CONTROL)))
-        } else {
-          Optional.empty()
-        }
-
+      val nominalPower = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NOMINAL_POWER))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER)))
+    } else {
+      Optional.empty()
+    }
+      val maximumEnergy = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MAXIMUM_ENERGY))) {
+      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_MAXIMUM_ENERGY)))
+    } else {
+      Optional.empty()
+    }
+      val loadControl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_LOAD_CONTROL))) {
+      Optional.of(tlvReader.getByte(ContextSpecificTag(TAG_LOAD_CONTROL)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
-      return DeviceEnergyManagementClusterConstraintsStruct(
-        startTime,
-        duration,
-        nominalPower,
-        maximumEnergy,
-        loadControl
-      )
+      return DeviceEnergyManagementClusterConstraintsStruct(startTime, duration, nominalPower, maximumEnergy, loadControl)
     }
   }
 }

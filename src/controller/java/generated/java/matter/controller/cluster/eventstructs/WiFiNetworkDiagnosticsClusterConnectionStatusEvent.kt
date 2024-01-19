@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: UByte) {
+class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(
+  val connectionStatus: UByte
+) {
   override fun toString(): String = buildString {
     append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n")
     append("\tconnectionStatus : $connectionStatus\n")
@@ -40,13 +44,10 @@ class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: U
   companion object {
     private const val TAG_CONNECTION_STATUS = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionStatus = tlvReader.getUByte(ContextSpecificTag(TAG_CONNECTION_STATUS))
-
+      
       tlvReader.exitContainer()
 
       return WiFiNetworkDiagnosticsClusterConnectionStatusEvent(connectionStatus)

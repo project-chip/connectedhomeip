@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -52,18 +53,12 @@ class GeneralDiagnosticsClusterNetworkInterface(
       put(ContextSpecificTag(TAG_NAME), name)
       put(ContextSpecificTag(TAG_IS_OPERATIONAL), isOperational)
       if (offPremiseServicesReachableIPv4 != null) {
-        put(
-          ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4),
-          offPremiseServicesReachableIPv4
-        )
+        put(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4), offPremiseServicesReachableIPv4)
       } else {
         putNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
       }
       if (offPremiseServicesReachableIPv6 != null) {
-        put(
-          ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6),
-          offPremiseServicesReachableIPv6
-        )
+        put(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6), offPremiseServicesReachableIPv6)
       } else {
         putNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
       }
@@ -97,51 +92,38 @@ class GeneralDiagnosticsClusterNetworkInterface(
       tlvReader.enterStructure(tlvTag)
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
       val isOperational = tlvReader.getBoolean(ContextSpecificTag(TAG_IS_OPERATIONAL))
-      val offPremiseServicesReachableIPv4 =
-        if (!tlvReader.isNull()) {
-          tlvReader.getBoolean(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
-          null
-        }
-      val offPremiseServicesReachableIPv6 =
-        if (!tlvReader.isNull()) {
-          tlvReader.getBoolean(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
-          null
-        }
+      val offPremiseServicesReachableIPv4 = if (!tlvReader.isNull()) {
+      tlvReader.getBoolean(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV4))
+      null
+    }
+      val offPremiseServicesReachableIPv6 = if (!tlvReader.isNull()) {
+      tlvReader.getBoolean(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_OFF_PREMISE_SERVICES_REACHABLE_I_PV6))
+      null
+    }
       val hardwareAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_HARDWARE_ADDRESS))
-      val IPv4Addresses =
-        buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
-      val IPv6Addresses =
-        buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
+      val IPv4Addresses = buildList<ByteArray> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_I_PV4_ADDRESSES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getByteArray(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
+      val IPv6Addresses = buildList<ByteArray> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_I_PV6_ADDRESSES))
+      while(!tlvReader.isEndOfContainer()) {
+        add(tlvReader.getByteArray(AnonymousTag))
+      }
+      tlvReader.exitContainer()
+    }
       val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
-
+      
       tlvReader.exitContainer()
 
-      return GeneralDiagnosticsClusterNetworkInterface(
-        name,
-        isOperational,
-        offPremiseServicesReachableIPv4,
-        offPremiseServicesReachableIPv6,
-        hardwareAddress,
-        IPv4Addresses,
-        IPv6Addresses,
-        type
-      )
+      return GeneralDiagnosticsClusterNetworkInterface(name, isOperational, offPremiseServicesReachableIPv4, offPremiseServicesReachableIPv6, hardwareAddress, IPv4Addresses, IPv6Addresses, type)
     }
   }
 }

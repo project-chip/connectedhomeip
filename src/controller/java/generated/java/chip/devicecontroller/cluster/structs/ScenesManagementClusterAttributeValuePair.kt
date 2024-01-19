@@ -17,13 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ScenesManagementClusterAttributeValuePair(val attributeID: ULong, val attributeValue: ULong) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ScenesManagementClusterAttributeValuePair (
+    val attributeID: ULong,
+    val attributeValue: ULong) {
+  override fun toString(): String  = buildString {
     append("ScenesManagementClusterAttributeValuePair {\n")
     append("\tattributeID : $attributeID\n")
     append("\tattributeValue : $attributeValue\n")
@@ -43,11 +49,11 @@ class ScenesManagementClusterAttributeValuePair(val attributeID: ULong, val attr
     private const val TAG_ATTRIBUTE_I_D = 0
     private const val TAG_ATTRIBUTE_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ScenesManagementClusterAttributeValuePair {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ScenesManagementClusterAttributeValuePair {
       tlvReader.enterStructure(tlvTag)
       val attributeID = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_I_D))
       val attributeValue = tlvReader.getULong(ContextSpecificTag(TAG_ATTRIBUTE_VALUE))
-
+      
       tlvReader.exitContainer()
 
       return ScenesManagementClusterAttributeValuePair(attributeID, attributeValue)

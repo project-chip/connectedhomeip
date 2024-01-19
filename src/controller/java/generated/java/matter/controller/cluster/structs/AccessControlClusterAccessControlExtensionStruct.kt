@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -46,14 +48,11 @@ class AccessControlClusterAccessControlExtensionStruct(
     private const val TAG_DATA = 1
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): AccessControlClusterAccessControlExtensionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccessControlClusterAccessControlExtensionStruct {
       tlvReader.enterStructure(tlvTag)
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-
+      
       tlvReader.exitContainer()
 
       return AccessControlClusterAccessControlExtensionStruct(data, fabricIndex)
