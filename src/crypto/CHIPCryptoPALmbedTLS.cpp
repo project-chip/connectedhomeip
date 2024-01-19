@@ -199,8 +199,6 @@ Hash_SHA256_stream::Hash_SHA256_stream()
 
 Hash_SHA256_stream::~Hash_SHA256_stream()
 {
-    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
-    mbedtls_sha256_free(context);
     Clear();
 }
 
@@ -272,6 +270,9 @@ CHIP_ERROR Hash_SHA256_stream::Finish(MutableByteSpan & out_buffer)
 
 void Hash_SHA256_stream::Clear()
 {
+    mbedtls_sha256_context * context = to_inner_hash_sha256_context(&mContext);
+    mbedtls_sha256_free(context);
+
     mbedtls_platform_zeroize(this, sizeof(*this));
 }
 
