@@ -315,11 +315,11 @@ public:
     static void TestCommandHandlerRejectMultipleCommandsWhenHandlerOnlySupportsOne(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandlerAcceptMultipleCommands(nlTestSuite * apSuite, void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
-                                                                                                 void * apContext);
+                                                                                                  void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponsePrimative(nlTestSuite * apSuite,
-                                                                                                        void * apContext);
+                                                                                                         void * apContext);
     static void TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
-                                                                                               void * apContext);
+                                                                                                void * apContext);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     static void TestCommandHandlerReleaseWithExchangeClosed(nlTestSuite * apSuite, void * apContext);
@@ -1748,8 +1748,8 @@ void TestCommandInteraction::TestCommandHandlerAcceptMultipleCommands(nlTestSuit
     exchange->Close();
 }
 
-void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(nlTestSuite * apSuite,
-                                                                                                              void * apContext)
+void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsStatusResponse(
+    nlTestSuite * apSuite, void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);
@@ -1801,7 +1801,7 @@ void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhere
 }
 
 void TestCommandInteraction::TestCommandHandler_FillUpInvokeResponseMessageWhereSecondResponseIsDataResponse(nlTestSuite * apSuite,
-                                                                                                            void * apContext)
+                                                                                                             void * apContext)
 {
     BasicCommandPathRegistry<4> mBasicCommandPathRegistry;
     CommandHandler commandHandler(kThisIsForTestOnly, &mockCommandHandlerDelegate, &mBasicCommandPathRegistry);

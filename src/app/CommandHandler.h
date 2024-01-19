@@ -364,10 +364,11 @@ public:
         // this function as minimal as possible to compiled code size.
         ConcreteCommandPath responsePath = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId,
                                              CommandData::GetCommandId() };
-        auto encodeCommandDataClosure = [&](TLV::TLVWriter & writer) -> CHIP_ERROR {
+        auto encodeCommandDataClosure    = [&](TLV::TLVWriter & writer) -> CHIP_ERROR {
             return DataModel::Encode(writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData);
         };
-        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, responsePath, encodeCommandDataClosure); });
+        return TryAddingResponse(
+            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, responsePath, encodeCommandDataClosure); });
     }
 
     /**
@@ -565,7 +566,8 @@ private:
      * @param [in] aData the data for the response.
      */
     template <typename Function>
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath, Function && encodeCommandDataFunction)
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath,
+                                  Function && encodeCommandDataFunction)
     {
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
@@ -615,7 +617,7 @@ private:
 
     State mState = State::Idle;
     State mBackupState;
-    ScopedChangeOnly<bool> mInternalCallToAddResponseData{false};
+    ScopedChangeOnly<bool> mInternalCallToAddResponseData{ false };
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
     bool mSentStatusResponse               = false;
@@ -625,7 +627,7 @@ private:
     // TODO(#30453): We should introduce breaking change where calls to add CommandData
     // need to use AddResponse, and not CommandHandler primitives directly using
     // GetCommandDataIBTLVWriter.
-    bool mRollbackBackupValid           = false;
+    bool mRollbackBackupValid = false;
     // If mGoneAsync is true, we have finished out initial processing of the
     // incoming invoke.  After this point, our session could go away at any
     // time.
