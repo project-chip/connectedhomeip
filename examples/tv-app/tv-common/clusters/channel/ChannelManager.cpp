@@ -60,6 +60,17 @@ ChannelManager::ChannelManager()
     worldChannel.minorNumber       = static_cast<uint16_t>(3);
     mChannels.push_back(worldChannel);
 
+    ChannelInfoType ottChannel;
+    ottChannel.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("OTT"));
+    ottChannel.callSign          = MakeOptional(chip::CharSpan::fromCharString("OTT-TV"));
+    ottChannel.name              = MakeOptional(chip::CharSpan::fromCharString("OTT Channel"));
+    ottChannel.majorNumber       = static_cast<uint8_t>(0);
+    ottChannel.minorNumber       = static_cast<uint16_t>(0);
+    ottChannel.identifier        = MakeOptional(chip::CharSpan::fromCharString("ott-1"));
+    // ottChannel.type              = MakeOptional(chip::app::Clusters::Channel::ChannelTypeEnum::kUnknownEnumValue); // TODO: OTT
+
+    mChannels.push_back(worldChannel);
+
     mCurrentChannelIndex = 0;
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
 
@@ -69,7 +80,7 @@ ChannelManager::ChannelManager()
     program1.title      = chip::CharSpan::fromCharString("ABC Title1");
     program1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
     program1.startTime  = 0;
-    program1.endTime    = 30 * 60 * 60;
+    program1.endTime    = 30 * 60;
 
     mPrograms.push_back(program1);
 
@@ -79,7 +90,7 @@ ChannelManager::ChannelManager()
     program_abc1.title      = chip::CharSpan::fromCharString("PBS Title1");
     program_abc1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
     program_abc1.startTime  = 0;
-    program_abc1.endTime    = 30 * 60 * 60;
+    program_abc1.endTime    = 30 * 60;
 
     mPrograms.push_back(program_abc1);
 
@@ -88,10 +99,20 @@ ChannelManager::ChannelManager()
     program2.channel    = abc;
     program2.title      = chip::CharSpan::fromCharString("My Program Title2");
     program2.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle2"));
-    program2.startTime  = 30 * 60 * 60;
-    program2.endTime    = 30 * 60 * 60;
+    program2.startTime  = 30 * 60;
+    program2.endTime    = 60 * 60;
 
     mPrograms.push_back(program2);
+
+    ProgramType program3;
+    program3.identifier = chip::CharSpan::fromCharString("progid-ott3");
+    program3.channel    = ottChannel;
+    program3.title      = chip::CharSpan::fromCharString("My Program Title3");
+    program3.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle3"));
+    program3.startTime  = 0;
+    program3.endTime    = 60 * 60;
+
+    mPrograms.push_back(program3);
 }
 
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
@@ -242,10 +263,44 @@ void ChannelManager::HandleGetProgramGuide(
     // ChannelPagingStructType channelPaging;
     // channelPaging.nextToken = MakeOptional<DataModel::Nullable<Structs::PageTokenStruct::Type>>(paging);
 
-    ProgramGuideResponseType response;
-    // response.channelPagingStruct = channelPaging;
-    response.programList = DataModel::List<const ProgramType>(mPrograms.data(), mPrograms.size());
+    std::vector<ProgramType> matches;
+    for (auto const & program : mPrograms)
+    {
+        if (startTime.ValueOr(0) > program.startTime)
+        {
+            continue;
+        }
+        if (endTime.HasValue() && endTime.ValueOr(0) < program.endTime)
+        {
+            continue;
+        }
+        if (channelList.HasValue())
+        {
+            auto iter     = channelList.Value().begin();
+            bool match    = false;
+            int listCount = 0;
+            while (iter.Next() && !match)
+            {
+                listCount++;
+                auto & channel = iter.GetValue();
+                if (channel.minorNumber != program.channel.minorNumber || channel.majorNumber != program.channel.majorNumber)
+                {
+                    continue;
+                }
+                // TODO: check OTT
+                match = true;
+            }
+            if (!match && listCount > 0)
+            {
+                continue;
+            }
+        }
+        // TODO: check external id list
+        matches.push_back(program);
+    }
 
+    ProgramGuideResponseType response;
+    response.programList = DataModel::List<const ProgramType>(matches.data(), matches.size());
     helper.Success(response);
 }
 

@@ -278,18 +278,22 @@ void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::Playb
 bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
 {
     bool foundMatch = false;
+    std::string idString(trackId.data(), trackId.size());
     for (auto const & availableAudioTrack : mAvailableAudioTracks)
     {
-        if (strcmp(availableAudioTrack.id.data(), trackId.data()) == 0)
+        std::string nextidString(availableAudioTrack.id.data(), availableAudioTrack.id.size());
+        if (strcmp(nextidString.c_str(), idString.c_str()) == 0)
         {
             mActiveAudioTrack = availableAudioTrack;
             foundMatch        = true;
+            break;
         }
     }
 
     if (!foundMatch)
     {
         // return an error
+        return false;
     }
 
     return true;
@@ -298,18 +302,25 @@ bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & track
 bool MediaPlaybackManager::HandleActivateTextTrack(const chip::CharSpan & trackId)
 {
     bool foundMatch = false;
+    std::string idString(trackId.data(), trackId.size());
+    ChipLogError(Controller, "HandleActivateTextTrack - Looking for %s", idString.c_str());
     for (auto const & availableTextTrack : mAvailableTextTracks)
     {
-        if (strcmp(availableTextTrack.id.data(), trackId.data()) == 0)
+        std::string nextidString(availableTextTrack.id.data(), availableTextTrack.id.size());
+        ChipLogError(Controller, "HandleActivateTextTrack - next track %s", nextidString.c_str());
+        if (strcmp(nextidString.c_str(), idString.c_str()) == 0)
         {
-            mActiveAudioTrack = availableTextTrack;
+            ChipLogError(Controller, "HandleActivateTextTrack - match");
+            mActiveTextTrack  = availableTextTrack;
             foundMatch        = true;
+            break;
         }
     }
 
     if (!foundMatch)
     {
         // return an error
+        return false;
     }
 
     return true;
