@@ -42,12 +42,11 @@ class TC_FAN_3_4(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.WindSetting(wind_setting))])
         asserts.assert_equal(result[0].Status, Status.Success, "WindSetting write failed")
 
+    def pics_TC_FAN_3_4(self) -> list[str]:
+        return ["FAN.S", "FAN.S.F03"]
+
     @async_test_body
     async def test_TC_FAN_3_4(self):
-        if not self.check_pics("FAN.S.F03"):
-            logger.info("Test skipped because PICS FAN.S.F03 is not set")
-            return
-
         endpoint = self.user_params.get("endpoint", 1)
 
         self.print_step(1, "Commissioning, already done")

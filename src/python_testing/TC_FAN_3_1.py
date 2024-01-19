@@ -49,6 +49,9 @@ class TC_FAN_3_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.PercentSetting(percent_setting))])
         return result[0].Status
 
+    def pics_TC_FAN_3_1(self) -> list[str]:
+        return ["FAN.S"]
+
     @async_test_body
     async def test_TC_FAN_3_1(self):
         endpoint = self.user_params.get("endpoint", 1)

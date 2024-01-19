@@ -44,12 +44,11 @@ class TC_FAN_3_2(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.SpeedSetting(speed_setting))])
         return result[0].Status
 
+    def pics_TC_FAN_3_2(self) -> list[str]:
+        return ["FAN.S", "FAN.S.F00"]
+
     @async_test_body
     async def test_TC_FAN_3_2(self):
-        if not self.check_pics("FAN.S.F00"):
-            logger.info("Test skipped because PICS FAN.S.F00 is not set")
-            return
-
         endpoint = self.user_params.get("endpoint", 1)
 
         self.print_step(1, "Commissioning, already done")
