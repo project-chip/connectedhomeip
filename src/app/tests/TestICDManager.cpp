@@ -321,6 +321,28 @@ public:
         uint32_t counter2 = ICDConfigurationData::GetInstance().GetICDCounter();
         NL_TEST_ASSERT(aSuite, (counter + 1) == counter2);
     }
+
+    static void TestOnSubscriptionReport(nlTestSuite * aSuite, void * aContext)
+    {
+        TestContext * ctx    = static_cast<TestContext *>(aContext);
+        ICDNotifier notifier = ICDNotifier::GetInstance();
+
+        // After the init we should be in Idle mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+
+        // Trigger a subscription report
+        notifier.BroadcastSubscriptionReport();
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
+
+        // Trigger another subscription report - active time should not be increased
+        notifier.BroadcastSubscriptionReport();
+
+        // Advance time so active mode interval expires.
+        AdvanceClockAndRunEventLoop(ctx, ICDConfigurationData::GetInstance().GetActiveModeDurationMs() + 1);
+
+        // After the init we should be in Idle mode
+        NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
+    }
 };
 
 } // namespace app
@@ -329,6 +351,7 @@ public:
 namespace {
 static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDModeDurations", TestICDManager::TestICDModeDurations),
+    NL_TEST_DEF("TestOnSubscriptionReport", TestICDManager::TestOnSubscriptionReport),
     NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),
