@@ -24340,6 +24340,4042 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ContentAppObserver
 
+namespace ElectricalMeasurement {
+namespace Attributes {
+
+namespace MeasurementType {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasurementType
+
+namespace DcVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcVoltage
+
+namespace DcVoltageMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcVoltageMin
+
+namespace DcVoltageMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcVoltageMax
+
+namespace DcCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcCurrent
+
+namespace DcCurrentMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcCurrentMin
+
+namespace DcCurrentMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcCurrentMax
+
+namespace DcPower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcPower
+
+namespace DcPowerMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcPowerMin
+
+namespace DcPowerMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcPowerMax
+
+namespace DcVoltageMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcVoltageMultiplier
+
+namespace DcVoltageDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcVoltageDivisor
+
+namespace DcCurrentMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcCurrentMultiplier
+
+namespace DcCurrentDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcCurrentDivisor
+
+namespace DcPowerMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcPowerMultiplier
+
+namespace DcPowerDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace DcPowerDivisor
+
+namespace AcFrequency {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcFrequency
+
+namespace AcFrequencyMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcFrequencyMin
+
+namespace AcFrequencyMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcFrequencyMax
+
+namespace NeutralCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace NeutralCurrent
+
+namespace TotalActivePower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
+{
+    using Traits = NumericAttributeTraits<int32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
+{
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
+}
+
+} // namespace TotalActivePower
+
+namespace TotalReactivePower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
+{
+    using Traits = NumericAttributeTraits<int32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
+{
+    using Traits = NumericAttributeTraits<int32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
+}
+
+} // namespace TotalReactivePower
+
+namespace TotalApparentPower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace TotalApparentPower
+
+namespace Measured1stHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace Measured1stHarmonicCurrent
+
+namespace Measured3rdHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace Measured3rdHarmonicCurrent
+
+namespace Measured5thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace Measured5thHarmonicCurrent
+
+namespace Measured7thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace Measured7thHarmonicCurrent
+
+namespace Measured9thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace Measured9thHarmonicCurrent
+
+namespace Measured11thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace Measured11thHarmonicCurrent
+
+namespace MeasuredPhase1stHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasuredPhase1stHarmonicCurrent
+
+namespace MeasuredPhase3rdHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasuredPhase3rdHarmonicCurrent
+
+namespace MeasuredPhase5thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasuredPhase5thHarmonicCurrent
+
+namespace MeasuredPhase7thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasuredPhase7thHarmonicCurrent
+
+namespace MeasuredPhase9thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasuredPhase9thHarmonicCurrent
+
+namespace MeasuredPhase11thHarmonicCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace MeasuredPhase11thHarmonicCurrent
+
+namespace AcFrequencyMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcFrequencyMultiplier
+
+namespace AcFrequencyDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcFrequencyDivisor
+
+namespace PowerMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace PowerMultiplier
+
+namespace PowerDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace PowerDivisor
+
+namespace HarmonicCurrentMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+} // namespace HarmonicCurrentMultiplier
+
+namespace PhaseHarmonicCurrentMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+} // namespace PhaseHarmonicCurrentMultiplier
+
+namespace InstantaneousVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace InstantaneousVoltage
+
+namespace InstantaneousLineCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace InstantaneousLineCurrent
+
+namespace InstantaneousActiveCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace InstantaneousActiveCurrent
+
+namespace InstantaneousReactiveCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace InstantaneousReactiveCurrent
+
+namespace InstantaneousPower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace InstantaneousPower
+
+namespace RmsVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltage
+
+namespace RmsVoltageMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageMin
+
+namespace RmsVoltageMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageMax
+
+namespace RmsCurrent {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrent
+
+namespace RmsCurrentMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentMin
+
+namespace RmsCurrentMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentMax
+
+namespace ActivePower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePower
+
+namespace ActivePowerMin {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerMin
+
+namespace ActivePowerMax {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerMax
+
+namespace ReactivePower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ReactivePower
+
+namespace ApparentPower {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ApparentPower
+
+namespace PowerFactor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+} // namespace PowerFactor
+
+namespace AverageRmsVoltageMeasurementPeriod {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsVoltageMeasurementPeriod
+
+namespace AverageRmsUnderVoltageCounter {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsUnderVoltageCounter
+
+namespace RmsExtremeOverVoltagePeriod {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeOverVoltagePeriod
+
+namespace RmsExtremeUnderVoltagePeriod {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeUnderVoltagePeriod
+
+namespace RmsVoltageSagPeriod {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSagPeriod
+
+namespace RmsVoltageSwellPeriod {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSwellPeriod
+
+namespace AcVoltageMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcVoltageMultiplier
+
+namespace AcVoltageDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcVoltageDivisor
+
+namespace AcCurrentMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcCurrentMultiplier
+
+namespace AcCurrentDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcCurrentDivisor
+
+namespace AcPowerMultiplier {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcPowerMultiplier
+
+namespace AcPowerDivisor {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcPowerDivisor
+
+namespace OverloadAlarmsMask {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    using Traits = NumericAttributeTraits<uint8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+}
+
+} // namespace OverloadAlarmsMask
+
+namespace VoltageOverload {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace VoltageOverload
+
+namespace CurrentOverload {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentOverload
+
+namespace AcOverloadAlarmsMask {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcOverloadAlarmsMask
+
+namespace AcVoltageOverload {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcVoltageOverload
+
+namespace AcCurrentOverload {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcCurrentOverload
+
+namespace AcActivePowerOverload {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcActivePowerOverload
+
+namespace AcReactivePowerOverload {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AcReactivePowerOverload
+
+namespace AverageRmsOverVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsOverVoltage
+
+namespace AverageRmsUnderVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsUnderVoltage
+
+namespace RmsExtremeOverVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeOverVoltage
+
+namespace RmsExtremeUnderVoltage {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeUnderVoltage
+
+namespace RmsVoltageSag {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSag
+
+namespace RmsVoltageSwell {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSwell
+
+namespace LineCurrentPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LineCurrentPhaseB
+
+namespace ActiveCurrentPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActiveCurrentPhaseB
+
+namespace ReactiveCurrentPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ReactiveCurrentPhaseB
+
+namespace RmsVoltagePhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltagePhaseB
+
+namespace RmsVoltageMinPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageMinPhaseB
+
+namespace RmsVoltageMaxPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageMaxPhaseB
+
+namespace RmsCurrentPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentPhaseB
+
+namespace RmsCurrentMinPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentMinPhaseB
+
+namespace RmsCurrentMaxPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentMaxPhaseB
+
+namespace ActivePowerPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerPhaseB
+
+namespace ActivePowerMinPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerMinPhaseB
+
+namespace ActivePowerMaxPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerMaxPhaseB
+
+namespace ReactivePowerPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ReactivePowerPhaseB
+
+namespace ApparentPowerPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ApparentPowerPhaseB
+
+namespace PowerFactorPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+} // namespace PowerFactorPhaseB
+
+namespace AverageRmsVoltageMeasurementPeriodPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseB
+
+namespace AverageRmsOverVoltageCounterPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsOverVoltageCounterPhaseB
+
+namespace AverageRmsUnderVoltageCounterPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsUnderVoltageCounterPhaseB
+
+namespace RmsExtremeOverVoltagePeriodPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeOverVoltagePeriodPhaseB
+
+namespace RmsExtremeUnderVoltagePeriodPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeUnderVoltagePeriodPhaseB
+
+namespace RmsVoltageSagPeriodPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSagPeriodPhaseB
+
+namespace RmsVoltageSwellPeriodPhaseB {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSwellPeriodPhaseB
+
+namespace LineCurrentPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LineCurrentPhaseC
+
+namespace ActiveCurrentPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActiveCurrentPhaseC
+
+namespace ReactiveCurrentPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ReactiveCurrentPhaseC
+
+namespace RmsVoltagePhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltagePhaseC
+
+namespace RmsVoltageMinPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageMinPhaseC
+
+namespace RmsVoltageMaxPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageMaxPhaseC
+
+namespace RmsCurrentPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentPhaseC
+
+namespace RmsCurrentMinPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentMinPhaseC
+
+namespace RmsCurrentMaxPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsCurrentMaxPhaseC
+
+namespace ActivePowerPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerPhaseC
+
+namespace ActivePowerMinPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerMinPhaseC
+
+namespace ActivePowerMaxPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActivePowerMaxPhaseC
+
+namespace ReactivePowerPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
+{
+    using Traits = NumericAttributeTraits<int16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+}
+
+} // namespace ReactivePowerPhaseC
+
+namespace ApparentPowerPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ApparentPowerPhaseC
+
+namespace PowerFactorPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
+{
+    using Traits = NumericAttributeTraits<int8_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+}
+
+} // namespace PowerFactorPhaseC
+
+namespace AverageRmsVoltageMeasurementPeriodPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseC
+
+namespace AverageRmsOverVoltageCounterPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsOverVoltageCounterPhaseC
+
+namespace AverageRmsUnderVoltageCounterPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace AverageRmsUnderVoltageCounterPhaseC
+
+namespace RmsExtremeOverVoltagePeriodPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeOverVoltagePeriodPhaseC
+
+namespace RmsExtremeUnderVoltagePeriodPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsExtremeUnderVoltagePeriodPhaseC
+
+namespace RmsVoltageSagPeriodPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSagPeriodPhaseC
+
+namespace RmsVoltageSwellPeriodPhaseC {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace RmsVoltageSwellPeriodPhaseC
+
+namespace FeatureMap {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalMeasurement::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalMeasurement
+
 namespace UnitTesting {
 namespace Attributes {
 

@@ -4407,6 +4407,662 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace ContentAppObserver
 
+namespace ElectricalMeasurement {
+namespace Attributes {
+
+namespace MeasurementType {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace MeasurementType
+
+namespace DcVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcVoltage
+
+namespace DcVoltageMin {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcVoltageMin
+
+namespace DcVoltageMax {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcVoltageMax
+
+namespace DcCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcCurrent
+
+namespace DcCurrentMin {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcCurrentMin
+
+namespace DcCurrentMax {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcCurrentMax
+
+namespace DcPower {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcPower
+
+namespace DcPowerMin {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcPowerMin
+
+namespace DcPowerMax {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace DcPowerMax
+
+namespace DcVoltageMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace DcVoltageMultiplier
+
+namespace DcVoltageDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace DcVoltageDivisor
+
+namespace DcCurrentMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace DcCurrentMultiplier
+
+namespace DcCurrentDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace DcCurrentDivisor
+
+namespace DcPowerMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace DcPowerMultiplier
+
+namespace DcPowerDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace DcPowerDivisor
+
+namespace AcFrequency {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcFrequency
+
+namespace AcFrequencyMin {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcFrequencyMin
+
+namespace AcFrequencyMax {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcFrequencyMax
+
+namespace NeutralCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace NeutralCurrent
+
+namespace TotalActivePower {
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value); // int32s
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value);
+} // namespace TotalActivePower
+
+namespace TotalReactivePower {
+EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value); // int32s
+EmberAfStatus Set(chip::EndpointId endpoint, int32_t value);
+} // namespace TotalReactivePower
+
+namespace TotalApparentPower {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace TotalApparentPower
+
+namespace Measured1stHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Measured1stHarmonicCurrent
+
+namespace Measured3rdHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Measured3rdHarmonicCurrent
+
+namespace Measured5thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Measured5thHarmonicCurrent
+
+namespace Measured7thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Measured7thHarmonicCurrent
+
+namespace Measured9thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Measured9thHarmonicCurrent
+
+namespace Measured11thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace Measured11thHarmonicCurrent
+
+namespace MeasuredPhase1stHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MeasuredPhase1stHarmonicCurrent
+
+namespace MeasuredPhase3rdHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MeasuredPhase3rdHarmonicCurrent
+
+namespace MeasuredPhase5thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MeasuredPhase5thHarmonicCurrent
+
+namespace MeasuredPhase7thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MeasuredPhase7thHarmonicCurrent
+
+namespace MeasuredPhase9thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MeasuredPhase9thHarmonicCurrent
+
+namespace MeasuredPhase11thHarmonicCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace MeasuredPhase11thHarmonicCurrent
+
+namespace AcFrequencyMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcFrequencyMultiplier
+
+namespace AcFrequencyDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcFrequencyDivisor
+
+namespace PowerMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace PowerMultiplier
+
+namespace PowerDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace PowerDivisor
+
+namespace HarmonicCurrentMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
+} // namespace HarmonicCurrentMultiplier
+
+namespace PhaseHarmonicCurrentMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
+} // namespace PhaseHarmonicCurrentMultiplier
+
+namespace InstantaneousVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace InstantaneousVoltage
+
+namespace InstantaneousLineCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace InstantaneousLineCurrent
+
+namespace InstantaneousActiveCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace InstantaneousActiveCurrent
+
+namespace InstantaneousReactiveCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace InstantaneousReactiveCurrent
+
+namespace InstantaneousPower {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace InstantaneousPower
+
+namespace RmsVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltage
+
+namespace RmsVoltageMin {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageMin
+
+namespace RmsVoltageMax {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageMax
+
+namespace RmsCurrent {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrent
+
+namespace RmsCurrentMin {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentMin
+
+namespace RmsCurrentMax {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentMax
+
+namespace ActivePower {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePower
+
+namespace ActivePowerMin {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerMin
+
+namespace ActivePowerMax {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerMax
+
+namespace ReactivePower {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ReactivePower
+
+namespace ApparentPower {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ApparentPower
+
+namespace PowerFactor {
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
+} // namespace PowerFactor
+
+namespace AverageRmsVoltageMeasurementPeriod {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsVoltageMeasurementPeriod
+
+namespace AverageRmsUnderVoltageCounter {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsUnderVoltageCounter
+
+namespace RmsExtremeOverVoltagePeriod {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsExtremeOverVoltagePeriod
+
+namespace RmsExtremeUnderVoltagePeriod {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsExtremeUnderVoltagePeriod
+
+namespace RmsVoltageSagPeriod {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageSagPeriod
+
+namespace RmsVoltageSwellPeriod {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageSwellPeriod
+
+namespace AcVoltageMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcVoltageMultiplier
+
+namespace AcVoltageDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcVoltageDivisor
+
+namespace AcCurrentMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcCurrentMultiplier
+
+namespace AcCurrentDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcCurrentDivisor
+
+namespace AcPowerMultiplier {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcPowerMultiplier
+
+namespace AcPowerDivisor {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcPowerDivisor
+
+namespace OverloadAlarmsMask {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace OverloadAlarmsMask
+
+namespace VoltageOverload {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace VoltageOverload
+
+namespace CurrentOverload {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace CurrentOverload
+
+namespace AcOverloadAlarmsMask {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AcOverloadAlarmsMask
+
+namespace AcVoltageOverload {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace AcVoltageOverload
+
+namespace AcCurrentOverload {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace AcCurrentOverload
+
+namespace AcActivePowerOverload {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace AcActivePowerOverload
+
+namespace AcReactivePowerOverload {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace AcReactivePowerOverload
+
+namespace AverageRmsOverVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace AverageRmsOverVoltage
+
+namespace AverageRmsUnderVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace AverageRmsUnderVoltage
+
+namespace RmsExtremeOverVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace RmsExtremeOverVoltage
+
+namespace RmsExtremeUnderVoltage {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace RmsExtremeUnderVoltage
+
+namespace RmsVoltageSag {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace RmsVoltageSag
+
+namespace RmsVoltageSwell {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace RmsVoltageSwell
+
+namespace LineCurrentPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace LineCurrentPhaseB
+
+namespace ActiveCurrentPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActiveCurrentPhaseB
+
+namespace ReactiveCurrentPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ReactiveCurrentPhaseB
+
+namespace RmsVoltagePhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltagePhaseB
+
+namespace RmsVoltageMinPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageMinPhaseB
+
+namespace RmsVoltageMaxPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageMaxPhaseB
+
+namespace RmsCurrentPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentPhaseB
+
+namespace RmsCurrentMinPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentMinPhaseB
+
+namespace RmsCurrentMaxPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentMaxPhaseB
+
+namespace ActivePowerPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerPhaseB
+
+namespace ActivePowerMinPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerMinPhaseB
+
+namespace ActivePowerMaxPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerMaxPhaseB
+
+namespace ReactivePowerPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ReactivePowerPhaseB
+
+namespace ApparentPowerPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ApparentPowerPhaseB
+
+namespace PowerFactorPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
+} // namespace PowerFactorPhaseB
+
+namespace AverageRmsVoltageMeasurementPeriodPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseB
+
+namespace AverageRmsOverVoltageCounterPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsOverVoltageCounterPhaseB
+
+namespace AverageRmsUnderVoltageCounterPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsUnderVoltageCounterPhaseB
+
+namespace RmsExtremeOverVoltagePeriodPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsExtremeOverVoltagePeriodPhaseB
+
+namespace RmsExtremeUnderVoltagePeriodPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsExtremeUnderVoltagePeriodPhaseB
+
+namespace RmsVoltageSagPeriodPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageSagPeriodPhaseB
+
+namespace RmsVoltageSwellPeriodPhaseB {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageSwellPeriodPhaseB
+
+namespace LineCurrentPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace LineCurrentPhaseC
+
+namespace ActiveCurrentPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActiveCurrentPhaseC
+
+namespace ReactiveCurrentPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ReactiveCurrentPhaseC
+
+namespace RmsVoltagePhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltagePhaseC
+
+namespace RmsVoltageMinPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageMinPhaseC
+
+namespace RmsVoltageMaxPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageMaxPhaseC
+
+namespace RmsCurrentPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentPhaseC
+
+namespace RmsCurrentMinPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentMinPhaseC
+
+namespace RmsCurrentMaxPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsCurrentMaxPhaseC
+
+namespace ActivePowerPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerPhaseC
+
+namespace ActivePowerMinPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerMinPhaseC
+
+namespace ActivePowerMaxPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ActivePowerMaxPhaseC
+
+namespace ReactivePowerPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace ReactivePowerPhaseC
+
+namespace ApparentPowerPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ApparentPowerPhaseC
+
+namespace PowerFactorPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value); // int8s
+EmberAfStatus Set(chip::EndpointId endpoint, int8_t value);
+} // namespace PowerFactorPhaseC
+
+namespace AverageRmsVoltageMeasurementPeriodPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsVoltageMeasurementPeriodPhaseC
+
+namespace AverageRmsOverVoltageCounterPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsOverVoltageCounterPhaseC
+
+namespace AverageRmsUnderVoltageCounterPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AverageRmsUnderVoltageCounterPhaseC
+
+namespace RmsExtremeOverVoltagePeriodPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsExtremeOverVoltagePeriodPhaseC
+
+namespace RmsExtremeUnderVoltagePeriodPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsExtremeUnderVoltagePeriodPhaseC
+
+namespace RmsVoltageSagPeriodPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageSagPeriodPhaseC
+
+namespace RmsVoltageSwellPeriodPhaseC {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace RmsVoltageSwellPeriodPhaseC
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ElectricalMeasurement
+
 namespace UnitTesting {
 namespace Attributes {
 

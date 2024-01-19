@@ -19043,6 +19043,849 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterElectricalMeasurement
+
+- (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self getProfileInfoCommandWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ElectricalMeasurement::Commands::GetProfileInfoCommand::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasurementTypeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcVoltageMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcVoltageMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcCurrentMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcCurrentMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcPowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcPowerMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcPowerMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcVoltageMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcVoltageDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcVoltageDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcCurrentDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcCurrentDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcPowerMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDcPowerDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeDcPowerDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcFrequencyWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcFrequencyMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcFrequencyMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNeutralCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeNeutralCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTotalActivePowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalActivePowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTotalReactivePowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalReactivePowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTotalApparentPowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeTotalApparentPowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasured1stHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured1stHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasured3rdHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured3rdHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasured5thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured5thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasured7thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured7thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasured9thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured9thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasured11thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasured11thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredPhase1stHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase1stHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredPhase3rdHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase3rdHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredPhase5thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase5thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredPhase7thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase7thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredPhase9thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase9thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasuredPhase11thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeMeasuredPhase11thHarmonicCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcFrequencyMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcFrequencyDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcFrequencyDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeHarmonicCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeHarmonicCurrentMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePhaseHarmonicCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePhaseHarmonicCurrentMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeInstantaneousVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeInstantaneousLineCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousLineCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeInstantaneousActiveCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousActiveCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeInstantaneousReactiveCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousReactiveCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeInstantaneousPowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeInstantaneousPowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerMinWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeReactivePowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeApparentPowerWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerFactorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsVoltageMeasurementPeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID) params:params];
+}
+
+- (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsUnderVoltageCounterWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID) params:params];
+}
+
+- (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeAverageRmsUnderVoltageCounterWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeOverVoltagePeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID) params:params];
+}
+
+- (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeRmsExtremeOverVoltagePeriodWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeUnderVoltagePeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID) params:params];
+}
+
+- (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeRmsExtremeUnderVoltagePeriodWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSagPeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID) params:params];
+}
+
+- (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeRmsVoltageSagPeriodWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSwellPeriodWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID) params:params];
+}
+
+- (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeRmsVoltageSwellPeriodWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcVoltageMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcVoltageDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcCurrentDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcPowerMultiplierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerMultiplierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcPowerDivisorWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcPowerDivisorID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeOverloadAlarmsMaskWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID) params:params];
+}
+
+- (void)writeAttributeOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeOverloadAlarmsMaskWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeOverloadAlarmsMaskID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeVoltageOverloadWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeVoltageOverloadID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentOverloadWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeCurrentOverloadID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcOverloadAlarmsMaskWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID) params:params];
+}
+
+- (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeAcOverloadAlarmsMaskWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
+}
+- (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcOverloadAlarmsMaskID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcVoltageOverloadWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcVoltageOverloadID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcCurrentOverloadWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcCurrentOverloadID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcActivePowerOverloadWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcActivePowerOverloadID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcReactivePowerOverloadWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcReactivePowerOverloadID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsOverVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsUnderVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeOverVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeUnderVoltageWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltageID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSagWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSwellWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLineCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeReactiveCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltagePhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageMinPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageMaxPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentMinPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentMaxPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerMinPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerMaxPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeReactivePowerPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeApparentPowerPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerFactorPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsOverVoltageCounterPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsUnderVoltageCounterPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeOverVoltagePeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSagPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSwellPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseBID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLineCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeLineCurrentPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActiveCurrentPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeReactiveCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactiveCurrentPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltagePhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltagePhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageMinPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMinPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageMaxPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageMaxPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentMinPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMinPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsCurrentMaxPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsCurrentMaxPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerMinPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMinPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeActivePowerMaxPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeActivePowerMaxPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeReactivePowerPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeReactivePowerPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeApparentPowerPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeApparentPowerPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributePowerFactorPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributePowerFactorPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsVoltageMeasurementPeriodPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsOverVoltageCounterPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsOverVoltageCounterPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAverageRmsUnderVoltageCounterPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAverageRmsUnderVoltageCounterPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeOverVoltagePeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeOverVoltagePeriodPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsExtremeUnderVoltagePeriodPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSagPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSagPeriodPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRmsVoltageSwellPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeRmsVoltageSwellPeriodPhaseCID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeEventListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeElectricalMeasurementID) attributeID:@(MTRAttributeIDTypeClusterElectricalMeasurementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterElectricalMeasurement (Deprecated)
+
+- (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
+{
+    return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
+}
+
+- (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self getProfileInfoCommandWithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
+                                                                                                                                                completionHandler];
+}
+- (void)getProfileInfoCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self getProfileInfoCommandWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+}
+- (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:(MTRStatusCompletion)completionHandler
+{
+    [self getMeasurementProfileCommandWithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
+                                                                                                                                                       completionHandler];
+}
+@end
+
 @implementation MTRClusterUnitTesting
 
 - (void)testWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion

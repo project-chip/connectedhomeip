@@ -181,6 +181,7 @@
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [
             "electrical-energy-measurement-server"
         ],
+        "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_POWER_MEASUREMENT_CLUSTER": [
             "electrical-power-measurement-server"
         ],

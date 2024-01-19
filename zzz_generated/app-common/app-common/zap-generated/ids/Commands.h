@@ -1671,6 +1671,28 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ContentAppObserver
 
+namespace ElectricalMeasurement {
+namespace Commands {
+
+namespace GetProfileInfoResponseCommand {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetProfileInfoResponseCommand
+
+namespace GetProfileInfoCommand {
+static constexpr CommandId Id = 0x00000000;
+} // namespace GetProfileInfoCommand
+
+namespace GetMeasurementProfileResponseCommand {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetMeasurementProfileResponseCommand
+
+namespace GetMeasurementProfileCommand {
+static constexpr CommandId Id = 0x00000001;
+} // namespace GetMeasurementProfileCommand
+
+} // namespace Commands
+} // namespace ElectricalMeasurement
+
 namespace UnitTesting {
 namespace Commands {
 

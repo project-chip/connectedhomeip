@@ -1207,6 +1207,14 @@ typedef void (*ContentAppObserverEventListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ContentAppObserverAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*ElectricalMeasurementGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*ElectricalMeasurementEventListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & data);
+typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*UnitTestingListInt8uListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<uint8_t> & data);
 typedef void (*UnitTestingListOctetStringListAttributeCallback)(void * context,

@@ -251,6 +251,7 @@ matter_clusters_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/DishwasherModeCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/DoorLockCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ElectricalEnergyMeasurementCluster.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ElectricalMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/ElectricalPowerMeasurementCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/EnergyEvseCluster.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/clusters/EnergyEvseModeCluster.kt",

@@ -4236,6 +4236,18 @@ static id _Nullable DecodeEventPayloadForContentAppObserverCluster(EventId aEven
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForElectricalMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ElectricalMeasurement;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::UnitTesting;
@@ -4744,6 +4756,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ContentAppObserver::Id: {
         return DecodeEventPayloadForContentAppObserverCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ElectricalMeasurement::Id: {
+        return DecodeEventPayloadForElectricalMeasurementCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::UnitTesting::Id: {
         return DecodeEventPayloadForUnitTestingCluster(aPath.mEventId, aReader, aError);
