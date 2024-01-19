@@ -301,7 +301,7 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
     for (auto & program : mPrograms)
     {
         std::string nextIdString(program.identifier.data(), program.identifier.size());
-        if (strcmp(idString.c_str(), nextIdString.c_str()) == 0)
+        if (nextIdString == idString)
         {
             program.recordingFlag = MakeOptional(static_cast<uint32_t>(shouldRecordSeries ? 2 : 1));
         }
@@ -319,7 +319,7 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
     for (auto & program : mPrograms)
     {
         std::string nextIdString(program.identifier.data(), program.identifier.size());
-        if (strcmp(idString.c_str(), nextIdString.c_str()) == 0)
+        if (nextIdString == idString)
         {
             program.recordingFlag = MakeOptional(static_cast<uint32_t>(0));
         }
