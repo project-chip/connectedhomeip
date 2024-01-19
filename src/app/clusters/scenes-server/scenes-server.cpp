@@ -31,6 +31,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
+#include <tracing/macros.h>
 
 using SceneTableEntry   = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId    = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
@@ -812,16 +813,19 @@ void ScenesServer::RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex
 
 void ScenesServer::HandleAddScene(HandlerContext & ctx, const Commands::AddScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("AddScene", "Scenes");
     AddSceneParse<Commands::AddScene::DecodableType, Commands::AddSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleViewScene(HandlerContext & ctx, const Commands::ViewScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("ViewScene", "Scenes");
     ViewSceneParse<Commands::ViewScene::DecodableType, Commands::ViewSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::RemoveScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RemoveScene", "Scenes");
     Commands::RemoveSceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -878,6 +882,7 @@ void ScenesServer::HandleRemoveScene(HandlerContext & ctx, const Commands::Remov
 
 void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::RemoveAllScenes::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RemoveAllScenes", "Scenes");
     Commands::RemoveAllScenesResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -927,6 +932,7 @@ void ScenesServer::HandleRemoveAllScenes(HandlerContext & ctx, const Commands::R
 
 void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("StoreScene", "Scenes");
     Commands::StoreSceneResponse::Type response;
 
     // Response data
@@ -947,6 +953,7 @@ void ScenesServer::HandleStoreScene(HandlerContext & ctx, const Commands::StoreS
 
 void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::RecallScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("RecallScene", "Scenes");
     CHIP_ERROR err = RecallSceneParse(ctx.mCommandHandler.GetAccessingFabricIndex(), ctx.mRequestPath.mEndpointId, req.groupID,
                                       req.sceneID, req.transitionTime, mGroupProvider);
 
@@ -968,6 +975,7 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
 
 void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands::GetSceneMembership::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("GetSceneMembership", "Scenes");
     Commands::GetSceneMembershipResponse::Type response;
 
     uint16_t endpointTableSize = 0;
@@ -1014,15 +1022,18 @@ void ScenesServer::HandleGetSceneMembership(HandlerContext & ctx, const Commands
 
 void ScenesServer::HandleEnhancedAddScene(HandlerContext & ctx, const Commands::EnhancedAddScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("EnhancedAddScene", "Scenes");
     AddSceneParse<Commands::EnhancedAddScene::DecodableType, Commands::EnhancedAddSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 
 void ScenesServer::HandleEnhancedViewScene(HandlerContext & ctx, const Commands::EnhancedViewScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("EnhancedViewScene", "Scenes");
     ViewSceneParse<Commands::EnhancedViewScene::DecodableType, Commands::EnhancedViewSceneResponse::Type>(ctx, req, mGroupProvider);
 }
 void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopyScene::DecodableType & req)
 {
+    MATTER_TRACE_SCOPE("CopyScene", "Scenes");
     Commands::CopySceneResponse::Type response;
 
     uint16_t endpointTableSize = 0;
