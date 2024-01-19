@@ -461,7 +461,8 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
     // check for extended advertisment interval
-    if (BLEMgrImpl().Internal_Slow_Advertising_MIN == CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL) {
+    if (BLEMgrImpl().Internal_Slow_Advertising_MIN == CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL)
+    {
         mDeviceIdInfo.SetVendorId(0x0000);
         mDeviceIdInfo.SetProductId(0x0000);
         mDeviceIdInfo.SetAdditionalDataFlag(true);
@@ -980,7 +981,8 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 #endif
     }
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-    else {
+    else
+    {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisment");
         BLEMgrImpl().Internal_Slow_Advertising_MIN = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL;
         BLEMgrImpl().Internal_Slow_Advertising_MAX = CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL;

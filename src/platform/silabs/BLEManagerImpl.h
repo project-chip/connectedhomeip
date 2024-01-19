@@ -213,7 +213,6 @@ private:
     uint16_t Internal_Slow_Advertising_MIN = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
     uint16_t Internal_Slow_Advertising_MAX = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
 #endif
-
 };
 
 /**
