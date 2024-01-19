@@ -60,17 +60,6 @@ ChannelManager::ChannelManager()
     worldChannel.minorNumber       = static_cast<uint16_t>(3);
     mChannels.push_back(worldChannel);
 
-    ChannelInfoType ottChannel;
-    ottChannel.affiliateCallSign = MakeOptional(chip::CharSpan::fromCharString("OTT"));
-    ottChannel.callSign          = MakeOptional(chip::CharSpan::fromCharString("OTT-TV"));
-    ottChannel.name              = MakeOptional(chip::CharSpan::fromCharString("OTT Channel"));
-    ottChannel.majorNumber       = static_cast<uint8_t>(0);
-    ottChannel.minorNumber       = static_cast<uint16_t>(0);
-    ottChannel.identifier        = MakeOptional(chip::CharSpan::fromCharString("ott-1"));
-    // ottChannel.type              = MakeOptional(chip::app::Clusters::Channel::ChannelTypeEnum::kUnknownEnumValue); // TODO: OTT
-
-    mChannels.push_back(worldChannel);
-
     mCurrentChannelIndex = 0;
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
 
@@ -84,15 +73,15 @@ ChannelManager::ChannelManager()
 
     mPrograms.push_back(program1);
 
-    ProgramType program_abc1;
-    program_abc1.identifier = chip::CharSpan::fromCharString("progid-pbs1");
-    program_abc1.channel    = pbs;
-    program_abc1.title      = chip::CharSpan::fromCharString("PBS Title1");
-    program_abc1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
-    program_abc1.startTime  = 0;
-    program_abc1.endTime    = 30 * 60;
+    ProgramType program_pbs1;
+    program_pbs1.identifier = chip::CharSpan::fromCharString("progid-pbs1");
+    program_pbs1.channel    = pbs;
+    program_pbs1.title      = chip::CharSpan::fromCharString("PBS Title1");
+    program_pbs1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program_pbs1.startTime  = 0;
+    program_pbs1.endTime    = 30 * 60;
 
-    mPrograms.push_back(program_abc1);
+    mPrograms.push_back(program_pbs1);
 
     ProgramType program2;
     program2.identifier = chip::CharSpan::fromCharString("progid-abc2");
@@ -105,8 +94,8 @@ ChannelManager::ChannelManager()
     mPrograms.push_back(program2);
 
     ProgramType program3;
-    program3.identifier = chip::CharSpan::fromCharString("progid-ott3");
-    program3.channel    = ottChannel;
+    program3.identifier = chip::CharSpan::fromCharString("progid-abc3");
+    program3.channel    = abc;
     program3.title      = chip::CharSpan::fromCharString("My Program Title3");
     program3.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle3"));
     program3.startTime  = 0;
@@ -203,7 +192,6 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
 bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
-    // TODO: Insert code here
     bool channelChanged = false;
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
@@ -287,7 +275,7 @@ void ChannelManager::HandleGetProgramGuide(
                 {
                     continue;
                 }
-                // TODO: check OTT
+                // this sample code does not currently check OTT
                 match = true;
             }
             if (!match && listCount > 0)
@@ -295,7 +283,7 @@ void ChannelManager::HandleGetProgramGuide(
                 continue;
             }
         }
-        // TODO: check external id list
+        // this sample code does not currently filter on external id list
         matches.push_back(program);
     }
 
