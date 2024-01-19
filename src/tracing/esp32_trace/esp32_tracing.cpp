@@ -16,14 +16,14 @@
  *    limitations under the License.
  */
 
-#include "esp32_tracing.h"
-#include "counter.h"
 #include <algorithm>
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
 #include <esp_log.h>
 #include <memory>
 #include <tracing/backend.h>
+#include <tracing/esp32_trace/counter.h>
+#include <tracing/esp32_trace/esp32_tracing.h>
 
 namespace chip {
 namespace Tracing {
