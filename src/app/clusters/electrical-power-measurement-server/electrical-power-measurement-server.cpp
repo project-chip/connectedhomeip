@@ -66,7 +66,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature.Raw()));
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
         break;
     case PowerMode::Id:
         ReturnErrorOnFailure(aEncoder.Encode(mDelegate.GetPowerMode()));
