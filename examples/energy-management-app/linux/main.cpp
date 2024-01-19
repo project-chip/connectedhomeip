@@ -73,11 +73,10 @@ CHIP_ERROR DeviceEnergyManagementInit()
     gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(
         EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
         BitMask<DeviceEnergyManagement::Feature, uint32_t>(
-            DeviceEnergyManagement::Feature::kPowerForecastReporting, DeviceEnergyManagement::Feature::kStateForecastReporting,
-            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kForecastAdjustment),
-        BitMask<DeviceEnergyManagement::OptionalCommands, uint32_t>(
-            DeviceEnergyManagement::OptionalCommands::kSupportsModifyForecastRequest,
-            DeviceEnergyManagement::OptionalCommands::kSupportsRequestConstraintBasedForecast));
+            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
+            DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+            DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+            DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
 
     if (!gDEMInstance)
     {
