@@ -17,18 +17,14 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class AccountLoginClusterLoggedOutEvent (
-    val node: Optional<ULong>) {
-  override fun toString(): String  = buildString {
+class AccountLoginClusterLoggedOutEvent(val node: Optional<ULong>) {
+  override fun toString(): String = buildString {
     append("AccountLoginClusterLoggedOutEvent {\n")
     append("\tnode : $node\n")
     append("}\n")
@@ -38,9 +34,9 @@ class AccountLoginClusterLoggedOutEvent (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (node.isPresent) {
-      val optnode = node.get()
-      put(ContextSpecificTag(TAG_NODE), optnode)
-    }
+        val optnode = node.get()
+        put(ContextSpecificTag(TAG_NODE), optnode)
+      }
       endStructure()
     }
   }
@@ -48,14 +44,15 @@ class AccountLoginClusterLoggedOutEvent (
   companion object {
     private const val TAG_NODE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AccountLoginClusterLoggedOutEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AccountLoginClusterLoggedOutEvent {
       tlvReader.enterStructure(tlvTag)
-      val node = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
-    } else {
-      Optional.empty()
-    }
-      
+      val node =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return AccountLoginClusterLoggedOutEvent(node)

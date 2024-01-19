@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -74,28 +73,32 @@ class BindingClusterTargetStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BindingClusterTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val node = if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
-      Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
-    } else {
-      Optional.empty()
-    }
-      val group = if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_GROUP)))
-    } else {
-      Optional.empty()
-    }
-      val endpoint = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-      Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT)))
-    } else {
-      Optional.empty()
-    }
-      val cluster = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER)))
-    } else {
-      Optional.empty()
-    }
+      val node =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE)))
+        } else {
+          Optional.empty()
+        }
+      val group =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_GROUP))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_GROUP)))
+        } else {
+          Optional.empty()
+        }
+      val endpoint =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
+          Optional.of(tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT)))
+        } else {
+          Optional.empty()
+        }
+      val cluster =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLUSTER))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_CLUSTER)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return BindingClusterTargetStruct(node, group, endpoint, cluster, fabricIndex)

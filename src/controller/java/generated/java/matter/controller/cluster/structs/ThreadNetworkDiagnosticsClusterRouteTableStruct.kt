@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -80,7 +78,10 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
     private const val TAG_ALLOCATED = 8
     private const val TAG_LINK_ESTABLISHED = 9
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThreadNetworkDiagnosticsClusterRouteTableStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): ThreadNetworkDiagnosticsClusterRouteTableStruct {
       tlvReader.enterStructure(tlvTag)
       val extAddress = tlvReader.getULong(ContextSpecificTag(TAG_EXT_ADDRESS))
       val rloc16 = tlvReader.getUShort(ContextSpecificTag(TAG_RLOC16))
@@ -92,10 +93,21 @@ class ThreadNetworkDiagnosticsClusterRouteTableStruct(
       val age = tlvReader.getUByte(ContextSpecificTag(TAG_AGE))
       val allocated = tlvReader.getBoolean(ContextSpecificTag(TAG_ALLOCATED))
       val linkEstablished = tlvReader.getBoolean(ContextSpecificTag(TAG_LINK_ESTABLISHED))
-      
+
       tlvReader.exitContainer()
 
-      return ThreadNetworkDiagnosticsClusterRouteTableStruct(extAddress, rloc16, routerId, nextHop, pathCost, LQIIn, LQIOut, age, allocated, linkEstablished)
+      return ThreadNetworkDiagnosticsClusterRouteTableStruct(
+        extAddress,
+        rloc16,
+        routerId,
+        nextHop,
+        pathCost,
+        LQIIn,
+        LQIOut,
+        age,
+        allocated,
+        linkEstablished
+      )
     }
   }
 }

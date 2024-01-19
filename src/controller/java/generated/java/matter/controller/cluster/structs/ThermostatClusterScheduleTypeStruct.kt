@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -57,10 +55,14 @@ class ThermostatClusterScheduleTypeStruct(
       val systemMode = tlvReader.getUByte(ContextSpecificTag(TAG_SYSTEM_MODE))
       val numberOfSchedules = tlvReader.getUByte(ContextSpecificTag(TAG_NUMBER_OF_SCHEDULES))
       val scheduleTypeFeatures = tlvReader.getUShort(ContextSpecificTag(TAG_SCHEDULE_TYPE_FEATURES))
-      
+
       tlvReader.exitContainer()
 
-      return ThermostatClusterScheduleTypeStruct(systemMode, numberOfSchedules, scheduleTypeFeatures)
+      return ThermostatClusterScheduleTypeStruct(
+        systemMode,
+        numberOfSchedules,
+        scheduleTypeFeatures
+      )
     }
   }
 }

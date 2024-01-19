@@ -18,7 +18,6 @@ package matter.controller.cluster.eventstructs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -51,15 +50,19 @@ class BooleanStateConfigurationClusterAlarmsStateChangedEvent(
     private const val TAG_ALARMS_ACTIVE = 0
     private const val TAG_ALARMS_SUPPRESSED = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BooleanStateConfigurationClusterAlarmsStateChangedEvent {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): BooleanStateConfigurationClusterAlarmsStateChangedEvent {
       tlvReader.enterStructure(tlvTag)
       val alarmsActive = tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_ACTIVE))
-      val alarmsSuppressed = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
-        Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
-      } else {
-        Optional.empty()
-      }
-      
+      val alarmsSuppressed =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ALARMS_SUPPRESSED))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_ALARMS_SUPPRESSED)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
       return BooleanStateConfigurationClusterAlarmsStateChangedEvent(alarmsActive, alarmsSuppressed)

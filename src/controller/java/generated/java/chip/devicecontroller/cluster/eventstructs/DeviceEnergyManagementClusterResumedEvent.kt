@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class DeviceEnergyManagementClusterResumedEvent (
-    val cause: UInt) {
-  override fun toString(): String  = buildString {
+class DeviceEnergyManagementClusterResumedEvent(val cause: UInt) {
+  override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterResumedEvent {\n")
     append("\tcause : $cause\n")
     append("}\n")
@@ -45,10 +40,10 @@ class DeviceEnergyManagementClusterResumedEvent (
   companion object {
     private const val TAG_CAUSE = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DeviceEnergyManagementClusterResumedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterResumedEvent {
       tlvReader.enterStructure(tlvTag)
       val cause = tlvReader.getUInt(ContextSpecificTag(TAG_CAUSE))
-      
+
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementClusterResumedEvent(cause)

@@ -88,18 +88,18 @@ class ChannelClusterProgramStruct(
       if (audioLanguages.isPresent) {
         val optaudioLanguages = audioLanguages.get()
         startArray(ContextSpecificTag(TAG_AUDIO_LANGUAGES))
-      for (item in optaudioLanguages.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+        for (item in optaudioLanguages.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       }
       if (ratings.isPresent) {
         val optratings = ratings.get()
         startArray(ContextSpecificTag(TAG_RATINGS))
-      for (item in optratings.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+        for (item in optratings.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
       }
       if (thumbnailUrl.isPresent) {
         val optthumbnailUrl = thumbnailUrl.get()
@@ -127,35 +127,35 @@ class ChannelClusterProgramStruct(
       }
       if (seriesInfo != null) {
         if (seriesInfo.isPresent) {
-        val optseriesInfo = seriesInfo.get()
-        optseriesInfo.toTlv(ContextSpecificTag(TAG_SERIES_INFO), this)
-      }
+          val optseriesInfo = seriesInfo.get()
+          optseriesInfo.toTlv(ContextSpecificTag(TAG_SERIES_INFO), this)
+        }
       } else {
         putNull(ContextSpecificTag(TAG_SERIES_INFO))
       }
       if (categoryList.isPresent) {
         val optcategoryList = categoryList.get()
         startArray(ContextSpecificTag(TAG_CATEGORY_LIST))
-      for (item in optcategoryList.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
+        for (item in optcategoryList.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
       if (castList.isPresent) {
         val optcastList = castList.get()
         startArray(ContextSpecificTag(TAG_CAST_LIST))
-      for (item in optcastList.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
+        for (item in optcastList.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
       if (externalIDList.isPresent) {
         val optexternalIDList = externalIDList.get()
         startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
-      for (item in optexternalIDList.iterator()) {
-        item.toTlv(AnonymousTag, this)
-      }
-      endArray()
+        for (item in optexternalIDList.iterator()) {
+          item.toTlv(AnonymousTag, this)
+        }
+        endArray()
       }
       endStructure()
     }
@@ -185,119 +185,166 @@ class ChannelClusterProgramStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterProgramStruct {
       tlvReader.enterStructure(tlvTag)
       val identifier = tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER))
-      val channel = ChannelClusterChannelInfoStruct.fromTlv(ContextSpecificTag(TAG_CHANNEL), tlvReader)
+      val channel =
+        ChannelClusterChannelInfoStruct.fromTlv(ContextSpecificTag(TAG_CHANNEL), tlvReader)
       val startTime = tlvReader.getUInt(ContextSpecificTag(TAG_START_TIME))
       val endTime = tlvReader.getUInt(ContextSpecificTag(TAG_END_TIME))
       val title = tlvReader.getString(ContextSpecificTag(TAG_TITLE))
-      val subtitle = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUBTITLE))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_SUBTITLE)))
-    } else {
-      Optional.empty()
-    }
-      val description = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
-    } else {
-      Optional.empty()
-    }
-      val audioLanguages = if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_LANGUAGES))) {
-      Optional.of(buildList<String> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_LANGUAGES))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getString(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val ratings = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATINGS))) {
-      Optional.of(buildList<String> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_RATINGS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getString(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val thumbnailUrl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_THUMBNAIL_URL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_THUMBNAIL_URL)))
-    } else {
-      Optional.empty()
-    }
-      val posterArtUrl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSTER_ART_URL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_POSTER_ART_URL)))
-    } else {
-      Optional.empty()
-    }
-      val dvbiUrl = if (tlvReader.isNextTag(ContextSpecificTag(TAG_DVBI_URL))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DVBI_URL)))
-    } else {
-      Optional.empty()
-    }
-      val releaseDate = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RELEASE_DATE))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_RELEASE_DATE)))
-    } else {
-      Optional.empty()
-    }
-      val parentalGuidanceText = if (tlvReader.isNextTag(ContextSpecificTag(TAG_PARENTAL_GUIDANCE_TEXT))) {
-      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_PARENTAL_GUIDANCE_TEXT)))
-    } else {
-      Optional.empty()
-    }
-      val recordingFlag = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RECORDING_FLAG))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RECORDING_FLAG)))
-    } else {
-      Optional.empty()
-    }
-      val seriesInfo = if (!tlvReader.isNull()) {
-      if (tlvReader.isNextTag(ContextSpecificTag(TAG_SERIES_INFO))) {
-      Optional.of(ChannelClusterSeriesInfoStruct.fromTlv(ContextSpecificTag(TAG_SERIES_INFO), tlvReader))
-    } else {
-      Optional.empty()
-    }
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_SERIES_INFO))
-      null
-    }
-      val categoryList = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CATEGORY_LIST))) {
-      Optional.of(buildList<ChannelClusterProgramCategoryStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_CATEGORY_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ChannelClusterProgramCategoryStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val castList = if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAST_LIST))) {
-      Optional.of(buildList<ChannelClusterProgramCastStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_CAST_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ChannelClusterProgramCastStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      val externalIDList = if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {
-      Optional.of(buildList<ChannelClusterProgramCastStruct> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
-      while(!tlvReader.isEndOfContainer()) {
-        add(ChannelClusterProgramCastStruct.fromTlv(AnonymousTag, tlvReader))
-      }
-      tlvReader.exitContainer()
-    })
-    } else {
-      Optional.empty()
-    }
-      
+      val subtitle =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUBTITLE))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_SUBTITLE)))
+        } else {
+          Optional.empty()
+        }
+      val description =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DESCRIPTION))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DESCRIPTION)))
+        } else {
+          Optional.empty()
+        }
+      val audioLanguages =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_AUDIO_LANGUAGES))) {
+          Optional.of(
+            buildList<String> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_AUDIO_LANGUAGES))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getString(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val ratings =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATINGS))) {
+          Optional.of(
+            buildList<String> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_RATINGS))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getString(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val thumbnailUrl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_THUMBNAIL_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_THUMBNAIL_URL)))
+        } else {
+          Optional.empty()
+        }
+      val posterArtUrl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSTER_ART_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_POSTER_ART_URL)))
+        } else {
+          Optional.empty()
+        }
+      val dvbiUrl =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_DVBI_URL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DVBI_URL)))
+        } else {
+          Optional.empty()
+        }
+      val releaseDate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RELEASE_DATE))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_RELEASE_DATE)))
+        } else {
+          Optional.empty()
+        }
+      val parentalGuidanceText =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_PARENTAL_GUIDANCE_TEXT))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_PARENTAL_GUIDANCE_TEXT)))
+        } else {
+          Optional.empty()
+        }
+      val recordingFlag =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RECORDING_FLAG))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RECORDING_FLAG)))
+        } else {
+          Optional.empty()
+        }
+      val seriesInfo =
+        if (!tlvReader.isNull()) {
+          if (tlvReader.isNextTag(ContextSpecificTag(TAG_SERIES_INFO))) {
+            Optional.of(
+              ChannelClusterSeriesInfoStruct.fromTlv(ContextSpecificTag(TAG_SERIES_INFO), tlvReader)
+            )
+          } else {
+            Optional.empty()
+          }
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_SERIES_INFO))
+          null
+        }
+      val categoryList =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CATEGORY_LIST))) {
+          Optional.of(
+            buildList<ChannelClusterProgramCategoryStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_CATEGORY_LIST))
+              while (!tlvReader.isEndOfContainer()) {
+                add(ChannelClusterProgramCategoryStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val castList =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CAST_LIST))) {
+          Optional.of(
+            buildList<ChannelClusterProgramCastStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_CAST_LIST))
+              while (!tlvReader.isEndOfContainer()) {
+                add(ChannelClusterProgramCastStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val externalIDList =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {
+          Optional.of(
+            buildList<ChannelClusterProgramCastStruct> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+              while (!tlvReader.isEndOfContainer()) {
+                add(ChannelClusterProgramCastStruct.fromTlv(AnonymousTag, tlvReader))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return ChannelClusterProgramStruct(identifier, channel, startTime, endTime, title, subtitle, description, audioLanguages, ratings, thumbnailUrl, posterArtUrl, dvbiUrl, releaseDate, parentalGuidanceText, recordingFlag, seriesInfo, categoryList, castList, externalIDList)
+      return ChannelClusterProgramStruct(
+        identifier,
+        channel,
+        startTime,
+        endTime,
+        title,
+        subtitle,
+        description,
+        audioLanguages,
+        ratings,
+        thumbnailUrl,
+        posterArtUrl,
+        dvbiUrl,
+        releaseDate,
+        parentalGuidanceText,
+        recordingFlag,
+        seriesInfo,
+        categoryList,
+        castList,
+        externalIDList
+      )
     }
   }
 }

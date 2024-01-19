@@ -16,17 +16,13 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class SwitchClusterInitialPressEvent(
-  val newPosition: UByte
-) {
+class SwitchClusterInitialPressEvent(val newPosition: UByte) {
   override fun toString(): String = buildString {
     append("SwitchClusterInitialPressEvent {\n")
     append("\tnewPosition : $newPosition\n")
@@ -44,10 +40,10 @@ class SwitchClusterInitialPressEvent(
   companion object {
     private const val TAG_NEW_POSITION = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : SwitchClusterInitialPressEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterInitialPressEvent {
       tlvReader.enterStructure(tlvTag)
       val newPosition = tlvReader.getUByte(ContextSpecificTag(TAG_NEW_POSITION))
-      
+
       tlvReader.exitContainer()
 
       return SwitchClusterInitialPressEvent(newPosition)
