@@ -124,7 +124,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.print_step(step_number, instruction)
         input("Press Enter when done.\n")
 
-
     @async_test_body
     async def test_TC_RVCOPSTATE_2_3(self):
 
@@ -211,7 +210,8 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
             await self.read_operational_state_with_check(17, op_states.kRunning)
 
-            self.print_instruction(18, "Manually cause the device to pause running due to an error, and be able to resume after clearing the error")
+            self.print_instruction(
+                18, "Manually cause the device to pause running due to an error, and be able to resume after clearing the error")
 
             await self.read_operational_state_with_check(19, op_states.kError)
 
@@ -242,7 +242,8 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
             await self.send_pause_cmd_with_check(31, op_errors.kCommandInvalidInState)
 
-            self.print_instruction(32, "Manually put the device in the Charging(0x41) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+            self.print_instruction(
+                32, "Manually put the device in the Charging(0x41) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
 
             await self.send_resume_cmd_with_check(33, op_errors.kCommandInvalidInState)
 
@@ -251,7 +252,8 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
             await self.send_pause_cmd_with_check(35, op_errors.kCommandInvalidInState)
 
-            self.print_instruction(36, "Manually put the device in the Docked(0x42) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
+            self.print_instruction(
+                36, "Manually put the device in the Docked(0x42) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag")
 
             await self.send_resume_cmd_with_check(37, op_errors.kCommandInvalidInState)
 
