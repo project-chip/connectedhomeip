@@ -45,10 +45,14 @@ class TC_FAN_3_2(MatterBaseTest):
         return result[0].Status
 
     def pics_TC_FAN_3_2(self) -> list[str]:
-        return ["FAN.S", "FAN.S.F00"]
+        return ["FAN.S"]
 
     @async_test_body
     async def test_TC_FAN_3_2(self):
+        if not self.check_pics("FAN.S.F00"):
+            logger.info("Test skipped because PICS FAN.S.F00 is not set")
+            return
+
         endpoint = self.user_params.get("endpoint", 1)
 
         self.print_step(1, "Commissioning, already done")

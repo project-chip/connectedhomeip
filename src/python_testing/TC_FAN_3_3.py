@@ -43,10 +43,14 @@ class TC_FAN_3_3(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "RockSetting write failed")
 
     def pics_TC_FAN_3_3(self) -> list[str]:
-        return ["FAN.S", "FAN.S.F02"]
+        return ["FAN.S"]
 
     @async_test_body
     async def test_TC_FAN_3_3(self):
+        if not self.check_pics("FAN.S.F02"):
+            logger.info("Test skipped because PICS FAN.S.F02 is not set")
+            return
+
         endpoint = self.user_params.get("endpoint", 1)
 
         self.print_step(1, "Commissioning, already done")
