@@ -451,7 +451,7 @@ class HostBuilder(GnBuilder):
             )
             return self.extra_gn_options
         elif "/lock-app" in self.root:
-            extra_gn_options.extend(["chip_enable_icd_server=true"])
+            self.extra_gn_options.extend(["chip_enable_icd_server=true"])
             return self.extra_gn_options
         else:
             raise Exception('Unknown host board type: %r' % self)
