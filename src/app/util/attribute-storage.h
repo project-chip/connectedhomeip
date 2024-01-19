@@ -159,10 +159,6 @@ void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath 
 EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-// Check whether there is an endpoint defined with the given endpoint id that is
-// enabled.
-bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
-
 // Note the difference in implementation from emberAfGetNthCluster().
 // emberAfGetClusterByIndex() retrieves the cluster by index regardless of server/client
 // and those indexes may be DIFFERENT than the indexes returned from
@@ -173,7 +169,6 @@ bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 //
 // Don't mix them.
 uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
-const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
 //
 // Retrieve the device type list associated with a specific endpoint.

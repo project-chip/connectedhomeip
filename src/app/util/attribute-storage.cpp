@@ -73,6 +73,21 @@ static uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * en
 // otherwise number of client clusters on the endpoint at the given index.
 static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
 
+// Check whether there is an endpoint defined with the given endpoint id that is
+// enabled.
+static bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
+
+// Note the difference in implementation from emberAfGetNthCluster().
+// emberAfGetClusterByIndex() retrieves the cluster by index regardless of server/client
+// and those indexes may be DIFFERENT than the indexes returned from
+// emberAfGetNthCluster().  In other words:
+//
+//  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster() emberAfGetNthClusterId()
+//  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
+//
+// Don't mix them.
+static const EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
+
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
