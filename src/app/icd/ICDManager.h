@@ -129,6 +129,15 @@ protected:
     uint8_t mCheckInRequestCount      = 0;
 
 private:
+    /**
+     * @brief Function checks if at least one client registration would require a Check-In message
+     *
+     * @return true At least one registration would require an Check-In message if we were entering ActiveMode.
+     * @return false None of the registration would require a Check-In message either because there are no registration or because
+     *               they all have associated subscriptions.
+     */
+    bool VerifyIfCheckInMessagesWouldBeSent();
+
     KeepActiveFlags mKeepActiveFlags{ 0 };
 
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.

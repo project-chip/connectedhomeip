@@ -272,7 +272,9 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        if (ICDConfigurationData::GetInstance().GetActiveModeDurationMs() > 0)
+        // unless the device would need to send a Check-In messages
+        // TODO(#30281) : Verify how persistant subscriptions affects this at ICDManager::Init
+        if (ICDConfigurationData::GetInstance().GetActiveModeDurationMs() > 0 || VerifyIfCheckInMessagesWouldBeSent())
         {
             uint32_t idleModeDuration = ICDConfigurationData::GetInstance().GetIdleModeDurationSec();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
@@ -538,5 +540,49 @@ void ICDManager::postObserverEvent(ObserverEventType event)
         }
     });
 }
+
+bool ICDManager::VerifyIfCheckInMessagesWouldBeSent()
+{
+    for (const auto & fabricInfo : *mFabricTable)
+    {
+        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
+
+        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
+                                 mSymmetricKeystore);
+        if (table.IsEmpty())
+        {
+            continue;
+        }
+
+        for (uint16_t i = 0; i < table.Limit(); i++)
+        {
+            ICDMonitoringEntry entry(mSymmetricKeystore);
+            CHIP_ERROR err = table.Get(i, entry);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                break;
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                // Try to fetch the next entry upon failure (should not happen).
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
+                continue;
+            }
+
+            bool isActive =
+                InteractionModelEngine::GetInstance()->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
+            if (!isActive)
+            {
+                // At least one registration would require a Check-In message
+                return true;
+            }
+        }
+    }
+
+    // None of the registrations would require
+    return false;
+}
+
 } // namespace app
 } // namespace chip
