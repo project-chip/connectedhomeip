@@ -8173,6 +8173,7 @@ endpoint 1 {
   }
 
   server cluster ElectricalPowerMeasurement {
+    emits event MeasurementPeriodRanges;
     callback attribute powerMode;
     callback attribute numberOfMeasurementTypes;
     callback attribute accuracy;
@@ -8186,6 +8187,8 @@ endpoint 1 {
   }
 
   server cluster ElectricalEnergyMeasurement {
+    emits event CumulativeEnergyMeasured;
+    emits event PeriodicEnergyMeasured;
     callback attribute accuracy;
     callback attribute cumulativeEnergyImported;
     callback attribute cumulativeEnergyExported;
