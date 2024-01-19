@@ -628,7 +628,6 @@ CHIP_ERROR FabricTable::FetchRootPubkey(FabricIndex fabricIndex, Crypto::P256Pub
 
 CHIP_ERROR FabricTable::FetchCATs(const FabricIndex fabricIndex, CATValues & cats) const
 {
-
     uint8_t nocBuf[Credentials::kMaxCHIPCertLength];
     MutableByteSpan nocSpan{ nocBuf };
     ReturnErrorOnFailure(FetchNOCCert(fabricIndex, nocSpan));
