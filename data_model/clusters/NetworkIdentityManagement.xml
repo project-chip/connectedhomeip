@@ -120,7 +120,7 @@ Davis, CA 95616, USA
   </attributes>
   <commands>
     <command id="0x00" name="AddOrUpdateClient" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ClientIdentity" type="octstr">
         <mandatoryConform/>
@@ -131,7 +131,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="RemoveClient" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="ClientNumber" type="uint16">
         <optionalConform choice="a"/>
@@ -142,7 +142,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x40" name="EndorseNetworkIdentityUpdate" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="NetworkIdentifier" type="octstr">
         <mandatoryConform/>
