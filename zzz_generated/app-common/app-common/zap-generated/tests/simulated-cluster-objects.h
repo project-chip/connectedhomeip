@@ -754,8 +754,7 @@ struct DiscoveryCommandResponse
     uint64_t rotatingIdLen;
     uint16_t pairingHint;
     chip::CharSpan pairingInstruction;
-    bool supportsTcpServer;
-    bool supportsTcpClient;
+    bool supportsTcp;
     uint8_t numIPs;
     uint16_t port;
     Optional<uint32_t> mrpRetryIntervalIdle;
@@ -780,14 +779,13 @@ struct DiscoveryCommandResponse
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(10), rotatingIdLen));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(11), pairingHint));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(12), pairingInstruction));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(13), supportsTcpClient));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(14), supportsTcpServer));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(15), numIPs));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(16), port));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(17), mrpRetryIntervalIdle));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(18), mrpRetryIntervalActive));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(19), mrpRetryActiveThreshold));
-        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(20), isICDOperatingAsLIT));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(13), supportsTcp));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(14), numIPs));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(15), port));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(16), mrpRetryIntervalIdle));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(17), mrpRetryIntervalActive));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(18), mrpRetryActiveThreshold));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(19), isICDOperatingAsLIT));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -844,27 +842,24 @@ struct DiscoveryCommandResponse
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, pairingInstruction));
                 break;
             case 13:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, supportsTcpClient));
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, supportsTcp));
                 break;
             case 14:
-                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, supportsTcpServer));
-                break;
-            case 15:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, numIPs));
                 break;
-            case 16:
+            case 15:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, port));
                 break;
-            case 17:
+            case 16:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryIntervalIdle));
                 break;
-            case 18:
+            case 17:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryIntervalActive));
                 break;
-            case 19:
+            case 18:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, mrpRetryActiveThreshold));
                 break;
-            case 20:
+            case 19:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, isICDOperatingAsLIT));
                 break;
             default:
