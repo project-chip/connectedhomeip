@@ -36,6 +36,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/Span.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestExtendedAssertions.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -4438,7 +4439,7 @@ static void AssertCannotReadString(nlTestSuite * inSuite, ContiguousBufferTLVRea
 static void CheckGetStringView(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t buf[256];
-    const char testString[] = "This is a test";
+    static const char testString[] = "This is a test";
     {
         TLVWriter writer;
         writer.Init(buf);
@@ -4646,6 +4647,281 @@ static void CheckTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestUninitializedWriter(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, !writer.IsInitialized());
+    }
+
+    {
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.Finalize() == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.ReserveBuffer(123) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.UnreserveBuffer(123) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint8_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int8_t v          = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int16_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int16_t v         = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int32_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int32_t v         = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int64_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        int64_t v         = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint8_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint8_t v         = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint16_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint16_t v        = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint32_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint32_t v        = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint64_t v = 3;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        uint64_t v        = 3;
+        bool preserveSize = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v, preserveSize) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        double v = 1.23;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        float v = 1.23f;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        bool v = true;
+        NL_TEST_ASSERT(inSuite, writer.PutBoolean(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        bool v = true;
+        NL_TEST_ASSERT(inSuite, writer.Put(ContextTag(1), v) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        const uint8_t buf[] = { 1, 2, 3 };
+        NL_TEST_ASSERT(inSuite,
+                       writer.PutBytes(ContextTag(1), buf, static_cast<uint32_t>(sizeof(buf))) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        const char * buf = "abc";
+        NL_TEST_ASSERT(inSuite, writer.PutString(ContextTag(1), buf) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        const char * buf = "abc";
+        NL_TEST_ASSERT(inSuite,
+                       writer.PutString(ContextTag(1), buf, static_cast<uint32_t>(strlen(buf))) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        CharSpan str = "abc"_span;
+        NL_TEST_ASSERT(inSuite, writer.PutString(ContextTag(1), str) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.PutStringF(ContextTag(1), "%d", 1) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.PutNull(ContextTag(1)) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        const uint8_t buf[]{ 0, 0, 0 };
+        TLVReader reader;
+        reader.Init(buf);
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.CopyElement(reader) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        const uint8_t buf[]{ 0, 0, 0 };
+        TLVReader reader;
+        reader.Init(buf);
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.CopyElement(ContextTag(1), reader) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        TLVType outerContainerType;
+
+        NL_TEST_ASSERT(inSuite,
+                       writer.StartContainer(ContextTag(1), TLVType::kTLVType_Structure, outerContainerType) ==
+                           CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter writer;
+        TLVType outerContainerType = TLVType::kTLVType_Structure;
+        NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter innerWriter;
+        uint8_t buf[]{ 0, 0, 0 };
+        innerWriter.Init(buf);
+        NL_TEST_ASSERT(inSuite, innerWriter.IsInitialized());
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite,
+                       writer.OpenContainer(ContextTag(1), TLVType::kTLVType_Structure, innerWriter) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        TLVWriter innerWriter;
+        uint8_t buf[]{ 0, 0, 0 };
+        innerWriter.Init(buf);
+        NL_TEST_ASSERT(inSuite, innerWriter.IsInitialized());
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.CloseContainer(innerWriter) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        uint8_t buf[]{ 0, 0, 0 };
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite,
+                       writer.PutPreEncodedContainer(ContextTag(1), TLVType::kTLVType_Structure, buf,
+                                                     static_cast<uint32_t>(sizeof(buf))) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        const uint8_t buf[]{ 0, 0, 0 };
+        TLVReader reader;
+        reader.Init(buf);
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.CopyContainer(reader) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        const uint8_t buf[]{ 0, 0, 0 };
+        TLVReader reader;
+        reader.Init(buf);
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite, writer.CopyContainer(ContextTag(1), reader) == CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        uint8_t buf[]{ 0, 0, 0 };
+
+        TLVWriter writer;
+        NL_TEST_ASSERT(inSuite,
+                       writer.CopyContainer(ContextTag(1), buf, static_cast<uint16_t>(sizeof(buf))) == CHIP_ERROR_INCORRECT_STATE);
+    }
+}
+
 // Test Suite
 
 /**
@@ -4684,6 +4960,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV GetStringView Test",         CheckGetStringView),
     NL_TEST_DEF("CHIP TLV GetByteView Test",           CheckGetByteView),
     NL_TEST_DEF("Int Min/Max Test",                    TestIntMinMax),
+    NL_TEST_DEF("Uninitialized Writer Test",           TestUninitializedWriter),
 
     NL_TEST_SENTINEL()
 };

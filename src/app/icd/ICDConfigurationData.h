@@ -20,11 +20,6 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
 
-#ifndef ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-// Set to 1 to enforce SIT Slow Polling Max value to 15seconds (spec 9.16.1.5)
-#define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
-#endif
-
 namespace chip {
 
 namespace app {

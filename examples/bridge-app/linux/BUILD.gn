@@ -44,3 +44,7 @@ executable("chip-bridge-app") {
 group("linux") {
   deps = [ ":chip-bridge-app" ]
 }
+
+group("default") {
+  deps = [ ":chip-bridge-app" ]
+}

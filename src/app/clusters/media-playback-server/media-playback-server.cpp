@@ -575,7 +575,10 @@ bool emberAfMediaPlaybackClusterActivateAudioTrackCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleActivateAudioTrack(trackId, audioOutputIndex);
+        if (!delegate->HandleActivateAudioTrack(trackId, audioOutputIndex))
+        {
+            status = Status::InvalidInState;
+        }
     }
 
 exit:
@@ -605,7 +608,10 @@ bool emberAfMediaPlaybackClusterActivateTextTrackCallback(
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleActivateTextTrack(trackId);
+        if (!delegate->HandleActivateTextTrack(trackId))
+        {
+            status = Status::InvalidInState;
+        }
     }
 
 exit:

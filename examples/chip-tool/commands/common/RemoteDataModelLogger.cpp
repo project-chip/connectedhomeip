@@ -21,21 +21,21 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/jsontlv/TlvJson.h>
 
-constexpr const char * kEventNumberKey    = "eventNumber";
-constexpr const char * kDataVersionKey    = "dataVersion";
-constexpr const char * kClusterIdKey      = "clusterId";
-constexpr const char * kEndpointIdKey     = "endpointId";
-constexpr const char * kAttributeIdKey    = "attributeId";
-constexpr const char * kEventIdKey        = "eventId";
-constexpr const char * kCommandIdKey      = "commandId";
-constexpr const char * kErrorIdKey        = "error";
-constexpr const char * kClusterErrorIdKey = "clusterError";
-constexpr const char * kValueKey          = "value";
-constexpr const char * kNodeIdKey         = "nodeId";
-constexpr const char * kNOCKey            = "NOC";
-constexpr const char * kICACKey           = "ICAC";
-constexpr const char * kRCACKey           = "RCAC";
-constexpr const char * kIPKKey            = "IPK";
+constexpr char kEventNumberKey[]    = "eventNumber";
+constexpr char kDataVersionKey[]    = "dataVersion";
+constexpr char kClusterIdKey[]      = "clusterId";
+constexpr char kEndpointIdKey[]     = "endpointId";
+constexpr char kAttributeIdKey[]    = "attributeId";
+constexpr char kEventIdKey[]        = "eventId";
+constexpr char kCommandIdKey[]      = "commandId";
+constexpr char kErrorIdKey[]        = "error";
+constexpr char kClusterErrorIdKey[] = "clusterError";
+constexpr char kValueKey[]          = "value";
+constexpr char kNodeIdKey[]         = "nodeId";
+constexpr char kNOCKey[]            = "NOC";
+constexpr char kICACKey[]           = "ICAC";
+constexpr char kRCACKey[]           = "RCAC";
+constexpr char kIPKKey[]            = "IPK";
 
 namespace {
 RemoteDataModelLoggerDelegate * gDelegate;

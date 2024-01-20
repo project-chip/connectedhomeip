@@ -42,3 +42,6 @@
 
 // Marks that a ModeBase Derived cluster is being used.
 #define EMBER_AF_PLUGIN_MODE_BASE
+
+// Enable batching of up to 5 commands.
+#define CHIP_CONFIG_MAX_PATHS_PER_INVOKE 5

@@ -52,8 +52,8 @@ namespace Internal {
 
 namespace {
 
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
-static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -776,10 +776,13 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+    // We StartScan in the ChipStack thread.
+    // StopScan should also be performed in the ChipStack thread.
+    // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
+    mDeviceScanner.StopScan();
+    // Stop scanning and then start connecting timer
     DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, &mEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    mDeviceScanner.StopScan();
 
     mEndpoint.ConnectDevice(device);
 }

@@ -1429,6 +1429,22 @@
               "reportableChange": 0
             },
             {
+              "name": "SupportedWiFiBands",
+              "code": 8,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "FeatureMap",
               "code": 65532,
               "mfgCode": null,
@@ -3142,8 +3158,8 @@
           ]
         },
         {
-          "name": "Scenes",
-          "code": 5,
+          "name": "Scenes Management",
+          "code": 98,
           "mfgCode": null,
           "define": "SCENES_CLUSTER",
           "side": "server",
@@ -3255,24 +3271,8 @@
               "isEnabled": 1
             },
             {
-              "name": "EnhancedAddScene",
-              "code": 64,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedViewScene",
-              "code": 65,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "CopyScene",
-              "code": 66,
+              "code": 64,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -3281,24 +3281,8 @@
           ],
           "attributes": [
             {
-              "name": "NameSupport",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "NameSupportBitmap",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x80",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
               "name": "LastConfiguredBy",
-              "code": 5,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "node_id",
@@ -3314,7 +3298,7 @@
             },
             {
               "name": "SceneTableSize",
-              "code": 6,
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
@@ -3330,7 +3314,7 @@
             },
             {
               "name": "FabricSceneInfo",
-              "code": 7,
+              "code": 2,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -3418,7 +3402,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "15",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

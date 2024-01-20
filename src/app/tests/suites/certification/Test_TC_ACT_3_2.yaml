@@ -132,9 +132,7 @@ tests:
     - label: "Step 2: DUT issues an StartAction command to TH"
       PICS: ACT.C.C02.Tx
       verification: |
-          ./chip-tool actions start-action 0 1 1
-
-          Note: Message log similar as in step 1
+          The reference app doesn't have implementation for this command
       disabled: true
 
     - label: "Step 3: DUT issues an StopAction command to TH"

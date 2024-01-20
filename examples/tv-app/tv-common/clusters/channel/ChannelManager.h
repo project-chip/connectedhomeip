@@ -31,6 +31,8 @@ using ChannelInfoType           = chip::app::Clusters::Channel::Structs::Channel
 using AdditionalInfoType        = chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type;
 using LineupInfoType            = chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type;
 using PageTokenType             = chip::app::Clusters::Channel::Structs::PageTokenStruct::Type;
+using ProgramType               = chip::app::Clusters::Channel::Structs::ProgramStruct::Type;
+using ChannelPagingType         = chip::app::Clusters::Channel::Structs::ChannelPagingStruct::Type;
 
 class ChannelManager : public ChannelDelegate
 {
@@ -66,6 +68,7 @@ protected:
     uint16_t mCurrentChannelIndex;
     ChannelInfoType mCurrentChannel;
     std::vector<ChannelInfoType> mChannels;
+    std::vector<ProgramType> mPrograms;
 
 private:
     // TODO: set this based upon meta data from app

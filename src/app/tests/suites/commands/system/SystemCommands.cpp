@@ -28,9 +28,9 @@ const char * getScriptsFolder()
 }
 } // namespace
 
-constexpr size_t kCommandMaxLen    = 256;
-constexpr size_t kArgumentMaxLen   = 128;
-constexpr const char * kDefaultKey = "default";
+constexpr size_t kCommandMaxLen  = 256;
+constexpr size_t kArgumentMaxLen = 128;
+constexpr char kDefaultKey[]     = "default";
 
 CHIP_ERROR SystemCommands::Start(const char * identity, const chip::app::Clusters::SystemCommands::Commands::Start::Type & value)
 {

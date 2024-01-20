@@ -30,6 +30,10 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
+#if CONFIG_BOOTLOADER_MCUBOOT
+#include <OTAUtil.h>
+#endif
+
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
@@ -245,6 +249,14 @@ CHIP_ERROR AppTaskCommon::StartApp(void)
 #if !CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     StartThreadButtonEventHandler();
 #endif
+
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        LOG_INF("Confirm image.");
+        OtaConfirmNewImage();
+    }
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     while (true)
     {
@@ -680,6 +692,23 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
+#endif
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+        if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
+        {
+            if (NFCMgr().IsTagEmulationStarted())
+            {
+                LOG_INF("NFC Tag emulation is already started");
+            }
+            else
+            {
+                ShareQRCodeOverNFC(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+            }
+        }
+        else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
+        {
+            NFCMgr().StopTagEmulation();
+        }
 #endif
         break;
     case DeviceEventType::kThreadStateChange:

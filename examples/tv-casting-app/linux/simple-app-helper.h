@@ -21,7 +21,6 @@
 #include "core/CastingPlayer.h"
 #include "core/CastingPlayerDiscovery.h"
 #include "core/Types.h"
-
 #include <platform/CHIPDeviceLayer.h>
 
 /**
@@ -30,6 +29,15 @@
  * 35 represents device type of Matter Video Player
  */
 const uint64_t kTargetPlayerDeviceType = 35;
+
+/**
+ * @brief Test values used for demo command and attribute read/subscribe calls
+ */
+const char kContentURL[]                          = "https://www.test.com/videoid";
+const char kContentDisplayStr[]                   = "Test video";
+const unsigned short kTimedInvokeCommandTimeoutMs = 5 * 1000;
+const uint16_t kMinIntervalFloorSeconds           = 0;
+const uint16_t kMaxIntervalCeilingSeconds         = 1;
 
 /**
  * @brief Singleton that reacts to CastingPlayer discovery results
