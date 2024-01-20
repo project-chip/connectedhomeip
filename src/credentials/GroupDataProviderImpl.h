@@ -156,16 +156,16 @@ protected:
     public:
         GroupKeyContext(GroupDataProviderImpl & provider) : mProvider(provider) {}
 
-        GroupKeyContext(GroupDataProviderImpl & provider, const Crypto::Aes128KeyByteArray & encryptionKey, uint16_t hash,
-                        const Crypto::Aes128KeyByteArray & privacyKey) :
+        GroupKeyContext(GroupDataProviderImpl & provider, const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
+                        const Crypto::Symmetric128BitsKeyByteArray & privacyKey) :
             mProvider(provider)
 
         {
             Initialize(encryptionKey, hash, privacyKey);
         }
 
-        void Initialize(const Crypto::Aes128KeyByteArray & encryptionKey, uint16_t hash,
-                        const Crypto::Aes128KeyByteArray & privacyKey)
+        void Initialize(const Crypto::Symmetric128BitsKeyByteArray & encryptionKey, uint16_t hash,
+                        const Crypto::Symmetric128BitsKeyByteArray & privacyKey)
         {
             ReleaseKeys();
             mKeyHash = hash;

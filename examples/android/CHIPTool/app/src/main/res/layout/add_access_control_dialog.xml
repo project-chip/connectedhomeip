@@ -24,6 +24,19 @@
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/titleText"
+      app:layout_constraintBottom_toTopOf="@+id/nodeIdEd"/>
+
+  <EditText
+      android:id="@+id/nodeIdEd"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:hint="@string/ota_provider_node_id_text"
+      android:inputType="number"
+      android:textSize="16sp"
+      android:layout_marginBottom="8dp"
+      android:visibility="gone"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/groupIdEd"
       app:layout_constraintBottom_toTopOf="@+id/accessControlEntryTv"/>
 
   <TextView
@@ -34,7 +47,7 @@
       android:textSize="16sp"
       android:layout_marginTop="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/groupIdEd"
+      app:layout_constraintTop_toBottomOf="@id/nodeIdEd"
       app:layout_constraintBottom_toTopOf="@id/accessControlEntrySp"
       />
 
@@ -47,7 +60,7 @@
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/accessControlEntryTv"
-      app:layout_constraintBottom_toTopOf="@+id/addGroupDialogBtn"/>
+      app:layout_constraintBottom_toTopOf="@+id/addAccessControlBtn"/>
 
   <Button
       android:id="@+id/addAccessControlBtn"

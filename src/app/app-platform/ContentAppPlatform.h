@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/app-platform/ContentApp.h>
 #include <app/util/attribute-storage.h>
 #include <controller/CHIPCluster.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
 
 using chip::app::Clusters::ApplicationBasic::CatalogVendorApp;
 using chip::Controller::CommandResponseFailureCallback;
@@ -149,9 +149,15 @@ public:
     // unset this as current app, if it is current app
     void UnsetIfCurrentApp(ContentApp * app);
 
-    // loads content app identified by vid/pid of client and calls HandleGetSetupPin.
-    // Returns 0 if pin cannot be obtained.
-    uint32_t GetPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId);
+    // loads content app identified by vid/pid of client and calls HandleGetSetupPasscode.
+    // Returns 0 if passcode cannot be obtained.
+    uint32_t GetPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId);
+
+    // locates app identified by target info and confirms that it grants access to given vid/pid of client,
+    // loads given app and calls HandleGetSetupPasscode. Sets passcode to 0 if it cannot be obtained.
+    // return true if a matching app was found (and it granted this client access), even if a passcode was not obtained
+    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId,
+                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode);
 
     /**
      * @brief

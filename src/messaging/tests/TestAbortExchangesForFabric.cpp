@@ -32,6 +32,10 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#endif
+
 namespace {
 
 using namespace chip;
@@ -163,10 +167,10 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
     const auto & sessionHandle1 = session1.Get();
     const auto & sessionHandle2 = session2.Get();
 
-    session1->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+    session1->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
         Test::MessagingContext::kResponsiveIdleRetransTimeout, Test::MessagingContext::kResponsiveActiveRetransTimeout));
 
-    session1Reply->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+    session1Reply->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig(
         Test::MessagingContext::kResponsiveIdleRetransTimeout, Test::MessagingContext::kResponsiveActiveRetransTimeout));
 
     NL_TEST_ASSERT(inSuite, session1);
@@ -209,7 +213,7 @@ void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx,
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
         // If running as an ICD, increase waitTimeout to account for the polling interval
-        waitTimeout += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+        waitTimeout += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 #endif
 
         // Account for the retry delay booster, so that we do not timeout our IO processing before the
@@ -254,12 +258,16 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL(),
 };
 
+// clang-format off
 nlTestSuite sSuite = {
     "Test-AbortExchangesForFabric",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
+// clang-format on
 
 } // namespace
 

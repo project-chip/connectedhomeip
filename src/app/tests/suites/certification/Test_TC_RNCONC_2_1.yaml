@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 145.1.2. [TC-RNCONC-2.1] Attributes with server as DUT
+name: 145.1.2. [TC-RNCONC-2.1] Attributes with DUT as Server
 
 PICS:
     - RNCONC.S
@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -133,3 +135,12 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 4
+
+    - label: "Step 12: TH reads from the DUT the Uncertainty attribute."
+      PICS: RNCONC.S.A0007
+      command: "readAttribute"
+      attribute: "Uncertainty"
+      response:
+          constraints:
+              type: single
+              minValue: 0

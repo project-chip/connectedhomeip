@@ -102,21 +102,21 @@ static const SceneStorageId sceneId12(kScene6, kGroup4);
 CharSpan empty;
 
 // Scene data
-static const SceneData sceneData1(CharSpan("Scene #1"));
-static const SceneData sceneData2(CharSpan("Scene #2"), 2000);
-static const SceneData sceneData3(CharSpan("Scene #3"), 250);
-static const SceneData sceneData4(CharSpan("Scene num4"), 5000);
+static const SceneData sceneData1("Scene #1"_span);
+static const SceneData sceneData2("Scene #2"_span, 2000);
+static const SceneData sceneData3("Scene #3"_span, 250);
+static const SceneData sceneData4("Scene num4"_span, 5000);
 static const SceneData sceneData5(empty);
-static const SceneData sceneData6(CharSpan("Scene #6"), 3000);
-static const SceneData sceneData7(CharSpan("Scene #7"), 20000);
-static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG!"), 15000);
-static const SceneData sceneData9(CharSpan("Scene #9"), 3000);
-static const SceneData sceneData10(CharSpan("Scene #10"), 1000);
-static const SceneData sceneData11(CharSpan("Scene #11"), 50);
-static const SceneData sceneData12(CharSpan("Scene #12"), 100);
-static const SceneData sceneData13(CharSpan("Scene #13"), 100);
-static const SceneData sceneData14(CharSpan("Scene #14"), 100);
-static const SceneData sceneData15(CharSpan("Scene #15"), 100);
+static const SceneData sceneData6("Scene #6"_span, 3000);
+static const SceneData sceneData7("Scene #7"_span, 20000);
+static const SceneData sceneData8("NAME TOO LOOONNG!"_span, 15000);
+static const SceneData sceneData9("Scene #9"_span, 3000);
+static const SceneData sceneData10("Scene #10"_span, 1000);
+static const SceneData sceneData11("Scene #11"_span, 50);
+static const SceneData sceneData12("Scene #12"_span, 100);
+static const SceneData sceneData13("Scene #13"_span, 100);
+static const SceneData sceneData14("Scene #14"_span, 100);
+static const SceneData sceneData15("Scene #15"_span, 100);
 
 // Scenes
 SceneTableEntry scene1(sceneId1, sceneData1);
@@ -136,13 +136,13 @@ SceneTableEntry scene14(sceneId11, sceneData14);
 SceneTableEntry scene15(sceneId12, sceneData15);
 
 // Clusters EFS data
-static app::Clusters::Scenes::Structs::ExtensionFieldSet::Type OOextensionFieldSet;
-static app::Clusters::Scenes::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
-static app::Clusters::Scenes::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type OOextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type LCextensionFieldSet;
+static app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type CCextensionFieldSet;
 
-static app::Clusters::Scenes::Structs::AttributeValuePair::Type OOPairs[1];
-static app::Clusters::Scenes::Structs::AttributeValuePair::Type LCPairs[2];
-static app::Clusters::Scenes::Structs::AttributeValuePair::Type CCPairs[8];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type OOPairs[1];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type LCPairs[2];
+static app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type CCPairs[8];
 
 static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -496,8 +496,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
     VerifyOrReturn(nullptr != sceneTable);
 
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
 
     TLV::TLVReader reader;
     TLV::TLVWriter writer;
@@ -644,9 +644,9 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(buffer, 0, buff_span.size());
 
     // To test failure on serialize and deserialize when too many pairs are in the field sets
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
-    app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
-    app::Clusters::Scenes::Structs::AttributeValuePair::Type TooManyPairs[16];
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::Type extensionFieldFailTestOut;
+    app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType extensionFieldFailTestIn;
+    app::Clusters::ScenesManagement::Structs::AttributeValuePair::Type TooManyPairs[16];
 
     uint8_t payloadOk = 0;
     for (uint8_t i = 0; i < 16; i++)
@@ -682,6 +682,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(failBuffer, 0, fail_list.size());
     memset(buffer, 0, buff_span.size());
 };
+
+void TestHandlerHelpers(nlTestSuite * aSuite, void * aContext) {}
 
 void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 {
@@ -1411,6 +1413,7 @@ void TestEndpointScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene7));
     // scene count to Endpoint
 
+    // Endpoint 3 still unafected
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint3, defaultTestTableSize);
     NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
     VerifyOrReturn(nullptr != sceneTable);
@@ -1418,6 +1421,69 @@ void TestEndpointScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, defaultTestFabricCapacity == fabric_capacity);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetRemainingCapacity(kFabric2, fabric_capacity));
     NL_TEST_ASSERT(aSuite, defaultTestFabricCapacity == fabric_capacity);
+
+    // Fill fabric 1 endpoint 3
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene3));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene4));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene5));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene6));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene7));
+
+    // Test removal of Endpoint clears scene on all fabrics for that endpoint
+    sceneTable = scenes::GetSceneTableImpl(kTestEndpoint2, defaultTestTableSize);
+    NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
+    VerifyOrReturn(nullptr != sceneTable);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveEndpoint());
+
+    // Check Fabric1 on Endpoint 2
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId4, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId5, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId6, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId7, scene));
+
+    // Check Fabric 1 and 2 on Endpoint 1
+    sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
+    NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
+    VerifyOrReturn(nullptr != sceneTable);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
+
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId4, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId5, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId6, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId7, scene));
+
+    // Check Fabric 1 on Endpoint 3
+    sceneTable = scenes::GetSceneTableImpl(kTestEndpoint3, defaultTestTableSize);
+    NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
+    VerifyOrReturn(nullptr != sceneTable);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
 
     // Test removal of fabric clears scene fabric on all endpoints
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint1, defaultTestTableSize);
@@ -1431,7 +1497,6 @@ void TestEndpointScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId8, scene));
 
     sceneTable = scenes::GetSceneTableImpl(kTestEndpoint2, defaultTestTableSize);
     NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
@@ -1443,7 +1508,17 @@ void TestEndpointScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId8, scene));
+
+    sceneTable = scenes::GetSceneTableImpl(kTestEndpoint3, defaultTestTableSize);
+    NL_TEST_ASSERT(aSuite, nullptr != sceneTable);
+    VerifyOrReturn(nullptr != sceneTable);
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId7, scene));
 
     sceneTable->RemoveFabric(kFabric2);
 

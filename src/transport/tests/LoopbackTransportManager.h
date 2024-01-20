@@ -38,6 +38,7 @@ public:
     // Shutdown all layers, finalize operations
     void Shutdown()
     {
+        mTransportManager.Close();
         GetLoopback().ShutdownLoopbackTransport();
         mIOContext.Shutdown();
     }

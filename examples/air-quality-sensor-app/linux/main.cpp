@@ -21,7 +21,7 @@
 #include <air-quality-sensor-manager.h>
 
 #include <app/util/af.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
@@ -35,7 +35,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
-constexpr const char kChipEventFifoPathPrefix[] = "/tmp/chip_air_quality_fifo_";
+constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_air_quality_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 AirQualitySensorAppAttrUpdateDelegate sAirQualitySensorAppCommandDelegate;
 } // namespace

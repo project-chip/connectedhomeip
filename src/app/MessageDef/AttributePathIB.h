@@ -21,7 +21,7 @@
 #include "ListBuilder.h"
 #include "ListParser.h"
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
@@ -43,6 +43,12 @@ enum class Tag : uint8_t
     kCluster              = 3,
     kAttribute            = 4,
     kListIndex            = 5,
+};
+
+enum class ValidateIdRanges : uint8_t
+{
+    kYes,
+    kNo,
 };
 
 class Parser : public ListParser
@@ -136,10 +142,13 @@ public:
      *        as ReplaceAll if that's appropriate to their context.
      *
      *  @param [in] aAttributePath    The attribute path object to write to.
+     *  @param [in] aValidateRanges   Whether to validate that the cluster/attribute
+     *                                IDs in the path are in the right ranges.
      *
      *  @return #CHIP_NO_ERROR on success
      */
-    CHIP_ERROR GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath) const;
+    CHIP_ERROR GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                        ValidateIdRanges aValidateRanges = ValidateIdRanges::kYes) const;
 
     /**
      * @brief Get a group attribute path.  This will set the ListOp to
@@ -148,10 +157,13 @@ public:
      *        endpoint id of the resulting path might have any value.
      *
      *  @param [in] aAttributePath    The attribute path object to write to.
+     *  @param [in] aValidateRanges   Whether to validate that the cluster/attribute
+     *                                IDs in the path are in the right ranges.
      *
      *  @return #CHIP_NO_ERROR on success
      */
-    CHIP_ERROR GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath) const;
+    CHIP_ERROR GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath,
+                                     ValidateIdRanges aValidateRanges = ValidateIdRanges::kYes) const;
 
     // TODO(#14934) Add a function to get ConcreteDataAttributePath from AttributePathIB::Parser directly.
 

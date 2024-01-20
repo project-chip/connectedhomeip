@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <bitmap name="Feature" type="bitmap32">
+    <cluster code="0x0081"/>
+    <field name="TimeSync" mask="0x01"/>
+    <field name="Level" mask="0x02"/>
+  </bitmap>
+
+  <bitmap name="ValveFaultBitmap" type="bitmap16">
+    <cluster code="0x0081"/>
+    <field name="GeneralFault" mask="0x01"/>
+    <field name="Blocked" mask="0x02"/>
+    <field name="Leaking" mask="0x04"/>
+    <field name="NotConnected" mask="0x08"/>
+    <field name="ShortCircuit" mask="0x10"/>
+    <field name="CurrentExceeded" mask="0x20"/>
+  </bitmap>
+
+  <enum name="ValveStateEnum" type="enum8">
+    <cluster code="0x0081"/>
+    <item name="Closed" value="0x0"/>
+    <item name="Open" value="0x1"/>
+    <item name="Transitioning" value="0x2"/>
+  </enum>
+
+  <enum name="StatusCodeEnum" type="enum8">
+    <cluster code="0x0081"/>
+     <item name="FailureDueToFault" value="0x02"/>
+  </enum>
+
+  <cluster apiMaturity="provisional">
+    <domain>HVAC</domain>
+    <name>Valve Configuration and Control</name>
+    <code>0x0081</code>
+    <define>VALVE_CONFIGURATION_AND_CONTROL_CLUSTER</define>
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+    <description>This cluster is used to configure a valve.</description>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
+    <!-- Therefore, this check needs to be done in code. -->
+    <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" writable="false" optional="false">OpenDuration</attribute>
+    <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
+    <!-- Therefore, this check needs to be done in code. -->
+    <attribute side="server" code="0x0001" define="DEFAULT_OPEN_DURATION" type="elapsed_s" isNullable="true" writable="true" optional="false">DefaultOpenDuration</attribute>
+    <attribute side="server" code="0x0002" define="AUTO_CLOSE_TIME" type="epoch_us" isNullable="true" writable="false" optional="true">AutoCloseTime</attribute>
+    <attribute side="server" code="0x0003" define="REMAINING_DURATION" type="elapsed_s" isNullable="true" writable="false" optional="false">RemainingDuration</attribute>
+    <attribute side="server" code="0x0004" define="CURRENT_STATE" type="ValveStateEnum" isNullable="true" writable="false" optional="false">CurrentState</attribute>
+    <attribute side="server" code="0x0005" define="TARGET_STATE" type="ValveStateEnum" isNullable="true" writable="false" optional="false">TargetState</attribute>
+    <attribute side="server" code="0x0006" define="CURRENT_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">CurrentLevel</attribute>
+    <attribute side="server" code="0x0007" define="TARGET_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">TargetLevel</attribute>
+    <attribute side="server" code="0x0008" define="DEFAULT_OPEN_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" default="100" optional="true">DefaultOpenLevel</attribute>
+    <attribute side="server" code="0x0009" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
+    <attribute side="server" code="0x000A" define="LEVEL_STEP" type="int8u" min="1" max="50" isNullable="false" writable="false" optional="true">LevelStep</attribute>
+
+    <command source="client" code="0x00" name="Open" optional="false">
+      <description>This command is used to set the valve to its open position.</description>
+      <arg name="OpenDuration" type="elapsed_s" optional="true" isNullable="true"/>
+      <arg name="TargetLevel" type="percent" optional="true"/>
+    </command>
+
+    <command source="client" code="0x01" name="Close" optional="false">
+      <description>This command is used to set the valve to its closed position.</description>
+    </command>
+
+    <event side="server" code="0x00" priority="info" name="ValveStateChanged" optional="true">
+      <description>This event SHALL be generated when the valve state changed.</description>
+      <field id="0" name="ValveState" type="ValveStateEnum"/>
+      <field id="1" name="ValveLevel" type="percent" optional="true"/>
+    </event>
+
+    <event side="server" code="0x01" priority="info" name="ValveFault" optional="true">
+      <description>This event SHALL be generated when the valve registers or clears a fault.</description>
+      <field id="0" name="ValveFault" type="ValveFaultBitmap"/>
+    </event>
+  </cluster>
+</configurator>

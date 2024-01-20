@@ -113,11 +113,17 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_WRONG_ENCRYPTION_TYPE.AsInteger():
         desc = "Wrong encryption type";
         break;
+    case CHIP_ERROR_INVALID_UTF8.AsInteger():
+        desc = "Character string is not a valid utf-8 encoding";
+        break;
     case CHIP_ERROR_INTEGRITY_CHECK_FAILED.AsInteger():
         desc = "Integrity check failed";
         break;
     case CHIP_ERROR_INVALID_SIGNATURE.AsInteger():
         desc = "Invalid signature";
+        break;
+    case CHIP_ERROR_INVALID_TLV_CHAR_STRING.AsInteger():
+        desc = "Invalid TLV Char string encoding.";
         break;
     case CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE.AsInteger():
         desc = "Unsupported signature type";
@@ -134,17 +140,17 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_WRONG_KEY_TYPE.AsInteger():
         desc = "Wrong key type";
         break;
-    case CHIP_ERROR_WELL_UNINITIALIZED.AsInteger():
-        desc = "Well uninitialized";
+    case CHIP_ERROR_UNINITIALIZED.AsInteger():
+        desc = "Uninitialized";
         break;
-    case CHIP_ERROR_WELL_EMPTY.AsInteger():
-        desc = "Well empty";
+    case CHIP_ERROR_INVALID_IPK.AsInteger():
+        desc = "Invalid IPK";
         break;
     case CHIP_ERROR_INVALID_STRING_LENGTH.AsInteger():
         desc = "Invalid string length";
         break;
     case CHIP_ERROR_INVALID_LIST_LENGTH.AsInteger():
-        desc = "invalid list length";
+        desc = "Invalid list length";
         break;
     case CHIP_END_OF_TLV.AsInteger():
         desc = "End of TLV";

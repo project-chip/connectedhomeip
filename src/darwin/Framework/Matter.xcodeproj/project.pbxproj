@@ -1901,6 +1901,13 @@
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				USER_HEADER_SEARCH_PATHS = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+					"-Wno-documentation",
+				);
 			};
 			name = Debug;
 		};
@@ -1970,6 +1977,13 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "";
+				WARNING_CFLAGS = (
+					"-Wformat",
+					"-Wformat-nonliteral",
+					"-Wformat-security",
+					"-Wconversion",
+					"-Wno-documentation",
+				);
 			};
 			name = Release;
 		};

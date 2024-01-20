@@ -80,7 +80,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: TH_CR1 opens a commissioning window on DUT_CE"
+    - label:
+          "Step 2: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       identity: "alpha"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -122,7 +124,9 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
-    - label: "Step 4: TH_CR1 opens a commissioning window on DUT_CE"
+    - label:
+          "Step 4: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       identity: "alpha"
       cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
@@ -142,7 +146,7 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    - label: "Step 5: TH_CR3 Commissions with DUT_CE"
+    - label: "Step 5: TH_CR3 starts a commissioning process with DUT_CE"
       PICS: CADMIN.S
       identity: "gamma"
       cluster: "CommissionerCommands"
@@ -244,7 +248,9 @@ tests:
                       { Label: "", FabricIndex: 3, NodeID: nodeId3 },
                   ]
 
-    - label: "Step 11: TH_CR1 opens a commissioning window on DUT_CE using BCM"
+    - label:
+          "Step 11: TH_CR1 opens a commissioning window on DUT_CE using a
+          commissioning timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       identity: "alpha"
       PICS: CADMIN.S.C01.Rsp
       cluster: "Administrator Commissioning"

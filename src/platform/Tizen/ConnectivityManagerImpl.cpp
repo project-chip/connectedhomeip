@@ -27,10 +27,9 @@
 #include <wifi-manager.h>
 #endif
 
-#include <inet/InetBuildConfig.h>
+#include <inet/InetConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>

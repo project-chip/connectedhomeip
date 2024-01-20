@@ -27,6 +27,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
+#include <controller/python/chip/native/PyChipError.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 // #include <support/CHIPMem.h>
@@ -118,21 +119,11 @@ void pychip_server_set_callbacks(PostAttributeChangeCallback cb)
     gPythonServerDelegate.SetPostAttributeChangeCallback(cb);
 }
 
-void pychip_server_native_init()
+PyChipError pychip_server_native_init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: memory init failed: %s", chip::ErrorStr(err));
-    }
-
-    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-    }
+    PyReturnErrorOnFailure(ToPyChipError(Platform::MemoryInit()));
+    PyReturnErrorOnFailure(ToPyChipError(DeviceLayer::PlatformMgr().InitChipStack()));
 
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
@@ -169,24 +160,20 @@ void pychip_server_native_init()
 
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    PyReturnErrorOnFailure(ToPyChipError(initParams.InitializeStaticResourcesBeforeServerInit()));
     initParams.operationalServicePort        = CHIP_PORT;
     initParams.userDirectedCommissioningPort = CHIP_UDC_PORT;
 
-    chip::Server::GetInstance().Init(initParams);
+    PyReturnErrorOnFailure(ToPyChipError(chip::Server::GetInstance().Init(initParams)));
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    err = chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to initialize CHIP stack: platform init failed: %s", chip::ErrorStr(err));
-    }
+    PyReturnErrorOnFailure(ToPyChipError(chip::DeviceLayer::PlatformMgr().StartEventLoopTask()));
 
     atexit(CleanShutdown);
 
-    return /*err*/;
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 }
 

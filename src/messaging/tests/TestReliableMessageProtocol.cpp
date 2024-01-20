@@ -45,6 +45,10 @@
 #include <messaging/Flags.h>
 #include <messaging/tests/MessagingContext.h>
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#endif
+
 namespace {
 
 using namespace chip;
@@ -53,8 +57,6 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 using namespace chip::System::Clock::Literals;
-
-using TestContext = Test::LoopbackMessagingContext;
 
 const char PAYLOAD[] = "Hello!";
 
@@ -65,6 +67,19 @@ const char PAYLOAD[] = "Hello!";
 // This adds extra I/O time to account for this. See the documentation for
 // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST for more details.
 constexpr auto retryBoosterTimeout = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS * CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
+
+class TestContext : public chip::Test::LoopbackMessagingContext
+{
+public:
+    // Performs setup for each individual test in the test suite
+    CHIP_ERROR SetUp() override
+    {
+        ReturnErrorOnFailure(chip::Test::LoopbackMessagingContext::SetUp());
+        GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
+        GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
+        return CHIP_NO_ERROR;
+    }
+};
 
 class MockAppDelegate : public UnsolicitedMessageHandler, public ExchangeDelegate
 {
@@ -322,7 +337,6 @@ public:
     static void CheckGetBackoff(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext);
     static void CheckApplicationResponseNeverComes(nlTestSuite * inSuite, void * inContext);
-    static int InitializeTestCase(void * inContext);
 };
 
 void TestReliableMessageProtocol::CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
@@ -395,10 +409,10 @@ void TestReliableMessageProtocol::CheckResendApplicationMessage(nlTestSuite * in
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         System::Clock::Timestamp(300), // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         System::Clock::Timestamp(300), // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's drop the initial message
     auto & loopback               = ctx.GetLoopback();
@@ -508,10 +522,10 @@ void TestReliableMessageProtocol::CheckCloseExchangeAndResendApplicationMessage(
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's drop the initial message
     auto & loopback               = ctx.GetLoopback();
@@ -567,10 +581,10 @@ void TestReliableMessageProtocol::CheckFailedMessageRetainOnSend(nlTestSuite * i
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     mockSender.mMessageDispatch.mRetainMessageOnSend = false;
     // Let's drop the initial message
@@ -657,10 +671,10 @@ void TestReliableMessageProtocol::CheckResendApplicationMessageWithPeerExchange(
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's drop the initial message
     auto & loopback               = ctx.GetLoopback();
@@ -719,10 +733,10 @@ void TestReliableMessageProtocol::CheckDuplicateMessageClosedExchange(nlTestSuit
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
     auto & loopback               = ctx.GetLoopback();
@@ -786,10 +800,10 @@ void TestReliableMessageProtocol::CheckDuplicateOldMessageClosedExchange(nlTestS
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
     auto & loopback               = ctx.GetLoopback();
@@ -887,10 +901,10 @@ void TestReliableMessageProtocol::CheckResendSessionEstablishmentMessageWithPeer
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's drop the initial message
     auto & loopback               = inctx.GetLoopback();
@@ -951,10 +965,10 @@ void TestReliableMessageProtocol::CheckDuplicateMessage(nlTestSuite * inSuite, v
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Let's not drop the message. Expectation is that it is received by the peer, but the ack is dropped
     auto & loopback               = ctx.GetLoopback();
@@ -1453,10 +1467,10 @@ void TestReliableMessageProtocol::CheckLostResponseWithPiggyback(nlTestSuite * i
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     // Make sure that we resend our message before the other side does.
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         64_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // We send a message, the other side sends an application-level response
     // (which is lost), then we do a retransmit that is acked, then the other
@@ -1491,10 +1505,10 @@ void TestReliableMessageProtocol::CheckLostResponseWithPiggyback(nlTestSuite * i
     // Make sure receiver resends after sender does, and there's enough of a gap
     // that we are very unlikely to actually trigger the resends on the receiver
     // when we trigger the resends on the sender.
-    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         256_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         256_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     // Now send a message from the other side, but drop it.
     loopback.mNumMessagesToDrop = 1;
@@ -1601,10 +1615,10 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
 
     mockSender.mTestSuite = inSuite;
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         1000_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
@@ -1655,10 +1669,10 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     NL_TEST_ASSERT(inSuite, !exchange->HasReceivedAtLeastOneMessage());
     NL_TEST_ASSERT(inSuite, mockReceiver.mExchange->HasReceivedAtLeastOneMessage());
 
-    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         100_ms32,  // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     mockReceiver.mRetainExchange = false;
     mockSender.mRetainExchange   = false;
@@ -1832,7 +1846,7 @@ void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * 
             auto maxBackoff = test.backoffMax + retryBoosterTimeout;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
             // If running as an ICD, increase maxBackoff to account for the polling interval
-            maxBackoff += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+            maxBackoff += ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 #endif
             NL_TEST_ASSERT(inSuite, backoff <= maxBackoff);
         }
@@ -1870,10 +1884,10 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
 
@@ -1932,10 +1946,10 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     loopback.mNumMessagesToDrop   = kMaxMRPTransmits - 1;
     loopback.mDroppedMessageCount = 0;
 
-    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
@@ -2032,10 +2046,10 @@ void TestReliableMessageProtocol::CheckApplicationResponseNeverComes(nlTestSuite
     ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     NL_TEST_ASSERT(inSuite, rm != nullptr);
 
-    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
+    exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
         30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
         30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
-    });
+    }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
 
@@ -2130,14 +2144,6 @@ void TestReliableMessageProtocol::CheckApplicationResponseNeverComes(nlTestSuite
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-int TestReliableMessageProtocol::InitializeTestCase(void * inContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(inContext);
-    ctx.GetSessionAliceToBob()->AsSecureSession()->SetRemoteMRPConfig(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
-    ctx.GetSessionBobToAlice()->AsSecureSession()->SetRemoteMRPConfig(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
-    return SUCCESS;
-}
-
 /**
  * TODO: A test that we should have but can't write with the existing
  * infrastructure we have:
@@ -2199,9 +2205,10 @@ const nlTest sTests[] = {
 nlTestSuite sSuite = {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize,
-    TestReliableMessageProtocol::InitializeTestCase,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
 // clang-format on
 

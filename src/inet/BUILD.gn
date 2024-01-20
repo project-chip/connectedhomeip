@@ -20,12 +20,15 @@ import("//build_overrides/nlio.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
 if (chip_system_config_use_open_thread_inet_endpoints) {
   import("//build_overrides/openthread.gni")
+}
+
+if (chip_system_config_use_lwip) {
+  import("//build_overrides/lwip.gni")
 }
 
 declare_args() {
@@ -56,6 +59,8 @@ buildconfig_header("inet_buildconfig") {
 
   defines += [ "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>" ]
   defines += [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl${chip_system_config_inet}.h>" ]
+
+  visibility = [ ":inet_config_header" ]
 }
 
 source_set("inet_config_header") {
@@ -63,10 +68,9 @@ source_set("inet_config_header") {
 
   public_configs = [ "${chip_root}/src:includes" ]
 
-  public_deps = [
-    ":inet_buildconfig",
-    "${chip_root}/src/system:system_config_header",
-  ]
+  public_deps = [ "${chip_root}/src/system:system_config_header" ]
+
+  deps = [ ":inet_buildconfig" ]
 }
 
 static_library("inet") {
@@ -97,14 +101,14 @@ static_library("inet") {
   public_deps = [
     ":inet_config_header",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/platform:platform_buildconfig",
+    "${chip_root}/src/platform:platform_config_header",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
 
   if (chip_system_config_use_lwip) {
     sources += [ "EndPointStateLwIP.cpp" ]
-    public_deps += [ "${chip_root}/src/lwip" ]
+    public_deps += [ "${lwip_root}:lwip" ]
   }
 
   if (chip_system_config_use_open_thread_inet_endpoints) {

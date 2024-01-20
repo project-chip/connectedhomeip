@@ -25,8 +25,12 @@
 #include "LEDWidget.h"
 #endif
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
 #include "PWMDevice.h"
+#endif
+
+#ifdef CONFIG_WS2812_STRIP
+#include "WS2812Device.h"
 #endif
 
 #include <zephyr/drivers/gpio.h>
@@ -117,7 +121,7 @@ protected:
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
-#if APP_USE_IDENTIFY_PWM
+#ifdef APP_USE_IDENTIFY_PWM
     PWMDevice mPwmIdentifyLed;
 
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);

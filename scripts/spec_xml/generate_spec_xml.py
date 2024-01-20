@@ -16,12 +16,18 @@
 
 import glob
 import os
+import re
 import subprocess
 
 import click
 
 DEFAULT_CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 DEFAULT_OUTPUT_DIR = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'data_model'))
+
+
+def get_xml_path(filename, output_dir):
+    xml = os.path.basename(filename).replace('.adoc', '.xml')
+    return os.path.abspath(os.path.join(output_dir, xml))
 
 
 @click.command()
@@ -45,8 +51,14 @@ DEFAULT_OUTPUT_DIR = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'data_model
     is_flag=True,
     help='Flag for dry run')
 def main(scraper, spec_root, output_dir, dry_run):
-    # TODO: Add scrapers for device types
+    # Clusters need to be scraped first because the cluster directory is passed to the device type directory
+    scrape_clusters(scraper, spec_root, output_dir, dry_run)
+    scrape_device_types(scraper, spec_root, output_dir, dry_run)
+    if not dry_run:
+        dump_versions(scraper, spec_root, output_dir)
 
+
+def scrape_clusters(scraper, spec_root, output_dir, dry_run):
     src_dir = os.path.abspath(os.path.join(spec_root, 'src'))
     sdm_clusters_dir = os.path.abspath(os.path.join(src_dir, 'service_device_management'))
     app_clusters_dir = os.path.abspath(os.path.join(src_dir, 'app_clusters'))
@@ -54,7 +66,8 @@ def main(scraper, spec_root, output_dir, dry_run):
     media_clusters_dir = os.path.abspath(os.path.join(app_clusters_dir, 'media'))
     clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
     dm_clusters_list = ['ACL-Cluster.adoc', 'Binding-Cluster.adoc', 'bridge-clusters.adoc',
-                        'Descriptor-Cluster.adoc', 'Group-Key-Management-Cluster.adoc', 'Label-Cluster.adoc']
+                        'Descriptor-Cluster.adoc', 'Group-Key-Management-Cluster.adoc', 'ICDManagement.adoc',
+                        'Label-Cluster.adoc']
     sdm_exclude_list = ['AdminAssistedCommissioningFlows.adoc', 'BulkDataExchange.adoc', 'CommissioningFlows.adoc',
                         'DeviceCommissioningFlows.adoc', 'DistributedComplianceLedger.adoc', 'OTAFileFormat.adoc']
     app_exclude_list = ['appliances.adoc', 'closures.adoc', 'general.adoc',
@@ -65,9 +78,8 @@ def main(scraper, spec_root, output_dir, dry_run):
         os.makedirs(clusters_output_dir)
 
     def scrape_cluster(filename: str) -> None:
-        xml = os.path.basename(filename).replace('.adoc', '.xml')
-        xml_path = os.path.abspath(os.path.join(clusters_output_dir, xml))
-        cmd = [scraper, 'cluster', filename, xml_path, '-nd']
+        xml_path = get_xml_path(filename, clusters_output_dir)
+        cmd = [scraper, 'cluster', '-i', filename, '-o', xml_path, '-nd']
         if dry_run:
             print(cmd)
         else:
@@ -86,12 +98,43 @@ def main(scraper, spec_root, output_dir, dry_run):
         filename = f'{dm_clusters_dir}/{f}'
         scrape_cluster(filename)
 
-    # Put the current spec sha into the cluster dir
+
+def scrape_device_types(scraper, spec_root, output_dir, dry_run):
+    device_type_dir = os.path.abspath(os.path.join(spec_root, 'src', 'device_types'))
+    device_types_output_dir = os.path.abspath(os.path.join(output_dir, 'device_types'))
+    clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
+
+    if not os.path.exists(device_types_output_dir):
+        os.makedirs(device_types_output_dir)
+
+    def scrape_device_type(filename: str) -> None:
+        xml_path = get_xml_path(filename, device_types_output_dir)
+        cmd = [scraper, 'devicetype', '-c', clusters_output_dir, '-nd', '-i', filename, '-o', xml_path]
+        if dry_run:
+            print(cmd)
+        else:
+            print(' '.join(cmd))
+            subprocess.run(cmd)
+
+    exclude_list = [r"section_*"]
+    for filename in glob.glob(f'{device_type_dir}/*.adoc'):
+        for exclude in exclude_list:
+            if not re.match(exclude, os.path.basename(filename)):
+                scrape_device_type(filename)
+
+
+def dump_versions(scraper, spec_root, output_dir):
     sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
     out = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, encoding="utf8", cwd=spec_root)
     sha = out.stdout
     with open(sha_file, 'wt', encoding='utf8') as output:
         output.write(sha)
+
+    scraper_file = os.path.abspath(os.path.join(output_dir, 'scraper_version'))
+    out = subprocess.run([scraper, '--version'], capture_output=True, encoding="utf8")
+    version = out.stdout
+    with open(scraper_file, "wt", encoding='utf8') as output:
+        output.write(version)
 
 
 if __name__ == '__main__':

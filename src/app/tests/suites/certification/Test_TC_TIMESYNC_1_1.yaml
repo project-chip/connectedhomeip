@@ -23,7 +23,9 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -34,7 +36,7 @@ tests:
     ##########################
     # TS 2: Cluster revision
     ##########################
-    - label: "TS2: read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -44,9 +46,7 @@ tests:
     # TS 3: Feature map
     ##########################
     # TZ
-    - label:
-          "TS3: Given TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit
-          set"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       PICS: TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -56,8 +56,8 @@ tests:
               hasMasksSet: [0x1]
 
     - label:
-          "TS3: Given !TIMESYNC.S.F00(TZ) ensure featuremap has the correct bit
-          clear"
+          "Step 3b: Given !TIMESYNC.S.F00(TZ) ensure featuremap has the correct
+          bit clear"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -67,8 +67,8 @@ tests:
               hasMasksClear: [0x1]
     # NTPC
     - label:
-          "TS3: Given TIMESYNC.S.F01(NTPC) ensure featuremap has the correct bit
-          set"
+          "Step 3c: Given TIMESYNC.S.F01(NTPC) ensure featuremap has the correct
+          bit set"
       PICS: TIMESYNC.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -78,8 +78,8 @@ tests:
               hasMasksSet: [0x2]
 
     - label:
-          "TS3: Given !TIMESYNC.S.F01(NTPC) ensure featuremap has the correct
-          bit clear"
+          "Step 3d: Given !TIMESYNC.S.F01(NTPC) ensure featuremap has the
+          correct bit clear"
       PICS: "!TIMESYNC.S.F01"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -90,8 +90,8 @@ tests:
 
     # NTPS
     - label:
-          "TS3: Given TIMESYNC.S.F02(NTPS) ensure featuremap has the correct bit
-          set"
+          "Step 3e: Given TIMESYNC.S.F02(NTPS) ensure featuremap has the correct
+          bit set"
       PICS: TIMESYNC.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -101,8 +101,8 @@ tests:
               hasMasksSet: [0x4]
 
     - label:
-          "TS3: Given !TIMESYNC.S.F02(NTPS) ensure featuremap has the correct
-          bit clear"
+          "Step 3f: Given !TIMESYNC.S.F02(NTPS) ensure featuremap has the
+          correct bit clear"
       PICS: "!TIMESYNC.S.F02"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -113,8 +113,8 @@ tests:
 
     # TSC
     - label:
-          "TS3: Given TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit
-          set"
+          "Step 3g: Given TIMESYNC.S.F03(TSC) ensure featuremap has the correct
+          bit set"
       PICS: TIMESYNC.S.F03
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -124,8 +124,8 @@ tests:
               hasMasksSet: [0x8]
 
     - label:
-          "TS3: Given !TIMESYNC.S.F03(TSC) ensure featuremap has the correct bit
-          clear"
+          "Step 3h: Given !TIMESYNC.S.F03(TSC) ensure featuremap has the correct
+          bit clear"
       PICS: "!TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -138,7 +138,7 @@ tests:
     # TS 3: Feature map
     ##########################
     # Mandatory entries
-    - label: "TS4: Check for mandatory attributes in AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -156,7 +156,7 @@ tests:
                       0xFFFD,
                   ]
 
-    - label: "TS4: Check for mandatory attributes in AttributeList"
+    - label: "Step 4b: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -165,7 +165,7 @@ tests:
               contains: [0x0000, 0x0001, 0xFFF8, 0xFFF9, 0xFFFB, 0xFFFC, 0xFFFD]
 
     # Optional
-    - label: "TS4: Check for optional attribute TimeSource in AttributeList"
+    - label: "Step 4c: Check for optional attribute TimeSource in AttributeList"
       PICS: TIMESYNC.S.A0002
       command: "readAttribute"
       attribute: "AttributeList"
@@ -173,7 +173,8 @@ tests:
           constraints:
               contains: [0x0002]
 
-    - label: "TS4: Check for optional attribute TimeSource not in AttributeList"
+    - label:
+          "Step 4d: Check for optional attribute TimeSource not in AttributeList"
       PICS: "!TIMESYNC.S.A0002"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -182,7 +183,7 @@ tests:
               excludes: [0x0002]
 
     # Feature TZ
-    - label: "TS4: Check for TZ feature-based attributes in AttributeList"
+    - label: "Step 4e: Check for TZ feature-based attributes in AttributeList"
       PICS: TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "AttributeList"
@@ -190,7 +191,8 @@ tests:
           constraints:
               contains: [0x0005, 0x0006, 0x0007, 0x0008, 0x000A, 0x000B]
 
-    - label: "TS4: Check for TZ feature-based attributes not in AttributeList"
+    - label:
+          "Step 4f: Check for TZ feature-based attributes not in AttributeList"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -199,7 +201,7 @@ tests:
               excludes: [0x0005, 0x0006, 0x0007, 0x0008, 0x000A, 0x000B]
 
     # Feature NTPC
-    - label: "TS4: Check for NTPC feature-based attributes in AttributeList"
+    - label: "Step 4g: Check for NTPC feature-based attributes in AttributeList"
       PICS: TIMESYNC.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
@@ -207,7 +209,8 @@ tests:
           constraints:
               contains: [0x0004, 0x000C]
 
-    - label: "TS4: Check for NTPC feature-based attributes not in AttributeList"
+    - label:
+          "Step 4h: Check for NTPC feature-based attributes not in AttributeList"
       PICS: "!TIMESYNC.S.F01"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -216,7 +219,7 @@ tests:
               excludes: [0x0004, 0x000C]
 
     # Feature NTPS
-    - label: "TS4: Check for NTPS feature-based attributes in AttributeList"
+    - label: "Step 4i: Check for NTPS feature-based attributes in AttributeList"
       PICS: TIMESYNC.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
@@ -224,7 +227,8 @@ tests:
           constraints:
               contains: [0x0009]
 
-    - label: "TS4: Check for NTPS feature-based attributes not in AttributeList"
+    - label:
+          "Step 4j: Check for NTPS feature-based attributes not in AttributeList"
       PICS: "!TIMESYNC.S.F02"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -233,7 +237,7 @@ tests:
               excludes: [0x0009]
 
     # Feature TSC
-    - label: "TS4: Check for TSC feature-based attributes in AttributeList"
+    - label: "Step 4k: Check for TSC feature-based attributes in AttributeList"
       PICS: TIMESYNC.S.F03
       command: "readAttribute"
       attribute: "AttributeList"
@@ -241,7 +245,8 @@ tests:
           constraints:
               contains: [0x0003]
 
-    - label: "TS4: Check for TSC feature-based attributes not in AttributeList"
+    - label:
+          "Step 4l: Check for TSC feature-based attributes not in AttributeList"
       PICS: "!TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -255,7 +260,7 @@ tests:
     # TS 5: Event list - NOTE: disabled
     ##########################
     # mandatory
-    - label: "TS5: Check for mandatory events in EventList"
+    - label: "Step 5a: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -264,7 +269,7 @@ tests:
               contains: [0x03]
 
     #Feature TZ
-    - label: "TS5: Check for TZ feature-based events in EventList"
+    - label: "Step 5b: Check for TZ feature-based events in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "EventList"
@@ -272,7 +277,7 @@ tests:
           constraints:
               contains: [0x00, 0x01, 0x02]
 
-    - label: "TS5: Check for TZ feature-based events not in EventList"
+    - label: "Step 5c: Check for TZ feature-based events not in EventList"
       PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "EventList"
@@ -281,7 +286,7 @@ tests:
               excludes: [0x00, 0x01, 0x02]
 
     #Feature TSC
-    - label: "TS5: Check for TSC feature-based events in EventList"
+    - label: "Step 5d: Check for TSC feature-based events in EventList"
       PICS: PICS_EVENT_LIST_ENABLED && TIMESYNC.S.F03
       command: "readAttribute"
       attribute: "EventList"
@@ -289,7 +294,7 @@ tests:
           constraints:
               contains: [0x04]
 
-    - label: "TS5: Check for TSC feature-based events not in EventList"
+    - label: "Step 5e: Check for TSC feature-based events not in EventList"
       PICS: "PICS_EVENT_LIST_ENABLED && !TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "EventList"
@@ -303,7 +308,7 @@ tests:
     # TS 6: AcceptedCommandList
     ##########################
     # mandatory
-    - label: "TS6: Check for mandatory commands in AcceptedCommandList"
+    - label: "Step 6a: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -311,7 +316,8 @@ tests:
               contains: [0x00]
 
     # Feature TZ
-    - label: "TS6: Check for TZ feature-based commands in AcceptedCommandList"
+    - label:
+          "Step 6b: Check for TZ feature-based commands in AcceptedCommandList"
       PICS: TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -320,7 +326,8 @@ tests:
               contains: [0x02, 0x04]
 
     - label:
-          "TS6: Check for TZ feature-based commands in not AcceptedCommandList"
+          "Step 6c: Check for TZ feature-based commands in not
+          AcceptedCommandList"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -329,7 +336,8 @@ tests:
               excludes: [0x02, 0x04]
 
     # Feature NTPC
-    - label: "TS6: Check for NTPC feature-based commands in AcceptedCommandList"
+    - label:
+          "Step 6d: Check for NTPC feature-based commands in AcceptedCommandList"
       PICS: TIMESYNC.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -338,7 +346,8 @@ tests:
               contains: [0x05]
 
     - label:
-          "TS6: Check for NTPC feature-based commands in not AcceptedCommandList"
+          "Step 6e: Check for NTPC feature-based commands in not
+          AcceptedCommandList"
       PICS: "!TIMESYNC.S.F01"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -347,7 +356,8 @@ tests:
               excludes: [0x05]
 
     # Feature TSC
-    - label: "TS6: Check for TSC feature-based commands in AcceptedCommandList"
+    - label:
+          "Step 6f: Check for TSC feature-based commands in AcceptedCommandList"
       PICS: TIMESYNC.S.F03
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -356,7 +366,8 @@ tests:
               contains: [0x01]
 
     - label:
-          "TS6: Check for TSC feature-based commands in not AcceptedCommandList"
+          "Step 6g: Check for TSC feature-based commands in not
+          AcceptedCommandList"
       PICS: "!TIMESYNC.S.F03"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -370,7 +381,7 @@ tests:
     # TS 7: GeneratedCommandList
     ##########################
     # Feature TZ
-    - label: "TS7: Check for TZ feature-based commands in GeneratedCommandList"
+    - label: "Step 7a: TH reads from the DUT the GeneratedCommandList attribute"
       PICS: TIMESYNC.S.F00
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -379,7 +390,8 @@ tests:
               contains: [0x03]
 
     - label:
-          "TS7: Check for TZ feature-based commands in not GeneratedCommandList"
+          "Step 7b: Check for TZ feature-based commands in not
+          GeneratedCommandList"
       PICS: "!TIMESYNC.S.F00"
       command: "readAttribute"
       attribute: "GeneratedCommandList"

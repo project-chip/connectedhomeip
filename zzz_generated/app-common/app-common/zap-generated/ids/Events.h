@@ -267,6 +267,30 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace BooleanState
 
+namespace IcdManagement {
+namespace Events {
+
+namespace OnTransitionToActiveMode {
+static constexpr EventId Id = 0x00000000;
+} // namespace OnTransitionToActiveMode
+
+} // namespace Events
+} // namespace IcdManagement
+
+namespace OvenCavityOperationalState {
+namespace Events {
+
+namespace OperationalError {
+static constexpr EventId Id = 0x00000000;
+} // namespace OperationalError
+
+namespace OperationCompletion {
+static constexpr EventId Id = 0x00000001;
+} // namespace OperationCompletion
+
+} // namespace Events
+} // namespace OvenCavityOperationalState
+
 namespace RefrigeratorAlarm {
 namespace Events {
 
@@ -364,6 +388,110 @@ static constexpr EventId Id = 0x00000001;
 
 } // namespace Events
 } // namespace RvcOperationalState
+
+namespace BooleanStateConfiguration {
+namespace Events {
+
+namespace AlarmsStateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace AlarmsStateChanged
+
+namespace SensorFault {
+static constexpr EventId Id = 0x00000001;
+} // namespace SensorFault
+
+} // namespace Events
+} // namespace BooleanStateConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Events {
+
+namespace ValveStateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace ValveStateChanged
+
+namespace ValveFault {
+static constexpr EventId Id = 0x00000001;
+} // namespace ValveFault
+
+} // namespace Events
+} // namespace ValveConfigurationAndControl
+
+namespace ElectricalEnergyMeasurement {
+namespace Events {
+
+namespace CumulativeEnergyMeasured {
+static constexpr EventId Id = 0x00000000;
+} // namespace CumulativeEnergyMeasured
+
+namespace PeriodicEnergyMeasured {
+static constexpr EventId Id = 0x00000001;
+} // namespace PeriodicEnergyMeasured
+
+} // namespace Events
+} // namespace ElectricalEnergyMeasurement
+
+namespace DemandResponseLoadControl {
+namespace Events {
+
+namespace LoadControlEventStatusChange {
+static constexpr EventId Id = 0x00000000;
+} // namespace LoadControlEventStatusChange
+
+} // namespace Events
+} // namespace DemandResponseLoadControl
+
+namespace DeviceEnergyManagement {
+namespace Events {
+
+namespace PowerAdjustStart {
+static constexpr EventId Id = 0x00000000;
+} // namespace PowerAdjustStart
+
+namespace PowerAdjustEnd {
+static constexpr EventId Id = 0x00000001;
+} // namespace PowerAdjustEnd
+
+namespace Paused {
+static constexpr EventId Id = 0x00000002;
+} // namespace Paused
+
+namespace Resumed {
+static constexpr EventId Id = 0x00000003;
+} // namespace Resumed
+
+} // namespace Events
+} // namespace DeviceEnergyManagement
+
+namespace EnergyEvse {
+namespace Events {
+
+namespace EVConnected {
+static constexpr EventId Id = 0x00000000;
+} // namespace EVConnected
+
+namespace EVNotDetected {
+static constexpr EventId Id = 0x00000001;
+} // namespace EVNotDetected
+
+namespace EnergyTransferStarted {
+static constexpr EventId Id = 0x00000002;
+} // namespace EnergyTransferStarted
+
+namespace EnergyTransferStopped {
+static constexpr EventId Id = 0x00000003;
+} // namespace EnergyTransferStopped
+
+namespace Fault {
+static constexpr EventId Id = 0x00000004;
+} // namespace Fault
+
+namespace Rfid {
+static constexpr EventId Id = 0x00000005;
+} // namespace Rfid
+
+} // namespace Events
+} // namespace EnergyEvse
 
 namespace DoorLock {
 namespace Events {
@@ -465,6 +593,46 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
+namespace TargetNavigator {
+namespace Events {
+
+namespace TargetUpdated {
+static constexpr EventId Id = 0x00000000;
+} // namespace TargetUpdated
+
+} // namespace Events
+} // namespace TargetNavigator
+
+namespace MediaPlayback {
+namespace Events {
+
+namespace StateChanged {
+static constexpr EventId Id = 0x00000000;
+} // namespace StateChanged
+
+} // namespace Events
+} // namespace MediaPlayback
+
+namespace AccountLogin {
+namespace Events {
+
+namespace LoggedOut {
+static constexpr EventId Id = 0x00000000;
+} // namespace LoggedOut
+
+} // namespace Events
+} // namespace AccountLogin
+
+namespace ContentControl {
+namespace Events {
+
+namespace RemainingScreenTimeExpired {
+static constexpr EventId Id = 0x00000000;
+} // namespace RemainingScreenTimeExpired
+
+} // namespace Events
+} // namespace ContentControl
+
 namespace UnitTesting {
 namespace Events {
 
@@ -478,6 +646,16 @@ static constexpr EventId Id = 0x00000002;
 
 } // namespace Events
 } // namespace UnitTesting
+
+namespace SampleMei {
+namespace Events {
+
+namespace PingCountEvent {
+static constexpr EventId Id = 0x00000000;
+} // namespace PingCountEvent
+
+} // namespace Events
+} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

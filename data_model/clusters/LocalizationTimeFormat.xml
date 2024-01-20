@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002c" name="Time Format Localization" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002C" name="Time Format Localization" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -103,6 +103,9 @@ Davis, CA 95616, USA
       <item value="11" name="Taiwanese" summary="Dates conveyed using the Taiwanese calendar">
         <optionalConform choice="a" more="true"/>
       </item>
+      <item value="255" name="UseActiveLocale" summary="calendar implied from active locale">
+        <optionalConform choice="a" more="true"/>
+      </item>
     </enum>
     <enum name="HourFormatEnum">
       <item value="0" name="12hr" summary="Time conveyed with a 12-hour clock">
@@ -111,22 +114,25 @@ Davis, CA 95616, USA
       <item value="1" name="24hr" summary="Time conveyed with a 24-hour clock">
         <mandatoryConform/>
       </item>
+      <item value="255" name="UseActiveLocale" summary="Use active locale clock">
+        <mandatoryConform/>
+      </item>
     </enum>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="HourFormat" type="HourFormatEnum" default="null">
+    <attribute id="0x0000" name="HourFormat" type="HourFormatEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0001" name="ActiveCalendarType" type="CalendarTypeEnum" default="null">
+    <attribute id="0x0001" name="ActiveCalendarType" type="CalendarTypeEnum">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="nonVolatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform>
         <feature name="CALFMT"/>
       </mandatoryConform>
     </attribute>
-    <attribute id="0x0002" name="SupportedCalendarTypes" type="&lt;&lt;ref_DataTypeList&gt;&gt;[CalendarTypeEnum Type]" default="N/A">
+    <attribute id="0x0002" name="SupportedCalendarTypes" type="ref_DataTypeList[CalendarTypeEnum Type]" default="N/A">
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>

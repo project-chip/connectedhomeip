@@ -177,7 +177,7 @@ CHIP_ERROR AppTask::Init()
     if (rc != 0)
     {
         P6_LOG("boot_set_confirmed failed");
-        appError(CHIP_ERROR_WELL_UNINITIALIZED);
+        appError(CHIP_ERROR_UNINITIALIZED);
     }
 #endif
     // Register the callback to init the MDNS server when connectivity is available

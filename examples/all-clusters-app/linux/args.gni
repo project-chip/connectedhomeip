@@ -28,3 +28,4 @@ matter_enable_tracing_support = true
 matter_log_json_payload_decode_full = true
 matter_log_json_payload_hex = true
 chip_enable_smoke_co_trigger = true
+chip_enable_boolean_state_configuration_trigger = true

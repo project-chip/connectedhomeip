@@ -6,6 +6,7 @@
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -58,7 +59,8 @@ SampleMeiContent::SampleMeiContent() : SampleMeiContent(kInvalidEndpointId) {}
 
 SampleMeiContent::SampleMeiContent(EndpointId aEndpoint)
 {
-    endpoint = aEndpoint;
+    endpoint  = aEndpoint;
+    pingCount = 10000;
 
     // Attribute default values
     flipflop = false;
@@ -70,6 +72,7 @@ SampleMeiContent::SampleMeiContent(EndpointId aEndpoint)
 void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
 {
     auto endpoint      = ctxt.mRequestPath.mEndpointId;
+    auto fabricIndex   = ctxt.mCommandHandler.GetAccessingFabricIndex();
     auto endpointIndex = EndpointIndex(endpoint);
     if (endpointIndex == std::numeric_limits<size_t>::max())
     {
@@ -80,10 +83,19 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     switch (ctxt.mRequestPath.mCommandId)
     {
     case Commands::Ping::Id:
-        HandleCommand<Commands::Ping::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {
-            ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
-        });
+        HandleCommand<Commands::Ping::DecodableType>(
+            ctxt, [this, endpoint, fabricIndex, endpointIndex, ctxt](HandlerContext & ctx, const auto & req) {
+                ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
+                Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++, .fabricIndex = fabricIndex };
+                chip::EventNumber placeholderEventNumber;
+                CHIP_ERROR err = LogEvent(event, endpoint, placeholderEventNumber);
+                if (CHIP_NO_ERROR != err)
+                {
+                    ChipLogError(Zcl, "Failed to record event on endpoint %d: %" CHIP_ERROR_FORMAT, static_cast<int>(endpoint),
+                                 err.Format());
+                }
+                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::Success);
+            });
         return;
     case Commands::AddArguments::Id:
         HandleCommand<Commands::AddArguments::DecodableType>(ctxt, [endpoint](HandlerContext & ctx, const auto & req) {

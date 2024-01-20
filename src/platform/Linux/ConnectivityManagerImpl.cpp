@@ -20,6 +20,7 @@
 
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
@@ -60,10 +61,6 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/GLibTypeDeleter.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
-#endif
-
-#ifndef CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD
-#define CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD "dhclient -nw %s"
 #endif
 
 using namespace ::chip;
@@ -765,6 +762,23 @@ bool ConnectivityManagerImpl::IsWiFiManagementStarted()
     return ret;
 }
 
+void ConnectivityManagerImpl::StartNonConcurrentWiFiManagement()
+{
+    StartWiFiManagement();
+
+    for (int cnt = 0; cnt < WIFI_START_CHECK_ATTEMPTS; cnt++)
+    {
+        if (IsWiFiManagementStarted())
+        {
+            DeviceControlServer::DeviceControlSvr().PostWiFiDeviceAvailableNetworkEvent();
+            ChipLogProgress(DeviceLayer, "Non-concurrent mode Wi-Fi Management Started.");
+            return;
+        }
+        usleep(WIFI_START_CHECK_TIME_USEC);
+    }
+    ChipLogError(Ble, "Non-concurrent mode Wi-Fi Management taking too long to start.");
+}
+
 void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1017,7 +1031,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     memcpy(keyStr, credentials.data(), credentials.size());
     g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
     g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(keyStr));
-    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
+    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
     args = g_variant_builder_end(&builder);
 
     result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args, &mWpaSupplicant.networkPath,
@@ -1121,6 +1135,10 @@ void ConnectivityManagerImpl::PostNetworkConnect()
         }
     }
 
+#if defined(CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD)
+    // CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD can be defined to a command pattern
+    // to run once the network has been connected, with a %s placeholder for the
+    // interface name. E.g. "dhclient -nw %s"
     // Run dhclient for IP on WiFi.
     // TODO: The wifi can be managed by networkmanager on linux so we don't have to care about this.
     char cmdBuffer[128];
@@ -1134,6 +1152,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     {
         ChipLogProgress(DeviceLayer, "dhclient is running on the %s interface.", sWiFiIfName);
     }
+#endif // defined(CHIP_DEVICE_CONFIG_LINUX_DHCPC_CMD)
 }
 
 CHIP_ERROR ConnectivityManagerImpl::CommitConfig()

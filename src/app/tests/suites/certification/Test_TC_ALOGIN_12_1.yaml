@@ -75,7 +75,7 @@ tests:
               - name: "SetupPIN"
                 saveAs: setupPIN
                 constraints:
-                    minLength: 11
+                    minLength: 8
 
     - label:
           "Step 2: TH sends a Login command to the DUT with test values provided
@@ -89,6 +89,8 @@ tests:
                 value: TempAccountIdentifier
               - name: "SetupPIN"
                 value: setupPIN
+              - name: "Node"
+                value: nodeId
 
     - label:
           "Step 3: TH sends a Logout command to the DUT with test values
@@ -96,3 +98,7 @@ tests:
       PICS: ALOGIN.S.C03.Rsp && PICS_SKIP_SAMPLE_APP
       command: "Logout"
       timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "Node"
+                value: nodeId

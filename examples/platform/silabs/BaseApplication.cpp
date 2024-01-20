@@ -25,9 +25,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
-#include "LEDWidget.h"
-#endif // ENABLE_WSTK_LEDS
+#include <app/server/Server.h>
 
 #ifdef DISPLAY_ENABLED
 #include "lcd.h"
@@ -37,9 +35,10 @@
 #endif // DISPLAY_ENABLED
 
 #include "SilabsDeviceDataProvider.h"
-#include <app/icd/ICDNotifier.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
 #include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
@@ -126,9 +125,6 @@ StaticQueue_t sAppEventQueueStruct;
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
-BaseApplication::Function_t mFunction;
-bool mFunctionTimerActive;
-
 #ifdef DISPLAY_ENABLED
 SilabsLCD slLCD;
 #endif
@@ -146,7 +142,10 @@ Identify gIdentify = {
 
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
-bool BaseApplication::sIsProvisioned = false;
+
+bool BaseApplication::sIsProvisioned           = false;
+bool BaseApplication::sIsFactoryResetTriggered = false;
+LEDWidget * BaseApplication::sAppActionLed     = nullptr;
 
 #ifdef DIC_ENABLE
 namespace {
@@ -277,39 +276,16 @@ void BaseApplication::FunctionTimerEventHandler(TimerHandle_t xTimer)
 
 void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
 {
-    if (aEvent->Type != AppEvent::kEventType_Timer)
-    {
-        return;
-    }
-
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_Timer);
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
+    if (!sIsFactoryResetTriggered)
     {
-        SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
-        // cancel, if required.
-        StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-        StartStatusLEDTimer();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
-        mFunction = kFunction_FactoryReset;
-
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
-        // Turn off all LEDs before starting blink to make sure blink is
-        // co-ordinated.
-        sStatusLED.Set(false);
-        sStatusLED.Blink(500);
-#endif // ENABLE_WSTK_LEDS
+        StartFactoryResetSequence();
     }
-    else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
+    else
     {
-        // Actually trigger Factory Reset
-        mFunction = kFunction_NoneSelected;
-
+        // The factory reset sequence was in motion. The cancellation window expired.
+        // Factory Reset the device now.
 #if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
         StopStatusLEDTimer();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -421,19 +397,13 @@ void BaseApplication::LightEventHandler()
 #endif /* CHIP_ENABLE_OPENTHREAD */
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
 
-#ifdef DISPLAY_ENABLED
-        SilabsLCD::DisplayStatus_t status;
-        status.connected   = sIsEnabled && sIsAttached;
-        status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
-        status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
-        slLCD.SetStatus(status);
-#endif
         PlatformMgr().UnlockChipStack();
     }
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
+#if defined(ENABLE_WSTK_LEDS)
+#if (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917))
     // Update the status LED if factory reset has not been initiated.
     //
     // If system has "full connectivity", keep the LED On constantly.
@@ -446,13 +416,18 @@ void BaseApplication::LightEventHandler()
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, blink the LED ON for a very short time.
-    if (mFunction != kFunction_FactoryReset)
+    if (!sIsFactoryResetTriggered)
     {
         ActivateStatusLedPatterns();
     }
 
     sStatusLED.Animate();
-#endif // ENABLE_WSTK_LEDS && SL_CATALOG_SIMPLE_LED_LED1_PRESENT
+#endif // SL_CATALOG_SIMPLE_LED_LED1_PRESENT
+    if (sAppActionLed)
+    {
+        sAppActionLed->Animate();
+    }
+#endif // ENABLE_WSTK_LEDS
 }
 
 void BaseApplication::ButtonHandler(AppEvent * aEvent)
@@ -466,23 +441,26 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
     // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
     if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
     {
-        if (!mFunctionTimerActive && mFunction == kFunction_NoneSelected)
-        {
-            StartFunctionTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            mFunction = kFunction_StartBleAdv;
-        }
+        StartFunctionTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
     }
     else
     {
-        // If the button was released before factory reset got initiated, open the commissioning window and start BLE advertissement
-        // in fast mode
-        if (mFunctionTimerActive && mFunction == kFunction_StartBleAdv)
+        if (sIsFactoryResetTriggered)
         {
+            CancelFactoryResetSequence();
+        }
+        else
+        {
+            // The factory reset sequence was not initiated,
+            // Press and Release:
+            // - Open the commissioning window and start BLE advertissement in fast mode when not  commissioned
+            // - Output qr code in logs
+            // - Cycle LCD screen
             CancelFunctionTimer();
-            mFunction = kFunction_NoneSelected;
 
             OutputQrCode(false);
 #ifdef DISPLAY_ENABLED
+            UpdateLCDStatusScreen();
             slLCD.CycleScreens();
 #endif
 
@@ -512,19 +490,6 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }
         }
-        else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
-        {
-            CancelFunctionTimer();
-
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
-            StopStatusLEDTimer();
-#endif
-
-            // Change the function to none selected since factory reset has been
-            // canceled.
-            mFunction = kFunction_NoneSelected;
-            SILABS_LOG("Factory Reset has been Canceled");
-        }
     }
 }
 
@@ -535,8 +500,6 @@ void BaseApplication::CancelFunctionTimer()
         SILABS_LOG("app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
     }
-
-    mFunctionTimerActive = false;
 }
 
 void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
@@ -555,8 +518,42 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
         SILABS_LOG("app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
     }
+}
 
-    mFunctionTimerActive = true;
+void BaseApplication::StartFactoryResetSequence()
+{
+    // Initiate the factory reset sequence
+    SILABS_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+    // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+    // cancel, if required.
+    StartFunctionTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+    sIsFactoryResetTriggered = true;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+    StartStatusLEDTimer();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
+    // Turn off all LEDs before starting blink to make sure blink is
+    // co-ordinated.
+    sStatusLED.Set(false);
+    sStatusLED.Blink(500);
+#endif // ENABLE_WSTK_LEDS
+}
+
+void BaseApplication::CancelFactoryResetSequence()
+{
+    CancelFunctionTimer();
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+    StopStatusLEDTimer();
+#endif
+    if (sIsFactoryResetTriggered)
+    {
+        sIsFactoryResetTriggered = false;
+        SILABS_LOG("Factory Reset has been Canceled");
+    }
 }
 
 void BaseApplication::StartStatusLEDTimer()
@@ -660,6 +657,31 @@ SilabsLCD & BaseApplication::GetLCD(void)
 {
     return slLCD;
 }
+
+void BaseApplication::UpdateLCDStatusScreen(void)
+{
+    SilabsLCD::DisplayStatus_t status;
+    bool enabled, attached;
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+#ifdef SL_WIFI
+    enabled  = ConnectivityMgr().IsWiFiStationEnabled();
+    attached = ConnectivityMgr().IsWiFiStationConnected();
+#endif /* SL_WIFI */
+#if CHIP_ENABLE_OPENTHREAD
+    enabled  = ConnectivityMgr().IsThreadEnabled();
+    attached = ConnectivityMgr().IsThreadAttached();
+#endif /* CHIP_ENABLE_OPENTHREAD */
+    status.connected   = enabled && attached;
+    status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
+    status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    status.icdMode = (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT)
+        ? SilabsLCD::ICDMode_e::SIT
+        : SilabsLCD::ICDMode_e::LIT;
+#endif
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+    slLCD.SetStatus(status);
+}
 #endif
 
 void BaseApplication::PostEvent(const AppEvent * aEvent)
@@ -751,7 +773,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     }
 }
 
-bool BaseApplication::getWifiProvisionStatus()
+bool BaseApplication::GetProvisionStatus()
 {
     return BaseApplication::sIsProvisioned;
 }

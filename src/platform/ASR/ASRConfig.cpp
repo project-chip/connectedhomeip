@@ -221,46 +221,35 @@ bool ASRConfig::ConfigValueExists(Key key)
 CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint8_t * buf, size_t bufSize,
                                              size_t & outLen)
 {
-    int32_t ret = 0;
+    factory_error_t ret = asr_factory_config_read(matter_partition, buf, (uint32_t) bufSize, (uint32_t *) &outLen);
 
-    ret = asr_factory_config_read(matter_partition, buf, (uint32_t) bufSize, (uint32_t *) &outLen);
-
-    if (ret != 0)
-        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, static_cast<int>(ret));
-
-    if (ret == 0)
+    if (ret != FACTORY_NO_ERROR)
     {
-        return CHIP_NO_ERROR;
-    }
-    else
-    {
+        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, err = %d\n", matter_partition, ret);
         outLen = 0;
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ASRConfig::ReadFactoryConfigValue(asr_matter_partition_t matter_partition, uint32_t & val)
 {
-    int32_t ret = 0;
     uint8_t buf[4];
-    size_t outlen = 0;
-
-    ret = asr_factory_config_read(matter_partition, buf, sizeof(uint32_t), (uint32_t *) &outlen);
+    size_t outlen       = 0;
+    factory_error_t ret = asr_factory_config_read(matter_partition, buf, sizeof(uint32_t), (uint32_t *) &outlen);
 
     if (outlen > sizeof(uint32_t))
-        ret = -1;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
 
-    if (ret != 0)
-        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, ret = %d\n", matter_partition, static_cast<int>(ret));
-
-    if (ret == 0)
+    if (ret != FACTORY_NO_ERROR)
     {
-        val = *((uint32_t *) buf);
-        return CHIP_NO_ERROR;
+        ChipLogProgress(DeviceLayer, "asr_factory_config_read: %d failed, err = %d\n", matter_partition, ret);
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     else
     {
-        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+        val = *((uint32_t *) buf);
+        return CHIP_NO_ERROR;
     }
 }
 #endif

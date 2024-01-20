@@ -32,8 +32,8 @@ void TestClone(nlTestSuite * inSuite, void * inContext)
     uint8_t buffer[128];
     FixedBufferAllocator alloc(buffer);
 
-    const char * kTestString     = "Test string";
-    const char * allocatedString = alloc.Clone(kTestString);
+    static const char kTestString[] = "Test string";
+    const char * allocatedString    = alloc.Clone(kTestString);
 
     NL_TEST_EXIT_ON_FAILED_ASSERT(inSuite, allocatedString != nullptr);
     NL_TEST_ASSERT(inSuite, allocatedString != kTestString);
@@ -56,7 +56,7 @@ void TestOutOfMemory(nlTestSuite * inSuite, void * inContext)
     uint8_t buffer[16];
     FixedBufferAllocator alloc(buffer);
 
-    const char * kTestData = "0123456789abcdef";
+    static const char kTestData[] = "0123456789abcdef";
 
     // Allocating 16 bytes still works...
     NL_TEST_ASSERT(inSuite, alloc.Clone(kTestData, 16) != nullptr);
@@ -76,7 +76,7 @@ int TestFixedBufferAllocator()
 {
     nlTestSuite theSuite = { "CHIP FixedBufferAllocator tests", &sTests[0], nullptr, nullptr };
 
-    // Run test suit againt one context.
+    // Run test suite against one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
