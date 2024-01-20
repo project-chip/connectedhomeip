@@ -79,7 +79,7 @@ tests:
                 value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
               - name: "Credentials"
                 value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 1
       response:
           error: FAILSAFE_REQUIRED
@@ -88,7 +88,7 @@ tests:
           "Step 2: TH sends RemoveNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
           field set to 1"
-      PICS: CNET.S.C04.Rsp
+      PICS: CNET.S.C02.Rsp && CNET.S.C04.Rsp
       command: "RemoveNetwork"
       arguments:
           values:
