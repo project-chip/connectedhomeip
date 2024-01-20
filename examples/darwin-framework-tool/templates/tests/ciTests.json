@@ -71,6 +71,7 @@
         "TestScenesMultiFabric",
         "TestScenesFabricSceneInfo",
         "#30759: Darwin chip-tool does not support ICD registration during commissioning",
-        "TestIcdManagementCluster"
+        "TestIcdManagementCluster",
+        "Test_TC_OVENOPSTATE_2_4"
     ]
 }

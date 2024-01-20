@@ -62,7 +62,7 @@ tests:
     - label: "Step 4: TH sends Start command to the DUT"
       PICS: OVENOPSTATE.S.C02.Rsp && OVENOPSTATE.S.C04.Tx
       verification: |
-          ./chip-tool operationalstate start 1 1
+          ./chip-tool ovencavityoperationalstate start 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
@@ -84,7 +84,7 @@ tests:
     - label: "Step 5: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
       verification: |
-          ./chip-tool operationalstate read operational-state 1 1
+          ./chip-tool ovencavityoperationalstate read operational-state 1 1
 
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x01 (Running)
@@ -102,7 +102,7 @@ tests:
     - label: "Step 6: TH reads from the DUT the OperationalError attribute"
       PICS: OVENOPSTATE.S.A0005
       verification: |
-          ./chip-tool operationalstate read operational-error 1 1
+          ./chip-tool ovencavityoperationalstate read operational-error 1 1
 
            Via the TH (chip-tool), verify:
            - the response  contains the ErrorStateId set to NoError(0x00)
@@ -119,7 +119,7 @@ tests:
     - label: "Step 7: TH reads from the DUT the CountdownTime attribute"
       PICS: OVENOPSTATE.S.A0002
       verification: |
-          ./chip-tool operationalstate read countdown-time 1 1
+          ./chip-tool ovencavityoperationalstate read countdown-time 1 1
 
            Via the TH (chip-tool), verify:
            - that CountdownTime attribute contains either null our a uint32 value
@@ -138,7 +138,7 @@ tests:
     - label: "Step 8: TH reads from the DUT the PhaseList attribute"
       PICS: OVENOPSTATE.S.A0000
       verification: |
-          ./chip-tool operationalstate read phase-list 1 1
+          ./chip-tool ovencavityoperationalstate read phase-list 1 1
 
            Via the TH (chip-tool), verify:
            - that PhaseList attribute value contains either null or a list of strings.
@@ -158,7 +158,7 @@ tests:
     - label: "Step 9: TH reads from the DUT the CurrentPhase attribute"
       PICS: OVENOPSTATE.S.A0001
       verification: |
-          ./chip-tool operationalstate read current-phase 1 1
+          ./chip-tool ovencavityoperationalstate read current-phase 1 1
 
            Via the TH (chip-tool), verify:
            - that the CurrentPhase attribute value contains contains a uint8 value
@@ -184,7 +184,7 @@ tests:
     - label: "Step 11: TH reads from the DUT the CountdownTime attribute"
       PICS: OVENOPSTATE.S.A0002
       verification: |
-          ./chip-tool operationalstate read countdown-time 1 1
+          ./chip-tool ovencavityoperationalstate read countdown-time 1 1
 
 
            Via the TH (chip-tool), verify:
@@ -203,7 +203,7 @@ tests:
     - label: "Step 12: TH sends Start command to the DUT"
       PICS: OVENOPSTATE.S.C02.Rsp && OVENOPSTATE.S.C04.Tx
       verification: |
-          ./chip-tool operationalstate start 1 1
+          ./chip-tool ovencavityoperationalstate start 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
@@ -228,7 +228,7 @@ tests:
     - label: "Step 13: TH sends Stop command to the DUT"
       PICS: OVENOPSTATE.S.C01.Rsp && OVENOPSTATE.S.C04.Tx
       verification: |
-          ./chip-tool operationalstate stop 1 1
+          ./chip-tool ovencavityoperationalstate stop 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
@@ -252,7 +252,7 @@ tests:
     - label: "Step 14: TH reads from the DUT the OperationalState attribute"
       PICS: OVENOPSTATE.S.A0004
       verification: |
-          ./chip-tool operationalstate read operational-state 1 1
+          ./chip-tool ovencavityoperationalstate read operational-state 1 1
 
            Via the TH (chip-tool), verify:
            - the response has an OperationalStateID field that is set to 0x00 (Stopped)
@@ -270,7 +270,7 @@ tests:
     - label: "Step 15: TH sends Stop command to the DUT"
       PICS: OVENOPSTATE.S.C01.Rsp && OVENOPSTATE.S.C04.Tx
       verification: |
-          ./chip-tool operationalstate stop 1 1
+          ./chip-tool ovencavityoperationalstate stop 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
@@ -301,7 +301,7 @@ tests:
           OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp
           && OVENOPSTATE.S.C04.Tx
       verification: |
-          ./chip-tool operationalstate start 1 1
+          ./chip-tool ovencavityoperationalstate start 1 1
 
            Via the TH (chip-tool), verify:
            - the response is an instance of OperationalCommandResponse
