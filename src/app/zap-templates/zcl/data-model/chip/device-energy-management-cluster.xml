@@ -84,19 +84,19 @@ limitations under the License.
     <command source="client" code="0x07" name="CancelRequest" optional="true">
       <description>Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command</description>
     </command>
-    <event code="0x0000" name="PowerAdjustStart" priority="info" side="server" apiMaturity="provisional" optional="true">
+    <event code="0x00" name="PowerAdjustStart" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>PowerAdjustStart</description>
     </event>
-    <event code="0x0001" name="PowerAdjustEnd" priority="info" side="server" apiMaturity="provisional" optional="true">
+    <event code="0x01" name="PowerAdjustEnd" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>PowerAdjustEnd</description>
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional" default="0x00" min="0x00" max="0x04"/>
       <field id="1" name="Duration" type="elapsed_s" apiMaturity="provisional"/>
       <field id="2" name="EnergyUse" type="energy_mwh" apiMaturity="provisional"/>
     </event>
-    <event code="0x0002" name="Paused" priority="info" side="server" apiMaturity="provisional" optional="true">
+    <event code="0x02" name="Paused" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>Paused</description>
     </event>
-    <event code="0x0003" name="Resumed" priority="info" side="server" apiMaturity="provisional" optional="true">
+    <event code="0x03" name="Resumed" priority="info" side="server" apiMaturity="provisional" optional="true">
       <description>Resumed</description>
       <field id="0" name="Cause" type="CauseEnum" apiMaturity="provisional" default="0x00" min="0x00" max="0x04"/>
     </event>
