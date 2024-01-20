@@ -275,6 +275,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, CommonRes
         nodeData.mrpRetryActiveThreshold = Internal::GetRetryActiveThreshold(value);
         break;
     case TxtFieldKey::kTcpSupported: {
+        // bit 0 is reserved and deprecated
         uint8_t support            = Internal::MakeU8FromAsciiDecimal(value);
         nodeData.supportsTcpClient = (support & (1 << Internal::kTCPClient)) != 0;
         nodeData.supportsTcpServer = (support & (1 << Internal::kTCPServer)) != 0;
