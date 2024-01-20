@@ -845,6 +845,45 @@ PICS:
       id: ACT.C.C0b.Tx
 
     #
+    # server / commandsGenerated
+    #
+    - label: "Does the device implement of InstantAction command?"
+      id: ACT.S.C00.Rsp
+
+    - label: "Does the device implement of InstantActionWithTransition command?"
+      id: ACT.S.C01.Rsp
+
+    - label: "Does the device implement of StartAction command?"
+      id: ACT.S.C02.Rsp
+
+    - label: "Does the device implement of StartActionWithDuration command?"
+      id: ACT.S.C03.Rsp
+
+    - label: "Does the device implement of StopAction command?"
+      id: ACT.S.C04.Rsp
+
+    - label: "Does the device implement of PauseAction command?"
+      id: ACT.S.C05.Rsp
+
+    - label: "Does the device implement of PauseActionWithDuration command?"
+      id: ACT.S.C06.Rsp
+
+    - label: "Does the device implement of ResumeAction command?"
+      id: ACT.S.C07.Rsp
+
+    - label: "Does the device implement of EnableAction command?"
+      id: ACT.S.C08.Rsp
+
+    - label: "Does the device implement of EnableActionWithDuration command?"
+      id: ACT.S.C09.Rsp
+
+    - label: "Does the device implement of DisableAction command?"
+      id: ACT.S.C0a.Rsp
+
+    - label: "Does the device implement of DisableActionWithDuration command?"
+      id: ACT.S.C0b.Rsp
+
+    #
     # client / manually
     #
     - label: "Write all supported optional attributes"
@@ -1813,8 +1852,11 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
-    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: DISHM.S.M.CAN_MANUALLY_CONTROLLED
 
     # PIXIT
 
@@ -2062,6 +2104,15 @@ PICS:
 
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
+
+    - label: "Does the DUT(Server) support SupportedWiFiBands attribute?"
+      id: CNET.S.A0008
+
+    - label: "Does the DUT(Server) support SupportedThreadFeatures attribute?"
+      id: CNET.S.A0009
+
+    - label: "Does the DUT(Server) support ThreadVersion attribute?"
+      id: CNET.S.A000A
 
     #
     # server / commandsReceived
@@ -5380,13 +5431,13 @@ PICS:
     # server / manually
     #
     - label: "Can the DUT be brought into a Wired Fault state?"
-      id: PS.M.ManualWiredFault
+      id: PS.S.M.ManualWiredFault
 
     - label: "Can the DUT be brought into a Battery Fault state?"
-      id: PS.M.ManualBatFault
+      id: PS.S.M.ManualBatFault
 
     - label: "Can the DUT be brought into a Battery Charge Fault state?"
-      id: PS.M.ManualBatChargeFault
+      id: PS.S.M.ManualBatChargeFault
 
     #
     # client / manually
@@ -8899,6 +8950,9 @@ PICS:
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: LWM.S.M.CAN_TEST_MODE_FAILURE
 
+    - label: "Can the mode changed by manually control at the device?"
+      id: LWM.S.M.CAN_MANUALLY_CONTROLLED
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
@@ -9054,6 +9108,9 @@ PICS:
           "Id of mode the device will fail to transition to, given its current
           state"
       id: PIXIT.TCCM.MODE_CHANGE_FAIL
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: TCCM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Features
     - label:
