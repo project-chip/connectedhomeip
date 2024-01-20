@@ -2032,16 +2032,7 @@ enum class CopyModeBitmap : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kSceneNames   = 0x1,
-    kExplicit     = 0x2,
-    kTableSize    = 0x4,
-    kFabricScenes = 0x8,
-};
-
-// Bitmap for NameSupportBitmap
-enum class NameSupportBitmap : uint8_t
-{
-    kSceneNames = 0x80,
+    kSceneNames = 0x1,
 };
 } // namespace ScenesManagement
 
@@ -2621,6 +2612,51 @@ enum class Feature : uint32_t
     kLowPowerModeSensitivity = 0x2,
 };
 } // namespace EnergyPreference
+
+namespace EnergyEvseMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kManual        = 0x4000,
+    kTimeOfUse     = 0x4001,
+    kSolarCharging = 0x4002,
+    // kUnknownEnumValue intentionally not defined. This enum never goes
+    // through DataModel::Decode, likely because it is a part of a derived
+    // cluster. As a result having kUnknownEnumValue in this enum is error
+    // prone, and was removed. See
+    // src/app/common/templates/config-data.yaml.
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace EnergyEvseMode
+
+namespace DeviceEnergyManagementMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kNoOptimization     = 0x4000,
+    kDeviceOptimization = 0x4001,
+    kLocalOptimization  = 0x4002,
+    kGridOptimization   = 0x4003,
+    // kUnknownEnumValue intentionally not defined. This enum never goes
+    // through DataModel::Decode, likely because it is a part of a derived
+    // cluster. As a result having kUnknownEnumValue in this enum is error
+    // prone, and was removed. See
+    // src/app/common/templates/config-data.yaml.
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace DeviceEnergyManagementMode
 
 namespace DoorLock {
 

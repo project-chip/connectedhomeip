@@ -21,6 +21,7 @@ PICS:
     - RVCCLEANM.S.A0002
     - RVCCLEANM.S.A0003
     - RVCCLEANM.S.F00
+    - OO.S.A4003
 
 config:
     nodeId: 0x12344321

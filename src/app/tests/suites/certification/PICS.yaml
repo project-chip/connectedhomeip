@@ -845,6 +845,45 @@ PICS:
       id: ACT.C.C0b.Tx
 
     #
+    # server / commandsGenerated
+    #
+    - label: "Does the device implement of InstantAction command?"
+      id: ACT.S.C00.Rsp
+
+    - label: "Does the device implement of InstantActionWithTransition command?"
+      id: ACT.S.C01.Rsp
+
+    - label: "Does the device implement of StartAction command?"
+      id: ACT.S.C02.Rsp
+
+    - label: "Does the device implement of StartActionWithDuration command?"
+      id: ACT.S.C03.Rsp
+
+    - label: "Does the device implement of StopAction command?"
+      id: ACT.S.C04.Rsp
+
+    - label: "Does the device implement of PauseAction command?"
+      id: ACT.S.C05.Rsp
+
+    - label: "Does the device implement of PauseActionWithDuration command?"
+      id: ACT.S.C06.Rsp
+
+    - label: "Does the device implement of ResumeAction command?"
+      id: ACT.S.C07.Rsp
+
+    - label: "Does the device implement of EnableAction command?"
+      id: ACT.S.C08.Rsp
+
+    - label: "Does the device implement of EnableActionWithDuration command?"
+      id: ACT.S.C09.Rsp
+
+    - label: "Does the device implement of DisableAction command?"
+      id: ACT.S.C0a.Rsp
+
+    - label: "Does the device implement of DisableActionWithDuration command?"
+      id: ACT.S.C0b.Rsp
+
+    #
     # client / manually
     #
     - label: "Write all supported optional attributes"
@@ -1813,8 +1852,11 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
-    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: DISHM.S.M.CAN_MANUALLY_CONTROLLED
 
     # PIXIT
 
@@ -2062,6 +2104,15 @@ PICS:
 
     - label: "Does the DUT(Server) support LastConnectErrorValue attribute?"
       id: CNET.S.A0007
+
+    - label: "Does the DUT(Server) support SupportedWiFiBands attribute?"
+      id: CNET.S.A0008
+
+    - label: "Does the DUT(Server) support SupportedThreadFeatures attribute?"
+      id: CNET.S.A0009
+
+    - label: "Does the DUT(Server) support ThreadVersion attribute?"
+      id: CNET.S.A000A
 
     #
     # server / commandsReceived
@@ -5380,13 +5431,13 @@ PICS:
     # server / manually
     #
     - label: "Can the DUT be brought into a Wired Fault state?"
-      id: PS.M.ManualWiredFault
+      id: PS.S.M.ManualWiredFault
 
     - label: "Can the DUT be brought into a Battery Fault state?"
-      id: PS.M.ManualBatFault
+      id: PS.S.M.ManualBatFault
 
     - label: "Can the DUT be brought into a Battery Charge Fault state?"
-      id: PS.M.ManualBatChargeFault
+      id: PS.S.M.ManualBatChargeFault
 
     #
     # client / manually
@@ -5740,29 +5791,14 @@ PICS:
     #
     # server / attributes
     #
-    - label: "Does the device implement the SceneCount attribute?"
+    - label: "Does the device implement the LastConfiguredBy attribute?"
       id: S.S.A0000
 
-    - label: "Does the device implement the CurrentScene attribute?"
+    - label: "Does the device implement the SceneTableSize attribute?"
       id: S.S.A0001
 
-    - label: "Does the device implement the CurrentGroup attribute?"
-      id: S.S.A0002
-
-    - label: "Does the device implement the SceneValid attribute?"
-      id: S.S.A0003
-
-    - label: "Does the device implement the NameSupport attribute?"
-      id: S.S.A0004
-
-    - label: "Does the device implement the LastConfiguredBy attribute?"
-      id: S.S.A0005
-
-    - label: "Does the device implement the SceneTableSize attribute?"
-      id: S.S.A0006
-
     - label: "Does the device implement the FabricSceneInfo attribute?"
-      id: S.S.A0007
+      id: S.S.A0002
 
     #
     # server / commandsReceived
@@ -5789,30 +5825,14 @@ PICS:
           "Does the device implement receiving the GetSceneMembership command?"
       id: S.S.C06.Rsp
 
-    - label: "Does the device implement receiving the EnhancedAddScene command?"
-      id: S.S.C40.Rsp
-
-    - label:
-          "Does the device implement receiving the EnhancedViewScene command?"
-      id: S.S.C41.Rsp
-
     - label: "Does the device implement receiving the CopyScene command?"
-      id: S.S.C42.Rsp
+      id: S.S.C40.Rsp
 
     #
     # server / features
     #
     - label: "Does the device implement the Scene Names feature?"
       id: S.S.F00
-
-    - label: "Does the device implement the Scene Explicit feature?"
-      id: S.S.F01
-
-    - label: "Does the device implement the Scene TableSize feature?"
-      id: S.S.F02
-
-    - label: "Does the device implement the Scene FabricScenes feature?"
-      id: S.S.F03
 
     #
     # server / manually
@@ -5847,19 +5867,13 @@ PICS:
     - label: "Does the device implement sending the GetSceneMembership command?"
       id: S.C.C06.Tx
 
-    - label: "Does the device implement sending the EnhancedAddScene command?"
-      id: S.C.C40.Tx
-
-    - label: "Does the device implement sending the EnhancedViewScene command?"
-      id: S.C.C41.Tx
-
     - label: "Does the device implement sending the CopyScene command?"
-      id: S.C.C42.Tx
+      id: S.C.C40.Tx
 
     - label:
           "Does the device process the TransitionTime parameter of the
           RecallScene command?"
-      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME
+      id: PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
 
     #
     # client / manually
@@ -9024,6 +9038,9 @@ PICS:
     - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: LWM.S.M.CAN_TEST_MODE_FAILURE
 
+    - label: "Can the mode changed by manually control at the device?"
+      id: LWM.S.M.CAN_MANUALLY_CONTROLLED
+
     - label:
           "Id of mode the device will fail to transition to, given its current
           state"
@@ -9179,6 +9196,9 @@ PICS:
           "Id of mode the device will fail to transition to, given its current
           state"
       id: PIXIT.TCCM.MODE_CHANGE_FAIL
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: TCCM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Features
     - label:
