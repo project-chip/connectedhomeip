@@ -36,7 +36,7 @@ public:
     CHIP_ERROR UpdateTimeFromPlatformSource(chip::Callback::Callback<OnTimeSyncCompletion> * callback) override;
     CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
                                           chip::Callback::Callback<OnFallbackNTPCompletion> * callback) override;
-    void UTCTimeChanged(uint64_t time) override;
+    void UTCTimeAvailabilityChanged(uint64_t time) override;
 };
 
 } // namespace TimeSynchronization

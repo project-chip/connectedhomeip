@@ -76,32 +76,6 @@ Davis, CA 95616, USA
     <cluster id="0x0004" name="Groups" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0062" name="Scenes Management" side="server">
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform/>
-      </otherwiseConform>
-      <commands>
-        <command id="" name="EnhancedAddScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-        <command id="" name="EnhancedViewScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-        <command id="" name="CopyScene">
-          <otherwiseConform>
-            <provisionalConform/>
-            <mandatoryConform/>
-          </otherwiseConform>
-        </command>
-      </commands>
-    </cluster>
     <cluster id="0x0006" name="On/Off" side="server">
       <mandatoryConform/>
       <features>
@@ -131,6 +105,14 @@ Davis, CA 95616, USA
           <constraint type="allowed" value="254"/>
         </attribute>
       </attributes>
+    </cluster>
+    <cluster id="0x0062" name="Scenes Management" side="server">
+      <mandatoryConform/>
+      <commands>
+        <command id="" name="CopyScene">
+          <mandatoryConform/>
+        </command>
+      </commands>
     </cluster>
     <cluster id="0x0090" name="Electrical Power Measurement" side="server">
       <optionalConform/>

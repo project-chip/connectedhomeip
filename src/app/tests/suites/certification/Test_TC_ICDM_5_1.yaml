@@ -1,0 +1,145 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 217.2.7. [TC-ICDM-5.1] Functionality with DUT as Client
+
+PICS:
+    - ICDM.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label:
+          "Step 1: DUT issues an C_REGISTER_CLIENT command to the Test Harness."
+      PICS: ICDM.S.C00.Tx
+      verification: |
+          From DUT:
+          ./chip-tool icdmanagement register-client 1 1 hex:1234567890abcdef1234567890abcdef 1 0 --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          From TH: lit-icd-app
+          [1704407463921] [48858:527745] [DMG] InvokeRequestMessage =
+          [1704407463921] [48858:527745] [DMG] {
+          [1704407463921] [48858:527745] [DMG]    suppressResponse = false,
+          [1704407463921] [48858:527745] [DMG]    timedRequest = false,
+          [1704407463921] [48858:527745] [DMG]    InvokeRequests =
+          [1704407463921] [48858:527745] [DMG]    [
+          [1704407463921] [48858:527745] [DMG]            CommandDataIB =
+          [1704407463921] [48858:527745] [DMG]            {
+          [1704407463921] [48858:527745] [DMG]                    CommandPathIB =
+          [1704407463921] [48858:527745] [DMG]                    {
+          [1704407463921] [48858:527745] [DMG]                            EndpointId = 0x0,
+          [1704407463921] [48858:527745] [DMG]                            ClusterId = 0x46,
+          [1704407463921] [48858:527745] [DMG]                            CommandId = 0x0,
+          [1704407463921] [48858:527745] [DMG]                    },
+          [1704407463921] [48858:527745] [DMG]
+          [1704407463921] [48858:527745] [DMG]                    CommandFields =
+          [1704407463921] [48858:527745] [DMG]                    {
+          [1704407463921] [48858:527745] [DMG]                            0x0 = 1,
+          [1704407463921] [48858:527745] [DMG]                            0x1 = 1,
+          [1704407463921] [48858:527745] [DMG]                            0x2 = [
+          [1704407463921] [48858:527745] [DMG]                                            0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef,
+          [1704407463921] [48858:527745] [DMG]                            ] (16 bytes)
+          [1704407463921] [48858:527745] [DMG]                            0x3 = [
+          [1704407463921] [48858:527745] [DMG]                                            0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90,
+          [1704407463921] [48858:527745] [DMG]                            ] (16 bytes)
+          [1704407463921] [48858:527745] [DMG]                    },
+          [1704407463921] [48858:527745] [DMG]            },
+          [1704407463921] [48858:527745] [DMG]
+          [1704407463921] [48858:527745] [DMG]    ],
+          [1704407463921] [48858:527745] [DMG]
+          [1704407463921] [48858:527745] [DMG]    InteractionModelRevision = 11
+          [1704407463921] [48858:527745] [DMG] },
+      disabled: true
+
+    - label:
+          "Step 2: DUT issues an C_UNREGISTER_CLIENT command to the Test
+          Harness."
+      PICS: ICDM.S.C02.Tx
+      verification: |
+          From DUT:
+          ./chip-tool icdmanagement unregister-client 1 1 0  --VerificationKey hex:abcdef1234567890abcdef1234567890
+
+          From TH: lit-icd-app
+          [1704407560687] [49015:529245] [DMG] InvokeRequestMessage =
+          [1704407560687] [49015:529245] [DMG] {
+          [1704407560687] [49015:529245] [DMG]    suppressResponse = false,
+          [1704407560687] [49015:529245] [DMG]    timedRequest = false,
+          [1704407560687] [49015:529245] [DMG]    InvokeRequests =
+          [1704407560687] [49015:529245] [DMG]    [
+          [1704407560687] [49015:529245] [DMG]            CommandDataIB =
+          [1704407560687] [49015:529245] [DMG]            {
+          [1704407560687] [49015:529245] [DMG]                    CommandPathIB =
+          [1704407560687] [49015:529245] [DMG]                    {
+          [1704407560687] [49015:529245] [DMG]                            EndpointId = 0x0,
+          [1704407560687] [49015:529245] [DMG]                            ClusterId = 0x46,
+          [1704407560687] [49015:529245] [DMG]                            CommandId = 0x2,
+          [1704407560687] [49015:529245] [DMG]                    },
+          [1704407560687] [49015:529245] [DMG]
+          [1704407560687] [49015:529245] [DMG]                    CommandFields =
+          [1704407560687] [49015:529245] [DMG]                    {
+          [1704407560687] [49015:529245] [DMG]                            0x0 = 1,
+          [1704407560687] [49015:529245] [DMG]                            0x1 = [
+          [1704407560687] [49015:529245] [DMG]                                            0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90, 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90,
+          [1704407560687] [49015:529245] [DMG]                            ] (16 bytes)
+          [1704407560687] [49015:529245] [DMG]                    },
+          [1704407560687] [49015:529245] [DMG]            },
+          [1704407560687] [49015:529245] [DMG]
+          [1704407560687] [49015:529245] [DMG]    ],
+          [1704407560687] [49015:529245] [DMG]
+          [1704407560687] [49015:529245] [DMG]    InteractionModelRevision = 11
+          [1704407560687] [49015:529245] [DMG] },
+      disabled: true
+
+    - label:
+          "Step 3: DUT issues an C_STAY_ACTIVE_REQUEST command to the Test
+          Harness."
+      PICS: ICDM.S.C03.Tx
+      verification: |
+          From DUT:
+          ./chip-tool icdmanagement stay-active-request 1 0
+
+          From TH: lit-icd-app
+          [1704406259650] [46741:509053] [DMG] InvokeRequestMessage =
+          [1704406259650] [46741:509053] [DMG] {
+          [1704406259650] [46741:509053] [DMG]    suppressResponse = false,
+          [1704406259650] [46741:509053] [DMG]    timedRequest = false,
+          [1704406259650] [46741:509053] [DMG]    InvokeRequests =
+          [1704406259650] [46741:509053] [DMG]    [
+          [1704406259650] [46741:509053] [DMG]            CommandDataIB =
+          [1704406259650] [46741:509053] [DMG]            {
+          [1704406259650] [46741:509053] [DMG]                    CommandPathIB =
+          [1704406259650] [46741:509053] [DMG]                    {
+          [1704406259650] [46741:509053] [DMG]                            EndpointId = 0x0,
+          [1704406259650] [46741:509053] [DMG]                            ClusterId = 0x46,
+          [1704406259650] [46741:509053] [DMG]                            CommandId = 0x3,
+          [1704406259650] [46741:509053] [DMG]                    },
+          [1704406259650] [46741:509053] [DMG]
+          [1704406259650] [46741:509053] [DMG]                    CommandFields =
+          [1704406259650] [46741:509053] [DMG]                    {
+          [1704406259650] [46741:509053] [DMG]                    },
+          [1704406259650] [46741:509053] [DMG]            },
+          [1704406259650] [46741:509053] [DMG]
+          [1704406259650] [46741:509053] [DMG]    ],
+          [1704406259650] [46741:509053] [DMG]
+          [1704406259650] [46741:509053] [DMG]    InteractionModelRevision = 11
+          [1704406259650] [46741:509053] [DMG] },
+          [1704406259650] [46741:509053] [DMG] AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0046 e=0 p=m
+          [1704406259650] [46741:509053] [DMG] AccessControl: allowed
+          [1704406259650] [46741:509053] [DMG] Received command for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0003
+          [1704406259650] [46741:509053] [DMG] Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0003 status 0x81 (UNSUPPORTED_COMMAND) (no additional context)
+      disabled: true

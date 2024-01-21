@@ -176,7 +176,7 @@ public:
         uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
         ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
         table.RemoveAll();
-        ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
     }
 
 private:
@@ -337,13 +337,13 @@ Status ICDManagementServer::StayActiveRequest(FabricIndex fabricIndex)
 {
     // TODO: Implementent stay awake logic for end device
     // https://github.com/project-chip/connectedhomeip/issues/24259
-    ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
     return InteractionModel::Status::UnsupportedCommand;
 }
 
 void ICDManagementServer::TriggerICDMTableUpdatedEvent()
 {
-    ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
 void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,
