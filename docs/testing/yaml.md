@@ -199,9 +199,7 @@ Wait for a time:
 ```
 
 A full description of the available pseudo-clusters and their commands is
-available below:
-
-TODO: generate a script to parse the pseudo cluster xml into something readable
+available at [Pseudo-cluster description](./yaml_pseudocluster.md).
 
 #### Config variables and saveAs:
 
