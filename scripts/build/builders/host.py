@@ -429,6 +429,9 @@ class HostBuilder(GnBuilder):
             self.build_command = 'fuzz_tests'
 
     def GnBuildArgs(self):
+        if "/lock-app" in self.root:
+            self.extra_gn_options.append("chip_enable_icd_server=true")
+
         if self.board == HostBoard.NATIVE:
             return self.extra_gn_options
         elif self.board == HostBoard.ARM64:
@@ -449,9 +452,6 @@ class HostBuilder(GnBuilder):
                     'chip_fake_platform=true',
                 ]
             )
-            return self.extra_gn_options
-        elif "/lock-app" in self.root:
-            self.extra_gn_options.extend(["chip_enable_icd_server=true"])
             return self.extra_gn_options
         else:
             raise Exception('Unknown host board type: %r' % self)
