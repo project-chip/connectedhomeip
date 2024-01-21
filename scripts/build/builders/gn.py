@@ -38,7 +38,7 @@ class GnBuilder(Builder):
         extra_args = []
         if "/lock-app" in self.root:
             extra_args.append("chip_enable_icd_server=true")
-            
+
         return extra_args if extra_args else None
 
     def GnBuildEnv(self):
