@@ -287,6 +287,14 @@ commands over a socket to chip-tool (running in interactive mode).
 
 ### Running locally
 
+#### Commissioning the DUT
+
+All YAML tests assume that the DUT has previously been commissioned before
+running. DUTs should be commissioned using chip-tool. Use the same KVS file when
+running the test.
+
+#### Running the tests
+
 There are several options for running tests locally. Because the YAML runner
 uses python, it is necessary to compile and install the chip python package
 before using any YAML runner script.
@@ -330,6 +338,12 @@ with --
 
 ```
 
+#### Factory resetting the DUT
+
+On the host machine, you can simulate a factory reset by deleting the KVS file.
+If you did not specify a location for the KVS file when starting the
+application, the KVS file will be in /tmp as chip_kvs
+
 ### Running in the CI
 
 -   YAML tests added to the certification directory get run automatically
@@ -337,7 +351,10 @@ with --
     -   PICS file: src/app/tests/suites/certification/ci-pics-values
 -   If you DON’T want to run a test in the CI
     -   (ex under development), add it to \_GetInDevelopmentTests in
-        scripts/tests/chiptest/**init**.py
+        `scripts/tests/chiptest/__init__.py`
+
+Please see [CI testing](./ci_testing.md) for more information about how to set
+up examples apps, PICS and PIXIT values for use in the CI.
 
 ### Running in the TH
 
