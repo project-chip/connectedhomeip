@@ -277,6 +277,7 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
+        SubscribeCommand::SetPeerLIT(mIsPeerLITCLI.ValueOr(0));
         return SubscribeCommand::SubscribeAttribute(device, endpointIds, mClusterIds, mAttributeIds);
     }
 
@@ -407,6 +408,7 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
+        SubscribeCommand::SetPeerLIT(mIsPeerLITCLI.ValueOr(0));
         return SubscribeCommand::SubscribeEvent(device, endpointIds, mClusterIds, mEventIds);
     }
 
@@ -538,6 +540,7 @@ public:
 
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
+        SubscribeCommand::SetPeerLIT(mIsPeerLITCLI.ValueOr(0));
         return SubscribeCommand::SubscribeAll(device, endpointIds, mClusterIds, mAttributeIds, mEventIds);
     }
 

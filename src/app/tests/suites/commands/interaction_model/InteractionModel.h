@@ -205,6 +205,18 @@ protected:
         return *this;
     }
 
+    InteractionModelReports & SetPeerLIT(bool isPeerLIT)
+    {
+        mIsPeerLIT.SetValue(isPeerLIT);
+        return *this;
+    }
+
+    InteractionModelReports & SetPeerLIT(const chip::Optional<bool> & isPeerLIT)
+    {
+        mIsPeerLIT = isPeerLIT;
+        return *this;
+    }
+
     void ResetOptions()
     {
         mDataVersions      = chip::NullOptional;
@@ -213,6 +225,7 @@ protected:
         mFabricFiltered    = chip::Optional<bool>(true);
         mKeepSubscriptions = chip::NullOptional;
         mAutoResubscribe   = chip::NullOptional;
+        mIsPeerLIT         = chip::NullOptional;
         mMinInterval       = 0;
         mMaxInterval       = 0;
     }
@@ -223,6 +236,7 @@ protected:
     chip::Optional<bool> mFabricFiltered;
     chip::Optional<bool> mKeepSubscriptions;
     chip::Optional<bool> mAutoResubscribe;
+    chip::Optional<bool> mIsPeerLIT;
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
 };
