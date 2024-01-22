@@ -189,7 +189,6 @@ void emberAfEndpointConfigure()
     uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
     uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
 
-
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
     // Initialize our data version storage.  If
     // ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT == 0, gcc complains about a memset
