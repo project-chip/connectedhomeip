@@ -16,6 +16,7 @@
  */
 
 #include "DeviceCallbacks.h"
+#include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
@@ -74,9 +75,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-static EnergyEvseDelegate * gDelegate       = nullptr;
-static EnergyEvseManager * gInstance        = nullptr;
+static EnergyEvseDelegate * gEvseDelegate       = nullptr;
+static EnergyEvseManager * gEvseInstance        = nullptr;
 static EVSEManufacturer * gEvseManufacturer = nullptr;
+static DeviceEnergyManagementDelegate * gDEMDelegate       = nullptr;
+static DeviceEnergyManagementManager * gDEMInstance        = nullptr;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -116,15 +119,40 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 } // namespace
 
+EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
+{
+    return gEvseManufacturer;
+}
+
 void ApplicationInit()
 {
-    if ((gDelegate == nullptr) && (gInstance == nullptr) && (gEvseManufacturer == nullptr))
+    if ((gDEMDelegate == nullptr) && (gDEMInstance == nullptr))
     {
-        gDelegate = new EnergyEvseDelegate();
-        if (gDelegate != nullptr)
+        gDEMDelegate = new DeviceEnergyManagementDelegate();
+        if (gDEMDelegate != nullptr)
         {
-            gInstance = new EnergyEvseManager(
-                EndpointId(ENERGY_EVSE_ENDPOINT), *gDelegate,
+            gDEMInstance = new DeviceEnergyManagementManager(
+                EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
+                BitMask<DeviceEnergyManagement::Feature, uint32_t>(
+                    DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
+                    DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+                    DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+                    DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+            gDEMInstance->Init(); /* Register Attribute & Command handlers */
+        }
+    }
+    else
+    {
+        ChipLogError(AppServer, "DEM Instance or Delegate already exist.")
+    }
+
+    if ((gEvseDelegate == nullptr) && (gEvseInstance == nullptr) && (gEvseManufacturer == nullptr))
+    {
+        gEvseDelegate = new EnergyEvseDelegate();
+        if (gEvseDelegate != nullptr)
+        {
+            gEvseInstance = new EnergyEvseManager(
+                EndpointId(ENERGY_EVSE_ENDPOINT), *gEvseDelegate,
                 BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences,
                                                        EnergyEvse::Feature::kPlugAndCharge, EnergyEvse::Feature::kRfid,
                                                        EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
@@ -132,7 +160,7 @@ void ApplicationInit()
                                                       OptionalAttributes::kSupportsRandomizationWindow,
                                                       OptionalAttributes::kSupportsApproximateEvEfficiency),
                 BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
-            gInstance->Init(); /* Register Attribute & Command handlers */
+            gEvseInstance->Init(); /* Register Attribute & Command handlers */
         }
     }
     else
@@ -142,8 +170,8 @@ void ApplicationInit()
 
     if (gEvseManufacturer == nullptr)
     {
-        gEvseManufacturer = new EVSEManufacturer();
-        gEvseManufacturer->Init(gInstance);
+        gEvseManufacturer = new EVSEManufacturer(gEvseInstance);
+        gEvseManufacturer->Init();
     }
     else
     {
