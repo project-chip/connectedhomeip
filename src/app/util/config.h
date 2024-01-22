@@ -22,6 +22,7 @@
 #if !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
 
 #include <zap-generated/gen_config.h>
+
 #include <zap-generated/endpoint_config.h>
 
 #endif // !CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES
