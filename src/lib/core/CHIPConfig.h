@@ -1599,7 +1599,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
  */
 #ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 300
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 5000
 #endif
 
 /**
