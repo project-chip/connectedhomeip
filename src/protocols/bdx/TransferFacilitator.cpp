@@ -132,5 +132,12 @@ CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role,
     return CHIP_NO_ERROR;
 }
 
+void Initiator::ResetTransfer()
+{
+    mTransfer.Reset();
+    ChipLogProgress(BDX, "Stop polling for messages");
+    mStopPolling = true;
+}
+
 } // namespace bdx
 } // namespace chip
