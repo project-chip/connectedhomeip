@@ -44,7 +44,8 @@ using namespace chip;
 // Globals
 
 EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                            EmberAfAttributeType dataType){
+                                            EmberAfAttributeType dataType)
+{
     return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */);
 }
 
