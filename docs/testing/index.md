@@ -1,6 +1,7 @@
 # Testing Guides
 
-The following guide provide an introduction to the testing mechanisms available in the SDK.
+The following guide provide an introduction to the testing mechanisms available
+in the SDK.
 
 ```{toctree}
 :glob:
@@ -11,16 +12,20 @@ The following guide provide an introduction to the testing mechanisms available 
 ```
 
 ## Unit testing
-- [Unit tests](./unit_testing.md)
+
+-   [Unit tests](./unit_testing.md)
 
 ## Integration and Certification tests
-- [Integration and Certification tests](./integration_tests.md)
-- [YAML](./yaml.md)
-- [Python testing framework](./python.md)
-- [Enabling tests in the CI](./ci_testing.md)
+
+-   [Integration and Certification tests](./integration_tests.md)
+-   [YAML](./yaml.md)
+-   [Python testing framework](./python.md)
+-   [Enabling tests in the CI](./ci_testing.md)
 
 ## PICS and PIXIT
-- [PICS and PIXIT](./pics_and_pixit.md)
+
+-   [PICS and PIXIT](./pics_and_pixit.md)
 
 ## Testing in the CI
-- [CI testing](./ci_testing.md)
+
+-   [CI testing](./ci_testing.md)
