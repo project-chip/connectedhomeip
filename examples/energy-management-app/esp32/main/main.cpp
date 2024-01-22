@@ -75,11 +75,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-static EnergyEvseDelegate * gEvseDelegate       = nullptr;
-static EnergyEvseManager * gEvseInstance        = nullptr;
-static EVSEManufacturer * gEvseManufacturer = nullptr;
-static DeviceEnergyManagementDelegate * gDEMDelegate       = nullptr;
-static DeviceEnergyManagementManager * gDEMInstance        = nullptr;
+static EnergyEvseDelegate * gEvseDelegate            = nullptr;
+static EnergyEvseManager * gEvseInstance             = nullptr;
+static EVSEManufacturer * gEvseManufacturer          = nullptr;
+static DeviceEnergyManagementDelegate * gDEMDelegate = nullptr;
+static DeviceEnergyManagementManager * gDEMInstance  = nullptr;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -181,7 +181,6 @@ void ApplicationInit()
 
 static void InitServer(intptr_t context)
 {
-    ApplicationInit();
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
@@ -203,6 +202,9 @@ static void InitServer(intptr_t context)
     static Tracing::Insights::ESP32Backend backend;
     Tracing::Register(backend);
 #endif
+
+    // Application code should always be initialised after the initialisation of server.
+    ApplicationInit();
 }
 
 extern "C" void app_main()
