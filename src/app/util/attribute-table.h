@@ -50,12 +50,6 @@ EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Clu
  * not checked and the read-only flag is ignored. This mode is meant for
  * testing or setting the initial value of the attribute on the device.
  *
- * if true is passed for justTest, then the type is not written but all
- * checks are done to see if the type could be written
- * reads the attribute specified, returns false if the attribute is not in
- * the table or the data is too large, returns true and writes to dataPtr
- * if the attribute is supported and the readLength specified is less than
- * the length of the data.
  * this returns:
  * - EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
  * - EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
@@ -68,7 +62,7 @@ EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Clu
  * - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
  */
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest);
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.

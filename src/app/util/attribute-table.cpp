@@ -55,7 +55,7 @@ EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId clust
     case EmberAfAttributeWritePermission::AllowWriteNormal:
     case EmberAfAttributeWritePermission::AllowWriteOfReadOnly:
         return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                                  (extWritePermission == EmberAfAttributeWritePermission::AllowWriteOfReadOnly), false);
+                                  (extWritePermission == EmberAfAttributeWritePermission::AllowWriteOfReadOnly));
     default:
         return (EmberAfStatus) extWritePermission;
     }
@@ -65,8 +65,7 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
                                     EmberAfAttributeType dataType)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                              true,   // override read-only?
-                              false); // just test?
+                              true   /* override read-only */);
 }
 
 //------------------------------------------------------------------------------
@@ -129,7 +128,7 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 }
 
 EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
@@ -207,9 +206,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         }
     }
 
-    // write the data unless this is only a test
-    if (!justTest)
-    {
         const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
 
         // Pre write attribute callback for all attribute changes,
@@ -261,14 +257,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // Post-write attribute callback specific
         // to the cluster that the attribute lives in.
         emAfClusterAttributeChangedCallback(attributePath);
-    }
-    else
-    {
-        // bug: 11618, we are not handling properly external attributes
-        // in this case... We need to do something. We don't really
-        // know if it will succeed.
-        ChipLogProgress(Zcl, "WRITE: no write, just a test");
-    }
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
