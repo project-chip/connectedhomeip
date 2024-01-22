@@ -66,11 +66,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 
     VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
 
-    // Removing the check for now since it is possible for the Fast polling
-    // to be larger than the ActiveModeDuration for now
-    // uint32_t activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDurationMs();
-    // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
-
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
 }
