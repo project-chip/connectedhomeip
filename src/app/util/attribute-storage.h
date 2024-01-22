@@ -24,7 +24,6 @@
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
-#include <zap-generated/endpoint_config.h>
 
 #include <app/att-storage.h>
 #include <zap-generated/endpoint_config.h>
