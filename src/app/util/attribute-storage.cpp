@@ -132,13 +132,11 @@ constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVI
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 
-#if !defined(EMBER_SCRIPTED_TEST)
 #define endpointNumber(x) fixedEndpoints[x]
 #define endpointDeviceTypeList(x)                                                                                                  \
     Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[x]], fixedDeviceTypeListLengths[x])
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
 #define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
-#endif
 
 AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 
@@ -186,12 +184,11 @@ void emberAfEndpointConfigure()
     static_assert(FIXED_ENDPOINT_COUNT <= std::numeric_limits<decltype(ep)>::max(),
                   "FIXED_ENDPOINT_COUNT must not exceed the size of the endpoint data type");
 
-#if !defined(EMBER_SCRIPTED_TEST)
     uint16_t fixedEndpoints[]             = FIXED_ENDPOINT_ARRAY;
     uint16_t fixedDeviceTypeListLengths[] = FIXED_DEVICE_TYPE_LENGTHS;
     uint16_t fixedDeviceTypeListOffsets[] = FIXED_DEVICE_TYPE_OFFSETS;
     uint8_t fixedEmberAfEndpointTypes[]   = FIXED_ENDPOINT_TYPES;
-#endif
+
 
 #if ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT > 0
     // Initialize our data version storage.  If
@@ -918,10 +915,7 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
 
 bool emberAfEndpointIsEnabled(EndpointId endpoint)
 {
-    uint16_t index = findIndexFromEndpoint(endpoint,
-                                           false); // ignore disabled endpoints?
-
-    EMBER_TEST_ASSERT(kEmberInvalidEndpointIndex != index);
+    uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 
     if (kEmberInvalidEndpointIndex == index)
     {
@@ -933,8 +927,7 @@ bool emberAfEndpointIsEnabled(EndpointId endpoint)
 
 bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 {
-    uint16_t index = findIndexFromEndpoint(endpoint,
-                                           false); // ignore disabled endpoints?
+    uint16_t index = findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
     bool currentlyEnabled;
 
     if (kEmberInvalidEndpointIndex == index)
@@ -990,15 +983,13 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 // Returns the index of a given endpoint.  Does not consider disabled endpoints.
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
 {
-    return findIndexFromEndpoint(endpoint,
-                                 true); // ignore disabled endpoints?
+    return findIndexFromEndpoint(endpoint, true /* ignoreDisabledEndpoints */);
 }
 
 // Returns the index of a given endpoint.  Considers disabled endpoints.
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 {
-    return findIndexFromEndpoint(endpoint,
-                                 false); // ignore disabled endpoints?
+    return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)
