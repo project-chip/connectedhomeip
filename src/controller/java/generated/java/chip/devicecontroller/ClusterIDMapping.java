@@ -5779,8 +5779,7 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {
-            OnTransitionToActiveMode(0L),;
+        public enum Event {;
             private final long id;
             Event(long id) {
                 this.id = id;
