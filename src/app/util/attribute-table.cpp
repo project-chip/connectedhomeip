@@ -69,12 +69,6 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
                               false); // just test?
 }
 
-EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                   uint16_t readLength)
-{
-    return emAfReadAttribute(endpoint, cluster, attributeID, dataPtr, readLength, nullptr);
-}
-
 //------------------------------------------------------------------------------
 // Internal Functions
 
@@ -134,28 +128,6 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
     return false;
 }
 
-// writes an attribute (identified by clusterID and attrID to the given value.
-// this returns:
-// - EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
-// - EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
-// - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isn't supported in the cluster.
-// - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
-//           stored in the attribute table
-// - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
-// - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
-//           the attribute
-// - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
-//
-// if true is passed in for overrideReadOnlyAndDataType then the data type is
-// not checked and the read-only flag is ignored. This mode is meant for
-// testing or setting the initial value of the attribute on the device.
-//
-// if true is passed for justTest, then the type is not written but all
-// checks are done to see if the type could be written
-// reads the attribute specified, returns false if the attribute is not in
-// the table or the data is too large, returns true and writes to dataPtr
-// if the attribute is supported and the readLength specified is less than
-// the length of the data.
 EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
 {
@@ -300,9 +272,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-
-// If dataPtr is NULL, no data is copied to the caller.
-// readLength should be 0 in that case.
 
 EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                 uint16_t readLength, EmberAfAttributeType * dataType)
