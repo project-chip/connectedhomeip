@@ -174,11 +174,9 @@ def read_pics_from_file(path: str) -> dict[str, bool]:
             with open(filename, 'r') as f:
                 contents = f.read()
                 pics_dict.update(parse_pics_xml(contents))
-        print(pics_dict)
         return pics_dict
 
     else:
-        print("notdir")
         with open(path, 'r') as f:
             lines = f.readlines()
             return parse_pics(lines)
