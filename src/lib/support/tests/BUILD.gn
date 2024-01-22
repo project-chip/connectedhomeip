@@ -44,6 +44,7 @@ chip_test_suite_using_nltest("tests") {
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
+    "TestScoped.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",
@@ -55,6 +56,7 @@ chip_test_suite_using_nltest("tests") {
     "TestTimeUtils.cpp",
     "TestTlvJson.cpp",
     "TestTlvToJson.cpp",
+    "TestUtf8.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]
@@ -77,7 +79,7 @@ chip_test_suite_using_nltest("tests") {
   public_deps = [
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",

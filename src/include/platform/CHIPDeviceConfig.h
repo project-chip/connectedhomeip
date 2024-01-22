@@ -303,6 +303,19 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
+ * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
+ * still hasn't been initialized, the device configuration is reset, and device
+ * needs to be paired again.
+ */
+#ifndef WIFI_START_CHECK_TIME_USEC
+#define WIFI_START_CHECK_TIME_USEC 100000 // 100ms
+#endif
+#ifndef WIFI_START_CHECK_ATTEMPTS
+#define WIFI_START_CHECK_ATTEMPTS 5
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_USER_SELECTED_MODE_TIMEOUT_SEC
  *
  * The default amount of time (in whole seconds) that the device will remain in "user selected"
@@ -344,6 +357,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+ *
+ * Enable support for WiFi Per-Device Credentials
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC 0
 #endif
 
 /**
@@ -595,6 +617,61 @@
 #define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME 30000
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+ *
+ * Optional configuration to enable Extended Announcement Duration up to 48h.
+ * Should be used together with extending CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS past 15 minutes.
+ * Disabled by default.
+ */
+
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING 0
+#endif
+
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be switched from the slow
+ * advertising to the extended advertising, counting from the moment of advertisement commencement.
+ *
+ *  Defaults to 900000 ms.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS (15 * 60 * 1000)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN
+ *
+ * The minimum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in the extended advertising mode. The minimum interval shall not be smaller than the default value
+ * and should not be equal to the CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX.
+ *
+ * Defaults to 1920 (1200 ms).
+ */
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN 1920
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
+ *
+ * The maximum interval (in units of 0.625ms) at which the device will send BLE advertisements while
+ * in the extended advertising mode. The maximum interval should be greater and not equal to the
+ * CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN.
+ *
+ * Defaults to 1936 (1210 ms).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX
+#define CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX 1936
+#endif
+
+static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX,
+              "Max Extended Advertising Interval cannot be smaller or equal to the Min Extended Advertising Interval");
+
+#endif
+
 // -------------------- Service Provisioning Configuration --------------------
 
 /**
@@ -822,6 +899,20 @@
 #define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+ *
+ * Enable or disable commissioner passcode feature.
+ * With this feature enabled, the commissioner can generate a commissioning passcode
+ * and display it to the user so that the user can enter it into a commissionable
+ * node, such as a phone app, during user directed commissioning.
+ *
+ * For Video Players, this value will often be 1
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_PASSCODE 0
+#endif
+
 // -------------------- Thread Configuration --------------------
 
 /**
@@ -852,6 +943,16 @@
 #define CHIP_DEVICE_CONFIG_THREAD_SSED 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+ *
+ * Enable Thread Border Router service.
+ * Users should ensure OPENTHREAD_CONFIG_BORDER_ROUTER_ENABLE is set accordingly within their thread stack
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
+#define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
+#endif
 /**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME
  *

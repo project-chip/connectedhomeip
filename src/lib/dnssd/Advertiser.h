@@ -101,6 +101,13 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
+    Derived & SetICDOperatingAsLIT(Optional<bool> operatesAsLIT)
+    {
+        mICDOperatesAsLIT = operatesAsLIT;
+        return *reinterpret_cast<Derived *>(this);
+    }
+    Optional<bool> GetICDOperatingAsLIT() const { return mICDOperatesAsLIT; }
+
 private:
     uint16_t mPort                   = CHIP_PORT;
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
@@ -109,6 +116,7 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
+    Optional<bool> mICDOperatesAsLIT;
 };
 
 /// Defines parameters required for advertising a CHIP node
@@ -255,6 +263,13 @@ public:
     }
     CommssionAdvertiseMode GetCommissionAdvertiseMode() const { return mMode; }
 
+    CommissionAdvertisingParameters & SetCommissionerPasscodeSupported(Optional<bool> commissionerPasscodeSupported)
+    {
+        mCommissionerPasscodeSupported = commissionerPasscodeSupported;
+        return *this;
+    }
+    Optional<bool> GetCommissionerPasscodeSupported() const { return mCommissionerPasscodeSupported; }
+
 private:
     uint8_t mShortDiscriminator          = 0;
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
@@ -273,6 +288,8 @@ private:
 
     char mPairingInstr[kKeyPairingInstructionMaxLength + 1];
     bool mPairingInstrHasValue = false;
+
+    Optional<bool> mCommissionerPasscodeSupported;
 };
 
 /**

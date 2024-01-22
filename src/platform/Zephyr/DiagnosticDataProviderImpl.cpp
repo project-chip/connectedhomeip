@@ -123,7 +123,7 @@ DiagnosticDataProviderImpl::DiagnosticDataProviderImpl() : mBootReason(Determine
 
 bool DiagnosticDataProviderImpl::SupportsWatermarks()
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     return true;
 #else
     return false;
@@ -165,7 +165,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     Malloc::Stats stats;
     ReturnErrorOnFailure(Malloc::GetStats(stats));
 
@@ -178,7 +178,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
-#ifdef CONFIG_CHIP_MALLOC_SYS_HEAP
+#if defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_CHIP_MALLOC_SYS_HEAP_WATERMARKS_SUPPORT)
     Malloc::ResetMaxStats();
     return CHIP_NO_ERROR;
 #else

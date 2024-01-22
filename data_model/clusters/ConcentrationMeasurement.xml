@@ -61,6 +61,18 @@ Davis, CA 95616, USA
     <revision revision="2" summary="CCB 2882"/>
     <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
   </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement"/>
+    <clusterId id="0x040D" name="Carbon Dioxide Concentration Measurement"/>
+    <clusterId id="0x0413" name="Nitrogen Dioxide Concentration Measurement"/>
+    <clusterId id="0x0415" name="Ozone Concentration Measurement"/>
+    <clusterId id="0x042A" name="PM2"/>
+    <clusterId id="0x042B" name="Formaldehyde Concentration Measurement"/>
+    <clusterId id="0x042C" name="PM1 Concentration Measurement"/>
+    <clusterId id="0x042D" name="PM10 Concentration Measurement"/>
+    <clusterId id="0x042E" name="Total Volatile Organic Compounds Concentration Measurement"/>
+    <clusterId id="0x042F" name="Radon Concentration Measurement"/>
+  </clusterIds>
   <classification hierarchy="base" role="application" picsCode="CONC" scope="Endpoint"/>
   <features>
     <feature bit="0" code="MEA" name="NumericMeasurement" summary="Cluster supports numeric measurement of substance">
@@ -242,7 +254,7 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x000a" name="LevelValue" type="LevelValueEnum" default="0">
+    <attribute id="0x000A" name="LevelValue" type="LevelValueEnum" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
         <feature name="LEV"/>

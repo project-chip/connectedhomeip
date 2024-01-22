@@ -16,6 +16,9 @@ name: 92.4.1. [TC-RVCCLEANM-3.1] On Mode functionality with DUT as Server
 
 PICS:
     - RVCCLEANM.S
+    - RVCCLEANM.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
 
 config:
     nodeId: 0x12344321

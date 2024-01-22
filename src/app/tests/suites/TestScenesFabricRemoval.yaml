@@ -1,0 +1,394 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
+# This test covers removal of fabric in the SceneTable
+
+name: Scenes Fabric Removal
+
+config:
+    nodeId: 0x12344321
+    cluster: "Scenes Management"
+    endpoint: 1
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    G1:
+        type: group_id
+        defaultValue: 0x0001
+
+tests:
+    - label: "Commission DUT to TH1"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH1 reads the fabric index"
+      cluster: "Operational Credentials"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th1FabricIndex
+
+    - label: "Open Commissioning Window from alpha"
+      endpoint: 0
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
+    - label: "Commission from TH2"
+      identity: "beta"
+      endpoint: 0
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for TH2"
+      endpoint: 0
+      identity: beta
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "TH2 reads the fabric index"
+      identity: "beta"
+      endpoint: 0
+      cluster: "Operational Credentials"
+      command: "readAttribute"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: th2FabricIndex
+
+    - label: "TH1 sends a RemoveAllGroups command to DUT."
+      cluster: "Groups"
+      command: "RemoveAllGroups"
+
+    - label: "TH 1 Add Group KeySet."
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a1,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1110000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1110001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1110002,
+                    }
+
+    - label: "TH1 Map KeySets to GroupId."
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a1 }]
+
+    - label: "TH1 sends a AddGroup command to DUT for G1."
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label: "Preparation step : TH2 Add Group KeySet."
+      identity: "beta"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a2,
+                        GroupKeySecurityPolicy: 0,
+                        EpochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        EpochStartTime0: 1120000,
+                        EpochKey1: "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf",
+                        EpochStartTime1: 1120001,
+                        EpochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        EpochStartTime2: 1120002,
+                    }
+
+    - label: "Preparation step TH2 Map KeySets to GroupId."
+      identity: "beta"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [{ FabricIndex: 0, GroupId: G1, GroupKeySetID: 0x01a2 }]
+
+    - label: "TH2 sends a AddGroup command to DUT for G1."
+      identity: "beta"
+      cluster: "Groups"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "GroupName"
+                value: "Group1"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH1 confirms its Scene table is empty and gets its capacity"
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                saveAs: fabricCapacity
+              - name: "GroupID"
+                value: G1
+
+    - label:
+          "TH2 confirms its Scene table is empty and has the same capacity as
+          TH1"
+      identity: "beta"
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity
+              - name: "GroupID"
+                value: G1
+
+    - label: "TH1 sends an AddScene command to DUT for Scene 1 G1"
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 0x0001
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label: "TH1 sends an AddScene command to DUT for Scene 2 G1"
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x02
+              - name: "TransitionTime"
+                value: 0x0000
+              - name: "SceneName"
+                value: "Scene2"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x02
+
+    - label: "TH2 sends an AddScene command to DUT for Scene 1 G1"
+      identity: "beta"
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 1000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label: "TH2 sends an AddScene command to DUT for Scene 2 G1"
+      identity: "beta"
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x02
+              - name: "TransitionTime"
+                value: 0x0000
+              - name: "SceneName"
+                value: "Scene2"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x02
+
+    - label: "TH1 confirms its G1 holds 2 scenes"
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 2
+              - name: "GroupID"
+                value: G1
+              - name: "SceneList"
+                value: [0x01, 0x02]
+
+    - label: "TH2 confirms its G1 holds 2 scenes"
+      command: "GetSceneMembership"
+      identity: "beta"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 2
+              - name: "GroupID"
+                value: G1
+              - name: "SceneList"
+                value: [0x01, 0x02]
+
+    - label: "TH1 sends RemoveFabric command for TH2"
+      cluster: "Operational Credentials"
+      endpoint: 0
+      command: "RemoveFabric"
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: th2FabricIndex
+
+    - label: "TH1 confirms its G1 still holds 2 scenes"
+      command: "GetSceneMembership"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+      response:
+          values:
+              - name: "Status"
+                value: 0x00
+              - name: "Capacity"
+                value: fabricCapacity - 2
+              - name: "GroupID"
+                value: G1
+              - name: "SceneList"
+                value: [0x01, 0x02]
+# TODO Figure out a way to recommission with Fabric Index 2 and confirm the scene table is empty for that fabric index

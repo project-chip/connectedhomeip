@@ -80,8 +80,14 @@ void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
     strcpy(key, "T");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupported);
 
+    strcpy(key, "ICD");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongIdleTimeICD);
+
     strcpy(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
+
+    strcpy(key, "CP");
+    NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kCommissionerPasscode);
 }
 
 void TestGetTxtFieldKeyCaseInsensitive(nlTestSuite * inSuite, void * inContext)
@@ -281,6 +287,20 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(ret, data) == 0);
 }
 
+void TestGetCommissionerPasscode(nlTestSuite * inSuite, void * inContext)
+{
+    char cm[64];
+    strcpy(cm, "0");
+    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 0);
+
+    strcpy(cm, "1");
+    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 1);
+
+    // overflow a uint8
+    sprintf(cm, "%u", static_cast<uint16_t>(std::numeric_limits<uint8_t>::max()) + 1);
+    NL_TEST_ASSERT(inSuite, GetCommissionerPasscode(GetSpan(cm)) == 0);
+}
+
 bool NodeDataIsEmpty(const DiscoveredNodeData & node)
 {
 
@@ -288,7 +308,8 @@ bool NodeDataIsEmpty(const DiscoveredNodeData & node)
         node.commissionData.commissioningMode != 0 || node.commissionData.deviceType != 0 ||
         node.commissionData.rotatingIdLen != 0 || node.commissionData.pairingHint != 0 ||
         node.resolutionData.mrpRetryIntervalIdle.HasValue() || node.resolutionData.mrpRetryIntervalActive.HasValue() ||
-        node.resolutionData.supportsTcp)
+        node.resolutionData.mrpRetryActiveThreshold.HasValue() || node.resolutionData.isICDOperatingAsLIT.HasValue() ||
+        node.resolutionData.supportsTcp || node.commissionData.commissionerPasscode != 0)
     {
         return false;
     }
@@ -339,6 +360,14 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     filled.commissionData.commissioningMode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
+    // Commissioning mode
+    strcpy(key, "CP");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled.commissionData);
+    NL_TEST_ASSERT(inSuite, filled.commissionData.commissionerPasscode == 1);
+    filled.commissionData.commissionerPasscode = 0;
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
+
     // Device type
     strcpy(key, "DT");
     strcpy(val, "1");
@@ -387,7 +416,8 @@ bool NodeDataIsEmpty(const ResolvedNodeData & nodeData)
 {
     return nodeData.operationalData.peerId == PeerId{} && nodeData.resolutionData.numIPs == 0 &&
         nodeData.resolutionData.port == 0 && !nodeData.resolutionData.mrpRetryIntervalIdle.HasValue() &&
-        !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcp;
+        !nodeData.resolutionData.mrpRetryIntervalActive.HasValue() && !nodeData.resolutionData.supportsTcp &&
+        !nodeData.resolutionData.isICDOperatingAsLIT.HasValue();
 }
 
 void ResetRetryIntervalIdle(DiscoveredNodeData & nodeData)
@@ -408,6 +438,16 @@ void ResetRetryIntervalActive(DiscoveredNodeData & nodeData)
 void ResetRetryIntervalActive(ResolvedNodeData & nodeData)
 {
     nodeData.resolutionData.mrpRetryIntervalActive.ClearValue();
+}
+
+void ResetRetryActiveThreshold(DiscoveredNodeData & nodeData)
+{
+    nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
+}
+
+void ResetRetryActiveThreshold(ResolvedNodeData & nodeData)
+{
+    nodeData.resolutionData.mrpRetryActiveThreshold.ClearValue();
 }
 
 // Test SAI (formally CRI)
@@ -559,7 +599,7 @@ void TxtFieldSessionActiveThreshold(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.GetMrpRetryActiveThreshold().Value() == 65535_ms16);
 
     // Test no other fields were populated
-    ResetRetryIntervalActive(nodeData);
+    ResetRetryActiveThreshold(nodeData);
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // Invalid SAI - negative value
@@ -630,6 +670,41 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nodeData.resolutionData.supportsTcp == false);
 }
 
+// Test ICD (ICD operation Mode)
+template <class NodeData>
+void TxtFieldICDoperatesAsLIT(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[16];
+    NodeData nodeData;
+
+    // ICD is operating as a LIT device
+    strcpy(key, "ICD");
+    strcpy(val, "1");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.Value());
+
+    // Test no other fields were populated
+    nodeData.resolutionData.isICDOperatingAsLIT.ClearValue();
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+
+    // ICD is operating as a SIT device
+    strcpy(key, "ICD");
+    strcpy(val, "0");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue());
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.Value() == false);
+
+    nodeData.resolutionData.isICDOperatingAsLIT.ClearValue();
+    NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
+    // Invalid value, No key set
+    strcpy(key, "ICD");
+    strcpy(val, "asdf");
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData.resolutionData);
+    NL_TEST_ASSERT(inSuite, nodeData.resolutionData.isICDOperatingAsLIT.HasValue() == false);
+}
+
 // Test IsDeviceTreatedAsSleepy() with CRI
 template <class NodeData>
 void TestIsDeviceSessionIdle(nlTestSuite * inSuite, void * inContext)
@@ -694,17 +769,20 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtFieldRotatingDeviceId", TestGetRotatingDeviceId),                        //
     NL_TEST_DEF("TxtFieldPairingHint", TestGetPairingHint),                                  //
     NL_TEST_DEF("TxtFieldPairingInstruction", TestGetPairingInstruction),                    //
+    NL_TEST_DEF("TxtFieldCommissionerPasscode", TestGetCommissionerPasscode),                //
     NL_TEST_DEF("TxtFieldFillDiscoveredNodeDataFromTxt", TestFillDiscoveredNodeDataFromTxt), //
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData>) ),
-    NL_TEST_DEF("TxtDiscoveredIsDeviceSessiondle", TestIsDeviceSessionIdle<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredIsICDoperatingAsLIT", (TxtFieldICDoperatesAsLIT<DiscoveredNodeData>) ),
+    NL_TEST_DEF("TxtDiscoveredIsDeviceSessionIdle", TestIsDeviceSessionIdle<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredIsDeviceSessionActive", TestIsDeviceSessionActive<DiscoveredNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldSessionIdleInterval<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldSessionActiveInterval<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryActiveThreshold", TxtFieldSessionActiveThreshold<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData>) ),
+    NL_TEST_DEF("TxtResolvedFieldICDoperatingAsLIT", (TxtFieldICDoperatesAsLIT<ResolvedNodeData>) ),
     NL_TEST_DEF("TxtResolvedIsDeviceSessionIdle", TestIsDeviceSessionIdle<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedIsDeviceSessionActive", TestIsDeviceSessionActive<ResolvedNodeData>),
     NL_TEST_SENTINEL()

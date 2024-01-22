@@ -64,8 +64,6 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
                                     queue:(dispatch_queue_t)queue
                                completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
 
-@property (nonatomic, readonly) MTRDeviceController * deviceController;
-@property (nonatomic, readonly, copy) NSNumber * nodeID;
 // Queue used for various internal bookkeeping work.
 @property (nonatomic) dispatch_queue_t queue;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;

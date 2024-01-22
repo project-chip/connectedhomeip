@@ -28,6 +28,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -48,6 +49,7 @@ struct CommonResolutionData
     uint16_t port                         = 0;
     char hostName[kHostNameMaxLength + 1] = {};
     bool supportsTcp                      = false;
+    Optional<bool> isICDOperatingAsLIT;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     Optional<System::Clock::Milliseconds16> mrpRetryActiveThreshold;
@@ -81,12 +83,14 @@ struct CommonResolutionData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
-        mrpRetryIntervalIdle   = NullOptional;
-        mrpRetryIntervalActive = NullOptional;
-        numIPs                 = 0;
-        port                   = 0;
-        supportsTcp            = false;
-        interfaceId            = Inet::InterfaceId::Null();
+        mrpRetryIntervalIdle    = NullOptional;
+        mrpRetryIntervalActive  = NullOptional;
+        mrpRetryActiveThreshold = NullOptional;
+        isICDOperatingAsLIT     = NullOptional;
+        numIPs                  = 0;
+        port                    = 0;
+        supportsTcp             = false;
+        interfaceId             = Inet::InterfaceId::Null();
         for (auto & addr : ipAddress)
         {
             addr = chip::Inet::IPAddress::Any;
@@ -127,7 +131,23 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tMrp Interval active: not present");
         }
+        if (mrpRetryActiveThreshold.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Active Threshold: %u ms", mrpRetryActiveThreshold.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Active Threshold: not present");
+        }
         ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
+        if (isICDOperatingAsLIT.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tThe ICD operates in %s", isICDOperatingAsLIT.Value() ? "LIT" : "SIT");
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tICD: not present");
+        }
     }
 };
 
@@ -157,6 +177,7 @@ struct CommissionNodeData
     size_t rotatingIdLen                                      = 0;
     uint16_t pairingHint                                      = 0;
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    uint8_t commissionerPasscode                              = 0;
 
     CommissionNodeData() {}
 
@@ -210,6 +231,10 @@ struct CommissionNodeData
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+        if (commissionerPasscode > 0)
+        {
+            ChipLogDetail(Discovery, "\tCommissioner Passcode: %u", commissionerPasscode);
+        }
     }
 };
 
@@ -334,6 +359,43 @@ public:
 };
 
 /**
+ * Node discovery context class.
+ *
+ * This class enables multiple clients of the global DNS-SD resolver to start simultaneous
+ * discovery operations.
+ *
+ * An object of this class is shared between a resolver client and the concrete resolver
+ * implementation. The client is responsible for allocating the context and passing it to
+ * the resolver when initiating a discovery operation. The resolver, in turn, is supposed to retain
+ * the context until the operation is finished. This allows the client to release the ownership of
+ * the context at any time without putting the resolver at risk of using a deleted object.
+ */
+class DiscoveryContext : public ReferenceCounted<DiscoveryContext>
+{
+public:
+    void SetBrowseIdentifier(intptr_t identifier) { mBrowseIdentifier.Emplace(identifier); }
+    void ClearBrowseIdentifier() { mBrowseIdentifier.ClearValue(); }
+    const Optional<intptr_t> & GetBrowseIdentifier() const { return mBrowseIdentifier; }
+
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) { mCommissioningDelegate = delegate; }
+    void OnNodeDiscovered(const DiscoveredNodeData & nodeData)
+    {
+        if (mCommissioningDelegate != nullptr)
+        {
+            mCommissioningDelegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            ChipLogError(Discovery, "Missing commissioning delegate. Data discarded");
+        }
+    }
+
+private:
+    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
+    Optional<intptr_t> mBrowseIdentifier;
+};
+
+/**
  * Interface for resolving CHIP DNS-SD services
  */
 class Resolver
@@ -365,11 +427,6 @@ public:
      * If nullptr is passed, the previously registered delegate is unregistered.
      */
     virtual void SetOperationalDelegate(OperationalResolveDelegate * delegate) = 0;
-
-    /**
-     * If nullptr is passed, the previously registered delegate is unregistered.
-     */
-    virtual void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) = 0;
 
     /**
      * Requests resolution of the given operational node service.
@@ -412,18 +469,26 @@ public:
     /**
      * Finds all commissionable nodes matching the given filter.
      *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     * Whenever a new matching node is found, the node information is passed to
+     * the `OnNodeDiscovered` method of the commissioning delegate configured
+     * in the context object.
+     *
+     * This method is expected to increase the reference count of the context
+     * object for as long as it takes to complete the discovery request.
      */
-    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
      * Finds all commissioner nodes matching the given filter.
      *
-     * Whenever a new matching node is found and a resolver delegate has been registered,
-     * the node information is passed to the delegate's `OnNodeDiscoveryComplete` method.
+     * Whenever a new matching node is found, the node information is passed to
+     * the `OnNodeDiscovered` method of the commissioning delegate configured
+     * in the context object.
+     *
+     * This method is expected to increase the reference count of the context
+     * object for as long as it takes to complete the discovery request.
      */
-    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+    virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter, DiscoveryContext & context) = 0;
 
     /**
      * Stop discovery (of commissionable or commissioner nodes).
@@ -431,7 +496,7 @@ public:
      * Some back ends may not support stopping discovery, so consumers should
      * not assume they will stop getting callbacks after calling this.
      */
-    virtual CHIP_ERROR StopDiscovery() = 0;
+    virtual CHIP_ERROR StopDiscovery(DiscoveryContext & context) = 0;
 
     /**
      * Verify the validity of an address that appears to be out of date (for example

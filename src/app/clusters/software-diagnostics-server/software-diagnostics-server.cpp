@@ -92,7 +92,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & 
 
         if (DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
         {
-            features.Set(Feature::kWaterMarks);
+            features.Set(Feature::kWatermarks);
         }
 
         return aEncoder.Encode(features);

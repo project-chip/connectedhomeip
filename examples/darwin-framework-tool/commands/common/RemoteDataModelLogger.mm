@@ -27,15 +27,15 @@
 
 #include <string>
 
-constexpr const char * kClusterIdKey = "clusterId";
-constexpr const char * kEndpointIdKey = "endpointId";
-constexpr const char * kAttributeIdKey = "attributeId";
-constexpr const char * kCommandIdKey = "commandId";
-constexpr const char * kErrorIdKey = "error";
-constexpr const char * kClusterErrorIdKey = "clusterError";
-constexpr const char * kValueKey = "value";
+constexpr char kClusterIdKey[] = "clusterId";
+constexpr char kEndpointIdKey[] = "endpointId";
+constexpr char kAttributeIdKey[] = "attributeId";
+constexpr char kCommandIdKey[] = "commandId";
+constexpr char kErrorIdKey[] = "error";
+constexpr char kClusterErrorIdKey[] = "clusterError";
+constexpr char kValueKey[] = "value";
 
-constexpr const char kBase64Header[] = "base64:";
+constexpr char kBase64Header[] = "base64:";
 
 namespace {
 RemoteDataModelLoggerDelegate * gDelegate;

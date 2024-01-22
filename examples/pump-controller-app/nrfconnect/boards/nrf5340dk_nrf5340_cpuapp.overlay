@@ -14,8 +14,15 @@
  *    limitations under the License.
  */
 
+#include <zephyr/dt-bindings/ipc_service/static_vrings.h>
+
 / {
 	chosen {
 		nordic,pm-ext-flash = &mx25r64;
 	};
+};
+
+/* Set IPC thread priority to the highest value to not collide with other threads. */
+&ipc0 {
+    zephyr,priority = <0 PRIO_COOP>;
 };

@@ -65,9 +65,6 @@
 #include <app/data-model/Encode.h>
 
 #include <limits>
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-#include <app/server/Server.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 extern "C" void otSysProcessDrivers(otInstance * aInstance);
 
 #if CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -93,6 +90,29 @@ void initNetworkCommissioningThreadDriver(void)
     sThreadNetworkCommissioningInstance.Init();
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
+CHIP_ERROR ReadDomainNameComponent(const char *& in, char * out, size_t outSize)
+{
+    const char * dotPos = strchr(in, '.');
+    VerifyOrReturnError(dotPos != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const size_t componentSize = static_cast<size_t>(dotPos - in);
+    VerifyOrReturnError(componentSize < outSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    memcpy(out, in, componentSize);
+    out[componentSize] = '\0';
+    in += componentSize + 1;
+
+    return CHIP_NO_ERROR;
+}
+
+template <size_t N>
+CHIP_ERROR ReadDomainNameComponent(const char *& in, char (&out)[N])
+{
+    return ReadDomainNameComponent(in, out, N);
+}
+#endif
 
 NetworkCommissioning::otScanResponseIterator<NetworkCommissioning::ThreadScanResponse> mScanResponseIter;
 } // namespace
@@ -209,15 +229,6 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnPlatformEvent(const
                 ChipLogError(DeviceLayer, "Failed to post Thread connectivity change: %" CHIP_ERROR_FORMAT, status.Format());
             }
         }
-
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-        if (event->ThreadStateChange.AddressChanged && isThreadAttached)
-        {
-            // Refresh Multicast listening
-            ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
-            Server::GetInstance().RejoinExistingMulticastGroups();
-        }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 #if CHIP_DETAIL_LOGGING
         LogOpenThreadStateChange(mOTInst, event->ThreadStateChange.OpenThread.Flags);
@@ -499,9 +510,13 @@ ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<I
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+    if (otLinkGetCslPeriod(mOTInst) != 0)
+#else
     if (otLinkCslGetPeriod(mOTInst) != 0)
+#endif // OPENTHREAD_API_VERSION
         ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
-#endif
+#endif // CHIP_DEVICE_CONFIG_THREAD_SSED
 
     ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 
@@ -1765,8 +1780,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
 // * poll period for SED devices that poll the parent for data
 // * CSL period for SSED devices that listen for messages in scheduled time slots.
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+    // Get CSL period in units of us and divide by 1000 to get milliseconds.
+    uint32_t curIntervalMS = otLinkGetCslPeriod(mOTInst) / 1000;
+#else
     // Get CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
     uint32_t curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#endif // OPENTHREAD_API_VERSION
 #else
     uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
@@ -1774,9 +1794,15 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetPollingInter
     if (pollingInterval.count() != curIntervalMS)
     {
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
+#if OPENTHREAD_API_VERSION >= 347
+        // Set CSL period in units of us and divide by 1000 to get milliseconds.
+        otErr         = otLinkSetCslPeriod(mOTInst, pollingInterval.count() * 1000);
+        curIntervalMS = otLinkGetCslPeriod(mOTInst) / 1000;
+#else
         // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
         otErr         = otLinkCslSetPeriod(mOTInst, pollingInterval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
         curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
+#endif // OPENTHREAD_API_VERSION
 #else
         otErr         = otLinkSetPollPeriod(mOTInst, pollingInterval.count());
         curIntervalMS = otLinkGetPollPeriod(mOTInst);
@@ -2075,7 +2101,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_AddSrpService(c
     size_t entryId                           = 0;
     FixedBufferAllocator alloc;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2175,7 +2201,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveSrpServic
     CHIP_ERROR error                         = CHIP_NO_ERROR;
     typename SrpClient::Service * srpService = nullptr;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
     VerifyOrReturnError(aInstanceName, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(aName, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -2224,7 +2250,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RemoveInvalidSr
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2249,7 +2275,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetupSrpHost(co
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_WELL_UNINITIALIZED);
+    VerifyOrReturnError(mSrpClient.mIsInitialized, CHIP_ERROR_UNINITIALIZED);
 
     Impl()->LockThreadStack();
 
@@ -2317,29 +2343,8 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 {
     char protocol[chip::Dnssd::kDnssdProtocolTextMaxSize + 1];
 
-    if (strchr(serviceType, '.') == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-
-    // Extract from the <type>.<protocol>.<domain-name>. the <type> part.
-    size_t substringSize = strchr(serviceType, '.') - serviceType;
-    if (substringSize >= ArraySize(mdnsService.mType))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    Platform::CopyString(mdnsService.mType, substringSize + 1, serviceType);
-
-    // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
-    const char * protocolSubstringStart = serviceType + substringSize + 1;
-
-    if (strchr(protocolSubstringStart, '.') == nullptr)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-
-    substringSize = strchr(protocolSubstringStart, '.') - protocolSubstringStart;
-    if (substringSize >= ArraySize(protocol))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    Platform::CopyString(protocol, substringSize + 1, protocolSubstringStart);
+    ReturnErrorOnFailure(ReadDomainNameComponent(serviceType, mdnsService.mType));
+    ReturnErrorOnFailure(ReadDomainNameComponent(serviceType, protocol));
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {
@@ -2354,24 +2359,20 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mProtocol = chip::Dnssd::DnssdServiceProtocol::kDnssdProtocolUnknown;
     }
 
+    mdnsService.mInterface     = Inet::InterfaceId::Null();
+    mdnsService.mSubTypeSize   = 0;
+    mdnsService.mTextEntrySize = 0;
+
     // Check if SRV record was included in DNS response.
-    if (error != OT_ERROR_NOT_FOUND)
+    // If not, return partial information about the service and exit early.
+    if (error != OT_ERROR_NONE)
     {
-        if (strchr(serviceInfo.mHostNameBuffer, '.') == nullptr)
-            return CHIP_ERROR_INVALID_ARGUMENT;
-
-        // Extract from the <hostname>.<domain-name>. the <hostname> part.
-        substringSize = strchr(serviceInfo.mHostNameBuffer, '.') - serviceInfo.mHostNameBuffer;
-        if (substringSize >= ArraySize(mdnsService.mHostName))
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        Platform::CopyString(mdnsService.mHostName, substringSize + 1, serviceInfo.mHostNameBuffer);
-
-        mdnsService.mPort = serviceInfo.mPort;
+        return CHIP_NO_ERROR;
     }
 
-    mdnsService.mInterface = Inet::InterfaceId::Null();
+    const char * host = serviceInfo.mHostNameBuffer;
+    ReturnErrorOnFailure(ReadDomainNameComponent(host, mdnsService.mHostName));
+    mdnsService.mPort = serviceInfo.mPort;
 
     // Check if AAAA record was included in DNS response.
 

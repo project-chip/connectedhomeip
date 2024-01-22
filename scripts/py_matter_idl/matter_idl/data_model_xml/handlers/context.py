@@ -16,7 +16,7 @@ import logging
 import xml.sax.xmlreader
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Idl, ParseMetaData
+from matter_idl.matter_idl_types import Cluster, Idl, ParseMetaData
 
 
 class IdlPostProcessor:
@@ -82,6 +82,18 @@ class Context:
         self.file_name = None
         self._not_handled: set[str] = set()
         self._idl_post_processors: list[IdlPostProcessor] = []
+        self.abstract_base_clusters: dict[str, Cluster] = {}
+
+    def AddAbstractBaseCluster(self, name: str, parse_meta: Optional[ParseMetaData] = None) -> Cluster:
+        """Creates a new cluster entry for the given name in the list of known
+           base clusters.
+        """
+        assert name not in self.abstract_base_clusters  # be unique
+
+        cluster = Cluster(name=name, code=-1, parse_meta=parse_meta)
+        self.abstract_base_clusters[name] = cluster
+
+        return cluster
 
     def GetCurrentLocationMeta(self) -> Optional[ParseMetaData]:
         if not self.locator:

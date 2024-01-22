@@ -55,45 +55,64 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1555"/>
     <revision revision="2" summary="ZLO 1.0: StartUpOnOff"/>
     <revision revision="3" summary="FeatureMap global attribute support with Level Control and Lighting feature"/>
     <revision revision="4" summary="New data model format and notation"/>
     <revision revision="5" summary="Addition of Dead Front behavior and associated FeatureMap entry"/>
+    <revision revision="6" summary="Addition of OffOnly feature and associated FeatureMap entry"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="OO" scope="Endpoint"/>
   <features>
     <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
-      <optionalConform/>
+      <optionalConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </optionalConform>
     </feature>
-    <feature bit="1" code="DF" name="DeadFrontBehaviour" summary="Device has DeadFrontBehaviour Feature">
-      <optionalConform/>
+    <feature bit="1" code="DF" name="DeadFrontBehavior" summary="Device has DeadFrontBehavior Feature">
+      <optionalConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </optionalConform>
+    </feature>
+    <feature bit="2" code="OFFONLY" name="OffOnly" summary="Device supports the OffOnly Feature feature">
+      <optionalConform>
+        <notTerm>
+          <orTerm>
+            <feature name="LT"/>
+            <feature name="DF"/>
+          </orTerm>
+        </notTerm>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
     <enum name="DelayedAllOffEffectVariantEnum">
-      <item value="0" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
+      <item value="0x00" name="DelayedOffFastFade" summary="Fade to off in 0.8 seconds">
         <mandatoryConform/>
       </item>
-      <item value="1" name="NoFade" summary="No fade">
+      <item value="0x01" name="NoFade" summary="No fade">
         <mandatoryConform/>
       </item>
-      <item value="2" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
+      <item value="0x02" name="DelayedOffSlowFade" summary="50% dim down in 0.8 seconds then fade to off in 12 seconds">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="DyingLightEffectVariantEnum">
-      <item value="0" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
+      <item value="0x00" name="DyingLightFadeOff" summary="20% dim up in 0.5s then fade to off in 1 second">
         <mandatoryConform/>
       </item>
     </enum>
     <enum name="EffectIdentifierEnum">
-      <item value="0" name="DelayedAllOff" summary="Delayed All Off">
+      <item value="0x00" name="DelayedAllOff" summary="Delayed All Off">
         <mandatoryConform/>
       </item>
-      <item value="1" name="DyingLight" summary="Dying Light">
+      <item value="0x01" name="DyingLight" summary="Dying Light">
         <mandatoryConform/>
       </item>
     </enum>
@@ -158,11 +177,19 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="On" response="Y">
       <access invokePrivilege="operate"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </mandatoryConform>
     </command>
     <command id="0x02" name="Toggle" response="Y">
       <access invokePrivilege="operate"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </mandatoryConform>
     </command>
     <command id="0x40" name="OffWithEffect" response="Y">
       <access invokePrivilege="operate"/>

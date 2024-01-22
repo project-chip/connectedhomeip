@@ -38,12 +38,6 @@
 #define CHIP_PRINTCLUSTER_GROUPS_CLUSTER
 #endif
 
-#if defined(ZCL_USING_SCENES_CLUSTER_SERVER) || defined(ZCL_USING_SCENES_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SCENES_CLUSTER { chip::app::Clusters::Scenes::Id, "Scenes" },
-#else
-#define CHIP_PRINTCLUSTER_SCENES_CLUSTER
-#endif
-
 #if defined(ZCL_USING_ON_OFF_CLUSTER_SERVER) || defined(ZCL_USING_ON_OFF_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ON_OFF_CLUSTER { chip::app::Clusters::OnOff::Id, "On/Off" },
 #else
@@ -286,6 +280,32 @@
 #define CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER
 #endif
 
+#if defined(ZCL_USING_TIMER_CLUSTER_SERVER) || defined(ZCL_USING_TIMER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER { chip::app::Clusters::Timer::Id, "Timer" },
+#else
+#define CHIP_PRINTCLUSTER_TIMER_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OPERATIONAL_STATE_OVEN_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_OVEN_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER                                                                           \
+    { chip::app::Clusters::OvenCavityOperationalState::Id, "Oven Cavity Operational State" },
+#else
+#define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER
+#endif
+
+#if defined(ZCL_USING_OVEN_MODE_CLUSTER_SERVER) || defined(ZCL_USING_OVEN_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_OVEN_MODE_CLUSTER { chip::app::Clusters::OvenMode::Id, "Oven Mode" },
+#else
+#define CHIP_PRINTCLUSTER_OVEN_MODE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_LAUNDRY_DRYER_CONTROLS_CLUSTER_SERVER) || defined(ZCL_USING_LAUNDRY_DRYER_CONTROLS_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_LAUNDRY_DRYER_CONTROLS_CLUSTER                                                                           \
+    { chip::app::Clusters::LaundryDryerControls::Id, "Laundry Dryer Controls" },
+#else
+#define CHIP_PRINTCLUSTER_LAUNDRY_DRYER_CONTROLS_CLUSTER
+#endif
+
 #if defined(ZCL_USING_MODE_SELECT_CLUSTER_SERVER) || defined(ZCL_USING_MODE_SELECT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER { chip::app::Clusters::ModeSelect::Id, "Mode Select" },
 #else
@@ -362,6 +382,19 @@
 #define CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER
 #endif
 
+#if defined(ZCL_USING_MICROWAVE_OVEN_MODE_CLUSTER_SERVER) || defined(ZCL_USING_MICROWAVE_OVEN_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER { chip::app::Clusters::MicrowaveOvenMode::Id, "Microwave Oven Mode" },
+#else
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_MICROWAVE_OVEN_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                           \
+    { chip::app::Clusters::MicrowaveOvenControl::Id, "Microwave Oven Control" },
+#else
+#define CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_SERVER) || defined(ZCL_USING_OPERATIONAL_STATE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER { chip::app::Clusters::OperationalState::Id, "Operational State" },
 #else
@@ -372,6 +405,12 @@
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER { chip::app::Clusters::RvcOperationalState::Id, "RVC Operational State" },
 #else
 #define CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER
+#endif
+
+#if defined(ZCL_USING_SCENES_CLUSTER_SERVER) || defined(ZCL_USING_SCENES_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_SCENES_CLUSTER { chip::app::Clusters::ScenesManagement::Id, "Scenes Management" },
+#else
+#define CHIP_PRINTCLUSTER_SCENES_CLUSTER
 #endif
 
 #if defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_SERVER) || defined(ZCL_USING_HEPA_FILTER_MONITORING_CLUSTER_CLIENT)
@@ -387,6 +426,69 @@
     { chip::app::Clusters::ActivatedCarbonFilterMonitoring::Id, "Activated Carbon Filter Monitoring" },
 #else
 #define CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER
+#endif
+
+#if defined(ZCL_USING_BOOLEAN_STATE_CONFIGURATION_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_STATE_CONFIGURATION_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER                                                                      \
+    { chip::app::Clusters::BooleanStateConfiguration::Id, "Boolean State Configuration" },
+#else
+#define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER
+#endif
+
+#if defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_SERVER) ||                                                           \
+    defined(ZCL_USING_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                  \
+    { chip::app::Clusters::ValveConfigurationAndControl::Id, "Valve Configuration and Control" },
+#else
+#define CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER) ||                                                             \
+    defined(ZCL_USING_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER                                                                    \
+    { chip::app::Clusters::ElectricalEnergyMeasurement::Id, "Electrical Energy Measurement" },
+#else
+#define CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                     \
+    { chip::app::Clusters::DemandResponseLoadControl::Id, "Demand Response Load Control" },
+#else
+#define CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                         \
+    { chip::app::Clusters::DeviceEnergyManagement::Id, "Device Energy Management" },
+#else
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ENERGY_EVSE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER { chip::app::Clusters::EnergyEvse::Id, "Energy EVSE" },
+#else
+#define CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ENERGY_PREFERENCE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_PREFERENCE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER { chip::app::Clusters::EnergyPreference::Id, "Energy Preference" },
+#else
+#define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER { chip::app::Clusters::EnergyEvseMode::Id, "Energy EVSE Mode" },
+#else
+#define CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_SERVER) ||                                                             \
+    defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER                                                                    \
+    { chip::app::Clusters::DeviceEnergyManagementMode::Id, "Device Energy Management Mode" },
+#else
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER
 #endif
 
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
@@ -640,6 +742,18 @@
 #define CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER
 #endif
 
+#if defined(ZCL_USING_CONTENT_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_CONTROL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER { chip::app::Clusters::ContentControl::Id, "Content Control" },
+#else
+#define CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER
+#endif
+
+#if defined(ZCL_USING_CONTENT_APP_OBSERVER_CLUSTER_SERVER) || defined(ZCL_USING_CONTENT_APP_OBSERVER_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER { chip::app::Clusters::ContentAppObserver::Id, "Content App Observer" },
+#else
+#define CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER
+#endif
+
 #if defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_SERVER) || defined(ZCL_USING_ELECTRICAL_MEASUREMENT_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                           \
     { chip::app::Clusters::ElectricalMeasurement::Id, "Electrical Measurement" },
@@ -668,7 +782,6 @@
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_IDENTIFY_CLUSTER                                                                                             \
     CHIP_PRINTCLUSTER_GROUPS_CLUSTER                                                                                               \
-    CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ON_OFF_SWITCH_CONFIGURATION_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_LEVEL_CONTROL_CLUSTER                                                                                        \
@@ -707,6 +820,10 @@
     CHIP_PRINTCLUSTER_PROXY_VALID_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_ICD_MANAGEMENT_CLUSTER                                                                                       \
+    CHIP_PRINTCLUSTER_TIMER_CLUSTER                                                                                                \
+    CHIP_PRINTCLUSTER_OPERATIONAL_STATE_OVEN_CLUSTER                                                                               \
+    CHIP_PRINTCLUSTER_OVEN_MODE_CLUSTER                                                                                            \
+    CHIP_PRINTCLUSTER_LAUNDRY_DRYER_CONTROLS_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_LAUNDRY_WASHER_MODE_CLUSTER                                                                                  \
     CHIP_PRINTCLUSTER_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_CLUSTER                                                 \
@@ -719,10 +836,22 @@
     CHIP_PRINTCLUSTER_AIR_QUALITY_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SMOKE_CO_ALARM_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_DISHWASHER_ALARM_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_MICROWAVE_OVEN_MODE_CLUSTER                                                                                  \
+    CHIP_PRINTCLUSTER_MICROWAVE_OVEN_CONTROL_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_OPERATIONAL_STATE_RVC_CLUSTER                                                                                \
+    CHIP_PRINTCLUSTER_SCENES_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_HEPA_FILTER_MONITORING_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER                                                                   \
+    CHIP_PRINTCLUSTER_BOOLEAN_STATE_CONFIGURATION_CLUSTER                                                                          \
+    CHIP_PRINTCLUSTER_VALVE_CONFIGURATION_AND_CONTROL_CLUSTER                                                                      \
+    CHIP_PRINTCLUSTER_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER                                                                        \
+    CHIP_PRINTCLUSTER_DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER                                                                         \
+    CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                             \
+    CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \
@@ -760,6 +889,8 @@
     CHIP_PRINTCLUSTER_APPLICATION_LAUNCHER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_APPLICATION_BASIC_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_ACCOUNT_LOGIN_CLUSTER                                                                                        \
+    CHIP_PRINTCLUSTER_CONTENT_CONTROL_CLUSTER                                                                                      \
+    CHIP_PRINTCLUSTER_CONTENT_APP_OBSERVER_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_UNIT_TESTING_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_FAULT_INJECTION_CLUSTER                                                                                      \

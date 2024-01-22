@@ -19,6 +19,21 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
+if(${TLNK_MARS_BOARD} MATCHES y)
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.overlay")
+    set(MARS_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.overlay")
+  else()
+    unset(MARS_DTC_OVERLAY_FILE)
+  endif()
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.conf")
+    set(MARS_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}_mars.conf")
+  else()
+    unset(MARS_CONF_OVERLAY_FILE)
+  endif()
+else()
+  unset(MARS_CONF_OVERLAY_FILE)
+endif()
+
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
   set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
 else()
@@ -41,14 +56,14 @@ endif()
 
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
     CACHE STRING "" FORCE
   )
 else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
-set(CONF_FILE prj.conf)
+set(CONF_FILE ${MARS_CONF_OVERLAY_FILE} prj.conf)
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
@@ -69,23 +84,24 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/util/include
                            ${TELINK_COMMON}/app/include)
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/SensorManager.cpp
                src/TemperatureManager.cpp
                src/ZclCallbacks.cpp
                ${TELINK_COMMON}/common/src/mainCommon.cpp
                ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
+               ${TELINK_COMMON}/common/src/SensorManagerCommon.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${TELINK_COMMON}/util/src/PWMDevice.cpp)
+               ${TELINK_COMMON}/util/src/PWMDevice.cpp
+               ${TELINK_COMMON}/util/src/WS2812Device.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../thermostat-common/thermostat.zap
 )
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()

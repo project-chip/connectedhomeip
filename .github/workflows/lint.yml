@@ -29,7 +29,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:22
+            image: ghcr.io/project-chip/chip-build:32
 
         steps:
             - name: Checkout
@@ -51,9 +51,6 @@ jobs:
                       #       https://github.com/project-chip/connectedhomeip/issues/19176
                       #       https://github.com/project-chip/connectedhomeip/issues/19175
                       #       https://github.com/project-chip/connectedhomeip/issues/19173
-                      #       https://github.com/project-chip/connectedhomeip/issues/19169
-                      #       https://github.com/project-chip/connectedhomeip/issues/22640
-                      if [ "$idl_file" = './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/log-source-app/log-source-common/log-source-app.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app1/config.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/placeholder/linux/apps/app2/config.matter' ]; then continue; fi
@@ -101,6 +98,19 @@ jobs:
               if: always()
               run: |
                   git grep -n "PRI.16" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)third_party/lwip/repo/lwip/src/include/lwip/arch.h' && exit 1 || exit 0
+
+            # git grep exits with 0 if it finds a match, but we want
+            # to fail (exit nonzero) on match.  And we want to exclude this file,
+            # to avoid our grep regexp matching itself.
+            - name: Check for use of PRI*64, which are not supported on some libcs.
+              if: always()
+              run: |
+                  # TODO: MessageDefHelper should ideally not be excluded here.
+                  # TODO: chip_im_initiatore should ideally not be excluded here.
+                  # TODO: TLVDebug should ideally not be excluded here.
+                  # TODO: protocol_decoder.cpp should ideally not be excluded here.
+                  # TODO: PersistentStorageMacros.h should ideally not be excluded here.
+                  git grep -n "PRI.64" -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)examples/chip-tool' ':(exclude)examples/tv-casting-app' ':(exclude)src/app/MessageDef/MessageDefHelper.cpp' ':(exclude)src/app/tests/integration/chip_im_initiator.cpp' ':(exclude)src/lib/core/TLVDebug.cpp' ':(exclude)src/lib/dnssd/tests/TestTxtFields.cpp' ':(exclude)src/lib/format/protocol_decoder.cpp' ':(exclude)src/lib/support/PersistentStorageMacros.h' ':(exclude)src/messaging/tests/echo/echo_requester.cpp' ':(exclude)src/platform/Linux' ':(exclude)src/platform/Ameba' ':(exclude)src/platform/ESP32' ':(exclude)src/platform/webos' ':(exclude)zzz_generated/chip-tool' ':(exclude)src/tools/chip-cert/Cmd_PrintCert.cpp' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,

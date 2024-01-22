@@ -56,7 +56,7 @@ void ICDNotifier::Unsubscribe(ICDListener * subscriber)
     }
 }
 
-void ICDNotifier::BroadcastNetworkActivityNotification()
+void ICDNotifier::NotifyNetworkActivityNotification()
 {
     for (auto subscriber : mSubscribers)
     {
@@ -67,7 +67,7 @@ void ICDNotifier::BroadcastNetworkActivityNotification()
     }
 }
 
-void ICDNotifier::BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request)
+void ICDNotifier::NotifyActiveRequestNotification(ICDListener::KeepActiveFlags request)
 {
     for (auto subscriber : mSubscribers)
     {
@@ -78,13 +78,35 @@ void ICDNotifier::BroadcastActiveRequestNotification(ICDListener::KeepActiveFlag
     }
 }
 
-void ICDNotifier::BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request)
+void ICDNotifier::NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlags request)
 {
     for (auto subscriber : mSubscribers)
     {
         if (subscriber != nullptr)
         {
             subscriber->OnActiveRequestWithdrawal(request);
+        }
+    }
+}
+
+void ICDNotifier::NotifyICDManagementEvent(ICDListener::ICDManagementEvents event)
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnICDManagementServerEvent(event);
+        }
+    }
+}
+
+void ICDNotifier::NotifySubscriptionReport()
+{
+    for (auto subscriber : mSubscribers)
+    {
+        if (subscriber != nullptr)
+        {
+            subscriber->OnSubscriptionReport();
         }
     }
 }

@@ -13,9 +13,31 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("icd.gni")
 
 # ICD Server sources and configurations
+
+buildconfig_header("icd_buildconfig") {
+  header = "ICDBuildConfig.h"
+  header_dir = "app/icd"
+
+  defines = [
+    "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
+    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
+    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
+    "ICD_ENFORCE_SIT_SLOW_POLL_LIMIT=${icd_enforce_sit_slow_poll_limit}",
+  ]
+
+  visibility = [ ":icd_config" ]
+}
+
+source_set("icd_config") {
+  sources = [ "ICDConfig.h" ]
+
+  deps = [ ":icd_buildconfig" ]
+}
+
 source_set("observer") {
   sources = [ "ICDStateObserver.h" ]
 }
@@ -26,8 +48,10 @@ source_set("notifier") {
     "ICDNotifier.h",
   ]
 
-  deps = [ "${chip_root}/src/lib/core" ]
-  public_deps = [ "${chip_root}/src/app:app_config" ]
+  deps = [
+    ":icd_config",
+    "${chip_root}/src/lib/core",
+  ]
 }
 
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
@@ -38,20 +62,38 @@ source_set("manager") {
     "ICDManager.h",
   ]
 
+  deps = [ ":icd_config" ]
+
   public_deps = [
-    ":cluster",
+    ":configuration-data",
+    ":monitoring-table",
     ":notifier",
     ":observer",
+    ":sender",
     "${chip_root}/src/credentials:credentials",
   ]
 }
 
-# ICD management cluster source-set is broken out of the main source-set to enable unit tests
-# All sources and configurations used by the ICD management cluster need to go in this source-set
-source_set("cluster") {
+source_set("sender") {
   sources = [
-    "ICDManagementServer.cpp",
-    "ICDManagementServer.h",
+    "ICDCheckInSender.cpp",
+    "ICDCheckInSender.h",
+  ]
+
+  public_deps = [
+    ":configuration-data",
+    ":monitoring-table",
+    ":notifier",
+    "${chip_root}/src/credentials:credentials",
+    "${chip_root}/src/lib/address_resolve:address_resolve",
+    "${chip_root}/src/protocols/secure_channel",
+  ]
+}
+
+# ICDMonitoringTable source-set is broken out of the main source-set to enable unit tests
+# All sources and configurations used by the ICDMonitoringTable need to go in this source-set
+source_set("monitoring-table") {
+  sources = [
     "ICDMonitoringTable.cpp",
     "ICDMonitoringTable.h",
   ]
@@ -59,6 +101,17 @@ source_set("cluster") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform:platform",
-    "${chip_root}/src/protocols:im_status",
+  ]
+}
+
+source_set("configuration-data") {
+  sources = [
+    "ICDConfigurationData.cpp",
+    "ICDConfigurationData.h",
+  ]
+
+  deps = [
+    ":icd_config",
+    "${chip_root}/src/lib/core",
   ]
 }

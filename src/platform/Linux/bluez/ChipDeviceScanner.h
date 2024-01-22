@@ -20,7 +20,6 @@
 #include <platform/CHIPDeviceConfig.h>
 
 #include <glib.h>
-#include <memory>
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
@@ -53,15 +52,18 @@ public:
 class ChipDeviceScanner
 {
 public:
-    /// NOTE: prefer to use the  ::Create method instead direct constructor calling.
-    ChipDeviceScanner(GDBusObjectManager * manager, BluezAdapter1 * adapter, GCancellable * cancellable,
-                      ChipDeviceScannerDelegate * delegate);
-
+    ChipDeviceScanner()                                      = default;
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
     ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
-    ~ChipDeviceScanner();
+    ~ChipDeviceScanner() { Shutdown(); }
+
+    /// Initialize the scanner.
+    CHIP_ERROR Init(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
+
+    /// Release any resources associated with the scanner.
+    void Shutdown();
 
     /// Initiate a scan for devices, with the given timeout
     ///
@@ -72,16 +74,21 @@ public:
     /// Stop any currently running scan
     CHIP_ERROR StopScan();
 
-    /// Should only be called by TimerExpiredCallback.
-    void MarkTimerExpired() { mTimerExpired = true; }
-
-    /// Create a new device scanner
-    ///
-    /// Convenience method to allocate any required variables.
-    /// On success, maintains a reference to the provided adapter.
-    static std::unique_ptr<ChipDeviceScanner> Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate);
-
 private:
+    enum ChipDeviceScannerState
+    {
+        SCANNER_UNINITIALIZED,
+        SCANNER_INITIALIZED,
+        SCANNER_SCANNING
+    };
+
+    enum ScannerTimerState
+    {
+        TIMER_CANCELED,
+        TIMER_STARTED,
+        TIMER_EXPIRED
+    };
+
     static void TimerExpiredCallback(chip::System::Layer * layer, void * appState);
     static CHIP_ERROR MainLoopStartScan(ChipDeviceScanner * self);
     static CHIP_ERROR MainLoopStopScan(ChipDeviceScanner * self);
@@ -103,10 +110,9 @@ private:
     ChipDeviceScannerDelegate * mDelegate = nullptr;
     gulong mObjectAddedSignal             = 0;
     gulong mInterfaceChangedSignal        = 0;
-    bool mIsScanning                      = false;
-    bool mIsStopping                      = false;
+    ChipDeviceScannerState mScannerState  = ChipDeviceScannerState::SCANNER_UNINITIALIZED;
     /// Used to track if timer has already expired and doesn't need to be canceled.
-    bool mTimerExpired = false;
+    ScannerTimerState mTimerState = ScannerTimerState::TIMER_CANCELED;
 };
 
 } // namespace Internal

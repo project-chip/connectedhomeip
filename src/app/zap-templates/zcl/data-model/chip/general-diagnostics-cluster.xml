@@ -38,7 +38,7 @@ limitations under the License.
     <item name="ThreadFault" value="0x03"/>
     <item name="NFCFault" value="0x04"/>
     <item name="BLEFault" value="0x05"/>
-    <item name="EthernetFault" value="0x06"/>    
+    <item name="EthernetFault" value="0x06"/>
   </enum>
   <enum name="NetworkFaultEnum" type="enum8">
     <cluster code="0x0033"/>
@@ -56,7 +56,7 @@ limitations under the License.
     <item name="HardwareWatchdogReset" value="0x04"/>
     <item name="SoftwareUpdateCompleted" value="0x05"/>
     <item name="SoftwareReset" value="0x06"/>
-  </enum>  
+  </enum>
   <enum name="InterfaceTypeEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
@@ -67,15 +67,15 @@ limitations under the License.
   </enum>
   <struct name="NetworkInterface">
     <cluster code="0x0033"/>
-    <item name="Name" type="char_string" length="32"/>
-    <item name="IsOperational" type="boolean"/>
-    <item name="OffPremiseServicesReachableIPv4" type="boolean" isNullable="true"/>
-    <item name="OffPremiseServicesReachableIPv6" type="boolean" isNullable="true"/>
+    <item code="0x00" name="Name" type="char_string" length="32"/>
+    <item code="0x01" name="IsOperational" type="boolean"/>
+    <item code="0x02" name="OffPremiseServicesReachableIPv4" type="boolean" isNullable="true"/>
+    <item code="0x03" name="OffPremiseServicesReachableIPv6" type="boolean" isNullable="true"/>
     <!-- TODO(#14075): HWADR not supported yet -->
-    <item name="HardwareAddress" type="octet_string" length="8"/>
-    <item name="IPv4Addresses" type="octet_string" array="true"/>
-    <item name="IPv6Addresses" type="octet_string" array="true"/>
-    <item name="Type" type="InterfaceTypeEnum"/>
+    <item code="0x04" name="HardwareAddress" type="octet_string" length="8"/>
+    <item code="0x05" name="IPv4Addresses" type="octet_string" array="true"/>
+    <item code="0x06" name="IPv6Addresses" type="octet_string" array="true"/>
+    <item code="0x07" name="Type" type="InterfaceTypeEnum"/>
   </struct>
   <cluster>
     <domain>General</domain>
@@ -83,22 +83,43 @@ limitations under the License.
     <code>0x0033</code>
     <define>GENERAL_DIAGNOSTICS_CLUSTER</define>
     <description>The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
-    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="ARRAY" entryType="NetworkInterface" length="254" writable="false" optional="false">NetworkInterfaces</attribute>
+    <globalAttribute side="either" code="0xFFFD" value="2"/>
+    <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="array" entryType="NetworkInterface" length="8" writable="false" optional="false">NetworkInterfaces</attribute>
     <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
+    <!-- ***NOTE***: UpTime attribute is mandatory starting at Rev >= 2, but because of backwards compatibility, has to be optional here.
+         The device type config and cert tests (TC-DGGEN-1.1/2.1) ensure that it is present. -->
     <attribute side="server" code="0x02" define="UP_TIME" type="int64u" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
     <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="int32u" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
     <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" writable="false" optional="true">BootReason</attribute>
-    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
-    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
-    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="array" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
+    <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="array" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
+    <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="array" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
     <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean" writable="false" optional="false">TestEventTriggersEnabled</attribute>
-    <attribute side="server" code="0x09" define="AVERAGE_WEAR_COUNT" type="int32u" writable="false" default="0x00000000" optional="true">AverageWearCount</attribute>
+    <!--
+        WARNING !!!!! Attribute 0x0009 (previously AverageWearCount, see #30002/#29285)
+        was previously mistakenly added in SDK without being in spec and WAS REMOVED.
+
+        Previously (disallowed):
+        <attribute side="server" code="0x09" define="AVERAGE_WEAR_COUNT" type="int32u" writable="false" default="0x00000000" optional="true">AverageWearCount</attribute>
+
+         ====== ID 0x0009 is reserved, do not use ======
+    -->
 
     <command source="client" code="0x00" name="TestEventTrigger" optional="false">
       <description>Provide a means for certification tests to trigger some test-plan-specific events</description>
       <arg name="EnableKey" type="octet_string" length="16"/>
       <arg name="EventTrigger" type="int64u"/>
       <access op="invoke" role="manage"/>
+    </command>
+
+    <command source="client" code="0x01" name="TimeSnapshot" response="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
+      <description>Take a snapshot of system time and epoch time.</description>
+    </command>
+
+    <command source="server" code="0x02" name="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
+      <description>Response for the TimeSnapshot command.</description>
+      <arg name="SystemTimeMs" type="systime_ms" optional="false"/>
+      <arg name="PosixTimeMs" type="posix_ms" isNullable="true" optional="false"/>
     </command>
 
     <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">

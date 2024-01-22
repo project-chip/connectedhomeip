@@ -16,29 +16,28 @@ import os
 from typing import Union
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, ClusterSide,
-                                         Command, CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl,
-                                         StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Command,
+                                         CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, StructQuality,
+                                         StructTag)
 
 
-def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
-    if type(value) is ClusterSide:
-        if value == ClusterSide.CLIENT:
-            return "client"
-        if value == ClusterSide.SERVER:
-            return "server"
-    elif type(value) is StructTag:
+def human_text_string(value: Union[StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
+    if type(value) is StructTag:
         if value == StructTag.REQUEST:
             return "request"
         if value == StructTag.RESPONSE:
             return "response"
     elif type(value) is FieldQuality:
+        # mypy seems confused if using `FieldQuality.OPTIONAL in value`
+        # directly, so do a useless cast here
+        quality: FieldQuality = value
+
         result = ""
-        if FieldQuality.OPTIONAL in value:
+        if FieldQuality.OPTIONAL in quality:
             result += "optional "
-        if FieldQuality.NULLABLE in value:
+        if FieldQuality.NULLABLE in quality:
             result += "nullable "
-        if FieldQuality.FABRIC_SENSITIVE in value:
+        if FieldQuality.FABRIC_SENSITIVE in quality:
             result += "fabric_sensitive "
         return result.strip()
     elif type(value) is StructQuality:
@@ -78,10 +77,10 @@ def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventP
         return result
     elif type(value) is CommandQuality:
         result = ""
-        if CommandQuality.TIMED_INVOKE in value:
-            result += "timed "
         if CommandQuality.FABRIC_SCOPED in value:
             result += "fabric "
+        if CommandQuality.TIMED_INVOKE in value:
+            result += "timed "
         return result
     elif type(value) is ApiMaturity:
         if value == ApiMaturity.STABLE:

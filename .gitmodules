@@ -54,7 +54,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13xx_26xx,bouffalolab,efr32,esp32,k32w,infineon,qpg,cc32xx,silabs_docker
+	platforms = ameba,cc13xx_26xx,bouffalolab,esp32,k32w,infineon,qpg,cc32xx
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -72,7 +72,7 @@
 	path = third_party/openthread/ot-efr32
 	url = https://github.com/SiliconLabs/ot-efr32.git
 	branch  = matter_sve
-	platforms = efr32,silabs_docker
+	platforms = silabs,silabs_docker
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
@@ -148,10 +148,6 @@
 [submodule "p6/wifi-host-driver"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-host-driver
 	url = https://github.com/Infineon/wifi-host-driver
-	platforms = infineon
-[submodule "p6/wifi-mw-core"]
-	path = third_party/infineon/psoc6/psoc6_sdk/libs/wifi-mw-core
-	url = https://github.com/Infineon/wifi-mw-core
 	platforms = infineon
 [submodule "p6/TARGET_CY8CKIT-062S2-43012"]
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/TARGET_CY8CKIT-062S2-43012
@@ -239,22 +235,22 @@
 	path = third_party/silabs/matter_support
 	url = https://github.com/SiliconLabs/sdk_support.git
 	branch = main
-	platforms = efr32,silabs_docker
+	platforms = silabs,silabs_docker
 [submodule "third_party/silabs/gecko_sdk"]
 	path = third_party/silabs/gecko_sdk
 	url = https://github.com/SiliconLabs/gecko_sdk.git
-	branch = v4.3.2
-	platforms = efr32
+	branch = v4.4.0
+	platforms = silabs
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
 	branch = 2.8.2
-	platforms = efr32,silabs_docker
+	platforms = silabs
 [submodule "third_party/silabs/wifi_sdk"]
 	path = third_party/silabs/wifi_sdk
 	url = https://github.com/SiliconLabs/wiseconnect.git
-	branch = v3.1.0
-	platforms = efr32
+	branch = v3.1.1
+	platforms = silabs
 [submodule "editline"]
 	path = third_party/editline/repo
 	url = https://github.com/troglobit/editline.git
@@ -324,3 +320,7 @@
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
 	branch = v1.17.0
 	platforms = stm32
+[submodule "p6/lwip-network-interface-integration"]
+	path = third_party/infineon/psoc6/psoc6_sdk/libs/lwip-network-interface-integration
+	url = https://github.com/Infineon/lwip-network-interface-integration.git
+	platforms = infineon

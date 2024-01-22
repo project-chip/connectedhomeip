@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 
@@ -38,15 +38,13 @@ ReportSchedulerImpl::ReportSchedulerImpl(TimerDelegate * aTimerDelegate) : Repor
     VerifyOrDie(nullptr != mTimerDelegate);
 }
 
-void ReportSchedulerImpl::OnTransitionToIdle() {}
-
 /// @brief Method that triggers a report emission on each ReadHandler that is not blocked on its min interval.
 ///        Each read handler that is not blocked is immediately marked dirty so that it will report as soon as possible.
 void ReportSchedulerImpl::OnEnterActiveMode()
 {
 #if ICD_REPORT_ON_ENTER_ACTIVE_MODE
     Timestamp now = mTimerDelegate->GetCurrentMonotonicTimestamp();
-    mNodesPool.ForEachActiveObject([now](ReadHandlerNode * node) {
+    mNodesPool.ForEachActiveObject([this, now](ReadHandlerNode * node) {
         if (now >= node->GetMinTimestamp())
         {
             this->HandlerForceDirtyState(node->GetReadHandler());
@@ -57,9 +55,6 @@ void ReportSchedulerImpl::OnEnterActiveMode()
 #endif
 }
 
-/// @brief When a ReadHandler is added, register it in the scheduler node pool. Scheduling the report here is un-necessary since the
-/// ReadHandler will call MoveToState(HandlerState::CanStartReporting);, which will call OnBecameReportable() and schedule the
-/// report.
 void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * newNode = FindReadHandlerNode(aReadHandler);
@@ -73,12 +68,11 @@ void ReportSchedulerImpl::OnSubscriptionEstablished(ReadHandler * aReadHandler)
     newNode = mNodesPool.CreateObject(aReadHandler, this, now);
 
     ChipLogProgress(DataManagement,
-                    "Registered a ReadHandler that will schedule a report between system Timestamp: %" PRIu64
-                    " and system Timestamp %" PRIu64 ".",
-                    newNode->GetMinTimestamp().count(), newNode->GetMaxTimestamp().count());
+                    "Registered a ReadHandler that will schedule a report between system Timestamp: 0x" ChipLogFormatX64
+                    " and system Timestamp 0x" ChipLogFormatX64 ".",
+                    ChipLogValueX64(newNode->GetMinTimestamp().count()), ChipLogValueX64(newNode->GetMaxTimestamp().count()));
 }
 
-/// @brief When a ReadHandler becomes reportable, schedule, recalculate and reschedule the report.
 void ReportSchedulerImpl::OnBecameReportable(ReadHandler * aReadHandler)
 {
     ReadHandlerNode * node = FindReadHandlerNode(aReadHandler);
@@ -107,7 +101,6 @@ void ReportSchedulerImpl::OnSubscriptionReportSent(ReadHandler * aReadHandler)
     ScheduleReport(newTimeout, node, now);
 }
 
-/// @brief When a ReadHandler is removed, unregister it, which will cancel any scheduled report
 void ReportSchedulerImpl::OnReadHandlerDestroyed(ReadHandler * aReadHandler)
 {
     CancelReport(aReadHandler);

@@ -581,7 +581,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_WRONG_ENCRYPTION_TYPE                       CHIP_CORE_ERROR(0x11)
 
-// AVAILABLE: 0x12
+/**
+ *  @def CHIP_ERROR_INVALID_UTF8
+ *
+ *  @brief
+ *    Invalid UTF8 string (contains some characters that are invalid)
+ *
+ */
+#define CHIP_ERROR_INVALID_UTF8                                CHIP_CORE_ERROR(0x12)
 
 /**
  *  @def CHIP_ERROR_INTEGRITY_CHECK_FAILED
@@ -602,8 +609,23 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_SIGNATURE                           CHIP_CORE_ERROR(0x14)
 
-// AVAILABLE: 0x15
-// AVAILABLE: 0x16
+/**
+ *  @def CHIP_ERROR_INVALID_TLV_CHAR_STRING
+ *
+ *  @brief
+ *    Invalid TLV character string (e.g. null terminator)
+ *
+ */
+#define CHIP_ERROR_INVALID_TLV_CHAR_STRING                     CHIP_CORE_ERROR(0x15)
+
+/**
+ *  @def CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT
+ *
+ *  @brief
+ *    Subscription timeout caused by LIT ICD device inactive mode
+ *
+ */
+#define CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT              CHIP_CORE_ERROR(0x16)
 
 /**
  *  @def CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE
@@ -651,22 +673,22 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_WRONG_KEY_TYPE                              CHIP_CORE_ERROR(0x1b)
 
 /**
- *  @def CHIP_ERROR_WELL_UNINITIALIZED
+ *  @def CHIP_ERROR_UNINITIALIZED
  *
  *  @brief
  *    A requested object is uninitialized.
  *
  */
-#define CHIP_ERROR_WELL_UNINITIALIZED                          CHIP_CORE_ERROR(0x1c)
+#define CHIP_ERROR_UNINITIALIZED                               CHIP_CORE_ERROR(0x1c)
 
 /**
- *  @def CHIP_ERROR_WELL_EMPTY
+ *  @def CHIP_ERROR_INVALID_IPK
  *
  *  @brief
- *    A requested object is empty.
+ *    The IPK is invalid
  *
  */
-#define CHIP_ERROR_WELL_EMPTY                                  CHIP_CORE_ERROR(0x1d)
+#define CHIP_ERROR_INVALID_IPK                                 CHIP_CORE_ERROR(0x1d)
 
 /**
  *  @def CHIP_ERROR_INVALID_STRING_LENGTH
@@ -1507,7 +1529,14 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB             CHIP_CORE_ERROR(0xba)
 
-// AVAILABLE: 0xbb
+/**
+ * @def CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED
+ *
+ * @brief
+ *   Caller is trying to add more invoke command paths
+ *   than what the remote node reports supporting.
+ */
+#define CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED           CHIP_CORE_ERROR(0xbb)
 
 /**
  * @def CHIP_ERROR_PEER_NODE_NOT_FOUND

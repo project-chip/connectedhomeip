@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 80.5.2. [TC-MOD-3.2] StartUpMode verification with DUT as Server
+name: 80.5.2.  [TC-MOD-3.2] StartUpMode Verification (DUT as Server)
 
 PICS:
     - MOD.S.A0004
@@ -28,7 +27,9 @@ config:
         defaultValue: 7
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 0: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -36,14 +37,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the StartUpMode attribute from the DUT"
+    - label: "Step 1: TH reads the StartUpMode attribute from the DUT"
       PICS: MOD.S.A0004
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
           saveAs: startup_mode_dut
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 2a: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003
       command: "readAttribute"
       attribute: "CurrentMode"
@@ -51,8 +52,8 @@ tests:
           saveAs: old_current_mode_dut
 
     - label:
-          "If startup_mode_dut is equal to old_current_mode_dut proceed to step
-          4. Else proceed to step 6"
+          "Step 2b: If the StartUpMode and CurrentMode attributes have the same
+          value, proceed to step 2c, Otherwise proceed to step 3a."
       PICS: MOD.S.A0003 && MOD.S.A0004
       cluster: "EqualityCommands"
       command: "UnsignedNumberEquals"
@@ -67,7 +68,7 @@ tests:
                 - name: "Equals"
                   saveAs: IsExpectedValue
 
-    - label: "TH reads the SupportedModes attribute from the DUT"
+    - label: "Step 2c: TH reads the SupportedModes attribute from the DUT"
       runIf: IsExpectedValue
       PICS: MOD.S.A0002
       command: "readAttribute"
@@ -77,9 +78,9 @@ tests:
               type: list
 
     - label:
-          "Select a value from the list in step 2c with a different value than
-          the StartUpMode value read in step 1. TH sends a ChangeToMode command
-          to the DUT with the selected value."
+          "Step 2d: Select a value from the list in step 2c with a different
+          value than the StartUpMode value read in step 1. TH sends a
+          ChangeToMode command to the DUT with the selected value."
       runIf: IsExpectedValue
       PICS: MOD.S.A0002 && MOD.S.C00.Rsp
       command: "ChangeToMode"
@@ -88,7 +89,7 @@ tests:
               - name: "NewMode"
                 value: NewMode
 
-    - label: "Physically power cycle the device."
+    - label: "Step 3a: Physically power cycle the device."
       verification: |
           Physically power cycle the device.
       cluster: "LogCommands"
@@ -101,7 +102,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Commission device after reboot"
+    - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -109,7 +110,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 3b: TH reads the CurrentMode attribute from the DUT"
       PICS: MOD.S.A0003 && MOD.S.F00 && PICS_USER_PROMPT
       command: "readAttribute"
       attribute: "CurrentMode"

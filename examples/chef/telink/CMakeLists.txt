@@ -15,8 +15,6 @@
 #
 cmake_minimum_required(VERSION 3.13.1)
 
-set(BOARD tlsr9518adk80d)
-
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
@@ -76,8 +74,10 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}/../
                            ${CHIP_ROOT}/src
                            ${CHEF}/shell_common/include
+                           ${CHEF}/telink/include
                            ${TELINK_COMMON}/common/include
                            ${TELINK_COMMON}/util/include
+                           ${TELINK_COMMON}/app/include
 )
 
 if (CONFIG_CHIP_LIB_SHELL)
@@ -92,12 +92,13 @@ if (CONFIG_CHIP_LIB_SHELL)
   )
 endif()
 
-add_definitions(
-    "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
-)
-
 target_sources(app PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    src/AppTask.cpp
+    ${TELINK_COMMON}/common/src/mainCommon.cpp
+    ${TELINK_COMMON}/common/src/AppTaskCommon.cpp
+    ${TELINK_COMMON}/util/src/PWMDevice.cpp
+    ${TELINK_COMMON}/util/src/ButtonManager.cpp
+    ${TELINK_COMMON}/util/src/ThreadUtil.cpp
     ${CHEF}/common/stubs.cpp
 )
 
@@ -107,6 +108,10 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
+
+if(CONFIG_BOOTLOADER_MCUBOOT)
+  target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
+endif()
 
 if (CONFIG_CHIP_PW_RPC)
 

@@ -122,33 +122,11 @@ Delegate * GetDefaultDelegate()
 } // namespace app
 } // namespace chip
 
-constexpr uint64_t kChipEpochUsSinceUnixEpoch =
-    static_cast<uint64_t>(kChipEpochSecondsSinceUnixEpoch) * chip::kMicrosecondsPerSecond;
-
-static bool ChipEpochToUnixEpochMicro(uint64_t chipEpochTime, uint64_t & unixEpochTime)
-{
-    // in case chipEpochTime is too big and result overflows return false
-    if (chipEpochTime + kChipEpochUsSinceUnixEpoch < kChipEpochUsSinceUnixEpoch)
-    {
-        return false;
-    }
-    unixEpochTime = chipEpochTime + kChipEpochUsSinceUnixEpoch;
-    return true;
-}
-
-static bool UnixEpochToChipEpochMicro(uint64_t unixEpochTime, uint64_t & chipEpochTime)
-{
-    VerifyOrReturnValue(unixEpochTime >= kChipEpochUsSinceUnixEpoch, false);
-    chipEpochTime = unixEpochTime - kChipEpochUsSinceUnixEpoch;
-
-    return true;
-}
-
 static CHIP_ERROR UpdateUTCTime(uint64_t UTCTimeInChipEpochUs)
 {
     uint64_t UTCTimeInUnixEpochUs;
 
-    VerifyOrReturnError(ChipEpochToUnixEpochMicro(UTCTimeInChipEpochUs, UTCTimeInUnixEpochUs), CHIP_ERROR_INVALID_TIME);
+    VerifyOrReturnError(ChipEpochToUnixEpochMicros(UTCTimeInChipEpochUs, UTCTimeInUnixEpochUs), CHIP_ERROR_INVALID_TIME);
     uint64_t secs = UTCTimeInChipEpochUs / chip::kMicrosecondsPerSecond;
     // https://github.com/project-chip/connectedhomeip/issues/27501
     VerifyOrReturnError(secs <= UINT32_MAX, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
@@ -551,7 +529,7 @@ void TimeSynchronizationServer::InitTimeZone()
     for (auto & tzStore : mTimeZoneObj.timeZoneList)
     {
         memset(tzStore.name, 0, sizeof(tzStore.name));
-        tzStore.timeZone = { .offset = 0, .validAt = 0, .name = MakeOptional(CharSpan(tzStore.name, sizeof(tzStore.name))) };
+        tzStore.timeZone = { .offset = 0, .validAt = 0, .name = chip::NullOptional };
     }
 }
 
@@ -798,6 +776,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         ChipLogError(Zcl, "Error setting UTC time on the device");
         return err;
     }
+    GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
     mGranularity         = granularity;
     EmberAfStatus status = TimeSource::Set(ep, source);
     if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
@@ -820,7 +799,7 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     TimeState newState = UpdateDSTOffsetState();
     VerifyOrReturnError(TimeState::kInvalid != newState, CHIP_ERROR_INVALID_TIME);
     ReturnErrorOnFailure(System::SystemClock().GetClock_RealTime(utcTime));
-    VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
+    VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), CHIP_ERROR_INVALID_TIME);
     if (TimeState::kChanged == UpdateTimeZoneState())
     {
         emitTimeZoneStatusEvent(ep);
@@ -863,7 +842,7 @@ TimeState TimeSynchronizationServer::UpdateTimeZoneState()
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, TimeState::kInvalid);
     VerifyOrReturnValue(tzList.size() != 0, TimeState::kInvalid);
-    VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), TimeState::kInvalid);
+    VerifyOrReturnValue(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), TimeState::kInvalid);
 
     for (size_t i = 0; i < tzList.size(); i++)
     {
@@ -902,7 +881,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
 
     VerifyOrReturnValue(System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR, TimeState::kInvalid);
     VerifyOrReturnValue(dstList.size() != 0, TimeState::kInvalid);
-    VerifyOrReturnValue(UnixEpochToChipEpochMicro(utcTime.count(), chipEpochTime), TimeState::kInvalid);
+    VerifyOrReturnValue(UnixEpochToChipEpochMicros(utcTime.count(), chipEpochTime), TimeState::kInvalid);
 
     for (size_t i = 0; i < dstList.size(); i++)
     {
@@ -1066,7 +1045,7 @@ CHIP_ERROR TimeSynchronizationAttrAccess::Read(const ConcreteReadAttributePath &
             return aEncoder.EncodeNull();
         }
         VerifyOrReturnError(System::SystemClock().GetClock_RealTime(utcTimeUnix) == CHIP_NO_ERROR, aEncoder.EncodeNull());
-        VerifyOrReturnError(UnixEpochToChipEpochMicro(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
+        VerifyOrReturnError(UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime), aEncoder.EncodeNull());
         return aEncoder.Encode(chipEpochTime);
     }
     case Granularity::Id: {
@@ -1284,24 +1263,19 @@ bool emberAfTimeSynchronizationClusterSetDefaultNTPCallback(
             commandObj->AddStatus(commandPath, Status::ConstraintError);
             return true;
         }
-        if (!GetDelegate()->IsNTPAddressValid(dNtpChar.Value()))
+        bool dnsResolve;
+        if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+        bool isDomain = GetDelegate()->IsNTPAddressDomain(dNtpChar.Value());
+        bool isIPv6   = GetDelegate()->IsNTPAddressValid(dNtpChar.Value());
+        bool useable  = isIPv6 || (isDomain && dnsResolve);
+        if (!useable)
         {
             commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
-        }
-        if (GetDelegate()->IsNTPAddressDomain(dNtpChar.Value()))
-        {
-            bool dnsResolve;
-            if (EMBER_ZCL_STATUS_SUCCESS != SupportsDNSResolve::Get(commandPath.mEndpointId, &dnsResolve))
-            {
-                commandObj->AddStatus(commandPath, Status::Failure);
-                return true;
-            }
-            if (!dnsResolve)
-            {
-                commandObj->AddStatus(commandPath, Status::InvalidCommand);
-                return true;
-            }
         }
     }
 

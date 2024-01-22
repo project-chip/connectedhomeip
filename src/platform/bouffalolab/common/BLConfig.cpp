@@ -26,12 +26,13 @@ namespace Internal {
 
 void BLConfig::Init(void)
 {
+    env_node_obj node;
+
     easyflash_init();
     ef_load_env_cache();
 
-    if (ef_get_env(kBLKey_factoryResetFlag))
+    if (ef_get_env_obj(kBLKey_factoryResetFlag, &node))
     {
-
         ef_print_env_cb([](env_node_obj_t env, void * arg1, void * arg2) {
             if (ENV_WRITE == env->status)
             {

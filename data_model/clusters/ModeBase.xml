@@ -55,9 +55,11 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status.
+Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
   <features>
@@ -76,10 +78,11 @@ Davis, CA 95616, USA
         <access read="true"/>
         <mandatoryConform/>
       </field>
-      <field id="2" name="ModeTags" type="list[ModeTagStruct Type]" default="MS">
+      <field id="2" name="ModeTags" type="list" default="MS">
+        <entry type="ModeTagStruct"/>
         <access read="true"/>
         <mandatoryConform/>
-        <constraint type="max" value="8"/>
+        <constraint type="maxCount" value="8"/>
       </field>
     </struct>
     <struct name="ModeTagStruct">
@@ -95,11 +98,12 @@ Davis, CA 95616, USA
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SupportedModes" type="list[ModeOptionStruct Type]" default="MS">
+    <attribute id="0x0000" name="SupportedModes" type="list" default="MS">
+      <entry type="ModeOptionStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform/>
-      <constraint type="between" from="2" to="255"/>
+      <constraint type="countBetween" from="2" to="255"/>
     </attribute>
     <attribute id="0x0001" name="CurrentMode" type="uint8" default="MS">
       <access read="true" readPrivilege="view"/>

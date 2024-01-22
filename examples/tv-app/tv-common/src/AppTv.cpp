@@ -62,7 +62,27 @@ class MyUserPrompter : public UserPrompter
     }
 
     // tv should override this with a dialog prompt
-    inline void PromptForCommissionPincode(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
+    inline void PromptForCommissionPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                            uint16_t pairingHint, const char * pairingInstruction) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void HidePromptsOnCancel(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override { return; }
+
+    // set to true when TV displays both QR and Passcode during Commissioner Passcode display.
+    inline bool DisplaysPasscodeAndQRCode() override { return true; }
+
+    // tv should override this with a dialog prompt
+    inline void PromptWithCommissionerPasscode(uint16_t vendorId, uint16_t productId, const char * commissioneeName,
+                                               uint32_t passcode, uint16_t pairingHint, const char * pairingInstruction) override
+    {
+        return;
+    }
+
+    // tv should override this with a dialog prompt
+    inline void PromptCommissioningStarted(uint16_t vendorId, uint16_t productId, const char * commissioneeName) override
     {
         return;
     }
@@ -79,14 +99,26 @@ class MyUserPrompter : public UserPrompter
 
 MyUserPrompter gMyUserPrompter;
 
-class MyPincodeService : public PincodeService
+class MyPasscodeService : public PasscodeService
 {
-    uint32_t FetchCommissionPincodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    bool HasTargetContentApp(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId,
+                             chip::Protocols::UserDirectedCommissioning::TargetAppInfo & info, uint32_t & passcode) override
     {
-        return ContentAppPlatform::GetInstance().GetPincodeFromContentApp(vendorId, productId, rotatingId);
+        return ContentAppPlatform::GetInstance().HasTargetContentApp(vendorId, productId, rotatingId, info, passcode);
+    }
+
+    uint32_t GetCommissionerPasscode(uint16_t vendorId, uint16_t productId, chip::CharSpan rotatingId) override
+    {
+        // TODO: randomly generate this value
+        return 12345678;
+    }
+
+    uint32_t FetchCommissionPasscodeFromContentApp(uint16_t vendorId, uint16_t productId, CharSpan rotatingId) override
+    {
+        return ContentAppPlatform::GetInstance().GetPasscodeFromContentApp(vendorId, productId, rotatingId);
     }
 };
-MyPincodeService gMyPincodeService;
+MyPasscodeService gMyPasscodeService;
 
 class MyPostCommissioningListener : public PostCommissioningListener
 {
@@ -393,21 +425,22 @@ constexpr CommandId channelOutgoingCommands[] = {
 };
 // Declare Cluster List for Content App endpoint
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(contentAppClusters)
-DECLARE_DYNAMIC_CLUSTER(app::Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationBasic::Id, applicationBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::KeypadInput::Id, keypadInputAttrs, keypadInputIncomingCommands,
+DECLARE_DYNAMIC_CLUSTER(app::Clusters::Descriptor::Id, descriptorAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationBasic::Id, applicationBasicAttrs, ZAP_CLUSTER_MASK(SERVER), nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::KeypadInput::Id, keypadInputAttrs, ZAP_CLUSTER_MASK(SERVER), keypadInputIncomingCommands,
                             keypadInputOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationLauncher::Id, applicationLauncherAttrs, applicationLauncherIncomingCommands,
-                            applicationLauncherOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::AccountLogin::Id, accountLoginAttrs, accountLoginIncomingCommands,
-                            accountLoginOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ContentLauncher::Id, contentLauncherAttrs, contentLauncherIncomingCommands,
-                            contentLauncherOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::MediaPlayback::Id, mediaPlaybackAttrs, mediaPlaybackIncomingCommands,
-                            mediaPlaybackOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::TargetNavigator::Id, targetNavigatorAttrs, targetNavigatorIncomingCommands,
-                            targetNavigatorOutgoingCommands),
-    DECLARE_DYNAMIC_CLUSTER(app::Clusters::Channel::Id, channelAttrs, channelIncomingCommands, channelOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ApplicationLauncher::Id, applicationLauncherAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            applicationLauncherIncomingCommands, applicationLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::AccountLogin::Id, accountLoginAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            accountLoginIncomingCommands, accountLoginOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::ContentLauncher::Id, contentLauncherAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            contentLauncherIncomingCommands, contentLauncherOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::MediaPlayback::Id, mediaPlaybackAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            mediaPlaybackIncomingCommands, mediaPlaybackOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::TargetNavigator::Id, targetNavigatorAttrs, ZAP_CLUSTER_MASK(SERVER),
+                            targetNavigatorIncomingCommands, targetNavigatorOutgoingCommands),
+    DECLARE_DYNAMIC_CLUSTER(app::Clusters::Channel::Id, channelAttrs, ZAP_CLUSTER_MASK(SERVER), channelIncomingCommands,
+                            channelOutgoingCommands),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Content App endpoint
@@ -557,7 +590,7 @@ CHIP_ERROR AppTvInit()
     CommissionerDiscoveryController * cdc = GetCommissionerDiscoveryController();
     if (cdc != nullptr)
     {
-        cdc->SetPincodeService(&gMyPincodeService);
+        cdc->SetPasscodeService(&gMyPasscodeService);
         cdc->SetUserPrompter(&gMyUserPrompter);
         cdc->SetPostCommissioningListener(&gMyPostCommissioningListener);
     }

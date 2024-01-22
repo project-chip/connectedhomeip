@@ -32,7 +32,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <app/icd/ICDNotifier.h>
+#include <app/icd/ICDConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPKeyIds.h>
@@ -113,7 +116,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // If session requires MRP, NoAutoRequestAck send flag is not specified and is not a group exchange context, request reliable
     // transmission.
     bool reliableTransmissionRequested =
-        GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
+        GetSessionHandle()->AllowsMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
     bool currentMessageExpectResponse = false;
     // If a response message is expected...
@@ -200,7 +203,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+            app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
             // Standalone acks are not application-level message sends.
@@ -322,11 +325,11 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
 
     SetAckPending(false);
 
-    // Do not request Ack for multicast
-    SetAutoRequestAck(!session->IsGroupSession());
+    // Try to use MRP by default, if it is allowed.
+    SetAutoRequestAck(session->AllowsMRP());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(app::ICDListener::KeepActiveFlags::kExchangeContextOpen);
+    app::ICDNotifier::GetInstance().NotifyActiveRequestNotification(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
@@ -345,7 +348,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(app::ICDListener::KeepActiveFlags::kExchangeContextOpen);
+    app::ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(app::ICDListener::KeepActiveFlag::kExchangeContextOpen);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Ideally, in this scenario, the retransmit table should
@@ -531,34 +534,37 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    if (mDispatch.IsReliableTransmissionAllowed() && !IsGroupExchangeContext())
+    if (mSession->AllowsMRP())
     {
-        if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
-            payloadHeader.GetAckMessageCounter().HasValue())
+        if (mDispatch.IsReliableTransmissionAllowed())
         {
-            HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
+            if (!msgFlags.Has(MessageFlagValues::kDuplicateMessage) && payloadHeader.IsAckMsg() &&
+                payloadHeader.GetAckMessageCounter().HasValue())
+            {
+                HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
+            }
+
+            if (payloadHeader.NeedsAck())
+            {
+                // An acknowledgment needs to be sent back to the peer for this message on this exchange,
+                HandleNeedsAck(messageCounter, msgFlags);
+            }
         }
 
-        if (payloadHeader.NeedsAck())
+        if (IsAckPending() && !mDelegate)
         {
-            // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-            HandleNeedsAck(messageCounter, msgFlags);
+            // The incoming message wants an ack, but we have no delegate, so
+            // there's not going to be a response to piggyback on.  Just flush the
+            // ack out right now.
+            ReturnErrorOnFailure(FlushAcks());
         }
-    }
 
-    if (IsAckPending() && !mDelegate)
-    {
-        // The incoming message wants an ack, but we have no delegate, so
-        // there's not going to be a response to piggyback on.  Just flush the
-        // ack out right now.
-        ReturnErrorOnFailure(FlushAcks());
-    }
-
-    // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
-    if (isStandaloneAck)
-    {
-        return CHIP_NO_ERROR;
-    }
+        // The SecureChannel::StandaloneAck message type is only used for MRP; do not pass such messages to the application layer.
+        if (isStandaloneAck)
+        {
+            return CHIP_NO_ERROR;
+        }
+    } // AllowsMRP
 
     // Since the message is duplicate, let's not forward it up the stack
     if (isDuplicate)
@@ -566,27 +572,30 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
-    if (IsEphemeralExchange())
+    if (mSession->AllowsMRP())
     {
-        // The EphemeralExchange has done its job, since StandaloneAck is sent in previous FlushAcks() call.
-        return CHIP_NO_ERROR;
-    }
+        if (IsEphemeralExchange())
+        {
+            // The EphemeralExchange has done its job, since StandaloneAck is sent in previous FlushAcks() call.
+            return CHIP_NO_ERROR;
+        }
 
-    if (IsWaitingForAck())
-    {
-        // The only way we can get here is a spec violation on the other side:
-        // we sent a message that needs an ack, and the other side responded
-        // with a message that does not contain an ack for the message we sent.
-        // Just drop this message; if we delivered it to our delegate it might
-        // try to send another message-needing-an-ack in response, which would
-        // violate our internal invariants.
-        ChipLogError(ExchangeManager, "Dropping message without piggyback ack when we are waiting for an ack.");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+        if (IsWaitingForAck())
+        {
+            // The only way we can get here is a spec violation on the other side:
+            // we sent a message that needs an ack, and the other side responded
+            // with a message that does not contain an ack for the message we sent.
+            // Just drop this message; if we delivered it to our delegate it might
+            // try to send another message-needing-an-ack in response, which would
+            // violate our internal invariants.
+            ChipLogError(ExchangeManager, "Dropping message without piggyback ack when we are waiting for an ack.");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+    } // AllowsMRP
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // message received
-    app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+    app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Set kFlagReceivedAtLeastOneMessage to true since we have received at least one new application level message

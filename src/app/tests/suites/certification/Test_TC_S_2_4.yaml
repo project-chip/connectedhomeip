@@ -13,14 +13,16 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 123.2.4. [TC-S-2.4] Recall scene with transition time functionality
+name:
+    123.2.4. [TC-S-2.4] Recall scene with transition time functionality with DUT
+    as Server
 
 PICS:
     - S.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
     G1:
         type: group_id
@@ -36,8 +38,14 @@ tests:
                 value: nodeId
 
     - label:
-          "Step 0a: preparation step for using commands from Groups cluster: Add
-          KeySet"
+          "Step 0a: TH sends KeySetWrite command in the GroupKeyManagement
+          cluster to DUT using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: 1)GroupKeySetID: 0x01a1
+          2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 2220000
+          5)EpochKey1: d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          2220001 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 2220002"
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -57,8 +65,10 @@ tests:
                     }
 
     - label:
-          "Step 0b: Preparation step for using commands from Groups cluster:
-          Write Group Keys"
+          "Step 0b: TH binds GroupId 0x0001 with GroupKeySetID 0x01a1 in the
+          GroupKeyMap attribute list on GroupKeyManagement cluster by writing
+          the GroupKeyMap attribute with one entry as follows: List item 1:
+          1)FabricIndex: 1 2)GroupId: 0x0001 3)GroupKeySetId: 0x01a1"
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -109,7 +119,7 @@ tests:
     - label:
           "Step 3: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
-          0x0001 and a set of extension fields appropriate to AC1."
+          0x4E20 (20s) and no extension fields set."
       PICS: S.S.C00.Rsp
       command: "AddScene"
       arguments:
@@ -119,7 +129,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0014
+                value: 0x4E20
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -307,7 +317,7 @@ tests:
           Is DUT configured with AC2?
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && PICS_SC_RECALL_SCENE_TRANSITION_TIME
+      PICS: PICS_SKIP_SAMPLE_APP && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
       arguments:
           values:
               - name: "message"
@@ -320,8 +330,8 @@ tests:
     - label:
           "Step 6b: TH sends a RecallScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01 and the TransitionTime field
-          set to 0x0032 (5s)."
-      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME
+          set to 5000 (5s)."
+      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
       command: "RecallScene"
       arguments:
           values:
@@ -330,10 +340,10 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0032
+                value: 5000
 
     - label: "Wait 5s"
-      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME
+      PICS: S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -344,7 +354,7 @@ tests:
     - label:
           "TH confirm the DUT reached AC2 (on level control cluster) after 5s"
       PICS:
-          S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME &&
+          S.S.C05.Rsp && PICS_SC_RECALL_SCENE_TRANSITION_TIME_MS &&
           PICS_SDK_CI_ONLY
       cluster: "Level Control"
       command: "readAttribute"

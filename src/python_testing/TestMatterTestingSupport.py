@@ -25,9 +25,9 @@ from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
                                     get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
-from TC_DeviceBasicComposition import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
-                                       find_tag_list_problems, find_tree_roots, get_all_children, get_direct_children_of_root,
-                                       parts_list_cycles, separate_endpoint_types)
+from taglist_and_topology_test_support import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                               find_tag_list_problems, find_tree_roots, get_all_children,
+                                               get_direct_children_of_root, parts_list_cycles, separate_endpoint_types)
 
 
 def get_raw_type_list():
@@ -136,7 +136,7 @@ class TestMatterTestingSupport(MatterBaseTest):
     async def test_pics_support(self):
         pics_list = ['TEST.S.A0000=1',
                      'TEST.S.A0001=0',
-                     'lower.s.a0000=1',
+                     'TEST.S.A000a=1'
                      '',
                      ' ',
                      '# comment',
@@ -148,10 +148,9 @@ class TestMatterTestingSupport(MatterBaseTest):
 
         asserts.assert_true(self.check_pics("TEST.S.A0000"), "PICS parsed incorrectly for TEST.S.A0000")
         asserts.assert_false(self.check_pics("TEST.S.A0001"), "PICS parsed incorrectly for TEST.S.A0001")
-        asserts.assert_true(self.check_pics("LOWER.S.A0000"), "PICS pased incorrectly for LOWER.S.A0000")
+        asserts.assert_true(self.check_pics("TEST.S.A000a"), "PICS parsed incorrectly for TEST.S.A000a")
         asserts.assert_true(self.check_pics("SPACE.S.A0000"), "PICS parsed incorrectly for SPACE.S.A0000")
         asserts.assert_false(self.check_pics("NOT.S.A0000"), "PICS parsed incorrectly for NOT.S.A0000")
-        asserts.assert_true(self.check_pics(" test.s.a0000"), "PICS checker lowercase handled incorrectly")
 
         # invalid pics file should throw a value error
         pics_list.append("BAD.S.A000=5")

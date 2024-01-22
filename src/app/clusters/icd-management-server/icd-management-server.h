@@ -16,3 +16,53 @@
  */
 
 #pragma once
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/icd/ICDConfigurationData.h>
+#include <app/icd/ICDMonitoringTable.h>
+#include <app/util/basic-types.h>
+#include <crypto/SessionKeystore.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/Optional.h>
+#include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+using chip::Protocols::InteractionModel::Status;
+
+class ICDManagementServer
+{
+public:
+    ICDManagementServer() = default;
+
+    static void Init(chip::PersistentStorageDelegate & storage, chip::Crypto::SymmetricKeystore * symmetricKeystore,
+                     chip::ICDConfigurationData & ICDConfigurationData);
+
+    /**
+     * @brief Function that executes the business logic of the RegisterClient Command
+     *
+     * @param[out] icdCounter If function succeeds, icdCounter will have the current value of the ICDCounter stored in the
+     * ICDConfigurationData If function fails, icdCounter will be unchanged
+     * @return Status
+     */
+    Status RegisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                          const chip::app::Clusters::IcdManagement::Commands::RegisterClient::DecodableType & commandData,
+                          uint32_t & icdCounter);
+
+    Status UnregisterClient(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                            const chip::app::Clusters::IcdManagement::Commands::UnregisterClient::DecodableType & commandData);
+
+    Status StayActiveRequest(chip::FabricIndex fabricIndex);
+
+private:
+    /**
+     * @brief Triggers table update events to notify subscribers that an entry was added or removed
+     *        from the ICDMonitoringTable.
+     */
+    void TriggerICDMTableUpdatedEvent();
+
+    static chip::PersistentStorageDelegate * mStorage;
+    static chip::Crypto::SymmetricKeystore * mSymmetricKeystore;
+    static chip::ICDConfigurationData * mICDConfigurationData;
+};

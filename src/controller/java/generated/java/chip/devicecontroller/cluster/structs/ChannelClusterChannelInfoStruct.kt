@@ -28,7 +28,9 @@ class ChannelClusterChannelInfoStruct(
   val minorNumber: UInt,
   val name: Optional<String>,
   val callSign: Optional<String>,
-  val affiliateCallSign: Optional<String>
+  val affiliateCallSign: Optional<String>,
+  val identifier: Optional<String>,
+  val type: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ChannelClusterChannelInfoStruct {\n")
@@ -37,6 +39,8 @@ class ChannelClusterChannelInfoStruct(
     append("\tname : $name\n")
     append("\tcallSign : $callSign\n")
     append("\taffiliateCallSign : $affiliateCallSign\n")
+    append("\tidentifier : $identifier\n")
+    append("\ttype : $type\n")
     append("}\n")
   }
 
@@ -57,6 +61,14 @@ class ChannelClusterChannelInfoStruct(
         val optaffiliateCallSign = affiliateCallSign.get()
         put(ContextSpecificTag(TAG_AFFILIATE_CALL_SIGN), optaffiliateCallSign)
       }
+      if (identifier.isPresent) {
+        val optidentifier = identifier.get()
+        put(ContextSpecificTag(TAG_IDENTIFIER), optidentifier)
+      }
+      if (type.isPresent) {
+        val opttype = type.get()
+        put(ContextSpecificTag(TAG_TYPE), opttype)
+      }
       endStructure()
     }
   }
@@ -67,6 +79,8 @@ class ChannelClusterChannelInfoStruct(
     private const val TAG_NAME = 2
     private const val TAG_CALL_SIGN = 3
     private const val TAG_AFFILIATE_CALL_SIGN = 4
+    private const val TAG_IDENTIFIER = 5
+    private const val TAG_TYPE = 6
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterChannelInfoStruct {
       tlvReader.enterStructure(tlvTag)
@@ -90,6 +104,18 @@ class ChannelClusterChannelInfoStruct(
         } else {
           Optional.empty()
         }
+      val identifier =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_IDENTIFIER))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IDENTIFIER)))
+        } else {
+          Optional.empty()
+        }
+      val type =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TYPE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_TYPE)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
@@ -98,7 +124,9 @@ class ChannelClusterChannelInfoStruct(
         minorNumber,
         name,
         callSign,
-        affiliateCallSign
+        affiliateCallSign,
+        identifier,
+        type
       )
     }
   }

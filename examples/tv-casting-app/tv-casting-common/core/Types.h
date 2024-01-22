@@ -49,6 +49,8 @@ class AppParameters;
 class ByteSpanDataProvider;
 class ServerInitParamsProvider;
 
+class EndpointListLoader;
+
 } // namespace support
 
 }; // namespace casting

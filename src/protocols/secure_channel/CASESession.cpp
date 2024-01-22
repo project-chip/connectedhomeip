@@ -41,6 +41,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/PairingSession.h>
+#include <protocols/secure_channel/SessionParameters.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/SystemClock.h>
@@ -385,6 +386,7 @@ void CASESession::OnSessionReleased()
 
 void CASESession::Clear()
 {
+    MATTER_TRACE_SCOPE("Clear", "CASESession");
     // Cancel any outstanding work.
     if (mSendSigma3Helper)
     {
@@ -435,6 +437,7 @@ void CASESession::InvalidateIfPendingEstablishmentOnFabric(FabricIndex fabricInd
 CHIP_ERROR CASESession::Init(SessionManager & sessionManager, Credentials::CertificateValidityPolicy * policy,
                              SessionEstablishmentDelegate * delegate, const ScopedNodeId & sessionEvictionHint)
 {
+    MATTER_TRACE_SCOPE("Init", "CASESession");
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mGroupDataProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(sessionManager.GetSessionKeystore() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -461,6 +464,7 @@ CASESession::PrepareForSessionEstablishment(SessionManager & sessionManager, Fab
                                             SessionEstablishmentDelegate * delegate, const ScopedNodeId & previouslyEstablishedPeer,
                                             Optional<ReliableMessageProtocolConfig> mrpLocalConfig)
 {
+    MATTER_TRACE_SCOPE("PrepareForSessionEstablishment", "CASESession");
     // Below VerifyOrReturnError is not SuccessOrExit since we only want to goto `exit:` after
     // Init has been successfully called.
     VerifyOrReturnError(fabricTable != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -543,6 +547,7 @@ exit:
 
 void CASESession::OnResponseTimeout(ExchangeContext * ec)
 {
+    MATTER_TRACE_SCOPE("OnResponseTimeout", "CASESession");
     VerifyOrReturn(ec != nullptr, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout was called by null exchange"));
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %u",
@@ -555,9 +560,12 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
+    MATTER_TRACE_SCOPE("AbortPendingEstablish", "CASESession");
+    // This needs to come before Clear() which will reset mState.
+    SessionEstablishmentStage state = MapCASEStateToSessionEstablishmentStage(mState);
     Clear();
     // Do this last in case the delegate frees us.
-    NotifySessionEstablishmentError(err);
+    NotifySessionEstablishmentError(err, state);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session) const
@@ -640,13 +648,11 @@ CHIP_ERROR CASESession::RecoverInitiatorIpk()
 CHIP_ERROR CASESession::SendSigma1()
 {
     MATTER_TRACE_SCOPE("SendSigma1", "CASESession");
-    const size_t mrpParamsSize =
-        mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t)) : 0;
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
-                                                  sizeof(uint16_t),            // initiatorSessionId,
-                                                  kSHA256_Hash_Length,         // destinationId
-                                                  kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                  mrpParamsSize,               // initiatorMRPParams
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize,          // initiatorRandom
+                                                  sizeof(uint16_t),                     // initiatorSessionId,
+                                                  kSHA256_Hash_Length,                  // destinationId
+                                                  kP256_PublicKey_Length,               // InitiatorEphPubKey,
+                                                  SessionParameters::kEstimatedTLVSize, // initiatorSessionParams
                                                   SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -699,11 +705,7 @@ CHIP_ERROR CASESession::SendSigma1()
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(4), mEphemeralKey->Pubkey(), static_cast<uint32_t>(mEphemeralKey->Pubkey().Length())));
 
-    if (mLocalMRPConfig.HasValue())
-    {
-        ChipLogDetail(SecureChannel, "Including MRP parameters");
-        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
-    }
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriter));
 
     // Try to find persistent session, and resume it.
     bool resuming = false;
@@ -754,6 +756,7 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
 
 CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinationId, const ByteSpan & initiatorRandom)
 {
+    MATTER_TRACE_SCOPE("FindLocalNodeFromDestinationId", "CASESession");
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     bool found = false;
@@ -808,6 +811,7 @@ CHIP_ERROR CASESession::FindLocalNodeFromDestinationId(const ByteSpan & destinat
 CHIP_ERROR CASESession::TryResumeSession(SessionResumptionStorage::ConstResumptionIdView resumptionId, ByteSpan resume1MIC,
                                          ByteSpan initiatorRandom)
 {
+    MATTER_TRACE_SCOPE("TryResumeSession", "CASESession");
     VerifyOrReturnError(mSessionResumptionStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFabricsTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -916,10 +920,9 @@ exit:
 CHIP_ERROR CASESession::SendSigma2Resume()
 {
     MATTER_TRACE_SCOPE("SendSigma2Resume", "CASESession");
-    const size_t mrpParamsSize =
-        mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t)) : 0;
-    size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(
-        SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), mrpParamsSize);
+    size_t max_sigma2_resume_data_len =
+        TLV::EstimateStructOverhead(SessionResumptionStorage::kResumptionIdSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                                    sizeof(uint16_t), SessionParameters::kEstimatedTLVSize);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
@@ -948,11 +951,7 @@ CHIP_ERROR CASESession::SendSigma2Resume()
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId().Value()));
 
-    if (mLocalMRPConfig.HasValue())
-    {
-        ChipLogDetail(SecureChannel, "Including MRP parameters");
-        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(4), mLocalMRPConfig.Value(), tlvWriter));
-    }
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(4), mLocalMRPConfig, tlvWriter));
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
@@ -1067,10 +1066,10 @@ CHIP_ERROR CASESession::SendSigma2()
                                          msg_R2_Encrypted.Get() + msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
-    const size_t mrpParamsSize =
-        mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t), sizeof(uint16_t)) : 0;
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
+    size_t size_of_local_session_id = sizeof(uint16_t);
+    size_t data_len =
+        TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, size_of_local_session_id, kP256_PublicKey_Length,
+                                    msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, SessionParameters::kEstimatedTLVSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -1086,11 +1085,9 @@ CHIP_ERROR CASESession::SendSigma2()
                                                 static_cast<uint32_t>(mEphemeralKey->Pubkey().Length())));
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
                                                 static_cast<uint32_t>(msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES)));
-    if (mLocalMRPConfig.HasValue())
-    {
-        ChipLogDetail(SecureChannel, "Including MRP parameters");
-        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriterMsg2));
-    }
+
+    ReturnErrorOnFailure(EncodeSessionParameters(TLV::ContextTag(5), mLocalMRPConfig, tlvWriterMsg2));
+
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msg_R2));
 
@@ -1147,7 +1144,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
     }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
@@ -1340,7 +1337,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     if (tlvReader.Next() != CHIP_END_OF_TLV)
     {
         SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(kTag_Sigma2_ResponderMRPParams), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
     }
 
 exit:
@@ -2029,7 +2026,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
         ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
-        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteMRPConfig(mRemoteMRPConfig);
+        mExchangeCtxt->GetSessionHandle()->AsUnauthenticatedSession()->SetRemoteSessionParameters(GetRemoteSessionParameters());
         err = tlvReader.Next();
     }
 
@@ -2105,6 +2102,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
 CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && msg)
 {
+    MATTER_TRACE_SCOPE("OnMessageReceived", "CASESession");
     CHIP_ERROR err                            = ValidateReceivedMessage(ec, payloadHeader, msg);
     Protocols::SecureChannel::MsgType msgType = static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType());
     SuccessOrExit(err);
@@ -2265,6 +2263,31 @@ bool CASESession::InvokeBackgroundWorkWatchdog()
     }
 
     return watchdogFired;
+}
+
+// Helper function to map CASESession::State to SessionEstablishmentStage
+SessionEstablishmentStage CASESession::MapCASEStateToSessionEstablishmentStage(State caseState)
+{
+    switch (caseState)
+    {
+    case State::kInitialized:
+        return SessionEstablishmentStage::kNotInKeyExchange;
+    case State::kSentSigma1:
+    case State::kSentSigma1Resume:
+        return SessionEstablishmentStage::kSentSigma1;
+    case State::kSentSigma2:
+    case State::kSentSigma2Resume:
+        return SessionEstablishmentStage::kSentSigma2;
+    case State::kSendSigma3Pending:
+        return SessionEstablishmentStage::kReceivedSigma2;
+    case State::kSentSigma3:
+        return SessionEstablishmentStage::kSentSigma3;
+    case State::kHandleSigma3Pending:
+        return SessionEstablishmentStage::kReceivedSigma3;
+    // Add more mappings here for other states
+    default:
+        return SessionEstablishmentStage::kUnknown; // Default mapping
+    }
 }
 
 } // namespace chip

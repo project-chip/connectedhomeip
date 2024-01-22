@@ -14,12 +14,20 @@
 
 import logging
 import re
+from dataclasses import dataclass
 from typing import Optional
+from xml.sax.xmlreader import AttributesImpl
 
-from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
+from matter_idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
+
+
+@dataclass
+class ParsedType:
+    name: str
+    is_list: bool = False
 
 
 def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
@@ -61,15 +69,15 @@ _TYPE_REMAP = {
     "uint32": "int32u",
     "uint48": "int48u",
     "uint52": "int52u",
-    "uint64": "int54u",
-    # signed
-    "sint8": "int8s",
-    "sint16": "int16s",
-    "sint24": "int24s",
-    "sint32": "int32s",
-    "sint48": "int48s",
-    "sint52": "int52s",
-    "sint64": "int54s",
+    "uint64": "int64u",
+    # signed (map to what zapxml/matter currently has)
+    "int8": "int8s",
+    "int16": "int16s",
+    "int24": "int24s",
+    "int32": "int32s",
+    "int48": "int48s",
+    "int52": "int52s",
+    "int64": "int64s",
     # other
     "bool": "boolean",
     "string": "char_string",
@@ -80,6 +88,52 @@ _TYPE_REMAP = {
 def NormalizeDataType(t: str) -> str:
     """Convert data model xml types into matter idl types."""
     return _TYPE_REMAP.get(t.lower(), t.replace("-", "_"))
+
+
+# Handle oddities in current data model XML schema for nicer diffs
+_REF_NAME_MAPPING = {
+    "<<ref_DataTypeEndpointNumber>>": "endpoint_no",
+    "<<ref_DataTypeEpochUs>>": "epoch_us",
+    "<<ref_DataTypeNodeId>>": "node_id",
+    "<<ref_DataTypeOctstr>>": "octet_string",
+    "<<ref_DataTypeString>>": "char_string",
+    "<<ref_DataTypeVendorId>>": "vendor_id",
+    "<<ref_FabricIdx>>": "fabric_idx",
+}
+
+
+# Handle odd casing and naming
+_CASE_RENAMES_MAPPING = {
+    "power_mW": "power_mw",
+    "energy_mWh": "energy_mwh"
+}
+
+
+def ParseType(t: str) -> ParsedType:
+    """Parse a data type entry.
+
+    Specifically parses a name like "list[Foo Type]".
+    """
+
+    # very rough matcher ...
+    is_list = False
+    if t.startswith("list[") and t.endswith("]"):
+        is_list = True
+        t = t[5:-1]
+    elif t.startswith("<<ref_DataTypeList>>[") and t.endswith("]"):
+        is_list = True
+        t = t[21:-1]
+
+    if t.endswith(" Type"):
+        t = t[:-5]
+
+    if t in _REF_NAME_MAPPING:
+        t = _REF_NAME_MAPPING[t]
+
+    if t in _CASE_RENAMES_MAPPING:
+        t = _CASE_RENAMES_MAPPING[t]
+
+    return ParsedType(name=NormalizeDataType(t), is_list=is_list)
 
 
 def NormalizeName(name: str) -> str:
@@ -115,34 +169,67 @@ def NormalizeName(name: str) -> str:
     return name
 
 
-def FieldName(name: str) -> str:
+def FieldName(input_name: str) -> str:
     """Normalized name with the first letter lowercase. """
-    name = NormalizeName(name)
+    name = NormalizeName(input_name)
+
+    # Some exception handling for nicer diffs
+    if name == "ID":
+        return "id"
+
+    # If the name starts with a all-uppercase thing, keep it that
+    # way. This is typical for "NOC", "IPK", "CSR" and such
+    if len(input_name) > 1:
+        if input_name[0].isupper() and input_name[1].isupper():
+            return name
+
     return name[0].lower() + name[1:]
 
 
-def AttributesToField(attrs) -> Field:
+def AttributesToField(attrs: AttributesImpl) -> Field:
     assert "name" in attrs
     assert "id" in attrs
-    assert "type" in attrs
+
+    if "type" in attrs:
+        attr_type = NormalizeDataType(attrs["type"])
+    else:
+        # TODO: Generally we should not have this, however current implementation
+        #       for derived clusters for example want to add things (like conformance
+        #       specifically) WITHOUT re-stating things like types
+        #
+        # https://github.com/csa-data-model/projects/issues/365
+        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        attr_type = "sint32"
+    t = ParseType(attr_type)
 
     return Field(
         name=FieldName(attrs["name"]),
         code=ParseInt(attrs["id"]),
-        data_type=DataType(name=NormalizeDataType(attrs["type"]))
+        is_list=t.is_list,
+        data_type=DataType(name=t.name),
     )
 
 
-def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
+def AttributesToBitFieldConstantEntry(attrs: AttributesImpl) -> ConstantEntry:
     """Creates a constant entry appropriate for bitmaps.
     """
-    assert ("name" in attrs)
-    assert ("bit" in attrs)
+    assert "name" in attrs
+
+    if 'bit' not in attrs:
+        # TODO: multi-bit fields not supported in XML currently. Be lenient here to have some
+        #       diff
+        # Issue: https://github.com/csa-data-model/projects/issues/347
+
+        LOGGER.error(
+            f"Constant {attrs['name']} has no bit value (may be multibit)")
+        return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=0)
+
+    assert "bit" in attrs
 
     return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
 
 
-def AttributesToAttribute(attrs) -> Attribute:
+def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
     assert "name" in attrs
     assert "id" in attrs
 
@@ -154,16 +241,19 @@ def AttributesToAttribute(attrs) -> Attribute:
         LOGGER.error(f"Attribute {attrs['name']} has no type")
         attr_type = "sint32"
 
+    t = ParseType(attr_type)
+
     return Attribute(
         definition=Field(
             code=ParseInt(attrs["id"]),
             name=FieldName(attrs["name"]),
-            data_type=DataType(name=attr_type),
+            is_list=t.is_list,
+            data_type=DataType(name=t.name),
         )
     )
 
 
-def AttributesToEvent(attrs) -> Event:
+def AttributesToEvent(attrs: AttributesImpl) -> Event:
     assert "name" in attrs
     assert "id" in attrs
     assert "priority" in attrs
@@ -201,7 +291,7 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         raise Exception("UNKNOWN privilege level: %r" % value)
 
 
-def AttributesToCommand(attrs) -> Command:
+def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "id" in attrs
     assert "name" in attrs
 

@@ -62,6 +62,46 @@ ChannelManager::ChannelManager()
 
     mCurrentChannelIndex = 0;
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
+
+    ProgramType program1;
+    program1.identifier = chip::CharSpan::fromCharString("progid-abc1");
+    program1.channel    = abc;
+    program1.title      = chip::CharSpan::fromCharString("ABC Title1");
+    program1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program1.startTime  = 0;
+    program1.endTime    = 30 * 60;
+
+    mPrograms.push_back(program1);
+
+    ProgramType program_pbs1;
+    program_pbs1.identifier = chip::CharSpan::fromCharString("progid-pbs1");
+    program_pbs1.channel    = pbs;
+    program_pbs1.title      = chip::CharSpan::fromCharString("PBS Title1");
+    program_pbs1.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle1"));
+    program_pbs1.startTime  = 0;
+    program_pbs1.endTime    = 30 * 60;
+
+    mPrograms.push_back(program_pbs1);
+
+    ProgramType program2;
+    program2.identifier = chip::CharSpan::fromCharString("progid-abc2");
+    program2.channel    = abc;
+    program2.title      = chip::CharSpan::fromCharString("My Program Title2");
+    program2.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle2"));
+    program2.startTime  = 30 * 60;
+    program2.endTime    = 60 * 60;
+
+    mPrograms.push_back(program2);
+
+    ProgramType program3;
+    program3.identifier = chip::CharSpan::fromCharString("progid-abc3");
+    program3.channel    = abc;
+    program3.title      = chip::CharSpan::fromCharString("My Program Title3");
+    program3.subtitle   = MakeOptional(chip::CharSpan::fromCharString("My Program Subtitle3"));
+    program3.startTime  = 0;
+    program3.endTime    = 60 * 60;
+
+    mPrograms.push_back(program3);
 }
 
 CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder)
@@ -131,18 +171,18 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
     // Error: Found multiple matches
     if (matchedChannels.size() > 1)
     {
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kMultipleMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kMultipleMatches;
         helper.Success(response);
     }
     else if (matchedChannels.size() == 0)
     {
         // Error: Found no match
-        response.status = chip::app::Clusters::Channel::ChannelStatusEnum::kNoMatches;
+        response.status = chip::app::Clusters::Channel::StatusEnum::kNoMatches;
         helper.Success(response);
     }
     else
     {
-        response.status      = chip::app::Clusters::Channel::ChannelStatusEnum::kSuccess;
+        response.status      = chip::app::Clusters::Channel::StatusEnum::kSuccess;
         response.data        = chip::MakeOptional(CharSpan::fromCharString("data response"));
         mCurrentChannel      = matchedChannels[0];
         mCurrentChannelIndex = index;
@@ -152,7 +192,6 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 
 bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
-    // TODO: Insert code here
     bool channelChanged = false;
     uint16_t index      = 0;
     for (auto const & channel : mChannels)
@@ -188,6 +227,103 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
 
     mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
+    return true;
+}
+
+void ChannelManager::HandleGetProgramGuide(
+    CommandResponseHelper<ProgramGuideResponseType> & helper, const chip::Optional<uint32_t> & startTime,
+    const chip::Optional<uint32_t> & endTime,
+    const chip::Optional<chip::app::DataModel::DecodableList<ChannelInfoType>> & channelList,
+    const chip::Optional<PageTokenType> & pageToken, const chip::Optional<chip::BitMask<RecordingFlagBitmap>> & recordingFlag,
+    const chip::Optional<chip::app::DataModel::DecodableList<AdditionalInfoType>> & externalIdList,
+    const chip::Optional<chip::ByteSpan> & data)
+{
+
+    // 1. Decode received parameters
+    // 2. Perform search
+    // 3. Return results
+
+    // PageTokenType paging;
+    // paging.limit  = MakeOptional(static_cast<uint16_t>(10));
+    // paging.after  = MakeOptional(chip::CharSpan::fromCharString("after-token"));
+    // paging.before = MakeOptional(chip::CharSpan::fromCharString("before-token"));
+
+    // ChannelPagingStructType channelPaging;
+    // channelPaging.nextToken = MakeOptional<DataModel::Nullable<Structs::PageTokenStruct::Type>>(paging);
+
+    std::vector<ProgramType> matches;
+    for (auto const & program : mPrograms)
+    {
+        if (startTime.ValueOr(0) > program.startTime)
+        {
+            continue;
+        }
+        if (endTime.HasValue() && endTime.ValueOr(0) < program.endTime)
+        {
+            continue;
+        }
+        if (channelList.HasValue())
+        {
+            auto iter     = channelList.Value().begin();
+            bool match    = false;
+            int listCount = 0;
+            while (iter.Next() && !match)
+            {
+                listCount++;
+                auto & channel = iter.GetValue();
+                if (channel.minorNumber != program.channel.minorNumber || channel.majorNumber != program.channel.majorNumber)
+                {
+                    continue;
+                }
+                // this sample code does not currently check OTT
+                match = true;
+            }
+            if (!match && listCount > 0)
+            {
+                continue;
+            }
+        }
+        // this sample code does not currently filter on external id list
+        matches.push_back(program);
+    }
+
+    ProgramGuideResponseType response;
+    response.programList = DataModel::List<const ProgramType>(matches.data(), matches.size());
+    helper.Success(response);
+}
+
+bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
+                                         const DataModel::DecodableList<AdditionalInfo> & externalIdList,
+                                         const chip::ByteSpan & data)
+{
+    // Start recording
+    std::string idString(programIdentifier.data(), programIdentifier.size());
+    for (auto & program : mPrograms)
+    {
+        std::string nextIdString(program.identifier.data(), program.identifier.size());
+        if (nextIdString == idString)
+        {
+            program.recordingFlag = MakeOptional(static_cast<uint32_t>(shouldRecordSeries ? 2 : 1));
+        }
+    }
+
+    return true;
+}
+
+bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
+                                               const DataModel::DecodableList<AdditionalInfo> & externalIdList,
+                                               const chip::ByteSpan & data)
+{
+    // Cancel recording
+    std::string idString(programIdentifier.data(), programIdentifier.size());
+    for (auto & program : mPrograms)
+    {
+        std::string nextIdString(program.identifier.data(), program.identifier.size());
+        if (nextIdString == idString)
+        {
+            program.recordingFlag = MakeOptional(static_cast<uint32_t>(0));
+        }
+    }
     return true;
 }
 

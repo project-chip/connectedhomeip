@@ -24,7 +24,7 @@
 @class MTRBaseDevice;
 
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
-@class MTRDeviceControllerParameters;
+@class MTRDeviceControllerAbstractParameters;
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 NS_ASSUME_NONNULL_BEGIN
@@ -58,7 +58,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
  * Once this returns non-nil, it's the caller's resposibility to call shutdown
  * on the controller to avoid leaking it.
  */
-- (nullable instancetype)initWithParameters:(MTRDeviceControllerParameters *)parameters
+- (nullable instancetype)initWithParameters:(MTRDeviceControllerAbstractParameters *)parameters
                                       error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 

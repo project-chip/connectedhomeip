@@ -3,6 +3,8 @@
     "disable": [
         "Test_TC_SC_4_1",
         "Test_TC_SC_5_2",
+        "TestBasicInformation disabled because codegen test don't support writing readonly attributes",
+        "TestBasicInformation",
         "TestClusterComplexTypes",
         "TestEvents",
         "TestDiscovery",
@@ -54,11 +56,25 @@
         "Disabled because darwin-framework-tool does not support EqualityCommands pseudo-cluster",
         "Test_TC_S_2_2",
         "Test_TC_TCCM_3_1",
+        "Test_TC_TCCM_3_2",
+        "Test_TC_TCCM_3_3",
+        "Test_TC_RVCRUNM_3_1",
         "Test_TC_TCTL_2_1",
+        "Test_TC_LWM_3_1",
+        "Test_TC_LWM_3_2",
+        "Test_TC_LWM_3_3",
+        "Test_TC_OTCCM_2_1",
+        "Test_TC_OTCCM_3_1",
+        "Test_TC_OTCCM_3_2",
+        "Test_TC_OTCCM_3_3",
         "Disabled because darwin-framework-tool does not support constraints arithmetic operations",
         "Test_TC_FLW_2_1",
         "Test_TC_RH_2_1",
         "Disabled because darwin-framework-tool does not handle substraction in parameters",
-        "Test_TC_S_2_3"
+        "Test_TC_S_2_3",
+        "TestScenesMultiFabric",
+        "TestScenesFabricSceneInfo",
+        "#30759: Darwin chip-tool does not support ICD registration during commissioning",
+        "TestIcdManagementCluster"
     ]
 }

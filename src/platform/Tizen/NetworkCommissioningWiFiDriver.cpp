@@ -24,7 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/NetworkCommissioning.h>
 
@@ -166,6 +166,12 @@ void TizenWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     {
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
+}
+
+uint32_t TizenWiFiDriver::GetSupportedWiFiBandsMask() const
+{
+    return static_cast<uint32_t>((1UL << chip::to_underlying(WiFiBandEnum::k2g4)) |
+                                 (1UL << chip::to_underlying(WiFiBandEnum::k5g)));
 }
 
 size_t TizenWiFiDriver::WiFiNetworkIterator::Count()

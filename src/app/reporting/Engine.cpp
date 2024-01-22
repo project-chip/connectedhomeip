@@ -23,6 +23,10 @@
  *
  */
 
+#include <app/icd/ICDConfig.h>
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+#include <app/icd/ICDNotifier.h> // nogncheck
+#endif
 #include <app/AppConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/RequiredPrivilege.h>
@@ -120,8 +124,10 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         ConcreteAttributePath readPath;
 
         ChipLogDetail(DataManagement,
-                      "Building Reports for ReadHandler with LastReportGeneration = %" PRIu64 " DirtyGeneration = %" PRIu64,
-                      apReadHandler->mPreviousReportsBeginGeneration, apReadHandler->mDirtyGeneration);
+                      "Building Reports for ReadHandler with LastReportGeneration = 0x" ChipLogFormatX64
+                      " DirtyGeneration = 0x" ChipLogFormatX64,
+                      ChipLogValueX64(apReadHandler->mPreviousReportsBeginGeneration),
+                      ChipLogValueX64(apReadHandler->mDirtyGeneration));
 
         // This ReadHandler is not generating reports, so we reset the iterator for a clean start.
         if (!apReadHandler->IsReporting())
@@ -507,6 +513,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     if (apReadHandler->IsType(ReadHandler::InteractionType::Subscribe))
     {
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // Notify the ICDManager that we are about to send a subscription report before we prepare the Report payload.
+        // This allows the ICDManager to trigger any necessary updates and have the information in the report about to be sent.
+        app::ICDNotifier::GetInstance().NotifySubscriptionReport();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
         SubscriptionId subscriptionId = 0;
         apReadHandler->GetSubscriptionId(subscriptionId);
         reportDataBuilder.SubscriptionId(subscriptionId);
@@ -640,6 +652,7 @@ void Engine::Run()
 
         if (readHandler->ShouldReportUnscheduled() || imEngine->GetReportScheduler()->IsReportableNow(readHandler))
         {
+
             mRunningReadHandler = readHandler;
             CHIP_ERROR err      = BuildAndSendSingleReportData(readHandler);
             mRunningReadHandler = nullptr;

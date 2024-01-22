@@ -38,8 +38,8 @@ Commissioner. In the context of the
 [Matter Video Player architecture](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc),
 a `CastingPlayer` would map to
 [Casting "Video" Player](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction).
-The `CastingPlayer` is expected to be hosting one or more `Endpoints` (similar
-to
+The `CastingPlayer` is expected to be hosting one or more `Endpoints` (some of
+which can represent
 [Content Apps](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/media/VideoPlayerArchitecture.adoc#1-introduction)
 in the Matter Video Player architecture) that support one or more Matter Media
 `Clusters`.
@@ -73,13 +73,16 @@ The Casting Client is expected to consume the Matter TV Casting library built
 for its respective platform which implements the APIs described in this
 document. Refer to the tv-casting-app READMEs for [Linux](linux/README.md),
 Android and [iOS](darwin/TvCasting/README.md) to understand how to build and
-consume each platform's specific libraries.
+consume each platform's specific libraries. The libraries MUST be built with the
+client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
+`CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID` updated in the
+[CHIPProjectAppConfig.h](tv-casting-common/include/CHIPProjectAppConfig.h) file.
 
 ### Initialize the Casting Client
 
 _{Complete Initialization examples: [Linux](linux/simple-app.cpp) |
 [Android](android/App/app/src/main/java/com/matter/casting/InitializationExample.java)
-| [iOS](darwin/TvCasting/TvCasting/MTRInitializationExample.swift)}_
+| [iOS](darwin/TvCasting/TvCasting/MCInitializationExample.swift)}_
 
 A Casting Client must first initialize the Matter SDK and define the following
 `DataProvider` objects for the the Matter Casting library to use throughout the
@@ -132,10 +135,10 @@ client's lifecycle:
 
     On iOS, define the
     `func castingAppDidReceiveRequestForRotatingDeviceIdUniqueId` in a class,
-    `MTRAppParametersDataSource`, that implements the `MTRDataSource`:
+    `MCAppParametersDataSource`, that implements the `MCDataSource`:
 
-    ```objectivec
-    class MTRAppParametersDataSource : NSObject, MTRDataSource
+    ```swift
+    class MCAppParametersDataSource : NSObject, MCDataSource
     {
         func castingAppDidReceiveRequestForRotatingDeviceIdUniqueId(_ sender: Any) -> Data {
             // dummy value, with at least 16 bytes (ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength), for demonstration only
@@ -193,13 +196,13 @@ client's lifecycle:
     ```
 
     On iOS, add a `func commissioningDataProvider` to the
-    `MTRAppParametersDataSource` class defined above, that can provide the
-    required values to the `MTRCastingApp`.
+    `MCAppParametersDataSource` class defined above, that can provide the
+    required values to the `MCCastingApp`.
 
-    ```objectivec
-    func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MTRCommissionableData {
+    ```swift
+    func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MCCommissionableData {
         // dummy values for demonstration only
-        return MTRCommissionableData(
+        return MCCommissionableData(
             passcode: 20202021,
             discriminator: 3874,
             spake2pIterationCount: 1000,
@@ -269,11 +272,11 @@ client's lifecycle:
     On iOS, add functions
     `castingAppDidReceiveRequestForDeviceAttestationCredentials` and
     `didReceiveRequestToSignCertificateRequest` to the
-    `MTRAppParametersDataSource` class defined above, that can return
-    `MTRDeviceAttestationCredentials` and sign messages for the Casting Client,
+    `MCAppParametersDataSource` class defined above, that can return
+    `MCDeviceAttestationCredentials` and sign messages for the Casting Client,
     respectively.
 
-    ```objectivec
+    ```swift
     // dummy DAC values for demonstration only
     let kDevelopmentDAC_Cert_FFF1_8001: Data = Data(base64Encoded: "MIIB..<snipped>..CXE1M=")!;
     let kDevelopmentDAC_PrivateKey_FFF1_8001: Data = Data(base64Encoded: "qrYA<snipped>tE+/8=")!;
@@ -281,29 +284,46 @@ client's lifecycle:
     let KPAI_FFF1_8000_Cert_Array: Data = Data(base64Encoded: "MIIB<snipped>4kQ==")!;
     let kCertificationDeclaration: Data = Data(base64Encoded: "MII<snipped>fA==")!;
 
-    func castingAppDidReceiveRequestForDeviceAttestationCredentials(_ sender: Any) -> MTRDeviceAttestationCredentials {
-        return MTRDeviceAttestationCredentials(
+    func castingAppDidReceiveRequestForDeviceAttestationCredentials(_ sender: Any) -> MCDeviceAttestationCredentials {
+        return MCDeviceAttestationCredentials(
             certificationDeclaration: kCertificationDeclaration,
             firmwareInformation: Data(),
             deviceAttestationCert: kDevelopmentDAC_Cert_FFF1_8001,
             productAttestationIntermediateCert: KPAI_FFF1_8000_Cert_Array)
     }
 
-    func castingApp(_ sender: Any, didReceiveRequestToSignCertificateRequest csrData: Data) -> Data {
-        var privateKey = Data()
-        privateKey.append(kDevelopmentDAC_PublicKey_FFF1_8001);
-        privateKey.append(kDevelopmentDAC_PrivateKey_FFF1_8001);
+    func castingApp(_ sender: Any, didReceiveRequestToSignCertificateRequest csrData: Data, outRawSignature: AutoreleasingUnsafeMutablePointer<NSData>) -> MatterError {
+        Log.info("castingApp didReceiveRequestToSignCertificateRequest")
 
-        let privateKeyRef: SecKey = SecKeyCreateWithData(privateKey as NSData,
+        // get the private SecKey
+        var privateKeyData = Data()
+        privateKeyData.append(kDevelopmentDAC_PublicKey_FFF1_8001);
+        privateKeyData.append(kDevelopmentDAC_PrivateKey_FFF1_8001);
+        let privateSecKey: SecKey = SecKeyCreateWithData(privateKeyData as NSData,
                                     [
                                         kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
                                         kSecAttrKeyClass: kSecAttrKeyClassPrivate,
                                         kSecAttrKeySizeInBits: 256
                                     ] as NSDictionary, nil)!
 
-        let _:Unmanaged<SecKey> = Unmanaged<SecKey>.passRetained(privateKeyRef);
+        // sign csrData to get asn1SignatureData
+        var error: Unmanaged<CFError>?
+        let asn1SignatureData: CFData? = SecKeyCreateSignature(privateSecKey, .ecdsaSignatureMessageX962SHA256, csrData as CFData, &error)
+        if(error != nil)
+        {
+            Log.error("Failed to sign message. Error: \(String(describing: error))")
+            return MATTER_ERROR_INVALID_ARGUMENT
+        }
+        else if (asn1SignatureData == nil)
+        {
+            Log.error("Failed to sign message. asn1SignatureData is nil")
+            return MATTER_ERROR_INVALID_ARGUMENT
+        }
 
-        // use SecKey above to sign csrData and return resulting value
+        // convert ASN.1 DER signature to SEC1 raw format
+        return MCCryptoUtils.ecdsaAsn1SignatureToRaw(withFeLengthBytes: 32,
+                                                    asn1Signature: asn1SignatureData!,
+                                                         outRawSignature: &outRawSignature.pointee)
     }
     ```
 
@@ -316,6 +336,7 @@ On Linux, create an `AppParameters` object using the
 `RotatingDeviceIdUniqueIdProvider`, `LinuxCommissionableDataProvider`,
 `CommonCaseDeviceServerInitParamsProvider`, `ExampleDACProvider` and
 `DefaultDACVerifier`, and call `CastingApp::GetInstance()->Initialize` with it.
+Then, call `Start` on the `CastingApp`.
 
 ```c
 LinuxCommissionableDataProvider gCommissionableDataProvider;
@@ -354,7 +375,8 @@ int main(int argc, char * argv[]) {
 On Android, create an `AppParameters` object using the
 `rotatingDeviceIdUniqueIdProvider`, `commissioningDataProvider`, `dacProvider`
 and `DataProvider<ConfigurationManager>`, and call
-`CastingApp.getInstance().initialize` with it.
+`CastingApp.getInstance().initialize` with it. Then, call `start` on the
+`CastingApp`
 
 ```java
 public static MatterError initAndStart(Context applicationContext) {
@@ -390,22 +412,86 @@ public static MatterError initAndStart(Context applicationContext) {
 }
 ```
 
-On iOS, call `MTRCastingApp.initialize` with an object of the
-`MTRAppParametersDataSource`.
+On iOS, call `MCCastingApp.initialize` with an object of the
+`MCAppParametersDataSource`.
 
-```objectivec
+```swift
 func initialize() -> MatterError {
-    if let castingApp = MTRCastingApp.getSharedInstance() {
-        return castingApp.initialize(with: MTRAppParametersDataSource())
+    if let castingApp = MCCastingApp.getSharedInstance() {
+        return castingApp.initialize(with: MCAppParametersDataSource())
     } else {
         return MATTER_ERROR_INCORRECT_STATE
     }
 }
 ```
 
+After initialization, on iOS, call `start` and `stop` on the `MCCastingApp`
+shared instance when the App sends the
+`UIApplication.didBecomeActiveNotification` and
+`UIApplication.willResignActiveNotification`
+
+```objectivec
+struct TvCastingApp: App {
+    let Log = Logger(subsystem: "com.matter.casting", category: "TvCastingApp")
+    @State
+    var firstAppActivation: Bool = true
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+                .onAppear(perform: {
+                    let err: Error? = MCInitializationExample().initialize()
+                    if err != nil
+                    {
+                        self.Log.error("MCCastingApp initialization failed \(err)")
+                        return
+                    }
+                })
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification")
+                    if let castingApp = MCCastingApp.getSharedInstance()
+                    {
+                        castingApp.start(completionBlock: { (err : Error?) -> () in
+                            if err != nil
+                            {
+                                self.Log.error("MCCastingApp start failed \(err)")
+                            }
+                        })
+                    }
+                }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+                    self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification")
+                    if let castingApp = MCCastingApp.getSharedInstance()
+                    {
+                        castingApp.stop(completionBlock: { (err : Error?) -> () in
+                            if err != nil
+                            {
+                                self.Log.error("MCCastingApp stop failed \(err)")
+                            }
+                        })
+                    }
+                }
+            }   // WindowGroup
+    }   // body
+}   // App
+```
+
+Note about on-device cache: The Casting App maintains an on-device cache
+containing information about the Casting Players it has connected with so far.
+This cached information allows the Casting App to connect with Casting Players
+(that it had previously connected with) faster and using fewer resources, by
+potentially skipping the longer commissioning process and instead, simply
+re-establishing the CASE session. This cache can be cleared by calling the
+`ClearCache` API on the `CastingApp`, say when the user signs out of the app.
+See API and its documentation for [Linux](tv-casting-common/core/CastingApp.h),
+Android and
+[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+
 ### Discover Casting Players
 
-_{Complete Discovery examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Discovery examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/DiscoveryExampleFragment.java)
+| [iOS](darwin/TvCasting/TvCasting/MCDiscoveryExampleViewModel.swift)}_
 
 The Casting Client discovers `CastingPlayers` using Matter Commissioner
 discovery over DNS-SD by listening for `CastingPlayer` events as they are
@@ -436,6 +522,111 @@ public:
 };
 ```
 
+On Android, implement the `CastingPlayerDiscovery.CastingPlayerChangeListener`.
+
+```java
+private static final CastingPlayerDiscovery.CastingPlayerChangeListener castingPlayerChangeListener =
+    new CastingPlayerDiscovery.CastingPlayerChangeListener() {
+        private final String TAG = CastingPlayerDiscovery.CastingPlayerChangeListener.class.getSimpleName();
+
+        @Override
+        public void onAdded(CastingPlayer castingPlayer) {
+            Log.i(TAG, "onAdded() Discovered CastingPlayer deviceId: " + castingPlayer.getDeviceId());
+            // Display CastingPlayer info on the screen
+            new Handler(Looper.getMainLooper()).post(() -> {
+                arrayAdapter.add(castingPlayer);
+            });
+        }
+
+        @Override
+        public void onChanged(CastingPlayer castingPlayer) {
+            Log.i(TAG, "onChanged() Discovered changes to CastingPlayer with deviceId: " + castingPlayer.getDeviceId());
+            // Update the CastingPlayer on the screen
+            new Handler(Looper.getMainLooper()).post(() -> {
+                final Optional<CastingPlayer> playerInList = castingPlayerList.stream().filter(node -> castingPlayer.equals(node)).findFirst();
+                if (playerInList.isPresent()) {
+                    Log.d(TAG, "onChanged() Updating existing CastingPlayer entry " + playerInList.get().getDeviceId() + " in castingPlayerList list");
+                    arrayAdapter.remove(playerInList.get());
+                }
+                arrayAdapter.add(castingPlayer);
+            });
+        }
+
+        @Override
+        public void onRemoved(CastingPlayer castingPlayer) {
+            Log.i(TAG, "onRemoved() Removed CastingPlayer with deviceId: " + castingPlayer.getDeviceId());
+            // Remove CastingPlayer from the screen
+            new Handler(Looper.getMainLooper()).post(() -> {
+                final Optional<CastingPlayer> playerInList = castingPlayerList.stream().filter(node -> castingPlayer.equals(node)).findFirst();
+                if (playerInList.isPresent()) {
+                    Log.d(TAG, "onRemoved() Removing existing CastingPlayer entry " + playerInList.get().getDeviceId() + " in castingPlayerList list");
+                    arrayAdapter.remove(playerInList.get());
+                }
+            });
+        }
+};
+```
+
+On iOS, implement a `func addDiscoveredCastingPlayers`,
+`func removeDiscoveredCastingPlayers` and `func updateDiscoveredCastingPlayers`
+which listen to notifications as Casting Players are added, removed, or updated.
+
+```swift
+@objc
+func didAddDiscoveredCastingPlayers(notification: Notification)
+{
+    Log.info("didAddDiscoveredCastingPlayers() called")
+    guard let userInfo = notification.userInfo,
+        let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+        self.Log.error("didAddDiscoveredCastingPlayers called with no MCCastingPlayer")
+        return
+    }
+
+    self.Log.info("didAddDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
+    DispatchQueue.main.async
+    {
+        self.displayedCastingPlayers.append(castingPlayer)
+    }
+}
+
+@objc
+func didRemoveDiscoveredCastingPlayers(notification: Notification)
+{
+    Log.info("didRemoveDiscoveredCastingPlayers() called")
+    guard let userInfo = notification.userInfo,
+        let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+        self.Log.error("didRemoveDiscoveredCastingPlayers called with no MCCastingPlayer")
+        return
+    }
+
+    self.Log.info("didRemoveDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
+    DispatchQueue.main.async
+    {
+        self.displayedCastingPlayers.removeAll(where: {$0 == castingPlayer})
+    }
+}
+
+@objc
+func didUpdateDiscoveredCastingPlayers(notification: Notification)
+{
+    Log.info("didUpdateDiscoveredCastingPlayers() called")
+    guard let userInfo = notification.userInfo,
+        let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+        self.Log.error("didUpdateDiscoveredCastingPlayers called with no MCCastingPlayer")
+        return
+    }
+
+    self.Log.info("didUpdateDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
+    if let index = displayedCastingPlayers.firstIndex(where: { castingPlayer.identifier() == $0.identifier() })
+    {
+        DispatchQueue.main.async
+        {
+            self.displayedCastingPlayers[index] = castingPlayer
+        }
+    }
+}
+```
+
 Finally, register these listeners and start discovery.
 
 On Linux, register an instance of the `DiscoveryDelegateImpl` with
@@ -459,9 +650,50 @@ chip::DeviceLayer::PlatformMgr().RunEventLoop();
 ...
 ```
 
+On Android, add the implemented `castingPlayerChangeListener` as a listener to
+the singleton instance of `MatterCastingPlayerDiscovery` to listen to changes in
+the discovered Casting Players and call `startDiscovery`.
+
+```java
+MatterError err = MatterCastingPlayerDiscovery.getInstance().addCastingPlayerChangeListener(castingPlayerChangeListener);
+if (err.hasError()) {
+    Log.e(TAG, "startDiscovery() addCastingPlayerChangeListener() called, err Add: " + err);
+    return false;
+}
+
+// Start discovery
+Log.i(TAG, "startDiscovery() calling CastingPlayerDiscovery.startDiscovery()");
+err = MatterCastingPlayerDiscovery.getInstance().startDiscovery(DISCOVERY_TARGET_DEVICE_TYPE);
+if (err.hasError()) {
+    Log.e(TAG, "Error in startDiscovery(): " + err);
+    return false;
+}
+```
+
+On iOS, register the listeners by calling `addObserver` on the
+`NotificationCenter` with the appropriate selector, and then call start on the
+`sharedInstance` of `MCCastingPlayerDiscovery`.
+
+```swift
+func startDiscovery() {
+    NotificationCenter.default.addObserver(self, selector: #selector(self.didAddDiscoveredCastingPlayers), name: NSNotification.Name.didAddCastingPlayers, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.didRemoveDiscoveredCastingPlayers), name: NSNotification.Name.didRemoveCastingPlayers, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(self.didUpdateDiscoveredCastingPlayers), name: NSNotification.Name.didUpdateCastingPlayers, object: nil)
+
+    MCCastingPlayerDiscovery.sharedInstance().start()
+    ...
+}
+```
+
+Note: You will need to connect with a Casting Player as described below to see
+the list of Endpoints that they support. Refer to the
+[Connection](#connect-to-a-casting-player) section for details on how to
+discover available endpoints supported by a Casting Player.
+
 ### Connect to a Casting Player
 
-_{Complete Connection examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Connection examples: [Linux](linux/simple-app-helper.cpp) |
+[iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
 
 Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
@@ -474,28 +706,267 @@ to a `CastingPlayer`, once the Casting client has been commissioned by it. After
 that, the Casting client is able to skip the full UDC process by establishing
 CASE with the `CastingPlayer` directly. Once connected, the `CastingPlayer`
 object will contain the list of available Endpoints on that `CastingPlayer`.
+Optionally, the following arguments may also be passed in. The optional
+`commissioningWindowTimeoutSec` indicates how long to keep the commissioning
+window open, if commissioning is required. And `DesiredEndpointFilter` specifies
+the attributes, such as Vendor ID and Product ID of the `Endpoint`, the Casting
+client desires to interact with after connecting. This forces the Matter TV
+Casting library to go through the full UDC process in search of the desired
+Endpoint, in cases where it is not available in the Casting client's cache.
 
 On Linux, the Casting Client can connect to a `CastingPlayer` by successfully
 calling `VerifyOrEstablishConnection` on it.
 
 ```c
+// VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
+const uint16_t kDesiredEndpointVendorId = 65521;
+
 void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
 {
-    ChipLogProgress(AppServer, "ConnectionHandler called with %" CHIP_ERROR_FORMAT, err.Format());
+    if(err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "ConnectionHandler: Successfully connected to CastingPlayer(ID: %s)", castingPlayer->GetId());
+        ...
+    }
 }
 
 ...
 // targetCastingPlayer is a discovered CastingPlayer
-targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler);
+matter::casting::core::EndpointFilter desiredEndpointFilter;
+desiredEndpointFilter.vendorId = kDesiredEndpointVendorId;
+targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
+                                                    matter::casting::core::kCommissioningWindowTimeoutSec,
+                                                    desiredEndpointFilter);
 ...
+```
+
+On iOS, the Casting Client may call `verifyOrEstablishConnection` on the
+`MCCastingPlayer` object it wants to connect to and handle any `NSErrors` that
+may happen in the process.
+
+```swift
+// VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
+let kDesiredEndpointVendorId: UInt16 = 65521;
+
+@Published var connectionSuccess: Bool?;
+
+@Published var connectionStatus: String?;
+
+func connect(selectedCastingPlayer: MCCastingPlayer?) {
+    let desiredEndpointFilter: MCEndpointFilter = MCEndpointFilter()
+    desiredEndpointFilter.vendorId = kDesiredEndpointVendorId
+    selectedCastingPlayer?.verifyOrEstablishConnection(completionBlock: { err in
+        self.Log.error("MCConnectionExampleViewModel connect() completed with \(err)")
+        if(err == nil)
+        {
+            self.connectionSuccess = true
+            self.connectionStatus = "Connected!"
+        }
+        else
+        {
+            self.connectionSuccess = false
+            self.connectionStatus = "Connection failed with \(String(describing: err))"
+        }
+    }, desiredEndpointFilter: desiredEndpointFilter)
+}
 ```
 
 ### Select an Endpoint on the Casting Player
 
+_{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp)}_
+
+On a successful connection with a `CastingPlayer`, a Casting Client may select
+one of the Endpoints to interact with based on its attributes (e.g. Vendor ID,
+Product ID, list of supported Clusters, etc).
+
+On Linux, for example, it may select an Endpoint with a particular VendorID.
+
+```c
+// VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
+const uint16_t kDesiredEndpointVendorId = 65521;
+
+std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
+// Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
+auto it = std::find_if(endpoints.begin(), endpoints.end(),
+                        [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
+                            return endpoint->GetVendorId() == 65521;
+                        });
+if (it != endpoints.end())
+{
+    // The desired endpoint is endpoints[index]
+    unsigned index = (unsigned int) std::distance(endpoints.begin(), it);
+    ...
+}
+```
+
 ## Interacting with a Casting Endpoint
+
+Once the Casting Client has selected an `Endpoint`, it is ready to
+[issue commands](#issuing-commands) to it, [read](#read-operations) current
+playback state, and [subscribe](#subscriptions) to playback events.
+
+Refer to the following platform specific files for a list of clusters, command
+and attributes supported by the Matter TV Casting library:
+
+1. Linux:
+   [tv-casting-common/clusters/Clusters.h](tv-casting-common/clusters/Clusters.h)
+
+Refer to the following platform specific files for the IDs and request /
+response types to use with these APIs:
+
+1. Linux:
+   [/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h](/zzz_generated/app-common/app-common/zap-generated/cluster-objects.h)
 
 ### Issuing Commands
 
+_{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp)}_
+
+The Casting Client can get a reference to a `endpoint` on a `CastingPlayer`,
+check if it supports the required cluster/command, and send commands to it. It
+can then handle any command response / error the `CastingPlayer` sends back.
+
+On Linux, for example, given an `endpoint`, it can send a `LaunchURL` command
+(part of the Content Launcher cluster) by calling the `Invoke` API on a
+`Command` of type
+`matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>`
+
+```c
+void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the launchURLCommand from the contentLauncherCluster
+    matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type> * launchURLCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type> *>(
+            contentLauncherCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Id));
+    VerifyOrReturn(launchURLCommand != nullptr, ChipLogError(AppServer, "LaunchURL command not found on ContentLauncherCluster"));
+
+    // create the LaunchURL request
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type request;
+    request.contentURL    = chip::CharSpan::fromCharString(kContentURL);
+    request.displayString = chip::Optional<chip::CharSpan>(chip::CharSpan::fromCharString(kContentDisplayStr));
+    request.brandingInformation =
+        chip::MakeOptional(chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type());
+
+    // call Invoke on launchURLCommand while passing in success/failure callbacks
+    launchURLCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
+                            response.data.Value().data());
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs));      // time out after kTimedInvokeCommandTimeoutMs
+}
+```
+
 ### Read Operations
 
+_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp)}_
+
+The `CastingClient` may read an Attribute from the `Endpoint` on the
+`CastingPlayer`. It should ensure that the desired cluster / attribute are
+available for reading on the endpoint before trying to read it.
+
+On Linux, for example, given an `endpoint`, it can read the `VendorID` (part of
+the Application Basic cluster) by calling the `Read` API on an `Attribute` of
+type
+`matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo>`
+
+```c
+void ReadApplicationBasicVendorID(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get applicationBasicCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::application_basic::ApplicationBasicCluster> applicationBasicCluster =
+        endpoint->GetCluster<matter::casting::clusters::application_basic::ApplicationBasicCluster>();
+    VerifyOrReturn(applicationBasicCluster != nullptr);
+
+    // get the vendorIDAttribute from the applicationBasicCluster
+    matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo> * vendorIDAttribute =
+        static_cast<matter::casting::core::Attribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo> *>(
+            applicationBasicCluster->GetAttribute(chip::app::Clusters::ApplicationBasic::Attributes::VendorID::Id));
+    VerifyOrReturn(vendorIDAttribute != nullptr,
+                   ChipLogError(AppServer, "VendorID attribute not found on ApplicationBasicCluster"));
+
+    // call Read on vendorIDAttribute while passing in success/failure callbacks
+    vendorIDAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::ApplicationBasic::Attributes::VendorID::TypeInfo::DecodableArgType after) {
+            if (before.HasValue())
+            {
+                ChipLogProgress(AppServer, "Read VendorID value: %d [Before reading value: %d]", after, before.Value());
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Read VendorID value: %d", after);
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "VendorID Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
+}
+```
+
 ### Subscriptions
+
+_{Complete Attribute subscription examples:
+[Linux](linux/simple-app-helper.cpp)}_
+
+A Casting Client may subscribe to an attribute on an `Endpoint` of the
+`CastingPlayer` to get data reports when the attributes change.
+
+On Linux, for example, given an `endpoint`, it can subscribe to the
+`CurrentState` (part of the Media Playback Basic cluster) by calling the
+`Subscribe` API on an `Attribute` of type
+`matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>`
+
+```c
+void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaPlaybackCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_playback::MediaPlaybackCluster> mediaPlaybackCluster =
+        endpoint->GetCluster<matter::casting::clusters::media_playback::MediaPlaybackCluster>();
+    VerifyOrReturn(mediaPlaybackCluster != nullptr);
+
+    // get the currentStateAttribute from the mediaPlaybackCluster
+    matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo> *
+        currentStateAttribute =
+            static_cast<matter::casting::core::Attribute<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo> *>(
+                mediaPlaybackCluster->GetAttribute(chip::app::Clusters::MediaPlayback::Attributes::CurrentState::Id));
+    VerifyOrReturn(currentStateAttribute != nullptr,
+                   ChipLogError(AppServer, "CurrentState attribute not found on MediaPlaybackCluster"));
+
+    // call Subscribe on currentStateAttribute while passing in success/failure callbacks
+    currentStateAttribute->Subscribe(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo::DecodableArgType after) {
+            if (before.HasValue())
+            {
+                ChipLogProgress(AppServer, "Read CurrentState value: %d [Before reading value: %d]", static_cast<int>(after),
+                                static_cast<int>(before.Value()));
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "Read CurrentState value: %d", static_cast<int>(after));
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "CurrentState Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        kMinIntervalFloorSeconds, kMaxIntervalCeilingSeconds);
+}
+```
+
+The Casting client can Shutdown all running Subscriptions by calling the
+`ShutdownAllSubscriptions` API on the `CastingApp`. See API and its
+documentation for [Linux](tv-casting-common/core/CastingApp.h), Android and
+[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).

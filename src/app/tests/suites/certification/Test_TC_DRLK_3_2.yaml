@@ -40,779 +40,720 @@ tests:
     - label: "Step 1: DUT sends Lock Door command to TH."
       PICS: DRLK.C.C00.Tx
       verification: |
-          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Lock Door command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Lock Door command response on TH(lock-app) log:
 
-          [1685673050.566811][2584:2586] CHIP:DMG: InvokeResponseMessage =
-          [1685673050.566867][2584:2586] CHIP:DMG: {
-          [1685673050.566921][2584:2586] CHIP:DMG:         suppressResponse = false,
-          [1685673050.566977][2584:2586] CHIP:DMG:         InvokeResponseIBs =
-          [1685673050.567050][2584:2586] CHIP:DMG:         [
-          [1685673050.567107][2584:2586] CHIP:DMG:                 InvokeResponseIB =
-          [1685673050.567186][2584:2586] CHIP:DMG:                 {
-          [1685673050.567248][2584:2586] CHIP:DMG:                         CommandStatusIB =
-          [1685673050.567320][2584:2586] CHIP:DMG:                         {
-          [1685673050.567387][2584:2586] CHIP:DMG:                                 CommandPathIB =
-          [1685673050.567464][2584:2586] CHIP:DMG:                                 {
-          [1685673050.567540][2584:2586] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673050.567625][2584:2586] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673050.567706][2584:2586] CHIP:DMG:                                         CommandId = 0x0,
-          [1685673050.567784][2584:2586] CHIP:DMG:                                 },
-          [1685673050.567870][2584:2586] CHIP:DMG:
-          [1685673050.567938][2584:2586] CHIP:DMG:                                 StatusIB =
-          [1685673050.568015][2584:2586] CHIP:DMG:                                 {
-          [1685673050.568092][2584:2586] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673050.568171][2584:2586] CHIP:DMG:                                 },
-          [1685673050.568246][2584:2586] CHIP:DMG:
-          [1685673050.568313][2584:2586] CHIP:DMG:                         },
-          [1685673050.568389][2584:2586] CHIP:DMG:
-          [1685673050.568451][2584:2586] CHIP:DMG:                 },
-          [1685673050.568524][2584:2586] CHIP:DMG:
-          [1685673050.568578][2584:2586] CHIP:DMG:         ],
-          [1685673050.568650][2584:2586] CHIP:DMG:
-          [1685673050.568707][2584:2586] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673050.568761][2584:2586] CHIP:DMG: },
+          [1698646727.274715][11887:11887] CHIP:DMG: InvokeRequestMessage =
+          [1698646727.274753][11887:11887] CHIP:DMG: {
+          [1698646727.274788][11887:11887] CHIP:DMG:         suppressResponse = false,
+          [1698646727.274829][11887:11887] CHIP:DMG:         timedRequest = true,
+          [1698646727.274867][11887:11887] CHIP:DMG:         InvokeRequests =
+          [1698646727.274916][11887:11887] CHIP:DMG:         [
+          [1698646727.274955][11887:11887] CHIP:DMG:                 CommandDataIB =
+          [1698646727.274998][11887:11887] CHIP:DMG:                 {
+          [1698646727.275119][11887:11887] CHIP:DMG:                         CommandPathIB =
+          [1698646727.275180][11887:11887] CHIP:DMG:                         {
+          [1698646727.275229][11887:11887] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698646727.275279][11887:11887] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698646727.275398][11887:11887] CHIP:DMG:                                 CommandId = 0x0,
+          [1698646727.275447][11887:11887] CHIP:DMG:                         },
+          [1698646727.275498][11887:11887] CHIP:DMG:
+          [1698646727.275591][11887:11887] CHIP:DMG:                         CommandFields =
+          [1698646727.275639][11887:11887] CHIP:DMG:                         {
+          [1698646727.275687][11887:11887] CHIP:DMG:                         },
+          [1698646727.275765][11887:11887] CHIP:DMG:                 },
+          [1698646727.275817][11887:11887] CHIP:DMG:
+          [1698646727.275854][11887:11887] CHIP:DMG:         ],
+          [1698646727.275900][11887:11887] CHIP:DMG:
+          [1698646727.275977][11887:11887] CHIP:DMG:         InteractionModelRevision = 11
+          [1698646727.276053][11887:11887] CHIP:DMG: },
       disabled: true
 
     - label: "Step 2: DUT sends Unlock Door command to TH."
       PICS: DRLK.C.C01.Tx
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Unlock Door command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Unlock Door command response on TH(lock-app) log:
 
-          [1685673083.557613][2593:2595] CHIP:DMG: InvokeResponseMessage =
-          [1685673083.557668][2593:2595] CHIP:DMG: {
-          [1685673083.557724][2593:2595] CHIP:DMG:         suppressResponse = false,
-          [1685673083.557834][2593:2595] CHIP:DMG:         InvokeResponseIBs =
-          [1685673083.557915][2593:2595] CHIP:DMG:         [
-          [1685673083.557973][2593:2595] CHIP:DMG:                 InvokeResponseIB =
-          [1685673083.558070][2593:2595] CHIP:DMG:                 {
-          [1685673083.558133][2593:2595] CHIP:DMG:                         CommandStatusIB =
-          [1685673083.558222][2593:2595] CHIP:DMG:                         {
-          [1685673083.558306][2593:2595] CHIP:DMG:                                 CommandPathIB =
-          [1685673083.558399][2593:2595] CHIP:DMG:                                 {
-          [1685673083.558493][2593:2595] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673083.558589][2593:2595] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673083.558685][2593:2595] CHIP:DMG:                                         CommandId = 0x1,
-          [1685673083.558775][2593:2595] CHIP:DMG:                                 },
-          [1685673083.558878][2593:2595] CHIP:DMG:
-          [1685673083.558962][2593:2595] CHIP:DMG:                                 StatusIB =
-          [1685673083.559058][2593:2595] CHIP:DMG:                                 {
-          [1685673083.559150][2593:2595] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673083.559243][2593:2595] CHIP:DMG:                                 },
-          [1685673083.559335][2593:2595] CHIP:DMG:
-          [1685673083.559418][2593:2595] CHIP:DMG:                         },
-          [1685673083.559513][2593:2595] CHIP:DMG:
-          [1685673083.559582][2593:2595] CHIP:DMG:                 },
-          [1685673083.559663][2593:2595] CHIP:DMG:
-          [1685673083.559720][2593:2595] CHIP:DMG:         ],
-          [1685673083.559792][2593:2595] CHIP:DMG:
-          [1685673083.559848][2593:2595] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673083.559903][2593:2595] CHIP:DMG: },
+          [1698646754.942170][11887:11887] CHIP:DMG: InvokeRequestMessage =
+          [1698646754.942214][11887:11887] CHIP:DMG: {
+          [1698646754.942241][11887:11887] CHIP:DMG:         suppressResponse = false,
+          [1698646754.942284][11887:11887] CHIP:DMG:         timedRequest = true,
+          [1698646754.942314][11887:11887] CHIP:DMG:         InvokeRequests =
+          [1698646754.942351][11887:11887] CHIP:DMG:         [
+          [1698646754.942397][11887:11887] CHIP:DMG:                 CommandDataIB =
+          [1698646754.942443][11887:11887] CHIP:DMG:                 {
+          [1698646754.942490][11887:11887] CHIP:DMG:                         CommandPathIB =
+          [1698646754.942527][11887:11887] CHIP:DMG:                         {
+          [1698646754.942563][11887:11887] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698646754.942613][11887:11887] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698646754.942650][11887:11887] CHIP:DMG:                                 CommandId = 0x1,
+          [1698646754.942686][11887:11887] CHIP:DMG:                         },
+          [1698646754.942735][11887:11887] CHIP:DMG:
+          [1698646754.942768][11887:11887] CHIP:DMG:                         CommandFields =
+          [1698646754.942803][11887:11887] CHIP:DMG:                         {
+          [1698646754.942838][11887:11887] CHIP:DMG:                         },
+          [1698646754.942882][11887:11887] CHIP:DMG:                 },
+          [1698646754.942918][11887:11887] CHIP:DMG:
+          [1698646754.942946][11887:11887] CHIP:DMG:         ],
+          [1698646754.942992][11887:11887] CHIP:DMG:
+          [1698646754.943021][11887:11887] CHIP:DMG:         InteractionModelRevision = 11
+          [1698646754.943048][11887:11887] CHIP:DMG: },
       disabled: true
 
     - label: "Step 3: DUT sends Unlock with Timeout command to TH."
       PICS: DRLK.C.C03.Tx
       verification: |
-          ./chip-tool doorlock unlock-with-timeout 60 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock unlock-with-timeout 60 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Unlock with Timeout command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Unlock with Timeout command response on TH(lock-app) log:
 
-          [1685673101.154705][2596:2598] CHIP:DMG: InvokeResponseMessage =
-          [1685673101.154760][2596:2598] CHIP:DMG: {
-          [1685673101.154813][2596:2598] CHIP:DMG:         suppressResponse = false,
-          [1685673101.154869][2596:2598] CHIP:DMG:         InvokeResponseIBs =
-          [1685673101.154941][2596:2598] CHIP:DMG:         [
-          [1685673101.154998][2596:2598] CHIP:DMG:                 InvokeResponseIB =
-          [1685673101.155074][2596:2598] CHIP:DMG:                 {
-          [1685673101.155135][2596:2598] CHIP:DMG:                         CommandStatusIB =
-          [1685673101.155206][2596:2598] CHIP:DMG:                         {
-          [1685673101.155273][2596:2598] CHIP:DMG:                                 CommandPathIB =
-          [1685673101.155349][2596:2598] CHIP:DMG:                                 {
-          [1685673101.155426][2596:2598] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673101.155501][2596:2598] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673101.155586][2596:2598] CHIP:DMG:                                         CommandId = 0x3,
-          [1685673101.155660][2596:2598] CHIP:DMG:                                 },
-          [1685673101.155743][2596:2598] CHIP:DMG:
-          [1685673101.155812][2596:2598] CHIP:DMG:                                 StatusIB =
-          [1685673101.155886][2596:2598] CHIP:DMG:                                 {
-          [1685673101.155965][2596:2598] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673101.156041][2596:2598] CHIP:DMG:                                 },
-          [1685673101.156115][2596:2598] CHIP:DMG:
-          [1685673101.156183][2596:2598] CHIP:DMG:                         },
-          [1685673101.156259][2596:2598] CHIP:DMG:
-          [1685673101.156321][2596:2598] CHIP:DMG:                 },
-          [1685673101.156392][2596:2598] CHIP:DMG:
-          [1685673101.156447][2596:2598] CHIP:DMG:         ],
-          [1685673101.156517][2596:2598] CHIP:DMG:
-          [1685673101.156573][2596:2598] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673101.156629][2596:2598] CHIP:DMG: },
+          [1698646961.411111][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698646961.411145][11905:11905] CHIP:DMG: {
+          [1698646961.411175][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698646961.411212][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698646961.411246][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698646961.411291][11905:11905] CHIP:DMG:         [
+          [1698646961.411328][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698646961.411374][11905:11905] CHIP:DMG:                 {
+          [1698646961.411478][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698646961.411527][11905:11905] CHIP:DMG:                         {
+          [1698646961.411572][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698646961.411616][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698646961.411694][11905:11905] CHIP:DMG:                                 CommandId = 0x3,
+          [1698646961.411776][11905:11905] CHIP:DMG:                         },
+          [1698646961.411824][11905:11905] CHIP:DMG:
+          [1698646961.411861][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698646961.411903][11905:11905] CHIP:DMG:                         {
+          [1698646961.411972][11905:11905] CHIP:DMG:                                 0x0 = 60,
+          [1698646961.412053][11905:11905] CHIP:DMG:                         },
+          [1698646961.412093][11905:11905] CHIP:DMG:                 },
+          [1698646961.412136][11905:11905] CHIP:DMG:
+          [1698646961.412169][11905:11905] CHIP:DMG:         ],
+          [1698646961.412211][11905:11905] CHIP:DMG:
+          [1698646961.412244][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698646961.412277][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 4: DUT sends Set Week Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C0b.Tx
       verification: |
-          ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Set user command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set user command response on TH(lock-app) log:
 
-          [1685673117.936503][2600:2602] CHIP:DMG: InvokeResponseMessage =
-          [1685673117.936560][2600:2602] CHIP:DMG: {
-          [1685673117.936615][2600:2602] CHIP:DMG:         suppressResponse = false,
-          [1685673117.936672][2600:2602] CHIP:DMG:         InvokeResponseIBs =
-          [1685673117.936747][2600:2602] CHIP:DMG:         [
-          [1685673117.936803][2600:2602] CHIP:DMG:                 InvokeResponseIB =
-          [1685673117.936880][2600:2602] CHIP:DMG:                 {
-          [1685673117.936941][2600:2602] CHIP:DMG:                         CommandStatusIB =
-          [1685673117.937029][2600:2602] CHIP:DMG:                         {
-          [1685673117.937106][2600:2602] CHIP:DMG:                                 CommandPathIB =
-          [1685673117.937199][2600:2602] CHIP:DMG:                                 {
-          [1685673117.937292][2600:2602] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673117.937389][2600:2602] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673117.937486][2600:2602] CHIP:DMG:                                         CommandId = 0x1a,
-          [1685673117.937577][2600:2602] CHIP:DMG:                                 },
-          [1685673117.937680][2600:2602] CHIP:DMG:
-          [1685673117.937755][2600:2602] CHIP:DMG:                                 StatusIB =
-          [1685673117.938008][2600:2602] CHIP:DMG:                                 {
-          [1685673117.938101][2600:2602] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673117.938194][2600:2602] CHIP:DMG:                                 },
-          [1685673117.938286][2600:2602] CHIP:DMG:
-          [1685673117.938368][2600:2602] CHIP:DMG:                         },
-          [1685673117.938462][2600:2602] CHIP:DMG:
-          [1685673117.938530][2600:2602] CHIP:DMG:                 },
-          [1685673117.938610][2600:2602] CHIP:DMG:
-          [1685673117.938667][2600:2602] CHIP:DMG:         ],
-          [1685673117.938737][2600:2602] CHIP:DMG:
-          [1685673117.938795][2600:2602] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673117.938850][2600:2602] CHIP:DMG: },
+          [1698646982.058610][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698646982.058637][11905:11905] CHIP:DMG: {
+          [1698646982.058661][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698646982.058690][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698646982.058717][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698646982.058754][11905:11905] CHIP:DMG:         [
+          [1698646982.058780][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698646982.058811][11905:11905] CHIP:DMG:                 {
+          [1698646982.058839][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698646982.058876][11905:11905] CHIP:DMG:                         {
+          [1698646982.058910][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698646982.058944][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698646982.058979][11905:11905] CHIP:DMG:                                 CommandId = 0x1a,
+          [1698646982.059011][11905:11905] CHIP:DMG:                         },
+          [1698646982.059072][11905:11905] CHIP:DMG:
+          [1698646982.059104][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698646982.059137][11905:11905] CHIP:DMG:                         {
+          [1698646982.059192][11905:11905] CHIP:DMG:                                 0x0 = 0,
+          [1698646982.059232][11905:11905] CHIP:DMG:                                 0x1 = 1,
+          [1698646982.059270][11905:11905] CHIP:DMG:                                 0x2 = "xxx" (3 chars),
+          [1698646982.059333][11905:11905] CHIP:DMG:                                 0x3 = 6452,
+          [1698646982.059371][11905:11905] CHIP:DMG:                                 0x4 = 1,
+          [1698646982.059406][11905:11905] CHIP:DMG:                                 0x5 = 0,
+          [1698646982.059467][11905:11905] CHIP:DMG:                                 0x6 = 0,
+          [1698646982.059503][11905:11905] CHIP:DMG:                         },
+          [1698646982.059534][11905:11905] CHIP:DMG:                 },
+          [1698646982.059571][11905:11905] CHIP:DMG:
+          [1698646982.059625][11905:11905] CHIP:DMG:         ],
+          [1698646982.059662][11905:11905] CHIP:DMG:
+          [1698646982.059714][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698646982.059763][11905:11905] CHIP:DMG: },
 
-
-          ./chip-tool doorlock set-week-day-schedule 1 1 2  15 45 16 55 1 1 --trace_decode 1
+          ./chip-tool doorlock set-week-day-schedule 1 1 2  15 45 16 55 1 1
 
           Verify TH receives Set Week Day Schedule command with SUCCESS response on TH(lock-app) log:
 
-          [1685673143.421323][2604:2606] CHIP:DMG: InvokeResponseMessage =
-          [1685673143.421380][2604:2606] CHIP:DMG: {
-          [1685673143.421437][2604:2606] CHIP:DMG:         suppressResponse = false,
-          [1685673143.421495][2604:2606] CHIP:DMG:         InvokeResponseIBs =
-          [1685673143.421569][2604:2606] CHIP:DMG:         [
-          [1685673143.421628][2604:2606] CHIP:DMG:                 InvokeResponseIB =
-          [1685673143.421705][2604:2606] CHIP:DMG:                 {
-          [1685673143.421893][2604:2606] CHIP:DMG:                         CommandStatusIB =
-          [1685673143.421975][2604:2606] CHIP:DMG:                         {
-          [1685673143.422043][2604:2606] CHIP:DMG:                                 CommandPathIB =
-          [1685673143.422121][2604:2606] CHIP:DMG:                                 {
-          [1685673143.422197][2604:2606] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673143.422277][2604:2606] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673143.422357][2604:2606] CHIP:DMG:                                         CommandId = 0xb,
-          [1685673143.422432][2604:2606] CHIP:DMG:                                 },
-          [1685673143.422517][2604:2606] CHIP:DMG:
-          [1685673143.422586][2604:2606] CHIP:DMG:                                 StatusIB =
-          [1685673143.422660][2604:2606] CHIP:DMG:                                 {
-          [1685673143.422737][2604:2606] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673143.422812][2604:2606] CHIP:DMG:                                 },
-          [1685673143.422887][2604:2606] CHIP:DMG:
-          [1685673143.422954][2604:2606] CHIP:DMG:                         },
-          [1685673143.423030][2604:2606] CHIP:DMG:
-          [1685673143.423092][2604:2606] CHIP:DMG:                 },
-          [1685673143.423162][2604:2606] CHIP:DMG:
-          [1685673143.423218][2604:2606] CHIP:DMG:         ],
-          [1685673143.423289][2604:2606] CHIP:DMG:
-          [1685673143.423345][2604:2606] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673143.423400][2604:2606] CHIP:DMG: },
+          [1698647005.052611][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647005.052642][11905:11905] CHIP:DMG: {
+          [1698647005.052668][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647005.052700][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647005.052728][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647005.052783][11905:11905] CHIP:DMG:         [
+          [1698647005.052813][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647005.052845][11905:11905] CHIP:DMG:                 {
+          [1698647005.052889][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647005.052931][11905:11905] CHIP:DMG:                         {
+          [1698647005.052980][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647005.053019][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647005.053057][11905:11905] CHIP:DMG:                                 CommandId = 0xb,
+          [1698647005.053103][11905:11905] CHIP:DMG:                         },
+          [1698647005.053142][11905:11905] CHIP:DMG:
+          [1698647005.053174][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647005.053209][11905:11905] CHIP:DMG:                         {
+          [1698647005.053258][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647005.053297][11905:11905] CHIP:DMG:                                 0x1 = 1,
+          [1698647005.053347][11905:11905] CHIP:DMG:                                 0x2 = 2,
+          [1698647005.053386][11905:11905] CHIP:DMG:                                 0x3 = 15,
+          [1698647005.053424][11905:11905] CHIP:DMG:                                 0x4 = 45,
+          [1698647005.053462][11905:11905] CHIP:DMG:                                 0x5 = 16,
+          [1698647005.053512][11905:11905] CHIP:DMG:                                 0x6 = 55,
+          [1698647005.053549][11905:11905] CHIP:DMG:                         },
+          [1698647005.053593][11905:11905] CHIP:DMG:                 },
+          [1698647005.053636][11905:11905] CHIP:DMG:
+          [1698647005.053669][11905:11905] CHIP:DMG:         ],
+          [1698647005.053809][11905:11905] CHIP:DMG:
+          [1698647005.053864][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647005.053898][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 5: DUT sends Get Week Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C0c.Tx
       verification: |
-          ./chip-tool doorlock get-week-day-schedule 1 1 1 1 --trace_decode 1
+          ./chip-tool doorlock get-week-day-schedule 1 1 1 1
 
           Verify TH receives Get Week Day Schedule command response on TH(lock-app) log:
 
-          [1685673169.698639][2609:2611] CHIP:DMG: InvokeResponseMessage =
-          [1685673169.698694][2609:2611] CHIP:DMG: {
-          [1685673169.698748][2609:2611] CHIP:DMG:         suppressResponse = false,
-          [1685673169.698804][2609:2611] CHIP:DMG:         InvokeResponseIBs =
-          [1685673169.698882][2609:2611] CHIP:DMG:         [
-          [1685673169.698940][2609:2611] CHIP:DMG:                 InvokeResponseIB =
-          [1685673169.699023][2609:2611] CHIP:DMG:                 {
-          [1685673169.699083][2609:2611] CHIP:DMG:                         CommandDataIB =
-          [1685673169.699151][2609:2611] CHIP:DMG:                         {
-          [1685673169.699211][2609:2611] CHIP:DMG:                                 CommandPathIB =
-          [1685673169.699288][2609:2611] CHIP:DMG:                                 {
-          [1685673169.699363][2609:2611] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673169.699443][2609:2611] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673169.699521][2609:2611] CHIP:DMG:                                         CommandId = 0xc,
-          [1685673169.699596][2609:2611] CHIP:DMG:                                 },
-          [1685673169.699787][2609:2611] CHIP:DMG:
-          [1685673169.699917][2609:2611] CHIP:DMG:                                 CommandFields =
-          [1685673169.700000][2609:2611] CHIP:DMG:                                 {
-          [1685673169.700080][2609:2611] CHIP:DMG:                                         0x0 = 1,
-          [1685673169.700162][2609:2611] CHIP:DMG:                                         0x1 = 1,
-          [1685673169.700243][2609:2611] CHIP:DMG:                                         0x2 = 0,
-          [1685673169.700324][2609:2611] CHIP:DMG:                                         0x3 = 2,
-          [1685673169.700451][2609:2611] CHIP:DMG:                                         0x4 = 15,
-          [1685673169.700535][2609:2611] CHIP:DMG:                                         0x5 = 45,
-          [1685673169.700616][2609:2611] CHIP:DMG:                                         0x6 = 16,
-          [1685673169.700697][2609:2611] CHIP:DMG:                                         0x7 = 55,
-          [1685673169.700835][2609:2611] CHIP:DMG:                                 },
-          [1685673169.700908][2609:2611] CHIP:DMG:                         },
-          [1685673169.700991][2609:2611] CHIP:DMG:
-          [1685673169.701053][2609:2611] CHIP:DMG:                 },
-          [1685673169.701130][2609:2611] CHIP:DMG:
-          [1685673169.701186][2609:2611] CHIP:DMG:         ],
-          [1685673169.701265][2609:2611] CHIP:DMG:
-          [1685673169.701320][2609:2611] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673169.701375][2609:2611] CHIP:DMG: },
+          [1698647031.575773][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647031.575813][11905:11905] CHIP:DMG: {
+          [1698647031.575848][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647031.575886][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647031.575925][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647031.575974][11905:11905] CHIP:DMG:         [
+          [1698647031.576012][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647031.576055][11905:11905] CHIP:DMG:                 {
+          [1698647031.576095][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647031.576140][11905:11905] CHIP:DMG:                         {
+          [1698647031.576192][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647031.576242][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647031.576320][11905:11905] CHIP:DMG:                                 CommandId = 0xc,
+          [1698647031.576372][11905:11905] CHIP:DMG:                         },
+          [1698647031.576424][11905:11905] CHIP:DMG:
+          [1698647031.576466][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647031.576513][11905:11905] CHIP:DMG:                         {
+          [1698647031.576563][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647031.576613][11905:11905] CHIP:DMG:                                 0x1 = 1,
+          [1698647031.576665][11905:11905] CHIP:DMG:                         },
+          [1698647031.576708][11905:11905] CHIP:DMG:                 },
+          [1698647031.576755][11905:11905] CHIP:DMG:
+          [1698647031.576792][11905:11905] CHIP:DMG:         ],
+          [1698647031.576835][11905:11905] CHIP:DMG:
+          [1698647031.576866][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647031.576896][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 6: DUT sends Clear Week Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C0d.Tx
       verification: |
-          ./chip-tool doorlock clear-week-day-schedule 1 1 1 1 --trace_decode 1
+          ./chip-tool doorlock clear-week-day-schedule 1 1 1 1
 
-          Verify TH receives Clear Week Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Week Day Schedule command response on TH(lock-app) log:
 
-          [1685673196.080189][2614:2616] CHIP:DMG: InvokeResponseMessage =
-          [1685673196.080247][2614:2616] CHIP:DMG: {
-          [1685673196.080303][2614:2616] CHIP:DMG:         suppressResponse = false,
-          [1685673196.080383][2614:2616] CHIP:DMG:         InvokeResponseIBs =
-          [1685673196.080455][2614:2616] CHIP:DMG:         [
-          [1685673196.080533][2614:2616] CHIP:DMG:                 InvokeResponseIB =
-          [1685673196.080616][2614:2616] CHIP:DMG:                 {
-          [1685673196.080696][2614:2616] CHIP:DMG:                         CommandStatusIB =
-          [1685673196.080768][2614:2616] CHIP:DMG:                         {
-          [1685673196.080836][2614:2616] CHIP:DMG:                                 CommandPathIB =
-          [1685673196.080933][2614:2616] CHIP:DMG:                                 {
-          [1685673196.081030][2614:2616] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673196.081112][2614:2616] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673196.081213][2614:2616] CHIP:DMG:                                         CommandId = 0xd,
-          [1685673196.081284][2614:2616] CHIP:DMG:                                 },
-          [1685673196.081362][2614:2616] CHIP:DMG:
-          [1685673196.081448][2614:2616] CHIP:DMG:                                 StatusIB =
-          [1685673196.081519][2614:2616] CHIP:DMG:                                 {
-          [1685673196.081616][2614:2616] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673196.081692][2614:2616] CHIP:DMG:                                 },
-          [1685673196.081822][2614:2616] CHIP:DMG:
-          [1685673196.081891][2614:2616] CHIP:DMG:                         },
-          [1685673196.081991][2614:2616] CHIP:DMG:
-          [1685673196.082053][2614:2616] CHIP:DMG:                 },
-          [1685673196.082125][2614:2616] CHIP:DMG:
-          [1685673196.082202][2614:2616] CHIP:DMG:         ],
-          [1685673196.082276][2614:2616] CHIP:DMG:
-          [1685673196.082331][2614:2616] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673196.082409][2614:2616] CHIP:DMG: },
+          [1698646775.513834][11887:11887] CHIP:DMG: InvokeRequestMessage =
+          [1698646775.513862][11887:11887] CHIP:DMG: {
+          [1698646775.513884][11887:11887] CHIP:DMG:         suppressResponse = false,
+          [1698646775.513911][11887:11887] CHIP:DMG:         timedRequest = false,
+          [1698646775.513942][11887:11887] CHIP:DMG:         InvokeRequests =
+          [1698646775.513982][11887:11887] CHIP:DMG:         [
+          [1698646775.514007][11887:11887] CHIP:DMG:                 CommandDataIB =
+          [1698646775.514033][11887:11887] CHIP:DMG:                 {
+          [1698646775.514059][11887:11887] CHIP:DMG:                         CommandPathIB =
+          [1698646775.514088][11887:11887] CHIP:DMG:                         {
+          [1698646775.514118][11887:11887] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698646775.514152][11887:11887] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698646775.514184][11887:11887] CHIP:DMG:                                 CommandId = 0xd,
+          [1698646775.514214][11887:11887] CHIP:DMG:                         },
+          [1698646775.514245][11887:11887] CHIP:DMG:
+          [1698646775.514272][11887:11887] CHIP:DMG:                         CommandFields =
+          [1698646775.514301][11887:11887] CHIP:DMG:                         {
+          [1698646775.514332][11887:11887] CHIP:DMG:                                 0x0 = 1,
+          [1698646775.514364][11887:11887] CHIP:DMG:                                 0x1 = 1,
+          [1698646775.514396][11887:11887] CHIP:DMG:                         },
+          [1698646775.514422][11887:11887] CHIP:DMG:                 },
+          [1698646775.514453][11887:11887] CHIP:DMG:
+          [1698646775.514477][11887:11887] CHIP:DMG:         ],
+          [1698646775.514507][11887:11887] CHIP:DMG:
+          [1698646775.514529][11887:11887] CHIP:DMG:         InteractionModelRevision = 11
+          [1698646775.514552][11887:11887] CHIP:DMG: },
       disabled: true
 
     - label: "Step 7: DUT sends Set Year Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C0e.Tx
       verification: |
-          ./chip-tool doorlock set-year-day-schedule 1 1 1080 2100 1 1 --trace_decode 1
+          ./chip-tool doorlock set-year-day-schedule 1 1 1080 2100 1 1
 
-          Verify TH receives Set Year Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set Year Day Schedule command response on TH(lock-app) log:
 
-          [1685673212.614964][2617:2619] CHIP:DMG: InvokeResponseMessage =
-          [1685673212.615020][2617:2619] CHIP:DMG: {
-          [1685673212.615096][2617:2619] CHIP:DMG:         suppressResponse = false,
-          [1685673212.615154][2617:2619] CHIP:DMG:         InvokeResponseIBs =
-          [1685673212.615227][2617:2619] CHIP:DMG:         [
-          [1685673212.615306][2617:2619] CHIP:DMG:                 InvokeResponseIB =
-          [1685673212.615385][2617:2619] CHIP:DMG:                 {
-          [1685673212.615466][2617:2619] CHIP:DMG:                         CommandStatusIB =
-          [1685673212.615544][2617:2619] CHIP:DMG:                         {
-          [1685673212.615611][2617:2619] CHIP:DMG:                                 CommandPathIB =
-          [1685673212.615707][2617:2619] CHIP:DMG:                                 {
-          [1685673212.615784][2617:2619] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673212.615884][2617:2619] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673212.615962][2617:2619] CHIP:DMG:                                         CommandId = 0xe,
-          [1685673212.616061][2617:2619] CHIP:DMG:                                 },
-          [1685673212.616147][2617:2619] CHIP:DMG:
-          [1685673212.616237][2617:2619] CHIP:DMG:                                 StatusIB =
-          [1685673212.616314][2617:2619] CHIP:DMG:                                 {
-          [1685673212.616411][2617:2619] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673212.616487][2617:2619] CHIP:DMG:                                 },
-          [1685673212.616583][2617:2619] CHIP:DMG:
-          [1685673212.616651][2617:2619] CHIP:DMG:                         },
-          [1685673212.616747][2617:2619] CHIP:DMG:
-          [1685673212.616809][2617:2619] CHIP:DMG:                 },
-          [1685673212.616902][2617:2619] CHIP:DMG:
-          [1685673212.616959][2617:2619] CHIP:DMG:         ],
-          [1685673212.617030][2617:2619] CHIP:DMG:
-          [1685673212.617109][2617:2619] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673212.617164][2617:2619] CHIP:DMG: },
+          [1698646805.099727][11887:11887] CHIP:DMG: InvokeRequestMessage =
+          [1698646805.099759][11887:11887] CHIP:DMG: {
+          [1698646805.099786][11887:11887] CHIP:DMG:         suppressResponse = false,
+          [1698646805.099817][11887:11887] CHIP:DMG:         timedRequest = false,
+          [1698646805.099847][11887:11887] CHIP:DMG:         InvokeRequests =
+          [1698646805.099885][11887:11887] CHIP:DMG:         [
+          [1698646805.099914][11887:11887] CHIP:DMG:                 CommandDataIB =
+          [1698646805.099946][11887:11887] CHIP:DMG:                 {
+          [1698646805.099976][11887:11887] CHIP:DMG:                         CommandPathIB =
+          [1698646805.100015][11887:11887] CHIP:DMG:                         {
+          [1698646805.100051][11887:11887] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698646805.100089][11887:11887] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698646805.100126][11887:11887] CHIP:DMG:                                 CommandId = 0xe,
+          [1698646805.100161][11887:11887] CHIP:DMG:                         },
+          [1698646805.100196][11887:11887] CHIP:DMG:
+          [1698646805.100227][11887:11887] CHIP:DMG:                         CommandFields =
+          [1698646805.100260][11887:11887] CHIP:DMG:                         {
+          [1698646805.100427][11887:11887] CHIP:DMG:                                 0x0 = 1,
+          [1698646805.100471][11887:11887] CHIP:DMG:                                 0x1 = 1,
+          [1698646805.100510][11887:11887] CHIP:DMG:                                 0x2 = 1080,
+          [1698646805.100548][11887:11887] CHIP:DMG:                                 0x3 = 2100,
+          [1698646805.100585][11887:11887] CHIP:DMG:                         },
+          [1698646805.100618][11887:11887] CHIP:DMG:                 },
+          [1698646805.100656][11887:11887] CHIP:DMG:
+          [1698646805.100684][11887:11887] CHIP:DMG:         ],
+          [1698646805.100721][11887:11887] CHIP:DMG:
+          [1698646805.100749][11887:11887] CHIP:DMG:         InteractionModelRevision = 11
+          [1698646805.100777][11887:11887] CHIP:DMG: },
       disabled: true
 
     - label: "Step 8: DUT sends Get Year Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C0f.Tx
       verification: |
-          ./chip-tool doorlock get-year-day-schedule 1 1 1 1 --trace_decode 1
+          ./chip-tool doorlock get-year-day-schedule 1 1 1 1
 
           Verify TH receives Get Year Day Schedule command response on TH(lock-app) log:
 
-          [1685673233.319349][2622:2624] CHIP:DMG: InvokeResponseMessage =
-          [1685673233.319404][2622:2624] CHIP:DMG: {
-          [1685673233.319458][2622:2624] CHIP:DMG:         suppressResponse = false,
-          [1685673233.319515][2622:2624] CHIP:DMG:         InvokeResponseIBs =
-          [1685673233.319592][2622:2624] CHIP:DMG:         [
-          [1685673233.319648][2622:2624] CHIP:DMG:                 InvokeResponseIB =
-          [1685673233.319732][2622:2624] CHIP:DMG:                 {
-          [1685673233.319792][2622:2624] CHIP:DMG:                         CommandDataIB =
-          [1685673233.319863][2622:2624] CHIP:DMG:                         {
-          [1685673233.319987][2622:2624] CHIP:DMG:                                 CommandPathIB =
-          [1685673233.320066][2622:2624] CHIP:DMG:                                 {
-          [1685673233.320144][2622:2624] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673233.320223][2622:2624] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673233.320303][2622:2624] CHIP:DMG:                                         CommandId = 0xf,
-          [1685673233.320379][2622:2624] CHIP:DMG:                                 },
-          [1685673233.320458][2622:2624] CHIP:DMG:
-          [1685673233.320524][2622:2624] CHIP:DMG:                                 CommandFields =
-          [1685673233.320598][2622:2624] CHIP:DMG:                                 {
-          [1685673233.320678][2622:2624] CHIP:DMG:                                         0x0 = 1,
-          [1685673233.320758][2622:2624] CHIP:DMG:                                         0x1 = 1,
-          [1685673233.320840][2622:2624] CHIP:DMG:                                         0x2 = 0,
-          [1685673233.320992][2622:2624] CHIP:DMG:                                         0x3 = 1080,
-          [1685673233.321075][2622:2624] CHIP:DMG:                                         0x4 = 2100,
-          [1685673233.321155][2622:2624] CHIP:DMG:                                 },
-          [1685673233.321226][2622:2624] CHIP:DMG:                         },
-          [1685673233.321310][2622:2624] CHIP:DMG:
-          [1685673233.321372][2622:2624] CHIP:DMG:                 },
-          [1685673233.321450][2622:2624] CHIP:DMG:
-          [1685673233.321506][2622:2624] CHIP:DMG:         ],
-          [1685673233.321581][2622:2624] CHIP:DMG:
-          [1685673233.321637][2622:2624] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673233.321691][2622:2624] CHIP:DMG: },
+          [1698647099.466619][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647099.466652][11905:11905] CHIP:DMG: {
+          [1698647099.466679][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647099.466709][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647099.466751][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647099.466787][11905:11905] CHIP:DMG:         [
+          [1698647099.466814][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647099.466842][11905:11905] CHIP:DMG:                 {
+          [1698647099.466880][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647099.466921][11905:11905] CHIP:DMG:                         {
+          [1698647099.466966][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647099.467000][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647099.467047][11905:11905] CHIP:DMG:                                 CommandId = 0xf,
+          [1698647099.467080][11905:11905] CHIP:DMG:                         },
+          [1698647099.467124][11905:11905] CHIP:DMG:
+          [1698647099.467155][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647099.467197][11905:11905] CHIP:DMG:                         {
+          [1698647099.467232][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647099.467277][11905:11905] CHIP:DMG:                                 0x1 = 1,
+          [1698647099.467311][11905:11905] CHIP:DMG:                         },
+          [1698647099.467352][11905:11905] CHIP:DMG:                 },
+          [1698647099.467386][11905:11905] CHIP:DMG:
+          [1698647099.467411][11905:11905] CHIP:DMG:         ],
+          [1698647099.467455][11905:11905] CHIP:DMG:
+          [1698647099.467481][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647099.467517][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 9: DUT sends Clear Year Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C10.Tx
       verification: |
-          ./chip-tool doorlock clear-year-day-schedule 1 1 1 1 --trace_decode 1
+          ./chip-tool doorlock clear-year-day-schedule 1 1 1 1
 
-          Verify TH receives Clear Year Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Year Day Schedule command response on TH(lock-app) log:
 
-          [1685673250.141106][2626:2628] CHIP:DMG: InvokeResponseMessage =
-          [1685673250.141162][2626:2628] CHIP:DMG: {
-          [1685673250.141215][2626:2628] CHIP:DMG:         suppressResponse = false,
-          [1685673250.141271][2626:2628] CHIP:DMG:         InvokeResponseIBs =
-          [1685673250.141342][2626:2628] CHIP:DMG:         [
-          [1685673250.141399][2626:2628] CHIP:DMG:                 InvokeResponseIB =
-          [1685673250.141479][2626:2628] CHIP:DMG:                 {
-          [1685673250.141539][2626:2628] CHIP:DMG:                         CommandStatusIB =
-          [1685673250.141608][2626:2628] CHIP:DMG:                         {
-          [1685673250.141672][2626:2628] CHIP:DMG:                                 CommandPathIB =
-          [1685673250.141746][2626:2628] CHIP:DMG:                                 {
-          [1685673250.141871][2626:2628] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673250.141952][2626:2628] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673250.142031][2626:2628] CHIP:DMG:                                         CommandId = 0x10,
-          [1685673250.142104][2626:2628] CHIP:DMG:                                 },
-          [1685673250.142189][2626:2628] CHIP:DMG:
-          [1685673250.142254][2626:2628] CHIP:DMG:                                 StatusIB =
-          [1685673250.142325][2626:2628] CHIP:DMG:                                 {
-          [1685673250.142402][2626:2628] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673250.142567][2626:2628] CHIP:DMG:                                 },
-          [1685673250.142648][2626:2628] CHIP:DMG:
-          [1685673250.142716][2626:2628] CHIP:DMG:                         },
-          [1685673250.142794][2626:2628] CHIP:DMG:
-          [1685673250.142853][2626:2628] CHIP:DMG:                 },
-          [1685673250.142924][2626:2628] CHIP:DMG:
-          [1685673250.143047][2626:2628] CHIP:DMG:         ],
-          [1685673250.143123][2626:2628] CHIP:DMG:
-          [1685673250.143179][2626:2628] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673250.143233][2626:2628] CHIP:DMG: },
+          [1698647125.062059][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647125.062092][11905:11905] CHIP:DMG: {
+          [1698647125.062121][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647125.062156][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647125.062187][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647125.062229][11905:11905] CHIP:DMG:         [
+          [1698647125.062260][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647125.062295][11905:11905] CHIP:DMG:                 {
+          [1698647125.062328][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647125.062373][11905:11905] CHIP:DMG:                         {
+          [1698647125.062412][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647125.062452][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647125.062492][11905:11905] CHIP:DMG:                                 CommandId = 0x10,
+          [1698647125.062530][11905:11905] CHIP:DMG:                         },
+          [1698647125.062570][11905:11905] CHIP:DMG:
+          [1698647125.062603][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647125.062642][11905:11905] CHIP:DMG:                         {
+          [1698647125.062682][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647125.062723][11905:11905] CHIP:DMG:                                 0x1 = 1,
+          [1698647125.062764][11905:11905] CHIP:DMG:                         },
+          [1698647125.062800][11905:11905] CHIP:DMG:                 },
+          [1698647125.062839][11905:11905] CHIP:DMG:
+          [1698647125.062869][11905:11905] CHIP:DMG:         ],
+          [1698647125.062909][11905:11905] CHIP:DMG:
+          [1698647125.062939][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647125.062969][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 10: DUT sends Set Holiday Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C11.Tx
       verification: |
-          ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1 --trace_decode 1
+          ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
 
-          Verify TH receives Set Holiday Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set Holiday Day Schedule command response on TH(lock-app) log:
 
-          [1685673266.868536][2630:2632] CHIP:DMG: InvokeResponseMessage =
-          [1685673266.868592][2630:2632] CHIP:DMG: {
-          [1685673266.868645][2630:2632] CHIP:DMG:         suppressResponse = false,
-          [1685673266.868772][2630:2632] CHIP:DMG:         InvokeResponseIBs =
-          [1685673266.868851][2630:2632] CHIP:DMG:         [
-          [1685673266.868908][2630:2632] CHIP:DMG:                 InvokeResponseIB =
-          [1685673266.868985][2630:2632] CHIP:DMG:                 {
-          [1685673266.869181][2630:2632] CHIP:DMG:                         CommandStatusIB =
-          [1685673266.869255][2630:2632] CHIP:DMG:                         {
-          [1685673266.869323][2630:2632] CHIP:DMG:                                 CommandPathIB =
-          [1685673266.869399][2630:2632] CHIP:DMG:                                 {
-          [1685673266.869475][2630:2632] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673266.869554][2630:2632] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673266.869632][2630:2632] CHIP:DMG:                                         CommandId = 0x11,
-          [1685673266.869708][2630:2632] CHIP:DMG:                                 },
-          [1685673266.869819][2630:2632] CHIP:DMG:
-          [1685673266.869887][2630:2632] CHIP:DMG:                                 StatusIB =
-          [1685673266.869965][2630:2632] CHIP:DMG:                                 {
-          [1685673266.870041][2630:2632] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673266.870115][2630:2632] CHIP:DMG:                                 },
-          [1685673266.870190][2630:2632] CHIP:DMG:
-          [1685673266.870256][2630:2632] CHIP:DMG:                         },
-          [1685673266.870332][2630:2632] CHIP:DMG:
-          [1685673266.870392][2630:2632] CHIP:DMG:                 },
-          [1685673266.870463][2630:2632] CHIP:DMG:
-          [1685673266.870518][2630:2632] CHIP:DMG:         ],
-          [1685673266.870589][2630:2632] CHIP:DMG:
-          [1685673266.870644][2630:2632] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673266.870698][2630:2632] CHIP:DMG: },
+          [1698647147.130306][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647147.130327][11905:11905] CHIP:DMG: {
+          [1698647147.130345][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647147.130367][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647147.130386][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647147.130412][11905:11905] CHIP:DMG:         [
+          [1698647147.130431][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647147.130453][11905:11905] CHIP:DMG:                 {
+          [1698647147.130473][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647147.130503][11905:11905] CHIP:DMG:                         {
+          [1698647147.130527][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647147.130551][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647147.130576][11905:11905] CHIP:DMG:                                 CommandId = 0x11,
+          [1698647147.130598][11905:11905] CHIP:DMG:                         },
+          [1698647147.130623][11905:11905] CHIP:DMG:
+          [1698647147.130644][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647147.130667][11905:11905] CHIP:DMG:                         {
+          [1698647147.130693][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647147.130718][11905:11905] CHIP:DMG:                                 0x1 = 20,
+          [1698647147.130743][11905:11905] CHIP:DMG:                                 0x2 = 30,
+          [1698647147.130767][11905:11905] CHIP:DMG:                                 0x3 = 0,
+          [1698647147.130792][11905:11905] CHIP:DMG:                         },
+          [1698647147.130813][11905:11905] CHIP:DMG:                 },
+          [1698647147.130839][11905:11905] CHIP:DMG:
+          [1698647147.130858][11905:11905] CHIP:DMG:         ],
+          [1698647147.130883][11905:11905] CHIP:DMG:
+          [1698647147.130902][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647147.130920][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 11: DUT sends Get Holiday Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C12.Tx
       verification: |
-          ./chip-tool doorlock get-holiday-schedule 1 1 1 --trace_decode 1
+          ./chip-tool doorlock get-holiday-schedule 1 1 1
 
           Verify TH receives Get Holiday Day Schedule command response on TH(lock-app) log:
 
-          [1685673297.404334][2637:2639] CHIP:DMG: InvokeResponseMessage =
-          [1685673297.404389][2637:2639] CHIP:DMG: {
-          [1685673297.404442][2637:2639] CHIP:DMG:         suppressResponse = false,
-          [1685673297.404499][2637:2639] CHIP:DMG:         InvokeResponseIBs =
-          [1685673297.404575][2637:2639] CHIP:DMG:         [
-          [1685673297.404632][2637:2639] CHIP:DMG:                 InvokeResponseIB =
-          [1685673297.404716][2637:2639] CHIP:DMG:                 {
-          [1685673297.404776][2637:2639] CHIP:DMG:                         CommandDataIB =
-          [1685673297.404848][2637:2639] CHIP:DMG:                         {
-          [1685673297.404915][2637:2639] CHIP:DMG:                                 CommandPathIB =
-          [1685673297.404997][2637:2639] CHIP:DMG:                                 {
-          [1685673297.405075][2637:2639] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673297.405155][2637:2639] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673297.405233][2637:2639] CHIP:DMG:                                         CommandId = 0x12,
-          [1685673297.405307][2637:2639] CHIP:DMG:                                 },
-          [1685673297.405385][2637:2639] CHIP:DMG:
-          [1685673297.405451][2637:2639] CHIP:DMG:                                 CommandFields =
-          [1685673297.405524][2637:2639] CHIP:DMG:                                 {
-          [1685673297.405602][2637:2639] CHIP:DMG:                                         0x0 = 1,
-          [1685673297.405683][2637:2639] CHIP:DMG:                                         0x1 = 0,
-          [1685673297.405803][2637:2639] CHIP:DMG:                                         0x2 = 20,
-          [1685673297.405889][2637:2639] CHIP:DMG:                                         0x3 = 30,
-          [1685673297.405970][2637:2639] CHIP:DMG:                                         0x4 = 0,
-          [1685673297.406051][2637:2639] CHIP:DMG:                                 },
-          [1685673297.406122][2637:2639] CHIP:DMG:                         },
-          [1685673297.406202][2637:2639] CHIP:DMG:
-          [1685673297.406262][2637:2639] CHIP:DMG:                 },
-          [1685673297.406336][2637:2639] CHIP:DMG:
-          [1685673297.406391][2637:2639] CHIP:DMG:         ],
-          [1685673297.406467][2637:2639] CHIP:DMG:
-          [1685673297.406524][2637:2639] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673297.406578][2637:2639] CHIP:DMG: },
+          [1698647166.323919][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647166.323940][11905:11905] CHIP:DMG: {
+          [1698647166.323958][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647166.323979][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647166.323998][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647166.324022][11905:11905] CHIP:DMG:         [
+          [1698647166.324041][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647166.324064][11905:11905] CHIP:DMG:                 {
+          [1698647166.324084][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647166.324110][11905:11905] CHIP:DMG:                         {
+          [1698647166.324158][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647166.324184][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647166.324208][11905:11905] CHIP:DMG:                                 CommandId = 0x12,
+          [1698647166.324231][11905:11905] CHIP:DMG:                         },
+          [1698647166.324256][11905:11905] CHIP:DMG:
+          [1698647166.324277][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647166.324348][11905:11905] CHIP:DMG:                         {
+          [1698647166.324374][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647166.324399][11905:11905] CHIP:DMG:                         },
+          [1698647166.324420][11905:11905] CHIP:DMG:                 },
+          [1698647166.324445][11905:11905] CHIP:DMG:
+          [1698647166.324464][11905:11905] CHIP:DMG:         ],
+          [1698647166.324488][11905:11905] CHIP:DMG:
+          [1698647166.324506][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647166.324525][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 12: DUT sends Clear Holiday Day Schedule command to TH."
       PICS: DRLK.C.F04 && DRLK.C.C13.Tx
       verification: |
-          ./chip-tool doorlock clear-holiday-schedule 1 1 1 --trace_decode 1
+          ./chip-tool doorlock clear-holiday-schedule 1 1 1
 
-          Verify TH receives Clear Holiday Day Schedule command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Holiday Day Schedule command response on TH(lock-app) log:
 
-          [1685673314.255117][2642:2644] CHIP:DMG: InvokeResponseMessage =
-          [1685673314.255174][2642:2644] CHIP:DMG: {
-          [1685673314.255230][2642:2644] CHIP:DMG:         suppressResponse = false,
-          [1685673314.255286][2642:2644] CHIP:DMG:         InvokeResponseIBs =
-          [1685673314.255360][2642:2644] CHIP:DMG:         [
-          [1685673314.255417][2642:2644] CHIP:DMG:                 InvokeResponseIB =
-          [1685673314.255494][2642:2644] CHIP:DMG:                 {
-          [1685673314.255553][2642:2644] CHIP:DMG:                         CommandStatusIB =
-          [1685673314.255625][2642:2644] CHIP:DMG:                         {
-          [1685673314.255690][2642:2644] CHIP:DMG:                                 CommandPathIB =
-          [1685673314.255765][2642:2644] CHIP:DMG:                                 {
-          [1685673314.255840][2642:2644] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673314.255919][2642:2644] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673314.255996][2642:2644] CHIP:DMG:                                         CommandId = 0x13,
-          [1685673314.256071][2642:2644] CHIP:DMG:                                 },
-          [1685673314.256154][2642:2644] CHIP:DMG:
-          [1685673314.256219][2642:2644] CHIP:DMG:                                 StatusIB =
-          [1685673314.256293][2642:2644] CHIP:DMG:                                 {
-          [1685673314.256371][2642:2644] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673314.256446][2642:2644] CHIP:DMG:                                 },
-          [1685673314.256521][2642:2644] CHIP:DMG:
-          [1685673314.256589][2642:2644] CHIP:DMG:                         },
-          [1685673314.256665][2642:2644] CHIP:DMG:
-          [1685673314.256724][2642:2644] CHIP:DMG:                 },
-          [1685673314.256796][2642:2644] CHIP:DMG:
-          [1685673314.256851][2642:2644] CHIP:DMG:         ],
-          [1685673314.256921][2642:2644] CHIP:DMG:
-          [1685673314.256976][2642:2644] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673314.257030][2642:2644] CHIP:DMG: },
+          [1698647186.638119][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647186.638155][11905:11905] CHIP:DMG: {
+          [1698647186.638186][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647186.638240][11905:11905] CHIP:DMG:         timedRequest = false,
+          [1698647186.638275][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647186.638320][11905:11905] CHIP:DMG:         [
+          [1698647186.638355][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647186.638406][11905:11905] CHIP:DMG:                 {
+          [1698647186.638444][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647186.638498][11905:11905] CHIP:DMG:                         {
+          [1698647186.638548][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647186.638605][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647186.638653][11905:11905] CHIP:DMG:                                 CommandId = 0x13,
+          [1698647186.638715][11905:11905] CHIP:DMG:                         },
+          [1698647186.638761][11905:11905] CHIP:DMG:
+          [1698647186.638811][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647186.638852][11905:11905] CHIP:DMG:                         {
+          [1698647186.638909][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647186.638953][11905:11905] CHIP:DMG:                         },
+          [1698647186.639008][11905:11905] CHIP:DMG:                 },
+          [1698647186.639053][11905:11905] CHIP:DMG:
+          [1698647186.639087][11905:11905] CHIP:DMG:         ],
+          [1698647186.639142][11905:11905] CHIP:DMG:
+          [1698647186.639178][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647186.639223][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 13: DUT sends Set USer command to TH."
       PICS: DRLK.C.F08 && DRLK.C.C1a.Tx
       verification: |
-          ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Set User command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Set User command response on TH(lock-app) log:
 
-          [1685673332.573601][2645:2647] CHIP:DMG: InvokeResponseMessage =
-          [1685673332.573656][2645:2647] CHIP:DMG: {
-          [1685673332.573709][2645:2647] CHIP:DMG:         suppressResponse = false,
-          [1685673332.573902][2645:2647] CHIP:DMG:         InvokeResponseIBs =
-          [1685673332.573982][2645:2647] CHIP:DMG:         [
-          [1685673332.574040][2645:2647] CHIP:DMG:                 InvokeResponseIB =
-          [1685673332.574116][2645:2647] CHIP:DMG:                 {
-          [1685673332.574175][2645:2647] CHIP:DMG:                         CommandStatusIB =
-          [1685673332.574245][2645:2647] CHIP:DMG:                         {
-          [1685673332.574312][2645:2647] CHIP:DMG:                                 CommandPathIB =
-          [1685673332.574390][2645:2647] CHIP:DMG:                                 {
-          [1685673332.574466][2645:2647] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673332.574545][2645:2647] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673332.574623][2645:2647] CHIP:DMG:                                         CommandId = 0x1a,
-          [1685673332.574697][2645:2647] CHIP:DMG:                                 },
-          [1685673332.574780][2645:2647] CHIP:DMG:
-          [1685673332.574848][2645:2647] CHIP:DMG:                                 StatusIB =
-          [1685673332.574922][2645:2647] CHIP:DMG:                                 {
-          [1685673332.575013][2645:2647] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673332.575108][2645:2647] CHIP:DMG:                                 },
-          [1685673332.575202][2645:2647] CHIP:DMG:
-          [1685673332.575276][2645:2647] CHIP:DMG:                         },
-          [1685673332.575357][2645:2647] CHIP:DMG:
-          [1685673332.575417][2645:2647] CHIP:DMG:                 },
-          [1685673332.575488][2645:2647] CHIP:DMG:
-          [1685673332.575543][2645:2647] CHIP:DMG:         ],
-          [1685673332.575612][2645:2647] CHIP:DMG:
-          [1685673332.575667][2645:2647] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673332.575721][2645:2647] CHIP:DMG: },
+          [1698647215.994171][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647215.994229][11905:11905] CHIP:DMG: {
+          [1698647215.994264][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647215.994319][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647215.994358][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647215.994426][11905:11905] CHIP:DMG:         [
+          [1698647215.994466][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647215.994516][11905:11905] CHIP:DMG:                 {
+          [1698647215.994571][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647215.994617][11905:11905] CHIP:DMG:                         {
+          [1698647215.994679][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647215.994730][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647215.994792][11905:11905] CHIP:DMG:                                 CommandId = 0x1a,
+          [1698647215.994840][11905:11905] CHIP:DMG:                         },
+          [1698647215.994888][11905:11905] CHIP:DMG:
+          [1698647215.994946][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647215.994993][11905:11905] CHIP:DMG:                         {
+          [1698647215.995054][11905:11905] CHIP:DMG:                                 0x0 = 0,
+          [1698647215.995106][11905:11905] CHIP:DMG:                                 0x1 = 2,
+          [1698647215.995174][11905:11905] CHIP:DMG:                                 0x2 = "xxx" (3 chars),
+          [1698647215.995225][11905:11905] CHIP:DMG:                                 0x3 = 6452,
+          [1698647215.995290][11905:11905] CHIP:DMG:                                 0x4 = 1,
+          [1698647215.995341][11905:11905] CHIP:DMG:                                 0x5 = 0,
+          [1698647215.995406][11905:11905] CHIP:DMG:                                 0x6 = 0,
+          [1698647215.995455][11905:11905] CHIP:DMG:                         },
+          [1698647215.995513][11905:11905] CHIP:DMG:                 },
+          [1698647215.995566][11905:11905] CHIP:DMG:
+          [1698647215.995617][11905:11905] CHIP:DMG:         ],
+          [1698647215.995670][11905:11905] CHIP:DMG:
+          [1698647215.995720][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647215.995759][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 14: DUT sends Get User to TH."
       PICS: DRLK.C.F08 && DRLK.C.C1b.Tx
       verification: |
-          ./chip-tool doorlock get-user 2 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock get-user 2 1 1 --timedInteractionTimeoutMs 1000
 
           Verify TH receives Get User command response on TH(lock-app) log:
 
-          [1685673354.071762][2648:2650] CHIP:DMG: InvokeResponseMessage =
-          [1685673354.071817][2648:2650] CHIP:DMG: {
-          [1685673354.071870][2648:2650] CHIP:DMG:         suppressResponse = false,
-          [1685673354.071926][2648:2650] CHIP:DMG:         InvokeResponseIBs =
-          [1685673354.072011][2648:2650] CHIP:DMG:         [
-          [1685673354.072068][2648:2650] CHIP:DMG:                 InvokeResponseIB =
-          [1685673354.072156][2648:2650] CHIP:DMG:                 {
-          [1685673354.072216][2648:2650] CHIP:DMG:                         CommandDataIB =
-          [1685673354.072285][2648:2650] CHIP:DMG:                         {
-          [1685673354.072352][2648:2650] CHIP:DMG:                                 CommandPathIB =
-          [1685673354.072428][2648:2650] CHIP:DMG:                                 {
-          [1685673354.072502][2648:2650] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673354.072582][2648:2650] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673354.072658][2648:2650] CHIP:DMG:                                         CommandId = 0x1c,
-          [1685673354.072733][2648:2650] CHIP:DMG:                                 },
-          [1685673354.072807][2648:2650] CHIP:DMG:
-          [1685673354.072875][2648:2650] CHIP:DMG:                                 CommandFields =
-          [1685673354.072948][2648:2650] CHIP:DMG:                                 {
-          [1685673354.073024][2648:2650] CHIP:DMG:                                         0x0 = 2,
-          [1685673354.073111][2648:2650] CHIP:DMG:                                         0x1 = "xxx" (3 chars),
-          [1685673354.073299][2648:2650] CHIP:DMG:                                         0x2 = 6452,
-          [1685673354.073384][2648:2650] CHIP:DMG:                                         0x3 = 1,
-          [1685673354.073465][2648:2650] CHIP:DMG:                                         0x4 = 0,
-          [1685673354.073546][2648:2650] CHIP:DMG:                                         0x5 = 0,
-          [1685673354.073667][2648:2650] CHIP:DMG:                                         0x6 = [
-          [1685673354.073749][2648:2650] CHIP:DMG:
-          [1685673354.073959][2648:2650] CHIP:DMG:                                         ],
-          [1685673354.074042][2648:2650] CHIP:DMG:                                         0x7 = 1,
-          [1685673354.074121][2648:2650] CHIP:DMG:                                         0x8 = 1,
-          [1685673354.074201][2648:2650] CHIP:DMG:                                         0x9 = NULL
-          [1685673354.074281][2648:2650] CHIP:DMG:                                 },
-          [1685673354.074350][2648:2650] CHIP:DMG:                         },
-          [1685673354.074439][2648:2650] CHIP:DMG:
-          [1685673354.074501][2648:2650] CHIP:DMG:                 },
-          [1685673354.074583][2648:2650] CHIP:DMG:
-          [1685673354.074638][2648:2650] CHIP:DMG:         ],
-          [1685673354.074725][2648:2650] CHIP:DMG:
-          [1685673354.074781][2648:2650] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673354.074836][2648:2650] CHIP:DMG: },
+          [1698647231.998669][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647231.998703][11905:11905] CHIP:DMG: {
+          [1698647231.998735][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647231.998772][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647231.998806][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647231.998850][11905:11905] CHIP:DMG:         [
+          [1698647231.998884][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647231.998923][11905:11905] CHIP:DMG:                 {
+          [1698647231.998959][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647231.999001][11905:11905] CHIP:DMG:                         {
+          [1698647231.999044][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647231.999088][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647231.999191][11905:11905] CHIP:DMG:                                 CommandId = 0x1b,
+          [1698647231.999235][11905:11905] CHIP:DMG:                         },
+          [1698647231.999316][11905:11905] CHIP:DMG:
+          [1698647231.999355][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647231.999429][11905:11905] CHIP:DMG:                         {
+          [1698647231.999475][11905:11905] CHIP:DMG:                                 0x0 = 2,
+          [1698647231.999543][11905:11905] CHIP:DMG:                         },
+          [1698647231.999586][11905:11905] CHIP:DMG:                 },
+          [1698647231.999653][11905:11905] CHIP:DMG:
+          [1698647231.999713][11905:11905] CHIP:DMG:         ],
+          [1698647231.999759][11905:11905] CHIP:DMG:
+          [1698647231.999793][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647231.999825][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 15: DUT sends Clear User command to TH.a"
       PICS: DRLK.C.F08 && DRLK.C.C1d.Tx
       verification: |
-          ./chip-tool doorlock clear-user 2 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock clear-user 2 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Clear User command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear User command response on TH(lock-app) log:
 
-          [1685673377.373571][2656:2658] CHIP:DMG: InvokeResponseMessage =
-          [1685673377.373626][2656:2658] CHIP:DMG: {
-          [1685673377.373680][2656:2658] CHIP:DMG:         suppressResponse = false,
-          [1685673377.373736][2656:2658] CHIP:DMG:         InvokeResponseIBs =
-          [1685673377.373862][2656:2658] CHIP:DMG:         [
-          [1685673377.373923][2656:2658] CHIP:DMG:                 InvokeResponseIB =
-          [1685673377.374005][2656:2658] CHIP:DMG:                 {
-          [1685673377.374066][2656:2658] CHIP:DMG:                         CommandStatusIB =
-          [1685673377.374135][2656:2658] CHIP:DMG:                         {
-          [1685673377.374204][2656:2658] CHIP:DMG:                                 CommandPathIB =
-          [1685673377.374279][2656:2658] CHIP:DMG:                                 {
-          [1685673377.374357][2656:2658] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673377.374435][2656:2658] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673377.374514][2656:2658] CHIP:DMG:                                         CommandId = 0x1d,
-          [1685673377.374587][2656:2658] CHIP:DMG:                                 },
-          [1685673377.374669][2656:2658] CHIP:DMG:
-          [1685673377.374738][2656:2658] CHIP:DMG:                                 StatusIB =
-          [1685673377.374813][2656:2658] CHIP:DMG:                                 {
-          [1685673377.374889][2656:2658] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673377.374964][2656:2658] CHIP:DMG:                                 },
-          [1685673377.375039][2656:2658] CHIP:DMG:
-          [1685673377.375107][2656:2658] CHIP:DMG:                         },
-          [1685673377.375182][2656:2658] CHIP:DMG:
-          [1685673377.375241][2656:2658] CHIP:DMG:                 },
-          [1685673377.375313][2656:2658] CHIP:DMG:
-          [1685673377.375369][2656:2658] CHIP:DMG:         ],
-          [1685673377.375437][2656:2658] CHIP:DMG:
-          [1685673377.375489][2656:2658] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673377.375543][2656:2658] CHIP:DMG: },
+          [1698647262.792533][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647262.792569][11905:11905] CHIP:DMG: {
+          [1698647262.792600][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647262.792637][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647262.792671][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647262.792715][11905:11905] CHIP:DMG:         [
+          [1698647262.792750][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647262.792841][11905:11905] CHIP:DMG:                 {
+          [1698647262.792917][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647262.792993][11905:11905] CHIP:DMG:                         {
+          [1698647262.793040][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647262.793085][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647262.793130][11905:11905] CHIP:DMG:                                 CommandId = 0x1d,
+          [1698647262.793172][11905:11905] CHIP:DMG:                         },
+          [1698647262.793216][11905:11905] CHIP:DMG:
+          [1698647262.793290][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647262.793332][11905:11905] CHIP:DMG:                         {
+          [1698647262.793401][11905:11905] CHIP:DMG:                                 0x0 = 2,
+          [1698647262.793485][11905:11905] CHIP:DMG:                         },
+          [1698647262.793527][11905:11905] CHIP:DMG:                 },
+          [1698647262.793569][11905:11905] CHIP:DMG:
+          [1698647262.793603][11905:11905] CHIP:DMG:         ],
+          [1698647262.793679][11905:11905] CHIP:DMG:
+          [1698647262.793717][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647262.793750][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 16: DUT sends Set Credential command to TH.a"
       PICS: DRLK.C.F08 && DRLK.C.C22.Tx
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
           Verify TH receives Set Credential command response on TH(lock-app) log:
 
-          [1685673397.369211][2660:2662] CHIP:DMG: InvokeResponseMessage =
-          [1685673397.369266][2660:2662] CHIP:DMG: {
-          [1685673397.369320][2660:2662] CHIP:DMG:         suppressResponse = false,
-          [1685673397.369375][2660:2662] CHIP:DMG:         InvokeResponseIBs =
-          [1685673397.369448][2660:2662] CHIP:DMG:         [
-          [1685673397.369504][2660:2662] CHIP:DMG:                 InvokeResponseIB =
-          [1685673397.369584][2660:2662] CHIP:DMG:                 {
-          [1685673397.369644][2660:2662] CHIP:DMG:                         CommandDataIB =
-          [1685673397.369712][2660:2662] CHIP:DMG:                         {
-          [1685673397.369829][2660:2662] CHIP:DMG:                                 CommandPathIB =
-          [1685673397.369908][2660:2662] CHIP:DMG:                                 {
-          [1685673397.369981][2660:2662] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673397.370061][2660:2662] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673397.370138][2660:2662] CHIP:DMG:                                         CommandId = 0x23,
-          [1685673397.370212][2660:2662] CHIP:DMG:                                 },
-          [1685673397.370289][2660:2662] CHIP:DMG:
-          [1685673397.370356][2660:2662] CHIP:DMG:                                 CommandFields =
-          [1685673397.370428][2660:2662] CHIP:DMG:                                 {
-          [1685673397.370506][2660:2662] CHIP:DMG:                                         0x0 = 133,
-          [1685673397.370586][2660:2662] CHIP:DMG:                                         0x1 = NULL
-          [1685673397.370665][2660:2662] CHIP:DMG:                                         0x2 = 2,
-          [1685673397.370743][2660:2662] CHIP:DMG:                                 },
-          [1685673397.370812][2660:2662] CHIP:DMG:                         },
-          [1685673397.370892][2660:2662] CHIP:DMG:
-          [1685673397.370951][2660:2662] CHIP:DMG:                 },
-          [1685673397.371023][2660:2662] CHIP:DMG:
-          [1685673397.371078][2660:2662] CHIP:DMG:         ],
-          [1685673397.371150][2660:2662] CHIP:DMG:
-          [1685673397.371208][2660:2662] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673397.371263][2660:2662] CHIP:DMG: },
+          [1698647281.453556][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647281.453576][11905:11905] CHIP:DMG: {
+          [1698647281.453593][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647281.453614][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647281.453634][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647281.453661][11905:11905] CHIP:DMG:         [
+          [1698647281.453681][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647281.453703][11905:11905] CHIP:DMG:                 {
+          [1698647281.453735][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647281.453762][11905:11905] CHIP:DMG:                         {
+          [1698647281.453791][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647281.453822][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647281.453851][11905:11905] CHIP:DMG:                                 CommandId = 0x22,
+          [1698647281.453880][11905:11905] CHIP:DMG:                         },
+          [1698647281.453907][11905:11905] CHIP:DMG:
+          [1698647281.453929][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647281.453957][11905:11905] CHIP:DMG:                         {
+          [1698647281.453987][11905:11905] CHIP:DMG:                                 0x0 = 0,
+          [1698647281.454016][11905:11905] CHIP:DMG:                                 0x1 =
+          [1698647281.454046][11905:11905] CHIP:DMG:                                 {
+          [1698647281.454077][11905:11905] CHIP:DMG:                                         0x0 = 1,
+          [1698647281.454109][11905:11905] CHIP:DMG:                                         0x1 = 1,
+          [1698647281.454141][11905:11905] CHIP:DMG:                                 },
+          [1698647281.454172][11905:11905] CHIP:DMG:                                 0x2 = [
+          [1698647281.454202][11905:11905] CHIP:DMG:                                                 0x31, 0x32, 0x33, 0x34, 0x35, 0x36,
+          [1698647281.454232][11905:11905] CHIP:DMG:                                 ] (6 bytes)
+          [1698647281.454263][11905:11905] CHIP:DMG:                                 0x3 = 1,
+          [1698647281.454290][11905:11905] CHIP:DMG:                                 0x4 = 0,
+          [1698647281.454320][11905:11905] CHIP:DMG:                                 0x5 = 0,
+          [1698647281.454349][11905:11905] CHIP:DMG:                         },
+          [1698647281.454376][11905:11905] CHIP:DMG:                 },
+          [1698647281.454403][11905:11905] CHIP:DMG:
+          [1698647281.454422][11905:11905] CHIP:DMG:         ],
+          [1698647281.454448][11905:11905] CHIP:DMG:
+          [1698647281.454467][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647281.454485][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 17: DUT sends Get Credential to TH."
       PICS: DRLK.C.F08 && DRLK.C.C24.Tx
       verification: |
-          ./chip-tool doorlock get-credential-status  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock get-credential-status  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
 
           Verify TH receives Get Credential command response on TH(lock-app) log:
 
-          [1685673421.665556][2664:2666] CHIP:DMG: InvokeResponseMessage =
-          [1685673421.665610][2664:2666] CHIP:DMG: {
-          [1685673421.665662][2664:2666] CHIP:DMG:         suppressResponse = false,
-          [1685673421.665720][2664:2666] CHIP:DMG:         InvokeResponseIBs =
-          [1685673421.665921][2664:2666] CHIP:DMG:         [
-          [1685673421.665982][2664:2666] CHIP:DMG:                 InvokeResponseIB =
-          [1685673421.666061][2664:2666] CHIP:DMG:                 {
-          [1685673421.666121][2664:2666] CHIP:DMG:                         CommandDataIB =
-          [1685673421.666195][2664:2666] CHIP:DMG:                         {
-          [1685673421.666261][2664:2666] CHIP:DMG:                                 CommandPathIB =
-          [1685673421.666335][2664:2666] CHIP:DMG:                                 {
-          [1685673421.666411][2664:2666] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673421.666490][2664:2666] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673421.666652][2664:2666] CHIP:DMG:                                         CommandId = 0x25,
-          [1685673421.666732][2664:2666] CHIP:DMG:                                 },
-          [1685673421.666812][2664:2666] CHIP:DMG:
-          [1685673421.666881][2664:2666] CHIP:DMG:                                 CommandFields =
-          [1685673421.666961][2664:2666] CHIP:DMG:                                 {
-          [1685673421.667041][2664:2666] CHIP:DMG:                                         0x0 = false,
-          [1685673421.667122][2664:2666] CHIP:DMG:                                         0x1 = NULL
-          [1685673421.667203][2664:2666] CHIP:DMG:                                         0x2 = NULL
-          [1685673421.667282][2664:2666] CHIP:DMG:                                         0x3 = NULL
-          [1685673421.667362][2664:2666] CHIP:DMG:                                         0x4 = NULL
-          [1685673421.667439][2664:2666] CHIP:DMG:                                 },
-          [1685673421.667509][2664:2666] CHIP:DMG:                         },
-          [1685673421.667590][2664:2666] CHIP:DMG:
-          [1685673421.667722][2664:2666] CHIP:DMG:                 },
-          [1685673421.667808][2664:2666] CHIP:DMG:
-          [1685673421.667865][2664:2666] CHIP:DMG:         ],
-          [1685673421.667939][2664:2666] CHIP:DMG:
-          [1685673421.667995][2664:2666] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673421.668049][2664:2666] CHIP:DMG: },
+          [1698647325.882227][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647325.882264][11905:11905] CHIP:DMG: {
+          [1698647325.882299][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647325.882339][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647325.882377][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647325.882427][11905:11905] CHIP:DMG:         [
+          [1698647325.882465][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647325.882518][11905:11905] CHIP:DMG:                 {
+          [1698647325.882559][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647325.882606][11905:11905] CHIP:DMG:                         {
+          [1698647325.882656][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647325.882706][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647325.882754][11905:11905] CHIP:DMG:                                 CommandId = 0x24,
+          [1698647325.882800][11905:11905] CHIP:DMG:                         },
+          [1698647325.882849][11905:11905] CHIP:DMG:
+          [1698647325.882890][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647325.882935][11905:11905] CHIP:DMG:                         {
+          [1698647325.882981][11905:11905] CHIP:DMG:                                 0x0 =
+          [1698647325.883029][11905:11905] CHIP:DMG:                                 {
+          [1698647325.883080][11905:11905] CHIP:DMG:                                         0x0 = 1,
+          [1698647325.883133][11905:11905] CHIP:DMG:                                         0x1 = 1,
+          [1698647325.883185][11905:11905] CHIP:DMG:                                 },
+          [1698647325.883232][11905:11905] CHIP:DMG:                         },
+          [1698647325.883276][11905:11905] CHIP:DMG:                 },
+          [1698647325.883324][11905:11905] CHIP:DMG:
+          [1698647325.883361][11905:11905] CHIP:DMG:         ],
+          [1698647325.883409][11905:11905] CHIP:DMG:
+          [1698647325.883446][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647325.883483][11905:11905] CHIP:DMG: },
       disabled: true
 
     - label: "Step 18: DUT sends Clear Credential command to TH."
       PICS: DRLK.C.F08 && DRLK.C.C26.Tx
       verification: |
-          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
 
-          Verify TH receives Clear Credential command with SUCCESS response on TH(lock-app) log:
+          Verify TH receives Clear Credential command response on TH(lock-app) log:
 
-          [1685673444.692000][2668:2670] CHIP:DMG: InvokeResponseMessage =
-          [1685673444.692055][2668:2670] CHIP:DMG: {
-          [1685673444.692109][2668:2670] CHIP:DMG:         suppressResponse = false,
-          [1685673444.692164][2668:2670] CHIP:DMG:         InvokeResponseIBs =
-          [1685673444.692235][2668:2670] CHIP:DMG:         [
-          [1685673444.692292][2668:2670] CHIP:DMG:                 InvokeResponseIB =
-          [1685673444.692368][2668:2670] CHIP:DMG:                 {
-          [1685673444.692429][2668:2670] CHIP:DMG:                         CommandStatusIB =
-          [1685673444.692518][2668:2670] CHIP:DMG:                         {
-          [1685673444.692597][2668:2670] CHIP:DMG:                                 CommandPathIB =
-          [1685673444.692691][2668:2670] CHIP:DMG:                                 {
-          [1685673444.692783][2668:2670] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673444.692879][2668:2670] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673444.692974][2668:2670] CHIP:DMG:                                         CommandId = 0x26,
-          [1685673444.693065][2668:2670] CHIP:DMG:                                 },
-          [1685673444.693164][2668:2670] CHIP:DMG:
-          [1685673444.693239][2668:2670] CHIP:DMG:                                 StatusIB =
-          [1685673444.693330][2668:2670] CHIP:DMG:                                 {
-          [1685673444.693517][2668:2670] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673444.693608][2668:2670] CHIP:DMG:                                 },
-          [1685673444.693700][2668:2670] CHIP:DMG:
-          [1685673444.693934][2668:2670] CHIP:DMG:                         },
-          [1685673444.694029][2668:2670] CHIP:DMG:
-          [1685673444.694099][2668:2670] CHIP:DMG:                 },
-          [1685673444.694183][2668:2670] CHIP:DMG:
-          [1685673444.694241][2668:2670] CHIP:DMG:         ],
-          [1685673444.694410][2668:2670] CHIP:DMG:
-          [1685673444.694467][2668:2670] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673444.694522][2668:2670] CHIP:DMG: },
+          [1698647366.030707][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647366.030759][11905:11905] CHIP:DMG: {
+          [1698647366.030791][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647366.030828][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647366.030876][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647366.030923][11905:11905] CHIP:DMG:         [
+          [1698647366.030970][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647366.031012][11905:11905] CHIP:DMG:                 {
+          [1698647366.031063][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647366.031107][11905:11905] CHIP:DMG:                         {
+          [1698647366.031150][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647366.031209][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647366.031253][11905:11905] CHIP:DMG:                                 CommandId = 0x26,
+          [1698647366.031310][11905:11905] CHIP:DMG:                         },
+          [1698647366.031354][11905:11905] CHIP:DMG:
+          [1698647366.031404][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647366.031445][11905:11905] CHIP:DMG:                         {
+          [1698647366.031495][11905:11905] CHIP:DMG:                                 0x0 =
+          [1698647366.031548][11905:11905] CHIP:DMG:                                 {
+          [1698647366.031608][11905:11905] CHIP:DMG:                                         0x0 = 1,
+          [1698647366.031669][11905:11905] CHIP:DMG:                                         0x1 = 1,
+          [1698647366.031729][11905:11905] CHIP:DMG:                                 },
+          [1698647366.031773][11905:11905] CHIP:DMG:                         },
+          [1698647366.031811][11905:11905] CHIP:DMG:                 },
+          [1698647366.031869][11905:11905] CHIP:DMG:
+          [1698647366.031903][11905:11905] CHIP:DMG:         ],
+          [1698647366.031960][11905:11905] CHIP:DMG:
+          [1698647366.031994][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647366.032040][11905:11905] CHIP:DMG: },
+      disabled: true
 
+    - label: "Step 19: DUT sends Clear User command to TH.a "
+      PICS: DRLK.C.F08 && DRLK.C.C1d.Tx
+      verification: |
+          ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000
 
-          ./chip-tool doorlock clear-user 1 1 1 --timedInteractionTimeoutMs 1000 --trace_decode 1
+          Verify TH receives Clear User command response on TH(lock-app) log:
 
-          Verify TH receives Clear User command with SUCCESS response on TH(lock-app) log:
-
-          [1685673467.295855][2674:2676] CHIP:DMG: InvokeResponseMessage =
-          [1685673467.295906][2674:2676] CHIP:DMG: {
-          [1685673467.295986][2674:2676] CHIP:DMG:         suppressResponse = false,
-          [1685673467.296044][2674:2676] CHIP:DMG:         InvokeResponseIBs =
-          [1685673467.296116][2674:2676] CHIP:DMG:         [
-          [1685673467.296194][2674:2676] CHIP:DMG:                 InvokeResponseIB =
-          [1685673467.296271][2674:2676] CHIP:DMG:                 {
-          [1685673467.296361][2674:2676] CHIP:DMG:                         CommandStatusIB =
-          [1685673467.296432][2674:2676] CHIP:DMG:                         {
-          [1685673467.296519][2674:2676] CHIP:DMG:                                 CommandPathIB =
-          [1685673467.296595][2674:2676] CHIP:DMG:                                 {
-          [1685673467.296692][2674:2676] CHIP:DMG:                                         EndpointId = 0x1,
-          [1685673467.296772][2674:2676] CHIP:DMG:                                         ClusterId = 0x101,
-          [1685673467.296872][2674:2676] CHIP:DMG:                                         CommandId = 0x1d,
-          [1685673467.296947][2674:2676] CHIP:DMG:                                 },
-          [1685673467.297053][2674:2676] CHIP:DMG:
-          [1685673467.297121][2674:2676] CHIP:DMG:                                 StatusIB =
-          [1685673467.297217][2674:2676] CHIP:DMG:                                 {
-          [1685673467.297295][2674:2676] CHIP:DMG:                                         status = 0x00 (SUCCESS),
-          [1685673467.297392][2674:2676] CHIP:DMG:                                 },
-          [1685673467.297468][2674:2676] CHIP:DMG:
-          [1685673467.297554][2674:2676] CHIP:DMG:                         },
-          [1685673467.297632][2674:2676] CHIP:DMG:
-          [1685673467.297692][2674:2676] CHIP:DMG:                 },
-          [1685673467.297836][2674:2676] CHIP:DMG:
-          [1685673467.297895][2674:2676] CHIP:DMG:         ],
-          [1685673467.297997][2674:2676] CHIP:DMG:
-          [1685673467.298055][2674:2676] CHIP:DMG:         InteractionModelRevision = 1
-          [1685673467.298109][2674:2676] CHIP:DMG: },
+          [1698647393.727713][11905:11905] CHIP:DMG: InvokeRequestMessage =
+          [1698647393.727764][11905:11905] CHIP:DMG: {
+          [1698647393.727796][11905:11905] CHIP:DMG:         suppressResponse = false,
+          [1698647393.727833][11905:11905] CHIP:DMG:         timedRequest = true,
+          [1698647393.727881][11905:11905] CHIP:DMG:         InvokeRequests =
+          [1698647393.727926][11905:11905] CHIP:DMG:         [
+          [1698647393.727973][11905:11905] CHIP:DMG:                 CommandDataIB =
+          [1698647393.728014][11905:11905] CHIP:DMG:                 {
+          [1698647393.728061][11905:11905] CHIP:DMG:                         CommandPathIB =
+          [1698647393.728105][11905:11905] CHIP:DMG:                         {
+          [1698647393.728147][11905:11905] CHIP:DMG:                                 EndpointId = 0x1,
+          [1698647393.728191][11905:11905] CHIP:DMG:                                 ClusterId = 0x101,
+          [1698647393.728247][11905:11905] CHIP:DMG:                                 CommandId = 0x1d,
+          [1698647393.728322][11905:11905] CHIP:DMG:                         },
+          [1698647393.728382][11905:11905] CHIP:DMG:
+          [1698647393.728420][11905:11905] CHIP:DMG:                         CommandFields =
+          [1698647393.728475][11905:11905] CHIP:DMG:                         {
+          [1698647393.728520][11905:11905] CHIP:DMG:                                 0x0 = 1,
+          [1698647393.728565][11905:11905] CHIP:DMG:                         },
+          [1698647393.728617][11905:11905] CHIP:DMG:                 },
+          [1698647393.728659][11905:11905] CHIP:DMG:
+          [1698647393.728706][11905:11905] CHIP:DMG:         ],
+          [1698647393.728749][11905:11905] CHIP:DMG:
+          [1698647393.728794][11905:11905] CHIP:DMG:         InteractionModelRevision = 11
+          [1698647393.728829][11905:11905] CHIP:DMG: },
       disabled: true

@@ -32,7 +32,6 @@
  *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
 #include "platform/internal/BLEManager.h"
 
-#include <cassert>
 #include <type_traits>
 #include <utility>
 
@@ -53,8 +52,8 @@ namespace Internal {
 
 namespace {
 
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
-static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -63,9 +62,8 @@ const ChipBleUUID ChipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 
 void HandleConnectTimeout(chip::System::Layer *, void * apEndpoint)
 {
-    assert(apEndpoint != nullptr);
-
-    CancelConnect(static_cast<BluezEndpoint *>(apEndpoint));
+    VerifyOrDie(apEndpoint != nullptr);
+    static_cast<BluezEndpoint *>(apEndpoint)->CancelConnect();
     BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
@@ -101,10 +99,14 @@ exit:
 
 void BLEManagerImpl::_Shutdown()
 {
-    // ensure scan resources are cleared (e.g. timeout timers)
-    mDeviceScanner.reset();
+    // Ensure scan resources are cleared (e.g. timeout timers).
+    mDeviceScanner.Shutdown();
+    // Stop advertising and free resources.
+    mBLEAdvertisement.Shutdown();
+    // Make sure that the endpoint is not used by the timer.
+    DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, &mEndpoint);
     // Release BLE connection resources (unregister from BlueZ).
-    ShutdownBluezBleLayer(mpEndpoint);
+    mEndpoint.Shutdown();
     mFlags.Clear(Flags::kBluezBLELayerInitialized);
 }
 
@@ -184,32 +186,15 @@ uint16_t BLEManagerImpl::_NumConnections()
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
 {
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
-    mBLEAdvConfig.mpBleName         = mDeviceName;
-    mBLEAdvConfig.mAdapterId        = aAdapterId;
-    mBLEAdvConfig.mMajor            = 1;
-    mBLEAdvConfig.mMinor            = 1;
-    mBLEAdvConfig.mVendorId         = 1;
-    mBLEAdvConfig.mProductId        = 1;
-    mBLEAdvConfig.mDeviceId         = 1;
-    mBLEAdvConfig.mDuration         = 2;
-    mBLEAdvConfig.mPairingStatus    = 0;
-    mBLEAdvConfig.mType             = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
-    mBLEAdvConfig.mpAdvertisingUUID = "0xFFF6";
 
+    mAdapterId = aAdapterId;
     mIsCentral = aIsCentral;
 
-    return err;
-}
+    mBLEAdvType       = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
+    mBLEAdvDurationMs = 2;
+    mpBLEAdvUUID      = "0xFFF6";
 
-CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
-{
-    return StartBluezAdv(mpEndpoint);
-}
-
-CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
-{
-    return StopBluezAdv(mpEndpoint);
+    return CHIP_NO_ERROR;
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
@@ -289,12 +274,6 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     case DeviceEventType::kPlatformLinuxBLEIndicationReceived:
         HandleIndicationReceived(apEvent->Platform.BLEIndicationReceived.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX,
                                  PacketBufferHandle::Adopt(apEvent->Platform.BLEIndicationReceived.mData));
-        break;
-    case DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete:
-        VerifyOrExit(apEvent->Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-        sInstance.mFlags.Set(Flags::kAdvertisingConfigured).Clear(Flags::kControlOpInProgress);
-        controlOpComplete = true;
-        ChipLogProgress(DeviceLayer, "CHIPoBLE advertising config complete");
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
@@ -592,16 +571,14 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
-        err = InitBluezBleLayer(mIsCentral, nullptr, mBLEAdvConfig, mpEndpoint);
-        SuccessOrExit(err);
+        SuccessOrExit(err = mEndpoint.Init(mAdapterId, mIsCentral, nullptr, mDeviceName));
         mFlags.Set(Flags::kBluezBLELayerInitialized);
     }
 
     // Register the CHIPoBLE application with the Bluez BLE layer if needed.
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
-        err = BluezGattsAppRegister(mpEndpoint);
-        SuccessOrExit(err);
+        SuccessOrExit(err = mEndpoint.RegisterGattApplication());
         mFlags.Set(Flags::kControlOpInProgress);
         ExitNow();
     }
@@ -615,20 +592,17 @@ void BLEManagerImpl::DriveBLEState()
         {
             mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
 
-            // Configure advertising data if it hasn't been done yet.  This is an asynchronous step which
-            // must complete before advertising can be started.  When that happens, this method will
-            // be called again, and execution will proceed to the code below.
+            // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                err = BluezAdvertisementSetup(mpEndpoint);
-                ExitNow();
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs));
+                mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
-            // Start advertising.  This is also an asynchronous step.
-            err = StartBLEAdvertising();
-            SuccessOrExit(err);
-
-            sInstance.mFlags.Set(Flags::kAdvertising);
+            // Start advertising. This is an asynchronous step. BLE manager will be notified of
+            // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
+            SuccessOrExit(err = mBLEAdvertisement.Start());
+            mFlags.Set(Flags::kControlOpInProgress);
             ExitNow();
         }
     }
@@ -638,8 +612,7 @@ void BLEManagerImpl::DriveBLEState()
     {
         if (mFlags.Has(Flags::kAdvertising))
         {
-            err = StopBLEAdvertising();
-            SuccessOrExit(err);
+            SuccessOrExit(err = mBLEAdvertisement.Stop());
             mFlags.Set(Flags::kControlOpInProgress);
 
             ExitNow();
@@ -662,6 +635,10 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
+    DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+#endif
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
@@ -675,24 +652,24 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    if (mpEndpoint == nullptr)
+    if (!mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "BLE Layer is not yet initialized");
         return;
     }
 
-    if (mpEndpoint->mpAdapter == nullptr)
+    if (mEndpoint.GetAdapter() == nullptr)
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "No adapter available for new connection establishment");
         return;
     }
 
-    mDeviceScanner               = Internal::ChipDeviceScanner::Create(mpEndpoint->mpAdapter, this);
     mBLEScanConfig.mBleScanState = scanType;
 
-    if (!mDeviceScanner)
+    CHIP_ERROR err = mDeviceScanner.Init(mEndpoint.GetAdapter(), this);
+    if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INTERNAL);
@@ -700,7 +677,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    CHIP_ERROR err = mDeviceScanner->StartScan(kNewConnectionScanTimeout);
+    err = mDeviceScanner.StartScan(kNewConnectionScanTimeout);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
@@ -713,7 +690,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 void BLEManagerImpl::CleanScanConfig()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
-        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, mpEndpoint);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, &mEndpoint);
 
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
@@ -735,10 +712,10 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
-        CancelConnect(mpEndpoint);
+        mEndpoint.CancelConnect();
     // If in discovery mode, stop scan.
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
-        mDeviceScanner->StopScan();
+        mDeviceScanner.StopScan();
     return CHIP_NO_ERROR;
 }
 
@@ -748,15 +725,6 @@ void BLEManagerImpl::NotifyBLEPeripheralRegisterAppComplete(bool aIsSuccess, voi
     event.Type                                                 = DeviceEventType::kPlatformLinuxBLEPeripheralRegisterAppComplete;
     event.Platform.BLEPeripheralRegisterAppComplete.mIsSuccess = aIsSuccess;
     event.Platform.BLEPeripheralRegisterAppComplete.mpAppstate = apAppstate;
-    PlatformMgr().PostEventOrDie(&event);
-}
-
-void BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(bool aIsSuccess, void * apAppstate)
-{
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kPlatformLinuxBLEPeripheralAdvConfiguredComplete;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mIsSuccess = aIsSuccess;
-    event.Platform.BLEPeripheralAdvConfiguredComplete.mpAppstate = apAppstate;
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -808,12 +776,15 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
+    // We StartScan in the ChipStack thread.
+    // StopScan should also be performed in the ChipStack thread.
+    // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
+    mDeviceScanner.StopScan();
+    // Stop scanning and then start connecting timer
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, &mEndpoint);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    mDeviceScanner->StopScan();
-
-    ConnectDevice(device, mpEndpoint);
+    mEndpoint.ConnectDevice(device);
 }
 
 void BLEManagerImpl::OnScanComplete()

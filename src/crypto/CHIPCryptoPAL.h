@@ -55,8 +55,8 @@ inline constexpr size_t kMaxCertificateSerialNumberLength      = 20;
 inline constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
 inline constexpr size_t kMaxCRLDistributionPointURLLength      = 100;
 
-inline constexpr const char * kValidCDPURIHttpPrefix  = "http://";
-inline constexpr const char * kValidCDPURIHttpsPrefix = "https://";
+inline constexpr char kValidCDPURIHttpPrefix[]  = "http://";
+inline constexpr char kValidCDPURIHttpsPrefix[] = "https://";
 
 inline constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 inline constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -92,6 +92,7 @@ inline constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
 inline constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
 inline constexpr size_t kAES_CCM128_Nonce_Length = 13;
 inline constexpr size_t kAES_CCM128_Tag_Length   = 16;
+inline constexpr size_t kHMAC_CCM128_Key_Length  = 128u / 8u;
 
 inline constexpr size_t CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = kAES_CCM128_Nonce_Length;
 
@@ -221,8 +222,16 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n);
 template <typename Sig>
 class ECPKey
 {
+protected:
+    // This base type can't be copied / assigned directly.
+    // Sub-types should be either uncopyable or final.
+    ECPKey()                           = default;
+    ECPKey(const ECPKey &)             = default;
+    ECPKey & operator=(const ECPKey &) = default;
+
 public:
-    virtual ~ECPKey() {}
+    virtual ~ECPKey() = default;
+
     virtual SupportedECPKeyTypes Type() const  = 0;
     virtual size_t Length() const              = 0;
     virtual bool IsUncompressed() const        = 0;
@@ -376,10 +385,11 @@ using IdentityProtectionKeySpan = FixedByteSpan<Crypto::CHIP_CRYPTO_SYMMETRIC_KE
 
 using AttestationChallenge = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 
-class P256PublicKey : public ECPKey<P256ECDSASignature>
+class P256PublicKey final // final due to being copyable
+    : public ECPKey<P256ECDSASignature>
 {
 public:
-    P256PublicKey() {}
+    P256PublicKey() = default;
 
     template <size_t N>
     constexpr P256PublicKey(const uint8_t (&raw_value)[N])
@@ -429,8 +439,15 @@ private:
 template <typename PK, typename Secret, typename Sig>
 class ECPKeypair
 {
+protected:
+    // This base type can't be copied / assigned directly.
+    // Sub-types should be either uncopyable or final.
+    ECPKeypair()                               = default;
+    ECPKeypair(const ECPKeypair &)             = default;
+    ECPKeypair & operator=(const ECPKeypair &) = default;
+
 public:
-    virtual ~ECPKeypair() {}
+    virtual ~ECPKeypair() = default;
 
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
@@ -471,6 +488,13 @@ using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256
 
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
+protected:
+    // This base type can't be copied / assigned directly.
+    // Sub-types should be either uncopyable or final.
+    P256KeypairBase()                                    = default;
+    P256KeypairBase(const P256KeypairBase &)             = default;
+    P256KeypairBase & operator=(const P256KeypairBase &) = default;
+
 public:
     /**
      * @brief Initialize the keypair.
@@ -494,8 +518,12 @@ public:
 class P256Keypair : public P256KeypairBase
 {
 public:
-    P256Keypair() {}
+    P256Keypair() = default;
     ~P256Keypair() override;
+
+    // P256Keypair can't be copied / assigned.
+    P256Keypair(const P256Keypair &)             = delete;
+    P256Keypair & operator=(const P256Keypair &) = delete;
 
     /**
      * @brief Initialize the keypair.
@@ -562,26 +590,27 @@ protected:
     bool mInitialized = false;
 };
 
-using Aes128KeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
+using Symmetric128BitsKeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
 /**
- * @brief Platform-specific AES key
+ * @brief Platform-specific Symmetric key handle
  *
- * The class represents AES key used by Matter stack either in the form of raw key material or key
+ * The class represents a key used by the Matter stack either in the form of raw key material or key
  * reference, depending on the platform. To achieve that, it contains an opaque context that can be
  * cast to a concrete representation used by the given platform. Note that currently Matter uses
  * 128-bit symmetric keys only.
+ *
+ * @note Symmetric128BitsKeyHandle is an abstract class to force child classes for each key handle type.
+ *       Symmetric128BitsKeyHandle class implements all the necessary components for handles.
+ *       Child classes only need to implement a constructor and delete all the copy operators.
  */
-class Aes128KeyHandle
+class Symmetric128BitsKeyHandle
 {
 public:
-    Aes128KeyHandle() = default;
-    ~Aes128KeyHandle() { ClearSecretData(mContext.mOpaque); }
-
-    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
-    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
-    void operator=(const Aes128KeyHandle &)  = delete;
-    void operator=(Aes128KeyHandle &&)       = delete;
+    Symmetric128BitsKeyHandle(const Symmetric128BitsKeyHandle &) = delete;
+    Symmetric128BitsKeyHandle(Symmetric128BitsKeyHandle &&)      = delete;
+    void operator=(const Symmetric128BitsKeyHandle &)            = delete;
+    void operator=(Symmetric128BitsKeyHandle &&)                 = delete;
 
     /**
      * @brief Get internal context cast to the desired key representation
@@ -601,6 +630,10 @@ public:
         return *SafePointerCast<T *>(&mContext);
     }
 
+protected:
+    Symmetric128BitsKeyHandle() = default;
+    ~Symmetric128BitsKeyHandle() { ClearSecretData(mContext.mOpaque); }
+
 private:
     static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
 
@@ -608,6 +641,34 @@ private:
     {
         uint8_t mOpaque[kContextSize] = {};
     } mContext;
+};
+
+/**
+ * @brief Platform-specific AES key handle
+ */
+class Aes128KeyHandle final : public Symmetric128BitsKeyHandle
+{
+public:
+    Aes128KeyHandle() = default;
+
+    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
+    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
+    void operator=(const Aes128KeyHandle &)  = delete;
+    void operator=(Aes128KeyHandle &&)       = delete;
+};
+
+/**
+ * @brief Platform-specific HMAC key handle
+ */
+class Hmac128KeyHandle final : public Symmetric128BitsKeyHandle
+{
+public:
+    Hmac128KeyHandle() = default;
+
+    Hmac128KeyHandle(const Hmac128KeyHandle &) = delete;
+    Hmac128KeyHandle(Hmac128KeyHandle &&)      = delete;
+    void operator=(const Hmac128KeyHandle &)   = delete;
+    void operator=(Hmac128KeyHandle &&)        = delete;
 };
 
 /**
@@ -885,8 +946,8 @@ private:
 class HKDF_sha
 {
 public:
-    HKDF_sha() {}
-    virtual ~HKDF_sha() {}
+    HKDF_sha()          = default;
+    virtual ~HKDF_sha() = default;
 
     /**
      * @brief A function that implements SHA-256 based HKDF
@@ -918,8 +979,8 @@ public:
 class HMAC_sha
 {
 public:
-    HMAC_sha() {}
-    virtual ~HMAC_sha() {}
+    HMAC_sha()          = default;
+    virtual ~HMAC_sha() = default;
 
     /**
      * @brief A function that implements SHA-256 based HMAC per FIPS1981.
@@ -946,6 +1007,31 @@ public:
      **/
 
     virtual CHIP_ERROR HMAC_SHA256(const uint8_t * key, size_t key_length, const uint8_t * message, size_t message_length,
+                                   uint8_t * out_buffer, size_t out_length);
+
+    /**
+     * @brief A function that implements SHA-256 based HMAC per FIPS1981.
+     *
+     * This implements the CHIP_Crypto_HMAC() cryptographic primitive
+     * in the the specification.
+     *
+     * The `out_length` must be at least kSHA256_Hash_Length, and only
+     * kSHA256_Hash_Length bytes are written to out_buffer.
+     *
+     * Error values are:
+     *   - CHIP_ERROR_INVALID_ARGUMENT: for any bad arguments or nullptr input on
+     *     any pointer.
+     *   - CHIP_ERROR_INTERNAL: for any unexpected error arising in the underlying
+     *     cryptographic layers.
+     *
+     * @param key The HMAC Key handle to use for the HMAC operation
+     * @param message Message over which to compute the HMAC
+     * @param message_length Length of the message over which to compute the HMAC
+     * @param out_buffer Pointer to buffer into which to write the output.
+     * @param out_length Underlying size of the `out_buffer`.
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR HMAC_SHA256(const Hmac128KeyHandle & key, const uint8_t * message, size_t message_length,
                                    uint8_t * out_buffer, size_t out_length);
 };
 
@@ -984,8 +1070,8 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 class PBKDF2_sha256
 {
 public:
-    PBKDF2_sha256() {}
-    virtual ~PBKDF2_sha256() {}
+    PBKDF2_sha256()          = default;
+    virtual ~PBKDF2_sha256() = default;
 
     /** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
      * @param password password used for key derivation
@@ -1026,7 +1112,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p() {}
+    virtual ~Spake2p() = default;
 
     /**
      * @brief Initialize Spake2+ with some context specific information.

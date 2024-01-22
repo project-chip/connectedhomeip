@@ -49,18 +49,6 @@ public:
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
-- (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
-{
-    if (self = [super initWithEndpointID:endpointID queue:queue]) {
-        if (device == nil) {
-            return nil;
-        }
-
-        _device = device;
-    }
-    return self;
-}
-
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
@@ -75,7 +63,7 @@ MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping
 MTR{{cluster}}Cluster{{command}}Params
 {{/unless}}
 {{/inline}}
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
@@ -151,7 +139,8 @@ MTR{{cluster}}Cluster{{command}}Params
                                         completion:completion];
 }
 
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completion:(MTRStatusCompletion)completion
 {
   [self write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value params:nil completion:completion];
@@ -257,7 +246,10 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
     {{/if}}
     ];
 }
-{{#unless hasArguments}}
+{{#unless commandHasRequiredField}}
+{{#unless (isInConfigList
+           (concat (asUpperCamelCase cluster preserveAcronyms=true) "::" (asUpperCamelCase command preserveAcronyms=true))
+           "LegacyCommandsWithOnlyOptionalArguments")}}
 {{! KeySetReadAllIndices grew this params-less API later _after_ it had already been shipped, so it needs to be special-cased here }}
 {{#unless (and (isStrEqual cluster "GroupKeyManagement")
                (isStrEqual command "KeySetReadAllIndices"))}}
@@ -265,6 +257,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {
   [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
 }
+{{/unless}}
 {{/unless}}
 {{/unless}}
 {{/if}}
@@ -292,7 +285,8 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);
       }];
 }
-{{#if isWritableAttribute}}
+{{#if (or isWritableAttribute
+      (isInConfigList (concat (asUpperCamelCase parent.name) "::" label) "DarwinForceWritable"))}}
 - (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name compatRemapClusterName=true}})value completionHandler:(MTRStatusCompletion)completionHandler
 {
   [self writeAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithValue:value params:nil completion:completionHandler];

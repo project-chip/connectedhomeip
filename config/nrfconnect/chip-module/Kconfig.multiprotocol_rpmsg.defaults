@@ -58,6 +58,10 @@ config BT_CTLR_ASSERT_HANDLER
 config BT_HCI_RAW_RESERVE
     default 1
 
+# Disable 2M PHY due to interoperability issues.
+config BT_CTLR_PHY_2M
+    default n
+
 # Workaround: Unable to allocate command buffer when using K_NO_WAIT since
 # Host number of completed commands does not follow normal flow control.
 config BT_BUF_CMD_TX_COUNT

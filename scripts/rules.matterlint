@@ -21,11 +21,19 @@ load "../src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/concentration-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/content-app-observer-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/content-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/device-energy-management-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/device-energy-management-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-alarm-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/dishwasher-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/microwave-oven-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/energy-evse-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/fixed-label-cluster.xml";
@@ -39,6 +47,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/laundry-washer-mode-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/laundry-dryer-controls-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml";
@@ -52,7 +61,9 @@ load "../src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml
 load "../src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-state-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/operational-state-oven-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/operational-state-rvc-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/oven-mode-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/power-source-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/power-source-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml";
@@ -77,6 +88,7 @@ load "../src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/time-synchronization-cluster.xml";
+load "../src/app/zap-templates/zcl/data-model/chip/timer-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml";
@@ -103,6 +115,16 @@ all endpoints {
 
     require global attribute featureMap = 65532;
     require global attribute clusterRevision = 65533;
+
+    // Deny rules:
+    //   deny cluster Foo;  // denies entire cluster by name
+    //   deny cluster 123;  // denies entire cluster by id
+    //   deny cluster Foo attribute bar;  // denies specific attribute by name
+    //   deny cluster Foo attribute 123;  // denies specific attribute by id
+    //   deny cluster 234 attribute 567;  // Allows deny using ids only
+
+    // (previously AverageWearCount, see #30002/#29285 in GitHub)
+    deny cluster GeneralDiagnostics attribute 9;
 }
 
 endpoint 0 {

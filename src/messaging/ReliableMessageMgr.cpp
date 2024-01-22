@@ -24,8 +24,6 @@
 #include <errno.h>
 #include <inttypes.h>
 
-#include <messaging/ReliableMessageMgr.h>
-
 #include <lib/support/BitFlags.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
@@ -35,11 +33,12 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h>  // nogncheck
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/ICDConfigurationData.h> // nogncheck
+#include <app/icd/ICDNotifier.h>          // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;
@@ -89,9 +88,10 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
 
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         ChipLogDetail(ExchangeManager,
-                      "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter " NextRetransTimeCtr:%" PRIu64,
+                      "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter
+                      " NextRetransTimeCtr: 0x" ChipLogFormatX64,
                       ChipLogValueExchange(&entry->ec.Get()), entry->retainedBuf.GetMessageCounter(),
-                      entry->nextRetransTime.count());
+                      ChipLogValueX64(entry->nextRetransTime.count()));
         return Loop::Continue;
     });
 #endif
@@ -102,7 +102,7 @@ void ReliableMessageMgr::ExecuteActions()
     System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
 #if defined(RMP_TICKLESS_DEBUG)
-    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at %" PRIu64 "ms", now.count());
+    ChipLogDetail(ExchangeManager, "ReliableMessageMgr::ExecuteActions at 0x" ChipLogFormatX64 "ms", ChipLogValueX64(now.count()));
 #endif
 
     ExecuteForAllContext([&](ReliableMessageContext * rc) {
@@ -259,7 +259,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
     // Implement:
     //   "An ICD sender SHOULD increase t to also account for its own sleepy interval
     //   required to receive the acknowledgment"
-    mrpBackoffTime += app::ICDManager::GetFastPollingInterval();
+    mrpBackoffTime += ICDConfigurationData::GetInstance().GetFastPollingInterval();
 #endif
 
     mrpBackoffTime += CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST;
@@ -316,7 +316,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     if (err == CHIP_NO_ERROR)
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+        app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
@@ -397,8 +397,10 @@ void ReliableMessageMgr::StartTimer()
         const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
 
 #if defined(RMP_TICKLESS_DEBUG)
-        ChipLogDetail(ExchangeManager, "ReliableMessageMgr::StartTimer at %" PRIu64 "ms wake at %" PRIu64 "ms (in %" PRIu64 "ms)",
-                      now.count(), nextWakeTime.count(), nextWakeDelay.count());
+        ChipLogDetail(ExchangeManager,
+                      "ReliableMessageMgr::StartTimer at 0x" ChipLogFormatX64 "ms wake at 0x" ChipLogFormatX64
+                      "ms (in 0x" ChipLogFormatX64 "ms)",
+                      ChipLogValueX64(now.count()), ChipLogValueX64(nextWakeTime.count()), ChipLogValueX64(nextWakeDelay.count()));
 #endif
         VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }

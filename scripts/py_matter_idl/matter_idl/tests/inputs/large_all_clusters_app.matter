@@ -102,7 +102,7 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-server cluster Scenes = 5 {
+server cluster MatterScenes = 98 {
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
   }
@@ -117,18 +117,16 @@ server cluster Scenes = 5 {
     int8u attributeValue[] = 1;
   }
 
-  readonly attribute int8u sceneCount = 0;
-  readonly attribute int8u currentScene = 1;
-  readonly attribute group_id currentGroup = 2;
-  readonly attribute boolean sceneValid = 3;
-  readonly attribute bitmap8 nameSupport = 4;
+  readonly attribute optional nullable node_id lastConfiguredBy = 0;
+  readonly attribute int16u sceneTableSize = 1;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    INT16U transitionTime = 2;
+    INT32U transitionTime = 2;
     CHAR_STRING sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
@@ -155,7 +153,7 @@ server cluster Scenes = 5 {
   request struct RecallSceneRequest {
     group_id groupId = 0;
     INT8U sceneId = 1;
-    optional nullable INT16U transitionTime = 2;
+    optional nullable INT32U transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
@@ -172,7 +170,7 @@ server cluster Scenes = 5 {
     ENUM8 status = 0;
     group_id groupId = 1;
     INT8U sceneId = 2;
-    optional INT16U transitionTime = 3;
+    optional INT32U transitionTime = 3;
     optional CHAR_STRING sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
@@ -3105,7 +3103,7 @@ server cluster WakeOnLan = 1283 {
 }
 
 server cluster Channel = 1284 {
-  enum ChannelStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
@@ -3250,7 +3248,7 @@ server cluster LowPower = 1288 {
 }
 
 server cluster KeypadInput = 1289 {
-  enum CecKeyCode : ENUM8 {
+  enum CECKeyCodeEnum : ENUM8 {
     kSelect = 0;
     kUp = 1;
     kDown = 2;
@@ -3355,7 +3353,7 @@ server cluster KeypadInput = 1289 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct SendKeyRequest {
-    CecKeyCode keyCode = 0;
+    CECKeyCodeEnum keyCode = 0;
   }
 
   response struct SendKeyResponse = 1 {
@@ -3398,7 +3396,7 @@ server cluster ContentLauncher = 1290 {
     kURLPlayback = 0x2;
   }
 
-  bitmap SupportedStreamingProtocol : BITMAP32 {
+  bitmap SupportedProtocolsBitmap : BITMAP32 {
     kDash = 0x1;
     kHls = 0x2;
   }
@@ -3472,7 +3470,7 @@ server cluster AudioOutput = 1291 {
 }
 
 server cluster ApplicationLauncher = 1292 {
-  enum ApplicationLauncherStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kAppNotAvailable = 1;
     kSystemBusy = 2;
@@ -4221,7 +4219,7 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Scenes {
+  server cluster MatterScenes {
     ram      attribute sceneCount;
     ram      attribute currentScene;
     ram      attribute currentGroup;

@@ -16,7 +16,8 @@
 #
 
 cd idt
-rm -R venv/
-rm -R pycache/
+sudo rm -R venv/
+sudo rm -R pycache/
 sudo rm -R IDT_ARTIFACTS/
+sudo find . -type d -name "BUILD" -delete
 cd ..

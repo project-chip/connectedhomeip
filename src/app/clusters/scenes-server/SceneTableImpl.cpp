@@ -22,81 +22,6 @@
 namespace chip {
 namespace scenes {
 
-CHIP_ERROR
-DefaultSceneHandlerImpl::EncodeAttributeValueList(const List<AttributeValuePairType> & aVlist, MutableByteSpan & serializedBytes)
-{
-    TLV::TLVWriter writer;
-    writer.Init(serializedBytes);
-    ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), aVlist));
-    serializedBytes.reduce_size(writer.GetLengthWritten());
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultSceneHandlerImpl::DecodeAttributeValueList(const ByteSpan & serializedBytes,
-                                                             DecodableList<AttributeValuePairDecodableType> & aVlist)
-{
-    TLV::TLVReader reader;
-
-    reader.Init(serializedBytes);
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
-    ReturnErrorOnFailure(aVlist.Decode(reader));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldSetDecodableType & extensionFieldSet,
-                                      MutableByteSpan & serializedBytes)
-{
-    AttributeValuePairType aVPairs[kMaxAvPair];
-
-    size_t pairTotal = 0;
-    // Verify size of list
-    ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
-    VerifyOrReturnError(pairTotal <= ArraySize(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    uint8_t pairCount  = 0;
-    auto pair_iterator = extensionFieldSet.attributeValueList.begin();
-    while (pair_iterator.Next())
-    {
-        aVPairs[pairCount] = pair_iterator.GetValue();
-        pairCount++;
-    }
-    ReturnErrorOnFailure(pair_iterator.GetStatus());
-    List<AttributeValuePairType> attributeValueList(aVPairs, pairCount);
-
-    return EncodeAttributeValueList(attributeValueList, serializedBytes);
-}
-
-CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
-                                                ExtensionFieldSetType & extensionFieldSet)
-{
-    DecodableList<AttributeValuePairDecodableType> attributeValueList;
-
-    ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
-
-    // Verify size of list
-    size_t pairTotal = 0;
-    ReturnErrorOnFailure(attributeValueList.ComputeSize(&pairTotal));
-    VerifyOrReturnError(pairTotal <= ArraySize(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    uint8_t pairCount  = 0;
-    auto pair_iterator = attributeValueList.begin();
-    while (pair_iterator.Next())
-    {
-        mAVPairs[pairCount] = pair_iterator.GetValue();
-        pairCount++;
-    };
-    ReturnErrorOnFailure(pair_iterator.GetStatus());
-
-    extensionFieldSet.clusterID          = cluster;
-    extensionFieldSet.attributeValueList = mAVPairs;
-    extensionFieldSet.attributeValueList.reduce_size(pairCount);
-
-    return CHIP_NO_ERROR;
-}
-
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
 /// kSceneCount: Number of scenes in a Fabric
 /// kStorageIDArray: Array of StorageID struct
@@ -114,7 +39,6 @@ enum class TagScene : uint8_t
     kSceneID,
     kName,
     kTransitionTimeMs,
-    kExtensionFieldSetsContainer,
 };
 
 using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
@@ -174,11 +98,11 @@ struct EndpointSceneCount : public PersistentData<kPersistentBufferSceneCountByt
     }
 };
 
-// Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 212bytes
+// Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 175 bytes
 // when using the OnOff, Level Control and Color Control as well as the maximal name length of 16 bytes. Putting 256 gives some
 // slack in case different clusters are used. Value obtained by using writer.GetLengthWritten at the end of the SceneTableData
 // Serialize method.
-static constexpr size_t kPersistentSceneBufferMax = 256;
+static constexpr size_t kPersistentSceneBufferMax = CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES;
 
 struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneBufferMax>
 {
@@ -225,8 +149,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         }
 
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTimeMs), mStorageData.mSceneTransitionTimeMs));
-        ReturnErrorOnFailure(
-            mStorageData.mExtensionFieldSets.Serialize(writer, TLV::ContextTag(TagScene::kExtensionFieldSetsContainer)));
+        ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Serialize(writer));
 
         return writer.EndContainer(container);
     }
@@ -248,7 +171,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         ReturnErrorOnFailure(reader.Next());
         TLV::Tag currTag = reader.GetTag();
         VerifyOrReturnError(TLV::ContextTag(TagScene::kName) == currTag || TLV::ContextTag(TagScene::kTransitionTimeMs) == currTag,
-                            CHIP_ERROR_WRONG_TLV_TYPE);
+                            CHIP_ERROR_INVALID_TLV_TAG);
 
         CharSpan nameSpan;
         // A name may or may not have been stored.  Check whether it was.
@@ -259,10 +182,9 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         }
         // Empty name will be initialized if the name wasn't stored
         mStorageData.SetName(nameSpan);
-
         ReturnErrorOnFailure(reader.Get(mStorageData.mSceneTransitionTimeMs));
-        ReturnErrorOnFailure(
-            mStorageData.mExtensionFieldSets.Deserialize(reader, TLV::ContextTag(TagScene::kExtensionFieldSetsContainer)));
+
+        ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Deserialize(reader));
 
         return reader.ExitContainer(container);
     }
@@ -284,7 +206,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     uint8_t scene_count = 0;
     uint16_t max_scenes_per_fabric;
     uint16_t max_scenes_per_endpoint;
-    SceneStorageId scene_map[kMaxScenesPerFabric];
+    SceneStorageId scene_map[CHIP_CONFIG_MAX_SCENES_TABLE_SIZE];
 
     FabricSceneData(EndpointId endpoint = kInvalidEndpointId, FabricIndex fabric = kUndefinedFabricIndex,
                     uint16_t maxScenesPerFabric = kMaxScenesPerFabric, uint16_t maxScenesPerEndpoint = kMaxScenesPerEndpoint) :
@@ -817,12 +739,12 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
         // TODO : Once zap supports the scenable quality, implement a GetSceneableClusterCountFromEndpointType function to avoid
         // over-allocation
         uint8_t clusterCount = GetClusterCountFromEndpoint();
-        chip::Platform::ScopedMemoryBuffer<clusterId> cBuffer;
+        chip::Platform::ScopedMemoryBuffer<ClusterId> cBuffer;
         VerifyOrReturnError(cBuffer.Calloc(clusterCount), CHIP_ERROR_NO_MEMORY);
         clusterCount = GetClustersFromEndpoint(cBuffer.Get(), clusterCount);
 
-        Span<clusterId> cSpan(cBuffer.Get(), clusterCount);
-        for (clusterId cluster : cSpan)
+        Span<ClusterId> cSpan(cBuffer.Get(), clusterCount);
+        for (ClusterId cluster : cSpan)
         {
             ExtensionFieldSet EFS;
             MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
@@ -880,7 +802,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::Scenes::Id))
+    for (auto endpoint : app::EnabledEndpointsWithServerCluster(chip::app::Clusters::ScenesManagement::Id))
     {
         FabricSceneData fabric(endpoint, fabric_index);
         SceneIndex idx = 0;
@@ -897,6 +819,35 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
             VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
             idx++;
         }
+
+        // Remove fabric scenes on endpoint
+        ReturnErrorOnFailure(fabric.Delete(mStorage));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::RemoveEndpoint()
+{
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
+    for (FabricIndex fabric_index = kMinValidFabricIndex; fabric_index < kMaxValidFabricIndex; fabric_index++)
+    {
+        FabricSceneData fabric(mEndpointId, fabric_index);
+        CHIP_ERROR err = fabric.Load(mStorage);
+        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            continue;
+        }
+
+        SceneIndex idx = 0;
+        while (idx < mMaxScenesPerFabric)
+        {
+            err = RemoveSceneTableEntryAtPosition(mEndpointId, fabric_index, idx);
+            VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+            idx++;
+        };
 
         // Remove fabric scenes on endpoint
         ReturnErrorOnFailure(fabric.Delete(mStorage));

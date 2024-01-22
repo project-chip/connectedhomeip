@@ -22,15 +22,17 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>
 #include <app/att-storage.h>
+#include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <credentials/GroupDataProvider.h>
 #include <inttypes.h>
 #include <lib/support/CodeUtils.h>
+#include <tracing/macros.h>
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif // EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 
 using namespace chip;
 using namespace app::Clusters;
@@ -90,6 +92,8 @@ static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId g
     }
     if (CHIP_NO_ERROR == err)
     {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
+                                               GroupKeyManagement::Attributes::GroupTable::Id);
         return Status::Success;
     }
 
@@ -109,6 +113,8 @@ static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId,
     CHIP_ERROR err = provider->RemoveEndpoint(fabricIndex, groupId, endpointId);
     if (CHIP_NO_ERROR == err)
     {
+        MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id,
+                                               GroupKeyManagement::Attributes::GroupTable::Id);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
@@ -136,6 +142,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
 bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::AddGroup::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("AddGroup", "Groups");
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::AddGroupResponse::Type response;
 
@@ -148,6 +155,7 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
 bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                            const Commands::ViewGroup::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("ViewGroup", "Groups");
     auto fabricIndex             = commandObj->GetAccessingFabricIndex();
     auto groupId                 = commandData.groupID;
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -250,6 +258,7 @@ struct GroupMembershipResponse
 bool emberAfGroupsClusterGetGroupMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::GetGroupMembership::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("GetGroupMembership", "Groups");
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto * provider  = GetGroupDataProvider();
     Status status    = Status::Failure;
@@ -279,12 +288,13 @@ exit:
 bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                              const Commands::RemoveGroup::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("RemoveGroup", "Groups");
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     Groups::Commands::RemoveGroupResponse::Type response;
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     // If a group is removed the scenes associated with that group SHOULD be removed.
-    Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
+    ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, commandData.groupID);
 #endif
     response.groupID = commandData.groupID;
     response.status  = GroupRemove(fabricIndex, commandPath.mEndpointId, commandData.groupID);
@@ -296,13 +306,14 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
 bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::RemoveAllGroups::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("RemoveAllGroups", "Groups");
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto * provider  = GetGroupDataProvider();
     Status status    = Status::Failure;
 
     VerifyOrExit(nullptr != provider, status = Status::Failure);
 
-#ifdef EMBER_AF_PLUGIN_SCENES
+#ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
     {
         GroupDataProvider::EndpointIterator * iter = provider->IterateEndpoints(fabricIndex);
         GroupDataProvider::GroupEndpoint mapping;
@@ -312,17 +323,18 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
         {
             if (commandPath.mEndpointId == mapping.endpoint_id)
             {
-                Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, mapping.endpoint_id, mapping.group_id);
+                ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, mapping.endpoint_id, mapping.group_id);
             }
         }
         iter->Release();
-        Scenes::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId, ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+        ScenesManagement::ScenesServer::Instance().GroupWillBeRemoved(fabricIndex, commandPath.mEndpointId,
+                                                                      ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
     }
 #endif
 
     provider->RemoveEndpoint(fabricIndex, commandPath.mEndpointId);
     status = Status::Success;
-
+    MatterReportingAttributeChangeCallback(kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id);
 exit:
     commandObj->AddStatus(commandPath, status);
     if (Status::Success != status)
@@ -336,6 +348,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(app::CommandHandler * com
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::AddGroupIfIdentifying::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("AddGroupIfIdentifying", "Groups");
     auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto groupId     = commandData.groupID;
     auto groupName   = commandData.groupName;

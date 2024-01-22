@@ -28,6 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <zephyr/dfu/mcuboot.h>
+#include <zephyr/mgmt/mcumgr/grp/img_mgmt/img_mgmt.h>
 #include <zephyr/mgmt/mcumgr/mgmt/callbacks.h>
 #include <zephyr/mgmt/mcumgr/mgmt/mgmt.h>
 
@@ -41,7 +42,8 @@ constexpr uint16_t kAdvertisingIntervalMax = 500;
 constexpr uint8_t kAdvertisingFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
 namespace {
-int32_t UploadConfirmHandler(uint32_t event, int32_t rc, bool * abort_more, void * data, size_t data_size)
+enum mgmt_cb_return UploadConfirmHandler(uint32_t event, enum mgmt_cb_return prev_status, int32_t * rc, uint16_t * group,
+                                         bool * abort_more, void * data, size_t data_size)
 {
     const img_mgmt_upload_check & imgData = *static_cast<img_mgmt_upload_check *>(data);
     IgnoreUnusedVariable(imgData);
@@ -49,10 +51,11 @@ int32_t UploadConfirmHandler(uint32_t event, int32_t rc, bool * abort_more, void
     ChipLogProgress(SoftwareUpdate, "DFU over SMP progress: %u/%u B of image %u", static_cast<unsigned>(imgData.req->off),
                     static_cast<unsigned>(imgData.action->size), static_cast<unsigned>(imgData.req->image));
 
-    return MGMT_ERR_EOK;
+    return MGMT_CB_OK;
 }
 
-int32_t CommandHandler(uint32_t event, int32_t rc, bool * abort_more, void * data, size_t data_size)
+enum mgmt_cb_return CommandHandler(uint32_t event, enum mgmt_cb_return prev_status, int32_t * rc, uint16_t * group,
+                                   bool * abort_more, void * data, size_t data_size)
 {
     if (event == MGMT_EVT_OP_CMD_RECV)
     {
@@ -63,7 +66,7 @@ int32_t CommandHandler(uint32_t event, int32_t rc, bool * abort_more, void * dat
         GetFlashHandler().DoAction(ExternalFlashManager::Action::SLEEP);
     }
 
-    return MGMT_ERR_EOK;
+    return MGMT_CB_OK;
 }
 
 mgmt_callback sUploadCallback = {

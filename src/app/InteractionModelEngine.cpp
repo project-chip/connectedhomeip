@@ -29,7 +29,7 @@
 
 #include "access/RequestPath.h"
 #include "access/SubjectDescriptor.h"
-#include <app/AppBuildConfig.h>
+#include <app/AppConfig.h>
 #include <app/RequiredPrivilege.h>
 #include <app/util/af-types.h>
 #include <app/util/endpoint-config-api.h>
@@ -40,6 +40,18 @@
 
 namespace chip {
 namespace app {
+
+class AutoReleaseSubscriptionInfoIterator
+{
+public:
+    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
+    ~AutoReleaseSubscriptionInfoIterator() { mIterator->Release(); }
+
+    SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
+
+private:
+    SubscriptionResumptionStorage::SubscriptionInfoIterator * mIterator;
+};
 
 using Protocols::InteractionModel::Status;
 
@@ -317,6 +329,43 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
     }
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
+
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
+{
+    bool isActive = false;
+    mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
+        if (!handler->IsType(ReadHandler::InteractionType::Subscribe))
+        {
+            return Loop::Continue;
+        }
+
+        Access::SubjectDescriptor subject = handler->GetSubjectDescriptor();
+        if (subject.fabricIndex != aFabricIndex)
+        {
+            return Loop::Continue;
+        }
+
+        if (subject.authMode == Access::AuthMode::kCase)
+        {
+            if (subject.cats.CheckSubjectAgainstCATs(subjectID) || subjectID == subject.subject)
+            {
+                isActive = handler->IsActiveSubscription();
+
+                // Exit loop only if isActive is set to true
+                // Otherwise keep looking for another subscription that could
+                // match the subject
+                if (isActive)
+                {
+                    return Loop::Break;
+                }
+            }
+        }
+
+        return Loop::Continue;
+    });
+
+    return isActive;
+}
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
 {
@@ -931,6 +980,37 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 }
 
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
+void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
+{
+    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    {
+        auto pNextItem = pListItem->GetNextClient();
+        // It is possible that pListItem is destroyed by the app in OnActiveModeNotification.
+        // Get the next item before invoking `OnActiveModeNotification`.
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        {
+            pListItem->OnActiveModeNotification();
+        }
+        pListItem = pNextItem;
+    }
+}
+
+void InteractionModelEngine::OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType)
+{
+    // TODO: Follow up to use a iterator function to avoid copy/paste here.
+    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    {
+        // It is possible that pListItem is destroyed by the app in OnPeerTypeChange.
+        // Get the next item before invoking `OnPeerTypeChange`.
+        auto pNextItem = pListItem->GetNextClient();
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        {
+            pListItem->OnPeerTypeChange(aType);
+        }
+        pListItem = pNextItem;
+    }
+}
+
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
     apReadClient->SetNextClient(mpActiveReadClientList);
@@ -1835,7 +1915,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     bool resumedSubscriptions                  = false;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
+    AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
@@ -1853,31 +1933,24 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             continue;
         }
 
-        auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
-        auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
-        if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount,
-                                                     requestedEventPathCount))
+        auto subscriptionResumptionSessionEstablisher = Platform::MakeUnique<SubscriptionResumptionSessionEstablisher>();
+        if (subscriptionResumptionSessionEstablisher == nullptr)
         {
-            ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
-            iterator->Release();
+            ChipLogProgress(InteractionModel, "Failed to create SubscriptionResumptionSessionEstablisher");
             return;
         }
 
-        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine, imEngine->GetReportScheduler());
-        if (handler == nullptr)
+        if (subscriptionResumptionSessionEstablisher->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo) !=
+            CHIP_NO_ERROR)
         {
-            ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
-            iterator->Release();
+            ChipLogProgress(InteractionModel, "Failed to ResumeSubscription 0x%" PRIx32, subscriptionInfo.mSubscriptionId);
             return;
         }
-
-        ChipLogProgress(InteractionModel, "Resuming subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
-        handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
+        subscriptionResumptionSessionEstablisher.release();
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
         resumedSubscriptions = true;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     }
-    iterator->Release();
 
 #if CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     // If no persisted subscriptions needed resumption then all resumption retries are done

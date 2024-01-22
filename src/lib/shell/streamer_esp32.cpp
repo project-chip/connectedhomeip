@@ -95,8 +95,8 @@ int streamer_esp32_init(streamer_t * streamer)
     esp_vfs_dev_uart_register();
 #endif // CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     esp_console_config_t console_config = {
-        .max_cmdline_length = 256,
-        .max_cmdline_args   = 32,
+        .max_cmdline_length = CONFIG_CHIP_SHELL_CMD_LINE_BUF_MAX_LENGTH,
+        .max_cmdline_args   = CONFIG_CHIP_SHELL_CMD_LINE_ARG_MAX_COUNT,
     };
     ESP_ERROR_CHECK(esp_console_init(&console_config));
     linenoiseSetMultiLine(1);

@@ -92,7 +92,7 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board SiWx917. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
-        'import("//with_pw_rpc.gni")'
+        use_pw_rpc
             Use to build the example with pigweed RPC
         ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
@@ -113,6 +113,10 @@ if [ "$#" == "0" ]; then
             Use provided hardware version at build time
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
+        si91x_alarm_based_wakeup
+            Enable the Alarm Based Wakeup for 917 SoC when sleep is enabled (Default false)
+        si91x_alarm_periodic_time
+            Periodic time at which the 917 SoC should wakeup (Default: 30sec)
         Presets
         --icd
             enable ICD features, set thread mtd
@@ -227,6 +231,8 @@ else
                 ;;
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                optArgs+="wiseconnect_sdk_root=\"$WISECONNECT_SDK_ROOT\" "
+                optArgs+="wifi_sdk_root=\"$WIFI_SDK_ROOT\" "
                 USE_DOCKER=true
                 shift
                 ;;
@@ -238,6 +244,10 @@ else
             --slc_generate)
                 optArgs+="slc_generate=true "
                 USE_SLC=true
+                shift
+                ;;
+            --use_pw_rpc)
+                optArgs+="import(\"//with_pw_rpc.gni\") "
                 shift
                 ;;
             --slc_reuse_files)
@@ -279,17 +289,17 @@ else
     fi
 
     # 917 exception. TODO find a more generic way
-    if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ]; then
+    if [ "$SILABS_BOARD" == "BRD4338A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
-        optArgs+="chip_device_platform =\"SiWx917\" "
+        optArgs+="chip_device_platform =\"SiWx917\" is_debug=false "
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
         {
             ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
-            optArgs+="sl_matter_version_str=\"v1.1-$branchName-$ShortCommitSha\" "
+            optArgs+="sl_matter_version_str=\"v1.2-$branchName-$ShortCommitSha\" "
         } &>/dev/null
     fi
 

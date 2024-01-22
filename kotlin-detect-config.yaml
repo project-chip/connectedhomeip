@@ -46,6 +46,7 @@ style:
             - "**/src/controller/java/tests/matter/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/matter/tlv/TlvWriterTest.kt"
+            - "**/src/controller/java/generated/java/**/*"
     WildcardImport:
         excludes:
             - "**/examples/android/CHIPTest/app/src/androidTest/java/com/tcl/chip/chiptest/ExampleInstrumentedTest.kt"
@@ -155,6 +156,7 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/generated/java/**/*"
     ForbiddenComment:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
@@ -231,6 +233,9 @@ exceptions:
             - "**/src/controller/java/generated/java/**/*"
 
 naming:
+    VariableNaming:
+        excludes:
+            - "**/src/controller/java/generated/java/**/*"
     FunctionNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/SelectActionFragment.kt"
@@ -245,6 +250,9 @@ naming:
     ConstructorParameterNaming:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommandAdapter.kt"
+            - "**/src/controller/java/generated/java/**/*"
+    FunctionParameterNaming:
+        excludes:
             - "**/src/controller/java/generated/java/**/*"
     TopLevelPropertyNaming:
         excludes:
@@ -275,6 +283,7 @@ complexity:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/GroupSettingFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OnOffClientFragment.kt"
+            - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/OtaProviderClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/WildcardFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/GenericChipDeviceListener.kt"
@@ -291,6 +300,7 @@ complexity:
             - "**/src/controller/java/src/matter/tlv/TlvWriter.kt"
             - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
             - "**/src/controller/java/src/matter/controller/CompletionListenerAdapter.kt"
+            - "**/src/controller/java/src/matter/controller/MatterController.kt"
             - "**/src/controller/java/tests/matter/jsontlv/JsonToTlvToJsonTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
             - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"

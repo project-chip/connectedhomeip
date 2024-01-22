@@ -93,6 +93,7 @@ class TizenBuilder(GnBuilder):
                  use_asan: bool = False,
                  use_tsan: bool = False,
                  use_ubsan: bool = False,
+                 with_ui: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, app.value.source),
@@ -128,6 +129,8 @@ class TizenBuilder(GnBuilder):
             raise Exception("TSAN sanitizer not supported by Tizen toolchain")
         if use_ubsan:
             self.extra_gn_options.append('is_ubsan=true')
+        if with_ui:
+            self.extra_gn_options.append('chip_examples_enable_ui=true')
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined

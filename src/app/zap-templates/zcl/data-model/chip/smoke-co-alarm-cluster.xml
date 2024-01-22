@@ -34,7 +34,7 @@ limitations under the License.
     <!-- Current cluster version -->
     <globalAttribute side="either" code="0xFFFD" value="1" />
     <!-- Cluster feature map -->
-    <globalAttribute side="server" code="0xFFFC" type="Feature" value="1" />
+    <globalAttribute side="server" code="0xFFFC" type="Feature" value="3" />
 
     <!-- Attributes -->
     <attribute side="server" code="0x0000" define="EXPRESSED_STATE" type="ExpressedStateEnum" writable="false" optional="false">ExpressedState</attribute>
@@ -48,7 +48,10 @@ limitations under the License.
     <attribute side="server" code="0x0008" define="INTERCONNECT_SMOKE_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectSmokeAlarm</attribute>
     <attribute side="server" code="0x0009" define="INTERCONNECT_CO_ALARM" type="AlarmStateEnum" writable="false" optional="true">InterconnectCOAlarm</attribute>
     <attribute side="server" code="0x000A" define="CONTAMINATION_STATE" type="ContaminationStateEnum" writable="false" optional="true">ContaminationState</attribute>
-    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">SmokeSensitivityLevel</attribute>
+    <attribute side="server" code="0x000B" define="SENSITIVITY_LEVEL" type="SensitivityEnum" min="0" max="2" writable="true" optional="true">
+      <description>SmokeSensitivityLevel</description>
+      <access op="write" role="manage"/>
+    </attribute>
     <attribute side="server" code="0x000C" define="EXPIRY_DATE" type="epoch_s" writable="false" optional="true">ExpiryDate</attribute>
 
     <!-- Commands -->

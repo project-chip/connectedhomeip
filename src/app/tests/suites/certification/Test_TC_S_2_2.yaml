@@ -13,14 +13,14 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 123.2.2. [TC-S-2.2] Primary functionality with server as DUT
+name: 123.2.2. [TC-S-2.2] Primary functionality with DUT as Server
 
 PICS:
     - S.S
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
     G1:
         type: group_id
@@ -39,7 +39,7 @@ tests:
                 value: nodeId
 
     - label: "TH reads from the DUT the (0x0006) SceneTableSize attribute"
-      PICS: S.S.A0006
+      PICS: S.S.A0001
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -271,45 +271,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Step 3c: TH reads the SceneCount attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "SceneCount"
-      response:
-          value: 1
-          saveAs: SceneCountValue
-          constraints:
-              type: int8u
-
-    - label: "Step 3d: TH reads the CurrentScene attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "CurrentScene"
-      response:
-          value: 0x01
-          constraints:
-              type: int8u
-
-    - label: "Step 3e: TH reads the CurrentGroup attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "CurrentGroup"
-      response:
-          value: G1
-          constraints:
-              type: group_id
-
-    - label: "Step 3f: TH reads the SceneValid attribute from DUT."
-      PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
-      command: "readAttribute"
-      attribute: "SceneValid"
-      response:
-          value: true
-          constraints:
-              type: boolean
-
-    - label: "Step 3g: TH reads attribute SceneTableSize from DUT."
-      PICS: S.S.F03 && S.S.F02
+    - label: "Step 3c: TH reads attribute SceneTableSize from DUT."
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
@@ -317,42 +279,21 @@ tests:
           constraints:
               type: int16u
 
-    #FabricSceneInfo attribute not supported
-    - label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
-      verification: |
-          DUT provides FabricSceneInfo containing (for the current fabric) following fields:
-
-          SceneCount has the value (PIXIT.S.SceneTableEntriesOnFactoryNew + 1)
-
-          CurrentScene has the value 0x01
-
-          CurrentGroup has the value G1
-
-          SceneValid has the value TRUE.
-
-          if S.S.F02(TS), RemainingCapacity has the value SceneTableSize/2
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP && S.S.F03 && S.S.F02
-      arguments:
-          values:
-              - name: "message"
-                value: "Enter y after success"
-              - name: "expectedValue"
-                value: "y"
-
-    #- label: "Step 3h: TH reads attribute FabricSceneInfo from DUT"
-    #  PICS: S.S.F03 && S.S.F02
-    #  command: "readAttribute"
-    #  attribute: "FabricSceneInfo"
-    #  response:
-    #      value: {
-    #              SceneCount: SceneCountValue,
-    #              CurrentScene: 0x01,
-    #              CurrentGroup: G1,
-    #              SceneValid: true,
-    #              RemainingCapacity: ( SceneTableSizeValue/2 ),
-    #          }
+    - label: "Step 3d: TH reads attribute FabricSceneInfo from DUT"
+      PICS: PICS_SDK_CI_ONLY
+      command: "readAttribute"
+      attribute: "FabricSceneInfo"
+      response:
+          value:
+              [
+                  {
+                      SceneCount: 1,
+                      CurrentScene: 0x01,
+                      CurrentGroup: G1,
+                      SceneValid: true,
+                      RemainingCapacity: fabricCapacity - 1,
+                  },
+              ]
 
     - label: "Step 4a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
@@ -449,76 +390,31 @@ tests:
               - name: "TransitionTime"
                 value: 0x0000
               - name: "ExtensionFieldSets"
-                value:
-                    [
-                        {
-                            ClusterID: 0x0006,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
-                        },
-                        {
-                            ClusterID: 0x0008,
-                            AttributeValueList:
-                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
-                        },
-                        {
-                            ClusterID: 0x0300,
-                            AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0003,
-                                        AttributeValue: 0x616b,
-                                    },
-                                    {
-                                        AttributeID: 0x0004,
-                                        AttributeValue: 0x607d,
-                                    },
-                                    {
-                                        AttributeID: 0x4000,
-                                        AttributeValue: 0x0000,
-                                    },
-                                    {
-                                        AttributeID: 0x0001,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4002,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4003,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4004,
-                                        AttributeValue: 0x0019,
-                                    },
-                                    {
-                                        AttributeID: 0x0007,
-                                        AttributeValue: 0x00,
-                                    },
-                                    {
-                                        AttributeID: 0x4001,
-                                        AttributeValue: 0x02,
-                                    },
-                                ],
-                        },
-                    ]
-                #TODO : Need to change the check for a check like below if possible
-                # constraints:
-                #     type: list
-                #     contains: [
-                #         {
-                #             ClusterID: 0x0006,
-                #             AttributeValueList:
-                #                 [{ AttributeID: 0x0000, AttributeValue: 0x01 }],
-                #         },
-                #         {
-                #             ClusterID: 0x0008,
-                #             AttributeValueList:
-                #                 [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
-                #         },
-                #     ]
+                constraints:
+                    type: list
+                    contains:
+                        [
+                            {
+                                ClusterID: 0x0006,
+                                AttributeValueList:
+                                    [
+                                        {
+                                            AttributeID: 0x0000,
+                                            AttributeValue: 0x01,
+                                        },
+                                    ],
+                            },
+                            {
+                                ClusterID: 0x0008,
+                                AttributeValueList:
+                                    [
+                                        {
+                                            AttributeID: 0x0000,
+                                            AttributeValue: 0x64,
+                                        },
+                                    ],
+                            },
+                        ]
 
     - label:
           "Step 5: TH sends a ViewScene command to DUT with the GroupID field
@@ -600,7 +496,10 @@ tests:
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 0x0001 and a set of extension fields appropriate to AC1."
+          to 7 000 000 (7 000s) and no extension field sets. This should fail
+          and return a status of 0x85 (INVALID_COMMAND) because we exceed the
+          max TransitionTime"
+      #TODO Add to chip-test-plan
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
@@ -610,7 +509,34 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0001
+                value: 7000000
+              - name: "SceneName"
+                value: "Scene1"
+              - name: "ExtensionFieldSets"
+                value: []
+      response:
+          values:
+              - name: "Status"
+                value: 0x85
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+
+    - label:
+          "Step 8b: TH sends a AddScene command to DUT with the GroupID field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field set
+          to 1000 (1s) and a set of extension fields appropriate to AC1."
+      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
+      command: "AddScene"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: G1
+              - name: "SceneID"
+                value: 0x01
+              - name: "TransitionTime"
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -637,9 +563,9 @@ tests:
                 value: 0x01
 
     - label:
-          "Step 8a: TH sends a AddScene command to DUT with the GroupID field
+          "Step 8b: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 0x0001 and a set of extension fields appropriate to AC1."
+          to 1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -699,7 +625,7 @@ tests:
                 value: "y"
 
     - label:
-          "Step 8b: TH sends a GetSceneMembership command to DUT with the
+          "Step 8c: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
