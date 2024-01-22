@@ -24,17 +24,10 @@
 #include <app/util/config.h>
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
-
-// ATTRIBUTE_STORAGE_CONFIGURATION macro
-// contains the file that contains the initial set-up of the
-// attribute data structures. If it is missing
-// we use the provider sample.
-#ifndef ATTRIBUTE_STORAGE_CONFIGURATION
-//  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
 #include <zap-generated/endpoint_config.h>
-#else
-#include ATTRIBUTE_STORAGE_CONFIGURATION
-#endif
+
+#include <app/att-storage.h>
+#include <zap-generated/endpoint_config.h>
 
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
