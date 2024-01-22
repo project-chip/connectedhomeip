@@ -1836,7 +1836,7 @@ OPSTATE.S.C04.Tx=1
 
 # Server Events
 OPSTATE.S.E00=1
-OPSTATE.S.E01=0
+OPSTATE.S.E01=1
 
 
 # Oven Operational State
@@ -1869,7 +1869,7 @@ OVENOPSTATE.S.C04.Tx=0
 
 # Server Events
 OVENOPSTATE.S.E00=1
-OVENOPSTATE.S.E01=1
+OVENOPSTATE.S.E01=0
 
 # Thermostat
 # Server

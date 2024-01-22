@@ -29,19 +29,24 @@ tests:
           This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
       disabled: true
 
-    - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)"
-      verification: |
+    - label: "Step 1: Commission DUT to TH"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
-      disabled: true
-
-    - label:
-          "Step 2: Manually put the DUT into a state wherein it can receive a
-          Start Command"
-      verification: |
-          Manually put the DUT into a state wherein it can receive a Start Command
-      disabled: true
+    - label: "Step 2: Manually put the DUT into a state wherein it can receive a Start Command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 3: TH reads from the DUT the OperationalStateList attribute"
       PICS: OVENOPSTATE.S.A0003
@@ -288,18 +293,19 @@ tests:
           [1689674689.588810][17337:17339] CHIP:IN: (S) Sending msg 16881995 on secure session with LSID: 35027
       disabled: true
 
-    - label:
-          "Step 16: Manually put the DUT into a state wherein it cannot receive
-          a Start Command"
-      PICS: OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
-      verification: |
-          Manually put the DUT into a state wherein it cannot receive a Start Command
-      disabled: true
+    - label: "Step 16: Manually put the DUT into a state wherein it cannot receive a Start Command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Step 17: TH sends Start command to the DUT"
-      PICS:
-          OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp
-          && OVENOPSTATE.S.C04.Tx
+      PICS: OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp && OVENOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool ovencavityoperationalstate start 1 1
 
