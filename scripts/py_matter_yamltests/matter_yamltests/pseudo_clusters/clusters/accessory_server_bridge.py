@@ -67,6 +67,15 @@ def _get_start_options(request):
             elif name == 'otaDownloadPath':
                 options.append('--otaDownloadPath')
                 options.append(str(value))
+            elif name == 'endUserSupportLogPath':
+                options.append('--end_user_support_log')
+                options.append(str(value))
+            elif name == 'networkDiagnosticsLogPath':
+                options.append('--network_diagnostics_log')
+                options.append(str(value))
+            elif name == 'crashLogPath':
+                options.append('--crash_log')
+                options.append(str(value))
             elif name == 'registerKey':
                 pass
             else:
@@ -114,7 +123,8 @@ class AccessoryServerBridge():
         rawImageContent = _get_option(request, 'rawImageContent')
 
         with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
-            proxy.createOtaImage(otaImageFilePath, rawImageFilePath, rawImageContent)
+            proxy.createOtaImage(
+                otaImageFilePath, rawImageFilePath, rawImageContent)
 
     def compareFiles(request):
         file1 = _get_option(request, 'file1')
@@ -122,3 +132,16 @@ class AccessoryServerBridge():
 
         with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
             proxy.compareFiles(file1, file2)
+
+    def createFile(request):
+        filePath = _get_option(request, 'filePath')
+        fileContent = _get_option(request, 'fileContent')
+
+        with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
+            proxy.createFile(filePath, fileContent)
+
+    def deleteFile(request):
+        filePath = _get_option(request, 'filePath')
+
+        with xmlrpc.client.ServerProxy(_make_url(), allow_none=True) as proxy:
+            proxy.deleteFile(filePath)
