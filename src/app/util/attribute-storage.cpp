@@ -65,6 +65,18 @@ static bool emAfMatchCluster(const EmberAfCluster * cluster, const EmberAfAttrib
 static bool emAfMatchAttribute(const EmberAfCluster * cluster, const EmberAfAttributeMetadata * am,
                                const EmberAfAttributeSearchRecord * attRecord);
 
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+static uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
+
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+static uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server);
+
+// Check whether there is an endpoint defined with the given endpoint id that is
+// enabled.
+static bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
+
 namespace {
 
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
@@ -1050,33 +1062,6 @@ uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
         return 0;
     }
     return emAfEndpoints[index].endpointType->clusterCount;
-}
-
-// Note the difference in implementation from emberAfGetNthCluster().
-// emberAfGetClusterByIndex() retrieves the cluster by index regardless of server/client
-// and those indexes may be DIFFERENT than the indexes returned from
-// emberAfGetNthCluster().  In other words:
-//
-//  - Use emberAfGetClustersFromEndpoint()  with emberAfGetNthCluster()
-//  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
-//
-// Don't mix them.
-const EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clusterIndex)
-{
-    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    EmberAfDefinedEndpoint * definedEndpoint;
-
-    if (endpointIndex == kEmberInvalidEndpointIndex)
-    {
-        return nullptr;
-    }
-    definedEndpoint = &(emAfEndpoints[endpointIndex]);
-
-    if (clusterIndex >= definedEndpoint->endpointType->clusterCount)
-    {
-        return nullptr;
-    }
-    return &(definedEndpoint->endpointType->cluster[clusterIndex]);
 }
 
 chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpoint(chip::EndpointId endpoint, CHIP_ERROR & err)
