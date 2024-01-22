@@ -68,17 +68,6 @@ tests:
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: TH reads the optional attribute(StartUpMode) in
-          AttributeList from the DUT"
-      PICS: RVCRUNM.S.A0002
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [2]
-
-    - label:
           "Step 4c: TH reads the Feature dependent(RVCRUNM.S.F00 - DEPONOFF) and
           optional attribute(OnMode) is in AttributeList from the DUT"
       PICS: RVCRUNM.S.F00
