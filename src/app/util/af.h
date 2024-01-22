@@ -105,7 +105,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-
 /**
  * @brief macro that returns size of attribute in bytes.
  *

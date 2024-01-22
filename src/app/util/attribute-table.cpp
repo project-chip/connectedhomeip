@@ -285,12 +285,10 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
                                                   false); // write?
 
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-        // failed, print debug info
-        if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
-        {
-            ChipLogProgress(Zcl, "READ: attribute size too large for caller");
-        }
+    // failed, print debug info
+    if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
+    {
+        ChipLogProgress(Zcl, "READ: attribute size too large for caller");
     }
 
     return status;

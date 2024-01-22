@@ -70,7 +70,6 @@ EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Clu
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest);
 
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
