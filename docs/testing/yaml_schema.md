@@ -4,6 +4,8 @@ DO NOT HAND-EDIT THIS FILE.
 Script: generate_yaml_doc_tables.py
 -->
 
+# YAML Schema
+
 YAML schema
 |key | type| supports variables
 |:---|:---|:---|

@@ -30,6 +30,7 @@ def create_tables():
     doc_path = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', 'docs', 'testing', 'yaml_pseudocluster.md'))
     with open(doc_path, "w") as f:
         f.writelines(WARNING)
+        f.writelines('# YAML Pseudo-clusters\n\n')
 
         for cluster in pseudo_clusters.clusters:
             f.writelines(f'\n\n{cluster.name}\n')

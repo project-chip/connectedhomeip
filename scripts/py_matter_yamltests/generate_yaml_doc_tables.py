@@ -58,6 +58,7 @@ def print_table(title: str, tree: SchemaTree) -> None:
     doc_path = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', 'docs', 'testing', 'yaml_schema.md'))
     with open(doc_path, "w") as f:
         f.writelines(WARNING)
+        f.writelines('# YAML Schema\n\n')
         f.writelines([f'{title}\n',
                       '|key | type| supports variables\n',
                       '|:---|:---|:---|\n'])

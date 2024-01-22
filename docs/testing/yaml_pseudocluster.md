@@ -4,6 +4,8 @@ DO NOT HAND-EDIT THIS FILE.
 Script: generate_pseudo_cluster_doc_tables.py
 -->
 
+# YAML Pseudo-clusters
+
 
 
 CommissionerCommands
