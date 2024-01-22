@@ -49,7 +49,7 @@ def print_tree(f: TextIO, indent: str, tree: SchemaTree) -> None:
         try:
             child = tree.children[tag]
             f.writelines([f'|{indent}{tag} | |{vars_str} |\n'])
-            print_tree(f, indent+'&emsp; ', tree.children[tag])
+            print_tree(f, indent+'&emsp; ', child)
         except (TypeError, KeyError):
             f.writelines([f'|{indent}{tag} |{typestr}|{vars_str}|\n'])
 
