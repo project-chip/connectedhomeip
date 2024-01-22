@@ -766,10 +766,6 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRICDManagementClusterOnTransitionToActiveModeEvent : NSObject <NSCopying>
-@end
-
-MTR_PROVISIONALLY_AVAILABLE
 @interface MTROvenCavityOperationalStateClusterErrorStateStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull errorStateID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSString * _Nullable errorStateLabel MTR_PROVISIONALLY_AVAILABLE;
