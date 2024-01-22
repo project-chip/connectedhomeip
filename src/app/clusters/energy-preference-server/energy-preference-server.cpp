@@ -90,7 +90,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             });
         }
         return CHIP_ERROR_INCORRECT_STATE;
-    case EnergyPriorities::Id: 
+    case EnergyPriorities::Id:
         if (balanceSupported == false)
         {
             return aEncoder.EncodeNull();
