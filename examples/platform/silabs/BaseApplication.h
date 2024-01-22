@@ -105,6 +105,11 @@ public:
      */
     static void PostEvent(const AppEvent * event);
 
+    /**
+     * @brief Overridable function used to update display on button press
+     */
+    static void UpdateDisplay();
+    
 #ifdef DISPLAY_ENABLED
     /**
      * @brief Return LCD object
