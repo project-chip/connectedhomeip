@@ -2438,6 +2438,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

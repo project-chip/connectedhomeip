@@ -656,6 +656,24 @@ static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInEnergyEVSEModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvseMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DeviceEnergyManagementMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInDoorLockCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DoorLock;
@@ -1283,6 +1301,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyPreference::Id: {
         return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);
+    }
+    case Clusters::EnergyEvseMode::Id: {
+        return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);
+    }
+    case Clusters::DeviceEnergyManagementMode::Id: {
+        return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

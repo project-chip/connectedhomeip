@@ -37,6 +37,7 @@
         "content-control-cluster.xml",
         "descriptor-cluster.xml",
         "device-energy-management-cluster.xml",
+        "device-energy-management-mode-cluster.xml",
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
@@ -46,6 +47,7 @@
         "drlc-cluster.xml",
         "electrical-measurement-cluster.xml",
         "energy-evse-cluster.xml",
+        "energy-evse-mode-cluster.xml",
         "energy-preference-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
         "fan-control-cluster.xml",
@@ -187,6 +189,11 @@
             "OptOutState",
             "FeatureMap"
         ],
+        "Device Energy Management Mode": [
+            "SupportedModes",
+            "CurrentMode",
+            "FeatureMap"
+        ],
         "Energy EVSE": [
             "State",
             "SupplyState",
@@ -213,6 +220,7 @@
             "SessionEnergyDischarged",
             "FeatureMap"
         ],
+        "Energy EVSE Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",

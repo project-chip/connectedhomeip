@@ -488,6 +488,15 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     }
 }
 
+void ICDManager::OnSubscriptionReport()
+{
+    // If the device is already in ActiveMode, that means that all active subscriptions have already been marked dirty.
+    // Since we only mark them dirty when we enter ActiveMode, it is not necessary to update the operational state a second time.
+    // Doing so will only add an ActiveModeThreshold to the active time which we don't want to do here.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+    this->UpdateOperationState(OperationalState::ActiveMode);
+}
+
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)
 {
     return mStateObserverPool.CreateObject(observer);
