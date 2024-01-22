@@ -9682,29 +9682,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 }
 } // namespace Attributes
 
-namespace Events {
-namespace OnTransitionToActiveMode {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
-    return aWriter.EndContainer(outer);
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-    }
-}
-} // namespace OnTransitionToActiveMode.
-} // namespace Events
+namespace Events {} // namespace Events
 
 } // namespace IcdManagement
 namespace Timer {
