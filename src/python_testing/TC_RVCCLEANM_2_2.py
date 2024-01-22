@@ -65,6 +65,9 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.print_step(step_number, instruction)
         input("Press Enter when done.\n")
 
+    def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
+        return ["RVCCLEANM.S"]
+
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
 
