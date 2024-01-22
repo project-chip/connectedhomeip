@@ -119,6 +119,7 @@ template("chip_data_model") {
     outputs = [
       "app/PluginApplicationCallbacks.h",
       "app/callback-stub.cpp",
+      "app/cluster-init-callback.cpp",
     ]
 
     public_configs = [ ":${_data_model_name}_config" ]

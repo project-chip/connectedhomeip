@@ -17,6 +17,8 @@ name: 183.3.1. [TC-LWM-3.1] On Mode functionality with DUT as Server
 PICS:
     - LWM.S.A0003
     - LWM.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
 
 config:
     nodeId: 0x12344321

@@ -12240,6 +12240,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace OperationalCommandResponse.
+namespace GoHome {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace GoHome.
 } // namespace Commands
 
 namespace Attributes {
@@ -13097,202 +13117,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace GetSceneMembershipResponse.
-namespace EnhancedAddScene {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
-    encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
-        {
-            err = DataModel::Decode(reader, transitionTime);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneName))
-        {
-            err = DataModel::Decode(reader, sceneName);
-        }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
-        {
-            err = DataModel::Decode(reader, extensionFieldSets);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedAddScene.
-namespace EnhancedAddSceneResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kStatus))
-        {
-            err = DataModel::Decode(reader, status);
-        }
-        else if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedAddSceneResponse.
-namespace EnhancedViewScene {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedViewScene.
-namespace EnhancedViewSceneResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kStatus), status);
-    encoder.Encode(to_underlying(Fields::kGroupID), groupID);
-    encoder.Encode(to_underlying(Fields::kSceneID), sceneID);
-    encoder.Encode(to_underlying(Fields::kTransitionTime), transitionTime);
-    encoder.Encode(to_underlying(Fields::kSceneName), sceneName);
-    encoder.Encode(to_underlying(Fields::kExtensionFieldSets), extensionFieldSets);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        auto __element = __iterator.Next();
-        if (std::holds_alternative<CHIP_ERROR>(__element))
-        {
-            return std::get<CHIP_ERROR>(__element);
-        }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kStatus))
-        {
-            err = DataModel::Decode(reader, status);
-        }
-        else if (__context_tag == to_underlying(Fields::kGroupID))
-        {
-            err = DataModel::Decode(reader, groupID);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneID))
-        {
-            err = DataModel::Decode(reader, sceneID);
-        }
-        else if (__context_tag == to_underlying(Fields::kTransitionTime))
-        {
-            err = DataModel::Decode(reader, transitionTime);
-        }
-        else if (__context_tag == to_underlying(Fields::kSceneName))
-        {
-            err = DataModel::Decode(reader, sceneName);
-        }
-        else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
-        {
-            err = DataModel::Decode(reader, extensionFieldSets);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-} // namespace EnhancedViewSceneResponse.
 namespace CopyScene {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -13398,16 +13222,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::SceneCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sceneCount);
-    case Attributes::CurrentScene::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentScene);
-    case Attributes::CurrentGroup::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentGroup);
-    case Attributes::SceneValid::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sceneValid);
-    case Attributes::NameSupport::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nameSupport);
     case Attributes::LastConfiguredBy::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, lastConfiguredBy);
     case Attributes::SceneTableSize::TypeInfo::GetAttributeId():
@@ -15198,6 +15012,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kLatestEndTime), latestEndTime);
     encoder.Encode(to_underlying(Fields::kIsPauseable), isPauseable);
     encoder.Encode(to_underlying(Fields::kSlots), slots);
+    encoder.Encode(to_underlying(Fields::kForecastUpdateReason), forecastUpdateReason);
     return encoder.Finalize();
 }
 
@@ -15246,6 +15061,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kSlots))
         {
             err = DataModel::Decode(reader, slots);
+        }
+        else if (__context_tag == to_underlying(Fields::kForecastUpdateReason))
+        {
+            err = DataModel::Decode(reader, forecastUpdateReason);
         }
         else
         {
@@ -15418,6 +15237,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kPower), power);
     encoder.Encode(to_underlying(Fields::kDuration), duration);
+    encoder.Encode(to_underlying(Fields::kCause), cause);
     return encoder.Finalize();
 }
 
@@ -15442,6 +15262,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
             err = DataModel::Decode(reader, duration);
+        }
+        else if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
         }
         else
         {
@@ -15476,6 +15300,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kRequestedStartTime), requestedStartTime);
+    encoder.Encode(to_underlying(Fields::kCause), cause);
     return encoder.Finalize();
 }
 
@@ -15497,6 +15322,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, requestedStartTime);
         }
+        else if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
+        }
         else
         {
         }
@@ -15510,6 +15339,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kDuration), duration);
+    encoder.Encode(to_underlying(Fields::kCause), cause);
     return encoder.Finalize();
 }
 
@@ -15530,6 +15360,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kDuration))
         {
             err = DataModel::Decode(reader, duration);
+        }
+        else if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
         }
         else
         {
@@ -15565,6 +15399,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kForecastId), forecastId);
     encoder.Encode(to_underlying(Fields::kSlotAdjustments), slotAdjustments);
+    encoder.Encode(to_underlying(Fields::kCause), cause);
     return encoder.Finalize();
 }
 
@@ -15590,6 +15425,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, slotAdjustments);
         }
+        else if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
+        }
         else
         {
         }
@@ -15603,6 +15442,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kConstraints), constraints);
+    encoder.Encode(to_underlying(Fields::kCause), cause);
     return encoder.Finalize();
 }
 
@@ -15624,6 +15464,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, constraints);
         }
+        else if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
+        }
         else
         {
         }
@@ -15632,6 +15476,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace RequestConstraintBasedForecast.
+namespace CancelRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace CancelRequest.
 } // namespace Commands
 
 namespace Attributes {
@@ -15653,6 +15517,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, powerAdjustmentCapability);
     case Attributes::Forecast::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, forecast);
+    case Attributes::OptOutState::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, optOutState);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -15764,6 +15630,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kCause), cause));
     return aWriter.EndContainer(outer);
 }
 
@@ -15777,6 +15644,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kCause))
+        {
+            err = DataModel::Decode(reader, cause);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Resumed.
@@ -15831,14 +15711,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace ChargingTargetStruct
-} // namespace Structs
 
-namespace Commands {
-namespace GetTargetsResponse {
+namespace ChargingTargetScheduleStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kDayOfWeekforSequence), dayOfWeekforSequence);
+    encoder.Encode(to_underlying(Fields::kDayOfWeekForSequence), dayOfWeekForSequence);
     encoder.Encode(to_underlying(Fields::kChargingTargets), chargingTargets);
     return encoder.Finalize();
 }
@@ -15857,13 +15735,51 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kDayOfWeekforSequence))
+        if (__context_tag == to_underlying(Fields::kDayOfWeekForSequence))
         {
-            err = DataModel::Decode(reader, dayOfWeekforSequence);
+            err = DataModel::Decode(reader, dayOfWeekForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kChargingTargets))
         {
             err = DataModel::Decode(reader, chargingTargets);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ChargingTargetScheduleStruct
+} // namespace Structs
+
+namespace Commands {
+namespace GetTargetsResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kChargingTargetSchedules), chargingTargetSchedules);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kChargingTargetSchedules))
+        {
+            err = DataModel::Decode(reader, chargingTargetSchedules);
         }
         else
         {
@@ -16000,8 +15916,7 @@ namespace SetTargets {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kDayOfWeekforSequence), dayOfWeekforSequence);
-    encoder.Encode(to_underlying(Fields::kChargingTargets), chargingTargets);
+    encoder.Encode(to_underlying(Fields::kChargingTargetSchedules), chargingTargetSchedules);
     return encoder.Finalize();
 }
 
@@ -16019,13 +15934,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kDayOfWeekforSequence))
+        if (__context_tag == to_underlying(Fields::kChargingTargetSchedules))
         {
-            err = DataModel::Decode(reader, dayOfWeekforSequence);
-        }
-        else if (__context_tag == to_underlying(Fields::kChargingTargets))
-        {
-            err = DataModel::Decode(reader, chargingTargets);
+            err = DataModel::Decode(reader, chargingTargetSchedules);
         }
         else
         {
@@ -16039,7 +15950,6 @@ namespace GetTargets {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kDaysToReturn), daysToReturn);
     return encoder.Finalize();
 }
 
@@ -16053,19 +15963,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err              = CHIP_NO_ERROR;
-        const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        if (__context_tag == to_underlying(Fields::kDaysToReturn))
-        {
-            err = DataModel::Decode(reader, daysToReturn);
-        }
-        else
-        {
-        }
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetTargets.
@@ -16118,10 +16015,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, userMaximumChargeCurrent);
     case Attributes::RandomizationDelayWindow::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, randomizationDelayWindow);
-    case Attributes::NumberOfWeeklyTargets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfWeeklyTargets);
-    case Attributes::NumberOfDailyTargets::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfDailyTargets);
     case Attributes::NextChargeStartTime::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, nextChargeStartTime);
     case Attributes::NextChargeTargetTime::TypeInfo::GetAttributeId():
@@ -16521,6 +16414,232 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {} // namespace Events
 
 } // namespace EnergyPreference
+namespace EnergyEvseMode {
+namespace Structs {} // namespace Structs
+
+namespace Commands {
+namespace ChangeToMode {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kNewMode), newMode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kNewMode))
+        {
+            err = DataModel::Decode(reader, newMode);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ChangeToMode.
+namespace ChangeToModeResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kStatusText), statusText);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStatus))
+        {
+            err = DataModel::Decode(reader, status);
+        }
+        else if (__context_tag == to_underlying(Fields::kStatusText))
+        {
+            err = DataModel::Decode(reader, statusText);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ChangeToModeResponse.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::SupportedModes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedModes);
+    case Attributes::CurrentMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentMode);
+    case Attributes::StartUpMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, startUpMode);
+    case Attributes::OnMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, onMode);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace EnergyEvseMode
+namespace DeviceEnergyManagementMode {
+namespace Structs {} // namespace Structs
+
+namespace Commands {
+namespace ChangeToMode {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kNewMode), newMode);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kNewMode))
+        {
+            err = DataModel::Decode(reader, newMode);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ChangeToMode.
+namespace ChangeToModeResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kStatus), status);
+    encoder.Encode(to_underlying(Fields::kStatusText), statusText);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kStatus))
+        {
+            err = DataModel::Decode(reader, status);
+        }
+        else if (__context_tag == to_underlying(Fields::kStatusText))
+        {
+            err = DataModel::Decode(reader, statusText);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace ChangeToModeResponse.
+} // namespace Commands
+
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
+{
+    switch (path.mAttributeId)
+    {
+    case Attributes::SupportedModes::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedModes);
+    case Attributes::CurrentMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentMode);
+    case Attributes::StartUpMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, startUpMode);
+    case Attributes::OnMode::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, onMode);
+    case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, generatedCommandList);
+    case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, acceptedCommandList);
+    case Attributes::EventList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, eventList);
+    case Attributes::AttributeList::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, attributeList);
+    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, featureMap);
+    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, clusterRevision);
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+
+namespace Events {} // namespace Events
+
+} // namespace DeviceEnergyManagementMode
 namespace DoorLock {
 namespace Structs {
 
@@ -29241,10 +29360,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::ScenesManagement::Commands::GetSceneMembership::Id:
             return true;
-        case Clusters::ScenesManagement::Commands::EnhancedAddScene::Id:
-            return true;
-        case Clusters::ScenesManagement::Commands::EnhancedViewScene::Id:
-            return true;
         case Clusters::ScenesManagement::Commands::CopyScene::Id:
             return true;
         default:
@@ -29294,6 +29409,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::EnergyEvse::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::EnergyEvseMode::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::DeviceEnergyManagementMode::Id: {
         switch (aCommand)
         {
         default:
