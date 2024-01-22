@@ -19,6 +19,7 @@
 #include <AppMain.h>
 #include <DeviceEnergyManagementManager.h>
 #include <EVSEManufacturerImpl.h>
+#include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
 #include <device-energy-management-modes.h>
@@ -37,12 +38,17 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::EnergyEvse;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 
 static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
 static std::unique_ptr<EnergyEvseManager> gEvseInstance;
 static std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
 static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
 static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
+static std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
+static std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
@@ -192,6 +198,77 @@ CHIP_ERROR EnergyEvseShutdown()
 }
 
 /*
+ *  @brief  Creates a Delegate and Instance for Electrical Power/Energy Measurement clusters
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+CHIP_ERROR EnergyMeterInit()
+{
+    CHIP_ERROR err;
+
+    if (gEPMDelegate || gEPMInstance)
+    {
+        ChipLogError(AppServer, "EPM Instance or Delegate already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    gEPMDelegate = std::make_unique<ElectricalPowerMeasurementDelegate>();
+    if (!gEPMDelegate)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EPM Delegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    /* Manufacturer may optionally not support all features, commands & attributes */
+    gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
+        EndpointId(ENERGY_EVSE_ENDPOINT), *gEPMDelegate,
+        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(ElectricalPowerMeasurement::Feature::kAlternatingCurrent),
+        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
+            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent));
+
+    if (!gEPMInstance)
+    {
+        ChipLogError(AppServer, "Failed to allocate memory for EPM Instance");
+        gEPMDelegate.reset();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    err = gEPMInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Init failed on gEPMInstance");
+        gEPMInstance.reset();
+        gEPMDelegate.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyMeterShutdown()
+{
+    /* Do this in the order Instance first, then delegate
+     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
+     */
+    if (gEPMInstance)
+    {
+        /* deregister attribute & command handlers */
+        gEPMInstance->Shutdown();
+        gEPMInstance.reset();
+    }
+
+    if (gEPMDelegate)
+    {
+        gEPMDelegate.reset();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/*
  *  @brief  Creates a EVSEManufacturer class to hold the EVSE & DEM clusters
  *
  * The Instance is a container around the Delegate, so
@@ -254,10 +331,18 @@ void ApplicationInit()
         return;
     }
 
+    if (EnergyMeterInit() != CHIP_NO_ERROR)
+    {
+        DeviceEnergyManagementShutdown();
+        EnergyEvseShutdown();
+        return;
+    }
+
     if (EVSEManufacturerInit() != CHIP_NO_ERROR)
     {
         DeviceEnergyManagementShutdown();
         EnergyEvseShutdown();
+        EnergyMeterShutdown();
         return;
     }
 }
@@ -268,6 +353,7 @@ void ApplicationShutdown()
 
     /* Shutdown in reverse order that they were created */
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
+    EnergyMeterShutdown();            /* Free the Energy Meter */
     EnergyEvseShutdown();             /* Free the EnergyEvse */
     DeviceEnergyManagementShutdown(); /* Free the DEM */
 
