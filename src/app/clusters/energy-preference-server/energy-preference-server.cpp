@@ -65,8 +65,8 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 
     switch (aPath.mAttributeId)
     {
-    case EnergyBalances::Id: {
-        if (balanceSupported == false)
+    case EnergyBalances::Id:
+        if (!balanceSupported)
         {
             return aEncoder.EncodeNull();
         }
@@ -90,9 +90,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             });
         }
         return CHIP_ERROR_INCORRECT_STATE;
-    }
-    break;
-    case EnergyPriorities::Id: {
+    case EnergyPriorities::Id: 
         if (balanceSupported == false)
         {
             return aEncoder.EncodeNull();
@@ -117,9 +115,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             });
         }
         return CHIP_ERROR_INCORRECT_STATE;
-    }
-    break;
-    case LowPowerModeSensitivities::Id: {
+    case LowPowerModeSensitivities::Id:
         if (lowPowerSupported == false)
         {
             return aEncoder.EncodeNull();
@@ -144,8 +140,6 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             });
         }
         return CHIP_ERROR_INCORRECT_STATE;
-    }
-    break;
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
         break;
     }
@@ -196,7 +190,10 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::Concre
         uint8_t index    = chip::Encoding::Get8(value);
         size_t arraySize = delegate->GetNumEnergyBalances(endpoint);
         if (index >= arraySize)
+        {
             return imcode::InvalidValue;
+        }
+
         return imcode::Success;
     }
 
@@ -207,7 +204,10 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::Concre
         uint8_t index    = chip::Encoding::Get8(value);
         size_t arraySize = delegate->GetNumLowPowerModes(endpoint);
         if (index >= arraySize)
+        {
             return imcode::InvalidValue;
+        }
+
         return imcode::Success;
     }
     default:

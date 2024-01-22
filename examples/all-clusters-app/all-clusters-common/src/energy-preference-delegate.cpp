@@ -4,37 +4,23 @@ using namespace chip;
 using namespace chip::app::Clusters::EnergyPreference;
 using namespace chip::app::Clusters::EnergyPreference::Structs;
 
-static constexpr const char * kEfficientLabel = "Efficient";
-static constexpr const char * kComfortLabel   = "Comfort";
-
 static BalanceStruct::Type gsEnergyBalances[] = {
-    { .step = 0, .label = Optional<chip::CharSpan>(chip::CharSpan(kEfficientLabel, strlen(kEfficientLabel))) },
+    { .step = 0, .label = Optional<chip::CharSpan>("Efficient"_span) },
     { .step = 50, .label = Optional<chip::CharSpan>() },
-    { .step = 100, .label = Optional<chip::CharSpan>(chip::CharSpan(kComfortLabel, strlen(kComfortLabel))) },
+    { .step = 100, .label = Optional<chip::CharSpan>("Comfort"_span) },
 };
 
-static constexpr const char * k1MinuteLabel    = "1 Minute";
-static constexpr const char * k5MinutesLabel   = "5 Minutes";
-static constexpr const char * k10MinutesLabel  = "10 Minutes";
-static constexpr const char * k15MinutesLabel  = "15 Minutes";
-static constexpr const char * k20MinutesLabel  = "20 Minutes";
-static constexpr const char * k25MinutesLabel  = "25 Minutes";
-static constexpr const char * k30MinutesLabel  = "30 Minutes";
-static constexpr const char * k60MinutesLabel  = "60 Minutes";
-static constexpr const char * k120MinutesLabel = "120 Minutes";
-static constexpr const char * kNeverLabel      = "Never";
-
 static BalanceStruct::Type gsPowerBalances[] = {
-    { .step = 0, .label = Optional<chip::CharSpan>(chip::CharSpan(k1MinuteLabel, strlen(k1MinuteLabel))) },
-    { .step = 12, .label = Optional<chip::CharSpan>(chip::CharSpan(k5MinutesLabel, strlen(k5MinutesLabel))) },
-    { .step = 24, .label = Optional<chip::CharSpan>(chip::CharSpan(k10MinutesLabel, strlen(k10MinutesLabel))) },
-    { .step = 36, .label = Optional<chip::CharSpan>(chip::CharSpan(k15MinutesLabel, strlen(k15MinutesLabel))) },
-    { .step = 48, .label = Optional<chip::CharSpan>(chip::CharSpan(k20MinutesLabel, strlen(k20MinutesLabel))) },
-    { .step = 60, .label = Optional<chip::CharSpan>(chip::CharSpan(k25MinutesLabel, strlen(k25MinutesLabel))) },
-    { .step = 70, .label = Optional<chip::CharSpan>(chip::CharSpan(k30MinutesLabel, strlen(k30MinutesLabel))) },
-    { .step = 80, .label = Optional<chip::CharSpan>(chip::CharSpan(k60MinutesLabel, strlen(k60MinutesLabel))) },
-    { .step = 90, .label = Optional<chip::CharSpan>(chip::CharSpan(k120MinutesLabel, strlen(k120MinutesLabel))) },
-    { .step = 100, .label = Optional<chip::CharSpan>(chip::CharSpan(kNeverLabel, strlen(kNeverLabel))) },
+    { .step = 0, .label = Optional<chip::CharSpan>("1 Minute"_span) },
+    { .step = 12, .label = Optional<chip::CharSpan>("5 Minutes"_span) },
+    { .step = 24, .label = Optional<chip::CharSpan>("10 Minutes"_span) },
+    { .step = 36, .label = Optional<chip::CharSpan>("15 Minutes"_span) },
+    { .step = 48, .label = Optional<chip::CharSpan>("20 Minutes"_span) },
+    { .step = 60, .label = Optional<chip::CharSpan>("25 Minutes"_span) },
+    { .step = 70, .label = Optional<chip::CharSpan>("30 Minutes"_span) },
+    { .step = 80, .label = Optional<chip::CharSpan>("60 Minutes"_span) },
+    { .step = 90, .label = Optional<chip::CharSpan>("120 Minutes"_span) },
+    { .step = 100, .label = Optional<chip::CharSpan>("Never"_span) },
 };
 
 // assumes it'll be the only delegate for it's lifetime.
@@ -53,22 +39,24 @@ struct EPrefDelegate : public EnergyPreferenceDelegate
 
 EPrefDelegate::EPrefDelegate() : EnergyPreferenceDelegate()
 {
+    VerifyOrDie(GetMatterEnergyPreferencesDelegate() == nullptr);
     SetMatterEnergyPreferencesDelegate(this);
 }
 
 EPrefDelegate::~EPrefDelegate()
 {
+    VerifyOrDie(GetMatterEnergyPreferencesDelegate() == this);
     SetMatterEnergyPreferencesDelegate(nullptr);
 }
 
 size_t EPrefDelegate::GetNumEnergyBalances(chip::EndpointId aEndpoint)
 {
-    return (sizeof(gsEnergyBalances) / sizeof(gsEnergyBalances[0]));
+    return (ArraySize(gsEnergyBalances));
 }
 
 size_t EPrefDelegate::GetNumLowPowerModes(chip::EndpointId aEndpoint)
 {
-    return (sizeof(gsEnergyBalances) / sizeof(gsEnergyBalances[0]));
+    return (ArraySize(gsEnergyBalances));
 }
 
 CHIP_ERROR
