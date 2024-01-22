@@ -27,7 +27,8 @@ WARNING = ("<!---\n"
 def create_tables():
     pseudo_clusters = get_default_pseudo_clusters()
 
-    doc_path = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', 'docs', 'testing', 'yaml_pseudocluster.md'))
+    doc_path = os.path.abspath(os.path.join(
+        SCRIPT_DIR, '..', '..', 'docs', 'testing', 'yaml_pseudocluster.md'))
     with open(doc_path, "w") as f:
         f.writelines(WARNING)
         f.writelines('# YAML Pseudo-clusters\n\n')
@@ -41,9 +42,12 @@ def create_tables():
             cluster_xml = next(et.iter('cluster'))
             for command_xml in cluster_xml.iter('command'):
                 cmd = command_xml.get('name')
-                arg = '<br />'.join([arg_xml.get('name') for arg_xml in command_xml.iter('arg')])
-                argtype = '<br />'.join([arg_xml.get('type') for arg_xml in command_xml.iter('arg')])
-                optional = '<br />'.join([arg_xml.get('optional', 'false') for arg_xml in command_xml.iter('arg')])
+                arg = '<br />'.join([arg_xml.get('name')
+                                    for arg_xml in command_xml.iter('arg')])
+                argtype = '<br />'.join([arg_xml.get('type')
+                                        for arg_xml in command_xml.iter('arg')])
+                optional = '<br />'.join([arg_xml.get('optional', 'false')
+                                         for arg_xml in command_xml.iter('arg')])
 
                 f.writelines(f'|{cmd}|{arg}|{argtype}|{optional}|\n')
 

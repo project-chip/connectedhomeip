@@ -131,17 +131,22 @@ class SchemaTree:
 
 
 _constraint_tree = SchemaTree(schema=_TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA)
-_response_tree = SchemaTree(schema=_TEST_STEP_RESPONSE_SCHEMA, children={'constraints': _constraint_tree})
+_response_tree = SchemaTree(schema=_TEST_STEP_RESPONSE_SCHEMA, children={
+                            'constraints': _constraint_tree})
 
 _arguments_values_tree = SchemaTree(schema=_TEST_STEP_ARGUMENTS_VALUES_SCHEMA)
-_arguments_tree = SchemaTree(schema=_TEST_STEP_ARGUMENTS_SCHEMA, children={'values': _arguments_values_tree})
+_arguments_tree = SchemaTree(schema=_TEST_STEP_ARGUMENTS_SCHEMA, children={
+                             'values': _arguments_values_tree})
 
-_test_step_tree = SchemaTree(schema=_TEST_STEP_SCHEMA, children={'arguments': _arguments_tree, 'response': _response_tree})
+_test_step_tree = SchemaTree(schema=_TEST_STEP_SCHEMA, children={
+                             'arguments': _arguments_tree, 'response': _response_tree})
 
 _config_variable_tree = SchemaTree(schema=_CONFIG_VARIABLE_SCHEMA)
-_config_tree = SchemaTree(schema=_CONFIG_SCHEMA, children={'_variableName_': _config_variable_tree})
+_config_tree = SchemaTree(schema=_CONFIG_SCHEMA, children={
+                          '_variableName_': _config_variable_tree})
 
-yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={'tests': _test_step_tree, 'config': _config_tree})
+yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
+                       'tests': _test_step_tree, 'config': _config_tree})
 
 
 class YamlLoader:
