@@ -160,7 +160,7 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-    class Callback : public CommandSenderLegacyCallback {};
+    using Callback = CommandSenderLegacyCallback;
 
     // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
     // for it. By having parameters to that API use this struct instead of individual
