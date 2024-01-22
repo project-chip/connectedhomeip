@@ -75,6 +75,8 @@ def error_enum_to_text(error_enum):
     elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing:
         return "MopCleaningPadMissing(0x47)"
 
+    def pics_TC_RVCOPSTATE_2_3(self) -> list[str]:
+        return ["RVCOPSTATE.S"]
 
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
 
