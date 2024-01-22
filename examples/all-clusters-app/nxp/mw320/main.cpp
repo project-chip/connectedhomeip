@@ -1152,7 +1152,7 @@ void task_test_main(void * param)
             PRINTF("--> update CurrentPosition [%d] \r\n", value);
             Clusters::Switch::Attributes::CurrentPosition::Set(1, value);
 #ifdef SUPPORT_MANUAL_CTRL
-            #error "Not implemented"
+#error "Not implemented"
             // TODO: previous code was trying to write a OnOff cluster attribute id to a switch attribute, generally
             //       not working. Determine if this should maybe be
             //       OnOff::Attributes::OnOff::Set(1, is_on) or similar

@@ -44,16 +44,14 @@ using namespace chip;
 // Globals
 
 EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                            EmberAfAttributeType dataType)
-{
-   return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */)
+                                            EmberAfAttributeType dataType){
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */)
 }
 
 EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                     EmberAfAttributeType dataType)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                              true   /* override read-only */);
+    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, true /* override read-only */);
 }
 
 //------------------------------------------------------------------------------
@@ -194,57 +192,57 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         }
     }
 
-        const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
+    const app::ConcreteAttributePath attributePath(endpoint, cluster, attributeID);
 
-        // Pre write attribute callback for all attribute changes,
-        // regardless of cluster.
-        Protocols::InteractionModel::Status imStatus =
-            MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
-        if (imStatus != Protocols::InteractionModel::Status::Success)
-        {
-            return app::ToEmberAfStatus(imStatus);
-        }
+    // Pre write attribute callback for all attribute changes,
+    // regardless of cluster.
+    Protocols::InteractionModel::Status imStatus =
+        MatterPreAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    if (imStatus != Protocols::InteractionModel::Status::Success)
+    {
+        return app::ToEmberAfStatus(imStatus);
+    }
 
-        // Pre-write attribute callback specific
-        // to the cluster that the attribute lives in.
-        status = emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    // Pre-write attribute callback specific
+    // to the cluster that the attribute lives in.
+    status = emAfClusterPreAttributeChangedCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
 
-        // Ignore the following write operation and return success
-        if (status == EMBER_ZCL_STATUS_WRITE_IGNORED)
-        {
-            return EMBER_ZCL_STATUS_SUCCESS;
-        }
+    // Ignore the following write operation and return success
+    if (status == EMBER_ZCL_STATUS_WRITE_IGNORED)
+    {
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            return status;
-        }
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        return status;
+    }
 
-        // write the attribute
-        status = emAfReadOrWriteAttribute(&record,
-                                          nullptr, // metadata
-                                          data,
-                                          0,     // buffer size - unused
-                                          true); // write?
+    // write the attribute
+    status = emAfReadOrWriteAttribute(&record,
+                                      nullptr, // metadata
+                                      data,
+                                      0,     // buffer size - unused
+                                      true); // write?
 
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            return status;
-        }
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        return status;
+    }
 
-        // Save the attribute to persistent storage if needed
-        // The callee will weed out attributes that do not need to be stored.
-        emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
+    // Save the attribute to persistent storage if needed
+    // The callee will weed out attributes that do not need to be stored.
+    emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
-        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
+    MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
 
-        // Post write attribute callback for all attributes changes, regardless
-        // of cluster.
-        MatterPostAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
+    // Post write attribute callback for all attributes changes, regardless
+    // of cluster.
+    MatterPostAttributeChangeCallback(attributePath, dataType, emberAfAttributeSize(metadata), data);
 
-        // Post-write attribute callback specific
-        // to the cluster that the attribute lives in.
-        emAfClusterAttributeChangedCallback(attributePath);
+    // Post-write attribute callback specific
+    // to the cluster that the attribute lives in.
+    emAfClusterAttributeChangedCallback(attributePath);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
