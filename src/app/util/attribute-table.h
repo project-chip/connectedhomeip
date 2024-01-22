@@ -81,4 +81,4 @@ EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId clus
  * (i.e. whether the attribute can be read).
  */
 EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
+                                uint8_t * dataPtr, uint16_t readLength);

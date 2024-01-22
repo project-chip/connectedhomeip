@@ -274,7 +274,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 }
 
 EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                uint16_t readLength, EmberAfAttributeType * dataType)
+                                uint16_t readLength)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
     EmberAfAttributeSearchRecord record;
@@ -285,16 +285,8 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
                                                   false); // write?
 
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        // It worked!  If the user asked for the type, set it before returning.
-        if (dataType != nullptr)
-        {
-            (*dataType) = metadata->attributeType;
-        }
-    }
-    else
-    { // failed, print debug info
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+        // failed, print debug info
         if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
         {
             ChipLogProgress(Zcl, "READ: attribute size too large for caller");
