@@ -13,8 +13,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 import os
-from matter_yamltests.yaml_loader import yaml_tree, SchemaTree
 from typing import TextIO
+
+from matter_yamltests.yaml_loader import SchemaTree, yaml_tree
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 WARNING = ("<!---\n"

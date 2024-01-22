@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import os
-from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 import xml.etree.ElementTree as ElementTree
+
+from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 WARNING = ("<!---\n"
