@@ -442,7 +442,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
         }
         auto RequestedSystemMode = static_cast<SystemModeEnum>(*value);
         if (ControlSequenceOfOperation > ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat ||
-            RequestedSystemMode > SystemModeEnum::kSleep)
+            EnsureKnownEnumValue(RequestedSystemMode) != SystemModeEnum::kUnknownValue)
         {
             return imcode::InvalidValue;
         }
