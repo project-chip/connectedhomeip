@@ -68,7 +68,12 @@ Davis, CA 95616, USA
       <optionalConform/>
     </feature>
     <feature bit="2" code="SPRS" name="AlarmSuppress" summary="Supports ability to suppress or acknowledge alarms">
-      <optionalConform/>
+      <optionalConform>
+        <orTerm>
+          <feature name="VIS"/>
+          <feature name="AUD"/>
+        </orTerm>
+      </optionalConform>
     </feature>
     <feature bit="3" code="SENSLVL" name="SensitivityLevel" summary="Supports ability to set sensor sensitivity">
       <optionalConform/>
@@ -130,13 +135,7 @@ Davis, CA 95616, USA
     <attribute id="0x0004" name="AlarmsSuppressed" type="AlarmModeBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
-        <andTerm>
-          <orTerm>
-            <feature name="VIS"/>
-            <feature name="AUD"/>
-          </orTerm>
-          <feature name="SPRS"/>
-        </andTerm>
+        <feature name="SPRS"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="AlarmsEnabled" type="AlarmModeBitmap">

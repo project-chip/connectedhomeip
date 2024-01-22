@@ -619,3 +619,35 @@ tests:
       attribute: "ProductAppearance"
       response:
           value: ProductAppearancevalue
+
+    - label:
+          "Step 62: TH reads attribute ID 0x0015 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0015
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
+
+    - label:
+          "Step 63: TH reads attribute ID 0x0016 from the DUT (matches in ID to
+          CapabilityMinima in the parent cluster, but is absent on the
+          BridgedDeviceBasicInformation cluster)."
+      PICS: BRBINFO.S
+      cluster: "AnyCommands"
+      command: "ReadById"
+      arguments:
+          values:
+              - name: "ClusterId"
+                value: BRBINFO.ClusterId
+              - name: "AttributeId"
+                value: 0x0016
+      response:
+          error: UNSUPPORTED_ATTRIBUTE

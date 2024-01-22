@@ -33,6 +33,9 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
         cluster = Clusters.Objects.RvcRunMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    def pics_TC_RVCRUNM_1_2(self) -> list[str]:
+        return ["RVCRUNM.S"]
+
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
 

@@ -83,6 +83,7 @@ void OnOffManager::PostOnOffChanged(chip::EndpointId endpoint, bool value)
 
 jboolean OnOffManager::SetOnOff(jint endpoint, bool value)
 {
+    chip::DeviceLayer::StackLock stack;
     EmberAfStatus status = app::Clusters::OnOff::Attributes::OnOff::Set(static_cast<chip::EndpointId>(endpoint), value);
     return status == EMBER_ZCL_STATUS_SUCCESS;
 }

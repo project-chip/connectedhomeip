@@ -3056,20 +3056,20 @@ cluster TemperatureControl = 86 {
 cluster RefrigeratorAlarm = 87 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3274,7 +3274,7 @@ cluster SmokeCoAlarm = 92 {
 cluster DishwasherAlarm = 93 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
     kDoorError = 0x4;
@@ -3288,16 +3288,16 @@ cluster DishwasherAlarm = 93 {
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute optional AlarmMap latch = 1;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3306,11 +3306,11 @@ cluster DishwasherAlarm = 93 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ResetRequest {
-    AlarmMap alarms = 0;
+    AlarmBitmap alarms = 0;
   }
 
   request struct ModifyEnabledAlarmsRequest {
-    AlarmMap mask = 0;
+    AlarmBitmap mask = 0;
   }
 
   /** Reset alarm */
@@ -3500,13 +3500,6 @@ provisional cluster ScenesManagement = 98 {
 
   bitmap Feature : bitmap32 {
     kSceneNames = 0x1;
-    kExplicit = 0x2;
-    kTableSize = 0x4;
-    kFabricScenes = 0x8;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kSceneNames = 0x80;
   }
 
   struct AttributeValuePair {
@@ -3528,14 +3521,9 @@ provisional cluster ScenesManagement = 98 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute optional int8u sceneCount = 0;
-  readonly attribute optional int8u currentScene = 1;
-  readonly attribute optional group_id currentGroup = 2;
-  readonly attribute optional boolean sceneValid = 3;
-  readonly attribute NameSupportBitmap nameSupport = 4;
-  readonly attribute optional nullable node_id lastConfiguredBy = 5;
-  readonly attribute int16u sceneTableSize = 6;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 7;
+  readonly attribute optional nullable node_id lastConfiguredBy = 0;
+  readonly attribute int16u sceneTableSize = 1;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3546,7 +3534,7 @@ provisional cluster ScenesManagement = 98 {
   request struct AddSceneRequest {
     group_id groupID = 0;
     int8u sceneID = 1;
-    int16u transitionTime = 2;
+    int32u transitionTime = 2;
     char_string sceneName = 3;
     ExtensionFieldSet extensionFieldSets[] = 4;
   }
@@ -3566,7 +3554,7 @@ provisional cluster ScenesManagement = 98 {
     status status = 0;
     group_id groupID = 1;
     int8u sceneID = 2;
-    optional int16u transitionTime = 3;
+    optional int32u transitionTime = 3;
     optional char_string sceneName = 4;
     optional ExtensionFieldSet extensionFieldSets[] = 5;
   }
@@ -3605,7 +3593,7 @@ provisional cluster ScenesManagement = 98 {
   request struct RecallSceneRequest {
     group_id groupID = 0;
     int8u sceneID = 1;
-    optional nullable int16u transitionTime = 2;
+    optional nullable int32u transitionTime = 2;
   }
 
   request struct GetSceneMembershipRequest {
@@ -3619,34 +3607,6 @@ provisional cluster ScenesManagement = 98 {
     optional int8u sceneList[] = 3;
   }
 
-  request struct EnhancedAddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct EnhancedAddSceneResponse = 64 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct EnhancedViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct EnhancedViewSceneResponse = 65 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
   request struct CopySceneRequest {
     CopyModeBitmap mode = 0;
     group_id groupIdentifierFrom = 1;
@@ -3655,7 +3615,7 @@ provisional cluster ScenesManagement = 98 {
     int8u sceneIdentifierTo = 4;
   }
 
-  response struct CopySceneResponse = 66 {
+  response struct CopySceneResponse = 64 {
     status status = 0;
     group_id groupIdentifierFrom = 1;
     int8u sceneIdentifierFrom = 2;
@@ -3675,12 +3635,8 @@ provisional cluster ScenesManagement = 98 {
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a scene to be added using a finer scene transition time than the AddScene command. */
-  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
-  /** Allows a scene to be retrieved using a finer scene transition time than the ViewScene command */
-  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
   /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -4376,38 +4332,105 @@ provisional cluster EnergyEvse = 153 {
   timed command ClearTargets(): DefaultSuccess = 7;
 }
 
-/** This cluster provides an interface to specify preferences for how devices should consume energy. */
-cluster EnergyPreference = 155 {
-  revision 1; // NOTE: Default/not specifically set
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster EnergyEvseMode = 157 {
+  revision 1;
 
-  enum EnergyPriorityEnum : enum8 {
-    kComfort = 0;
-    kSpeed = 1;
-    kEfficiency = 2;
-    kWaterConsumption = 3;
+  enum ModeTag : enum16 {
+    kManual = 16384;
+    kTimeOfUse = 16385;
+    kSolarCharging = 16386;
   }
 
   bitmap Feature : bitmap32 {
-    kEnergyBalance = 0x1;
-    kLowPowerModeSensitivity = 0x2;
+    kOnOff = 0x1;
   }
 
-  struct BalanceStruct {
-    percent step = 0;
-    optional char_string<64> label = 1;
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
   }
 
-  readonly attribute optional BalanceStruct energyBalances[] = 0;
-  attribute optional int8u currentEnergyBalance = 1;
-  readonly attribute optional EnergyPriorityEnum energyPriorities[] = 2;
-  readonly attribute optional BalanceStruct lowPowerModeSensitivities[] = 3;
-  attribute optional int8u currentLowPowerModeSensitivity = 4;
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster DeviceEnergyManagementMode = 159 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kNoOptimization = 16384;
+    kDeviceOptimization = 16385;
+    kLocalOptimization = 16386;
+    kGridOptimization = 16387;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** Provides an interface for controlling and adjusting automatic window coverings. */
@@ -7684,6 +7707,9 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
   }
 
   server cluster LaundryDryerControls {
@@ -7935,7 +7961,6 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute nameSupport default = 0x80;
     ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
@@ -7943,7 +7968,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 15;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
@@ -7959,10 +7984,6 @@ endpoint 1 {
     handle command RecallScene;
     handle command GetSceneMembership;
     handle command GetSceneMembershipResponse;
-    handle command EnhancedAddScene;
-    handle command EnhancedAddSceneResponse;
-    handle command EnhancedViewScene;
-    handle command EnhancedViewSceneResponse;
     handle command CopyScene;
     handle command CopySceneResponse;
   }
@@ -8139,18 +8160,32 @@ endpoint 1 {
     handle command ClearTargets;
   }
 
-  server cluster EnergyPreference {
-    callback attribute energyBalances;
-    ram      attribute currentEnergyBalance;
-    callback attribute energyPriorities;
-    callback attribute lowPowerModeSensitivities;
-    ram      attribute currentLowPowerModeSensitivity;
+  server cluster EnergyEvseMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
+  }
+
+  server cluster DeviceEnergyManagementMode {
+    callback attribute supportedModes;
+    callback attribute currentMode;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    callback attribute featureMap;
+    ram      attribute clusterRevision default = 1;
+
+    handle command ChangeToMode;
+    handle command ChangeToModeResponse;
   }
 
   server cluster WindowCovering {
@@ -8876,7 +8911,6 @@ endpoint 2 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute nameSupport default = 0x80;
     ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
@@ -8884,7 +8918,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 15;
+    ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
@@ -8900,10 +8934,6 @@ endpoint 2 {
     handle command RecallScene;
     handle command GetSceneMembership;
     handle command GetSceneMembershipResponse;
-    handle command EnhancedAddScene;
-    handle command EnhancedAddSceneResponse;
-    handle command EnhancedViewScene;
-    handle command EnhancedViewSceneResponse;
     handle command CopyScene;
     handle command CopySceneResponse;
   }
