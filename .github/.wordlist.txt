@@ -95,6 +95,7 @@ ASR
 AssertionError
 AST
 ASYNC
+ATLs
 atomics
 att
 attId
@@ -381,6 +382,7 @@ DefaultOTARequestor
 DefaultOTARequestorDriver
 DefaultOTARequestorStorage
 DefaultSuccess
+defaultValue
 definedValue
 DehumidificationControl
 DelayedActionTime
@@ -606,6 +608,7 @@ GenericWiFiConfigurationManagerImpl
 GetDeviceId
 GetDeviceInfo
 GetDns
+GetInDevelopmentTests
 GetIP
 getManualTests
 GetSafeAttributePersistenceProvider
@@ -1081,6 +1084,7 @@ Pigweed
 PinCode
 pinrequest
 PIXIT
+PIXITs
 pkgconfig
 PKI
 plaintext
@@ -1225,6 +1229,7 @@ RTOS
 RTT
 RTX
 runArgs
+runIf
 RUNAS
 RunMain
 runtime

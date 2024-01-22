@@ -20,7 +20,7 @@
 #
 #   Actual run:
 #
-#      pyspelling pyspelling --config .spellcheck.yml
+#      pyspelling --config .spellcheck.yml
 
 matrix:
   - name: markdown
