@@ -780,6 +780,16 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestDifferentVendorMeiRequest::DecodableType & commandData)
+{
+    Commands::TestDifferentVendorMeiResponse::Type response;
+
+    response.arg1 = commandData.arg1;
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
@@ -825,15 +835,28 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
     DataModel::List<const SimpleEnum> arg6;
 
-    // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
-    Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
-
-    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
-        commandObj->AddStatus(commandPath, Status::Failure);
-        return true;
+        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+
+        EventNumber eventIdPlaceholder = 0;
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, eventIdPlaceholder))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
     }
-    commandObj->AddResponse(commandPath, responseData);
+
+    {
+        // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
+        Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
+
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+        commandObj->AddResponse(commandPath, responseData);
+    }
     return true;
 }
 
