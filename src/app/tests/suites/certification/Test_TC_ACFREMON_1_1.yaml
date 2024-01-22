@@ -73,7 +73,7 @@ tests:
               hasMasksSet: [0x2]
 
     - label:
-          "Step 3d: Given ACFREMON.S.F01(ReplacementProductList) ensure
+          "Step 3d: Given ACFREMON.S.F02(ReplacementProductList) ensure
           featuremap has the correct bit set"
       command: "readAttribute"
       attribute: "FeatureMap"

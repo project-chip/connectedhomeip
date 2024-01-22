@@ -68,17 +68,7 @@ Davis, CA 95616, USA
       <mandatoryConform/>
     </cluster>
     <cluster id="0x0004" name="Groups" side="server">
-      <optionalConform>
-        <condition name="Zigbee"/>
-      </optionalConform>
-    </cluster>
-    <cluster id="0x0062" name="Scenes Management" side="server">
-      <otherwiseConform>
-        <optionalConform>
-          <condition name="Zigbee"/>
-        </optionalConform>
-        <provisionalConform/>
-      </otherwiseConform>
+      <disallowConform/>
     </cluster>
     <cluster id="0x0009" name="Alarms" side="server">
       <optionalConform>
@@ -94,6 +84,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <condition name="Zigbee"/>
       </optionalConform>
+    </cluster>
+    <cluster id="0x0062" name="Scenes Management" side="server">
+      <disallowConform/>
     </cluster>
     <cluster id="0x0101" name="Door Lock" side="server">
       <mandatoryConform/>
