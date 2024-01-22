@@ -118,7 +118,8 @@ void ASROTAImageProcessor::HandlePrepareDownload(intptr_t context)
 
     imageProcessor->mHeaderParser.Init();
 
-    imageProcessor->mDownloader->OnPreparedForDownload(((err == LEGA_OTA_OK) || (err == LEGA_OTA_INIT_ALREADY)) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+    imageProcessor->mDownloader->OnPreparedForDownload(
+        ((err == LEGA_OTA_OK) || (err == LEGA_OTA_INIT_ALREADY)) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
 }
 
 void ASROTAImageProcessor::HandleFinalize(intptr_t context)

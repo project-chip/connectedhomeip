@@ -69,7 +69,7 @@ private:
     const char * mImageFile = nullptr;
 };
 
-#define LEGA_OTA_OK 0 // No error, operation OK
+#define LEGA_OTA_OK 0            // No error, operation OK
 #define LEGA_OTA_INIT_ALREADY -2 // ota init already
 
 } // namespace chip
