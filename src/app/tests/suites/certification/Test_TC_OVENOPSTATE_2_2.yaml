@@ -37,7 +37,9 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Manually put the DUT into a state wherein it can receive a Start Command"
+    - label:
+          "Step 2: Manually put the DUT into a state wherein it can receive a
+          Start Command"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT
@@ -293,7 +295,9 @@ tests:
           [1689674689.588810][17337:17339] CHIP:IN: (S) Sending msg 16881995 on secure session with LSID: 35027
       disabled: true
 
-    - label: "Step 16: Manually put the DUT into a state wherein it cannot receive a Start Command"
+    - label:
+          "Step 16: Manually put the DUT into a state wherein it cannot receive
+          a Start Command"
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT && OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME
@@ -305,7 +309,9 @@ tests:
                 value: "y"
 
     - label: "Step 17: TH sends Start command to the DUT"
-      PICS: OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp && OVENOPSTATE.S.C04.Tx
+      PICS:
+          OVENOPSTATE.S.M.ERR_UNABLE_TO_START_OR_RESUME && OVENOPSTATE.S.C02.Rsp
+          && OVENOPSTATE.S.C04.Tx
       verification: |
           ./chip-tool ovencavityoperationalstate start 1 1
 
