@@ -160,8 +160,8 @@ public:
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
 
-    // `Callback` exists for legacy purposes. If you are developing a new callback implementation, 
-    // please use `ExtendableCallback`. 
+    // `Callback` exists for legacy purposes. If you are developing a new callback implementation,
+    // please use `ExtendableCallback`.
     using Callback = CommandSenderLegacyCallback;
 
     // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
