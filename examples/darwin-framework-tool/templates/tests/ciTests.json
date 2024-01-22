@@ -45,6 +45,7 @@
         "Test_TC_SMOKECO_2_5",
         "Test_TC_DGGEN_2_1",
         "Test_TC_OPSTATE_2_4",
+        "Test_TC_OVENOPSTATE_2_4",
         "Disabled due to undefined properties",
         "Test_TC_SMOKECO_2_6",
         "Disabled because the power source configuration cluster is now deprecated and not present in all-clusters",
@@ -71,7 +72,6 @@
         "TestScenesMultiFabric",
         "TestScenesFabricSceneInfo",
         "#30759: Darwin chip-tool does not support ICD registration during commissioning",
-        "TestIcdManagementCluster",
-        "Test_TC_OVENOPSTATE_2_4"
+        "TestIcdManagementCluster"
     ]
 }
