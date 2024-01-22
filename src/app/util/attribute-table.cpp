@@ -46,19 +46,7 @@ using namespace chip;
 EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                             EmberAfAttributeType dataType)
 {
-    EmberAfAttributeWritePermission extWritePermission =
-        emberAfAllowNetworkWriteAttributeCallback(endpoint, cluster, attributeID, dataPtr, dataType);
-    switch (extWritePermission)
-    {
-    case EmberAfAttributeWritePermission::DenyWrite:
-        return EMBER_ZCL_STATUS_FAILURE;
-    case EmberAfAttributeWritePermission::AllowWriteNormal:
-    case EmberAfAttributeWritePermission::AllowWriteOfReadOnly:
-        return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                                  (extWritePermission == EmberAfAttributeWritePermission::AllowWriteOfReadOnly));
-    default:
-        return (EmberAfStatus) extWritePermission;
-    }
+   return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType, false /* override read-only */)
 }
 
 EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,

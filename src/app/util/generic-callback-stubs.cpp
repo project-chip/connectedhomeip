@@ -24,13 +24,6 @@ using namespace chip;
 
 // This file contains overridable callbacks that are not cluster specific.
 
-EmberAfAttributeWritePermission __attribute__((weak))
-emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t * value,
-                                          uint8_t type)
-{
-    return EmberAfAttributeWritePermission::AllowWriteNormal; // Default
-}
-
 bool __attribute__((weak)) emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {
     return true;

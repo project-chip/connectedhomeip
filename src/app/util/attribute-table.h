@@ -22,12 +22,6 @@
 #define ZCL_NULL_ATTRIBUTE_TABLE_INDEX 0xFFFF
 
 // Remote devices writing attributes of local device
-//
-// Forwards to emberAfWriteAttribute after an extra check through
-// a validation callback: emberAfAllowNetworkWriteAttributeCallback
-//
-// TODO: emberAfAllowNetworkWriteAttributeCallback seems never used or defined
-//       in CHIP code, consider removing
 EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                             uint8_t * dataPtr, EmberAfAttributeType dataType);
 
