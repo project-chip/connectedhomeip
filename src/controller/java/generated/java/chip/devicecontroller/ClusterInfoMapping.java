@@ -18930,6 +18930,28 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
+
+  public static class DelegatedUnitTestingClusterTestDifferentVendorMeiResponseCallback implements ChipClusters.UnitTestingCluster.TestDifferentVendorMeiResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer arg1) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo arg1ResponseValue = new CommandResponseInfo("arg1", "Integer");
+      responseValues.put(arg1ResponseValue, arg1);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedUnitTestingClusterListInt8uAttributeCallback implements ChipClusters.UnitTestingCluster.ListInt8uAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -27058,6 +27080,24 @@ public class ClusterInfoMapping {
         unitTestingtestSecondBatchHelperRequestCommandParams
       );
     unitTestingClusterInteractionInfoMap.put("testSecondBatchHelperRequest", unitTestingtestSecondBatchHelperRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> unitTestingtestDifferentVendorMeiRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo unitTestingtestDifferentVendorMeiRequestarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
+    unitTestingtestDifferentVendorMeiRequestCommandParams.put("arg1",unitTestingtestDifferentVendorMeiRequestarg1CommandParameterInfo);
+    InteractionInfo unitTestingtestDifferentVendorMeiRequestInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster)
+          .testDifferentVendorMeiRequest((ChipClusters.UnitTestingCluster.TestDifferentVendorMeiResponseCallback) callback
+           , (Integer)
+             commandArguments.get("arg1")
+
+            );
+        },
+        () -> new DelegatedUnitTestingClusterTestDifferentVendorMeiResponseCallback(),
+        unitTestingtestDifferentVendorMeiRequestCommandParams
+      );
+    unitTestingClusterInteractionInfoMap.put("testDifferentVendorMeiRequest", unitTestingtestDifferentVendorMeiRequestInteractionInfo);
 
     commandMap.put("unitTesting", unitTestingClusterInteractionInfoMap);
 

@@ -8103,6 +8103,33 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic fabricIndex;
 @end
 
+@implementation MTRUnitTestingClusterTestDifferentVendorMeiEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRUnitTestingClusterTestDifferentVendorMeiEventEvent alloc] init];
+
+    other.arg1 = self.arg1;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRSampleMEIClusterPingCountEventEvent
 - (instancetype)init
 {
