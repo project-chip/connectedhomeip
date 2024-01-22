@@ -2611,7 +2611,7 @@ endpoint 1 {
     ram      attribute sceneTableSize;
     callback attribute fabricSceneInfo;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command AddScene;
     handle command AddSceneResponse;
