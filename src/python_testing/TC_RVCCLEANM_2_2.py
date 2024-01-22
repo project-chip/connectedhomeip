@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-import logging
-
 import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
@@ -107,7 +105,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         # Verify that the supported_run_modes_dut entry matching run_mode_dut does not have the Idle (0x4000) mode tag.
         for t in self.supported_run_modes[current_run_mode].modeTags:
             if t.value == Clusters.RvcRunMode.Enums.ModeTag.kIdle:
-                asserts.fail("The device must not be in a mode with the Idle (0x4000) mode tag.")
+                asserts.fail("The device must  be is a mode with the Idle (0x4000) mode tag.")
 
         self.print_step(5, "Read the RvcCleanMode SupportedModes attribute")
         supported_clean_modes = await self.read_clean_supported_modes()
