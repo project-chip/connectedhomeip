@@ -42,12 +42,12 @@ limitations under the License.
     <!--Conformance feature IMPE & PERE - for now optional-->
     <attribute code="0x0004" side="server" define="PERIODIC_ENERGY_EXPORTED" type="EnergyMeasurementStruct" isNullable="true" optional="true">PeriodicEnergyExported</attribute>
     <!--Conformance feature EXPE & PERE - for now optional-->
-    <event code="0x0000" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true" side="server">
+    <event code="0x00" name="CumulativeEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
       <description>CumulativeEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
     </event>
-    <event code="0x0001" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true" side="server">
+    <event code="0x01" name="PeriodicEnergyMeasured" priority="info" apiMaturity="provisional" optional="true">
       <description>PeriodicEnergyMeasured</description>
       <field id="0" name="EnergyImported" type="EnergyMeasurementStruct" optional="true"/>
       <field id="1" name="EnergyExported" type="EnergyMeasurementStruct" optional="true"/>
@@ -55,7 +55,7 @@ limitations under the License.
   </cluster>
   <struct name="EnergyMeasurementStruct" apiMaturity="provisional">
     <cluster code="0x0091"/>
-    <item fieldId="0" name="Energy" type="energy_mwh" min="0" max="0x4000000000000000"/>
+    <item fieldId="0" name="Energy" type="energy_mwh" min="0" max="4611686018427387904"/>
     <item fieldId="1" name="StartTimestamp" type="epoch_s" optional="true"/>
     <item fieldId="2" name="EndTimestamp" type="epoch_s" optional="true"/>
     <item fieldId="3" name="StartSystime" type="systime_ms" optional="true"/>
