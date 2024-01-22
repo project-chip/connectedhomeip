@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
+#include <lib/support/CommonIterator.h>
 
 namespace chip {
 namespace app {
@@ -39,25 +40,29 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    virtual PowerModeEnum GetPowerMode()                                                                         = 0;
-    virtual uint8_t GetNumberOfMeasurementTypes()                                                                = 0;
-    virtual DataModel::List<const Structs::MeasurementAccuracyStruct::Type> GetAccuracy()                        = 0;
-    virtual DataModel::List<const Structs::MeasurementRangeStruct::Type> GetRanges()                             = 0;
-    virtual DataModel::Nullable<int64_t> GetVoltage()                                                            = 0;
-    virtual DataModel::Nullable<int64_t> GetActiveCurrent()                                                      = 0;
-    virtual DataModel::Nullable<int64_t> GetReactiveCurrent()                                                    = 0;
-    virtual DataModel::Nullable<int64_t> GetApparentCurrent()                                                    = 0;
-    virtual DataModel::Nullable<int64_t> GetActivePower()                                                        = 0;
-    virtual DataModel::Nullable<int64_t> GetReactivePower()                                                      = 0;
-    virtual DataModel::Nullable<int64_t> GetApparentPower()                                                      = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSVoltage()                                                         = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSCurrent()                                                         = 0;
-    virtual DataModel::Nullable<int64_t> GetRMSPower()                                                           = 0;
-    virtual DataModel::Nullable<int64_t> GetFrequency()                                                          = 0;
-    virtual DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicCurrents() = 0;
-    virtual DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicPhases()   = 0;
-    virtual DataModel::Nullable<int64_t> GetPowerFactor()                                                        = 0;
-    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()                                                     = 0;
+    using AccuracyIterator            = CommonIterator<const Structs::MeasurementAccuracyStruct::Type>;
+    using RangeIterator               = CommonIterator<const Structs::MeasurementRangeStruct::Type>;
+    using HarmonicMeasurementIterator = CommonIterator<const Structs::HarmonicMeasurementStruct::Type>;
+
+    virtual PowerModeEnum GetPowerMode()                            = 0;
+    virtual uint8_t GetNumberOfMeasurementTypes()                   = 0;
+    virtual AccuracyIterator * IterateAccuracy()                    = 0;
+    virtual RangeIterator * IterateRanges()                         = 0;
+    virtual DataModel::Nullable<int64_t> GetVoltage()               = 0;
+    virtual DataModel::Nullable<int64_t> GetActiveCurrent()         = 0;
+    virtual DataModel::Nullable<int64_t> GetReactiveCurrent()       = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentCurrent()       = 0;
+    virtual DataModel::Nullable<int64_t> GetActivePower()           = 0;
+    virtual DataModel::Nullable<int64_t> GetReactivePower()         = 0;
+    virtual DataModel::Nullable<int64_t> GetApparentPower()         = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSVoltage()            = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSCurrent()            = 0;
+    virtual DataModel::Nullable<int64_t> GetRMSPower()              = 0;
+    virtual DataModel::Nullable<int64_t> GetFrequency()             = 0;
+    virtual HarmonicMeasurementIterator * IterateHarmonicCurrents() = 0;
+    virtual HarmonicMeasurementIterator * IterateHarmonicPhases()   = 0;
+    virtual DataModel::Nullable<int64_t> GetPowerFactor()           = 0;
+    virtual DataModel::Nullable<int64_t> GetNeutralCurrent()        = 0;
 
 protected:
     EndpointId mEndpointId = 0;
@@ -83,7 +88,8 @@ enum class OptionalAttributes : uint32_t
 class Instance : public AttributeAccessInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature, BitMask<OptionalAttributes> aOptionalAttributes) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeature,
+             BitMask<OptionalAttributes> aOptionalAttributes) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), mDelegate(aDelegate), mFeature(aFeature),
         mOptionalAttrs(aOptionalAttributes)
     {
@@ -105,6 +111,11 @@ private:
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    CHIP_ERROR ReadAccuracy(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadRanges(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadHarmonicCurrents(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadHarmonicPhases(AttributeValueEncoder & aEncoder);
 };
 
 } // namespace ElectricalPowerMeasurement
