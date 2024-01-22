@@ -284,7 +284,7 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/WiFiNetworkDiagnosticsClient-ReadImpl.cpp",
       "jni/WindowCoveringClient-InvokeSubscribeImpl.cpp",
       "jni/WindowCoveringClient-ReadImpl.cpp",
-    ]
+ ]
 
     deps = [
       ":data_model",
