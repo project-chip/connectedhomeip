@@ -78,14 +78,7 @@
         ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
     }
 
-#define CLUSTER_TICK_FREQ_ALL (0x00)
-#define CLUSTER_TICK_FREQ_QUARTER_SECOND (0x04)
-#define CLUSTER_TICK_FREQ_HALF_SECOND (0x08)
-#define CLUSTER_TICK_FREQ_SECOND (0x0C)
-
 extern uint8_t attributeData[]; // main storage bucket for all attributes
-
-extern uint8_t attributeDefaults[]; // storage bucked for > 2b default values
 
 void emAfCallInits(void);
 

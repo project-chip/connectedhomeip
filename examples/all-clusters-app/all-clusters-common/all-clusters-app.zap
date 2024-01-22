@@ -8612,6 +8612,24 @@
           "side": "server",
           "enabled": 1,
           "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ],
           "attributes": [
             {
               "name": "SupportedModes",

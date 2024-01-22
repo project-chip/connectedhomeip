@@ -9125,6 +9125,63 @@ PICS:
     - label: "Can the device be controlled manually?"
       id: DRYERCTRL.S.M.ManuallyControlled
 
+    #  Oven Mode Cluster
+
+    - label: "Does the device implement the OM cluster as a server?"
+      id: OTCCM.S
+
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: OTCCM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label:
+          "Id of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.OTCCM.MODE_CHANGE_FAIL
+
+    - label:
+          "Id of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.OTCCM.MODE_CHANGE_OK
+
+    #
+    # server / features
+    #
+    - label:
+          "Does the device support depending on an On/Off cluster implemented on
+          the same endpoint?"
+      id: OTCCM.S.F00
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: OTCCM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: OTCCM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: OTCCM.S.A0002
+
+    - label: "Does the device implement the OnMode attribute?"
+      id: OTCCM.S.A0003
+
+    #
+    # server / Commands received
+    #
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: OTCCM.S.C00.Rsp
+
+    #
+    # server / Commands generated
+    #
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: OTCCM.S.C01.Tx
+
+    - label: "Can the device be controlled manually?"
+      id: OTCCM.S.M.CAN_MANUALLY_CONTROLLED
+
     # RVC Clean Mode Cluster
 
     - label: "Does the device implement the RVCCLEANM cluster as a server?"
