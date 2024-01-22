@@ -76,6 +76,7 @@ def error_enum_to_text(error_enum):
     def pics_TC_RVCOPSTATE_2_4(self) -> list[str]:
         return ["RVCOPSTATE.S"]
 
+
 class TC_RVCOPSTATE_2_4(MatterBaseTest):
     def __init__(self, *args):
         super().__init__(args)
