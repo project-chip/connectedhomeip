@@ -132,12 +132,6 @@ constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVI
 // Not const, because these need to mutate.
 DataVersion fixedEndpointDataVersions[ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT];
 
-#define endpointNumber(x) fixedEndpoints[x]
-#define endpointDeviceTypeList(x)                                                                                                  \
-    Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[x]], fixedDeviceTypeListLengths[x])
-// Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
-#define endpointTypeMacro(x) (&(generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[x]]))
-
 AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 
 // shouldUnregister returns true if the given AttributeAccessInterface should be
@@ -206,10 +200,11 @@ void emberAfEndpointConfigure()
     DataVersion * currentDataVersions = fixedEndpointDataVersions;
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
-        emAfEndpoints[ep].endpoint       = endpointNumber(ep);
-        emAfEndpoints[ep].deviceTypeList = endpointDeviceTypeList(ep);
-        emAfEndpoints[ep].endpointType   = endpointTypeMacro(ep);
-        emAfEndpoints[ep].dataVersions   = currentDataVersions;
+        emAfEndpoints[ep].endpoint = fixedEndpoints[ep];
+        emAfEndpoints[ep].deviceTypeList =
+            Span<const EmberAfDeviceType>(&fixedDeviceTypeList[fixedDeviceTypeListOffsets[ep]], fixedDeviceTypeListLengths[ep]);
+        emAfEndpoints[ep].endpointType = &generatedEmberAfEndpointTypes[fixedEmberAfEndpointTypes[ep]];
+        emAfEndpoints[ep].dataVersions = currentDataVersions;
 
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isEnabled);
         emAfEndpoints[ep].bitmask.Set(EmberAfEndpointOptions::isFlatComposition);
