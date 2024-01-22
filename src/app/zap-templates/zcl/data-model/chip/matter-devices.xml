@@ -118,12 +118,7 @@ limitations under the License.
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
-                <requireAttribute>DEVICE_TYPE_LIST</requireAttribute>
-                <requireAttribute>SERVER_LIST</requireAttribute>
-                <requireAttribute>CLIENT_LIST</requireAttribute>
-                <requireAttribute>PARTS_LIST</requireAttribute>
-            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="false" serverLocked="false"></include>
         </clusters>
