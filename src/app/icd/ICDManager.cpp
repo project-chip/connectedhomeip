@@ -50,9 +50,13 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 
     bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
-                       "The CheckIn protocol feature is required for LIT support");
+                       "The CheckIn protocol feature is required for LIT support.");
     VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
-                       "The user ActiveMode trigger feature is required for LIT support");
+                       "The user ActiveMode trigger feature is required for LIT support.");
+    VerifyOrDieWithMsg((supportLIT == false) ||
+                           ICDConfigurationData::GetInstance().GetMinLitActiveModeThresholdMs() <=
+                               ICDConfigurationData::GetInstance().GetActiveModeThresholdMs(),
+                       AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
 
     // Disabling check until LIT support is compelte
     // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
