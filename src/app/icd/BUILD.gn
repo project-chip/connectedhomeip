@@ -114,5 +114,6 @@ source_set("configuration-data") {
   deps = [
     ":icd_config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }
