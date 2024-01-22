@@ -154,7 +154,7 @@ are represented using name:, value: tags.
 
 Tests often require functionality that is not strictly cluster-based. Some of
 this functionality is supported in YAML using pseudo-clusters. These clusters
-accept command: tags like the DUT clusters to control the psudo-cluster
+accept command: tags like the DUT clusters to control the pseudo-cluster
 functionality.
 
 Some of the more common functionality is shown below:

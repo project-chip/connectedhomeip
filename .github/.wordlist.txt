@@ -160,6 +160,7 @@ blockquote
 bluetoothd
 bluez
 BOOL
+booleans
 BooleanState
 bootable
 Bootloader
@@ -503,6 +504,7 @@ emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
 EmberAfInitializeAttributes
 emberAfSetDynamicEndpoint
+emsp
 EnableNetwork
 EnableWiFiNetwork
 endian
@@ -673,6 +675,7 @@ IasWd
 iaszone
 ibb
 ICA
+ICAC
 ICD
 ICDs
 iCloud
@@ -724,6 +727,7 @@ IoT
 ipaddr
 iPadOS
 ipadr
+IPK
 ipp
 iptables
 iputils
@@ -935,6 +939,7 @@ namespacing
 nano
 natively
 navpad
+nbsp
 NCP
 ncs
 nding
@@ -1155,6 +1160,7 @@ RADVD
 raspberryPi
 RasPi
 rAv
+RCAC
 RCP
 ReadAttribute
 ReadConfigValue
@@ -1227,6 +1233,7 @@ rw
 RXD
 sandboxed
 saveAs
+saveDataVersschemaionAs
 sbin
 scalability
 scalable
@@ -1377,6 +1384,7 @@ TestArray
 TestCluster
 TestConstraints
 TestEmptyString
+TestEqualities
 TestGenExample
 TestGroupDemoConfig
 TestMultiRead

@@ -42,5 +42,5 @@ way that is understandable, readable, and has the features you need
 -   python
     -   pros: full programming language, full control API with support for core
         (certs, commissioning, etc), less plumbing if you need to add features,
-        can use python libs
+        can use python libraries
     -   cons: more complex, can be harder to read
