@@ -3,4 +3,4 @@ Sphinx>=4.5
 sphinx-book-theme
 myst-parser
 breathe>=4.34
-pydata-sphinx-theme==0.14.4
+pydata-sphinx-theme==0.15.2
