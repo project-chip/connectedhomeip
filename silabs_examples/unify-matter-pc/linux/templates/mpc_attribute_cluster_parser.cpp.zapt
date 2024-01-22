@@ -35,6 +35,8 @@
 #include "attribute_resolver_rule.h"
 #include "attribute_store.h"
 #include "dotdot_mqtt.h"
+#include "matter_to_unify_converter.hpp"
+#include "zap-types.h"
 
 using namespace std;
 using namespace attribute_store;
@@ -181,20 +183,26 @@ sl_status_t mpc_{{asSnakeCaseLower label}}_cluster_parser(const chip::app::Concr
 {{#if (supportedAttributes parent.label code)}}
 {{#if_is_enum type}}
     case {{clusterNameWithoutSlash parent.label}}::Attributes::{{label}}::Id: { // type {{type}}
-        chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::{{label}}Enum value;
+        chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::{{type}} value;
+        {{#if isNullable}}
         if (info.{{asLowerCamelCase label}}.IsNull())
-            value = chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::{{label}}Enum::kUnknownEnumValue;
+            value = chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::{{type}}::kUnknownEnumValue;
         else
-            value = info.{{asLowerCamelCase label}}.Value();
+        value = info.{{asLowerCamelCase label}}.Value();
+        {{else}}
+        value = info.{{asLowerCamelCase label}};
+        {{/if}}
+        {{asUpperCamelCase (unifyEnumType this.type (clusterNameWithoutSlash parent.label))}} unify_value = to_unify<chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::{{type}}, {{asUpperCamelCase (unifyEnumType this.type (clusterNameWithoutSlash parent.label))}}>(value);
         sl_log_info(LOG_TAG, "{{label}}: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<chip::app::Clusters::{{clusterNameWithoutSlash parent.label}}::{{label}}Enum>(value);
+        attribute(mNode).set_reported<{{asUnderlyingType type}}>(static_cast<{{asUnderlyingType type}}>(unify_value));
+
     }
     break;
 {{else if isNullable}}
     case {{clusterNameWithoutSlash parent.label}}::Attributes::{{label}}::Id: { // type {{type}}
         auto value = info.{{asLowerCamelCase label}}.Value();
         sl_log_info(LOG_TAG, "{{label}}: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<>(value);
+        attribute(mNode).set_reported<>(to_unify(value));
     }
     break;
 {{else if entryType~}}
@@ -230,7 +238,7 @@ sl_status_t mpc_{{asSnakeCaseLower label}}_cluster_parser(const chip::app::Concr
     case {{clusterNameWithoutSlash parent.label}}::Attributes::{{label}}::Id: { // type {{type}}
         auto value = info.{{asLowerCamelCase label}};
         sl_log_info(LOG_TAG, "{{label}}: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<{{clusterNameWithoutSlash parent.label}}::Attributes::{{label}}::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<{{asUnderlyingType type}}>(to_unify(value));
     }
     break;
 {{/if_is_enum}}

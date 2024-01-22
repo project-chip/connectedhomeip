@@ -189,11 +189,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::OnOff::StartUpOnOffEnum
     using namespace chip::app::Clusters::OnOff;
     switch (value) {
     case StartUpOnOffEnum::kOff:
-        return "Off";
+        return "SetOnOffTo0";
     case StartUpOnOffEnum::kOn:
-        return "On";
+        return "SetOnOffTo1";
     case StartUpOnOffEnum::kToggle:
-        return "Toggle";
+        return "TogglePreviousOnOff";
     default:
         return "{}";
     }

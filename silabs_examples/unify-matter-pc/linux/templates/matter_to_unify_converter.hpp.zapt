@@ -1,0 +1,78 @@
+/*******************************************************************************
+ * # License
+ * <b>Copyright 2024 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
+
+#include "app/data-model/NullObject.h"
+#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/cluster-enums.h>
+#include "zap-types.h"
+
+#define DEFAULT_ENUM_RETURN_VALUE 255
+
+// Default translation
+template <typename T>
+T inline to_unify(const T & value)
+{
+    return value;
+}
+
+template<typename T1, typename T2>
+T2 inline to_unify(const T1& value)
+{
+    return (T2)value;
+}
+
+string inline to_unify(const chip::Span<const char> & value)
+{
+    return std::string( value.data(), value.size());
+}
+
+string inline to_unify(const chip::Span<const unsigned char> & value)
+{
+    return std::string( reinterpret_cast<const char*>(value.data()), value.size());
+}
+
+{{#zcl_clusters}}
+{{#if (supportedClusterByMpc code) }}
+
+{{#zcl_enums}}
+{{#if (matterUnifyEnumMapped label (clusterNameWithoutSlash parent.label))}}
+template<> {{asUpperCamelCase (unifyEnumType label (clusterNameWithoutSlash parent.label))}} inline to_unify(const chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{label}}& value) 
+{{else}}
+template<> {{asUnderlyingType label}} inline to_unify(const chip::app::Clusters::{{asUpperCamelCase parent.label}}::{{label}}& value) 
+{{/if}}
+{
+    using namespace chip::app::Clusters::{{asUpperCamelCase parent.label}};
+    {{#if (unifyTypeExists label)}}
+    switch( value ) {
+        {{#zcl_enum_items}}
+        case {{parent.label}}::k{{asUpperCamelCase label}}: return ZCL_{{asDelimitedMacro (unifyEnumType parent.label (clusterNameWithoutSlash parent.parent.label))}}_{{asDelimitedMacro (unifyEnumValName this (clusterNameWithoutSlash parent.parent.label))}};
+        {{#last}}
+        {{#unless (isInConfigList (concat (asUpperCamelCase ../name) "::" parent.label) "EnumsNotUsedAsTypeInXML")}}
+        {{#if (checkUnknownEnumValue parent.label this.index)}}
+        case {{parent.label}}::kUnknownEnumValue: return ZCL_{{asDelimitedMacro (unifyEnumType parent.label (clusterNameWithoutSlash parent.parent.label))}}_{{asDelimitedMacro (unknownEnumValue parent.label this.index)}};
+        {{/if}}
+        {{/unless}}
+        {{/last}}
+        {{/zcl_enum_items}}
+        default:
+        return static_cast<{{asUpperCamelCase (unifyEnumType label (clusterNameWithoutSlash parent.label))}}>(DEFAULT_ENUM_RETURN_VALUE);
+    }
+    {{else}}
+    return static_cast<{{asUnderlyingType label}}>(value);
+    {{/if}}
+}
+{{/zcl_enums}}
+{{/if}}
+{{/zcl_clusters}}

@@ -14,7 +14,7 @@
     ],
     "templates": [
         {
-            "path": "matter_support_data_model.js.zapt",
+            "path": "../../../../unify-matter-common/zap-common/matter_support_data_model.js.zapt",
             "name": "Matter data model support",
             "output": "matter_support_model.js"
         }

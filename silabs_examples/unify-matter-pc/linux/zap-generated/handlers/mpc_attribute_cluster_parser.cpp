@@ -35,6 +35,8 @@
 #include "attribute_resolver_rule.h"
 #include "attribute_store.h"
 #include "dotdot_mqtt.h"
+#include "matter_to_unify_converter.hpp"
+#include "zap-types.h"
 
 using namespace std;
 using namespace attribute_store;
@@ -167,22 +169,22 @@ sl_status_t mpc_on_off_cluster_parser(const chip::app::ConcreteDataAttributePath
     case OnOff::Attributes::OnOff::Id: { // type boolean
         auto value = info.onOff;
         sl_log_info(LOG_TAG, "OnOff: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<OnOff::Attributes::OnOff::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<uint8_t>(to_unify(value));
     } break;
     case OnOff::Attributes::GlobalSceneControl::Id: { // type boolean
         auto value = info.globalSceneControl;
         sl_log_info(LOG_TAG, "GlobalSceneControl: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<OnOff::Attributes::GlobalSceneControl::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<uint8_t>(to_unify(value));
     } break;
     case OnOff::Attributes::OnTime::Id: { // type int16u
         auto value = info.onTime;
         sl_log_info(LOG_TAG, "OnTime: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<OnOff::Attributes::OnTime::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<uint16_t>(to_unify(value));
     } break;
     case OnOff::Attributes::OffWaitTime::Id: { // type int16u
         auto value = info.offWaitTime;
         sl_log_info(LOG_TAG, "OffWaitTime: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<OnOff::Attributes::OffWaitTime::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<uint16_t>(to_unify(value));
     } break;
     case OnOff::Attributes::StartUpOnOff::Id: { // type StartUpOnOffEnum
         chip::app::Clusters::OnOff::StartUpOnOffEnum value;
@@ -190,8 +192,9 @@ sl_status_t mpc_on_off_cluster_parser(const chip::app::ConcreteDataAttributePath
             value = chip::app::Clusters::OnOff::StartUpOnOffEnum::kUnknownEnumValue;
         else
             value = info.startUpOnOff.Value();
+        OnOffStartUpOnOff unify_value = to_unify<chip::app::Clusters::OnOff::StartUpOnOffEnum, OnOffStartUpOnOff>(value);
         sl_log_info(LOG_TAG, "StartUpOnOff: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<chip::app::Clusters::OnOff::StartUpOnOffEnum>(value);
+        attribute(mNode).set_reported<uint8_t>(static_cast<uint8_t>(unify_value));
     } break;
     case OnOff::Attributes::GeneratedCommandList::Id: {
         info.generatedCommandList.ComputeSize(&count);
@@ -214,12 +217,12 @@ sl_status_t mpc_on_off_cluster_parser(const chip::app::ConcreteDataAttributePath
     case OnOff::Attributes::FeatureMap::Id: { // type bitmap32
         auto value = info.featureMap;
         sl_log_info(LOG_TAG, "FeatureMap: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<OnOff::Attributes::FeatureMap::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<uint32_t>(to_unify(value));
     } break;
     case OnOff::Attributes::ClusterRevision::Id: { // type int16u
         auto value = info.clusterRevision;
         sl_log_info(LOG_TAG, "ClusterRevision: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<OnOff::Attributes::ClusterRevision::TypeInfo::Type>(value);
+        attribute(mNode).set_reported<uint16_t>(to_unify(value));
     } break;
     default:
         break;

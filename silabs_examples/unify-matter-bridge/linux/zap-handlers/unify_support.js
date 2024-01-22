@@ -1,5 +1,5 @@
 
-var unify_matter_mapping = require('./unify_matter_mapping.js')
+var unify_matter_mapping = require('../../../unify-matter-common/zap-common/unify_matter_mapping.js')
 var unify = require('../zap-generated/data-models/unify_support_model.js')
 
 
@@ -70,12 +70,16 @@ function unifyClusterAttributeName(clusterID,attributesID) {
 
 function unifyEnumValName(n) {
   var name = unify_matter_mapping.unify_enum_name(n.parent.label);
-  if(unify.model.enums.hasOwnProperty(name)) {
-    return unify.model.enums[name][n.index]
-  } else {
-    console.log("--->  Enum " + name + " was not mapped, make sure that this is ok " );
-    return n.label
+  if(!unify.model.enums.hasOwnProperty(name)) {
+    // As few matter have same Enum types for multiple clutsers. Here, we differ them using Cluster name
+    var enum_name = n.parent.parent.label+"::"+n.parent.label;
+    name = unify_matter_mapping.unify_enum_name(enum_name);
+    if(!unify.model.enums.hasOwnProperty(name)){
+      console.log("--->  Enum " + name + " was not mapped, make sure that this is ok " );
+      return n.label
+    }
   }
+  return unify.model.enums[name][n.index]
 }
 
 function unifyBitmapValName(n) {

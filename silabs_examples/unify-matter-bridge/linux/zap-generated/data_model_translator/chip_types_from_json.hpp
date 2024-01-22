@@ -176,9 +176,9 @@ template <>
 inline std::optional<OnOff::StartUpOnOffEnum> from_json(const nlohmann::json& value)
 {
     const std::map<std::string, OnOff::StartUpOnOffEnum> table = {
-        { "Off", OnOff::StartUpOnOffEnum::kOff },
-        { "On", OnOff::StartUpOnOffEnum::kOn },
-        { "Toggle", OnOff::StartUpOnOffEnum::kToggle },
+        { "SetOnOffTo0", OnOff::StartUpOnOffEnum::kOff },
+        { "SetOnOffTo1", OnOff::StartUpOnOffEnum::kOn },
+        { "TogglePreviousOnOff", OnOff::StartUpOnOffEnum::kToggle },
     };
 
     auto i = table.find(value);

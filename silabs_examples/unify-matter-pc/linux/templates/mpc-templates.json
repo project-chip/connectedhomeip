@@ -9,8 +9,12 @@
         "common/attributes/Accessors.js",
         "templates/app/helper.js",
         "templates/chip/helper.js",
+        "mpc_support.js",
         "mpc-helpers.js"
     ],
+    "resources": {
+        "config-data": "../../../../src/app/common/templates/config-data.yaml"
+    },
     "override": "../../../../src/app/zap-templates/common/override.js",
     "templates": [
         {
@@ -30,8 +34,13 @@
         },
         {
             "path": "mpc_attribute_cluster_parser.cpp.zapt",
-            "name": "Header",
+            "name": "Implementation",
             "output": "mpc_attribute_cluster_parser.cpp"
+        },
+        {
+            "path": "matter_to_unify_converter.hpp.zapt",
+            "name": "Header",
+            "output": "matter_to_unify_converter.hpp"
         }
     ]
 }

@@ -139,8 +139,10 @@ const enums_unify_to_matter = {
     "OTAUpgradeUpgradeActivationPolicy" : "",  // Not used
     "OTAUpgradeUpgradeTimeoutPolicy" : "",  // Not used
     "OccupancySensingOccupancySensorType" : "OccupancySensorTypeEnum",
-    "OffWithEffectEffectIdentifier" : "OnOffEffectIdentifier",
-    "OnOffStartUpOnOff" : "OnOffStartUpOnOff",
+    // As few matter have same Enum types for multiple clutsers. Here, we differ them using Cluster name
+    "OffWithEffectEffectIdentifier" : "OnOff::EffectIdentifierEnum",
+    "TriggerEffectEffectIdentifier" : "Identify::EffectIdentifierEnum",
+    "OnOffStartUpOnOff" : "StartUpOnOffEnum",
     "OperatingEventNotificationOperationEventCode" : "DoorLockOperationEventCode",
     "OptionsStartupMode" : "",  // Not used
     "ProfileIntervalPeriod" : "",  // FIXME

@@ -1,7 +1,7 @@
 #!/bin/bash
 pushd ../../../../
 
-output_dir=silabs_examples/unify-matter-pc/linux/zap-generated/
+output_dir=silabs_examples/unify-matter-pc/linux/zap-generated/handlers
 
 rm -rf "$output_dir"
 mkdir -p "$output_dir"

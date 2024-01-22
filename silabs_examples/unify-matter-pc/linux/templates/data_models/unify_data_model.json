@@ -9,7 +9,7 @@
         "common/attributes/Accessors.js",
         "templates/app/helper.js",
         "templates/chip/helper.js",
-        "../unify-helper.js"
+        "../mpc-helpers.js"
     ],
     "templates": [
         {

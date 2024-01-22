@@ -138,6 +138,34 @@ function supportedAttributes(cluster_name, attribute_id) {
   return false;
 }
 
+function supportedMappedClusterCode(code){
+  switch (code) {
+    default: return true
+  }
+}
+
+function matterSupportedClusterFeatureCommands(cluster_name, command_id) {
+  return true;
+}
+
+function matterSupportedClusterFeatureAttributes(cluster_name, command_id){
+  return true;
+}
+
+function supportedClusterCommandResponse(code)
+{
+  switch (code) {
+    default: return false
+  }
+}
+
+function supportedClusterEvents(code)
+{
+  switch (code) {
+    default: return false
+  }
+}
+
 function isDefaultNull(zclAttribute){
   if(zclAttribute.isNullable == true){
     return true;
@@ -171,8 +199,13 @@ exports.listComma                = listComma
 exports.commandCbFnName          = commandCbFnName
 exports.asSnakeCaseLower         = asSnakeCaseLower
 exports.supportedClusterByMpc    = supportedClusterByMpc
+exports.supportedMappedClusterCode    = supportedMappedClusterCode
 exports.supportedAttributes      = supportedAttributes
 exports.isDefaultNull            = isDefaultNull
 exports.isEntryTypeNotNull       = isEntryTypeNotNull
 exports.isProcessingRequired     = isProcessingRequired
 exports.isCommandHandlingRequired= isCommandHandlingRequired
+exports.matterSupportedClusterFeatureCommands = matterSupportedClusterFeatureCommands
+exports.matterSupportedClusterFeatureAttributes = matterSupportedClusterFeatureAttributes
+exports.supportedClusterCommandResponse = supportedClusterCommandResponse
+exports.supportedClusterEvents = supportedClusterEvents
