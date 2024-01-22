@@ -252,7 +252,7 @@ class YamlLoader:
             self.__check_test_step_response_value(content)
 
     def __check_test_step_response_value(self, content, allow_name_key=False):
-        schema = _TEST_STEP_RESPONSE_VALUE_SCHEMA
+        schema = _TEST_STEP_RESPONSE_SCHEMA
 
         if allow_name_key:
             schema['name'] = str
