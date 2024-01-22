@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,75 +20,106 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic Information"
-    endpoint: 0
+    cluster: "Oven Mode"
+    endpoint: 1
 
 tests:
-    - label:
-          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
-          test)."
-      verification: |
-
-      disabled: true
+    - label: "Step 1: Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
 
     - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
-      verification: |
-          ./chip-tool ovenmode read cluster-revision 1 1
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          value: 1
+          constraints:
+              type: int16u
 
-          [1705647221.295875][50041:50047] CHIP:DMG: }
-          [1705647221.296007][50041:50047] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFFD DataVersion: 3240184500
-          [1705647221.296039][50041:50047] CHIP:TOO:   ClusterRevision: 1
-      disabled: true
+    - label:
+          "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
+          be 1 if and only if OTCCM.S.F00(DEPONOFF)"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: OTCCM.S.F00
+      response:
+          constraints:
+              type: bitmap32
+              hasMasksSet: [0x1]
 
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
-      verification: |
-          ./chip-tool ovenmode read feature-map 1 1
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      PICS: "!OTCCM.S.F00"
+      response:
+          value: 0
+          constraints:
+              type: bitmap32
 
-          [1705647273.001229][53151:53158] CHIP:DMG: }
-          [1705647273.001266][53151:53158] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFFC DataVersion: 3240184500
-          [1705647273.001279][53151:53158] CHIP:TOO:   FeatureMap: 1
-      disabled: true
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4: TH reads from the DUT the AttributeList attribute."
-      verification: |
-          ./chip-tool ovenmode read attribute-list 1 1
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
+      PICS: "!PICS_EVENT_LIST_ENABLED"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-          [1705647386.476019][60066:60072] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFFB DataVersion: 3240184500
-          [1705647386.476098][60066:60072] CHIP:TOO:   AttributeList: 7 entries
-          [1705647386.476117][60066:60072] CHIP:TOO:     [1]: 0
-          [1705647386.476130][60066:60072] CHIP:TOO:     [2]: 1
-          [1705647386.476139][60066:60072] CHIP:TOO:     [3]: 65528
-          [1705647386.476151][60066:60072] CHIP:TOO:     [4]: 65529
-          [1705647386.476162][60066:60072] CHIP:TOO:     [5]: 65531
-          [1705647386.476171][60066:60072] CHIP:TOO:     [6]: 65532
-          [1705647386.476183][60066:60072] CHIP:TOO:     [7]: 65533
-      disabled: true
+    - label:
+          "Step 4b: Read the optional attribute(StartUpMode) in AttributeList"
+      PICS: OTCCM.S.A0002
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [2]
 
-    - label: "Step 5*: TH reads from the DUT the EventList attribute."
-      verification: |
-          ./chip-tool ovenmode read event-list 1 1
+    - label:
+          "Step 4c: Read the Feature dependent attribute(DEPONOFF) in
+          AttributeList"
+      PICS: OTCCM.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
 
-
-          [1705647422.713386][62252:62257] CHIP:DMG: 				StatusIB =
-          [1705647422.713399][62252:62257] CHIP:DMG: 				{
-          [1705647422.713411][62252:62257] CHIP:DMG: 					status = 0x86 (UNSUPPORTED_ATTRIBUTE),
-          [1705647422.713420][62252:62257] CHIP:DMG: 				},
-      disabled: true
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
 
     - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
-      verification: |
-          ./chip-tool ovenmode read accepted-command-list 1 1
-
-          [1705647458.520722][64406:64412] CHIP:DMG: }
-          [1705647458.520764][64406:64412] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFF9 DataVersion: 3240184500
-          [1705647458.520776][64406:64412] CHIP:TOO:   AcceptedCommandList: 0 entries
-      disabled: true
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0]
 
     - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
-      verification: |
-          ./chip-tool ovenmode read generated-command-list 1 1
-
-          [1705647658.986480][76560:76567] CHIP:DMG: }
-          [1705647658.986529][76560:76567] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_FFF8 DataVersion: 3240184500
-          [1705647658.986540][76560:76567] CHIP:TOO:   GeneratedCommandList: 0 entries
-      disabled: true
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [1]

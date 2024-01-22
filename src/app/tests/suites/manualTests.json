@@ -307,6 +307,7 @@
         "Test_TC_BRBINFO_3_1"
     ],
     "LaundryWasherControl": [],
+    "OvenMode": ["Test_TC_OTCCM_1_2", "Test_TC_OTCCM_3_2", "Test_TC_OTCCM_3_3"],
     "AccessControlEnforcement": [],
     "OvenMode": ["Test_TC_OTCCM_1_1", "Test_TC_OTCCM_1_2"],
     "EnergyEVSE": ["Test_TC_EEVSE_1_1", "Test_TC_EEVSE_2_1"],
@@ -352,6 +353,7 @@
         "LevelControl",
         "LaundryWasherMode",
         "OnOff",
+        "OvenMode",
         "OperationalState",
         "OvenMode",
         "RelativeHumidityMeasurement",
