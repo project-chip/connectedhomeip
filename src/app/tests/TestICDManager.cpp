@@ -203,14 +203,14 @@ public:
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == table.Set(0, entry));
 
         // Trigger register event after first entry was added
-        ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDMEvent::kTableUpdated);
+        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDMEvent::kTableUpdated);
 
         // Check ICDManager is now in the LIT operating mode
         NL_TEST_ASSERT(aSuite, ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT);
 
         // Kick an ActiveModeThreshold since a Registration can only happen from an incoming message that would transition the ICD
         // to ActiveMode
-        ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+        ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Return the device to return to IdleMode - Increase time by ActiveModeThreshold since ActiveModeDuration is 0
