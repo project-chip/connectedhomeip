@@ -8229,8 +8229,6 @@ public class ClusterIDMapping {
 
         public enum Command {
             Pause(0L),
-            Stop(1L),
-            Start(2L),
             Resume(3L),
             GoHome(128L),;
             private final long id;
