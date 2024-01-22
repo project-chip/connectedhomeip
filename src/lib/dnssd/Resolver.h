@@ -177,6 +177,7 @@ struct CommissionNodeData
     size_t rotatingIdLen                                      = 0;
     uint16_t pairingHint                                      = 0;
     char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
+    uint8_t commissionerPasscode                              = 0;
 
     CommissionNodeData() {}
 
@@ -230,6 +231,10 @@ struct CommissionNodeData
             ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         ChipLogDetail(Discovery, "\tCommissioning Mode: %u", commissioningMode);
+        if (commissionerPasscode > 0)
+        {
+            ChipLogDetail(Discovery, "\tCommissioner Passcode: %u", commissionerPasscode);
+        }
     }
 };
 

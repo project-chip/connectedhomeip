@@ -22,6 +22,7 @@
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />
    <xi:include href="chip/device-energy-management-cluster.xml" />
+   <xi:include href="chip/device-energy-management-mode-cluster.xml" />
    <xi:include href="chip/diagnostic-logs-cluster.xml" />
    <xi:include href="chip/dishwasher-alarm-cluster.xml" />
    <xi:include href="chip/dishwasher-mode-cluster.xml" />
@@ -30,6 +31,7 @@
    <xi:include href="chip/microwave-oven-control-cluster.xml" />
    <xi:include href="chip/door-lock-cluster.xml" />
    <xi:include href="chip/energy-evse-cluster.xml" />
+   <xi:include href="chip/energy-evse-mode-cluster.xml" />   
    <xi:include href="chip/energy-preference-cluster.xml" />
    <xi:include href="chip/ethernet-network-diagnostics-cluster.xml" />
    <xi:include href="chip/electrical-energy-measurement-cluster.xml" />

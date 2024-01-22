@@ -70,7 +70,7 @@ void ValveControlDelegate::HandleRemainingDurationTick(uint32_t duration)
     sLastOpenDuration = duration;
 }
 
-void ExtendedTimeSyncDelegate::UTCTimeChanged(uint64_t time)
+void ExtendedTimeSyncDelegate::UTCTimeAvailabilityChanged(uint64_t time)
 {
     ValveConfigurationAndControl::UpdateAutoCloseTime(time);
 }

@@ -21,6 +21,8 @@
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
+#include <device-energy-management-modes.h>
+#include <energy-evse-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -73,11 +75,10 @@ CHIP_ERROR DeviceEnergyManagementInit()
     gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(
         EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
         BitMask<DeviceEnergyManagement::Feature, uint32_t>(
-            DeviceEnergyManagement::Feature::kPowerForecastReporting, DeviceEnergyManagement::Feature::kStateForecastReporting,
-            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kForecastAdjustment),
-        BitMask<DeviceEnergyManagement::OptionalCommands, uint32_t>(
-            DeviceEnergyManagement::OptionalCommands::kSupportsModifyForecastRequest,
-            DeviceEnergyManagement::OptionalCommands::kSupportsRequestConstraintBasedForecast));
+            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
+            DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+            DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+            DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
 
     if (!gDEMInstance)
     {
@@ -269,6 +270,9 @@ void ApplicationShutdown()
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
     EnergyEvseShutdown();             /* Free the EnergyEvse */
     DeviceEnergyManagementShutdown(); /* Free the DEM */
+
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::EnergyEvseMode::Shutdown();
 }
 
 int main(int argc, char * argv[])

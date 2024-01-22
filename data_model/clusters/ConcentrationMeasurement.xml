@@ -62,6 +62,7 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Cluster redesigned to add support for Level Indication, Peak/Average Measurement, Medium/Unit of Measurement and Uncertainty."/>
   </revisionHistory>
   <clusterIds>
+    <clusterId id="0x040C" name="Carbon Monoxide Concentration Measurement"/>
     <clusterId id="0x040D" name="Carbon Dioxide Concentration Measurement"/>
     <clusterId id="0x0413" name="Nitrogen Dioxide Concentration Measurement"/>
     <clusterId id="0x0415" name="Ozone Concentration Measurement"/>

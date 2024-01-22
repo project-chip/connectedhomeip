@@ -38,6 +38,9 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
                             "Unexpected return type for ChangeToMode")
         return ret
 
+    def pics_TC_RVCRUNM_2_1(self) -> list[str]:
+        return ["RVCRUNM.S"]
+
     @async_test_body
     async def test_TC_RVCRUNM_2_1(self):
 
