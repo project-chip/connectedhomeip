@@ -60,7 +60,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
     <revision revision="2" summary="Updates after 0.7 Ballot review"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="ENEVSE" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="EEVSE" scope="Endpoint"/>
   <features>
     <feature bit="0" code="PREF" name="ChargingPreferences" summary="EVSE supports storing user charging preferences">
       <optionalConform/>
@@ -79,6 +79,8 @@ Davis, CA 95616, USA
     </feature>
   </features>
   <dataTypes>
+    <number name="ChargingTargets Field" type=""/>
+    <number name="DayOfWeekForSequence Field" type=""/>
     <enum name="EnergyTransferStoppedReasonEnum">
       <item value="0" name="EVStopped" summary="The EV decided to stop">
         <mandatoryConform/>
@@ -212,6 +214,17 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </bitfield>
     </bitmap>
+    <struct name="ChargingTargetScheduleStruct">
+      <field id="0" name="DayOfWeekForSequence" type="TargetDayOfWeekBitmap">
+        <mandatoryConform/>
+        <constraint type="desc"/>
+      </field>
+      <field id="1" name="ChargingTargets" type="list">
+        <entry type="ChargingTargetStruct"/>
+        <mandatoryConform/>
+        <constraint type="maxCount" value="10"/>
+      </field>
+    </struct>
     <struct name="ChargingTargetStruct">
       <field id="0" name="TargetTimeMinutesPastMidnight" type="uint16" default="0">
         <access read="true" write="true"/>
@@ -220,7 +233,12 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="TargetSoC" type="percent" default="0">
         <access read="true" write="true"/>
-        <optionalConform choice="a" more="true"/>
+        <otherwiseConform>
+          <mandatoryConform>
+            <feature name="SOC"/>
+          </mandatoryConform>
+          <optionalConform choice="a" more="true"/>
+        </otherwiseConform>
       </field>
       <field id="2" name="AddedEnergy" type="energy-mWh" default="0">
         <access read="true" write="true"/>
@@ -292,20 +310,6 @@ Davis, CA 95616, USA
       <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <optionalConform/>
       <constraint type="between" from="0" to="86400"/>
-    </attribute>
-    <attribute id="0x0021" name="NumberOfWeeklyTargets" type="uint8" default="0">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="PREF"/>
-      </mandatoryConform>
-    </attribute>
-    <attribute id="0x0022" name="NumberOfDailyTargets" type="uint8" default="1">
-      <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
-      <mandatoryConform>
-        <feature name="PREF"/>
-      </mandatoryConform>
     </attribute>
     <attribute id="0x0023" name="NextChargeStartTime" type="epoch-s" default="null">
       <access read="true" readPrivilege="view"/>
@@ -398,14 +402,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
-      <field id="0" name="DayOfWeekforSequence" type="TargetDayOfWeekBitmap">
+      <field id="0" name="ChargingTargetSchedules" type="list">
+        <entry type="ChargingTargetScheduleStruct"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="1" name="ChargingTargets" type="list">
-        <entry type="ChargingTargetStruct"/>
-        <mandatoryConform/>
-        <constraint type="maxCount" value="10"/>
+        <constraint type="maxCount" value="7"/>
       </field>
     </command>
     <command id="0x01" name="Disable" response="Y">
@@ -451,14 +451,10 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
-      <field id="0" name="DayOfWeekforSequence" type="TargetDayOfWeekBitmap">
+      <field id="0" name="ChargingTargetSchedules" type="list">
+        <entry type="ChargingTargetScheduleStruct"/>
         <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
-      <field id="1" name="ChargingTargets" type="list">
-        <entry type="ChargingTargetStruct"/>
-        <mandatoryConform/>
-        <constraint type="maxCount" value="10"/>
+        <constraint type="maxCount" value="7"/>
       </field>
     </command>
     <command id="0x06" name="GetTargets" response="GetTargetsResponse">
@@ -466,10 +462,6 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PREF"/>
       </mandatoryConform>
-      <field id="0" name="DaysToReturn" type="TargetDayOfWeekBitmap">
-        <mandatoryConform/>
-        <constraint type="desc"/>
-      </field>
     </command>
     <command id="0x07" name="ClearTargets" response="Y">
       <access invokePrivilege="operate" timed="true"/>

@@ -613,36 +613,6 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPScenesManagementClusterEnhancedAddSceneResponseCallback
-    : public Callback::Callback<CHIPScenesManagementClusterEnhancedAddSceneResponseCallbackType>
-{
-public:
-    CHIPScenesManagementClusterEnhancedAddSceneResponseCallback(jobject javaCallback);
-
-    ~CHIPScenesManagementClusterEnhancedAddSceneResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::ScenesManagement::Commands::EnhancedAddSceneResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPScenesManagementClusterEnhancedViewSceneResponseCallback
-    : public Callback::Callback<CHIPScenesManagementClusterEnhancedViewSceneResponseCallbackType>
-{
-public:
-    CHIPScenesManagementClusterEnhancedViewSceneResponseCallback(jobject javaCallback);
-
-    ~CHIPScenesManagementClusterEnhancedViewSceneResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::ScenesManagement::Commands::EnhancedViewSceneResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
 class CHIPScenesManagementClusterCopySceneResponseCallback
     : public Callback::Callback<CHIPScenesManagementClusterCopySceneResponseCallbackType>
 {
@@ -668,6 +638,37 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPEnergyEvseModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPEnergyEvseModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPEnergyEvseModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPEnergyEvseModeClusterChangeToModeResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallback
+    : public Callback::Callback<CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallbackType>
+{
+public:
+    CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallback(jobject javaCallback);
+
+    ~CHIPDeviceEnergyManagementModeClusterChangeToModeResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

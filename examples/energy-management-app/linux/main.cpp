@@ -21,6 +21,8 @@
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
+#include <device-energy-management-modes.h>
+#include <energy-evse-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -268,6 +270,9 @@ void ApplicationShutdown()
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
     EnergyEvseShutdown();             /* Free the EnergyEvse */
     DeviceEnergyManagementShutdown(); /* Free the DEM */
+
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::EnergyEvseMode::Shutdown();
 }
 
 int main(int argc, char * argv[])

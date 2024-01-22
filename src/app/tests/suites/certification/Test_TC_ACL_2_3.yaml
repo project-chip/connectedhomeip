@@ -17,6 +17,7 @@ name: 133.2.3. [TC-ACL-2.3] Extension attribute
 
 PICS:
     - ACL.S
+    - ACL.S.A0001
 
 config:
     nodeId: 0x12344321
@@ -54,7 +55,7 @@ config:
         defaultValue: ""
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
