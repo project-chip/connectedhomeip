@@ -82,9 +82,6 @@ extern uint8_t attributeData[]; // main storage bucket for all attributes
 
 void emAfCallInits(void);
 
-#define emberAfClusterIsClient(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_CLIENT) != 0))
-#define emberAfClusterIsServer(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_SERVER) != 0))
-
 // Initial configuration
 void emberAfEndpointConfigure(void);
 

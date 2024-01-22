@@ -726,8 +726,7 @@ const EmberAfCluster * emberAfFindClusterInType(const EmberAfEndpointType * endp
     {
         const EmberAfCluster * cluster = &(endpointType->cluster[i]);
 
-        if ((mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
-             (mask == CLUSTER_MASK_SERVER && emberAfClusterIsServer(cluster))))
+        if (mask == 0 || ((cluster->mask & mask) != 0))
         {
             if (cluster->clusterId == clusterId)
             {
@@ -1038,20 +1037,10 @@ uint8_t emberAfClusterCountByIndex(uint16_t endpointIndex, bool server)
 
 uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
 {
-    uint8_t c = 0;
-    for (uint8_t i = 0; i < type->clusterCount; i++)
-    {
-        auto * cluster = &(type->cluster[i]);
-        if (server && emberAfClusterIsServer(cluster))
-        {
-            c++;
-        }
-        if ((!server) && emberAfClusterIsClient(cluster))
-        {
-            c++;
-        }
-    }
-    return c;
+    const EmberAfClusterMask cluster_mask = server ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+
+    return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
+                                              [=](const EmberAfCluster & cluster) { return (cluster.mask & cluster_mask) != 0; }));
 }
 
 uint8_t emberAfGetClusterCountForEndpoint(EndpointId endpoint)
@@ -1121,28 +1110,31 @@ CHIP_ERROR SetTagList(EndpointId endpoint, Span<const Clusters::Descriptor::Stru
 const EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool server)
 {
     uint16_t index = emberAfIndexFromEndpoint(endpoint);
-    EmberAfDefinedEndpoint * de;
-    uint8_t i, c = 0;
-    const EmberAfCluster * cluster;
-
     if (index == kEmberInvalidEndpointIndex)
     {
         return nullptr;
     }
-    de = &(emAfEndpoints[index]);
 
-    for (i = 0; i < de->endpointType->clusterCount; i++)
+    const EmberAfEndpointType * endpointType = emAfEndpoints[index].endpointType;
+    const EmberAfClusterMask cluster_mask    = server ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+    const uint8_t clusterCount               = endpointType->clusterCount;
+
+    uint8_t c = 0;
+    for (uint8_t i = 0; i < clusterCount; i++)
     {
-        cluster = &(de->endpointType->cluster[i]);
+        const EmberAfCluster * cluster = &(endpointType->cluster[i]);
 
-        if ((server && emberAfClusterIsServer(cluster)) || ((!server) && emberAfClusterIsClient(cluster)))
+        if ((cluster->mask & cluster_mask) == 0)
         {
-            if (c == n)
-            {
-                return cluster;
-            }
-            c++;
+            continue;
         }
+
+        if (c == n)
+        {
+            return cluster;
+        }
+
+        c++;
     }
     return nullptr;
 }
