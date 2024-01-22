@@ -1836,7 +1836,7 @@ OPSTATE.S.C04.Tx=1
 
 # Server Events
 OPSTATE.S.E00=1
-OPSTATE.S.E01=1
+OPSTATE.S.E01=0
 
 
 # Oven Operational State
@@ -2776,7 +2776,7 @@ DEM.S.A0005=0
 DEM.S.A0006=0
 DEM.S.A0007=0
 
-# Features 
+# Features
 DEM.S.F00=0
 DEM.S.F01=0
 DEM.S.F02=0
