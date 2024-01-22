@@ -466,7 +466,8 @@ private:
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 
-    union CallbackHandle {
+    union CallbackHandle
+    {
         CallbackHandle(Callback * apCallback) : legacyCallback(apCallback) {}
         CallbackHandle(ExtendableCallback * apExtendableCallback) : extendableCallback(apExtendableCallback) {}
         Callback * legacyCallback;

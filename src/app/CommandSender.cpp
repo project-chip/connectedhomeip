@@ -71,11 +71,8 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
 CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messaging::ExchangeManager * apExchangeMgr,
                              bool aIsTimedRequest, bool aSuppressResponse) :
     mExchangeCtx(*this),
-    mCallbackHandle(apExtendableCallback),
-    mpExchangeMgr(apExchangeMgr),
-    mSuppressResponse(aSuppressResponse),
-    mTimedRequest(aIsTimedRequest),
-    mUseExtendableCallback(true)
+    mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
+    mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true)
 {
     assertChipStackLockedByCurrentThread();
 }
@@ -452,7 +449,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
-    bool canAddAnotherCommand     = (mState == State::AddedCommand && mBatchCommandsEnabled && mUseExtendableCallback);
+    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && mUseExtendableCallback);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
