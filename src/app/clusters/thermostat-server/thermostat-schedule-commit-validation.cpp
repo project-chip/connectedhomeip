@@ -142,7 +142,7 @@ using DecodableType = Type;
 } // namespace ScheduleTypeStruct
 #endif
 
-static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule)
+static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, ScheduleStruct::Type & schedule, Span<PresetStruct::Type> & presetList)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     size_t index         = 0;
@@ -161,12 +161,11 @@ static EmberAfStatus CheckScheduleTypes(ThermostatMatterScheduleManager & mgr, S
                 VerifyOrReturnError(presetsSupported == true, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
 
                 // make sure the preset exists (check 7)
-                VerifyOrDie(mgr.mGetPresetAtIndexCb);
                 {
                     size_t preset_index = 0;
                     PresetStruct::Type preset;
                     bool presetFound = false;
-                    while (mgr.mGetPresetAtIndexCb(&mgr, preset_index, preset) != CHIP_ERROR_NOT_FOUND)
+                    while (presetList[index] != CHIP_ERROR_NOT_FOUND)
                     {
                         VerifyOrDie(preset.presetHandle.IsNull() == false);
                         if (preset.presetHandle.Value().data_equal(schedule.presetHandle.Value()))
@@ -244,7 +243,8 @@ exit:
 }
 
 EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Span<ScheduleStruct::Type> & oldlist,
-                                                                              Span<ScheduleStruct::Type> & newlist)
+                                                                              Span<ScheduleStruct::Type> & newlist,
+                                                                              Span<PresetStruct::Type> & presetlist)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     ScheduleStruct::Type querySchedule; // manager storage used for queries.
@@ -306,7 +306,7 @@ EmberAfStatus ThermostatMatterScheduleManager::ValidateSchedulesForCommitting(Sp
         }
 
         // Check for system mode in Schedule Types
-        status = CheckScheduleTypes(*this, new_schedule);
+        status = CheckScheduleTypes(*this, new_schedule, presetlist);
         SuccessOrExit(status);
 
         // Make sure the number of transitions does not exceed out limits

@@ -122,9 +122,10 @@ struct ThermostatMatterScheduleManager
     ThermostatMatterScheduleManager * next() { return this->nextEditor; }
     void setNext(ThermostatMatterScheduleManager * inst) { this->nextEditor = inst; }
 
-    EmberAfStatus ValidatePresetsForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & oldlist,
-                                               chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & newlist);
+    EmberAfStatus ValidatePresetsForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & oldList,
+                                               chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & newList);
     EmberAfStatus
-    ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & oldlist,
-                                   chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & newlist);
+    ValidateSchedulesForCommitting(chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & oldList,
+                                   chip::Span<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::Type> & newList,
+                                   chip::Span<chip::app::Clusters::Thermostat::Structs::PresetStruct::Type> & presetList);
 };
