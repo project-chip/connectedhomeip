@@ -29,6 +29,7 @@
         "CONTENT_APP_OBSERVER_CLUSTER": [],
         "DESCRIPTOR_CLUSTER": [],
         "DEVICE_ENERGY_MANAGEMENT_CLUSTER": [],
+        "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER": [],
         "DEVICE_TEMP_CLUSTER": [],
         "DIAGNOSTIC_LOGS_CLUSTER": [],
         "DISHWASHER_ALARM_CLUSTER": [],
@@ -38,6 +39,7 @@
         "ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER": [],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ENERGY_EVSE_CLUSTER": [],
+        "ENERGY_EVSE_MODE_CLUSTER": [],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "ENERGY_PREFERENCE_CLUSTER": [],
         "FAN_CONTROL_CLUSTER": [],
@@ -168,6 +170,7 @@
         "CONTENT_APP_OBSERVER_CLUSTER": ["content-app-observer"],
         "DESCRIPTOR_CLUSTER": ["descriptor"],
         "DEVICE_ENERGY_MANAGEMENT_CLUSTER": ["device-energy-management-server"],
+        "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER": ["mode-base-server"],
         "DEVICE_TEMP_CLUSTER": [],
         "DIAGNOSTIC_LOGS_CLUSTER": ["diagnostic-logs-server"],
         "DISHWASHER_ALARM_CLUSTER": ["dishwasher-alarm-server"],
@@ -179,6 +182,7 @@
         ],
         "ELECTRICAL_MEASUREMENT_CLUSTER": [],
         "ENERGY_EVSE_CLUSTER": ["energy-evse-server"],
+        "ENERGY_EVSE_MODE_CLUSTER": ["mode-base-server"],
         "ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER": [
             "ethernet-network-diagnostics-server"
         ],

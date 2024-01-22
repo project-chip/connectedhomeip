@@ -19,6 +19,7 @@ name:
 
 PICS:
     - DRLK.S
+    - DRLK.S.F08
 
 config:
     nodeId: 0x12344321
@@ -84,7 +85,8 @@ tests:
                 value: null
 
     - label:
-          "Step 1: TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute"
+          "Step 1: TH reads NumberOfWeekDay SchedulesSupportedPerUser attribute
+          and saves for future use"
       PICS: DRLK.S.F04 && DRLK.S.A0014
       command: "readAttribute"
       attribute: "NumberOfWeekDaySchedulesSupportedPerUser"
@@ -94,7 +96,9 @@ tests:
               minValue: 0
               maxValue: 255
 
-    - label: "Step 2: TH reads NumberOfTotalUsers Supported attribute"
+    - label:
+          "Step 2: TH reads NumberOfTotalUsers Supported attribute and saves for
+          future use"
       PICS: DRLK.S.F08 && DRLK.S.A0011
       command: "readAttribute"
       attribute: "NumberOfTotalUsersSupported"
@@ -104,7 +108,11 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 3: TH send Set Week Day Schedule Command"
+    - label:
+          "Step 3: TH send Set Week Day Schedule Command to DUT with the
+          following values : a)WeekDayIndex as 1 b)UserIndex as 1 c)DaysMaskMap
+          as 2 d)StartHour as 15 e)StartMinute as 45 f)EndHour as 16 g)EndMinute
+          as 55 "
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
@@ -125,7 +133,9 @@ tests:
                 value: 55
 
     #issue #18591
-    - label: "Step 4: TH send Get Week Day Schedule Command to DUT"
+    - label:
+          "Step 4:  TH send Get Week Day Schedule Command to DUT with
+          a)WeekDayIndex as 1 b)UserIndex as 1 "
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
@@ -157,7 +167,11 @@ tests:
                     hasValue: true
                     minValue: 55
 
-    - label: "Step 5: TH send Set Week Day Schedule Command"
+    - label:
+          "Step 5: TH send Set Week Day Schedule Command to DUT with the
+          following values : a)WeekDayIndex as 0 (invalid value) b)UserIndex as
+          1 c)DaysMaskMap as 7 (invalid value) d)StartHour as 15 e)StartMinute
+          as 45 f)EndHour as 16 g)EndMinute as 55"
       PICS: DRLK.S.F04 && DRLK.S.C0b.Rsp
       command: "SetWeekDaySchedule"
       arguments:
@@ -179,7 +193,9 @@ tests:
       response:
           error: INVALID_COMMAND
 
-    - label: "Step 6: TH send Get Week Day Schedule Command to DUT"
+    - label:
+          "Step 6: TH send Get Week Day Schedule Command to DUT : a)WeekDayIndex
+          as 0 b)UserIndex as 1 "
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
@@ -213,8 +229,9 @@ tests:
                     hasValue: false
 
     - label:
-          "Step 7: TH sends Get Week Day Schedule Command to DUT for
-          non-existent User"
+          "Step 7: TH sends Get Week Day Schedule Command to DUT with following
+          values: a)WeekDayIndex as 1 (index of existing Schedule entry)
+          b)UserIndex as 2 (index on non-existent User)"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:
@@ -247,7 +264,9 @@ tests:
                 constraints:
                     hasValue: false
 
-    - label: "Step 8: TH sends Clear Week Day Schedule Command to DUT"
+    - label:
+          "Step 8: TH sends Clear Week Day Schedule Command to DUT with :
+          a)WeekDayIndex as 1 b)UserIndex as 1"
       PICS: DRLK.S.F04 && DRLK.S.C0d.Rsp
       command: "ClearWeekDaySchedule"
       arguments:
@@ -257,7 +276,9 @@ tests:
               - name: "UserIndex"
                 value: 1
 
-    - label: "Step 9: TH sends Get Week Day Schedule Command to DUT"
+    - label:
+          "Step 9: TH sends Get Week Day Schedule Command to DUT with following
+          values: a)WeekDayIndex as 1 b)UserIndex as 1"
       PICS: DRLK.S.F04 && DRLK.S.C0c.Rsp && DRLK.S.C0c.Tx
       command: "GetWeekDaySchedule"
       arguments:

@@ -43,7 +43,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
         code = 0
 
         try:
-            await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=current_time, granularity=time_cluster.Enums.GranularityEnum.kSecondsGranularity), endpoint=endpoint)
+            await self.send_single_cmd(cmd=time_cluster.Commands.SetUTCTime(UTCTime=current_time, granularity=time_cluster.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=endpoint)
         except InteractionModelError as e:
             # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
             # see #26521
@@ -66,8 +66,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_GEN_2_4(self):
-        self.print_step(1, "Detect Time Synchronization UTCTime attribute presence")
-
+        self.print_step("1a", "Detect Time Synchronization UTCTime attribute presence")
         root_descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Descriptor)])
         root_server_list = root_descriptor[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
         has_timesync = (Clusters.TimeSynchronization.id in root_server_list)
@@ -80,6 +79,21 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             if has_utc_time:
                 testvar_TimeSyncSupported = True
+            else:
+                asserts.fail("Time Synchronization cluster present but UTCTime missing. This should not happen!")
+
+            self.print_step("1b", "Write current time to DUT")
+            # Get current time in the correct format to set via command.
+            th_utc = matter_epoch_us_from_utc_datetime(desired_datetime=None)
+
+            await self.set_time_in_timesync(th_utc)
+
+            self.print_step("1c", "Read current time from DUT")
+            testvar_UTCTime1 = await self.read_timesync_attribute_expect_success(Clusters.TimeSynchronization.Attributes.UTCTime)
+            asserts.assert_true(testvar_UTCTime1 != NullValue,
+                                "UTCTime1 readback must not be null after SetUTCTime (per Time Synchronization cluster spec)")
+
+            testvar_TimeSyncSupported = True
 
         self.print_step(2, "Read UpTime attribute, save as UpTime1")
         testvar_UpTime1 = await self.read_diags_attribute_expect_success(Clusters.GeneralDiagnostics.Attributes.UpTime)
@@ -89,22 +103,14 @@ class TC_DGGEN_2_4(MatterBaseTest):
         if testvar_TimeSyncSupported:
             self.print_step(3, "Functional verifications when Time Synchronization is supported")
 
-            self.print_step("3a", "Write current time to DUT")
-            # Get current time in the correct format to set via command.
-            th_utc = matter_epoch_us_from_utc_datetime(desired_datetime=None)
+            self.print_step("3a", "Read UTCTime if TimeSyncSupported is true (already done as part of 1c, not redoing)")
 
-            await self.set_time_in_timesync(th_utc)
-
-            self.print_step("3b", "Read current time from DUT")
-            testvar_UTCTime1 = await self.read_timesync_attribute_expect_success(Clusters.TimeSynchronization.Attributes.UTCTime)
-            asserts.assert_true(testvar_UTCTime1 != NullValue, "UTCTime1 readback must not be null")
-
-            self.print_step("3c", "Wait for 1 second")
+            self.print_step("3b", "Wait for 1 second")
             await asyncio.sleep(1)
 
-            self.print_step("3d", "Send a first TimeSnapshot command and verify")
+            self.print_step("3c", "Send a first TimeSnapshot command and verify")
             response = await self.send_time_snapshot_expect_success()
-            logging.info(f"Step 3d: {response}")
+            logging.info(f"Step 3c: {response}")
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following conditions met:
             #   - Value of PosixTimeMs field is not null.
@@ -127,13 +133,13 @@ class TC_DGGEN_2_4(MatterBaseTest):
             testvar_SystemTimeMs1 = response.systemTimeMs
             testvar_PosixTimeMs1 = response.posixTimeMs
 
-            self.print_step("3e", "Wait for 1 second")
+            self.print_step("3d", "Wait for 1 second")
             await asyncio.sleep(1)
 
-            self.print_step("3f", "Send a second TimeSnapshot command and verify")
+            self.print_step("3e", "Send a second TimeSnapshot command and verify")
 
             response = await self.send_time_snapshot_expect_success()
-            logging.info(f"Step 3f: {response}")
+            logging.info(f"Step 3e: {response}")
 
             # Verify that the DUT sends a TimeSnapshotResponse with the following fields:
             #   - Value of PosixTimeMs field is not null and greater than PosixTimeMs1.
@@ -145,11 +151,11 @@ class TC_DGGEN_2_4(MatterBaseTest):
             asserts.assert_greater(response.systemTimeMs, testvar_SystemTimeMs1,
                                    "System time in milliseconds must be > SystemTimeMs1")
 
-            self.print_step(4, "Skipped: Functional verifications when Time Synchronization is NOT supported")
+            self.print_step(4, "Skipped: Functional verifications for case when Time Synchronization is NOT supported")
 
         # Step 4 (Time Sync not supported)
         else:  # if not testvar_TimeSyncSupported:
-            self.print_step(3, "Skipped: Functional verifications when Time Synchronization is supported")
+            self.print_step(3, "Skipped: Functional verifications for case when Time Synchronization is supported")
 
             self.print_step(4, "Functional verifications when Time Synchronization is NOT supported")
 

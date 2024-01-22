@@ -24,6 +24,7 @@ import logging
 import os
 import pathlib
 import queue
+import random
 import re
 import sys
 import typing
@@ -42,6 +43,7 @@ from chip.tlv import float32, uint
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
+from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
@@ -150,7 +152,7 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
         if val not in ["1", "0"]:
             raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
 
-        pics[key.strip().upper()] = (val == "1")
+        pics[key.strip()] = (val == "1")
     return pics
 
 
@@ -377,6 +379,12 @@ def cluster_id_str(id):
         return f'{id_str(id)} {s}'
     except TypeError:
         return 'HERE IS THE PROBLEM'
+
+
+@dataclass
+class CustomCommissioningParameters:
+    commissioningParameters: CommissioningParameters
+    randomDiscriminator: int
 
 
 @dataclass
@@ -725,8 +733,19 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip().upper()
+        pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
+
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+        rnd_discriminator = random.randint(0, 4095)
+        try:
+            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                    discriminator=rnd_discriminator, option=1)
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
+            return params
+
+        except InteractionModelError as e:
+            asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:

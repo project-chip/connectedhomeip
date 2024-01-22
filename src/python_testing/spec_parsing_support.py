@@ -61,6 +61,7 @@ class XmlAttribute:
     conformance: Callable[[uint], ConformanceDecision]
     read_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
     write_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+    write_optional: bool
 
     def access_string(self):
         read_marker = "R" if self.read_access is not Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue else ""
@@ -100,6 +101,7 @@ class XmlCluster:
     accepted_commands: dict[uint, XmlCommand]
     generated_commands: dict[uint, XmlCommand]
     events: dict[uint, XmlEvent]
+    pics: str
 
 
 class CommandType(Enum):
@@ -123,6 +125,12 @@ class ClusterParser:
                 self._derived = classification.attrib['baseCluster']
         except (KeyError, StopIteration):
             self._derived = None
+
+        try:
+            classification = next(cluster.iter('classification'))
+            self._pics = classification.attrib['picsCode']
+        except (KeyError, StopIteration):
+            self._pics = None
 
         self.feature_elements = self.get_all_feature_elements()
         self.attribute_elements = self.get_all_attribute_elements()
@@ -221,6 +229,9 @@ class ClusterParser:
                                                 severity=ProblemSeverity.WARNING, problem=str(ex)))
             return None
 
+    def parse_write_optional(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element) -> bool:
+        return access_xml.attrib['write'] == 'optional'
+
     def parse_access(self, element_xml: ElementTree.Element, access_xml: ElementTree.Element, conformance: Callable) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
         ''' Returns a tuple of access types for read / write / invoke'''
         def str_to_access_type(privilege_str: str) -> Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum:
@@ -294,13 +305,16 @@ class ClusterParser:
                 # I don't have a good way to relate the ranges to the conformance, but they're both acceptable, so let's just or them.
                 conformance = or_operation([conformance, attributes[code].conformance])
             read_access, write_access, _ = self.parse_access(element, access_xml, conformance)
+            write_optional = False
+            if write_access not in [None, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue]:
+                write_optional = self.parse_write_optional(element, access_xml)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
-                                            conformance=conformance, read_access=read_access, write_access=write_access)
+                                            conformance=conformance, read_access=read_access, write_access=write_access, write_optional=write_optional)
         # Add in the global attributes for the base class
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
             attributes[id] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
-            ), read_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, write_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+            ), read_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView, write_access=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue, write_optional=False)
         return attributes
 
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlAttribute]:
@@ -348,7 +362,7 @@ class ClusterParser:
                           attributes=self.parse_attributes(),
                           accepted_commands=self.parse_commands(CommandType.ACCEPTED),
                           generated_commands=self.parse_commands(CommandType.GENERATED),
-                          events=self.parse_events())
+                          events=self.parse_events(), pics=self._pics)
 
     def get_problems(self) -> list[ProblemNotice]:
         return self._problems
@@ -356,23 +370,21 @@ class ClusterParser:
 
 def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     # workaround for aliased clusters not appearing in the xml. Remove this once https://github.com/csa-data-model/projects/issues/373 is addressed
-    conc_clusters = {0x040C: 'Carbon Monoxide Concentration Measurement',
-                     0x040D: 'Carbon Dioxide Concentration Measurement',
-                     0x0413: 'Nitrogen Dioxide Concentration Measurement',
-                     0x0415: 'Ozone Concentration Measurement',
-                     0x042A: 'PM2.5 Concentration Measurement',
-                     0x042B: 'Formaldehyde Concentration Measurement',
-                     0x042C: 'PM1 Concentration Measurement',
-                     0x042D: 'PM10 Concentration Measurement',
-                     0x042E: 'Total Volatile Organic Compounds Concentration Measurement',
-                     0x042F: 'Radon Concentration Measurement'}
+    conc_clusters = {0x040C: ('Carbon Monoxide Concentration Measurement', 'CMOCONC'),
+                     0x040D: ('Carbon Dioxide Concentration Measurement', 'CDOCONC'),
+                     0x0413: ('Nitrogen Dioxide Concentration Measurement', 'NDOCONC'),
+                     0x0415: ('Ozone Concentration Measurement', 'OZCONC'),
+                     0x042A: ('PM2.5 Concentration Measurement', 'PMICONC'),
+                     0x042B: ('Formaldehyde Concentration Measurement', 'FLDCONC'),
+                     0x042C: ('PM1 Concentration Measurement', 'PMHCONC'),
+                     0x042D: ('PM10 Concentration Measurement', 'PMKCONC'),
+                     0x042E: ('Total Volatile Organic Compounds Concentration Measurement', 'TVOCCONC'),
+                     0x042F: ('Radon Concentration Measurement', 'RNCONC')}
     conc_base_name = 'Concentration Measurement Clusters'
-    resource_clusters = {0x0071: 'HEPA Filter Monitoring',
-                         0x0072: 'Activated Carbon Filter Monitoring'}
+    resource_clusters = {0x0071: ('HEPA Filter Monitoring', 'HEPAFREMON'),
+                         0x0072: ('Activated Carbon Filter Monitoring', 'ACFREMON')}
     resource_base_name = 'Resource Monitoring Clusters'
-    water_clusters = {0x0405: 'Relative Humidity Measurement',
-                      0x0407: 'Leaf Wetness Measurement',
-                      0x0408: 'Soil Moisture Measurement'}
+    water_clusters = {0x0405: ('Relative Humidity Measurement', 'RH')}
     water_base_name = 'Water Content Measurement Clusters'
     aliases = {conc_base_name: conc_clusters, resource_base_name: resource_clusters, water_base_name: water_clusters}
 
@@ -482,15 +494,16 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
             new = XmlCluster(revision=c.revision, derived=c.derived, name=c.name,
                              feature_map=feature_map, attribute_map=attribute_map, command_map=command_map,
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
-                             generated_commands=generated_commands, events=events)
+                             generated_commands=generated_commands, events=events, pics=c.pics)
             clusters[id] = new
 
     for alias_base_name, aliased_clusters in aliases.items():
-        for id, alias_name in aliased_clusters.items():
+        for id, (alias_name, pics) in aliased_clusters.items():
             base = derived_clusters[alias_base_name]
             new = deepcopy(base)
             new.derived = alias_base_name
             new.name = alias_name
+            new.pics = pics
             clusters[id] = new
 
     # TODO: All these fixups should be removed BEFORE SVE if at all possible
@@ -502,12 +515,12 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
         view = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView
         none = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue
         clusters[temp_control_id].attributes = {
-            0x00: XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none),
-            0x01: XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none),
-            0x02: XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none),
-            0x03: XmlAttribute(name='Step', datatype='temperature', conformance=feature(0x04, 'STEP'), read_access=view, write_access=none),
-            0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none),
-            0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none),
+            0x00: XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none, write_optional=False),
+            0x01: XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none, write_optional=False),
+            0x02: XmlAttribute(name='MaxTemperature', datatype='temperature', conformance=feature(0x01, 'TN'), read_access=view, write_access=none, write_optional=False),
+            0x03: XmlAttribute(name='Step', datatype='temperature', conformance=feature(0x04, 'STEP'), read_access=view, write_access=none, write_optional=False),
+            0x04: XmlAttribute(name='SelectedTemperatureLevel', datatype='uint8', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
+            0x05: XmlAttribute(name='SupportedTemperatureLevels', datatype='list', conformance=feature(0x02, 'TL'), read_access=view, write_access=none, write_optional=False),
         }
 
     # Workaround for incorrect parsing of access control cluster.

@@ -720,7 +720,7 @@ bool emberAfUnitTestingClusterTestCallback(app::CommandHandler * commandObj, con
                                            const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
-    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    emberAfInitializeAttributes(commandPath.mEndpointId);
     for (int i = 0; i < kAttributeListLength; ++i)
     {
         gListUint8Data[i] = 0;
