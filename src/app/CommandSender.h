@@ -455,7 +455,7 @@ public:
 private:
     friend class TestCommandInteraction;
 
-    enum class State
+    enum class State : uint8_t
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         AddingCommand,       ///< In the process of adding a command.
@@ -464,6 +464,14 @@ private:
         AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    union CallbackHandle
+    {
+        CallbackHandle(Callback * apCallback) : legacyCallback(apCallback) {}
+        CallbackHandle(ExtendableCallback * apExtendableCallback) : extendableCallback(apExtendableCallback) {}
+        Callback * legacyCallback;
+        ExtendableCallback * extendableCallback;
     };
 
     void MoveToState(const State aTargetState);
@@ -513,46 +521,45 @@ private:
     void OnResponseCallback(const ResponseData & aResponseData)
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
-        if (mpExtendableCallback)
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
         {
-            mpExtendableCallback->OnResponse(this, aResponseData);
+            mCallbackHandle.extendableCallback->OnResponse(this, aResponseData);
         }
-        else if (mpCallback)
+        else if (mCallbackHandle.legacyCallback)
         {
-            mpCallback->OnResponse(this, aResponseData.path, aResponseData.statusIB, aResponseData.data);
+            mCallbackHandle.legacyCallback->OnResponse(this, aResponseData.path, aResponseData.statusIB, aResponseData.data);
         }
     }
 
     void OnErrorCallback(CHIP_ERROR aError)
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
-        if (mpExtendableCallback)
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
         {
             ErrorData errorData = { aError };
-            mpExtendableCallback->OnError(this, errorData);
+            mCallbackHandle.extendableCallback->OnError(this, errorData);
         }
-        else if (mpCallback)
+        else if (mCallbackHandle.legacyCallback)
         {
-            mpCallback->OnError(this, aError);
+            mCallbackHandle.legacyCallback->OnError(this, aError);
         }
     }
 
     void OnDoneCallback()
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
-        if (mpExtendableCallback)
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
         {
-            mpExtendableCallback->OnDone(this);
+            mCallbackHandle.extendableCallback->OnDone(this);
         }
-        else if (mpCallback)
+        else if (mCallbackHandle.legacyCallback)
         {
-            mpCallback->OnDone(this);
+            mCallbackHandle.legacyCallback->OnDone(this);
         }
     }
 
     Messaging::ExchangeHolder mExchangeCtx;
-    Callback * mpCallback                      = nullptr;
-    ExtendableCallback * mpExtendableCallback  = nullptr;
+    CallbackHandle mCallbackHandle;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
@@ -564,15 +571,16 @@ private:
     Optional<uint16_t> mTimedInvokeTimeoutMs;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
 
-    State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
-    bool mSuppressResponse     = false;
-    bool mTimedRequest         = false;
-    bool mBufferAllocated      = false;
-    bool mBatchCommandsEnabled = false;
+    State mState                = State::Idle;
+    bool mSuppressResponse      = false;
+    bool mTimedRequest          = false;
+    bool mBufferAllocated       = false;
+    bool mBatchCommandsEnabled  = false;
+    bool mUseExtendableCallback = false;
 };
 
 } // namespace app
