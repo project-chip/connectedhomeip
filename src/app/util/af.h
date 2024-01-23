@@ -118,7 +118,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
 EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                             uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
@@ -129,7 +128,7 @@ EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Clu
  * (i.e. whether the attribute can be read).
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                uint8_t * dataPtr, uint16_t readLength);
+                                   uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief macro that returns size of attribute in bytes.
