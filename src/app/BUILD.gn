@@ -63,6 +63,12 @@ buildconfig_header("app_buildconfig") {
   visibility = [ ":app_config" ]
 }
 
+source_set("app_config") {
+  sources = [ "AppConfig.h" ]
+
+  deps = [ ":app_buildconfig" ]
+}
+
 source_set("revision_info") {
   sources = [
     "DataModelRevision.h",
@@ -73,17 +79,15 @@ source_set("revision_info") {
   public_deps = [ ":app_config" ]
 }
 
-source_set("app_config") {
-  sources = [ "AppConfig.h" ]
-
-  deps = [ ":app_buildconfig" ]
-}
-
 source_set("path-params") {
   sources = [
     "AttributePathParams.h",
     "EventPathParams.h",
   ]
+}
+
+source_set("global-attributes") {
+  sources = [ "GlobalAttributes.h" ]
 }
 
 source_set("message-def") {
@@ -173,6 +177,30 @@ source_set("message-def") {
   ]
 }
 
+config("config-controller-dynamic-server") {
+  defines = [
+    "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+    "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
+  ]
+}
+
+source_set("controller-dynamic-server") {
+  sources = [
+    "clusters/ota-provider/ota-provider.cpp",
+    "dynamic_server/AccessControl.cpp",
+    "dynamic_server/AccessControl.h",
+    "dynamic_server/DynamicDispatcher.cpp",
+  ]
+
+  public_deps = [
+    ":global-attributes",
+    ":interaction-model",
+    "${chip_root}/src/access",
+  ]
+
+  public_configs = [ ":config-controller-dynamic-server" ]
+}
+
 source_set("interaction-model") {
   sources = [
     "CASEClient.cpp",
@@ -215,12 +243,9 @@ source_set("interaction-model") {
   }
 
   public_deps = [
+    ":app_config",
     ":message-def",
     ":path-params",
-  ]
-
-  deps = [
-    ":app_config",
     "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
@@ -229,6 +254,12 @@ source_set("interaction-model") {
     "${chip_root}/src/protocols/secure_channel",
     "${chip_root}/src/system",
   ]
+
+  deps = []
+
+  if (chip_build_controller_dynamic_server) {
+    public_deps += [ ":controller-dynamic-server" ]
+  }
 }
 
 static_library("app") {
@@ -252,7 +283,6 @@ static_library("app") {
     "EventManagement.cpp",
     "FailSafeContext.cpp",
     "FailSafeContext.h",
-    "GlobalAttributes.h",
     "OTAUserConsentCommon.h",
     "ReadHandler.cpp",
     "SafeAttributePersistenceProvider.h",
@@ -270,6 +300,7 @@ static_library("app") {
 
   public_deps = [
     ":app_config",
+    ":global-attributes",
     ":interaction-model",
     ":revision_info",
     "${chip_root}/src/app/icd:icd_config",
@@ -280,22 +311,6 @@ static_library("app") {
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]
-
-  if (chip_build_controller_dynamic_server) {
-    defines = [
-      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-      "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
-    ]
-    sources += [
-      "clusters/ota-provider/ota-provider.cpp",
-      "dynamic_server/AccessControl.cpp",
-      "dynamic_server/AccessControl.h",
-      "dynamic_server/DynamicDispatcher.cpp",
-      "util/privilege-storage.cpp",
-      "util/privilege-storage.h",
-    ]
-    public_deps += [ "${chip_root}/src/access" ]
-  }
 
   if (chip_enable_read_client) {
     sources += [
