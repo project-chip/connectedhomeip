@@ -22,17 +22,6 @@
 #endif
 #include CONFIGURATION_HEADER
 
-#ifdef EZSP_HOST
-// Includes needed for ember related functions for the EZSP host
-#include "app/util/ezsp/ezsp-protocol.h"
-#include "app/util/ezsp/ezsp-utils.h"
-#include "app/util/ezsp/ezsp.h"
-#include "app/util/ezsp/serial-interface.h"
-#include "stack/include/ember-random-api.h"
-#include "stack/include/ember-types.h"
-#include "stack/include/error.h"
-#endif // EZSP_HOST
-
 #include <app/util/af-types.h>
 
 #include <app/util/endpoint-config-api.h>
