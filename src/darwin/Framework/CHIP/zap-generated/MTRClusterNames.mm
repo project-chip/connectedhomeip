@@ -228,6 +228,12 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
     case MTRClusterIDTypeEnergyPreferenceID:
         result = @"EnergyPreference";
         break;
+    case MTRClusterIDTypeEnergyEVSEModeID:
+        result = @"EnergyEVSEMode";
+        break;
+    case MTRClusterIDTypeDeviceEnergyManagementModeID:
+        result = @"DeviceEnergyManagementMode";
+        break;
     case MTRClusterIDTypeDoorLockID:
         result = @"DoorLock";
         break;
@@ -3822,26 +3828,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
         switch (attributeID) {
 
             // Cluster ScenesManagement attributes
-        case MTRAttributeIDTypeClusterScenesManagementAttributeSceneCountID:
-            result = @"SceneCount";
-            break;
-
-        case MTRAttributeIDTypeClusterScenesManagementAttributeCurrentSceneID:
-            result = @"CurrentScene";
-            break;
-
-        case MTRAttributeIDTypeClusterScenesManagementAttributeCurrentGroupID:
-            result = @"CurrentGroup";
-            break;
-
-        case MTRAttributeIDTypeClusterScenesManagementAttributeSceneValidID:
-            result = @"SceneValid";
-            break;
-
-        case MTRAttributeIDTypeClusterScenesManagementAttributeNameSupportID:
-            result = @"NameSupport";
-            break;
-
         case MTRAttributeIDTypeClusterScenesManagementAttributeLastConfiguredByID:
             result = @"LastConfiguredBy";
             break;
@@ -4296,6 +4282,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"Forecast";
             break;
 
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeOptOutStateID:
+            result = @"OptOutState";
+            break;
+
         case MTRAttributeIDTypeClusterDeviceEnergyManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -4372,14 +4362,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterEnergyEVSEAttributeRandomizationDelayWindowID:
             result = @"RandomizationDelayWindow";
-            break;
-
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfWeeklyTargetsID:
-            result = @"NumberOfWeeklyTargets";
-            break;
-
-        case MTRAttributeIDTypeClusterEnergyEVSEAttributeNumberOfDailyTargetsID:
-            result = @"NumberOfDailyTargets";
             break;
 
         case MTRAttributeIDTypeClusterEnergyEVSEAttributeNextChargeStartTimeID:
@@ -4505,6 +4487,106 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterEnergyPreferenceAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeEnergyEVSEModeID:
+
+        switch (attributeID) {
+
+            // Cluster EnergyEVSEMode attributes
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeCurrentModeID:
+            result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeStartUpModeID:
+            result = @"StartUpMode";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeOnModeID:
+            result = @"OnMode";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterEnergyEVSEModeAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeDeviceEnergyManagementModeID:
+
+        switch (attributeID) {
+
+            // Cluster DeviceEnergyManagementMode attributes
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeSupportedModesID:
+            result = @"SupportedModes";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeCurrentModeID:
+            result = @"CurrentMode";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeStartUpModeID:
+            result = @"StartUpMode";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeOnModeID:
+            result = @"OnMode";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterDeviceEnergyManagementModeAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
