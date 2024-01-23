@@ -221,7 +221,6 @@ public:
                   bool aSuppressResponse = false) :
         CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
     {}
-    CommandSender(bool aIsTimedRequest = false, bool aSuppressResponse = false);
 
     ~CommandSender();
 
@@ -245,8 +244,6 @@ public:
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
-    void SetExchangeManager(Messaging::ExchangeManager * apExchangeMgr);
-    void SetCommandSenderDelegate(Callback * apCallback);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, AdditionalCommandParameters & aOptionalArgs);
 
     [[deprecated("PrepareCommand should migrate to calling PrepareCommand with AdditionalCommandParameters")]] CHIP_ERROR

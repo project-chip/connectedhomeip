@@ -22,87 +22,100 @@
 #include <app/InteractionModelEngine.h>
 #include <app/InteractionModelTimeout.h>
 #include <app/OperationalSessionSetup.h>
+#include <memory>
 
 namespace chip {
 namespace app {
 
-ICDRefreshKeyInfo::ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, const ICDClientInfo aICDClientInfo,
-                                     const ICDClientStorage * aICDClientStorage) :
+ICDRefreshKeyInfo::ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo * apICDClientInfo,
+                                     ICDClientStorage * aICDClientStorage) :
     mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
     mpCheckInDelegate  = apCheckInDelegate;
-    mICDClientInfo     = aICDClientInfo;
-    mpICDClientStorage = const_cast<ICDClientStorage *>(aICDClientStorage);
+    mpICDClientInfo    = apICDClientInfo;
+    mpICDClientStorage = aICDClientStorage;
 }
 
-void ICDRefreshKeyInfo::OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
-                                   const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData)
+void RegisterCommandSenderDelegate::OnResponse(chip::app::CommandSender * apCommandSender,
+                                               const chip::app::ConcreteCommandPath & aPath, const chip::app::StatusIB & aStatus,
+                                               chip::TLV::TLVReader * aData)
 {
     app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType responseData;
+    if (aData == nullptr)
+    {
+        mpICDRefreshKeyInfo->GetCheckInDelegate()->OnRegistrationUpdateFailure(mpICDRefreshKeyInfo.get(),
+                                                                               CHIP_ERROR_INVALID_TLV_ELEMENT);
+        Platform::Delete(this);
+        return;
+    }
+
     mError = DataModel::Decode(*aData, responseData);
     if (mError != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Failed to decode re-registration response data: %" CHIP_ERROR_FORMAT, mError.Format());
+        mpICDRefreshKeyInfo->GetCheckInDelegate()->OnRegistrationUpdateFailure(mpICDRefreshKeyInfo.get(), mError);
+        Platform::Delete(this);
         return;
     }
     // Update the ICDClientInfo with new key and start counter and store it to persistence
-    mICDClientInfo.start_icd_counter = responseData.ICDCounter;
-    mError                           = mpICDClientStorage->SetKey(mICDClientInfo, mNewKey.Span());
+    mpICDRefreshKeyInfo->GetICDClientInfo()->start_icd_counter = responseData.ICDCounter;
+    mError = mpICDRefreshKeyInfo->GetICDClientStorage()->SetKey(*mpICDRefreshKeyInfo->GetICDClientInfo(),
+                                                                mpICDRefreshKeyInfo->mNewKey.Span());
     if (mError != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Failed to store the new key after re-registration: %" CHIP_ERROR_FORMAT, mError.Format());
+        Platform::Delete(this);
     }
+    mpICDRefreshKeyInfo->GetCheckInDelegate()->OnRegistrationUpdateComplete(mpICDRefreshKeyInfo->GetICDClientInfo(),
+                                                                            mpICDRefreshKeyInfo.get());
+    Platform::Delete(this);
 }
-void ICDRefreshKeyInfo::OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError)
+void RegisterCommandSenderDelegate::OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError)
 {
     mError = aError;
+    mpICDRefreshKeyInfo->GetCheckInDelegate()->OnRegistrationUpdateFailure(mpICDRefreshKeyInfo.get(), mError);
+    Platform::Delete(this);
 }
 
-void ICDRefreshKeyInfo::OnDone(chip::app::CommandSender * apCommandSender)
+void RegisterCommandSenderDelegate::OnDone(chip::app::CommandSender * apCommandSender) {}
+
+void RegisterCommandSenderDelegate::OnFailure(CHIP_ERROR aError)
 {
-    if (mError == CHIP_NO_ERROR)
-    {
-        mpCheckInDelegate->OnRegistrationUpdateComplete(mICDClientInfo, this);
-        return;
-    }
-    mpCheckInDelegate->OnRegistrationUpdateFailure(this);
+    mError = aError;
+    mpICDRefreshKeyInfo->GetCheckInDelegate()->OnRegistrationUpdateFailure(mpICDRefreshKeyInfo.get(), mError);
+    Platform::Delete(this);
 }
 
 CHIP_ERROR ICDRefreshKeyInfo::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr,
                                                        const SessionHandle & sessionHandle)
 {
     using namespace Clusters::IcdManagement;
+    EndpointId endpointId = 0;
+    GroupId groupId       = 0;
 
-    mRegisterCommandSender.SetExchangeManager(&exchangeMgr);
-    mRegisterCommandSender.SetCommandSenderDelegate(this);
+    mRegisterCommandSender.Emplace(mpCommandSenderDelegate, &exchangeMgr);
 
-    auto commandPathParams = CommandPathParams(0, 0, Id, Commands::RegisterClient::Id, (CommandPathFlags::kEndpointIdValid));
+    Commands::RegisterClient::Type registerClientCommand;
+    registerClientCommand.checkInNodeID    = mpICDClientInfo->peer_node.GetNodeId();
+    registerClientCommand.monitoredSubject = mpICDClientInfo->monitored_subject;
+    registerClientCommand.key              = mNewKey.Span();
+    auto commandPathParams =
+        CommandPathParams(endpointId, groupId, Id, Commands::RegisterClient::Id, (CommandPathFlags::kEndpointIdValid));
 
-    ReturnErrorOnFailure(mRegisterCommandSender.PrepareCommand(commandPathParams));
-
-    chip::TLV::TLVWriter * writer = mRegisterCommandSender.GetCommandDataIBTLVWriter();
-
-    ReturnErrorOnFailure(
-        writer->Put(chip::TLV::ContextTag(Commands::RegisterClient::Fields::kCheckInNodeID), mICDClientInfo.peer_node.GetNodeId()));
-    ReturnErrorOnFailure(
-        writer->Put(chip::TLV::ContextTag(Commands::RegisterClient::Fields::kMonitoredSubject), mICDClientInfo.monitored_subject));
-    ReturnErrorOnFailure(writer->Put(chip::TLV::ContextTag(Commands::RegisterClient::Fields::kKey), mNewKey.Span()));
-
-    // TODO : We don't have plain data for the old key
-
-    ReturnErrorOnFailure(mRegisterCommandSender.FinishCommand());
-    ReturnErrorOnFailure(mRegisterCommandSender.SendCommandRequest(sessionHandle));
+    ReturnErrorOnFailure(mRegisterCommandSender.Value().AddRequestData(commandPathParams, registerClientCommand));
+    ReturnErrorOnFailure(mRegisterCommandSender.Value().SendCommandRequest(sessionHandle));
 
     return CHIP_NO_ERROR;
 }
 
-void ICDRefreshKeyInfo::EstablishSessionToPeer()
+CHIP_ERROR ICDRefreshKeyInfo::EstablishSessionToPeer()
 {
     ChipLogProgress(ICD, "Trying to establish a CASE session for re-registering an ICD client");
     auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
-    VerifyOrReturn(caseSessionManager != nullptr);
-    caseSessionManager->FindOrEstablishSession(mICDClientInfo.peer_node, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    VerifyOrReturnError(caseSessionManager != nullptr, CHIP_ERROR_INVALID_CASE_PARAMETER);
+    caseSessionManager->FindOrEstablishSession(mpICDClientInfo->peer_node, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    return CHIP_NO_ERROR;
 }
 
 void ICDRefreshKeyInfo::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
@@ -111,9 +124,11 @@ void ICDRefreshKeyInfo::HandleDeviceConnected(void * context, Messaging::Exchang
     ICDRefreshKeyInfo * const _this = static_cast<ICDRefreshKeyInfo *>(context);
     VerifyOrDie(_this != nullptr);
 
-    if (CHIP_NO_ERROR != _this->RegisterClientWithNewKey(exchangeMgr, sessionHandle))
+    CHIP_ERROR err = _this->RegisterClientWithNewKey(exchangeMgr, sessionHandle);
+    if (CHIP_NO_ERROR != err)
     {
         ChipLogError(ICD, "Failed to send register client command");
+        _this->GetCommandSenderDelegate()->OnFailure(err);
     }
 }
 
@@ -123,6 +138,7 @@ void ICDRefreshKeyInfo::HandleDeviceConnectionFailure(void * context, const Scop
     VerifyOrDie(_this != nullptr);
 
     ChipLogError(ICD, "Failed to establish CASE for re-registration with error '%" CHIP_ERROR_FORMAT "'", err.Format());
+    _this->GetCommandSenderDelegate()->OnFailure(err);
 }
 } // namespace app
 } // namespace chip

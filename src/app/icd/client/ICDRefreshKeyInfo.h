@@ -33,24 +33,97 @@
 namespace chip {
 namespace app {
 
-typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
-
 class CheckInDelegate;
+class ICDRefreshKeyInfo;
+
+/**
+ * @brief This class comprises Command sender callbacks for the registration command. The application can inherit this class and
+ *        provide their own implementation
+ */
+class RegisterCommandSenderDelegate : public CommandSender::Callback
+{
+public:
+    // CommandSender callbacks
+    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatus,
+                    chip::TLV::TLVReader * aData) override;
+    void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
+    void OnDone(CommandSender * apCommandSender) override;
+    /**
+     * @brief Callback used to indicate failures before successfully sending out a re-register command.
+     *
+     * @param[in] aError Failure reason
+     * */
+    void OnFailure(CHIP_ERROR aError);
+
+    void AdoptICDRefreshKeyInfo(Platform::UniquePtr<ICDRefreshKeyInfo> apICDRefreshKeyInfo)
+    {
+        mpICDRefreshKeyInfo = std::move(apICDRefreshKeyInfo);
+    }
+
+    virtual ~RegisterCommandSenderDelegate() { mpICDRefreshKeyInfo = nullptr; }
+
+private:
+    CHIP_ERROR mError                                          = CHIP_NO_ERROR;
+    Platform::UniquePtr<ICDRefreshKeyInfo> mpICDRefreshKeyInfo = nullptr;
+};
+
 /**
  * @brief ICDRefreshKeyInfo contains all the data and methods needed for key refresh and re-registration of an ICD client.
  */
-class ICDRefreshKeyInfo : public CommandSender::Callback
+class ICDRefreshKeyInfo
 {
 public:
-    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, const ICDClientInfo aICDClientInfo,
-                      const ICDClientStorage * aICDClientStorage);
+    typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
 
-    // CommandSender callbacks
-    void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
-                    const chip::app::StatusIB & aStatus, chip::TLV::TLVReader * aData) override;
-    void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
-    void OnDone(chip::app::CommandSender * apCommandSender) override;
+    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo * aICDClientInfo, ICDClientStorage * aICDClientStorage);
 
+    /**
+     * @brief Used by the application to set a new key to avoid counter rollover problems.
+     *
+     * @param[in] clientInfo clientInfo object
+     * @param[in] keyData New key data to use to re-register the client with the server
+     * @param[in] exchangeMgr exchange manager to use for the re-registration
+     * @param[in] sessionHandle session handle to use for the re-registration
+     */
+    CHIP_ERROR RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+
+    /**
+     * @brief Sets up a CASE session to the peer for re-registering a client with the peer when a key refresh is required to avoid
+     * ICD counter rollover. Returns error if we did not even manage to kick off a CASE attempt.
+     */
+    CHIP_ERROR EstablishSessionToPeer();
+
+    /**
+     * @brief Getter for ICDClientInfo pointer
+     */
+    ICDClientInfo * GetICDClientInfo(void) { return mpICDClientInfo; }
+
+    /**
+     * @brief Getter for ICDClientStorage pointer
+     */
+    ICDClientStorage * GetICDClientStorage(void) { return mpICDClientStorage; }
+
+    /**
+     * @brief Getter for CheckInDelegate pointer
+     */
+    CheckInDelegate * GetCheckInDelegate(void) { return mpCheckInDelegate; }
+
+    /**
+     * @brief Getter for Command Sender delegate
+     */
+    RegisterCommandSenderDelegate * GetCommandSenderDelegate(void) { return mpCommandSenderDelegate; }
+
+    /**
+     * @brief Setter for Command Sender delegate
+     */
+    void SetCommandSenderDelegate(RegisterCommandSenderDelegate * apCommandSenderDelegate)
+    {
+        mpCommandSenderDelegate = apCommandSenderDelegate;
+    }
+
+    RefreshKeyBuffer mNewKey;
+
+private:
     // CASE session callbacks
     /**
      * @brief Callback received on successfully establishing a CASE session in order to re-register the client with the peer node
@@ -72,31 +145,11 @@ public:
      */
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);
 
-    /**
-     * @brief Used by the application to set a new key to avoid counter rollover problems.
-     *
-     * @param[in] clientInfo clientInfo object
-     * @param[in] keyData New key data to use to re-register the client with the server
-     * @param[in] exchangeMgr exchange manager to use for the re-registration
-     * @param[in] sessionHandle session handle to use for the re-registration
-     */
-    CHIP_ERROR RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
-
-    /**
-     * @brief Sets up a CASE session to the peer for re-registering a client with the peer when a key refresh is required to avoid
-     * ICD counter rollover. Returns error if we did not even manage to kick off a CASE attempt.
-     */
-    void EstablishSessionToPeer();
-
-    // TODO Making it private and adding a getter threw error as copy constructors are disabled for SensitiveDataBuffer. Making it
-    // public temporarily to continue development
-    RefreshKeyBuffer mNewKey;
-
-private:
-    ICDClientInfo mICDClientInfo;
+    ICDClientInfo * mpICDClientInfo       = nullptr;
     ICDClientStorage * mpICDClientStorage = nullptr;
     CheckInDelegate * mpCheckInDelegate   = nullptr;
-    app::CommandSender mRegisterCommandSender;
+    chip::Optional<CommandSender> mRegisterCommandSender;
+    RegisterCommandSenderDelegate * mpCommandSenderDelegate = nullptr;
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     CHIP_ERROR mError = CHIP_NO_ERROR;

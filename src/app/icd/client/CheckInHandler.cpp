@@ -109,13 +109,7 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
 
     if (refreshKey)
     {
-        ICDRefreshKeyInfo * refreshKeyInfo = mpCheckInDelegate->OnKeyRefreshNeeded(clientInfo, mpICDClientStorage);
-        if (refreshKeyInfo == nullptr)
-        {
-            ChipLogError(ICD, "Key Refresh failed");
-            return CHIP_NO_ERROR;
-        }
-        refreshKeyInfo->EstablishSessionToPeer();
+        mpCheckInDelegate->OnKeyRefreshNeeded(&clientInfo, mpICDClientStorage);
     }
     else
     {
