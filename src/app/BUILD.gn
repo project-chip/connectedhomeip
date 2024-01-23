@@ -268,6 +268,19 @@ static_library("app") {
     "data-model/PreEncodedValue.h",
   ]
 
+  public_deps = [
+    ":app_config",
+    ":interaction-model",
+    ":revision_info",
+    "${chip_root}/src/app/icd:icd_config",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
+  ]
+
   if (chip_build_controller_dynamic_server) {
     defines = [
       "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
@@ -292,19 +305,6 @@ static_library("app") {
       "ReadClient.cpp",
     ]
   }
-
-  public_deps = [
-    ":app_config",
-    ":interaction-model",
-    ":revision_info",
-    "${chip_root}/src/app/icd:icd_config",
-    "${chip_root}/src/lib/address_resolve",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols/interaction_model",
-    "${chip_root}/src/system",
-    "${nlio_root}:nlio",
-  ]
 
   if (chip_enable_icd_server) {
     public_deps += [
