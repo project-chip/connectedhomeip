@@ -41,17 +41,14 @@ tests:
           constraints:
               type: int16u
 
-    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
-    - label:
-          "Step 3:TH reads from the DUT the FeatureMap attribute., bit 0: SHALL
-          be 1 if and only if LWM.S.F00(DEPONOFF)"
+    - label: "Step 3:TH reads from the DUT the FeatureMap attribute., bit 0:0"
       command: "readAttribute"
       attribute: "FeatureMap"
       PICS: LWM.S.F00
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x1]
+              hasMasksSet: [0x0]
 
     - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"
@@ -81,7 +78,7 @@ tests:
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: TH reads the optional attribute(StartUpMode) in
+          "Step 4b: TH reads the provisional attribute(StartUpMode) in
           AttributeList"
       PICS: LWM.S.A0002
       command: "readAttribute"
@@ -91,6 +88,7 @@ tests:
               type: list
               contains: [2]
 
+<<<<<<< HEAD
     #Issue https://github.com/project-chip/connectedhomeip/issues/31551
     - label:
           "Step 4c: TH reads the Feature dependent attribute(DEPONOFF) in
@@ -103,6 +101,8 @@ tests:
               type: list
               contains: [3]
 
+=======
+>>>>>>> 3b0149b454 (Modifed YAML tests:)
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"

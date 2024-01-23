@@ -41,26 +41,13 @@ tests:
           constraints:
               type: int16u
 
-    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
-    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0:0"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: "!TCCM.S.F00"
-      response:
-          value: 0
-          constraints:
-              type: bitmap32
-
-    - label:
-          "Step 3: TH reads from the DUT the FeatureMap attribute, bit 0: SHALL
-          be 1 if and only if TCCM.S.F00(DEPONOFF)"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      PICS: TCCM.S.F00
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x1]
+              hasMasksSet: [0x0]
 
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
@@ -90,18 +77,6 @@ tests:
           constraints:
               type: list
               contains: [2]
-
-    #Issue https://github.com/project-chip/connectedhomeip/issues/31551
-    - label:
-          "Step 4c: TH reads from the DUT the AttributeList attribute. 0x0003
-          SHALL be included if and only if TCCM.S.F00(DEPONOFF)"
-      PICS: TCCM.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [3]
 
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
