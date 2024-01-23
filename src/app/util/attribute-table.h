@@ -19,10 +19,6 @@
 
 #include <app/util/af.h>
 
-// Remote devices writing attributes of local device
-EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                            uint8_t * dataPtr, EmberAfAttributeType dataType);
-
 /**
  * @brief write an attribute, performing all the checks.
  *
@@ -55,15 +51,3 @@ EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::Clu
  */
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
                                  EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);
-
-/**
- * @brief Read the attribute value, performing all the checks.
- *
- * This function will attempt to read the attribute and store it into the
- * pointer.
- *
- * dataPtr may be NULL, signifying that we don't need the value, just the status
- * (i.e. whether the attribute can be read).
- */
-EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                uint8_t * dataPtr, uint16_t readLength);

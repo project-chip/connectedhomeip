@@ -101,9 +101,35 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * over the air. Because this function is being called locally
  * it assumes that the device knows what it is doing and has permission
  * to perform the given operation.
+ *
+ * This function also does NOT check that the input dataType matches the expected
+ * data type (as Accessors.h/cpp have this correct by default).
+ * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
+
+/**
+ * Write an attribute for a request arriving from external sources.
+ *
+ * This will check attribute attribute writeability and that
+ * the privided data type matches the expected data type.
+ */
+EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                            uint8_t * dataPtr, EmberAfAttributeType dataType);
+
+
+/**
+ * @brief Read the attribute value, performing all the checks.
+ *
+ * This function will attempt to read the attribute and store it into the
+ * pointer.
+ *
+ * dataPtr may be NULL, signifying that we don't need the value, just the status
+ * (i.e. whether the attribute can be read).
+ */
+EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                uint8_t * dataPtr, uint16_t readLength);
 
 /**
  * @brief macro that returns size of attribute in bytes.

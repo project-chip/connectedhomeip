@@ -237,7 +237,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
+EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                 uint16_t readLength)
 {
     const EmberAfAttributeMetadata * metadata = nullptr;
