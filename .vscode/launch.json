@@ -11,6 +11,14 @@
             "pid": "${command:pickProcess}"
         },
         {
+            "name": "Run energy management application (Linux x64)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/examples/energy-management-app/linux/out/debug/chip-energy-management-app",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Run application (Darwin x64)",
             "type": "lldb",
             "request": "launch",
