@@ -208,6 +208,8 @@ tests:
               - name: "Status"
                 value: 0x85
               - name: "Capacity"
+                constraints:
+                    anyOf: [fabricCapacity, 0xfe, null]
                 value: null
               - name: "GroupID"
                 value: GI
@@ -592,7 +594,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [fabricCapacity, 0xfe, 0x89]
+                    anyOf: [fabricCapacity, 0xfe, null]
               - name: "GroupID"
                 value: G1
 
@@ -749,7 +751,7 @@ tests:
     - label:
           "Step 8d: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 7 000 000 (7 000s) and no extension field sets. This should fail
+          to 70 000 000 (70 000s) and no extension field sets. This should fail
           and return a status of 0x85 (INVALID_COMMAND)."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
@@ -760,7 +762,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 7000000
+                value: 70000000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"

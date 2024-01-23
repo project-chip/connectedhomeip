@@ -268,7 +268,7 @@ tests:
     - label:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
-         1s and a set of extension fields appropriate to AC1."
+          1000 (1s) and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
@@ -307,7 +307,7 @@ tests:
     - label:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
-          1s and a set of extension fields appropriate to AC1."
+          1000 (1s) and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -532,7 +532,7 @@ tests:
     - label:
           "Step 6a: TH sends a AddScene command to group G1 with the GroupID
           field set to G1, the SceneID field set to 0x01, the TransitionTime
-          field set to 1s and a set of extension fields appropriate to
+          field set to 1000 (1s) and a set of extension fields appropriate to
           AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
@@ -707,6 +707,15 @@ tests:
               - name: "SceneID"
                 value: 0x03
 
+    - label: "Wait 1+ s to give CI time to process the RemoveScene command."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1250
+
     - label:
           "Step 6e: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x03."
@@ -874,7 +883,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [fabricCapacity - 4, 0xfe, 0x89]
+                    anyOf: [fabricCapacity - 4, 0xfe, null]
               - name: "GroupID"
                 value: G2
               - name: "SceneList"
@@ -916,7 +925,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [fabricCapacity - 5, 0xfe, 0x89]
+                    anyOf: [fabricCapacity - 5, 0xfe, null]
               - name: "GroupID"
                 value: G2
               - name: "SceneList"
@@ -933,6 +942,15 @@ tests:
               - name: "GroupID"
                 value: G1
 
+    - label: "Wait 1+ s to give CI time to process the RemoveScene command."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1250
+
     - label:
           "Step 9b: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G1."
@@ -948,7 +966,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [fabricCapacity - 3, 0xfe, 0x89]
+                    anyOf: [fabricCapacity - 3, 0xfe, null]
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -964,6 +982,16 @@ tests:
           values:
               - name: "GroupID"
                 value: G2
+
+    - label: "Wait 1+ s to give CI time to process the RemoveScene command."
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1250
+
     - label:
           "Step 10b: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G1."
@@ -979,7 +1007,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [fabricCapacity, 0xfe, 0x89]
+                    anyOf: [fabricCapacity, 0xfe, null]
               - name: "GroupID"
                 value: G2
               - name: "SceneList"
