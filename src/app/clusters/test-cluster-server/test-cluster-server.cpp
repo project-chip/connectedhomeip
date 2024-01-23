@@ -85,8 +85,6 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
-
-
     CHIP_ERROR WriteListFabricScopedListEntry(const Structs::TestFabricScoped::DecodableType & entry, size_t index);
 
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
@@ -782,7 +780,8 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
-bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestDifferentVendorMeiRequest::DecodableType & commandData)
 {
     Commands::TestDifferentVendorMeiResponse::Type response;
