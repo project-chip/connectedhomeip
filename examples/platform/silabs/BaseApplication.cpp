@@ -458,11 +458,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             // - Cycle LCD screen
             CancelFunctionTimer();
 
-            OutputQrCode(false);
-#ifdef DISPLAY_ENABLED
-            UpdateLCDStatusScreen();
-            slLCD.CycleScreens();
-#endif
+            AppTask::GetAppTask().UpdateDisplay();
 
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -491,6 +487,15 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             }
         }
     }
+}
+
+void BaseApplication::UpdateDisplay()
+{
+    OutputQrCode(false);
+#ifdef DISPLAY_ENABLED
+    UpdateLCDStatusScreen();
+    slLCD.CycleScreens();
+#endif
 }
 
 void BaseApplication::CancelFunctionTimer()
