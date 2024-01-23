@@ -33,14 +33,13 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
+CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase)
 {
     if (index >= mOperationalPhaseList.size())
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalPhase = mOperationalPhaseList[index];
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(mOperationalPhaseList[index], operationalPhase);
 }
 
 void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
@@ -104,6 +103,11 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
 static OperationalState::Instance * gOperationalStateInstance = nullptr;
 static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
 
+OperationalState::Instance * OperationalState::GetOperationalStateInstance()
+{
+    return gOperationalStateInstance;
+}
+
 void OperationalState::Shutdown()
 {
     if (gOperationalStateInstance != nullptr)
@@ -130,37 +134,4 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     gOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
 
     gOperationalStateInstance->Init();
-}
-
-// Init RVC Operational State cluster
-
-static OperationalState::Instance * gRvcOperationalStateInstance  = nullptr;
-static RvcOperationalStateDelegate * gRvcOperationalStateDelegate = nullptr;
-
-void RvcOperationalState::Shutdown()
-{
-    if (gRvcOperationalStateInstance != nullptr)
-    {
-        delete gRvcOperationalStateInstance;
-        gRvcOperationalStateInstance = nullptr;
-    }
-    if (gRvcOperationalStateDelegate != nullptr)
-    {
-        delete gRvcOperationalStateDelegate;
-        gRvcOperationalStateDelegate = nullptr;
-    }
-}
-
-void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
-{
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gRvcOperationalStateInstance == nullptr && gRvcOperationalStateDelegate == nullptr);
-
-    gRvcOperationalStateDelegate        = new RvcOperationalStateDelegate;
-    EndpointId operationalStateEndpoint = 0x01;
-    gRvcOperationalStateInstance        = new RvcOperationalState::Instance(gRvcOperationalStateDelegate, operationalStateEndpoint);
-
-    gRvcOperationalStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-
-    gRvcOperationalStateInstance->Init();
 }

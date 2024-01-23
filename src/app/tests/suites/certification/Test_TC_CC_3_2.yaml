@@ -128,14 +128,16 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #Tolerance to be computed from the range
+    #Start value 200, expected value 45, 200 - 45 = 155, 155 % 15 = 23 , So 45+/-23
     - label: "Step 2d: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 38
-              maxValue: 52
+              minValue: 22
+              maxValue: 68
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -162,14 +164,16 @@ tests:
               - name: "OptionsOverride"
                 value: 0
 
+    #Tolerance to be computed from the range
+    #Start value 200, expected value 95, 200 - 95 = 155, 105 % 15 = 16 , So 95+/-16
     - label: "Step 2f: TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 80
-              maxValue: 110
+              minValue: 79
+              maxValue: 111
 
     - label: "Wait 2s"
       PICS: CC.S.F00
@@ -186,8 +190,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 80
-              maxValue: 110
+              minValue: 79
+              maxValue: 111
 
     - label:
           "Step 3a: TH sends MoveToHue command to DUT with Hue=60,

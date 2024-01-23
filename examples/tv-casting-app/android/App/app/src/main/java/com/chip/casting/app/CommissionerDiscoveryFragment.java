@@ -14,6 +14,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.R;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterError;
@@ -67,6 +68,7 @@ public class CommissionerDiscoveryFragment extends Fragment {
 
   @Override
   public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    Log.d(TAG, "onViewCreated() called");
     super.onViewCreated(view, savedInstanceState);
 
     Button manualCommissioningButton = getView().findViewById(R.id.manualCommissioningButton);
@@ -103,7 +105,10 @@ public class CommissionerDiscoveryFragment extends Fragment {
         new SuccessCallback<DiscoveredNodeData>() {
           @Override
           public void handle(DiscoveredNodeData discoveredNodeData) {
-            Log.d(TAG, "Discovered a Video Player Commissioner: " + discoveredNodeData);
+            Log.d(
+                TAG,
+                "SuccessCallback handle() Discovered a Video Player Commissioner: "
+                    + discoveredNodeData);
             new Handler(Looper.getMainLooper())
                 .post(
                     () -> {
@@ -129,7 +134,10 @@ public class CommissionerDiscoveryFragment extends Fragment {
         new FailureCallback() {
           @Override
           public void handle(MatterError matterError) {
-            Log.e(TAG, "Error occurred during video player commissioner discovery: " + matterError);
+            Log.e(
+                TAG,
+                "FailureCallback handle() Error occurred during video player commissioner discovery: "
+                    + matterError);
             if (MatterError.DISCOVERY_SERVICE_LOST == matterError) {
               Log.d(TAG, "Attempting to restart service");
               tvCastingApp.discoverVideoPlayerCommissioners(successCallback, this);
@@ -148,7 +156,7 @@ public class CommissionerDiscoveryFragment extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
-    Log.d(TAG, "Auto discovering");
+    Log.d(TAG, "onResume() called. Auto discovering");
 
     poller =
         executor.scheduleAtFixedRate(

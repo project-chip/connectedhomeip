@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 11.2.1. [TC-BINFO-2.1] Attributes [DUT-Server]
 
@@ -98,7 +97,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 3: TH writes DataModelRevision from the DUT."
+    - label: "Step 3: TH writes DataModelRevision as '0x1124' "
       PICS: BINFO.S.A0000
       command: "writeAttribute"
       attribute: "DataModelRevision"
@@ -133,7 +132,7 @@ tests:
       response:
           error: UNSUPPORTED_WRITE
 
-    - label: "Step 7: reads VendorName from the DUT."
+    - label: "Step 7: TH reads VendorName from the DUT."
       PICS: BINFO.S.A0001
       command: "readAttribute"
       attribute: "VendorName"
@@ -163,7 +162,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 9: TH writes VendorID from the DUT."
+    - label: "Step 9: TH writes VendorID as '0x0011' "
       PICS: BINFO.S.A0002
       command: "writeAttribute"
       attribute: "VendorID"
@@ -216,7 +215,7 @@ tests:
               minValue: 1
               maxValue: 65534
 
-    - label: "Step 15: TH writes ProductID from the DUT."
+    - label: "Step 15: TH writes ProductID as '0x4521' "
       PICS: BINFO.S.A0004
       command: "writeAttribute"
       attribute: "ProductID"
@@ -286,7 +285,10 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 20b: TH write Location from the DUT"
+    - label:
+          "Step 20b: TH selects a country code value that is different from the
+          CountryCode saved from step1 and known to be supported on the DUT. TH
+          writes this value to Location"
       PICS: BINFO.S.A0006
       command: "writeAttribute"
       attribute: "Location"
@@ -311,7 +313,7 @@ tests:
               minValue: 0
               maxValue: 65534
 
-    - label: "Step 22: TH writes HardwareVersion from the DUT."
+    - label: "Step 22: TH writes HardwareVersion as '0x4531'"
       PICS: BINFO.S.A0007
       command: "writeAttribute"
       attribute: "HardwareVersion"
@@ -377,7 +379,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 28: TH writes SoftwareVersion from the DUT."
+    - label: "Step 28: TH writes SoftwareVersion as '0x8213'"
       PICS: BINFO.S.A0009
       command: "writeAttribute"
       attribute: "SoftwareVersion"
@@ -403,7 +405,7 @@ tests:
               minLength: 1
               maxLength: 64
 
-    - label: "Step 31: TH writes SoftwareVersionString from the DUT."
+    - label: "Step 31: TH writes SoftwareVersionString as '1.0'"
       PICS: BINFO.S.A000a
       command: "writeAttribute"
       attribute: "SoftwareVersionString"
@@ -443,7 +445,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 34: TH writes ManufacturingDate from the DUT."
+    - label: "Step 34: TH writes ManufacturingDate as '20210814789452IN'"
       PICS: BINFO.S.A000b
       command: "writeAttribute"
       attribute: "ManufacturingDate"
@@ -508,7 +510,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
-    - label: "Step 40: TH writes ProductURL from the DUT."
+    - label: "Step 40: TH writes ProductURL as 'https://www.example.com'"
       PICS: BINFO.S.A000d
       command: "writeAttribute"
       attribute: "ProductURL"
@@ -675,7 +677,9 @@ tests:
       response:
           saveAs: CapabilityMinimaValue
 
-    - label: "Step 57: TH writes CapabilityMinima from the DUT."
+    - label:
+          "Step 57: TH writes the CapabilityMinima value with
+          CaseSessionsPerFabric set to 4 and SubscriptionsPerFabric set to 4"
       PICS: BINFO.S.A0013
       command: "writeAttribute"
       attribute: "CapabilityMinima"
@@ -715,3 +719,87 @@ tests:
       attribute: "ProductAppearance"
       response:
           value: ProductAppearancevalue
+
+    - label: "Step 62: TH reads SpecificationVersion from the DUT."
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          saveAs: SpecificationVersionValue
+
+    - label:
+          "Step 62: If the SpecificationVersion value is absent or zero this
+          step cannot be verified, move on to the next step"
+      PICS: BINFO.S.A0015
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: SpecificationVersionValue
+              - name: "Value2"
+                value: null
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 62: SpecificationVersion value should in the inclusive range of
+          (0 to 4294967295) and the initial 7 bits are set to zero."
+      runIf: "!IsExpectedValue"
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          value: SpecificationVersionValue
+          constraints:
+              minValue: 0
+              maxValue: 4294967295
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40]
+
+    - label:
+          "Step 63: TH sends Write request message to DUT to change the value of
+          SpecificationVersion to '0x0103AAF1'."
+      PICS: BINFO.S.A0015
+      command: "writeAttribute"
+      attribute: "SpecificationVersion"
+      arguments:
+          value: "0x0103AAF1"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 64: TH reads SpecificationVersion attribute from DUT"
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          value: SpecificationVersionValue
+
+    - label: "Step 65: TH reads MaxPathsPerInvoke from the DUT."
+      PICS: BINFO.S.A0016
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      response:
+          saveAs: MaxPathsPerInvokeValue
+          constraints:
+              minValue: 1
+              maxValue: 65535
+
+    - label:
+          "Step 66: TH sends Write request message to DUT to change
+          MaxPathsPerInvoke to a different value."
+      PICS: BINFO.S.A0016
+      command: "writeAttribute"
+      attribute: "MaxPathsPerInvoke"
+      arguments:
+          value: 12345
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 67: TH reads MaxPathsPerInvoke attribute from DUT"
+      PICS: BINFO.S.A0016
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      response:
+          value: MaxPathsPerInvokeValue

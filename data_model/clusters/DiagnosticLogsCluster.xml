@@ -110,7 +110,7 @@ Davis, CA 95616, USA
       <field id="1" name="RequestedProtocol" type="TransferProtocolEnum">
         <mandatoryConform/>
       </field>
-      <field id="2" name="TransferFileDesignator" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+      <field id="2" name="TransferFileDesignator" type="ref_DataTypeString">
         <optionalConform/>
         <constraint type="max" value="32"/>
       </field>
@@ -121,14 +121,14 @@ Davis, CA 95616, USA
       <field id="0" name="Status" type="StatusEnum">
         <mandatoryConform/>
       </field>
-      <field id="1" name="LogContent" type="&lt;&lt;ref_DataTypeOctstr&gt;&gt;">
+      <field id="1" name="LogContent" type="ref_DataTypeOctstr">
         <mandatoryConform/>
         <constraint type="max" value="1024"/>
       </field>
-      <field id="2" name="UTCTimeStamp" type="&lt;&lt;ref_DataTypeEpochUs&gt;&gt;">
+      <field id="2" name="UTCTimeStamp" type="ref_DataTypeEpochUs">
         <optionalConform/>
       </field>
-      <field id="3" name="TimeSinceBoot" type="&lt;&lt;ref_DataTypeSystemTimeUs&gt;&gt;">
+      <field id="3" name="TimeSinceBoot" type="ref_DataTypeSystemTimeUs">
         <optionalConform/>
       </field>
     </command>

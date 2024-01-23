@@ -26,7 +26,11 @@ FOUNDATION_EXPORT const unsigned char MatterTvCastingBridgeVersionString[];
 #import "CastingServerBridge.h"
 
 // Add simplified casting API headers here
-#import "MTRCastingApp.h"
-#import "MTRCommissionableData.h"
-#import "MTRDataSource.h"
-#import "MTRDeviceAttestationCredentials.h"
+#import "MCCastingApp.h"
+#import "MCCastingPlayer.h"
+#import "MCCastingPlayerDiscovery.h"
+#import "MCCommissionableData.h"
+#import "MCCryptoUtils.h"
+#import "MCDataSource.h"
+#import "MCDeviceAttestationCredentials.h"
+#import "MCEndpointFilter.h"

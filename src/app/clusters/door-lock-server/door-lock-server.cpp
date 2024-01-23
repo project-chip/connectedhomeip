@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 - 2024 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -1569,6 +1569,9 @@ bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, Cred
     case CredentialTypeEnum::kFace:
         status = emberAfPluginDoorLockGetNumberOfFaceCredentialsSupported(endpointId, maxNumberOfCredentials);
         break;
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
     default:
         return false;
     }
@@ -3167,6 +3170,12 @@ LockDataTypeEnum DoorLockServer::credentialTypeToLockDataType(CredentialTypeEnum
         return LockDataTypeEnum::kFingerVein;
     case CredentialTypeEnum::kFace:
         return LockDataTypeEnum::kFace;
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+        return LockDataTypeEnum::kAliroCredentialIssuerKey;
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+        return LockDataTypeEnum::kAliroEvictableEndpointKey;
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return LockDataTypeEnum::kAliroNonEvictableEndpointKey;
     case CredentialTypeEnum::kUnknownEnumValue:
         return LockDataTypeEnum::kUnspecified;
     }

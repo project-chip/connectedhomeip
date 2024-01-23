@@ -245,7 +245,7 @@ class EnumHandler(BaseHandler):
         if not self._enum.entries:
             return
 
-        # try to find the best enum size that fits out of enum8, enum32 and enum32
+        # try to find the best enum size that fits out of enum8 and enum16
         # TODO: this is a pure heuristic. XML containing this would be better.
         #       https://github.com/csa-data-model/projects/issues/345
         acceptable = {8, 16}

@@ -37,6 +37,10 @@ import("${build_root}/config/compiler/compiler.gni")
 
 import("//src/crypto/crypto.gni")
 
+if (chip_with_lwip) {
+  import("//build_overrides/lwip.gni")
+}
+
 if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   declare_args() {
     chip_enable_python_modules =
@@ -146,13 +150,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
-      if (current_os == "android") {
+      if (current_os == "android" && current_toolchain == default_toolchain) {
         deps += [ "${chip_root}/build/chip/java/tests:java_build_test" ]
       }
     }
 
     if (chip_with_lwip) {
-      deps += [ "${chip_root}/src/lwip" ]
+      deps += [ "${lwip_root}:lwip" ]
     }
 
     if (chip_build_tools) {
@@ -351,6 +355,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Build the Linux lock app example.
     enable_linux_lock_app_build =
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the Linux LIT ICD example.
+    enable_linux_lit_icd_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the cc13x2x7_26x2x7 lock app example.
@@ -604,6 +612,15 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     extra_build_deps += [ ":linux_lock_app" ]
+  }
+
+  if (enable_linux_lit_icd_app_build) {
+    group("linux_lit_icd_app") {
+      deps =
+          [ "${chip_root}/examples/lit-icd-app/linux(${standalone_toolchain})" ]
+    }
+
+    extra_build_deps += [ ":linux_lit_icd_app" ]
   }
 
   if (enable_efr32_lock_app_build) {

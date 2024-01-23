@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name:
-    12.1.3. [TC-CNET-1.3] Global Attributes for Networking commissioning cluster
-    [DUT-Server]
+name: 12.1.3. [TC-CNET-1.3] Global Attributes with DUT as Server
 
 PICS:
     - CNET.S
@@ -33,15 +31,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 1
+          value: 2
           constraints:
               type: int16u
 
-    - label: "Step 3a: Read the global attribute: FeatureMap"
+    - label: "Step 3a: TH reads from the DUT the FeatureMap attribute"
       PICS: " !CNET.S.F00 && !CNET.S.F01 && !CNET.S.F02 "
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -49,7 +47,8 @@ tests:
           value: 0
 
     - label:
-          "Step 3b: Read the global attribute: FeatureMap when CNET.S.F00 is set"
+          "Step 3b: TH reads the global attribute: FeatureMap when CNET.S.F00 is
+          set"
       PICS: CNET.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -57,7 +56,8 @@ tests:
           value: 1
 
     - label:
-          "Step 3c: Read the global attribute: FeatureMap when CNET.S.F01 is set"
+          "Step 3c: TH reads the global attribute: FeatureMap when CNET.S.F01 is
+          set"
       PICS: CNET.S.F01
       command: "readAttribute"
       attribute: "FeatureMap"
@@ -65,14 +65,15 @@ tests:
           value: 2
 
     - label:
-          "Step 3d: Read the global attribute: FeatureMap when CNET.S.F02 is set"
+          "Step 3d: TH reads the global attribute: FeatureMap when CNET.S.F02 is
+          set"
       PICS: CNET.S.F02
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 4
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -81,7 +82,7 @@ tests:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4b: TH reads from the DUT the AttributeList attribute."
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -91,7 +92,7 @@ tests:
               contains: [65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4b: Read mandatory attributes in AttributeList if
+          "Step 4c: TH reads mandatory attributes in AttributeList if
           CNET.S.F00(WI)/CNET.S.F01(TH)/CNET.S.F02(ET) is true"
       PICS: CNET.S.F00 || CNET.S.F01 || CNET.S.F02
       command: "readAttribute"
@@ -102,9 +103,9 @@ tests:
               contains: [0, 1, 4, 5, 6, 7]
 
     - label:
-          "Step 4c: Read the optional attribute(ScanMaxTimeSeconds):
-          AttributeList"
-      PICS: CNET.S.A0002
+          "Step 4d: TH reads the feature dependent
+          attribute(ScanMaxTimeSeconds): AttributeList"
+      PICS: CNET.S.F00 || CNET.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -113,9 +114,9 @@ tests:
               contains: [2]
 
     - label:
-          "Step 4d: Reading optional attribute(ConnectMaxTimeSeconds) in
-          AttributeList"
-      PICS: CNET.S.A0003
+          "Step 4e: TH reads the feature dependent
+          attribute(ConnectMaxTimeSeconds) in AttributeList"
+      PICS: CNET.S.F00 || CNET.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -123,7 +124,29 @@ tests:
               type: list
               contains: [3]
 
-    - label: "Step 5: Read the global attribute: EventList"
+    - label:
+          "Step 4f: TH reads WIFI related attribute (SupportedWiFiBands) in
+          AttributeList"
+      PICS: CNET.S.F00
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [8]
+
+    - label:
+          "Step 4g: TH reads Thread related attribute (SupportedWiFiBands and
+          ThreadVersion) in AttributeList"
+      PICS: CNET.S.F01
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [9, 10]
+
+    - label: "Step 5: TH reads from the DUT the EventList attribute"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"
@@ -133,8 +156,8 @@ tests:
               type: list
 
     - label:
-          "Step 6a: Read AcceptedCommandList If DUT supports Wi-Fi/Thread
-          related features CNET.S.F00(WI),CNET.S.F01(TH)"
+          "Step 6a: TH reads AcceptedCommandList attribute from DUT. If DUT
+          supports Wi-Fi/Thread related features CNET.S.F00(WI),CNET.S.F01(TH)"
       PICS: ( CNET.S.F00 || CNET.S.F01 )
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -144,8 +167,8 @@ tests:
               contains: [0, 4, 6, 8]
 
     - label:
-          "Step 6b: Read AcceptedCommandList If DUT supports Wi-Fi related
-          features (CNET.S.F00(WI) is true)"
+          "Step 6b: TH reads AcceptedCommandList attribute from DUT. If DUT
+          supports Wi-Fi related features (CNET.S.F00(WI) is true)"
       PICS: CNET.S.F00
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -155,8 +178,8 @@ tests:
               contains: [2]
 
     - label:
-          "Step 6c: Read AcceptedCommandList If DUT supports Thread related
-          features(CNET.S.F01(TH) is true)"
+          "Step 6c: TH reads AcceptedCommandList attribute from DUT. If DUT
+          supports Thread related features(CNET.S.F01(TH) is true)"
       PICS: CNET.S.F01
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -166,8 +189,8 @@ tests:
               contains: [3]
 
     - label:
-          "Step 6d: Read AcceptedCommandList If DUT supports Ethernet related
-          features(CNET.S.F02(TH) is true)"
+          "Step 6d: TH reads AcceptedCommandList attribute from DUT. If DUT
+          supports Ethernet related features(CNET.S.F02(TH) is true)"
       PICS: CNET.S.F02
       command: "readAttribute"
       attribute: "AcceptedCommandList"
@@ -175,8 +198,9 @@ tests:
           value: []
 
     - label:
-          "Step 7a: Read the GeneratedCommandList If DUT supports Wi-Fi/Thread
-          related features(CNET.S.F00(WI) or CNET.S.F01(TH) is true)"
+          "Step 7a: TH reads the GeneratedCommandList attribute from DUT. If DUT
+          supports Wi-Fi/Thread related features(CNET.S.F00(WI) or
+          CNET.S.F01(TH) is true)"
       PICS: ( CNET.S.F00 || CNET.S.F01 )
       command: "readAttribute"
       attribute: "GeneratedCommandList"
@@ -186,8 +210,8 @@ tests:
               contains: [1, 5, 7]
 
     - label:
-          "Step 7b: Read the GeneratedCommandList If DUT supports Ethernet
-          related features(CNET.S.F02(ET) must be true)"
+          "Step 7b: Read the GeneratedCommandList attribute from DUT. If DUT
+          supports Ethernet related features(CNET.S.F02(ET) must be true)"
       PICS: CNET.S.F02
       command: "readAttribute"
       attribute: "GeneratedCommandList"

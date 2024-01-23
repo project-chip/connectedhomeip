@@ -78,6 +78,15 @@ chip-tool/README
 darwin-framework-tool/README
 ```
 
+## Energy Management example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+energy-management-app/**/README
+```
+
 ## Java matter controller example
 
 ```{toctree}
@@ -122,6 +131,7 @@ lighting-app/qpg/APPLICATION
 :maxdepth: 1
 
 light-switch-app/**/README
+light-switch-app/qpg/APPLICATION
 ```
 
 ## Lock example
@@ -247,6 +257,15 @@ smoke-co-alarm-app/**/README
 dishwasher-app/**/README
 ```
 
+## Microwave oven example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+microwave-oven-app/**/README
+```
+
 ## Temperature measurement example
 
 ```{toctree}
@@ -264,6 +283,7 @@ temperature-measurement-app/**/README
 
 thermostat/**/README
 thermostat/**/Readme
+thermostat/qpg/APPLICATION
 ```
 
 ## TV example

@@ -207,6 +207,19 @@ int AppTask::Init()
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
+    // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+#ifdef CC13XX_26XX_FACTORY_DATA
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#endif
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
     // Initialize Pump module
     PLAT_LOG("Initialize Pump");
     PumpMgr().Init();
@@ -222,14 +235,10 @@ int AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
-
     ConfigurationMgr().LogDeviceConfig();
+
+    uint32_t iterationCount;
+    mFactoryDataProvider.GetSpake2pIterationCount(iterationCount);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();

@@ -81,12 +81,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * The controller this device was created for.  May return nil if that
  * controller has been shut down.
  */
-@property (nonatomic, readonly, nullable) MTRDeviceController * deviceController MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable) MTRDeviceController * deviceController MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 /**
  * The node ID of the node this device corresponds to.
  */
-@property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -189,7 +189,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                               queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+                         completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
@@ -255,14 +255,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * List of all client data types supported
  *
  */
-- (NSArray *)supportedClientDataClasses MTR_NEWLY_AVAILABLE;
+- (NSArray *)supportedClientDataClasses MTR_UNSTABLE_API;
 
 /**
  *
  * List of all client data keys stored
  *
  */
-- (NSArray * _Nullable)clientDataKeys MTR_NEWLY_AVAILABLE;
+- (NSArray * _Nullable)clientDataKeys MTR_UNSTABLE_API;
 
 /**
  *
@@ -270,7 +270,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * @param key           NSString * for the key to store the value as
  */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key MTR_UNSTABLE_API;
 
 /**
  *
@@ -279,7 +279,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  * @param value         id <NSSecureCoding> for the value to store
  */
-- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+- (void)setClientDataForKey:(NSString *)key value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
 
 /**
  *
@@ -287,14 +287,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * @param key           NSString * for the key to store the value as
  */
-- (void)removeClientDataForKey:(NSString *)key MTR_NEWLY_AVAILABLE;
+- (void)removeClientDataForKey:(NSString *)key MTR_UNSTABLE_API;
 
 /**
  *
  * List of all client data keys stored
  *
  */
-- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (NSArray * _Nullable)clientDataKeysForEndpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 /**
  *
@@ -303,7 +303,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  */
-- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (id<NSSecureCoding> _Nullable)clientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 /**
  *
@@ -313,7 +313,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  * @param value         id <NSSecureCoding> for the value to store
  */
-- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_NEWLY_AVAILABLE;
+- (void)setClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID value:(id<NSSecureCoding>)value MTR_UNSTABLE_API;
 
 /**
  *
@@ -322,7 +322,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param key           NSString * for the key to store the value as
  * @param endpointID    NSNumber * for the endpoint to associate the metadata with
  */
-- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+- (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
 @end
 

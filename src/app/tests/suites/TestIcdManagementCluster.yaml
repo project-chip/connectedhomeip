@@ -58,7 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "ActiveModeThreshold"
       response:
-          value: 1000
+          value: 5000
 
     - label: "Read ICDCounter"
       command: "readAttribute"
@@ -68,6 +68,23 @@ tests:
               type: int32u
               minValue: 0x0
               maxValue: 0xFFFFFFFF
+
+    - label: "Read UserActiveModeTriggerHint"
+      command: "readAttribute"
+      attribute: "UserActiveModeTriggerHint"
+      response:
+          constraints:
+              type: bitmap32
+          value: 0x110D
+
+    - label: "Read UserActiveModeTriggerInstruction"
+      command: "readAttribute"
+      attribute: "UserActiveModeTriggerInstruction"
+      response:
+          constraints:
+              type: char_string
+              minLength: 1
+              maxLength: 128
 
     - label: "Read ClientsSupportedPerFabric"
       command: "readAttribute"

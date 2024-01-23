@@ -55,7 +55,7 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x007a" name="Extractor Hood" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x007A" name="Extractor Hood" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
@@ -80,7 +80,7 @@ Davis, CA 95616, USA
         <feature code="" name="Wind">
           <disallowConform/>
         </feature>
-        <feature code="" name="Airflow Direction">
+        <feature code="" name="AirflowDirection">
           <disallowConform/>
         </feature>
       </features>

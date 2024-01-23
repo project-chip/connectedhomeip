@@ -42,6 +42,9 @@ class TC_FAN_3_3(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.FanControl.Attributes.RockSetting(rock_setting))])
         asserts.assert_equal(result[0].Status, Status.Success, "RockSetting write failed")
 
+    def pics_TC_FAN_3_3(self) -> list[str]:
+        return ["FAN.S"]
+
     @async_test_body
     async def test_TC_FAN_3_3(self):
         if not self.check_pics("FAN.S.F02"):
