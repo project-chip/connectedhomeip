@@ -789,7 +789,7 @@ bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
     {
         Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
 
-        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.evenNumber))
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.eventNumber))
         {
             commandObj->AddStatus(commandPath, Status::Failure);
             return true;
@@ -846,28 +846,16 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
     DataModel::List<const SimpleEnum> arg6;
 
-    {
-        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+    // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
+    Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
 
-        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
-        {
-            commandObj->AddStatus(commandPath, Status::Failure);
-            return true;
-        }
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+        return true;
     }
 
-    {
-        // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
-        Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
-
-        EventNumber eventIdPlaceholder = 0;
-        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, eventIdPlaceholder))
-        {
-            commandObj->AddStatus(commandPath, Status::Failure);
-            return true;
-        }
-        commandObj->AddResponse(commandPath, responseData);
-    }
+    commandObj->AddResponse(commandPath, responseData);
     return true;
 }
 
