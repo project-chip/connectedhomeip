@@ -32,17 +32,6 @@
 
 using namespace chip;
 
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// External Declarations
-
-//------------------------------------------------------------------------------
-// Forward Declarations
-
-//------------------------------------------------------------------------------
-// Globals
-
 EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                             EmberAfAttributeType dataType)
 {

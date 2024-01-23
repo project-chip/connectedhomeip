@@ -160,19 +160,6 @@ CHIP_ERROR BdxOTASender::OnMessageToSend(TransferSession::OutputEvent & event)
     return err;
 }
 
-bdx::StatusCode BdxOTASender::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
-{
-    if (err == CHIP_ERROR_INCORRECT_STATE)
-    {
-        return bdx::StatusCode::kUnexpectedMessage;
-    }
-    if (err == CHIP_ERROR_INVALID_ARGUMENT)
-    {
-        return bdx::StatusCode::kBadMessageContents;
-    }
-    return bdx::StatusCode::kUnknown;
-}
-
 CHIP_ERROR BdxOTASender::OnTransferSessionBegin(TransferSession::OutputEvent & event)
 {
     assertChipStackLockedByCurrentThread();
