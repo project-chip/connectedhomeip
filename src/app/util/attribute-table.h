@@ -22,8 +22,8 @@
 /**
  * Write an attribute for a request arriving from external sources.
  *
- * This will check attribute attribute writeability and that
- * the privided data type matches the expected data type.
+ * This will check attribute writeability and that
+ * the provided data type matches the expected data type.
  */
 EmberAfStatus emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                          uint8_t * dataPtr, EmberAfAttributeType dataType);
