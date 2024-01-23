@@ -554,7 +554,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         ok = True
         for endpoint_id in flat:
             # ensure that every sub-id in the parts list is included in the parent
-            sub_children = []
+            sub_children = set()
             for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
                 sub_children.update(get_all_children(child))
             if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
