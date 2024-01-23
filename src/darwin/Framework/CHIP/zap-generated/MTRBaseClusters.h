@@ -15184,7 +15184,7 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Command TestDifferentVendorMeiRequest
  *
- * Command having a different MEI vendor ID than the cluster.
+ * Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent.
  */
 - (void)testDifferentVendorMeiRequestWithParams:(MTRUnitTestingClusterTestDifferentVendorMeiRequestParams *)params completion:(void (^)(MTRUnitTestingClusterTestDifferentVendorMeiResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 

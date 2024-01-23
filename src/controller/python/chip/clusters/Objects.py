@@ -47061,9 +47061,11 @@ class UnitTesting(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="eventNumber", Tag=1, Type=uint),
                     ])
 
             arg1: 'uint' = 0
+            eventNumber: 'uint' = 0
 
     class Attributes:
         @dataclass

@@ -12723,6 +12723,8 @@ MTR_PROVISIONALLY_AVAILABLE
 
 @property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_PROVISIONALLY_AVAILABLE;
 
+@property (nonatomic, copy) NSNumber * _Nonnull eventNumber MTR_PROVISIONALLY_AVAILABLE;
+
 /**
  * Initialize an MTRUnitTestingClusterTestDifferentVendorMeiResponseParams with a response-value dictionary
  * of the sort that MTRDeviceResponseHandler would receive.

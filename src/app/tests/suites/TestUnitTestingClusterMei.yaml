@@ -28,17 +28,6 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Send MEI command in cluster"
-      command: "TestDifferentVendorMeiRequest"
-      arguments:
-          values:
-              - name: "arg1"
-                value: 76
-      response:
-          values:
-              - name: "arg1"
-                value: 76
-
     - label: "Write different vendor MEI attribute"
       command: "writeAttribute"
       attribute: "mei_int8u"
@@ -73,6 +62,26 @@ tests:
               type: list
               contains: [4294070017]
 
+    - label: "Send MEI command and force event generation"
+      command: "TestDifferentVendorMeiRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 76
+      response:
+          values:
+              - name: "arg1"
+                value: 76
+              - name: "eventNumber"
+                saveAs: firstMeiEventNumber
+
+    - label: "Validate event generation 1/2"
+      command: "readEvent"
+      event: "TestDifferentVendorMeiEvent"
+      eventNumber: firstMeiEventNumber
+      response:
+          value: { arg1: 76 }
+
     - label: "Force event generation"
       command: "TestEmitTestEventRequest"
       arguments:
@@ -88,14 +97,7 @@ tests:
               - name: "value"
                 saveAs: firstEventNumber
 
-    - label: "Validate event generation 1/2"
-      command: "readEvent"
-      event: "TestDifferentVendorMeiEvent"
-      eventNumber: firstEventNumber
-      response:
-          value: { arg1: 42 }
-
     - label: "Validate event generation 2/2"
       command: "readEvent"
       event: "TestEvent"
-      eventNumber: "LastReceivedEventNumber + 1"
+      eventNumber: firstEventNumber

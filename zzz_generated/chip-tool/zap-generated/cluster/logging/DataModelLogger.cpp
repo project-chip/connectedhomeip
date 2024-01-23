@@ -7631,6 +7631,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("eventNumber", indent + 1, value.eventNumber));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }

@@ -121,7 +121,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class TestBatchHelperResponse(val buffer: ByteArray)
 
-  class TestDifferentVendorMeiResponse(val arg1: UByte)
+  class TestDifferentVendorMeiResponse(val arg1: UByte, val eventNumber: ULong)
 
   class ListInt8uAttribute(val value: List<UByte>)
 
@@ -2365,11 +2365,18 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     val TAG_ARG1: Int = 0
     var arg1_decoded: UByte? = null
 
+    val TAG_EVENT_NUMBER: Int = 1
+    var eventNumber_decoded: ULong? = null
+
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
       if (tag == ContextSpecificTag(TAG_ARG1)) {
         arg1_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_EVENT_NUMBER)) {
+        eventNumber_decoded = tlvReader.getULong(tag)
       } else {
         tlvReader.skipElement()
       }
@@ -2379,9 +2386,13 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       throw IllegalStateException("arg1 not found in TLV")
     }
 
+    if (eventNumber_decoded == null) {
+      throw IllegalStateException("eventNumber not found in TLV")
+    }
+
     tlvReader.exitContainer()
 
-    return TestDifferentVendorMeiResponse(arg1_decoded)
+    return TestDifferentVendorMeiResponse(arg1_decoded, eventNumber_decoded)
   }
 
   suspend fun readBooleanAttribute(): Boolean {

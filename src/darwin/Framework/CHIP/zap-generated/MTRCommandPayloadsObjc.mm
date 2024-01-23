@@ -34281,6 +34281,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _arg1 = @(0);
+
+        _eventNumber = @(0);
     }
     return self;
 }
@@ -34290,13 +34292,14 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRUnitTestingClusterTestDifferentVendorMeiResponseParams alloc] init];
 
     other.arg1 = self.arg1;
+    other.eventNumber = self.eventNumber;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; eventNumber:%@; >", NSStringFromClass([self class]), _arg1, _eventNumber];
     return descriptionString;
 }
 
@@ -34348,6 +34351,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     {
         self.arg1 = [NSNumber numberWithUnsignedChar:decodableStruct.arg1];
+    }
+    {
+        self.eventNumber = [NSNumber numberWithUnsignedLongLong:decodableStruct.eventNumber];
     }
     return CHIP_NO_ERROR;
 }

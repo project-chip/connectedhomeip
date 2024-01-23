@@ -6904,6 +6904,7 @@ internal cluster UnitTesting = 4294048773 {
 
   response struct TestDifferentVendorMeiResponse = 4294049979 {
     int8u arg1 = 0;
+    int64u eventNumber = 1;
   }
 
   /** Simple command without any parameters and without a specific response.
@@ -6976,7 +6977,7 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
-  /** Command having a different MEI vendor ID than the cluster. */
+  /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
   command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
 

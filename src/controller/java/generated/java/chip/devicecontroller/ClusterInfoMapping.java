@@ -18939,11 +18939,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer arg1) {
+    public void onSuccess(Integer arg1, Long eventNumber) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo arg1ResponseValue = new CommandResponseInfo("arg1", "Integer");
       responseValues.put(arg1ResponseValue, arg1);
+      CommandResponseInfo eventNumberResponseValue = new CommandResponseInfo("eventNumber", "Long");
+      responseValues.put(eventNumberResponseValue, eventNumber);
       callback.onSuccess(responseValues);
     }
 

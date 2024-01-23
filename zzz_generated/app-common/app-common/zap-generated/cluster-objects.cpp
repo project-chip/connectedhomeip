@@ -28450,6 +28450,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
     encoder.Encode(to_underlying(Fields::kArg1), arg1);
+    encoder.Encode(to_underlying(Fields::kEventNumber), eventNumber);
     return encoder.Finalize();
 }
 
@@ -28470,6 +28471,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
+        }
+        else if (__context_tag == to_underlying(Fields::kEventNumber))
+        {
+            err = DataModel::Decode(reader, eventNumber);
         }
         else
         {

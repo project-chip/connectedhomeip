@@ -60051,15 +60051,22 @@ public class ChipClusters {
           public void onResponse(StructType invokeStructValue) {
           final long arg1FieldID = 0L;
           Integer arg1 = null;
+          final long eventNumberFieldID = 1L;
+          Long eventNumber = null;
           for (StructElement element: invokeStructValue.value()) {
             if (element.contextTagNum() == arg1FieldID) {
               if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
                 UIntType castingValue = element.value(UIntType.class);
                 arg1 = castingValue.value(Integer.class);
               }
+            } else if (element.contextTagNum() == eventNumberFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                eventNumber = castingValue.value(Long.class);
+              }
             }
           }
-          callback.onSuccess(arg1);
+          callback.onSuccess(arg1, eventNumber);
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
@@ -60116,7 +60123,7 @@ public class ChipClusters {
     }
 
     public interface TestDifferentVendorMeiResponseCallback extends BaseClusterCallback {
-      void onSuccess(Integer arg1);
+      void onSuccess(Integer arg1, Long eventNumber);
     }
 
     public interface ListInt8uAttributeCallback extends BaseAttributeCallback {

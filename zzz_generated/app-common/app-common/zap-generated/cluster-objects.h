@@ -42303,7 +42303,8 @@ public:
 namespace TestDifferentVendorMeiResponse {
 enum class Fields : uint8_t
 {
-    kArg1 = 0,
+    kArg1        = 0,
+    kEventNumber = 1,
 };
 
 struct Type
@@ -42313,7 +42314,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    uint8_t arg1 = static_cast<uint8_t>(0);
+    uint8_t arg1         = static_cast<uint8_t>(0);
+    uint64_t eventNumber = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -42328,7 +42330,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 
-    uint8_t arg1 = static_cast<uint8_t>(0);
+    uint8_t arg1         = static_cast<uint8_t>(0);
+    uint64_t eventNumber = static_cast<uint64_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestDifferentVendorMeiResponse

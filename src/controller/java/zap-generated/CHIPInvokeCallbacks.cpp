@@ -8444,7 +8444,8 @@ void CHIPUnitTestingClusterTestDifferentVendorMeiResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/Long;)V",
+                                                  &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject arg1;
@@ -8452,8 +8453,14 @@ void CHIPUnitTestingClusterTestDifferentVendorMeiResponseCallback::CallbackFn(
     std::string arg1CtorSignature = "(I)V";
     jint jniarg1                  = static_cast<jint>(dataResponse.arg1);
     chip::JniReferences::GetInstance().CreateBoxedObject<jint>(arg1ClassName.c_str(), arg1CtorSignature.c_str(), jniarg1, arg1);
+    jobject eventNumber;
+    std::string eventNumberClassName     = "java/lang/Long";
+    std::string eventNumberCtorSignature = "(J)V";
+    jlong jnieventNumber                 = static_cast<jlong>(dataResponse.eventNumber);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(eventNumberClassName.c_str(), eventNumberCtorSignature.c_str(),
+                                                                jnieventNumber, eventNumber);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, arg1);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arg1, eventNumber);
 }
 CHIPSampleMeiClusterAddArgumentsResponseCallback::CHIPSampleMeiClusterAddArgumentsResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>(CallbackFn, this)
