@@ -17,8 +17,8 @@
 menuconfig CHIP
 	bool "Matter protocol stack"
 	default n
-	select CPLUSPLUS
-	imply LIB_CPLUSPLUS
+	select CPP
+	imply REQUIRES_FULL_LIBCPP
 	imply REQUIRES_FULL_LIBC
 	imply NEWLIB_LIBC_NANO
 	imply CBPRINTF_LIBC_SUBSTS
