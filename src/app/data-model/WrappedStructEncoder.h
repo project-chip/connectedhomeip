@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

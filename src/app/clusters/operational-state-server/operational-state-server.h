@@ -29,6 +29,9 @@ namespace app {
 namespace Clusters {
 namespace OperationalState {
 
+const uint8_t DerivedClusterNumberSpaceStart = 0x40;
+const uint8_t VendorNumberSpaceStart         = 0x80;
+
 class Uncopyable
 {
 protected:
@@ -50,17 +53,22 @@ class Instance : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
     /**
-     * Creates an operational state cluster instance. The Init() function needs to be called for this instance
-     * to be registered and called by the interaction model at the appropriate times.
+     * Creates an operational state cluster instance.
+     * The Init() function needs to be called for this instance to be registered and called by the
+     * interaction model at the appropriate times.
      * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
      * @param aDelegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param aClusterId The ID of the operational state derived cluster to be instantiated.
      */
-    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
+    Instance(Delegate * aDelegate, EndpointId aEndpointId);
 
     ~Instance() override;
+
+    /**
+     * Phase name's max length
+     */
+    static constexpr uint8_t kMaxPhaseNameLength = 64;
 
     /**
      * Initialise the operational state server instance.
@@ -148,18 +156,61 @@ public:
      */
     bool IsSupportedOperationalState(uint8_t aState);
 
+protected:
+    /**
+     * Creates an operational state cluster instance for a given cluster ID.
+     * The Init() function needs to be called for this instance to be registered and called by the
+     * interaction model at the appropriate times.
+     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
+     * @param aDelegate A pointer to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param aClusterId The ID of the operational state derived cluster to be instantiated.
+     */
+    Instance(Delegate * aDelegate, EndpointId aEndpointId, ClusterId aClusterId);
+
+    /**
+     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is pause-compatible.
+     * Note: if a state outside the derived cluster number-space is given, this method returns false.
+     * @param aState The state to check.
+     * @return true if aState is pause-compatible, false otherwise.
+     */
+    virtual bool IsDerivedClusterStatePauseCompatible(uint8_t aState) { return false; };
+
+    /**
+     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is resume-compatible.
+     * Note: if a state outside the derived cluster number-space is given, this method returns false.
+     * @param aState The state to check.
+     * @return true if aState is pause-compatible, false otherwise.
+     */
+    virtual bool IsDerivedClusterStateResumeCompatible(uint8_t aState) { return false; };
+
+    /**
+     * Handles the invocation of derived cluster commands.
+     * If a derived cluster defines its own commands, this method SHALL be implemented by the derived cluster's class
+     * to handle the derived cluster's specific commands.
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    virtual void InvokeDerivedClusterCommand(HandlerContext & handlerContext) { return; };
+
 private:
     Delegate * mDelegate;
 
-    EndpointId mEndpointId;
-    ClusterId mClusterId;
+    const EndpointId mEndpointId;
+    const ClusterId mClusterId;
 
     // Attribute Data Store
     app::DataModel::Nullable<uint8_t> mCurrentPhase;
     uint8_t mOperationalState                 = 0; // assume 0 for now.
     GenericOperationalError mOperationalError = to_underlying(ErrorStateEnum::kNoError);
 
-    // Inherited from CommandHandlerInterface
+    /**
+     * This method is inherited from CommandHandlerInterface.
+     * This reimplementation does not check that the cluster ID in the HandlerContext (the cluster the command relates to)
+     * matches the cluster ID of the RequestT type.
+     * These cluster IDs may be different in the case where a command defined in the base cluster is intended for a
+     * derived cluster.
+     */
     template <typename RequestT, typename FuncT>
     void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
@@ -174,6 +225,9 @@ private:
 
     /**
      * Handle Command: Pause.
+     * If the current state is not pause-compatible, this method responds with an ErrorStateId of CommandInvalidInState.
+     * If the current state is paused, this method responds with an ErrorStateId of NoError but takes no action.
+     * Otherwise, this method calls the delegate's HandlePauseStateCallback.
      */
     void HandlePauseState(HandlerContext & ctx, const Commands::Pause::DecodableType & req);
 
@@ -189,6 +243,8 @@ private:
 
     /**
      * Handle Command: Resume.
+     * If the current state is not resume-compatible, this method responds with an ErrorStateId of CommandInvalidInState.
+     * Otherwise, this method calls the delegate's HandleResumeStateCallback.
      */
     void HandleResumeState(HandlerContext & ctx, const Commands::Resume::DecodableType & req);
 };
@@ -225,14 +281,18 @@ public:
     virtual CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) = 0;
 
     /**
-     * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
+     * Fills in the provided MutableCharSpan with the phase at index `index` if there is one,
      * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of phases.
+     *
+     * If CHIP_ERROR_NOT_FOUND is returned for index 0, that indicates that the PhaseList attribute is null
+     * (there are no phases defined at all).
+     *
      * Note: This is used by the SDK to populate the phase list attribute. If the contents of this list changes, the
      * device SHALL call the Instance's ReportPhaseListChange method to report that this attribute has changed.
      * @param index The index of the phase, with 0 representing the first phase.
-     * @param operationalPhase  The GenericOperationalPhase is filled.
+     * @param operationalPhase  The MutableCharSpan is filled.
      */
-    virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) = 0;
+    virtual CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, MutableCharSpan & operationalPhase) = 0;
 
     // command callback
     /**
@@ -275,6 +335,89 @@ protected:
 };
 
 } // namespace OperationalState
+
+namespace RvcOperationalState {
+
+class Delegate : public OperationalState::Delegate
+{
+public:
+    virtual void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
+    };
+};
+
+class Instance : public OperationalState::Instance
+{
+public:
+    /**
+     * Creates an RVC operational state cluster instance.
+     * The Init() function needs to be called for this instance to be registered and called by the
+     * interaction model at the appropriate times.
+     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
+     * @param aDelegate A pointer to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     */
+    Instance(Delegate * aDelegate, EndpointId aEndpointId) :
+        OperationalState::Instance(aDelegate, aEndpointId, Id), mDelegate(aDelegate)
+    {}
+
+protected:
+    /**
+     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is pause-compatible.
+     * Note: if a state outside the derived cluster number-space is given, this method returns false.
+     * @param aState The state to check.
+     * @return true if aState is pause-compatible, false otherwise.
+     */
+    bool IsDerivedClusterStatePauseCompatible(uint8_t aState) override;
+
+    /**
+     * Given a state in the derived cluster number-space (from 0x40 to 0x7f), this method checks if the state is resume-compatible.
+     * Note: if a state outside the derived cluster number-space is given, this method returns false.
+     * @param aState The state to check.
+     * @return true if aState is pause-compatible, false otherwise.
+     */
+    bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override;
+
+    /**
+     * Handles the invocation of RvcOperationalState specific commands
+     * @param handlerContext The command handler context containing information about the received command.
+     */
+    void InvokeDerivedClusterCommand(HandlerContext & handlerContext) override;
+
+private:
+    Delegate * mDelegate;
+
+    /**
+     * Handle Command: GoHome
+     */
+    void HandleGoHomeCommand(HandlerContext & ctx, const Commands::GoHome::DecodableType & req);
+};
+
+} // namespace RvcOperationalState
+
+namespace OvenCavityOperationalState {
+
+class Instance : public OperationalState::Instance
+{
+public:
+    /**
+     * Creates an oven cavity operational state cluster instance.
+     * The Init() function needs to be called for this instance to be registered and called by the
+     * interaction model at the appropriate times.
+     * It is possible to set the CurrentPhase and OperationalState via the Set... methods before calling Init().
+     * @param aDelegate A pointer to the delegate to be used by this server.
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     * @param aEndpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     */
+    Instance(OperationalState::Delegate * aDelegate, EndpointId aEndpointId) :
+        OperationalState::Instance(aDelegate, aEndpointId, Id)
+    {}
+};
+
+} // namespace OvenCavityOperationalState
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -37,6 +37,25 @@ public:
     virtual void TimerFired() = 0;
 };
 
+/**
+ * @class ReportScheduler
+ *
+ * @brief This class is responsible for scheduling Engine runs based on the reporting intervals of the ReadHandlers.
+ *
+ *
+ * This class holds a pool of ReadHandlerNodes that are used to keep track of the minimum and maximum timestamps for a report to be
+ * emitted based on the reporting intervals of the ReadHandlers associated with the node.
+ *
+ * The ReportScheduler also holds a TimerDelegate pointer that is used to start and cancel timers for the ReadHandlers depending
+ * on the reporting logic of the Scheduler.
+ *
+ * It inherits the ReadHandler::Observer class to be notified of reportability changes in the ReadHandlers.
+ * It inherits the ICDStateObserver class to allow the implementation to generate reports based on the changes in ICD devices state,
+ * such as going from idle to active and vice-versa.
+ *
+ * @note The logic for how and when to schedule reports is implemented in the subclasses of ReportScheduler, such as
+ * ReportSchedulerImpl and SyncronizedReportSchedulerImpl.
+ */
 class ReportScheduler : public ReadHandler::Observer, public ICDStateObserver
 {
 public:
@@ -60,6 +79,29 @@ public:
         virtual Timestamp GetCurrentMonotonicTimestamp()   = 0;
     };
 
+    /**
+     * @class ReadHandlerNode
+     *
+     * @brief This class is in charge of determining when a ReadHandler is reportable depending on the monotonic timestamp of the
+     * system and the intervals of the ReadHandler. It inherits the TimerContext class to allow it to be used as a context for a
+     * TimerDelegate so the TimerDelegate can call the TimerFired method when the timer expires.
+     *
+     *  The Logic to determine if a ReadHandler is reportable at a precise timestamp is as follows:
+     *  1: The ReadHandler is in the CanStartReporting state
+     *  2: The minimal interval since last report has elapsed
+     *  3: The maximal interval since last report has elapsed or the ReadHandler is dirty
+     *  If the three conditions are met, the ReadHandler is reportable.
+     *
+     *  Additionnal flags have been provided for specific use cases:
+     *
+     *  CanbeSynced: Mechanism to allow the ReadHandler to emit a report if another readHandler is ReportableNow.
+     *  This flag can substitute the maximal interval condition or the dirty condition. It is currently only used by the
+     *  SynchronizedReportScheduler.
+     *
+     *  EngineRunScheduled: Mechanism to ensure that the reporting engine will see the ReadHandler as reportable if a timer fires.
+     *  This flag can substitute the minimal interval condition or the maximal interval condition. The goal is to allow for
+     *  reporting when timers fire earlier than the minimal timestamp du to mechanism such as NTP clock adjustments.
+     */
     class ReadHandlerNode : public TimerContext
     {
     public:
@@ -96,6 +138,7 @@ public:
                      IsEngineRunScheduled()));
         }
 
+        bool IsChunkedReport() const { return mReadHandler->IsChunkedReport(); }
         bool IsEngineRunScheduled() const { return mFlags.Has(ReadHandlerNodeFlags::EngineRunScheduled); }
         void SetEngineRunScheduled(bool aEngineRunScheduled)
         {
@@ -153,7 +196,10 @@ public:
     }
 
     /// @brief Check if a ReadHandler is reportable without considering the timing
-    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const { return aReadHandler->ShouldStartReporting(); }
+    bool IsReadHandlerReportable(ReadHandler * aReadHandler) const
+    {
+        return (nullptr != aReadHandler) ? aReadHandler->ShouldStartReporting() : false;
+    }
     /// @brief Sets the ForceDirty flag of a ReadHandler
     void HandlerForceDirtyState(ReadHandler * aReadHandler) { aReadHandler->ForceDirtyState(); }
 

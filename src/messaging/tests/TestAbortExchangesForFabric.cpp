@@ -258,12 +258,16 @@ const nlTest sTests[] = {
     NL_TEST_SENTINEL(),
 };
 
+// clang-format off
 nlTestSuite sSuite = {
     "Test-AbortExchangesForFabric",
     &sTests[0],
-    TestContext::Initialize,
-    TestContext::Finalize,
+    TestContext::nlTestSetUpTestSuite,
+    TestContext::nlTestTearDownTestSuite,
+    TestContext::nlTestSetUp,
+    TestContext::nlTestTearDown,
 };
+// clang-format on
 
 } // namespace
 

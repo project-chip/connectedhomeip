@@ -48,15 +48,20 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
 
-    bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
-    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
-                       "The CheckIn protocol feature is required for LIT support");
-    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
-                       "The user ActiveMode trigger feature is required for LIT support");
-
-    // Disabling check until LIT support is compelte
-    // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
-    //                    "LIT support is required for slow polling intervals superior to 15 seconds");
+    // LIT ICD Verification Checks
+    if (SupportsFeature(Feature::kLongIdleTimeSupport))
+    {
+        VerifyOrDieWithMsg(SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
+                           "The CheckIn protocol feature is required for LIT support.");
+        VerifyOrDieWithMsg(SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
+                           "The user ActiveMode trigger feature is required for LIT support.");
+        VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThresholdMs() <=
+                               ICDConfigurationData::GetInstance().GetActiveModeThresholdMs(),
+                           AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
+        // Disabling check until LIT support is compelte
+        // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
+        //                    "LIT support is required for slow polling intervals superior to 15 seconds");
+    }
 
     mStorage     = storage;
     mFabricTable = fabricTable;
@@ -65,11 +70,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mExchangeManager   = exchangeManager;
 
     VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
-
-    // Removing the check for now since it is possible for the Fast polling
-    // to be larger than the ActiveModeDuration for now
-    // uint32_t activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDurationMs();
-    // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -245,6 +245,11 @@ void ICDManager::UpdateICDMode()
     {
         ICDConfigurationData::GetInstance().SetICDMode(tempMode);
         postObserverEvent(ObserverEventType::ICDModeChange);
+
+        // Can't use attribute accessors/Attributes::OperatingMode::Set in unit tests
+#if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        Attributes::OperatingMode::Set(kRootEndpointId, static_cast<OperatingModeEnum>(tempMode));
+#endif
     }
 
     // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
@@ -274,15 +279,6 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
 
         System::Clock::Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
-
-#if ICD_ENFORCE_SIT_SLOW_POLL_LIMIT
-        // When in SIT mode, the slow poll interval SHOULDN'T be greater than the SIT mode polling threshold, per spec.
-        if (ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::SIT &&
-            GetSlowPollingInterval() > GetSITPollingThreshold())
-        {
-            slowPollInterval = GetSITPollingThreshold();
-        }
-#endif
 
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
@@ -490,6 +486,15 @@ void ICDManager::OnICDManagementServerEvent(ICDManagementEvents event)
     default:
         break;
     }
+}
+
+void ICDManager::OnSubscriptionReport()
+{
+    // If the device is already in ActiveMode, that means that all active subscriptions have already been marked dirty.
+    // Since we only mark them dirty when we enter ActiveMode, it is not necessary to update the operational state a second time.
+    // Doing so will only add an ActiveModeThreshold to the active time which we don't want to do here.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+    this->UpdateOperationState(OperationalState::ActiveMode);
 }
 
 ICDManager::ObserverPointer * ICDManager::RegisterObserver(ICDStateObserver * observer)

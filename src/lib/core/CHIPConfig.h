@@ -1484,16 +1484,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *  }
  *
  *  Including all the TLV fields, the following values can help estimate the needed size for a scenes given a number of clusters:
- *  Empty EFS Scene Max name size: 33bytes
- *  Scene Max name size + OnOff : 51 bytes
- *  Scene Max name size + LevelControl : 60 bytes
- *  Scene Max name size + ColorControl : 126 bytes
- *  Scene Max name size + OnOff + LevelControl + ColoControl : 171 bytes
+ *  Empty EFS Scene Max name size: 37 bytes
+ *  Scene Max name size + OnOff : 55 bytes
+ *  Scene Max name size + LevelControl : 64 bytes
+ *  Scene Max name size + ColorControl : 130 bytes
+ *  Scene Max name size + OnOff + LevelControl + ColoControl : 175 bytes
  *
  *  Cluster Sizes:
- *  OnOff Cluster Max Size: 18 bytes
- *  LevelControl Cluster Max Size: 27 bytes
- *  Color Control Cluster Max Size: 93 bytes
+ *  OnOff Cluster Max Size: 21 bytes
+ *  LevelControl Cluster Max Size: 30 bytes
+ *  Color Control Cluster Max Size: 96 bytes
  * */
 #ifndef CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES
 #define CHIP_CONFIG_SCENES_MAX_SERIALIZED_SCENE_SIZE_BYTES 256
@@ -1599,7 +1599,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
  */
 #ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 300
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 5000
 #endif
 
 /**
@@ -1690,6 +1690,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+ *
+ * @brief Device supports sending multiple batch commands in a single Invoke Request Message.
+ */
+#ifndef CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED
+#define CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED 0
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_PATHS_PER_INVOKE
  *
  * @brief The maximum number of elements in the InvokeRequests list that the Node is able to process.
@@ -1710,6 +1719,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
 #define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+ *
+ * @brief Enables support for diagnostic logs transfer using the BDX protocol
+ *
+ */
+#ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+#define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
 #endif
 
 /**

@@ -252,14 +252,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
 
 /** @} END addtogroup */
 
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-#if defined(EMBER_TEST)
-#define EMBER_TEST_ASSERT(x) assert(x)
-#else
-#define EMBER_TEST_ASSERT(x)
-#endif
-#endif
-
 /**
  * Returns the pointer to the data version storage for the given endpoint and
  * cluster.  Can return null in the following cases:

@@ -17,7 +17,11 @@ limitations under the License.
 <configurator>
   <domain name="Home Automation"/>
 
-  <cluster introducedIn="ha-1.2-05-3520-29">
+  <!-- 
+    Deprecated because this is a zigbee-only cluster.
+    Matter electrical measurement is 0x90 (see https://github.com/project-chip/connectedhomeip/pull/30389)
+  -->
+  <cluster apiMaturity="deprecated" introducedIn="ha-1.2-05-3520-29">
     <name>Electrical Measurement</name>
     <domain>Home Automation</domain>
     <description>Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster..</description>

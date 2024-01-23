@@ -31,19 +31,19 @@
 #include <app/MessageDef/WriteResponseMessage.h>
 
 namespace {
-constexpr const char * kProtocolName = "Interaction Model";
+constexpr char kProtocolName[] = "Interaction Model";
 
-constexpr const char * kUnknown               = "Unknown";
-constexpr const char * kStatusResponse        = "Status Response";
-constexpr const char * kReadRequest           = "Read Request";
-constexpr const char * kSubscribeRequest      = "Subscribe Request";
-constexpr const char * kSubscribeResponse     = "Subscribe Response";
-constexpr const char * kReportData            = "Report Data";
-constexpr const char * kWriteRequest          = "Write Request";
-constexpr const char * kWriteResponse         = "Write Response";
-constexpr const char * kInvokeCommandRequest  = "InvokeCommandRequest";
-constexpr const char * kInvokeCommandResponse = "InvokeCommandResponse";
-constexpr const char * kTimedRequest          = "Timed Request";
+constexpr char kUnknown[]               = "Unknown";
+constexpr char kStatusResponse[]        = "Status Response";
+constexpr char kReadRequest[]           = "Read Request";
+constexpr char kSubscribeRequest[]      = "Subscribe Request";
+constexpr char kSubscribeResponse[]     = "Subscribe Response";
+constexpr char kReportData[]            = "Report Data";
+constexpr char kWriteRequest[]          = "Write Request";
+constexpr char kWriteResponse[]         = "Write Response";
+constexpr char kInvokeCommandRequest[]  = "InvokeCommandRequest";
+constexpr char kInvokeCommandResponse[] = "InvokeCommandResponse";
+constexpr char kTimedRequest[]          = "Timed Request";
 
 } // namespace
 

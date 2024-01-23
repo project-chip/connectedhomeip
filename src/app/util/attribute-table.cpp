@@ -32,17 +32,6 @@
 
 using namespace chip;
 
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-// External Declarations
-
-//------------------------------------------------------------------------------
-// Forward Declarations
-
-//------------------------------------------------------------------------------
-// Globals
-
 EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                             EmberAfAttributeType dataType)
 {
@@ -172,7 +161,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     // if we dont support that attribute
     if (metadata == nullptr)
     {
-        ChipLogProgress(Zcl, "%pep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", "WRITE ERR: ", endpoint,
+        ChipLogProgress(Zcl, "%p ep %x clus " ChipLogFormatMEI " attr " ChipLogFormatMEI " not supported", "WRITE ERR: ", endpoint,
                         ChipLogValueMEI(cluster), ChipLogValueMEI(attributeID));
         return status;
     }
@@ -182,13 +171,13 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     {
         if (dataType != metadata->attributeType)
         {
-            ChipLogProgress(Zcl, "%pinvalid data type", "WRITE ERR: ");
+            ChipLogProgress(Zcl, "%p invalid data type", "WRITE ERR: ");
             return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
         if (metadata->IsReadOnly())
         {
-            ChipLogProgress(Zcl, "%pattr not writable", "WRITE ERR: ");
+            ChipLogProgress(Zcl, "%p attr not writable", "WRITE ERR: ");
             return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
         }
     }

@@ -23,7 +23,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -116,7 +117,7 @@ tests:
               - name: "ms"
                 value: 5000
 
-    - label: "Step 2e: TH reads CurrentLevel attribute from DUT"
+    - label: "Step 2e: After 5 seconds TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C05.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -177,7 +178,8 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 4b: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4b: After 10 seconds, TH reads CurrentLevel attribute from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -194,7 +196,9 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 4c: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4c: After another 10 seconds, TH reads CurrentLevel attribute
+          from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -211,7 +215,9 @@ tests:
               - name: "ms"
                 value: 10000
 
-    - label: "Step 4d: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4d: After another 10 seconds, TH reads CurrentLevel attribute
+          from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"
@@ -228,7 +234,9 @@ tests:
               - name: "ms"
                 value: 19000
 
-    - label: "Step 4e: TH reads CurrentLevel attribute from DUT"
+    - label:
+          "Step 4e: After another 19 seconds, TH reads CurrentLevel attribute
+          from DUT"
       PICS: LVL.S.C01.Rsp && LVL.S.A0000
       command: "readAttribute"
       attribute: "CurrentLevel"

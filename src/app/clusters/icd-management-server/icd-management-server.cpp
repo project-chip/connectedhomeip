@@ -176,7 +176,7 @@ public:
         uint16_t supported_clients = mICDConfigurationData->GetClientsSupportedPerFabric();
         ICDMonitoringTable table(*mStorage, fabricIndex, supported_clients, mSymmetricKeystore);
         table.RemoveAll();
-        ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+        ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
     }
 
 private:
@@ -189,11 +189,11 @@ IcdManagementFabricDelegate gFabricDelegate;
 IcdManagementAttributeAccess gAttribute;
 
 /**
- * @brief Function checks if the client as admin permissions to the cluster in the commandPath
+ * @brief Function checks if the client has admin permissions to the cluster in the commandPath
  *
  * @param[out] isClientAdmin True : Client has admin permissions
  *                           False : Client does not have admin permissions
- *                           If an error ocurs, isClientAdmin is not changed
+ *                           If an error occurs, isClientAdmin is not changed
  * @return CHIP_ERROR
  */
 CHIP_ERROR CheckAdmin(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, bool & isClientAdmin)
@@ -337,13 +337,13 @@ Status ICDManagementServer::StayActiveRequest(FabricIndex fabricIndex)
 {
     // TODO: Implementent stay awake logic for end device
     // https://github.com/project-chip/connectedhomeip/issues/24259
-    ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kStayActiveRequestReceived);
     return InteractionModel::Status::UnsupportedCommand;
 }
 
 void ICDManagementServer::TriggerICDMTableUpdatedEvent()
 {
-    ICDNotifier::GetInstance().BroadcastICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
+    ICDNotifier::GetInstance().NotifyICDManagementEvent(ICDListener::ICDManagementEvents::kTableUpdated);
 }
 
 void ICDManagementServer::Init(PersistentStorageDelegate & storage, Crypto::SymmetricKeystore * symmetricKeystore,

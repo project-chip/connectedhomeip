@@ -75,9 +75,9 @@
 namespace chip {
 namespace trace {
 
-inline constexpr const char * kTraceMessageEvent              = "SecureMsg";
-inline constexpr const char * kTraceMessageSentDataFormat     = "SecMsgSent";
-inline constexpr const char * kTraceMessageReceivedDataFormat = "SecMsgReceived";
+inline constexpr char kTraceMessageEvent[]              = "SecureMsg";
+inline constexpr char kTraceMessageSentDataFormat[]     = "SecMsgSent";
+inline constexpr char kTraceMessageReceivedDataFormat[] = "SecMsgReceived";
 
 struct TraceSecureMessageSentData
 {

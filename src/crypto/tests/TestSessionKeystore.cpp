@@ -110,7 +110,7 @@ void TestBasicImport(nlTestSuite * inSuite, void * inContext)
     {
         const ccm_128_test_vector & test = *testPtr;
 
-        Aes128KeyByteArray keyMaterial;
+        Symmetric128BitsKeyByteArray keyMaterial;
         memcpy(keyMaterial, test.key, test.key_len);
 
         Aes128KeyHandle keyHandle;
