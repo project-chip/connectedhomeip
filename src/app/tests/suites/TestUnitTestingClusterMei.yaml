@@ -56,7 +56,7 @@ tests:
       attribute: "AcceptedCommandList"
       response:
           constraints:
-              contains: [ 4294049962, ]
+              contains: [4294049962]
 
     - label: "Validate GeneratedCommandList attribute"
       command: "readAttribute"
@@ -93,9 +93,7 @@ tests:
       event: "TestDifferentVendorMeiEvent"
       eventNumber: firstEventNumber
       response:
-          value: {
-            arg1: 42
-          }
+          value: { arg1: 42 }
 
     - label: "Validate event generation 2/2"
       command: "readEvent"
