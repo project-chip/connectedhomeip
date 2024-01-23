@@ -15,11 +15,10 @@
 #    limitations under the License.
 #
 
-import logging
 
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 from mdns_discovery.mdns_discovery import MdnsDiscovery
+
 
 '''
 Category:
@@ -41,16 +40,16 @@ class TC_DD_1_12(MatterBaseTest):
     @async_test_body
     async def test_TC_DD_1_12(self):
         print("\n" * 10)
-        
+
         mdns = MdnsDiscovery(tc=self)
         await mdns.discover()
-                
+
         print(f"getCommisionerServiceInfo: {mdns.getCommisionerServiceInfo()}\n")
         print(f"getCommissionableServiceInfo: {mdns.getCommissionableServiceInfo()}\n")
         print(f"getOperationalServiceInfo: {mdns.getOperationalServiceInfo()}\n")
         print(f"getBorderRouterServiceInfo: {mdns.getBorderRouterServiceInfo()}\n")
         print(f"txtsai: {mdns.getOperationalServiceInfo()[0]['txt_record']['SAI']}")
-        
+
         print("\n" * 10)
 
 
