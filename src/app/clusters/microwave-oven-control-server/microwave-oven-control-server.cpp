@@ -119,7 +119,7 @@ bool Instance::CheckSupportedWattLevelsValid() const
 uint8_t Instance::GetMaxSupportedWattLevelsIndex() const
 {
     uint8_t wattIndex = 0, maxWattIndex = 0;
-    uint16_t watt     = 0;
+    uint16_t watt = 0;
     while (mDelegate->GetWattSettingByIndex(wattIndex, watt) == CHIP_NO_ERROR)
     {
         maxWattIndex = wattIndex;
