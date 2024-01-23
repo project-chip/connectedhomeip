@@ -30,7 +30,7 @@
 
 /**
  * @define `MTR_ENABLE_PROVISIONAL`
- * Makes provisional APIs available for evaluation / testing purposes.
+ * Makes provisional spec features available for evaluation / testing purposes.
  * The usual API / ABI stability guarantees DO NOT APPLY to provisional features.
  */
 #ifndef MTR_ENABLE_PROVISIONAL
