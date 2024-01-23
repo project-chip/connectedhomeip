@@ -20,6 +20,15 @@
 #include <app/util/af.h>
 
 /**
+ * Write an attribute for a request arriving from external sources.
+ *
+ * This will check attribute attribute writeability and that
+ * the privided data type matches the expected data type.
+ */
+EmberAfStatus emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                         uint8_t * dataPtr, EmberAfAttributeType dataType);
+
+/**
  * @brief write an attribute, performing all the checks.
  *
  * This function will attempt to write the attribute value from

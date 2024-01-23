@@ -99,27 +99,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
- * Write an attribute for a request arriving from external sources.
- *
- * This will check attribute attribute writeability and that
- * the privided data type matches the expected data type.
- */
-EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                            uint8_t * dataPtr, EmberAfAttributeType dataType);
-
-/**
- * @brief Read the attribute value, performing all the checks.
- *
- * This function will attempt to read the attribute and store it into the
- * pointer.
- *
- * dataPtr may be NULL, signifying that we don't need the value, just the status
- * (i.e. whether the attribute can be read).
- */
-EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                   uint8_t * dataPtr, uint16_t readLength);
-
-/**
  * @brief macro that returns size of attribute in bytes.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.
