@@ -53,6 +53,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <pthread.h>
 #include <system/SystemClock.h>
 #include <vector>
@@ -228,7 +229,12 @@ JNI_METHOD(jint, onNOCChainGeneration)
     {
         JniByteArray jByteArrayIpk(env, ipk);
 
-        VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+        if (jByteArrayIpk.byteSpan().size() != sizeof(ipkValue))
+        {
+            ChipLogError(Controller, "Invalid IPK size %u and expect %u", static_cast<unsigned>(jByteArrayIpk.byteSpan().size()),
+                         static_cast<unsigned>(sizeof(ipkValue)));
+            return CHIP_ERROR_INVALID_IPK.AsInteger();
+        }
         memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
 
         ipkOptional.SetValue(ipkTempSpan);
@@ -1360,10 +1366,18 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
-    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    VerifyOrExit(connectedDeviceCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     err = wrapper->Controller()->GetConnectedDevice(static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess,
                                                     &connectedDeviceCallback->mOnFailure);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking GetConnectedDevice"));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "GetConnectedDevice failed: %" CHIP_ERROR_FORMAT, err.Format());
+        OperationalSessionSetup::ConnnectionFailureInfo failureInfo(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(nodeId), wrapper->Controller()->GetFabricIndex()), err,
+            SessionEstablishmentStage::kUnknown);
+        connectedDeviceCallback->mOnFailure.mCall(&connectedDeviceCallback->mOnFailure.mContext, failureInfo);
+    }
 }
 
 JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jlong devicePtr)

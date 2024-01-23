@@ -57,16 +57,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::Scenes::Id: {
-        using namespace app::Clusters::Scenes;
-        switch (aPath.mEventId)
-        {
-        default:
-            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-            break;
-        }
-        break;
-    }
     case app::Clusters::OnOff::Id: {
         using namespace app::Clusters::OnOff;
         switch (aPath.mEventId)
@@ -2594,36 +2584,6 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         using namespace app::Clusters::IcdManagement;
         switch (aPath.mEventId)
         {
-        case Events::OnTransitionToActiveMode::Id: {
-            Events::OnTransitionToActiveMode::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jclass onTransitionToActiveModeStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent",
-                onTransitionToActiveModeStructClass);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent");
-                return nullptr;
-            }
-
-            jmethodID onTransitionToActiveModeStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, onTransitionToActiveModeStructClass, "<init>", "()V",
-                                                                &onTransitionToActiveModeStructCtor);
-            if (err != CHIP_NO_ERROR || onTransitionToActiveModeStructCtor == nullptr)
-            {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$IcdManagementClusterOnTransitionToActiveModeEvent constructor");
-                return nullptr;
-            }
-
-            jobject value = env->NewObject(onTransitionToActiveModeStructClass, onTransitionToActiveModeStructCtor);
-
-            return value;
-        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -3847,6 +3807,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ScenesManagement::Id: {
+        using namespace app::Clusters::ScenesManagement;
+        switch (aPath.mEventId)
+        {
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
@@ -5282,6 +5252,13 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             {
                 return nullptr;
             }
+            jobject value_cause;
+            std::string value_causeClassName     = "java/lang/Integer";
+            std::string value_causeCtorSignature = "(I)V";
+            jint jnivalue_cause                  = static_cast<jint>(cppValue.cause);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_causeClassName.c_str(), value_causeCtorSignature.c_str(), jnivalue_cause, value_cause);
+
             jclass resumedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
                 env, "chip/devicecontroller/ChipEventStructs$DeviceEnergyManagementClusterResumedEvent", resumedStructClass);
@@ -5292,14 +5269,15 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID resumedStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(env, resumedStructClass, "<init>", "()V", &resumedStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(env, resumedStructClass, "<init>", "(Ljava/lang/Integer;)V",
+                                                                &resumedStructCtor);
             if (err != CHIP_NO_ERROR || resumedStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$DeviceEnergyManagementClusterResumedEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(resumedStructClass, resumedStructCtor);
+            jobject value = env->NewObject(resumedStructClass, resumedStructCtor, value_cause);
 
             return value;
         }
@@ -5655,6 +5633,26 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
     }
     case app::Clusters::EnergyPreference::Id: {
         using namespace app::Clusters::EnergyPreference;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::EnergyEvseMode::Id: {
+        using namespace app::Clusters::EnergyEvseMode;
+        switch (aPath.mEventId)
+        {
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::DeviceEnergyManagementMode::Id: {
+        using namespace app::Clusters::DeviceEnergyManagementMode;
         switch (aPath.mEventId)
         {
         default:

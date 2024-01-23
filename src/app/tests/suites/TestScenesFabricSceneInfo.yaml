@@ -26,7 +26,7 @@ PICS:
 
 config:
     nodeId: 0x12344321
-    cluster: "Scenes"
+    cluster: "Scenes Management"
     endpoint: 1
     payload:
         type: char_string
@@ -63,14 +63,6 @@ tests:
       attribute: "CurrentFabricIndex"
       response:
           saveAs: th1FabricIndex
-
-    - label: "Read FeatureMap FabricScene bit (global attribute 65532)"
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      response:
-          constraints:
-              type: bitmap32
-              hasMasksSet: [0x8]
 
     - label: "Read the FabricSceneInfo attribute (0x0007) "
       command: "readAttribute"
@@ -207,7 +199,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0001
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -267,7 +259,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0001
+                value: 1000
               - name: "ExtensionFieldSets"
                 value:
                     [
@@ -333,7 +325,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0002
+                value: 2000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -368,7 +360,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x0002
+                value: 2000
               - name: "ExtensionFieldSets"
                 value:
                     [

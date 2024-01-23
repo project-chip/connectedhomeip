@@ -31,9 +31,6 @@ static constexpr ClusterId Id = 0x00000003;
 namespace Groups {
 static constexpr ClusterId Id = 0x00000004;
 } // namespace Groups
-namespace Scenes {
-static constexpr ClusterId Id = 0x00000005;
-} // namespace Scenes
 namespace OnOff {
 static constexpr ClusterId Id = 0x00000006;
 } // namespace OnOff
@@ -208,6 +205,9 @@ static constexpr ClusterId Id = 0x00000060;
 namespace RvcOperationalState {
 static constexpr ClusterId Id = 0x00000061;
 } // namespace RvcOperationalState
+namespace ScenesManagement {
+static constexpr ClusterId Id = 0x00000062;
+} // namespace ScenesManagement
 namespace HepaFilterMonitoring {
 static constexpr ClusterId Id = 0x00000071;
 } // namespace HepaFilterMonitoring
@@ -235,6 +235,12 @@ static constexpr ClusterId Id = 0x00000099;
 namespace EnergyPreference {
 static constexpr ClusterId Id = 0x0000009B;
 } // namespace EnergyPreference
+namespace EnergyEvseMode {
+static constexpr ClusterId Id = 0x0000009D;
+} // namespace EnergyEvseMode
+namespace DeviceEnergyManagementMode {
+static constexpr ClusterId Id = 0x0000009F;
+} // namespace DeviceEnergyManagementMode
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

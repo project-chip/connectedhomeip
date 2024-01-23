@@ -14,7 +14,6 @@ Generally regenerate using one of:
 | ---------- | ---------- | ------------------------------------------------------- |
 |          3 |       0x03 | Identify                                                |
 |          4 |       0x04 | Groups                                                  |
-|          5 |       0x05 | Scenes                                                  |
 |          6 |       0x06 | OnOff                                                   |
 |          7 |       0x07 | OnOffSwitchConfiguration                                |
 |          8 |       0x08 | LevelControl                                            |
@@ -73,6 +72,7 @@ Generally regenerate using one of:
 |         95 |       0x5F | MicrowaveOvenControl                                    |
 |         96 |       0x60 | OperationalState                                        |
 |         97 |       0x61 | RvcOperationalState                                     |
+|         98 |       0x62 | ScenesManagement                                        |
 |        113 |       0x71 | HepaFilterMonitoring                                    |
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
 |        128 |       0x80 | BooleanStateConfiguration                               |
@@ -82,6 +82,8 @@ Generally regenerate using one of:
 |        152 |       0x98 | DeviceEnergyManagement                                  |
 |        153 |       0x99 | EnergyEvse                                              |
 |        155 |       0x9B | EnergyPreference                                        |
+|        157 |       0x9D | EnergyEvseMode                                          |
+|        159 |       0x9F | DeviceEnergyManagementMode                              |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |

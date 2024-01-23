@@ -269,10 +269,7 @@ chip_python_wheel_action("chip-core") {
       if (chip_controller) {
         sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
-        sources += [
-          "chip/server/__init__.py",
-          "chip/server/types.py",
-        ]
+        sources += [ "chip/server/__init__.py" ]
       }
     },
     {

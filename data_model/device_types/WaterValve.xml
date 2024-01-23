@@ -68,5 +68,11 @@ Davis, CA 95616, USA
     <cluster id="0x0081" name="Valve Configuration and Control" side="server">
       <mandatoryConform/>
     </cluster>
+    <cluster id="0x0404" name="Flow Measurement" side="server">
+      <optionalConform/>
+    </cluster>
+    <cluster id="0x0404" name="Flow Measurement" side="client">
+      <optionalConform/>
+    </cluster>
   </clusters>
 </deviceType>

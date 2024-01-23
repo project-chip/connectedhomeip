@@ -485,7 +485,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().LockChipStack();
-                ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+                ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
                 PlatformMgr().UnlockChipStack();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }

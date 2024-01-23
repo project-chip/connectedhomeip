@@ -87,10 +87,6 @@ limitations under the License.
         <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
         <attribute side="server" code="0x08" define="OPERATING_MODE" type="OperatingModeEnum" default="0" writable="false" optional="true" isNullable="false">OperatingMode</attribute>
 
-        <event side="server" code="0x00" priority="critical" name="OnTransitionToActiveMode" optional="true">
-            <description>OnTransitionToActiveMode</description>
-        </event>
-
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description>Register a client to the end device</description>
             <arg name="CheckInNodeID" type="node_id" optional="false"/>

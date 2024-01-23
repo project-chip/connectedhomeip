@@ -52,8 +52,6 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("identify", writeIdentifyInteractionInfo);
     Map<String, InteractionInfo> writeGroupsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("groups", writeGroupsInteractionInfo);
-    Map<String, InteractionInfo> writeScenesInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("scenes", writeScenesInteractionInfo);
     Map<String, InteractionInfo> writeOnOffInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeOnOffOnTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo onOffonTimeCommandParameterInfo =
@@ -1116,6 +1114,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
+    Map<String, InteractionInfo> writeScenesManagementInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("scenesManagement", writeScenesManagementInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeHepaFilterMonitoringLastChangedTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo hepaFilterMonitoringlastChangedTimeCommandParameterInfo =
@@ -1398,6 +1398,98 @@ public class ClusterWriteMapping {
     );
     writeEnergyPreferenceInteractionInfo.put("writeCurrentLowPowerModeSensitivityAttribute", writeEnergyPreferenceCurrentLowPowerModeSensitivityAttributeInteractionInfo);
     writeAttributeMap.put("energyPreference", writeEnergyPreferenceInteractionInfo);
+    Map<String, InteractionInfo> writeEnergyEvseModeInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeEnergyEvseModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo energyEvseModestartUpModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeEnergyEvseModeStartUpModeCommandParams.put(
+        "value",
+        energyEvseModestartUpModeCommandParameterInfo
+    );
+    InteractionInfo writeEnergyEvseModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.EnergyEvseModeCluster) cluster).writeStartUpModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeEnergyEvseModeStartUpModeCommandParams
+    );
+    writeEnergyEvseModeInteractionInfo.put("writeStartUpModeAttribute", writeEnergyEvseModeStartUpModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeEnergyEvseModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo energyEvseModeonModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeEnergyEvseModeOnModeCommandParams.put(
+        "value",
+        energyEvseModeonModeCommandParameterInfo
+    );
+    InteractionInfo writeEnergyEvseModeOnModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.EnergyEvseModeCluster) cluster).writeOnModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeEnergyEvseModeOnModeCommandParams
+    );
+    writeEnergyEvseModeInteractionInfo.put("writeOnModeAttribute", writeEnergyEvseModeOnModeAttributeInteractionInfo);
+    writeAttributeMap.put("energyEvseMode", writeEnergyEvseModeInteractionInfo);
+    Map<String, InteractionInfo> writeDeviceEnergyManagementModeInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeDeviceEnergyManagementModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo deviceEnergyManagementModestartUpModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeDeviceEnergyManagementModeStartUpModeCommandParams.put(
+        "value",
+        deviceEnergyManagementModestartUpModeCommandParameterInfo
+    );
+    InteractionInfo writeDeviceEnergyManagementModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DeviceEnergyManagementModeCluster) cluster).writeStartUpModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeDeviceEnergyManagementModeStartUpModeCommandParams
+    );
+    writeDeviceEnergyManagementModeInteractionInfo.put("writeStartUpModeAttribute", writeDeviceEnergyManagementModeStartUpModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDeviceEnergyManagementModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo deviceEnergyManagementModeonModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeDeviceEnergyManagementModeOnModeCommandParams.put(
+        "value",
+        deviceEnergyManagementModeonModeCommandParameterInfo
+    );
+    InteractionInfo writeDeviceEnergyManagementModeOnModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.DeviceEnergyManagementModeCluster) cluster).writeOnModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeDeviceEnergyManagementModeOnModeCommandParams
+    );
+    writeDeviceEnergyManagementModeInteractionInfo.put("writeOnModeAttribute", writeDeviceEnergyManagementModeOnModeAttributeInteractionInfo);
+    writeAttributeMap.put("deviceEnergyManagementMode", writeDeviceEnergyManagementModeInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =
