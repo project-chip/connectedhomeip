@@ -71,8 +71,6 @@ public:
 
     bool HasFeature(MicrowaveOvenControl::Feature feature) const;
 
-    uint8_t GetMaxSupportedWattLevelsIndex(uint8_t & supportedWattLevels) const;
-
     uint32_t GetCookTimeSec() const;
 
     void SetCookTimeSec(uint32_t cookTimeSec);
@@ -86,6 +84,7 @@ private:
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
     uint32_t mCookTimeSec                = kDefaultCookTimeSec;
+    uint8_t mSupportedWattLevels         = 0;
     uint8_t mMaxSupportedWattLevelsIndex = 0;
 
     /**
@@ -114,6 +113,10 @@ private:
      * If the operational state is in 'Error', returns the Interaction Model status code of INVALID_IN_STATE.
      */
     void HandleAddMoreTime(HandlerContext & ctx, const Commands::AddMoreTime::DecodableType & req);
+
+    uint8_t GetMaxSupportedWattLevelsIndex() const;
+
+    bool CheckSupportedWattLevelsValid() const;
 };
 
 /** @brief

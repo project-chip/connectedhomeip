@@ -93,10 +93,9 @@ CHIP_ERROR Instance::Init()
     // ensure incoming watt level values are valid.
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
-        uint8_t supportedWattLevels  = 0;
-        mMaxSupportedWattLevelsIndex = GetMaxSupportedWattLevelsIndex(supportedWattLevels);
-        VerifyOrReturnError(supportedWattLevels > 0, CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "Microwave Oven Control: supported watt levels is empty"));
+        VerifyOrReturnError(CheckSupportedWattLevelsValid(), CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "Microwave Oven Control: invalid watt setting"));
+        mMaxSupportedWattLevelsIndex = GetMaxSupportedWattLevelsIndex();
     }
     return CHIP_NO_ERROR;
 }
@@ -106,14 +105,25 @@ bool Instance::HasFeature(MicrowaveOvenControl::Feature feature) const
     return mFeature.Has(feature);
 }
 
-uint8_t Instance::GetMaxSupportedWattLevelsIndex(uint8_t & supportedWattLevels) const
+bool Instance::CheckSupportedWattLevelsValid() const
 {
-    uint8_t maxWattIndex = 0;
-    uint16_t watt        = 0;
-    while (mDelegate->GetWattSettingByIndex(supportedWattLevels, watt) == CHIP_NO_ERROR)
+    uint8_t wattIndex = 0;
+    uint16_t watt     = 0;
+    while (mDelegate->GetWattSettingByIndex(wattIndex, watt) == CHIP_NO_ERROR)
     {
-        maxWattIndex = supportedWattLevels;
-        supportedWattLevels++;
+        wattIndex++;
+    }
+    return wattIndex > 0 && watt > 0;
+}
+
+uint8_t Instance::GetMaxSupportedWattLevelsIndex() const
+{
+    uint8_t wattIndex = 0, maxWattIndex = 0;
+    uint16_t watt     = 0;
+    while (mDelegate->GetWattSettingByIndex(wattIndex, watt) == CHIP_NO_ERROR)
+    {
+        maxWattIndex = wattIndex;
+        wattIndex++;
     }
     return maxWattIndex;
 }
