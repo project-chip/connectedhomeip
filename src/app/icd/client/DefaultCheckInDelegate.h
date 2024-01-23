@@ -20,6 +20,7 @@
 
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
+#include <unordered_map>
 
 namespace chip {
 namespace app {
@@ -33,12 +34,24 @@ public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
-    void OnKeyRefreshNeeded(ICDClientInfo * clientInfo, ICDClientStorage * clientStorage) override;
-    void OnRegistrationUpdateComplete(const ICDClientInfo * clientInfo, ICDRefreshKeyInfo * icdRefreshKeyInfo) override;
-    void OnRegistrationUpdateFailure(ICDRefreshKeyInfo * icdRefreshKeyInfo, CHIP_ERROR failureReason) override;
+    ICDRefreshKeyInfo * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
+    void OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError) override;
 
 private:
+    struct HashFunction
+    {
+        size_t operator()(const ScopedNodeId & peer) const
+        {
+            size_t nodeIdHash    = std::hash<uint64_t>()(peer.GetNodeId());
+            size_t fabricIdxHash = std::hash<uint64_t>()(peer.GetFabricIndex()) << 1;
+            return nodeIdHash ^ fabricIdxHash;
+        }
+    };
     ICDClientStorage * mpStorage = nullptr;
+    // Data structure used to store the ICDRefreshKeyInfo created for every node. Since the check-in delegate has to manage key
+    // refresh requests from multiple servers, this is used to keep track of the memory allocated for each node so that it can
+    // be freed up at the end of the key refresh process.
+    unordered_map<ScopedNodeId, ICDRefreshKeyInfo *, HashFunction> mICDRefreshKeyMap;
 };
 
 } // namespace app

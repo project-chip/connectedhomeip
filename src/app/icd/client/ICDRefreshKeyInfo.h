@@ -37,45 +37,34 @@ class CheckInDelegate;
 class ICDRefreshKeyInfo;
 
 /**
- * @brief This class comprises Command sender callbacks for the registration command. The application can inherit this class and
- *        provide their own implementation
- */
-class RegisterCommandSenderDelegate : public CommandSender::Callback
-{
-public:
-    // CommandSender callbacks
-    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatus,
-                    chip::TLV::TLVReader * aData) override;
-    void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
-    void OnDone(CommandSender * apCommandSender) override;
-    /**
-     * @brief Callback used to indicate failures before successfully sending out a re-register command.
-     *
-     * @param[in] aError Failure reason
-     * */
-    void OnFailure(CHIP_ERROR aError);
-
-    void AdoptICDRefreshKeyInfo(Platform::UniquePtr<ICDRefreshKeyInfo> apICDRefreshKeyInfo)
-    {
-        mpICDRefreshKeyInfo = std::move(apICDRefreshKeyInfo);
-    }
-
-    virtual ~RegisterCommandSenderDelegate() { mpICDRefreshKeyInfo = nullptr; }
-
-private:
-    CHIP_ERROR mError                                          = CHIP_NO_ERROR;
-    Platform::UniquePtr<ICDRefreshKeyInfo> mpICDRefreshKeyInfo = nullptr;
-};
-
-/**
  * @brief ICDRefreshKeyInfo contains all the data and methods needed for key refresh and re-registration of an ICD client.
  */
 class ICDRefreshKeyInfo
 {
 public:
     typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
+    /**
+     * @brief This class comprises command sender callbacks for the registration command.
+     */
+    class Callback : public CommandSender::Callback
+    {
+    public:
+        // CommandSender callbacks
+        void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatus,
+                        chip::TLV::TLVReader * aData) override;
+        void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
+        void OnDone(CommandSender * apCommandSender) override;
 
-    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo * aICDClientInfo, ICDClientStorage * aICDClientStorage);
+        void SetICDRefreshKeyInfo(ICDRefreshKeyInfo * apICDRefreshKeyInfo) { mpICDRefreshKeyInfo = apICDRefreshKeyInfo; }
+
+        virtual ~Callback() {}
+
+    private:
+        CHIP_ERROR mError                       = CHIP_NO_ERROR;
+        ICDRefreshKeyInfo * mpICDRefreshKeyInfo = nullptr;
+    };
+
+    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo & aICDClientInfo, ICDClientStorage * aICDClientStorage);
 
     /**
      * @brief Used by the application to set a new key to avoid counter rollover problems.
@@ -94,9 +83,9 @@ public:
     CHIP_ERROR EstablishSessionToPeer();
 
     /**
-     * @brief Getter for ICDClientInfo pointer
+     * @brief Getter for ICDClientInfo
      */
-    ICDClientInfo * GetICDClientInfo(void) { return mpICDClientInfo; }
+    ICDClientInfo & GetICDClientInfo(void) { return mICDClientInfo; }
 
     /**
      * @brief Getter for ICDClientStorage pointer
@@ -107,19 +96,6 @@ public:
      * @brief Getter for CheckInDelegate pointer
      */
     CheckInDelegate * GetCheckInDelegate(void) { return mpCheckInDelegate; }
-
-    /**
-     * @brief Getter for Command Sender delegate
-     */
-    RegisterCommandSenderDelegate * GetCommandSenderDelegate(void) { return mpCommandSenderDelegate; }
-
-    /**
-     * @brief Setter for Command Sender delegate
-     */
-    void SetCommandSenderDelegate(RegisterCommandSenderDelegate * apCommandSenderDelegate)
-    {
-        mpCommandSenderDelegate = apCommandSenderDelegate;
-    }
 
     RefreshKeyBuffer mNewKey;
 
@@ -145,11 +121,11 @@ private:
      */
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);
 
-    ICDClientInfo * mpICDClientInfo       = nullptr;
+    ICDClientInfo mICDClientInfo;
     ICDClientStorage * mpICDClientStorage = nullptr;
     CheckInDelegate * mpCheckInDelegate   = nullptr;
     chip::Optional<CommandSender> mRegisterCommandSender;
-    RegisterCommandSenderDelegate * mpCommandSenderDelegate = nullptr;
+    Callback mCommandSenderDelegate;
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     CHIP_ERROR mError = CHIP_NO_ERROR;

@@ -43,46 +43,46 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 #endif
 }
 
-void DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo * clientInfo, ICDClientStorage * clientStorage)
+ICDRefreshKeyInfo * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    auto icdRefreshKeyInfo = chip::Platform::MakeUnique<ICDRefreshKeyInfo>(this, clientInfo, clientStorage);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
+    auto icdRefreshKeyInfo = chip::Platform::New<ICDRefreshKeyInfo>(this, clientInfo, clientStorage);
     if (icdRefreshKeyInfo == nullptr)
     {
-        return;
+        return nullptr;
     }
-    auto callback = chip::Platform::MakeUnique<RegisterCommandSenderDelegate>();
-    if (callback == nullptr)
-    {
-        return;
-    }
-    icdRefreshKeyInfo->SetCommandSenderDelegate(callback.get());
 
     err = chip::Crypto::DRBG_get_bytes(icdRefreshKeyInfo->mNewKey.Bytes(), icdRefreshKeyInfo->mNewKey.Capacity());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
+        Platform::Delete(icdRefreshKeyInfo);
+        return nullptr;
     }
+    mICDRefreshKeyMap[clientInfo.peer_node] = icdRefreshKeyInfo;
+    return icdRefreshKeyInfo;
+}
 
-    err = icdRefreshKeyInfo->EstablishSessionToPeer();
-    if (CHIP_NO_ERROR != err)
+void DefaultCheckInDelegate::OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError)
+{
+    if (aError == CHIP_NO_ERROR)
     {
-        ChipLogError(ICD, "CASE session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
-        return;
+        ChipLogProgress(ICD,
+                        "Re-registration complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
+                        clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
     }
-    callback->AdoptICDRefreshKeyInfo(std::move(icdRefreshKeyInfo));
-    callback.release();
-}
+    else
+    {
+        ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, aError.Format());
+    }
 
-void DefaultCheckInDelegate::OnRegistrationUpdateComplete(const ICDClientInfo * clientInfo, ICDRefreshKeyInfo * icdRefreshKeyInfo)
-{
-    ChipLogProgress(ICD, "Re-registration with new key successful. New start counter = %d", clientInfo->start_icd_counter);
-}
-void DefaultCheckInDelegate::OnRegistrationUpdateFailure(ICDRefreshKeyInfo * icdRefreshKeyInfo, CHIP_ERROR failureReason)
-{
-    ChipLogError(ICD, "Re-registration with new key failed: %" CHIP_ERROR_FORMAT, failureReason.Format());
+    if (mICDRefreshKeyMap.find(clientInfo.peer_node) != mICDRefreshKeyMap.end())
+    {
+        auto refreshKeyInfo = mICDRefreshKeyMap.at(clientInfo.peer_node);
+        Platform::Delete(refreshKeyInfo);
+        mICDRefreshKeyMap.erase(clientInfo.peer_node);
+    }
 }
 } // namespace app
 } // namespace chip

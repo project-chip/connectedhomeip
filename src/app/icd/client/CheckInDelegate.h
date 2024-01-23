@@ -47,48 +47,32 @@ public:
      * @brief Callback used to let the application know that a key refresh is
      * needed to avoid counter rollover problems.
      *
-     * The implementer of this function should create a new ICDRefreshKeyInfo object and a CommandSender delegate object. They
-       should also generate a new key and store it in the ICDRefreshKeyInfo object. This object will be tied to the specific key
-       refresh process and will not be used by the caller after that particular key refresh process has ended, regardless of success
-       or failure. On creating both the objects successfully, the callee should use the EstablishSession() API in ICDRefreshKeyInfo
-       to start a CASE session for re-registration.
+     * The implementer of this function should create a new ICDRefreshKeyInfo object. They should also generate a new key and store
+       it in the ICDRefreshKeyInfo object. This object will be tied to the specific key refresh process and will not be used by the
+       caller after that particular key refresh process has ended, regardless of success or failure.
 
-     * If the callee is unable to provide either the ICDRefreshKeyInfo or the CommandSender Delegate objects, that indicates key
+     * If the callee is unable to provide the ICDRefreshKeyInfo object, that indicates key
      * refresh is not possible until the callee is able to provide the required resources.
      *
-     * @param[in] clientInfo - pointer to ICDClientInfo object representing the state associated with the
+     * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
                                node that sent the check-in message. The callee can use the clientInfo to determine the type of key
                                to generate.
      * @param[in] clientStorage - ICDClientStorage object stores the updated ICDClientInfo after re-registration into
                                   persistent storage.
      */
-    virtual void OnKeyRefreshNeeded(ICDClientInfo * clientInfo, ICDClientStorage * clientStorage) = 0;
+    virtual ICDRefreshKeyInfo * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) = 0;
 
     /**
-     * @brief Callback used to let the application know that the re-registration with the new key was successful and provides the
-     * updated ICDClientInfo
-     *
-     * @param[in] clientInfo - pointer to ICDClientInfo object representing the state associated with the
-                               node that sent the check-in message. This will have the new key used for registration and the updated
-                               icd counter.
-     * @param[in] ICDRefreshKeyInfo - a pointer to the ICDRefreshKeyInfo object comprising the newly
-                                      generated key, the input ICDClientInfo, pointer to the CheckInDelegate and CommandSender
-                                      object for re-registering with the new key. The caller will NOT use icdRefreshKeyInfo passed
-                                      here anymore.
-     */
-    virtual void OnRegistrationUpdateComplete(const ICDClientInfo * clientInfo, ICDRefreshKeyInfo * icdRefreshKeyInfo) = 0;
-
-    /**
-     * @brief Callback used to let the application know that the re-registration with the new key has failed. The caller will NOT
-     *        use icdRefreshKeyInfo passed here anymore.
-     * @param[in] ICDRefreshKeyInfo - a pointer to the ICDRefreshKeyInfo object comprising the newly generated key, the input
-                                      ICDClientInfo, pointer to the CheckInDelegate and CommandSender object for re-registering with
-                                      the new key. The caller will NOT use icdRefreshKeyInfo passed
-                                      here anymore.
-     * @param[in] failureReason - reason for regitration failure. The callee can use this informarion to take necessary action to
-                                  resolve the failure.
-     */
-    virtual void OnRegistrationUpdateFailure(ICDRefreshKeyInfo * icdRefreshKeyInfo, CHIP_ERROR failureReason) = 0;
+ * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for both
+          success and failure cases. On failure, the callee should address the error reason and take appropriate corrective action.
+ *
+ * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
+                           node that sent the check-in message. This will have the new key used for registration and the updated
+                           icd counter.
+   @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
+                       Other errors indicate the failure reason.
+ */
+    virtual void OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError) = 0;
 };
 
 } // namespace app
