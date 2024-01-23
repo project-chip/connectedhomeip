@@ -26,6 +26,8 @@ from mobly import asserts
 This test is meant to test cases not covered in IDM_1_4 as a result of not being able to control
 how DUT processes commands.
 '''
+
+
 class TestBatchInvoke(MatterBaseTest):
 
     @async_test_body
@@ -57,7 +59,7 @@ class TestBatchInvoke(MatterBaseTest):
             result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
         except InteractionModelError as e:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
-        
+
         asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
         asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")
         asserts.assert_true(type_matches(
@@ -91,7 +93,7 @@ class TestBatchInvoke(MatterBaseTest):
             result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
         except InteractionModelError as e:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
-        
+
         asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
         asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")
         asserts.assert_true(type_matches(
