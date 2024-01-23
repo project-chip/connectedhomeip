@@ -18,22 +18,17 @@ package com.matter.casting.support;
 
 import java.util.List;
 
-/**
- * Describes an Endpoint that the client wants to connect to.
- */
+/** Describes an Endpoint that the client wants to connect to. */
 public class EndpointFilter {
-    // Value of 0 means unspecified
-    public int productId;
-    // Value of 0 means unspecified
-    public int vendorId;
-    public List<DeviceTypeStruct> requiredDeviceTypes;
+  // Value of 0 means unspecified
+  public int productId;
+  // Value of 0 means unspecified
+  public int vendorId;
+  public List<DeviceTypeStruct> requiredDeviceTypes;
 
-    public EndpointFilter(
-            int productId,
-            int vendorId,
-            List<DeviceTypeStruct> requiredDeviceTypes) {
-        this.productId = productId;
-        this.vendorId = vendorId;
-        this.requiredDeviceTypes = requiredDeviceTypes;
-    }
+  public EndpointFilter(int productId, int vendorId, List<DeviceTypeStruct> requiredDeviceTypes) {
+    this.productId = productId;
+    this.vendorId = vendorId;
+    this.requiredDeviceTypes = requiredDeviceTypes;
+  }
 }

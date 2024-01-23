@@ -16,17 +16,13 @@
  */
 package com.matter.casting.support;
 
-/**
- * A class to describe a Matter device type.
- */
+/** A class to describe a Matter device type. */
 public class DeviceTypeStruct {
-    public long deviceType;
-    public int revision;
+  public long deviceType;
+  public int revision;
 
-    public DeviceTypeStruct(
-            long deviceType,
-            int revision) {
-        this.deviceType = deviceType;
-        this.revision = revision;
-    }
+  public DeviceTypeStruct(long deviceType, int revision) {
+    this.deviceType = deviceType;
+    this.revision = revision;
+  }
 }

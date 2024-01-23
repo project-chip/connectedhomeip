@@ -35,13 +35,16 @@ public class ConnectionExampleFragment extends Fragment {
   private static final String TAG = ConnectionExampleFragment.class.getSimpleName();
   // Time (in sec) to keep the commissioning window open, if commissioning is required.
   // Must be >= 3 minutes.
-  private static final long MIN_CONNECTION_TIMEOUT_SEC = 3*60;
+  private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
   private final CastingPlayer selectedCastingPlayer;
   private TextView connectionFragmentStatusTextView;
   private Button connectionFragmentNextButton;
 
   public ConnectionExampleFragment(CastingPlayer selectedCastingPlayer) {
-      Log.i(TAG, "ConnectionExampleFragment() called with CastingPlayer with deviceId: " + selectedCastingPlayer.getDeviceId());
+    Log.i(
+        TAG,
+        "ConnectionExampleFragment() called with CastingPlayer with deviceId: "
+            + selectedCastingPlayer.getDeviceId());
     this.selectedCastingPlayer = selectedCastingPlayer;
   }
 
@@ -52,22 +55,22 @@ public class ConnectionExampleFragment extends Fragment {
    * @return A new instance of fragment ConnectionExampleFragment.
    */
   public static ConnectionExampleFragment newInstance(CastingPlayer castingPlayer) {
-      Log.i(TAG, "newInstance() called");
-      return new ConnectionExampleFragment(castingPlayer);
+    Log.i(TAG, "newInstance() called");
+    return new ConnectionExampleFragment(castingPlayer);
   }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      Log.i(TAG, "onCreate() called");
+    super.onCreate(savedInstanceState);
+    Log.i(TAG, "onCreate() called");
   }
 
   @Override
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-      Log.i(TAG, "onCreateView() called");
-      // Inflate the layout for this fragment
-      return inflater.inflate(R.layout.fragment_matter_connection_example, container, false);
+    Log.i(TAG, "onCreateView() called");
+    // Inflate the layout for this fragment
+    return inflater.inflate(R.layout.fragment_matter_connection_example, container, false);
   }
 
   @Override
@@ -76,47 +79,77 @@ public class ConnectionExampleFragment extends Fragment {
     Log.i(TAG, "onViewCreated() called");
 
     connectionFragmentStatusTextView = getView().findViewById(R.id.connectionWindowStatus);
-    connectionFragmentStatusTextView.setText("Verifying or establishing connection with Casting Player with device name: " + selectedCastingPlayer.getDeviceName());
+    connectionFragmentStatusTextView.setText(
+        "Verifying or establishing connection with Casting Player with device name: "
+            + selectedCastingPlayer.getDeviceName());
 
     connectionFragmentNextButton = getView().findViewById(R.id.connectionWindowNextButton);
     Callback callback = (ConnectionExampleFragment.Callback) this.getActivity();
     connectionFragmentNextButton.setOnClickListener(
-      v -> {
-          Log.i(TAG, "onViewCreated() connectionWindowNextButton button clicked. Calling MainActivity.handleConnectionComplete()");
+        v -> {
+          Log.i(
+              TAG,
+              "onViewCreated() connectionWindowNextButton button clicked. Calling MainActivity.handleConnectionComplete()");
           callback.handleConnectionComplete(selectedCastingPlayer);
-      });
+        });
 
-    Executors.newSingleThreadExecutor().submit( () -> {
-        Log.d(TAG, "onViewCreated() calling verifyOrEstablishConnection() on CastingPlayer with deviceId: " + selectedCastingPlayer.getDeviceId());
+    Executors.newSingleThreadExecutor()
+        .submit(
+            () -> {
+              Log.d(
+                  TAG,
+                  "onViewCreated() calling verifyOrEstablishConnection() on CastingPlayer with deviceId: "
+                      + selectedCastingPlayer.getDeviceId());
 
-        CompletableFuture<Void> completableFuture = selectedCastingPlayer.VerifyOrEstablishConnection();
-        // Optionally, we can specify the desired commissioning window duration and Endpoint Filter.
-        //EndpointFilter desiredEndpointFilter = new EndpointFilter(0, 0, new ArrayList<DeviceTypeStruct>());
-        //CompletableFuture<Void> completableFuture = selectedCastingPlayer.VerifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC, desiredEndpointFilter);
+              CompletableFuture<Void> completableFuture =
+                  selectedCastingPlayer.VerifyOrEstablishConnection();
+              // Optionally, we can specify the desired commissioning window duration and Endpoint
+              // Filter.
+              // EndpointFilter desiredEndpointFilter = new EndpointFilter(0, 0, new
+              // ArrayList<DeviceTypeStruct>());
+              // CompletableFuture<Void> completableFuture =
+              // selectedCastingPlayer.VerifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC,
+              // desiredEndpointFilter);
 
-        Log.d(TAG, "onViewCreated() verifyOrEstablishConnection() called");
-        if (completableFuture == null) {
-            Log.e(TAG, "onViewCreated() verifyOrEstablishConnection() Warning: completableFuture == null");
-        }
+              Log.d(TAG, "onViewCreated() verifyOrEstablishConnection() called");
+              if (completableFuture == null) {
+                Log.e(
+                    TAG,
+                    "onViewCreated() verifyOrEstablishConnection() Warning: completableFuture == null");
+              }
 
-        completableFuture.thenRun(
-          () -> {
-              Log.i(TAG, "onViewCreated() CompletableFuture.thenRun(), Connected to CastingPlayer with deviceId: " + selectedCastingPlayer.getDeviceId());
-              getActivity().runOnUiThread(
+              completableFuture
+                  .thenRun(
                       () -> {
-                          connectionFragmentStatusTextView.setText("Connected to Casting Player with device name: " + selectedCastingPlayer.getDeviceName());
-                          connectionFragmentNextButton.setEnabled(true);
+                        Log.i(
+                            TAG,
+                            "onViewCreated() CompletableFuture.thenRun(), Connected to CastingPlayer with deviceId: "
+                                + selectedCastingPlayer.getDeviceId());
+                        getActivity()
+                            .runOnUiThread(
+                                () -> {
+                                  connectionFragmentStatusTextView.setText(
+                                      "Connected to Casting Player with device name: "
+                                          + selectedCastingPlayer.getDeviceName());
+                                  connectionFragmentNextButton.setEnabled(true);
+                                });
+                      })
+                  .exceptionally(
+                      exc -> {
+                        Log.e(
+                            TAG,
+                            "onViewCreated() CompletableFuture.exceptionally(), CastingPlayer connection failed due to exception: "
+                                + exc.getMessage());
+                        getActivity()
+                            .runOnUiThread(
+                                () -> {
+                                  connectionFragmentStatusTextView.setText(
+                                      "Casting Player connection failed due to: "
+                                          + exc.getMessage());
+                                });
+                        return null;
                       });
-          }).exceptionally(
-          exc -> {
-              Log.e(TAG, "onViewCreated() CompletableFuture.exceptionally(), CastingPlayer connection failed due to exception: " + exc.getMessage());
-              getActivity().runOnUiThread(
-                      () -> {
-                          connectionFragmentStatusTextView.setText("Casting Player connection failed due to: " + exc.getMessage());
-                      });
-              return null;
-          });
-    });
+            });
   }
 
   /** Interface for notifying the host. */
