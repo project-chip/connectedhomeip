@@ -20,6 +20,8 @@
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
+#include <device-energy-management-modes.h>
+#include <energy-evse-modes.h>
 
 #include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
@@ -75,11 +77,11 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-static EnergyEvseDelegate * gEvseDelegate            = nullptr;
-static EnergyEvseManager * gEvseInstance             = nullptr;
-static EVSEManufacturer * gEvseManufacturer          = nullptr;
-static DeviceEnergyManagementDelegate * gDEMDelegate = nullptr;
-static DeviceEnergyManagementManager * gDEMInstance  = nullptr;
+static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
+static std::unique_ptr<EnergyEvseManager> gEvseInstance;
+static std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
+static std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
+static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 extern const char insights_auth_key_start[] asm("_binary_insights_auth_key_txt_start");
@@ -121,62 +123,232 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 
 EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
 {
-    return gEvseManufacturer;
+    return gEvseManufacturer.get();
+}
+
+/*
+ *  @brief  Creates a Delegate and Instance for DEM
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+CHIP_ERROR DeviceEnergyManagementInit()
+{
+    if (gDEMDelegate || gDEMInstance)
+    {
+        ESP_LOGE(TAG, "DEM Instance or Delegate already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    gDEMDelegate = std::make_unique<DeviceEnergyManagementDelegate>();
+    if (!gDEMDelegate)
+    {
+        ESP_LOGE(TAG, "Failed to allocate memory for DeviceEnergyManagementDelegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    /* Manufacturer may optionally not support all features, commands & attributes */
+    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(
+        EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
+        BitMask<DeviceEnergyManagement::Feature, uint32_t>(
+            DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
+            DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
+            DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
+            DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+
+    if (!gDEMInstance)
+    {
+        ESP_LOGE(TAG, "Failed to allocate memory for DeviceEnergyManagementManager");
+        gDEMDelegate.reset();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    CHIP_ERROR err = gDEMInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Init failed on gDEMInstance, err:%" CHIP_ERROR_FORMAT, err.Format());
+        gDEMInstance.reset();
+        gDEMDelegate.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeviceEnergyManagementShutdown()
+{
+    /* Do this in the order Instance first, then delegate
+     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
+     */
+    if (gDEMInstance)
+    {
+        /* deregister attribute & command handlers */
+        gDEMInstance->Shutdown();
+        gDEMInstance.reset();
+    }
+    if (gDEMDelegate)
+    {
+        gDEMDelegate.reset();
+    }
+    return CHIP_NO_ERROR;
+}
+
+/*
+ *  @brief  Creates a Delegate and Instance for EVSE cluster
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+CHIP_ERROR EnergyEvseInit()
+{
+    CHIP_ERROR err;
+
+    if (gEvseDelegate || gEvseInstance)
+    {
+        ESP_LOGE(TAG, "EVSE Instance or Delegate already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    gEvseDelegate = std::make_unique<EnergyEvseDelegate>();
+    if (!gEvseDelegate)
+    {
+        ESP_LOGE(TAG, "Failed to allocate memory for EnergyEvseDelegate");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    /* Manufacturer may optionally not support all features, commands & attributes */
+    gEvseInstance = std::make_unique<EnergyEvseManager>(
+        EndpointId(ENERGY_EVSE_ENDPOINT), *gEvseDelegate,
+        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kPlugAndCharge,
+                                               EnergyEvse::Feature::kRfid, EnergyEvse::Feature::kSoCReporting,
+                                               EnergyEvse::Feature::kV2x),
+        BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+                                                          EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
+                                                          EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
+        BitMask<EnergyEvse::OptionalCommands, uint32_t>(EnergyEvse::OptionalCommands::kSupportsStartDiagnostics));
+
+    if (!gEvseInstance)
+    {
+        ESP_LOGE(TAG, "Failed to allocate memory for EnergyEvseManager");
+        gEvseDelegate.reset();
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    err = gEvseInstance->Init(); /* Register Attribute & Command handlers */
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Init failed on gEvseInstance, err:%" CHIP_ERROR_FORMAT, err.Format());
+        gEvseInstance.reset();
+        gEvseDelegate.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyEvseShutdown()
+{
+    /* Do this in the order Instance first, then delegate
+     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
+     */
+    if (gEvseInstance)
+    {
+        /* deregister attribute & command handlers */
+        gEvseInstance->Shutdown();
+        gEvseInstance.reset();
+    }
+
+    if (gEvseDelegate)
+    {
+        gEvseDelegate.reset();
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+/*
+ *  @brief  Creates a EVSEManufacturer class to hold the EVSE & DEM clusters
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+ */
+CHIP_ERROR EVSEManufacturerInit()
+{
+    CHIP_ERROR err;
+
+    if (gEvseManufacturer)
+    {
+        ESP_LOGE(TAG, "EvseManufacturer already exist.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    /* Now create EVSEManufacturer */
+    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get());
+    if (!gEvseManufacturer)
+    {
+        ESP_LOGE(TAG, "Failed to allocate memory for EvseManufacturer");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    /* Call Manufacturer specific init */
+    err = gEvseManufacturer->Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Init failed on gEvseManufacturer, err:%" CHIP_ERROR_FORMAT, err.Format());
+        gEvseManufacturer.reset();
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EVSEManufacturerShutdown()
+{
+    if (gEvseManufacturer)
+    {
+        /* Shutdown the EVSEManufacturer */
+        gEvseManufacturer->Shutdown();
+        gEvseManufacturer.reset();
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 void ApplicationInit()
 {
-    if ((gDEMDelegate == nullptr) && (gDEMInstance == nullptr))
+    if (DeviceEnergyManagementInit() != CHIP_NO_ERROR)
     {
-        gDEMDelegate = new DeviceEnergyManagementDelegate();
-        if (gDEMDelegate != nullptr)
-        {
-            gDEMInstance = new DeviceEnergyManagementManager(
-                EndpointId(ENERGY_EVSE_ENDPOINT), *gDEMDelegate,
-                BitMask<DeviceEnergyManagement::Feature, uint32_t>(
-                    DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
-                    DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-                    DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
-                    DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
-            gDEMInstance->Init(); /* Register Attribute & Command handlers */
-        }
-    }
-    else
-    {
-        ChipLogError(AppServer, "DEM Instance or Delegate already exist.")
+        return;
     }
 
-    if ((gEvseDelegate == nullptr) && (gEvseInstance == nullptr) && (gEvseManufacturer == nullptr))
+    if (EnergyEvseInit() != CHIP_NO_ERROR)
     {
-        gEvseDelegate = new EnergyEvseDelegate();
-        if (gEvseDelegate != nullptr)
-        {
-            gEvseInstance = new EnergyEvseManager(
-                EndpointId(ENERGY_EVSE_ENDPOINT), *gEvseDelegate,
-                BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences,
-                                                       EnergyEvse::Feature::kPlugAndCharge, EnergyEvse::Feature::kRfid,
-                                                       EnergyEvse::Feature::kSoCReporting, EnergyEvse::Feature::kV2x),
-                BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                      OptionalAttributes::kSupportsRandomizationWindow,
-                                                      OptionalAttributes::kSupportsApproximateEvEfficiency),
-                BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
-            gEvseInstance->Init(); /* Register Attribute & Command handlers */
-        }
-    }
-    else
-    {
-        ChipLogError(AppServer, "EVSE Instance or Delegate already exist.")
+        DeviceEnergyManagementShutdown();
+        return;
     }
 
-    if (gEvseManufacturer == nullptr)
+    if (EVSEManufacturerInit() != CHIP_NO_ERROR)
     {
-        gEvseManufacturer = new EVSEManufacturer(gEvseInstance);
-        gEvseManufacturer->Init();
+        DeviceEnergyManagementShutdown();
+        EnergyEvseShutdown();
+        return;
     }
-    else
-    {
-        ChipLogError(AppServer, "EVSEManufacturer already exists.")
-    }
+}
+
+void ApplicationShutdown()
+{
+    ESP_LOGD(TAG, "Energy Management App: ApplicationShutdown()");
+
+    /* Shutdown in reverse order that they were created */
+    EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
+    EnergyEvseShutdown();             /* Free the EnergyEvse */
+    DeviceEnergyManagementShutdown(); /* Free the DEM */
+
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::EnergyEvseMode::Shutdown();
 }
 
 static void InitServer(intptr_t context)
