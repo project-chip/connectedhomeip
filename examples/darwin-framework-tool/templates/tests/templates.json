@@ -51,12 +51,5 @@
             "name": "maybeCheckExpectedConstraints",
             "path": "partials/checks/maybeCheckExpectedConstraints.zapt"
         }
-    ],
-    "templates": [
-        {
-            "path": "commands.zapt",
-            "name": "Tests Commands header",
-            "output": "test/Commands.h"
-        }
     ]
 }

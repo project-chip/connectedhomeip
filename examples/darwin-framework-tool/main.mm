@@ -30,7 +30,7 @@
 #include "commands/storage/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
-#include <zap-generated/test/Commands.h>
+//#include <zap-generated/test/Commands.h>
 
 int main(int argc, const char * argv[])
 {
@@ -45,7 +45,6 @@ int main(int argc, const char * argv[])
         registerCommandsPayload(commands);
         registerClusterOtaSoftwareUpdateProviderInteractive(commands);
         registerCommandsStorage(commands);
-        registerCommandsTests(commands);
         registerClusters(commands);
         return commands.Run(argc, (char **) argv);
     }

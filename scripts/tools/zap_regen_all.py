@@ -60,7 +60,6 @@ class TargetType(Flag):
 
 
 __TARGET_TYPES__ = {
-    'tests': TargetType.TESTS,
     'global': TargetType.GLOBAL,
     'idl_codegen': TargetType.IDL_CODEGEN,
     'specific': TargetType.SPECIFIC,
@@ -446,25 +445,6 @@ def getCodegenTemplates():
     return targets
 
 
-def getTestsTemplatesTargets(test_target):
-    zap_input = ZapInput.FromPropertiesJson('src/app/zap-templates/zcl/zcl.json')
-    templates = {
-        'darwin-framework-tool': {
-            'template': 'examples/darwin-framework-tool/templates/tests/templates.json',
-            'output_dir': 'zzz_generated/darwin-framework-tool/zap-generated'
-        }
-    }
-
-    targets = []
-    for key, target in templates.items():
-        if test_target == 'all' or test_target == key:
-            logging.info("Found test target %s (via %s)" %
-                         (key, target['template']))
-            targets.append(ZAPGenerateTarget(zap_input, template=target['template'], output_dir=target['output_dir']))
-
-    return targets
-
-
 def getGoldenTestImageTargets():
     return [GoldenTestImageTarget()]
 
@@ -493,9 +473,6 @@ def getSpecificTemplatesTargets():
 
 def getTargets(type, test_target):
     targets = []
-
-    if type & TargetType.TESTS:
-        targets.extend(getTestsTemplatesTargets(test_target))
 
     if type & TargetType.GLOBAL:
         targets.extend(getGlobalTemplatesTargets())
