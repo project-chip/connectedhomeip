@@ -552,14 +552,14 @@ private:
 
     /**
      * @brief Non-templated coded to be called before DataModel::Encode in trying to add response.
-     * 
+     *
      * If this function fails, it may leave our TLV buffer in an inconsistent state.
      * Callers should snapshot as needed before calling this function, and roll back
      * as needed afterward.
-     * 
+     *
      * Intended to be called only by TryAddResponseData. This code was factored out, to be called
      * before Encode. This reduces generated codesize.
-     * 
+     *
      * @param [in] aRequestCommandPath the concrete path of the command we are
      *             responding to.
      * @param [in] aResponseCommandPath the concrete command response path.
