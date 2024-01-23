@@ -71,7 +71,7 @@ public:
 
     bool HasFeature(MicrowaveOvenControl::Feature feature) const;
 
-    uint8_t GetCountOfSupportedWattLevels() const;
+    uint8_t GetMaxSupportedWattLevelsIndex(uint8_t & supportedWattLevels) const;
 
     uint32_t GetCookTimeSec() const;
 
@@ -86,7 +86,7 @@ private:
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
     uint32_t mCookTimeSec        = kDefaultCookTimeSec;
-    uint8_t mSupportedWattLevels = 0;
+    uint8_t mMaxSupportedWattLevelsIndex = 0;
 
     /**
      * IM-level implementation of read
