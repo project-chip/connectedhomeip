@@ -268,7 +268,7 @@ tests:
     - label:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
-          0x03E8 (1s) and a set of extension fields appropriate to AC1."
+         1s and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
@@ -278,7 +278,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x03E8
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -307,7 +307,7 @@ tests:
     - label:
           "Step 2: TH sends a AddScene command to DUT with the GroupID field set
           to G1, the SceneID field set to 0x01, the TransitionTime field set to
-          0x03E8 and a set of extension fields appropriate to AC1."
+          1s and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -386,7 +386,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
-                value: 0x03E8
+                value: 1000
               - name: "ExtensionFieldSets"
                 value:
                     [
@@ -532,7 +532,7 @@ tests:
     - label:
           "Step 6a: TH sends a AddScene command to group G1 with the GroupID
           field set to G1, the SceneID field set to 0x01, the TransitionTime
-          field set to 0x03E8 (1s) and a set of extension fields appropriate to
+          field set to 1s and a set of extension fields appropriate to
           AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
@@ -544,7 +544,7 @@ tests:
               - name: "SceneID"
                 value: 0x03
               - name: "TransitionTime"
-                value: 0x03E8
+                value: 1000
               - name: "SceneName"
                 value: "Scene1"
               - name: "ExtensionFieldSets"
@@ -637,7 +637,7 @@ tests:
               - name: "SceneID"
                 value: 0x03
               - name: "TransitionTime"
-                value: 0x03E8
+                value: 1000
               - name: "ExtensionFieldSets"
                 value:
                     [

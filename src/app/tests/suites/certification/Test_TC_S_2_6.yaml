@@ -92,10 +92,10 @@ tests:
     - label:
           "Step 3a: TH1 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
-          set to 0x4E20 (20s) and no extension field sets."
+          set to 20s and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x1 0x4E20 scene1 [] 1 1
+          ./chip-tool scenes add-scene 0x0000 0x1 20000 scene1 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -130,11 +130,11 @@ tests:
     - label:
           "Step 4b: TH1 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 1 more than last value used in
-          step 4a, the TransitionTime field set to 0x4E20 (20s) and no extension
+          step 4a, the TransitionTime field set to 20s and no extension
           field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x10 0x4E20 scene101 [] 1 1
+          ./chip-tool scenes add-scene 0x0000 0x10 20000 scene101 [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -147,7 +147,7 @@ tests:
     - label: "Step 5a: Repeat Step 4a with TH2"
       PICS: S.S.C00.Rsp && S.S.A0002
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x1 0x4E20 scene1 [] 2 1 --commissioner-name beta
+          ./chip-tool scenes add-scene 0x0000 0x1 20000 scene1 [] 2 1 --commissioner-name beta
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
           CHIP:TOO:     status: 0
@@ -159,7 +159,7 @@ tests:
     - label: "Step 5b: Repeat Step 4b with TH2"
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x11 0x4E20 scene201 [] 2 1 --commissioner-name beta
+          ./chip-tool scenes add-scene 0x0000 0x11 20000 scene201 [] 2 1 --commissioner-name beta
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -172,7 +172,7 @@ tests:
     - label: "Step 6a: Repeat Step 4a with TH3"
       PICS: S.S.C00.Rsp && S.S.A0002
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x1 0x4E20 scene1 [] 2 1 --commissioner-name gamma
+          ./chip-tool scenes add-scene 0x0000 0x1 20000 scene1 [] 2 1 --commissioner-name gamma
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
           CHIP:TOO:     status: 0
@@ -184,10 +184,10 @@ tests:
     - label:
           "Step 6b: TH3 sends a AddScene command to DUT with the GroupID field
           set to 0x0000, the SceneID field set to 0x01, the TransitionTime field
-          set to 0x4E20 (20s) and no extension field sets."
+          set to 20s and no extension field sets."
       PICS: S.S.C00.Rsp
       verification: |
-          ./chip-tool scenes add-scene 0x0000 0x12 0x4E20 scene301 [] 3 1 --commissioner-name gamma
+          ./chip-tool scenes add-scene 0x0000 0x12 20000 scene301 [] 3 1 --commissioner-name gamma
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           CHIP:TOO:   AddSceneResponse: {
@@ -202,7 +202,7 @@ tests:
           set to 0x0000, the SceneID field set to 0x01."
       PICS: S.S.C04.Rsp
       verification: |
-          ./chip-tool scenes store-scene 0x0000 0xFE 0x4E20 sceneFE [] 1 1
+          ./chip-tool scenes store-scene 0x0000 0xFE 20000 sceneFE [] 1 1
 
           CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0004
           CHIP:TOO:   StoreSceneResponse: {
