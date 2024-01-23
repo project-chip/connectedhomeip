@@ -48,15 +48,20 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
 
-    bool supportLIT = SupportsFeature(Feature::kLongIdleTimeSupport);
-    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
-                       "The CheckIn protocol feature is required for LIT support");
-    VerifyOrDieWithMsg((supportLIT == false) || SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
-                       "The user ActiveMode trigger feature is required for LIT support");
-
-    // Disabling check until LIT support is compelte
-    // VerifyOrDieWithMsg((supportLIT == false) && (GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
-    //                    "LIT support is required for slow polling intervals superior to 15 seconds");
+    // LIT ICD Verification Checks
+    if (SupportsFeature(Feature::kLongIdleTimeSupport))
+    {
+        VerifyOrDieWithMsg(SupportsFeature(Feature::kCheckInProtocolSupport), AppServer,
+                           "The CheckIn protocol feature is required for LIT support.");
+        VerifyOrDieWithMsg(SupportsFeature(Feature::kUserActiveModeTrigger), AppServer,
+                           "The user ActiveMode trigger feature is required for LIT support.");
+        VerifyOrDieWithMsg(ICDConfigurationData::GetInstance().GetMinLitActiveModeThresholdMs() <=
+                               ICDConfigurationData::GetInstance().GetActiveModeThresholdMs(),
+                           AppServer, "The minimum ActiveModeThreshold value for a LIT ICD is 5 seconds.");
+        // Disabling check until LIT support is compelte
+        // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
+        //                    "LIT support is required for slow polling intervals superior to 15 seconds");
+    }
 
     mStorage     = storage;
     mFabricTable = fabricTable;
@@ -65,11 +70,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mExchangeManager   = exchangeManager;
 
     VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
-
-    // Removing the check for now since it is possible for the Fast polling
-    // to be larger than the ActiveModeDuration for now
-    // uint32_t activeModeDuration = ICDConfigurationData::GetInstance().GetActiveModeDurationMs();
-    // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
