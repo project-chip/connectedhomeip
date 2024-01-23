@@ -17,7 +17,7 @@ name: 263.4.1. [TC-DISHM-3.1] On Mode functionality with DUT as Server
 
 PICS:
     - DISHM.S.A0003
-    - DISHM.S.F00
+    - MOD.S.F00
     - OO.S.C00.Rsp
     - OO.S.C01.Rsp
 
@@ -95,7 +95,7 @@ tests:
       disabled: true
 
     - label: "Step 2: TH reads from the DUT the OnMode attribute."
-      PICS: DISHM.S.A0003 && DISHM.S.F00
+      PICS: DISHM.S.A0003 && MOD.S.F00
       verification: |
           ./chip-tool dishwashermode read on-mode 1 1
 
@@ -107,7 +107,7 @@ tests:
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the CurrentMode attribute."
-      PICS: DISHM.S.A0001 && DISHM.S.F00
+      PICS: DISHM.S.A0001 && MOD.S.F00
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 
@@ -121,7 +121,7 @@ tests:
       disabled: true
 
     - label: "Step 4: TH reads from the DUT the SupportedModes attribute."
-      PICS: DISHM.S.A0000 && DISHM.S.F00
+      PICS: DISHM.S.A0000 && MOD.S.F00
       verification: |
           ./chip-tool dishwashermode read supported-modes 1 1
 
@@ -171,7 +171,7 @@ tests:
     - label:
           "Step 5: TH sends a ChangeToMode command to the DUT with NewMode set
           to new_mode_th"
-      PICS: DISHM.S.C00.Rsp && DISHM.S.F00
+      PICS: DISHM.S.C00.Rsp && MOD.S.F00
       verification: |
           ./chip-tool dishwashermode change-to-mode 2 1 1
 
@@ -184,7 +184,7 @@ tests:
       disabled: true
 
     - label: "Step 6: TH sends a Off command to the DUT"
-      PICS: OO.S.C00.Rsp && DISHM.S.F00
+      PICS: OO.S.C00.Rsp && MOD.S.F00
       verification: |
           ./chip-tool onoff off 1 1
 
@@ -196,7 +196,7 @@ tests:
       disabled: true
 
     - label: "Step 7: TH sends a On command to the DUT"
-      PICS: OO.S.C01.Rsp && DISHM.S.F00
+      PICS: OO.S.C01.Rsp && MOD.S.F00
       verification: |
           ./chip-tool onoff on 1 1
 
@@ -208,7 +208,7 @@ tests:
       disabled: true
 
     - label: "Step 8: TH reads from the DUT the CurrentMode attribute."
-      PICS: DISHM.S.A0001 && DISHM.S.F00
+      PICS: DISHM.S.A0001 && MOD.S.F00
       verification: |
           ./chip-tool dishwashermode read current-mode 1 1
 

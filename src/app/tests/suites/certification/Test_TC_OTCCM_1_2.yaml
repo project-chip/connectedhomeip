@@ -53,19 +53,3 @@ tests:
           Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut
 
       disabled: true
-
-    - label: "Step 4: TH reads from the DUT the OnMode attribute."
-      PICS: OTCCM.S.A0003
-      verification: |
-          ./chip-tool Ovenmode read on-mode 1 1
-
-          Verify on TH(chip-tool) logs, OnMode attribute value is an integer value from supported_modes_dut or null
-      disabled: true
-
-    - label: "Step 5: TH reads from the DUT the StartUpMode attribute."
-      PICS: OTCCM.S.A0002
-      verification: |
-          ./chip-tool Ovenmode read start-up-mode 1 1
-
-          Verify on TH(chip-tool) logs, StartUpMode attribute value is an integer value from supported_modes_dut or null
-      disabled: true
