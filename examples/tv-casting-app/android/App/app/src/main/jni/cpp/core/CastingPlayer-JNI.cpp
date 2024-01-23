@@ -127,14 +127,16 @@ JNI_METHOD(jobject, VerifyOrEstablishConnection)
                         "CastingPlayer::VerifyOrEstablishConnection(desiredEndpointFilter) on Casting Player with device ID: %s",
                         castingPlayer->GetId());
         // Convert the EndpointFilter Java class to a C++ EndpointFilter
-        jclass endpointFilterJavaClass      = env->GetObjectClass(desiredEndpointFilterJavaObject);
-        jfieldID vendorIdFieldId            = env->GetFieldID(endpointFilterJavaClass, "productId", "I");
-        jfieldID productIdFieldId           = env->GetFieldID(endpointFilterJavaClass, "vendorId", "I");
-        jfieldID requiredDeviceTypesFieldId = env->GetFieldID(endpointFilterJavaClass, "requiredDeviceTypes", "Ljava/util/List;");
+        jclass endpointFilterJavaClass = env->GetObjectClass(desiredEndpointFilterJavaObject);
+        jfieldID vendorIdFieldId       = env->GetFieldID(endpointFilterJavaClass, "vendorId", "I");
+        jfieldID productIdFieldId      = env->GetFieldID(endpointFilterJavaClass, "productId", "I");
+        // jfieldID requiredDeviceTypesFieldId = env->GetFieldID(endpointFilterJavaClass, "requiredDeviceTypes",
+        // "Ljava/util/List;");
 
         matter::casting::core::EndpointFilter desiredEndpointFilter;
-        desiredEndpointFilter.vendorId  = static_cast<uint16_t>(env->GetIntField(desiredEndpointFilterJavaObject, vendorIdFieldId));
-        desiredEndpointFilter.productId = static_cast<uint16_t>(env->GetIntField(desiredEndpointFilterJavaObject, vendorIdFieldId));
+        desiredEndpointFilter.vendorId = static_cast<uint16_t>(env->GetIntField(desiredEndpointFilterJavaObject, vendorIdFieldId));
+        desiredEndpointFilter.productId =
+            static_cast<uint16_t>(env->GetIntField(desiredEndpointFilterJavaObject, productIdFieldId));
         // TODO: In following PRs. Translate the Java requiredDeviceTypes list to a C++ requiredDeviceTypes vector. For now we're
         // passing an empty list of.
 
