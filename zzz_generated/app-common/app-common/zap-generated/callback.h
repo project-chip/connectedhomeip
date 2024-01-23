@@ -6410,6 +6410,12 @@ bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::UnitTesting::Commands::TestSecondBatchHelperRequest::DecodableType & commandData);
 /**
+ * @brief Unit Testing Cluster TestDifferentVendorMeiRequest Command callback (from client)
+ */
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiRequest::DecodableType & commandData);
+/**
  * @brief Fault Injection Cluster FailAtFault Command callback (from client)
  */
 bool emberAfFaultInjectionClusterFailAtFaultCallback(

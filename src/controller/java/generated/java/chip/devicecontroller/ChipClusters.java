@@ -59020,6 +59020,7 @@ public class ChipClusters {
     private static final long NULLABLE_RANGE_RESTRICTED_INT16U_ATTRIBUTE_ID = 16424L;
     private static final long NULLABLE_RANGE_RESTRICTED_INT16S_ATTRIBUTE_ID = 16425L;
     private static final long WRITE_ONLY_INT8U_ATTRIBUTE_ID = 16426L;
+    private static final long MEI_INT8U_ATTRIBUTE_ID = 4294070017L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -60032,6 +60033,43 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
+    public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1) {
+      testDifferentVendorMeiRequest(callback, arg1, 0);
+    }
+
+    public void testDifferentVendorMeiRequest(TestDifferentVendorMeiResponseCallback callback, Integer arg1, int timedInvokeTimeoutMs) {
+      final long commandId = 4294049962L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long arg1FieldID = 0L;
+      BaseTLVType arg1tlvValue = new UIntType(arg1);
+      elements.add(new StructElement(arg1FieldID, arg1tlvValue));
+
+      StructType value = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long arg1FieldID = 0L;
+          Integer arg1 = null;
+          final long eventNumberFieldID = 1L;
+          Long eventNumber = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == arg1FieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                arg1 = castingValue.value(Integer.class);
+              }
+            } else if (element.contextTagNum() == eventNumberFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                eventNumber = castingValue.value(Long.class);
+              }
+            }
+          }
+          callback.onSuccess(arg1, eventNumber);
+        }}, commandId, value, timedInvokeTimeoutMs);
+    }
+
     public interface TestSpecificResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer returnValue);
     }
@@ -60082,6 +60120,10 @@ public class ChipClusters {
 
     public interface TestBatchHelperResponseCallback extends BaseClusterCallback {
       void onSuccess(byte[] buffer);
+    }
+
+    public interface TestDifferentVendorMeiResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer arg1, Long eventNumber);
     }
 
     public interface ListInt8uAttributeCallback extends BaseAttributeCallback {
@@ -63047,6 +63089,40 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
         }, WRITE_ONLY_INT8U_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMeiInt8uAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEI_INT8U_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MEI_INT8U_ATTRIBUTE_ID, true);
+    }
+
+    public void writeMeiInt8uAttribute(DefaultClusterCallback callback, Integer value) {
+      writeMeiInt8uAttribute(callback, value, 0);
+    }
+
+    public void writeMeiInt8uAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new UIntType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MEI_INT8U_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeMeiInt8uAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEI_INT8U_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+          }
+        }, MEI_INT8U_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
