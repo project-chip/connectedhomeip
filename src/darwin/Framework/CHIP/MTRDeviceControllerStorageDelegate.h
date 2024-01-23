@@ -112,7 +112,7 @@ MTR_NEWLY_AVAILABLE
 @end
 
 // TODO: FIXME: Is this a sane place to put this API?
-MTR_NEWLY_AVAILABLE NSSet<Class> * MTRDeviceControllerStorageClasses(void);
+MTR_EXTERN MTR_NEWLY_AVAILABLE NSSet<Class> * MTRDeviceControllerStorageClasses(void);
 
 NS_ASSUME_NONNULL_END
 
