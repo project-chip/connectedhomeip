@@ -360,8 +360,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        return TryAddingResponse(
-            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
+        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
     }
 
     /**
@@ -564,7 +563,8 @@ private:
      *             responding to.
      * @param [in] aResponseCommandPath the concrete command response path.
      */
-    CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath)
+    CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath,
+                                           const ConcreteCommandPath & aResponseCommandPath)
     {
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
@@ -587,8 +587,7 @@ private:
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath,
-                                  const CommandData & aData)
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
         // This method, templated with CommandData, captures all the components needs
         // from CommandData with as little code as possible.
