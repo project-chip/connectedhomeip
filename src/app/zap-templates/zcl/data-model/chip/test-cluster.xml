@@ -467,7 +467,7 @@ limitations under the License.
     <command source="client" code="0xFFF200AA" name="TestDifferentVendorMeiRequest"
              optional="true" response="TestDifferentVendorMeiResponse">
       <description>
-        Command having a different MEI vendor ID than the cluster.
+        Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent.
       </description>
       <arg name="arg1" type="int8u"/>
     </command>
@@ -610,6 +610,7 @@ limitations under the License.
         Response to TestDifferentVendorMeiRequest, which is a command having a different MEI vendor ID than the cluster.
       </description>
       <arg name="arg1" type="int8u"/>
+      <arg name="eventNumber" type="int64u"/>>
     </command>
 
     <event code="0x0001" name="TestEvent" priority="info" side="server">
