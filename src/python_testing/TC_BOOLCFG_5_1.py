@@ -160,7 +160,7 @@ class TC_BOOLCFG_5_1(MatterBaseTest):
         self.step("9b")
         if not is_aud_feature_supported:
             try:
-                await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.SuppressAlarm(alarmsToSuppress=Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kVisual), endpoint=endpoint)
+                await self.send_single_cmd(cmd=Clusters.Objects.BooleanStateConfiguration.Commands.SuppressAlarm(alarmsToSuppress=Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible), endpoint=endpoint)
                 asserts.fail("Received Success response when an CONSTRAINT_ERROR was expected")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.ConstraintError, "Unexpected error returned")
