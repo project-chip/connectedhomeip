@@ -41,6 +41,7 @@ private:
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),
@@ -52,7 +53,7 @@ private:
         detail::Structs::ModeOptionStruct::Type{
             .label    = CharSpan::fromCharString("Mapping"),
             .mode     = ModeMapping,
-            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) }, // todo set to no mode tags
+            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
 
     CHIP_ERROR Init() override;
