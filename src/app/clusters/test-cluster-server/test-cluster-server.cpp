@@ -786,6 +786,16 @@ bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
 {
     Commands::TestDifferentVendorMeiResponse::Type response;
 
+    {
+        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.evenNumber))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+    }
+
     response.arg1 = commandData.arg1;
     commandObj->AddResponse(commandPath, response);
     return true;
