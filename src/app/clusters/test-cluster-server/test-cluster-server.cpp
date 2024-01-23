@@ -85,6 +85,8 @@ public:
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
+
+
     CHIP_ERROR WriteListFabricScopedListEntry(const Structs::TestFabricScoped::DecodableType & entry, size_t index);
 
     CHIP_ERROR ReadListInt8uAttribute(AttributeValueEncoder & aEncoder);
@@ -838,8 +840,7 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
     {
         Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
 
-        EventNumber eventIdPlaceholder = 0;
-        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, eventIdPlaceholder))
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
         {
             commandObj->AddStatus(commandPath, Status::Failure);
             return true;
@@ -850,7 +851,8 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
         // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
         Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
 
-        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+        EventNumber eventIdPlaceholder = 0;
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, eventIdPlaceholder))
         {
             commandObj->AddStatus(commandPath, Status::Failure);
             return true;
