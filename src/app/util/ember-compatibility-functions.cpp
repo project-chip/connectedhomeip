@@ -1052,7 +1052,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     }
 
     auto status = ToInteractionModelStatus(emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                                                         attributeData, attributeMetadata->attributeType));
+                                                                      attributeData, attributeMetadata->attributeType));
     return apWriteHandler->AddStatus(aPath, status);
 }
 
