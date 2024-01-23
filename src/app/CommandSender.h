@@ -221,7 +221,6 @@ public:
                   bool aSuppressResponse = false) :
         CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
     {}
-
     ~CommandSender();
 
     /**
