@@ -66,8 +66,10 @@ class TestBatchInvoke(MatterBaseTest):
             result[0], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for first InvokeRequest")
         asserts.assert_true(type_matches(
             result[1], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for second InvokeRequest")
-        asserts.assert_equal(result[0].buffer, request_1_fill_character * response_size, "Unexpected response to first InvokeRequest")
-        asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size, "Unexpected response to second InvokeRequest")
+        asserts.assert_equal(result[0].buffer, request_1_fill_character * response_size,
+                             "Unexpected response to first InvokeRequest")
+        asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size,
+                             "Unexpected response to second InvokeRequest")
         logging.info("DUT successfully responded to a InvokeRequest action with two valid commands")
 
         # TODO(#31434): After TestEventTrigger adds ability to force one response per InvokeResponseMessage
@@ -96,8 +98,10 @@ class TestBatchInvoke(MatterBaseTest):
             result[0], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for first InvokeRequest")
         asserts.assert_true(type_matches(
             result[1], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for second InvokeRequest")
-        asserts.assert_equal(result[0].buffer, request_1_fill_character * response_size, "Unexpected response to first InvokeRequest")
-        asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size, "Unexpected response to second InvokeRequest")
+        asserts.assert_equal(result[0].buffer, request_1_fill_character * response_size,
+                             "Unexpected response to first InvokeRequest")
+        asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size,
+                             "Unexpected response to second InvokeRequest")
         logging.info("DUT successfully responded to a InvokeRequest spread accross multiple InvokeResponseMessages")
 
 
