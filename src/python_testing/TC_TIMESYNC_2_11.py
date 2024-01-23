@@ -51,6 +51,9 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
             asserts.fail("Did not receive DSTStatus event")
             pass
 
+    def pics_TC_TIMESYNC_2_11(self) -> list[str]:
+        return ["TIMESYNC.S.F00"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_11(self):
 

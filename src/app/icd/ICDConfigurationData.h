@@ -61,6 +61,8 @@ public:
 
     System::Clock::Milliseconds32 GetFastPollingInterval() { return mFastPollingInterval; }
 
+    uint32_t GetMinLitActiveModeThresholdMs() { return kMinLitActiveModeThreshold_ms; }
+
     /**
      * If ICD_ENFORCE_SIT_SLOW_POLL_LIMIT is set to 0, function will always return the configured Slow Polling interval
      * (CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL).
@@ -92,6 +94,8 @@ private:
     void SetICDCounter(uint32_t count) { mICDCounter = count; }
     void SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval) { mSlowPollingInterval = slowPollInterval; };
     void SetFastPollingInterval(System::Clock::Milliseconds32 fastPollInterval) { mFastPollingInterval = fastPollInterval; };
+
+    static constexpr uint32_t kMinLitActiveModeThreshold_ms = 5000;
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= 64800,
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");

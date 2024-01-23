@@ -7641,7 +7641,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7721,7 +7721,7 @@
               "code": 28,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "SystemModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7876,6 +7876,5 @@
       "endpointId": 5,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

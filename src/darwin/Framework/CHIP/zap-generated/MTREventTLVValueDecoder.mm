@@ -1624,17 +1624,6 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
 {
     using namespace Clusters::IcdManagement;
     switch (aEventId) {
-    case Events::OnTransitionToActiveMode::Id: {
-        Events::OnTransitionToActiveMode::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRICDManagementClusterOnTransitionToActiveModeEvent new];
-
-        return value;
-    }
     default: {
         break;
     }
@@ -2863,6 +2852,12 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId a
 
         __auto_type * value = [MTRDeviceEnergyManagementClusterResumedEvent new];
 
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
+            value.cause = memberValue;
+        } while (0);
+
         return value;
     }
     default: {
@@ -3058,6 +3053,30 @@ static id _Nullable DecodeEventPayloadForEnergyEVSECluster(EventId aEventId, TLV
 static id _Nullable DecodeEventPayloadForEnergyPreferenceCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EnergyPreference;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForEnergyEVSEModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::EnergyEvseMode;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForDeviceEnergyManagementModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::DeviceEnergyManagementMode;
     switch (aEventId) {
     default: {
         break;
@@ -4507,6 +4526,12 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::EnergyPreference::Id: {
         return DecodeEventPayloadForEnergyPreferenceCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::EnergyEvseMode::Id: {
+        return DecodeEventPayloadForEnergyEVSEModeCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::DeviceEnergyManagementMode::Id: {
+        return DecodeEventPayloadForDeviceEnergyManagementModeCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::DoorLock::Id: {
         return DecodeEventPayloadForDoorLockCluster(aPath.mEventId, aReader, aError);

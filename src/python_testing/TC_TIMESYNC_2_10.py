@@ -45,6 +45,9 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
     async def send_set_utc_cmd(self, utc: uint) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
 
+    def pics_TC_TIMESYNC_2_10(self) -> list[str]:
+        return ["TIMESYNC.S.F00"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_10(self):
 

@@ -32,7 +32,8 @@ class DeviceEnergyManagementClusterForecastStruct(
   val earliestStartTime: Optional<UInt>?,
   val latestEndTime: Optional<UInt>,
   val isPauseable: Boolean,
-  val slots: List<DeviceEnergyManagementClusterSlotStruct>
+  val slots: List<DeviceEnergyManagementClusterSlotStruct>,
+  val forecastUpdateReason: UByte
 ) {
   override fun toString(): String = buildString {
     append("DeviceEnergyManagementClusterForecastStruct {\n")
@@ -44,6 +45,7 @@ class DeviceEnergyManagementClusterForecastStruct(
     append("\tlatestEndTime : $latestEndTime\n")
     append("\tisPauseable : $isPauseable\n")
     append("\tslots : $slots\n")
+    append("\tforecastUpdateReason : $forecastUpdateReason\n")
     append("}\n")
   }
 
@@ -76,6 +78,7 @@ class DeviceEnergyManagementClusterForecastStruct(
         item.toTlv(AnonymousTag, this)
       }
       endArray()
+      put(ContextSpecificTag(TAG_FORECAST_UPDATE_REASON), forecastUpdateReason)
       endStructure()
     }
   }
@@ -89,6 +92,7 @@ class DeviceEnergyManagementClusterForecastStruct(
     private const val TAG_LATEST_END_TIME = 5
     private const val TAG_IS_PAUSEABLE = 6
     private const val TAG_SLOTS = 7
+    private const val TAG_FORECAST_UPDATE_REASON = 8
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterForecastStruct {
       tlvReader.enterStructure(tlvTag)
@@ -128,6 +132,7 @@ class DeviceEnergyManagementClusterForecastStruct(
           }
           tlvReader.exitContainer()
         }
+      val forecastUpdateReason = tlvReader.getUByte(ContextSpecificTag(TAG_FORECAST_UPDATE_REASON))
 
       tlvReader.exitContainer()
 
@@ -139,7 +144,8 @@ class DeviceEnergyManagementClusterForecastStruct(
         earliestStartTime,
         latestEndTime,
         isPauseable,
-        slots
+        slots,
+        forecastUpdateReason
       )
     }
   }
