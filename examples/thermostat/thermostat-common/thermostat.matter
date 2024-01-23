@@ -2097,6 +2097,7 @@ endpoint 0 {
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x00;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
 
@@ -2240,6 +2241,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
 
     handle command RetrieveLogsRequest;
+    handle command RetrieveLogsResponse;
   }
 
   server cluster GeneralDiagnostics {
