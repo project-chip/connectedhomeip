@@ -350,7 +350,7 @@ CHIP_ERROR InteractionModelReports::ReportAttribute(DeviceProxy * device, std::v
         {
             params.mKeepSubscriptions = mKeepSubscriptions.Value();
         }
-        params.mIsPeerLIT = mIsPeerLIT.ValueOr(false);
+        params.mIsPeerLIT = mIsPeerLIT;
     }
 
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
@@ -480,7 +480,7 @@ CHIP_ERROR InteractionModelReports::ReportEvent(DeviceProxy * device, std::vecto
         {
             params.mKeepSubscriptions = mKeepSubscriptions.Value();
         }
-        params.mIsPeerLIT = mIsPeerLIT.ValueOr(false);
+        params.mIsPeerLIT = mIsPeerLIT;
     }
 
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
@@ -654,7 +654,7 @@ CHIP_ERROR InteractionModelReports::ReportAll(chip::DeviceProxy * device, std::v
         {
             params.mKeepSubscriptions = mKeepSubscriptions.Value();
         }
-        params.mIsPeerLIT = mIsPeerLIT.ValueOr(false);
+        params.mIsPeerLIT = mIsPeerLIT;
     }
 
     auto client = std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),

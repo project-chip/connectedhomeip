@@ -77,9 +77,9 @@ void ModelCommand::Shutdown()
 
 void ModelCommand::CheckPeerICDType()
 {
-    if (mIsPeerLITCLI.HasValue())
+    if (mIsPeerLIT.HasValue())
     {
-        ChipLogProgress(chipTool, "Peer is ICD type set to %s", mIsPeerLITCLI.Value() == 1 ? "LIT-ICD" : "non LIT-ICD");
+        ChipLogProgress(chipTool, "Peer ICD type is set to %s", mIsPeerLIT.Value() == 1 ? "LIT-ICD" : "non LIT-ICD");
         return;
     }
 
@@ -87,12 +87,17 @@ void ModelCommand::CheckPeerICDType()
     auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
     auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
 
+    if (iter == nullptr)
+    {
+        return;
+    }
+
     while (iter->Next(info))
     {
         if (ScopedNodeId(info.peer_node.GetNodeId(), info.peer_node.GetFabricIndex()) == destinationPeerId)
         {
             ChipLogProgress(chipTool, "Peer is a registered LIT ICD.");
-            mIsPeerLITCLI.SetValue(true);
+            mIsPeerLIT.SetValue(true);
             return;
         }
     }
