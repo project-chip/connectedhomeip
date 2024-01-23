@@ -30,7 +30,7 @@
 #include "commands/storage/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
-//#include <zap-generated/test/Commands.h>
+// #include <zap-generated/test/Commands.h>
 
 int main(int argc, const char * argv[])
 {
