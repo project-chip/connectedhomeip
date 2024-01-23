@@ -82,7 +82,6 @@ source_set("revision_info") {
 source_set("path-params") {
   sources = [
     "AttributePathParams.h",
-    "ConcreteAttributePath.h",
     "EventPathParams.h",
   ]
 }
