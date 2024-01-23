@@ -25,14 +25,14 @@
 
 /**
  * Resolve Matter cluster IDs into a descriptive string.
- * 
+ *
  * For unknown IDs, a string '<Unknown clusterID %d>' will be returned.
  */
 MTR_EXPORT MTR_NEWLY_AVAILABLE NSString * MTRClusterNameForID(MTRClusterIDType clusterID);
 
 /**
  * Resolve Matter attribute IDs into a descriptive string.
- * 
+ *
  * For unknown IDs, a string '<Unknown clusterID %d>' (if the cluster ID is not known)
  * or '<Unknown attributeID %d>' (if the cluster ID is known but the attribute ID is not known)
  * will be returned.
