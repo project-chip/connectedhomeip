@@ -360,7 +360,8 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        return TryAddingResponse([&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
+        return TryAddingResponse(
+            [&]() -> CHIP_ERROR { return TryAddResponseData(aRequestCommandPath, aData); });
     }
 
     /**
@@ -550,21 +551,19 @@ private:
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
-     * @brief Non-templated coded to be called before DataModel::Encode in trying to add response.
+     * Non-templated function called before DataModel::Encode when attempting to add a response.
      *
-     * If this function fails, it may leave our TLV buffer in an inconsistent state.
-     * Callers should snapshot as needed before calling this function, and roll back
-     * as needed afterward.
+     * **Important:** If this function fails, the TLV buffer may be left in an inconsistent state.
+     * Callers should create snapshots as necessary before invoking this function and implement
+     * rollback mechanisms if needed.
      *
-     * Intended to be called only by TryAddResponseData. This code was factored out, to be called
-     * before Encode. This reduces generated codesize.
+     * **Usage:** This function is intended to be called exclusively by TryAddResponseData. It was
+     * factored out to optimize code size.
      *
-     * @param [in] aRequestCommandPath the concrete path of the command we are
-     *             responding to.
-     * @param [in] aResponseCommandPath the concrete command response path.
+     * @param aRequestCommandPath  The concrete path of the command being responded to.
+     * @param aResponseCommandPath The concrete path of the command response.
      */
-    CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath,
-                                           const ConcreteCommandPath & aResponseCommandPath)
+    CHIP_ERROR TryAddResponseDataPreEncode(const ConcreteCommandPath & aRequestCommandPath, const ConcreteCommandPath & aResponseCommandPath)
     {
         // Return early in case of requests targeted to a group, since they should not add a response.
         VerifyOrReturnValue(!IsGroupRequest(), CHIP_NO_ERROR);
@@ -587,7 +586,8 @@ private:
      * @param [in] aData the data for the response.
      */
     template <typename CommandData>
-    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
+    CHIP_ERROR TryAddResponseData(const ConcreteCommandPath & aRequestCommandPath,
+                                  const CommandData & aData)
     {
         // This method, templated with CommandData, captures all the components needs
         // from CommandData with as little code as possible.
@@ -603,8 +603,8 @@ private:
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), aData));
 
         // FinishCommand technically should be refactored out as it is not a command that needs templating.
-        // But because there is only a single function call keeping it here takes less code. If there is
-        // ever more code between DataModel::Encode and the end of this function is should be broken out into
+        // But, because there is only a single function call, keeping it here takes less code. If there is
+        // ever more code between DataModel::Encode and the end of this function, it should be broken out into
         // TryAddResponseDataPostEncode.
         return FinishCommand(/* aEndDataStruct = */ false);
     }
