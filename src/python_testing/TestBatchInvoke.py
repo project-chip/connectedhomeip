@@ -17,7 +17,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import InteractionModelError
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
@@ -47,17 +47,17 @@ class TestBatchInvoke(MatterBaseTest):
         self.print_step(1, "Send simple batch commands to UnitTesting Cluster")
         response_size = 7
         endpoint = 1
-        request_1_fill_character = ord('a')
-        request_2_fill_character = ord('b')
+        request_1_fill_character = b"a"
+        request_2_fill_character = b"b"
         command = Clusters.UnitTesting.Commands.TestBatchHelperRequest(
-            sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=request_1_fill_character)
+            sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=ord(request_1_fill_character))
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         command = Clusters.UnitTesting.Commands.TestSecondBatchHelperRequest(
-            sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=request_2_fill_character)
+            sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=ord(request_2_fill_character))
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         try:
             result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
-        except InteractionModelError as e:
+        except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
         asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
@@ -66,12 +66,8 @@ class TestBatchInvoke(MatterBaseTest):
             result[0], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for first InvokeRequest")
         asserts.assert_true(type_matches(
             result[1], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for second InvokeRequest")
-        asserts.assert_equal(len(result[0].buffer), response_size, "Unexpected response size for first InvokeRequest")
-        for byte in result[0].buffer:
-            asserts.assert_equal(byte, request_1_fill_character, "Unexpected byte in response first InvokeRequest")
-        asserts.assert_equal(len(result[1].buffer), response_size, "Unexpected response size for second InvokeRequest")
-        for byte in result[1].buffer:
-            asserts.assert_equal(byte, request_2_fill_character, "Unexpected byte in response second InvokeRequest")
+        asserts.assert_equal(result[0].buffer, request_1_fill_character * response_size, "Unexpected response to first InvokeRequest")
+        asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size, "Unexpected response to second InvokeRequest")
         logging.info("DUT successfully responded to a InvokeRequest action with two valid commands")
 
         # TODO(#31434): After TestEventTrigger adds ability to force one response per InvokeResponseMessage
@@ -80,18 +76,18 @@ class TestBatchInvoke(MatterBaseTest):
         self.print_step(2, "Send batch commands with large expected response over multiple `InvokeResponseMessage`s")
         response_size = 700
         endpoint = 1
-        request_1_fill_character = ord('a')
-        request_2_fill_character = ord('b')
+        request_1_fill_character = b"a"
+        request_2_fill_character = b"b"
         # Note that first request is actually delayed trying to get DUT to respond with values out of order
         command = Clusters.UnitTesting.Commands.TestBatchHelperRequest(
-            sleepBeforeResponseTimeMs=50, sizeOfResponseBuffer=response_size, fillCharacter=request_1_fill_character)
+            sleepBeforeResponseTimeMs=50, sizeOfResponseBuffer=response_size, fillCharacter=ord(request_1_fill_character))
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         command = Clusters.UnitTesting.Commands.TestSecondBatchHelperRequest(
-            sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=request_2_fill_character)
+            sleepBeforeResponseTimeMs=0, sizeOfResponseBuffer=response_size, fillCharacter=ord(request_2_fill_character))
         invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
         try:
             result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
-        except InteractionModelError as e:
+        except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
         asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
@@ -100,12 +96,8 @@ class TestBatchInvoke(MatterBaseTest):
             result[0], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for first InvokeRequest")
         asserts.assert_true(type_matches(
             result[1], Clusters.UnitTesting.Commands.TestBatchHelperResponse), "Unexpected return type for second InvokeRequest")
-        asserts.assert_equal(len(result[0].buffer), response_size, "Unexpected response size for first InvokeRequest")
-        for byte in result[0].buffer:
-            asserts.assert_equal(byte, request_1_fill_character, "Unexpected byte in response first InvokeRequest")
-        asserts.assert_equal(len(result[1].buffer), response_size, "Unexpected response size for second InvokeRequest")
-        for byte in result[1].buffer:
-            asserts.assert_equal(byte, request_2_fill_character, "Unexpected byte in response second InvokeRequest")
+        asserts.assert_equal(result[0].buffer, request_1_fill_character * response_size, "Unexpected response to first InvokeRequest")
+        asserts.assert_equal(result[1].buffer, request_2_fill_character * response_size, "Unexpected response to second InvokeRequest")
         logging.info("DUT successfully responded to a InvokeRequest spread accross multiple InvokeResponseMessages")
 
 
