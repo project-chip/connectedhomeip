@@ -16,6 +16,7 @@
  */
 
 #include "FabricScopedPreEncodedValue.h"
+#include <lib/core/TLVReader.h>
 #include <lib/support/CodeUtils.h>
 
 #include <optional>
@@ -24,17 +25,12 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-FabricScopedPreEncodedValue::FabricScopedPreEncodedValue(const ByteSpan & aData)
-{
-    mReader.Init(aData);
-}
+FabricScopedPreEncodedValue::FabricScopedPreEncodedValue(const ByteSpan & aData) : mData(aData) {}
 
 CHIP_ERROR FabricScopedPreEncodedValue::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aFabricIndex) const
 {
-    // Clone our reader, since we need to do Next() to move to its first element
-    // but not change our state.  And CopyElement needs a non-const reader
-    // anyway since it also changes reader state.
-    TLV::TLVReader reader(mReader);
+    TLV::TLVReader reader;
+    reader.Init(mData);
 
     ReturnErrorOnFailure(reader.Next());
 
@@ -43,7 +39,8 @@ CHIP_ERROR FabricScopedPreEncodedValue::EncodeForRead(TLV::TLVWriter & aWriter, 
 
 FabricIndex FabricScopedPreEncodedValue::GetFabricIndex() const
 {
-    TLV::TLVReader reader(mReader);
+    TLV::TLVReader reader;
+    reader.Init(mData);
     CHIP_ERROR err = reader.Next();
     if (err != CHIP_NO_ERROR)
     {

@@ -17,7 +17,6 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVWriter.h>
 
@@ -51,7 +50,7 @@ public:
     FabricIndex GetFabricIndex() const;
 
 private:
-    TLV::TLVReader mReader;
+    const ByteSpan mData;
 };
 
 } // namespace DataModel

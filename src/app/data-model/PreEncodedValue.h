@@ -16,7 +16,6 @@
  */
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLVReader.h>
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVWriter.h>
 
@@ -45,7 +44,7 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
 private:
-    TLV::TLVReader mReader;
+    const ByteSpan mData;
 };
 
 } // namespace DataModel

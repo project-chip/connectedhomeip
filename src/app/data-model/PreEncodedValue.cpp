@@ -16,23 +16,19 @@
  */
 
 #include "PreEncodedValue.h"
+#include <lib/core/TLVReader.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
-PreEncodedValue::PreEncodedValue(const ByteSpan & aData)
-{
-    mReader.Init(aData);
-}
+PreEncodedValue::PreEncodedValue(const ByteSpan & aData) : mData(aData) {}
 
 CHIP_ERROR PreEncodedValue::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    // Clone our reader, since we need to do Next() to move to its first element
-    // but not change our state.  And CopyElement needs a non-const reader
-    // anyway since it also changes reader state.
-    TLV::TLVReader reader(mReader);
+    TLV::TLVReader reader;
+    reader.Init(mData);
 
     ReturnErrorOnFailure(reader.Next());
 
