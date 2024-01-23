@@ -108,7 +108,7 @@ public:
     /**
      * @brief Overridable function used to update display on button press
      */
-    static void UpdateDisplay();
+    virtual void UpdateDisplay();
 
 #ifdef DISPLAY_ENABLED
     /**
