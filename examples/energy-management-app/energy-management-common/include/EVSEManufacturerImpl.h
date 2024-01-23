@@ -88,8 +88,7 @@ public:
      * @param[in]   aPower_mW    - the mean power of the load
      *                             Positive power indicates Imported energy (e.g. a load)
      *                             Negative power indicated Exported energy (e.g. a generator)
-     * @param[in]   aPowerRandomness_mW  This is used to define the std.dev of the
-     *                             random power values around the mean power of the load
+     * @param[in]   aPowerRandomness_mW  This is used to scale random power fluctuations around the mean power of the load
      *
      * @param[in]   aInterval_s  - the callback interval in seconds
      * @param[in]   bReset       - boolean: true will reset the energy values to 0

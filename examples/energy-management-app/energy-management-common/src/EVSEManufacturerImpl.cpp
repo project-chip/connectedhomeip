@@ -232,9 +232,10 @@ void EVSEManufacturer::FakeReadingsUpdate()
     if (gFakeReadingsData.bEnabled)
     {
         // Update meter values
-        // first compute power as a mean + stddev
-        // TODO implement stddev
-        int64_t power = gFakeReadingsData.mPower_mW + (gFakeReadingsData.mPowerRandomness_mW * rand());
+        // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
+        // first compute power as a mean + some random value in range 0 to mPowerRandomness_mW
+        int64_t power = (rand() % gFakeReadingsData.mPowerRandomness_mW);
+        power += gFakeReadingsData.mPower_mW; // add in the base power
 
         // TODO call the EPM cluster to send a power reading
 
