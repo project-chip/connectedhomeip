@@ -93,7 +93,7 @@ CHIP_ERROR Instance::Init()
     // ensure incoming watt level values are valid.
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
-        uint8_t supportedWattLevels = 0;
+        uint8_t supportedWattLevels  = 0;
         mMaxSupportedWattLevelsIndex = GetMaxSupportedWattLevelsIndex(supportedWattLevels);
         VerifyOrReturnError(supportedWattLevels > 0, CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl, "Microwave Oven Control: supported watt levels is empty"));

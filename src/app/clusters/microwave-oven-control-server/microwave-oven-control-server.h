@@ -85,7 +85,7 @@ private:
     Clusters::OperationalState::Instance & mOpStateInstance;
     Clusters::ModeBase::Instance & mMicrowaveOvenModeInstance;
 
-    uint32_t mCookTimeSec        = kDefaultCookTimeSec;
+    uint32_t mCookTimeSec                = kDefaultCookTimeSec;
     uint8_t mMaxSupportedWattLevelsIndex = 0;
 
     /**
