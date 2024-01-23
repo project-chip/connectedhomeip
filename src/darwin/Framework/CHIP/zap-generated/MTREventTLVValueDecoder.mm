@@ -1624,17 +1624,6 @@ static id _Nullable DecodeEventPayloadForICDManagementCluster(EventId aEventId, 
 {
     using namespace Clusters::IcdManagement;
     switch (aEventId) {
-    case Events::OnTransitionToActiveMode::Id: {
-        Events::OnTransitionToActiveMode::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
-        if (*aError != CHIP_NO_ERROR) {
-            return nil;
-        }
-
-        __auto_type * value = [MTRICDManagementClusterOnTransitionToActiveModeEvent new];
-
-        return value;
-    }
     default: {
         break;
     }

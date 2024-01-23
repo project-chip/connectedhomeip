@@ -98,6 +98,6 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
 } else {
   import("${chip_root}/build/chip/chip_test_group.gni")
   chip_test_group("tests") {
-    deps = []
+    tests = []
   }
 }

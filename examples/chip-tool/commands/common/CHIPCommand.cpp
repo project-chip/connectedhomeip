@@ -139,6 +139,14 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.listenPort = port;
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
+    auto systemState = chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState();
+    VerifyOrReturnError(nullptr != systemState, CHIP_ERROR_INCORRECT_STATE);
+
+    auto server = systemState->BDXTransferServer();
+    VerifyOrReturnError(nullptr != server, CHIP_ERROR_INCORRECT_STATE);
+
+    server->SetDelegate(&BDXDiagnosticLogsServerDelegate::GetInstance());
+
     ReturnErrorOnFailure(GetAttestationTrustStore(mPaaTrustStorePath.ValueOr(nullptr), &sTrustStore));
 
     ReturnLogErrorOnFailure(sCheckInDelegate.Init(&sICDClientStorage));

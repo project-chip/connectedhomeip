@@ -2798,29 +2798,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRICDManagementClusterOnTransitionToActiveModeEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRICDManagementClusterOnTransitionToActiveModeEvent alloc] init];
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTROvenCavityOperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
