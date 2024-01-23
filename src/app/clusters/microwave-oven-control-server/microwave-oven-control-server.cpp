@@ -314,7 +314,7 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
         VerifyOrExit(
             cookMode.HasValue() || cookTimeSec.HasValue() || wattSettingIndex.HasValue(), status = Status::InvalidCommand;
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
-        
+
         reqWattSettingIndex = wattSettingIndex.ValueOr(mMaxSupportedWattLevelsIndex);
         VerifyOrExit(reqWattSettingIndex <= mMaxSupportedWattLevelsIndex, status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
