@@ -29,7 +29,7 @@ class CommandSender;
 /**
  * @brief Legacy callbacks for CommandSender
  *
- * `Callback` exists for legacy purposes. If you are developing a new callback implementation,
+ * This class exists for legacy purposes. If you are developing a new callback implementation,
  * please use `CommandSender::ExtendableCallback`.
  */
 class CommandSenderLegacyCallback
