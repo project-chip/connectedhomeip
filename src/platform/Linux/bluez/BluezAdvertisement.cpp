@@ -92,7 +92,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     bluez_leadvertisement1_set_local_name(adv, localNamePtr);
     bluez_leadvertisement1_set_appearance(adv, 0xffff /* no appearance */);
     // empty duration
-    bluez_leadvertisement1_set_timeout(adv, 0);
+    // empty timeout
     // empty secondary channel for now
 
     bluez_object_skeleton_set_leadvertisement1(object, adv);
