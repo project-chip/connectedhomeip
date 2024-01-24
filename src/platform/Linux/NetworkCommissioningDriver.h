@@ -103,7 +103,6 @@ public:
 
     uint32_t GetSupportedWiFiBandsMask() const override
     {
-        // Default to 2.4G support.
         uint32_t supportedBands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
         if (mIs5gSupported)
         {
@@ -117,7 +116,7 @@ private:
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
-    // Whether 5GHz band is supported.
+    // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
