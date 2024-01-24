@@ -22,9 +22,9 @@
 #include <array>
 #include <string_view>
 
+#include "pw_hdlc/decoder.h"
 #include "pw_hdlc/default_addresses.h"
 #include "pw_hdlc/rpc_channel.h"
-#include "pw_hdlc/decoder.h"
 #include "pw_log/log.h"
 #include "pw_rpc/channel.h"
 #include "pw_status/status.h"
@@ -122,7 +122,8 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
     while (true)
     {
         std::byte data;
-        if (!pw::sys_io::ReadByte(&data).ok()) {
+        if (!pw::sys_io::ReadByte(&data).ok())
+        {
             // TODO: should we log?
             return;
         }
