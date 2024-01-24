@@ -27,7 +27,12 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
 {
 
     SafeAttributePersistenceProvider * aProvider = GetSafeAttributePersistenceProvider();
-    EndpointId aEndpointId                       = mDelegate->GetEndpointId();
+    if (aProvider == nullptr)
+    {
+        ChipLogError(AppServer, "GetSafeAttributePersistenceProvider returned NULL");
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
+    EndpointId aEndpointId = mDelegate->GetEndpointId();
     CHIP_ERROR err;
 
     // Restore ChargingEnabledUntil value

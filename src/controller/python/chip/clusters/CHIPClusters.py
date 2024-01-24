@@ -13499,6 +13499,13 @@ class ChipClusters:
                     "fillCharacter": "int",
                 },
             },
+            0xFFF200AA: {
+                "commandId": 0xFFF200AA,
+                "commandName": "TestDifferentVendorMeiRequest",
+                "args": {
+                    "arg1": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -14110,6 +14117,13 @@ class ChipClusters:
                 "attributeId": 0x0000FFFD,
                 "type": "int",
                 "reportable": True,
+            },
+            0xFFF24F01: {
+                "attributeName": "MeiInt8u",
+                "attributeId": 0xFFF24F01,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
             },
         },
     }

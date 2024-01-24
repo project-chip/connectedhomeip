@@ -634,6 +634,10 @@ namespace TestFabricScopedEvent {
 static constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
 
+namespace TestDifferentVendorMeiEvent {
+static constexpr EventId Id = 0xFFF200EE;
+} // namespace TestDifferentVendorMeiEvent
+
 } // namespace Events
 } // namespace UnitTesting
 

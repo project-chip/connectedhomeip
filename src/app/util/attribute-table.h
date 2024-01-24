@@ -19,8 +19,6 @@
 
 #include <app/util/af.h>
 
-#define ZCL_NULL_ATTRIBUTE_TABLE_INDEX 0xFFFF
-
 // Remote devices writing attributes of local device
 EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                             uint8_t * dataPtr, EmberAfAttributeType dataType);

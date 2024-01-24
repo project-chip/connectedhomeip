@@ -25,24 +25,8 @@
 #include <app/util/endpoint-config-api.h>
 #include <lib/support/CodeUtils.h>
 
-#if !defined(EMBER_SCRIPTED_TEST)
 #include <app/att-storage.h>
-#endif
-
-#if !defined(ATTRIBUTE_STORAGE_CONFIGURATION) && defined(EMBER_TEST)
-#define ATTRIBUTE_STORAGE_CONFIGURATION "attribute-storage-test.h"
-#endif
-
-// ATTRIBUTE_STORAGE_CONFIGURATION macro
-// contains the file that contains the initial set-up of the
-// attribute data structures. If it is missing
-// we use the provider sample.
-#ifndef ATTRIBUTE_STORAGE_CONFIGURATION
-//  #error "Must define ATTRIBUTE_STORAGE_CONFIGURATION to specify the App. Builder default attributes file."
 #include <zap-generated/endpoint_config.h>
-#else
-#include ATTRIBUTE_STORAGE_CONFIGURATION
-#endif
 
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
