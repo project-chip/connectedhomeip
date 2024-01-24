@@ -90,7 +90,7 @@ enum
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionCapacity = 0x1024,
 #endif
-    kDeviceOption_WiFiSupports5g                        = 0x1025
+    kDeviceOption_WiFiSupports5g = 0x1025
 };
 
 constexpr unsigned kAppUsageLength = 64;
