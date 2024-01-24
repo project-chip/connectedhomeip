@@ -21,8 +21,8 @@ limitations under the License.
     <cluster code="0x0097"/>
     <field name="ReceivedConfirmation" mask="0x1"/>
     <field name="ConfirmationResponse" mask="0x2"/>
-    <field name="ConfirmationReply" mask="0x3"/>
-    <field name="ProtectedMessages" mask="0x4"/>
+    <field name="ConfirmationReply" mask="0x4"/>
+    <field name="ProtectedMessages" mask="0x8"/>
   </bitmap>
 
   <bitmap name="MessageControlBitmap" type="bitmap32">
@@ -76,16 +76,16 @@ limitations under the License.
     <define>MESSAGES_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <globalAttribute side="either" code="0xFFFD" value="3"/><!-- Revision   -->
     <attribute side="server" code="0x0000" define="MESSAGES_CLUSTER_MESSAGES" type="ARRAY" entryType="MessageStruct" writable="false" max="8" optional="false">Messages</attribute>
     <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8" writable="false" optional="false">ActiveMessageIDs</attribute>
-    <command source="client" code="0x00" name="PresentMessagesRequest" optional="false">
+    <command source="client" code="0x00" name="PresentMessagesRequest" isFabricScoped="true" optional="false">
       <description>
         Command for requesting messages be presented
       </description>
       <arg name="Messages" type="octet_string" array="true"/>
     </command>
-    <command source="client" code="0x01" name="CancelMessagesRequest" optional="false">
+    <command source="client" code="0x01" name="CancelMessagesRequest" isFabricScoped="true" optional="false">
       <description>
         Command for cancelling message present requests
       </description>

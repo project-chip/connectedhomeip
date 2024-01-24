@@ -9473,7 +9473,7 @@ using chip::System::Clock::Timeout;
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
     using RequestType = Messages::Commands::PresentMessagesRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
@@ -9500,7 +9500,7 @@ using chip::System::Clock::Timeout;
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
     using RequestType = Messages::Commands::CancelMessagesRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
@@ -9515,42 +9515,42 @@ using chip::System::Clock::Timeout;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMessagesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeMessagesID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeMessagesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveMessageIDsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeEventListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeEventListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAttributeListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeAttributeListID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeMessagesID) attributeID:@(MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID) params:params];
 }
 
 @end
