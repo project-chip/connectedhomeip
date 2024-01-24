@@ -1336,7 +1336,7 @@ cluster UserLabel = 65 {
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 cluster OperationalState = 96 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum ErrorStateEnum : enum8 {
     kNoError = 0;

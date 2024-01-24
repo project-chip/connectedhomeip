@@ -188,239 +188,6 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
     }
     ctxt.SetCommandHandled();
 }
-// Scenes : 5
-void ScenesClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
-{
-    using namespace chip::app::Clusters::Scenes;
-
-    auto unify_node = m_node_state_monitor.bridged_endpoint(ctxt.mRequestPath.mEndpointId);
-    if (!unify_node) {
-        sl_log_info(LOG_TAG, "The endpoint [%i] is not a part of unify matter bridge node", ctxt.mRequestPath.mEndpointId);
-        return;
-    }
-
-    std::string cmd;
-    nlohmann::json payload = {};
-
-    if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
-        m_node_state_monitor.emulator().invoke_command(ctxt);
-        return;
-    }
-
-    switch (ctxt.mRequestPath.mCommandId) {
-    case Commands::AddScene::Id: {
-        Commands::AddScene::DecodableType data;
-        cmd = "AddScene"; // "AddScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["TransitionTime"] = to_json(data.transitionTime);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneName"] = to_json(data.sceneName);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["ExtensionFieldSets"] = to_json(data.extensionFieldSets);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::ViewScene::Id: {
-        Commands::ViewScene::DecodableType data;
-        cmd = "ViewScene"; // "ViewScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::RemoveScene::Id: {
-        Commands::RemoveScene::DecodableType data;
-        cmd = "RemoveScene"; // "RemoveScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::RemoveAllScenes::Id: {
-        Commands::RemoveAllScenes::DecodableType data;
-        cmd = "RemoveAllScenes"; // "RemoveAllScenes";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::StoreScene::Id: {
-        Commands::StoreScene::DecodableType data;
-        cmd = "StoreScene"; // "StoreScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::RecallScene::Id: {
-        Commands::RecallScene::DecodableType data;
-        cmd = "RecallScene"; // "RecallScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            if (data.transitionTime.HasValue()) {
-                try {
-                    payload["TransitionTime"] = to_json(data.transitionTime.Value());
-                } catch (std::exception& ex) {
-                    sl_log_warning(LOG_TAG, "Failed to add the command arguments value to json format: %s", ex.what());
-                }
-            }
-        }
-    } break;
-    case Commands::GetSceneMembership::Id: {
-        Commands::GetSceneMembership::DecodableType data;
-        cmd = "GetSceneMembership"; // "GetSceneMembership";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::EnhancedAddScene::Id: {
-        Commands::EnhancedAddScene::DecodableType data;
-        cmd = "EnhancedAddScene"; // "EnhancedAddScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["TransitionTime"] = to_json(data.transitionTime);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneName"] = to_json(data.sceneName);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["ExtensionFieldSets"] = to_json(data.extensionFieldSets);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::EnhancedViewScene::Id: {
-        Commands::EnhancedViewScene::DecodableType data;
-        cmd = "EnhancedViewScene"; // "EnhancedViewScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["GroupID"] = to_json(data.groupID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneID"] = to_json(data.sceneID);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    case Commands::CopyScene::Id: {
-        Commands::CopyScene::DecodableType data;
-        cmd = "CopyScene"; // "CopyScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-            try {
-                payload["Mode"] = to_json(data.mode);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["GroupIdentifierFrom"] = to_json(data.groupIdentifierFrom);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneIdentifierFrom"] = to_json(data.sceneIdentifierFrom);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["GroupIdentifierTo"] = to_json(data.groupIdentifierTo);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-            try {
-                payload["SceneIdentifierTo"] = to_json(data.sceneIdentifierTo);
-            } catch (std::exception& ex) {
-                sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
-            }
-        }
-    } break;
-    }
-
-    if (!cmd.empty()) {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
-        send_unify_mqtt_cmd(ctxt, cmd, payload);
-        sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
-    } else {
-        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    }
-    ctxt.SetCommandHandled();
-}
 // On/Off : 6
 void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1038,6 +805,18 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
             Invoke_UnboltDoor(ctxt, data);
         }
     } break;
+    case Commands::SetAliroReaderConfig::Id: {
+        Commands::SetAliroReaderConfig::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_SetAliroReaderConfig(ctxt, data);
+        }
+    } break;
+    case Commands::ClearAliroReaderConfig::Id: {
+        Commands::ClearAliroReaderConfig::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_ClearAliroReaderConfig(ctxt, data);
+        }
+    } break;
     }
 
     if (!cmd.empty()) {
@@ -1179,6 +958,48 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
         Commands::ClearWeeklySchedule::DecodableType data;
         cmd = "ClearWeeklySchedule"; // "ClearWeeklySchedule";
         if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+        }
+    } break;
+    case Commands::SetActiveScheduleRequest::Id: {
+        Commands::SetActiveScheduleRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_SetActiveScheduleRequest(ctxt, data);
+        }
+    } break;
+    case Commands::SetActivePresetRequest::Id: {
+        Commands::SetActivePresetRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_SetActivePresetRequest(ctxt, data);
+        }
+    } break;
+    case Commands::StartPresetsSchedulesEditRequest::Id: {
+        Commands::StartPresetsSchedulesEditRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_StartPresetsSchedulesEditRequest(ctxt, data);
+        }
+    } break;
+    case Commands::CancelPresetsSchedulesEditRequest::Id: {
+        Commands::CancelPresetsSchedulesEditRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_CancelPresetsSchedulesEditRequest(ctxt, data);
+        }
+    } break;
+    case Commands::CommitPresetsSchedulesRequest::Id: {
+        Commands::CommitPresetsSchedulesRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_CommitPresetsSchedulesRequest(ctxt, data);
+        }
+    } break;
+    case Commands::CancelSetActivePresetRequest::Id: {
+        Commands::CancelSetActivePresetRequest::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_CancelSetActivePresetRequest(ctxt, data);
+        }
+    } break;
+    case Commands::SetTemperatureSetpointHoldPolicy::Id: {
+        Commands::SetTemperatureSetpointHoldPolicy::DecodableType data;
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
+            Invoke_SetTemperatureSetpointHoldPolicy(ctxt, data);
         }
     } break;
     }

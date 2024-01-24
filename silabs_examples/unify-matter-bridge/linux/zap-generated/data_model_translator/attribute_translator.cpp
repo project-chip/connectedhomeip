@@ -312,245 +312,6 @@ void GroupsAttributeAccess::reported_updated(const bridged_endpoint* ep, const s
 }
 
 CHIP_ERROR
-ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
-{
-    namespace MN = chip::app::Clusters::Scenes::Attributes;
-    namespace UN = unify::matter_bridge::Scenes::Attributes;
-    if (aPath.mClusterId != Clusters::Scenes::Id) {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    // Do not handle Read for non-unify endpoints
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node) {
-        return CHIP_NO_ERROR;
-    }
-
-    ConcreteAttributePath atr_path = ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
-
-    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
-        return m_node_state_monitor.emulator().read_attribute(aPath, aEncoder);
-    }
-
-    try {
-        switch (aPath.mAttributeId) {
-        case MN::SceneCount::Id: { // type is int8u
-            MN::SceneCount::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::CurrentScene::Id: { // type is int8u
-            MN::CurrentScene::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::CurrentGroup::Id: { // type is group_id
-            MN::CurrentGroup::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::SceneValid::Id: { // type is boolean
-            MN::SceneValid::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::NameSupport::Id: { // type is NameSupportBitmap
-            MN::NameSupport::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::LastConfiguredBy::Id: { // type is node_id
-            MN::LastConfiguredBy::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::SceneTableSize::Id: { // type is int16u
-            MN::SceneTableSize::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::FeatureMap::Id: { // type is bitmap32
-            MN::FeatureMap::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        case MN::ClusterRevision::Id: { // type is int16u
-            MN::ClusterRevision::TypeInfo::Type value;
-            if (attribute_state_cache::get_instance().get(atr_path, value)) {
-                return aEncoder.Encode(value);
-            }
-            break;
-        }
-        }
-    } catch (const std::out_of_range& e) {
-        sl_log_info(LOG_TAG,
-            "The request attribute Path for endpoint [%i] is not found in the attribute state "
-            "container: %s\n",
-            atr_path.mEndpointId, e.what());
-        return CHIP_ERROR_NO_MESSAGE_HANDLER;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ScenesAttributeAccess::Write(const ConcreteDataAttributePath& aPath, AttributeValueDecoder& aDecoder)
-{
-    using namespace chip::app::Clusters::Scenes;
-
-    if (aPath.mClusterId != Clusters::Scenes::Id) {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    auto unify_node = m_node_state_monitor.bridged_endpoint(aPath.mEndpointId);
-
-    if (!unify_node) {
-        return CHIP_NO_ERROR;
-    }
-    nlohmann::json jsn;
-
-    if (m_node_state_monitor.emulator().is_attribute_emulated(aPath)) {
-        return m_node_state_monitor.emulator().write_attribute(aPath, aDecoder);
-    }
-
-    switch (aPath.mAttributeId) {
-        // SceneCount is not supported by UCL
-        // CurrentScene is not supported by UCL
-        // CurrentGroup is not supported by UCL
-        // SceneValid is not supported by UCL
-        // NameSupport is not supported by UCL
-        // LastConfiguredBy is not supported by UCL
-        // SceneTableSize is not supported by UCL
-        // FabricSceneInfo is not supported by UCL
-        // GeneratedCommandList is not supported by UCL
-        // AcceptedCommandList is not supported by UCL
-        // EventList is not supported by UCL
-        // AttributeList is not supported by UCL
-        // FeatureMap is not supported by UCL
-        // ClusterRevision is not supported by UCL
-    }
-
-    if (!jsn.empty()) {
-        std::string topic = "ucl/by-unid/" + unify_node->unify_unid + "/ep" + std::to_string(unify_node->unify_endpoint) + "/Scenes/Commands/WriteAttributes";
-        std::string payload_str = jsn.dump();
-        m_unify_mqtt.Publish(topic, payload_str, true);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_NO_MESSAGE_HANDLER;
-}
-
-void ScenesAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
-    const std::string& attribute, const nlohmann::json& unify_value)
-{
-    namespace MN = chip::app::Clusters::Scenes::Attributes;
-    namespace UN = unify::matter_bridge::Scenes::Attributes;
-
-    auto cluster_id = m_dev_translator.get_cluster_id(cluster);
-
-    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::Scenes::Id)) {
-        return;
-    }
-
-    // get attribute id
-    auto attribute_id = m_dev_translator.get_attribute_id(cluster, attribute);
-
-    if (!attribute_id.has_value()) {
-        return;
-    }
-
-    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
-    ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::Scenes::Id, attribute_id.value());
-    switch (attribute_id.value()) {
-    // type is int8u
-    case MN::SceneCount::Id: {
-        using T = MN::SceneCount::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "SceneCount attribute value is %s", unify_value.dump().c_str());
-            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneCount::Id);
-        }
-        break;
-    }
-        // type is int8u
-    case MN::CurrentScene::Id: {
-        using T = MN::CurrentScene::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "CurrentScene attribute value is %s", unify_value.dump().c_str());
-            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentScene::Id);
-        }
-        break;
-    }
-        // type is group_id
-    case MN::CurrentGroup::Id: {
-        using T = MN::CurrentGroup::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "CurrentGroup attribute value is %s", unify_value.dump().c_str());
-            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::CurrentGroup::Id);
-        }
-        break;
-    }
-        // type is boolean
-    case MN::SceneValid::Id: {
-        using T = MN::SceneValid::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "SceneValid attribute value is %s", unify_value.dump().c_str());
-            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::SceneValid::Id);
-        }
-        break;
-    }
-        // type is NameSupportBitmap
-    case MN::NameSupport::Id: {
-        using T = MN::NameSupport::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "NameSupport attribute value is %s", unify_value.dump().c_str());
-            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::NameSupport::Id);
-        }
-        break;
-    }
-        // type is node_id
-    case MN::LastConfiguredBy::Id: {
-        using T = MN::LastConfiguredBy::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
-
-        if (value.has_value()) {
-            sl_log_debug(LOG_TAG, "LastConfiguredBy attribute value is %s", unify_value.dump().c_str());
-            attribute_state_cache::get_instance().set<T>(attrpath, value.value());
-            MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::Scenes::Id, MN::LastConfiguredBy::Id);
-        }
-        break;
-    }
-    }
-}
-
-CHIP_ERROR
 OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValueEncoder& aEncoder)
 {
     namespace MN = chip::app::Clusters::OnOff::Attributes;
@@ -1485,6 +1246,55 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
             }
             break;
         }
+        case MN::AliroReaderVerificationKey::Id: { // type is octet_string
+            MN::AliroReaderVerificationKey::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::AliroReaderGroupIdentifier::Id: { // type is octet_string
+            MN::AliroReaderGroupIdentifier::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::AliroReaderGroupSubIdentifier::Id: { // type is octet_string
+            MN::AliroReaderGroupSubIdentifier::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::AliroGroupResolvingKey::Id: { // type is octet_string
+            MN::AliroGroupResolvingKey::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::AliroBLEAdvertisingVersion::Id: { // type is int8u
+            MN::AliroBLEAdvertisingVersion::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::NumberOfAliroCredentialIssuerKeysSupported::Id: { // type is int16u
+            MN::NumberOfAliroCredentialIssuerKeysSupported::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::NumberOfAliroEndpointKeysSupported::Id: { // type is int16u
+            MN::NumberOfAliroEndpointKeysSupported::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
@@ -1659,6 +1469,15 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
         jsn["RequirePINforRFOperation"] = to_json(value);
         break;
     }
+        // AliroReaderVerificationKey is not supported by UCL
+        // AliroReaderGroupIdentifier is not supported by UCL
+        // AliroReaderGroupSubIdentifier is not supported by UCL
+        // AliroExpeditedTransactionSupportedProtocolVersions is not supported by UCL
+        // AliroGroupResolvingKey is not supported by UCL
+        // AliroSupportedBLEUWBProtocolVersions is not supported by UCL
+        // AliroBLEAdvertisingVersion is not supported by UCL
+        // NumberOfAliroCredentialIssuerKeysSupported is not supported by UCL
+        // NumberOfAliroEndpointKeysSupported is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
         // EventList is not supported by UCL
@@ -2808,6 +2627,69 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
+        case MN::NumberOfPresets::Id: { // type is int8u
+            MN::NumberOfPresets::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::NumberOfSchedules::Id: { // type is int8u
+            MN::NumberOfSchedules::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::NumberOfScheduleTransitions::Id: { // type is int8u
+            MN::NumberOfScheduleTransitions::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::NumberOfScheduleTransitionPerDay::Id: { // type is int8u
+            MN::NumberOfScheduleTransitionPerDay::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::ActivePresetHandle::Id: { // type is octet_string
+            MN::ActivePresetHandle::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::ActiveScheduleHandle::Id: { // type is octet_string
+            MN::ActiveScheduleHandle::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::PresetsSchedulesEditable::Id: { // type is boolean
+            MN::PresetsSchedulesEditable::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::TemperatureSetpointHoldPolicy::Id: { // type is TemperatureSetpointHoldPolicyBitmap
+            MN::TemperatureSetpointHoldPolicy::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
+        case MN::SetpointHoldExpiryTimestamp::Id: { // type is epoch_s
+            MN::SetpointHoldExpiryTimestamp::TypeInfo::Type value;
+            if (attribute_state_cache::get_instance().get(atr_path, value)) {
+                return aEncoder.Encode(value);
+            }
+            break;
+        }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
@@ -3063,6 +2945,18 @@ CHIP_ERROR ThermostatAttributeAccess::Write(const ConcreteDataAttributePath& aPa
         jsn["ACCapacityFormat"] = to_json(value);
         break;
     }
+        // PresetTypes is not supported by UCL
+        // ScheduleTypes is not supported by UCL
+        // NumberOfPresets is not supported by UCL
+        // NumberOfSchedules is not supported by UCL
+        // NumberOfScheduleTransitions is not supported by UCL
+        // NumberOfScheduleTransitionPerDay is not supported by UCL
+        // ActivePresetHandle is not supported by UCL
+        // ActiveScheduleHandle is not supported by UCL
+        // PresetsSchedulesEditable is not supported by UCL
+        // TemperatureSetpointHoldPolicy is not supported by UCL
+        // SetpointHoldExpiryTimestamp is not supported by UCL
+        // QueuedPreset is not supported by UCL
         // GeneratedCommandList is not supported by UCL
         // AcceptedCommandList is not supported by UCL
         // EventList is not supported by UCL

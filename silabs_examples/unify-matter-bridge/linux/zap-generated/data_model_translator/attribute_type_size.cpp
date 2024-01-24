@@ -182,20 +182,6 @@ constexpr uint8_t ZCL_GROUPS_FEATURE_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBU
 constexpr uint8_t ZCL_GROUPS_NAME_SUPPORT_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_GROUPS_NAME_SUPPORT_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 
-constexpr uint8_t ZCL_COPY_MODE_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
-constexpr uint8_t ZCL_COPY_MODE_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
-constexpr uint8_t ZCL_SCENES_FEATURE_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
-constexpr uint8_t ZCL_SCENES_FEATURE_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
-constexpr uint8_t ZCL_SCENES_NAME_SUPPORT_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
-constexpr uint8_t ZCL_SCENES_NAME_SUPPORT_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
-
-constexpr uint8_t ZCL_ATTRIBUTE_VALUE_PAIR_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
-constexpr uint8_t ZCL_ATTRIBUTE_VALUE_PAIR_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
-constexpr uint8_t ZCL_EXTENSION_FIELD_SET_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
-constexpr uint8_t ZCL_EXTENSION_FIELD_SET_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
-constexpr uint8_t ZCL_SCENE_INFO_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
-constexpr uint8_t ZCL_SCENE_INFO_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
-
 constexpr uint8_t ZCL_ON_OFF_FEATURE_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_ON_OFF_FEATURE_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_ON_OFF_CONTROL_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
@@ -306,6 +292,8 @@ constexpr uint8_t ZCL_THERMOSTAT_FEATURE_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUT
 constexpr uint8_t ZCL_THERMOSTAT_FEATURE_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_HVAC_SYSTEM_TYPE_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_HVAC_SYSTEM_TYPE_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_PRESET_TYPE_FEATURES_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_PRESET_TYPE_FEATURES_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_PROGRAMMING_OPERATION_MODE_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_PROGRAMMING_OPERATION_MODE_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_RELAY_STATE_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
@@ -316,6 +304,10 @@ constexpr uint8_t ZCL_SCHEDULE_DAY_OF_WEEK_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32
 constexpr uint8_t ZCL_SCHEDULE_DAY_OF_WEEK_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_SCHEDULE_MODE_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_SCHEDULE_MODE_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_SCHEDULE_TYPE_FEATURES_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_SCHEDULE_TYPE_FEATURES_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_TEMPERATURE_SETPOINT_HOLD_POLICY_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_TEMPERATURE_SETPOINT_HOLD_POLICY_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 
 constexpr uint8_t ZCL_AC_CAPACITY_FORMAT_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_AC_CAPACITY_FORMAT_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
@@ -329,6 +321,8 @@ constexpr uint8_t ZCL_AC_TYPE_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_AC_TYPE_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_CONTROL_SEQUENCE_OF_OPERATION_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_CONTROL_SEQUENCE_OF_OPERATION_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_PRESET_SCENARIO_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_PRESET_SCENARIO_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_SETPOINT_CHANGE_SOURCE_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_SETPOINT_CHANGE_SOURCE_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_SETPOINT_RAISE_LOWER_MODE_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
@@ -342,6 +336,18 @@ constexpr uint8_t ZCL_TEMPERATURE_SETPOINT_HOLD_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_
 constexpr uint8_t ZCL_THERMOSTAT_RUNNING_MODE_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_THERMOSTAT_RUNNING_MODE_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
 
+constexpr uint8_t ZCL_SCHEDULE_TRANSITION_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_SCHEDULE_TRANSITION_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_SCHEDULE_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_SCHEDULE_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_PRESET_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_PRESET_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_PRESET_TYPE_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_PRESET_TYPE_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_QUEUED_PRESET_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_QUEUED_PRESET_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_SCHEDULE_TYPE_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_SCHEDULE_TYPE_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
 constexpr uint8_t ZCL_WEEKLY_SCHEDULE_TRANSITION_STRUCT_ATTRIBUTE_TYPES = ZCL_STRUCT_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_WEEKLY_SCHEDULE_TRANSITION_STRUCT_ATTRIBUTE_TYPES_SIZE = ZCL_STRUCT_ATTRIBUTE_TYPES_SIZE;
 
@@ -460,54 +466,6 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
         }
         case Groups::Attributes::ClusterRevision::Id: {
-            return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
-        }
-        default:
-            return { ZCL_BOOLEAN_ATTRIBUTE_TYPES, 0x01 };
-        }
-    }
-    case chip::app::Clusters::Scenes::Id: {
-        switch (attribute_id) {
-        case Scenes::Attributes::SceneCount::Id: {
-            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::CurrentScene::Id: {
-            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::CurrentGroup::Id: {
-            return { ZCL_GROUP_ID_ATTRIBUTE_TYPES, ZCL_GROUP_ID_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::SceneValid::Id: {
-            return { ZCL_BOOLEAN_ATTRIBUTE_TYPES, ZCL_BOOLEAN_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::NameSupport::Id: {
-            return { ZCL_SCENES_NAME_SUPPORT_BITMAP_ATTRIBUTE_TYPES, ZCL_SCENES_NAME_SUPPORT_BITMAP_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::LastConfiguredBy::Id: {
-            return { ZCL_NODE_ID_ATTRIBUTE_TYPES, ZCL_NODE_ID_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::SceneTableSize::Id: {
-            return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::FabricSceneInfo::Id: {
-            return { ZCL_SCENE_INFO_STRUCT_ATTRIBUTE_TYPES, ZCL_SCENE_INFO_STRUCT_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::EventList::Id: {
-            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::AttributeList::Id: {
-            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::FeatureMap::Id: {
-            return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
-        }
-        case Scenes::Attributes::ClusterRevision::Id: {
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         default:
@@ -728,6 +686,33 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_BOOLEAN_ATTRIBUTE_TYPES, ZCL_BOOLEAN_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::ExpiringUserTimeout::Id: {
+            return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroReaderVerificationKey::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroReaderGroupIdentifier::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroReaderGroupSubIdentifier::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroGroupResolvingKey::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::AliroBLEAdvertisingVersion::Id: {
+            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
+            return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case DoorLock::Attributes::NumberOfAliroEndpointKeysSupported::Id: {
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::GeneratedCommandList::Id: {
@@ -956,6 +941,49 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
         }
         case Thermostat::Attributes::ACCapacityformat::Id: {
             return { ZCL_AC_CAPACITY_FORMAT_ENUM_ATTRIBUTE_TYPES, ZCL_AC_CAPACITY_FORMAT_ENUM_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::PresetTypes::Id: {
+            return { ZCL_PRESET_TYPE_STRUCT_ATTRIBUTE_TYPES, ZCL_PRESET_TYPE_STRUCT_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::ScheduleTypes::Id: {
+            return { ZCL_SCHEDULE_TYPE_STRUCT_ATTRIBUTE_TYPES, ZCL_SCHEDULE_TYPE_STRUCT_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::NumberOfPresets::Id: {
+            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::NumberOfSchedules::Id: {
+            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::NumberOfScheduleTransitions::Id: {
+            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::NumberOfScheduleTransitionPerDay::Id: {
+            return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::ActivePresetHandle::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::ActiveScheduleHandle::Id: {
+            return { ZCL_OCTET_STRING_ATTRIBUTE_TYPES, ZCL_OCTET_STRING_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::Presets::Id: {
+            return { ZCL_PRESET_STRUCT_ATTRIBUTE_TYPES, ZCL_PRESET_STRUCT_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::Schedules::Id: {
+            return { ZCL_SCHEDULE_STRUCT_ATTRIBUTE_TYPES, ZCL_SCHEDULE_STRUCT_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::PresetsSchedulesEditable::Id: {
+            return { ZCL_BOOLEAN_ATTRIBUTE_TYPES, ZCL_BOOLEAN_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::TemperatureSetpointHoldPolicy::Id: {
+            return { ZCL_TEMPERATURE_SETPOINT_HOLD_POLICY_BITMAP_ATTRIBUTE_TYPES,
+                ZCL_TEMPERATURE_SETPOINT_HOLD_POLICY_BITMAP_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id: {
+            return { ZCL_EPOCH_S_ATTRIBUTE_TYPES, ZCL_EPOCH_S_ATTRIBUTE_TYPES_SIZE };
+        }
+        case Thermostat::Attributes::QueuedPreset::Id: {
+            return { ZCL_QUEUED_PRESET_STRUCT_ATTRIBUTE_TYPES, ZCL_QUEUED_PRESET_STRUCT_ATTRIBUTE_TYPES_SIZE };
         }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };

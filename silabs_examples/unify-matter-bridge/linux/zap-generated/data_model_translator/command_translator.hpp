@@ -84,39 +84,6 @@ public:
         return CHIP_NO_ERROR;
     }
 };
-class ScenesClusterCommandHandler : public command_translator_interface {
-public:
-    ScenesClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
-        : command_translator_interface(node_state_monitor, chip::app::Clusters::Scenes::Id, "Scenes", unify_mqtt, group_translator_m)
-    {
-    }
-    void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
-
-    virtual CHIP_ERROR EnumerateAcceptedCommands(const chip::app::ConcreteClusterPath& cluster, CommandIdCallback callback,
-        void* context) override
-    {
-        const chip::CommandId all_commands[] = {
-            0,
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            64,
-            65,
-            66,
-        };
-        for (const auto& cmd : all_commands) {
-            if (callback(cmd, context) != chip::Loop::Continue) {
-                break;
-            }
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
 class OnOffClusterCommandHandler : public command_translator_interface {
 public:
     OnOffClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
@@ -252,6 +219,24 @@ public:
         ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
         ctxt.SetCommandHandled();
     };
+    ///
+    /// The command SetAliroReaderConfig is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_SetAliroReaderConfig(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command ClearAliroReaderConfig is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_ClearAliroReaderConfig(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
 
     virtual CHIP_ERROR EnumerateAcceptedCommands(const chip::app::ConcreteClusterPath& cluster, CommandIdCallback callback,
         void* context) override
@@ -276,6 +261,8 @@ public:
             36,
             38,
             39,
+            40,
+            41,
         };
         for (const auto& cmd : all_commands) {
             if (callback(cmd, context) != chip::Loop::Continue) {
@@ -322,6 +309,77 @@ public:
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
 
+    ///
+    /// The command SetActiveScheduleRequest is not defined in UCL and must be manually handled
+    ///
+    virtual void
+    Invoke_SetActiveScheduleRequest(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command SetActivePresetRequest is not defined in UCL and must be manually handled
+    ///
+    virtual void
+    Invoke_SetActivePresetRequest(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command StartPresetsSchedulesEditRequest is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_StartPresetsSchedulesEditRequest(
+        CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::StartPresetsSchedulesEditRequest::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command CancelPresetsSchedulesEditRequest is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_CancelPresetsSchedulesEditRequest(
+        CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::CancelPresetsSchedulesEditRequest::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command CommitPresetsSchedulesRequest is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_CommitPresetsSchedulesRequest(
+        CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::CommitPresetsSchedulesRequest::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command CancelSetActivePresetRequest is not defined in UCL and must be manually handled
+    ///
+    virtual void
+    Invoke_CancelSetActivePresetRequest(CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::CancelSetActivePresetRequest::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+    ///
+    /// The command SetTemperatureSetpointHoldPolicy is not defined in UCL and must be manually handled
+    ///
+    virtual void Invoke_SetTemperatureSetpointHoldPolicy(
+        CommandHandlerInterface::HandlerContext& ctxt,
+        chip::app::Clusters::Thermostat::Commands::SetTemperatureSetpointHoldPolicy::DecodableType data)
+    {
+        ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, chip::Protocols::InteractionModel::Status::UnsupportedCommand);
+        ctxt.SetCommandHandled();
+    };
+
     virtual CHIP_ERROR EnumerateAcceptedCommands(const chip::app::ConcreteClusterPath& cluster, CommandIdCallback callback,
         void* context) override
     {
@@ -330,6 +388,13 @@ public:
             1,
             2,
             3,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
         };
         for (const auto& cmd : all_commands) {
             if (callback(cmd, context) != chip::Loop::Continue) {

@@ -126,36 +126,6 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Groups::N
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::CopyModeBitmap>& value)
-{
-    using namespace chip::app::Clusters::Scenes;
-    nlohmann::json obj;
-    obj["CopyAllScenes"] = static_cast<bool>(value.GetField(CopyModeBitmap::kCopyAllScenes));
-    return obj;
-}
-template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::Feature>& value)
-{
-    using namespace chip::app::Clusters::Scenes;
-    nlohmann::json obj;
-    obj["SceneNames"] = static_cast<bool>(value.GetField(Feature::kSceneNames));
-    obj["Explicit"] = static_cast<bool>(value.GetField(Feature::kExplicit));
-    obj["TableSize"] = static_cast<bool>(value.GetField(Feature::kTableSize));
-    obj["FabricScenes"] = static_cast<bool>(value.GetField(Feature::kFabricScenes));
-    return obj;
-}
-template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap>& value)
-{
-    using namespace chip::app::Clusters::Scenes;
-    nlohmann::json obj;
-    obj["SceneNames"] = static_cast<bool>(value.GetField(NameSupportBitmap::kSceneNames));
-    return obj;
-}
-
-/***************************** Bitmap Converter FIXME**************/
-
-template <>
 nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::Feature>& value)
 {
     using namespace chip::app::Clusters::OnOff;
@@ -477,6 +447,8 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
     obj["Year Day Access Schedules"] = static_cast<bool>(value.GetField(Feature::kYearDayAccessSchedules));
     obj["Holiday Schedules"] = static_cast<bool>(value.GetField(Feature::kHolidaySchedules));
     obj["Unbolt"] = static_cast<bool>(value.GetField(Feature::kUnbolt));
+    obj["AliroProvisioning"] = static_cast<bool>(value.GetField(Feature::kAliroProvisioning));
+    obj["AliroBLEUWB"] = static_cast<bool>(value.GetField(Feature::kAliroBLEUWB));
     return obj;
 }
 
@@ -537,6 +509,12 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::CredentialTyp
         return "FingerVein";
     case CredentialTypeEnum::kFace:
         return "Face";
+    case CredentialTypeEnum::kAliroCredentialIssuerKey:
+        return "AliroCredentialIssuerKey";
+    case CredentialTypeEnum::kAliroEvictableEndpointKey:
+        return "AliroEvictableEndpointKey";
+    case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        return "AliroNonEvictableEndpointKey";
     default:
         return "{}";
     }
@@ -794,6 +772,12 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::LockDataTypeE
         return "FingerVein";
     case LockDataTypeEnum::kFace:
         return "Face";
+    case LockDataTypeEnum::kAliroCredentialIssuerKey:
+        return "AliroCredentialIssuerKey";
+    case LockDataTypeEnum::kAliroEvictableEndpointKey:
+        return "AliroEvictableEndpointKey";
+    case LockDataTypeEnum::kAliroNonEvictableEndpointKey:
+        return "AliroNonEvictableEndpointKey";
     default:
         return "{}";
     }
@@ -880,6 +864,8 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::OperationSour
         return "RFID";
     case OperationSourceEnum::kBiometric:
         return "Biometric";
+    case OperationSourceEnum::kAliro:
+        return "Aliro";
     default:
         return "{}";
     }
@@ -976,6 +962,10 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
     obj["Setback"] = static_cast<bool>(value.GetField(Feature::kSetback));
     obj["AutoMode"] = static_cast<bool>(value.GetField(Feature::kAutoMode));
     obj["LocalTemperatureNotExposed"] = static_cast<bool>(value.GetField(Feature::kLocalTemperatureNotExposed));
+    obj["MatterScheduleConfiguration"] = static_cast<bool>(value.GetField(Feature::kMatterScheduleConfiguration));
+    obj["Presets"] = static_cast<bool>(value.GetField(Feature::kPresets));
+    obj["Setpoints"] = static_cast<bool>(value.GetField(Feature::kSetpoints));
+    obj["QueuedPresetsSupported"] = static_cast<bool>(value.GetField(Feature::kQueuedPresetsSupported));
     return obj;
 }
 template <>
@@ -987,6 +977,15 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
     obj["HeatingStage"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kHeatingStage));
     obj["HeatingIsHeatPump"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kHeatingIsHeatPump));
     obj["HeatingUsesFuel"] = static_cast<bool>(value.GetField(HVACSystemTypeBitmap::kHeatingUsesFuel));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::PresetTypeFeaturesBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["Automatic"] = static_cast<bool>(value.GetField(PresetTypeFeaturesBitmap::kAutomatic));
+    obj["SupportsNames"] = static_cast<bool>(value.GetField(PresetTypeFeaturesBitmap::kSupportsNames));
     return obj;
 }
 template <>
@@ -1045,6 +1044,26 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
     nlohmann::json obj;
     obj["HeatSetpointPresent"] = static_cast<bool>(value.GetField(ScheduleModeBitmap::kHeatSetpointPresent));
     obj["CoolSetpointPresent"] = static_cast<bool>(value.GetField(ScheduleModeBitmap::kCoolSetpointPresent));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::ScheduleTypeFeaturesBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["SupportsPresets"] = static_cast<bool>(value.GetField(ScheduleTypeFeaturesBitmap::kSupportsPresets));
+    obj["SupportsSetpoints"] = static_cast<bool>(value.GetField(ScheduleTypeFeaturesBitmap::kSupportsSetpoints));
+    obj["SupportsNames"] = static_cast<bool>(value.GetField(ScheduleTypeFeaturesBitmap::kSupportsNames));
+    obj["SupportsOff"] = static_cast<bool>(value.GetField(ScheduleTypeFeaturesBitmap::kSupportsOff));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap>& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    nlohmann::json obj;
+    obj["HoldDurationElapsed"] = static_cast<bool>(value.GetField(TemperatureSetpointHoldPolicyBitmap::kHoldDurationElapsed));
+    obj["HoldDurationElapsedOrPresetChanged"] = static_cast<bool>(value.GetField(TemperatureSetpointHoldPolicyBitmap::kHoldDurationElapsedOrPresetChanged));
     return obj;
 }
 
@@ -1148,6 +1167,29 @@ nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::ControlSequ
         return "CoolingAndHeating4Pipes";
     case ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat:
         return "CoolingAndHeating4PipesWithReheat";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::Thermostat::PresetScenarioEnum& value)
+{
+    using namespace chip::app::Clusters::Thermostat;
+    switch (value) {
+    case PresetScenarioEnum::kUnspecified:
+        return "Unspecified";
+    case PresetScenarioEnum::kOccupied:
+        return "Occupied";
+    case PresetScenarioEnum::kUnoccupied:
+        return "Unoccupied";
+    case PresetScenarioEnum::kSleep:
+        return "Sleep";
+    case PresetScenarioEnum::kWake:
+        return "Wake";
+    case PresetScenarioEnum::kVacation:
+        return "Vacation";
+    case PresetScenarioEnum::kUserDefined:
+        return "UserDefined";
     default:
         return "{}";
     }

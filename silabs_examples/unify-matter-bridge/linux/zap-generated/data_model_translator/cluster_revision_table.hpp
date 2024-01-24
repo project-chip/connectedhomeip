@@ -14,7 +14,6 @@
 const std::map<int, int> zap_cluster_revisions = {
     { 3, 4 },
     { 4, 4 },
-    { 5, 5 },
     { 6, 6 },
     {
         7,
@@ -166,6 +165,7 @@ const std::map<int, int> zap_cluster_revisions = {
     },
     { 96, 1 },
     { 97, 1 },
+    { 98, 5 },
     {
         113,
         0,
@@ -178,12 +178,14 @@ const std::map<int, int> zap_cluster_revisions = {
     { 129, 1 },
     { 145, 1 },
     { 150, 4 },
-    { 152, 2 },
+    { 152, 3 },
     { 153, 2 },
     {
         155,
         0,
     },
+    { 157, 1 },
+    { 159, 1 },
     { 257, 7 },
     { 258, 5 },
     {

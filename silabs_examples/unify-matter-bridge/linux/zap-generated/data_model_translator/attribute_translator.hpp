@@ -94,42 +94,6 @@ private:
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
-/// Attribute Handler for the Scenes cluster
-/// Please note that the following attributes are not defined in UCL, and they must be handled
-/// by separate code
-/// - SceneTableSize
-/// - FabricSceneInfo
-/// - GeneratedCommandList
-/// - AcceptedCommandList
-/// - EventList
-/// - AttributeList
-/// - FeatureMap
-/// - ClusterRevision
-///
-class ScenesAttributeAccess : public attribute_translator_interface {
-public:
-    ScenesAttributeAccess(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        device_translator& dev_translator)
-        : attribute_translator_interface(node_state_monitor, unify_mqtt, dev_translator, chip::app::Clusters::Scenes::Id,
-              "attr_translator_Scenes")
-        , m_unify_mqtt(unify_mqtt)
-        , m_dev_translator(dev_translator)
-    {
-    }
-
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath& aPath, chip::app::AttributeValueEncoder& aEncoder) override;
-    CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath& aPath, chip::app::AttributeValueDecoder& aDecoder) override;
-
-private:
-    void reported_updated(const bridged_endpoint* ep, const std::string& cluster, const std::string& attribute,
-        const nlohmann::json& unify_value) override;
-
-    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>({ "Scenes" }); }
-    UnifyMqtt& m_unify_mqtt;
-    device_translator& m_dev_translator;
-};
-
-/////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the On/Off cluster
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
@@ -252,6 +216,7 @@ private:
 // Skipping Microwave Oven Control
 // Skipping Operational State
 // Skipping RVC Operational State
+// Skipping Scenes Management
 // Skipping HEPA Filter Monitoring
 // Skipping Activated Carbon Filter Monitoring
 // Skipping Boolean State Configuration
@@ -261,6 +226,8 @@ private:
 // Skipping Device Energy Management
 // Skipping Energy EVSE
 // Skipping Energy Preference
+// Skipping Energy EVSE Mode
+// Skipping Device Energy Management Mode
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /// Attribute Handler for the Door Lock cluster
@@ -270,6 +237,15 @@ private:
 /// - NumberOfCredentialsSupportedPerUser (optional)
 /// - LocalProgrammingFeatures (optional)
 /// - ExpiringUserTimeout (optional)
+/// - AliroReaderVerificationKey (optional)
+/// - AliroReaderGroupIdentifier (optional)
+/// - AliroReaderGroupSubIdentifier (optional)
+/// - AliroExpeditedTransactionSupportedProtocolVersions (optional)
+/// - AliroGroupResolvingKey (optional)
+/// - AliroSupportedBLEUWBProtocolVersions (optional)
+/// - AliroBLEAdvertisingVersion (optional)
+/// - NumberOfAliroCredentialIssuerKeysSupported (optional)
+/// - NumberOfAliroEndpointKeysSupported (optional)
 /// - GeneratedCommandList
 /// - AcceptedCommandList
 /// - EventList
@@ -340,6 +316,20 @@ private:
 /// Attribute Handler for the Thermostat cluster
 /// Please note that the following attributes are not defined in UCL, and they must be handled
 /// by separate code
+/// - PresetTypes (optional)
+/// - ScheduleTypes (optional)
+/// - NumberOfPresets (optional)
+/// - NumberOfSchedules (optional)
+/// - NumberOfScheduleTransitions (optional)
+/// - NumberOfScheduleTransitionPerDay (optional)
+/// - ActivePresetHandle (optional)
+/// - ActiveScheduleHandle (optional)
+/// - Presets (optional)
+/// - Schedules (optional)
+/// - PresetsSchedulesEditable (optional)
+/// - TemperatureSetpointHoldPolicy (optional)
+/// - SetpointHoldExpiryTimestamp (optional)
+/// - QueuedPreset (optional)
 /// - GeneratedCommandList
 /// - AcceptedCommandList
 /// - EventList

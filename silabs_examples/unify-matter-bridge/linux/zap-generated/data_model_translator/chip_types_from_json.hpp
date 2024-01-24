@@ -111,32 +111,6 @@ inline std::optional<chip::BitMask<Groups::NameSupportBitmap>> from_json(const n
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<Scenes::CopyModeBitmap>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<Scenes::CopyModeBitmap> r;
-    r.SetField(Scenes::CopyModeBitmap::kCopyAllScenes, obj.value("CopyAllScenes", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<Scenes::Feature>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<Scenes::Feature> r;
-    r.SetField(Scenes::Feature::kSceneNames, obj.value("SceneNames", false));
-    r.SetField(Scenes::Feature::kExplicit, obj.value("Explicit", false));
-    r.SetField(Scenes::Feature::kTableSize, obj.value("TableSize", false));
-    r.SetField(Scenes::Feature::kFabricScenes, obj.value("FabricScenes", false));
-    return r;
-}
-template <>
-inline std::optional<chip::BitMask<Scenes::NameSupportBitmap>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<Scenes::NameSupportBitmap> r;
-    r.SetField(Scenes::NameSupportBitmap::kSceneNames, obj.value("SceneNames", false));
-    return r;
-}
-
-/***************************** Bitmap Converters **************/
-template <>
 inline std::optional<chip::BitMask<OnOff::Feature>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<OnOff::Feature> r;
@@ -454,6 +428,8 @@ inline std::optional<chip::BitMask<DoorLock::Feature>> from_json(const nlohmann:
     r.SetField(DoorLock::Feature::kYearDayAccessSchedules, obj.value("Year Day Access Schedules", false));
     r.SetField(DoorLock::Feature::kHolidaySchedules, obj.value("Holiday Schedules", false));
     r.SetField(DoorLock::Feature::kUnbolt, obj.value("Unbolt", false));
+    r.SetField(DoorLock::Feature::kAliroProvisioning, obj.value("AliroProvisioning", false));
+    r.SetField(DoorLock::Feature::kAliroBLEUWB, obj.value("AliroBLEUWB", false));
     return r;
 }
 
@@ -504,6 +480,9 @@ inline std::optional<DoorLock::CredentialTypeEnum> from_json(const nlohmann::jso
         { "Fingerprint", DoorLock::CredentialTypeEnum::kFingerprint },
         { "FingerVein", DoorLock::CredentialTypeEnum::kFingerVein },
         { "Face", DoorLock::CredentialTypeEnum::kFace },
+        { "AliroCredentialIssuerKey", DoorLock::CredentialTypeEnum::kAliroCredentialIssuerKey },
+        { "AliroEvictableEndpointKey", DoorLock::CredentialTypeEnum::kAliroEvictableEndpointKey },
+        { "AliroNonEvictableEndpointKey", DoorLock::CredentialTypeEnum::kAliroNonEvictableEndpointKey },
     };
 
     auto i = table.find(value);
@@ -726,6 +705,9 @@ inline std::optional<DoorLock::LockDataTypeEnum> from_json(const nlohmann::json&
         { "Fingerprint", DoorLock::LockDataTypeEnum::kFingerprint },
         { "FingerVein", DoorLock::LockDataTypeEnum::kFingerVein },
         { "Face", DoorLock::LockDataTypeEnum::kFace },
+        { "AliroCredentialIssuerKey", DoorLock::LockDataTypeEnum::kAliroCredentialIssuerKey },
+        { "AliroEvictableEndpointKey", DoorLock::LockDataTypeEnum::kAliroEvictableEndpointKey },
+        { "AliroNonEvictableEndpointKey", DoorLock::LockDataTypeEnum::kAliroNonEvictableEndpointKey },
     };
 
     auto i = table.find(value);
@@ -803,6 +785,7 @@ inline std::optional<DoorLock::OperationSourceEnum> from_json(const nlohmann::js
         { "Remote", DoorLock::OperationSourceEnum::kRemote },
         { "RFID", DoorLock::OperationSourceEnum::kRfid },
         { "Biometric", DoorLock::OperationSourceEnum::kBiometric },
+        { "Aliro", DoorLock::OperationSourceEnum::kAliro },
     };
 
     auto i = table.find(value);
@@ -893,6 +876,10 @@ inline std::optional<chip::BitMask<Thermostat::Feature>> from_json(const nlohman
     r.SetField(Thermostat::Feature::kSetback, obj.value("Setback", false));
     r.SetField(Thermostat::Feature::kAutoMode, obj.value("AutoMode", false));
     r.SetField(Thermostat::Feature::kLocalTemperatureNotExposed, obj.value("LocalTemperatureNotExposed", false));
+    r.SetField(Thermostat::Feature::kMatterScheduleConfiguration, obj.value("MatterScheduleConfiguration", false));
+    r.SetField(Thermostat::Feature::kPresets, obj.value("Presets", false));
+    r.SetField(Thermostat::Feature::kSetpoints, obj.value("Setpoints", false));
+    r.SetField(Thermostat::Feature::kQueuedPresetsSupported, obj.value("QueuedPresetsSupported", false));
     return r;
 }
 template <>
@@ -903,6 +890,14 @@ inline std::optional<chip::BitMask<Thermostat::HVACSystemTypeBitmap>> from_json(
     r.SetField(Thermostat::HVACSystemTypeBitmap::kHeatingStage, obj.value("HeatingStage", false));
     r.SetField(Thermostat::HVACSystemTypeBitmap::kHeatingIsHeatPump, obj.value("HeatingIsHeatPump", false));
     r.SetField(Thermostat::HVACSystemTypeBitmap::kHeatingUsesFuel, obj.value("HeatingUsesFuel", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::PresetTypeFeaturesBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::PresetTypeFeaturesBitmap> r;
+    r.SetField(Thermostat::PresetTypeFeaturesBitmap::kAutomatic, obj.value("Automatic", false));
+    r.SetField(Thermostat::PresetTypeFeaturesBitmap::kSupportsNames, obj.value("SupportsNames", false));
     return r;
 }
 template <>
@@ -956,6 +951,25 @@ inline std::optional<chip::BitMask<Thermostat::ScheduleModeBitmap>> from_json(co
     chip::BitMask<Thermostat::ScheduleModeBitmap> r;
     r.SetField(Thermostat::ScheduleModeBitmap::kHeatSetpointPresent, obj.value("HeatSetpointPresent", false));
     r.SetField(Thermostat::ScheduleModeBitmap::kCoolSetpointPresent, obj.value("CoolSetpointPresent", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::ScheduleTypeFeaturesBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::ScheduleTypeFeaturesBitmap> r;
+    r.SetField(Thermostat::ScheduleTypeFeaturesBitmap::kSupportsPresets, obj.value("SupportsPresets", false));
+    r.SetField(Thermostat::ScheduleTypeFeaturesBitmap::kSupportsSetpoints, obj.value("SupportsSetpoints", false));
+    r.SetField(Thermostat::ScheduleTypeFeaturesBitmap::kSupportsNames, obj.value("SupportsNames", false));
+    r.SetField(Thermostat::ScheduleTypeFeaturesBitmap::kSupportsOff, obj.value("SupportsOff", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Thermostat::TemperatureSetpointHoldPolicyBitmap>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Thermostat::TemperatureSetpointHoldPolicyBitmap> r;
+    r.SetField(Thermostat::TemperatureSetpointHoldPolicyBitmap::kHoldDurationElapsed, obj.value("HoldDurationElapsed", false));
+    r.SetField(Thermostat::TemperatureSetpointHoldPolicyBitmap::kHoldDurationElapsedOrPresetChanged,
+        obj.value("HoldDurationElapsedOrPresetChanged", false));
     return r;
 }
 
@@ -1053,6 +1067,26 @@ inline std::optional<Thermostat::ControlSequenceOfOperationEnum> from_json(const
         { "HeatingWithReheat", Thermostat::ControlSequenceOfOperationEnum::kHeatingWithReheat },
         { "CoolingAndHeating4Pipes", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeating },
         { "CoolingAndHeating4PipesWithReheat", Thermostat::ControlSequenceOfOperationEnum::kCoolingAndHeatingWithReheat },
+    };
+
+    auto i = table.find(value);
+    if (i != table.end()) {
+        return i->second;
+    } else {
+        return std::nullopt;
+    }
+}
+template <>
+inline std::optional<Thermostat::PresetScenarioEnum> from_json(const nlohmann::json& value)
+{
+    const std::map<std::string, Thermostat::PresetScenarioEnum> table = {
+        { "Unspecified", Thermostat::PresetScenarioEnum::kUnspecified },
+        { "Occupied", Thermostat::PresetScenarioEnum::kOccupied },
+        { "Unoccupied", Thermostat::PresetScenarioEnum::kUnoccupied },
+        { "Sleep", Thermostat::PresetScenarioEnum::kSleep },
+        { "Wake", Thermostat::PresetScenarioEnum::kWake },
+        { "Vacation", Thermostat::PresetScenarioEnum::kVacation },
+        { "UserDefined", Thermostat::PresetScenarioEnum::kUserDefined },
     };
 
     auto i = table.find(value);
