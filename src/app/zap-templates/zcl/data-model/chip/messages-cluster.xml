@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (c) 2021 Project CHIP Authors
+Copyright (c) 2024 Project CHIP Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,84 +19,71 @@ limitations under the License.
 
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0097"/>
-    <field name="Confirmation" mask="0x1"/>
+    <field name="ReceivedConfirmation" mask="0x1"/>
     <field name="ConfirmationResponse" mask="0x2"/>
-    <field name="ConfirmationReply" mask="0x4"/>
-    <field name="ProtectedMessages" mask="0x8"/>
+    <field name="ConfirmationReply" mask="0x3"/>
+    <field name="ProtectedMessages" mask="0x4"/>
   </bitmap>
 
-  <enum name="MessagePriorityEnum" type="enum8">
+  <bitmap name="MessageControlBitmap" type="bitmap32">
     <cluster code="0x0097"/>
-    <item name="Low" value="0x0"/>
-    <item name="Medium" value="0x1"/>
-    <item name="High" value="0x2"/>
-    <item name="Critical" value="0x3"/>
-  </enum>
+    <field name="ConfirmationRequired" mask="0x1"/>
+    <field name="ResponseRequired" mask="0x2"/>
+    <field name="ReplyMessage" mask="0x3"/>
+    <field name="MessageConfirmed" mask="0x4"/>
+    <field name="MessageProtected" mask="0x5"/>
+  </bitmap>
 
   <enum name="FutureMessagePreferenceEnum" type="enum8">
     <cluster code="0x0097"/>
-    <item name="Allowed" value="0x0"/>
-    <item name="Increased" value="0x1"/>
-    <item name="Reduced" value="0x2"/>
-    <item name="Disallowed" value="0x3"/>
-    <item name="Banned" value="0x4"/>
+    <item value="0x00" name="Allowed"/>
+    <item value="0x01" name="Increased" />
+    <item value="0x02" name="Reduced"/>
+    <item value="0x03" name="Disallowed"/>
+    <item value="0x04" name="Banned"/>
   </enum>
+
+  <enum name="MessagePriorityEnum" type="enum8">
+    <cluster code="0x0097"/>
+    <item value="0x00" name="Low"/>
+    <item value="0x01" name="Medium" />
+    <item value="0x02" name="High"/>
+    <item value="0x03" name="Critical"/>
+  </enum>
+
+  <struct name="MessageStruct" isFabricScoped="true">
+    <cluster code="0x0097"/>
+    <item fieldId="0" name="MessageID" type="octet_string" length="16" optional="false"/>
+    <item fieldId="1" name="Priority" type="MessagePriorityEnum" optional="false"/>
+    <item fieldId="2" name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
+    <item fieldId="3" name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
+    <item fieldId="4" name="Duration" type="int16u" default="0" optional="false" isNullable="true"/>
+    <item fieldId="5" name="MessageText" type="char_string" length="256" optional="false"/>
+    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" optional="true"/>
+  </struct>
 
   <struct name="MessageResponseOptionStruct">
     <cluster code="0x0097"/>
     <item fieldId="0" name="MessageResponseID" type="int32u"/>
-    <item fieldId="1" name="Label" type="char_string" length="32" default=""/>
-  </struct>
-
-  <bitmap name="MessageControl" type="bitmap16">
-    <cluster code="0x0097"/>
-    <field name="ConfirmationRequired" mask="0x1"/>
-    <field name="ResponseRequired" mask="0x2"/>
-    <field name="ReplyMessage" mask="0x4"/>
-    <field name="MessageConfirmed" mask="0x8"/>
-    <field name="MessageProtected" mask="0x10"/>
-  </bitmap>
-
-  <struct name="MessageStruct" isFabricScoped="true">
-    <cluster code="0x0097"/>
-    <item fieldId="0" name="MessageID" type="octet_string" length="16" default=""/>
-    <item fieldId="1" name="Priority" type="MessagePriorityEnum"/>
-    <item fieldId="2" name="MessageControl" type="MessageControl" default="0"/>
-    <item fieldId="3" name="StartTime" type="epoch_s" default="0"/>
-    <item fieldId="4" name="Duration" type="int16u" default="0"/>
-    <item fieldId="5" name="MessageText" type="long_char_string" length="512" default=""/>
-    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true"/>
-  </struct>
-
-  <struct name="PresentMessageRequestStruct">
-    <cluster code="0x0097"/>
-    <item fieldId="0" name="MessageID" type="octet_string" length="16" default=""/>
-    <item fieldId="1" name="Priority" type="MessagePriorityEnum"/>
-    <item fieldId="2" name="MessageControl" type="MessageControl" default="0"/>
-    <item fieldId="3" name="StartTime" type="epoch_s" default="0"/>
-    <item fieldId="4" name="Duration" type="int16u" default="0"/>
-    <item fieldId="5" name="MessageText" type="long_char_string" length="512" default=""/>
-    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true"/>
+    <item fieldId="1" name="Label" type="char_string" length="32"/>
   </struct>
 
   <cluster apiMaturity="provisional">
     <name>Messages</name>
     <domain>General</domain>
-    <description>An interface for passing messages to be presented by a device.</description>
+    <description>This cluster provides an interface for passing messages to be presented by a device.</description>
     <code>0x0097</code>
     <define>MESSAGES_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
-    <attribute side="server" code="0x0000" define="MESSAGES" type="ARRAY" entryType="MessageStruct" writable="false" optional="false">
-        <description>Messages</description>
-    </attribute>
-    <attribute side="server" code="0x0001" define="ACTIVEMESSAGEIDS" type="octet_string" length="16" writable="false" optional="false" array="true">ActiveMessageIDs</attribute>
+    <attribute side="server" code="0x0000" define="MESSAGES_CLUSTER_MESSAGES" type="ARRAY" entryType="MessageStruct" writable="false" max="8" optional="false">Messages</attribute>
+    <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8" writable="false" optional="false">ActiveMessageIDs</attribute>
     <command source="client" code="0x00" name="PresentMessagesRequest" optional="false">
       <description>
         Command for requesting messages be presented
       </description>
-      <arg name="Messages" type="PresentMessageRequestStruct" array="true"/>
+      <arg name="Messages" type="octet_string" array="true"/>
     </command>
     <command source="client" code="0x01" name="CancelMessagesRequest" optional="false">
       <description>

@@ -23,9 +23,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace Messaging {
-
-} // namespace Messaging
+namespace Messaging {} // namespace Messaging
 } // namespace Clusters
 } // namespace app
 } // namespace chip

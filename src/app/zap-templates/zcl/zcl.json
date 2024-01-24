@@ -263,9 +263,6 @@
             "ICDCounter",
             "ClientsSupportedPerFabric"
         ],
-        "Messages": [
-            "Messages"
-        ],
         "Operational Credentials": [
             "SupportedFabrics",
             "CommissionedFabrics",
