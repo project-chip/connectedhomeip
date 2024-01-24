@@ -32,19 +32,23 @@ The Flash is divided into different regions as follow :
 -   Secondary application partition : Update image received with the OTA
     (candidate application).
 
-The size reserved for each partition can be found in `src/platform/nxp/zephyr/boards/board.overlay`.
+The size reserved for each partition can be found in
+`src/platform/nxp/zephyr/boards/board.overlay`.
 
 Notes :
 
 -   When applicable, BLE/15.4/Wi-Fi firmwares are embedded in the application
     binary, ensuring compatibility between the application and the controllers.
 -   The sizes of the primary and secondary applications are provided as an
-    example. The size can be changed by overriding the partitions located at `board.overlay`.(example: `src/platform/nxp/zephyr/boards/rd_rw612_bga.overlay`)
+    example. The size can be changed by overriding the partitions located at
+    `board.overlay`.(example:
+    `src/platform/nxp/zephyr/boards/rd_rw612_bga.overlay`)
 
 ### MCUBoot Bootloader
 
-Current OTA solution is using MCUBoot Bootloader. MCUBoot is an open-source secure bootloader 
-used to apply the self-upgrade. For more details, please refer to the
+Current OTA solution is using MCUBoot Bootloader. MCUBoot is an open-source
+secure bootloader used to apply the self-upgrade. For more details, please refer
+to the
 [MCUBoot documentation](https://github.com/mcu-tools/mcuboot/blob/main/docs/design.md).
 
 In our use case, the bootloader runs the application residing in the primary
@@ -56,18 +60,22 @@ called swap-move and is the default upgrade configured by MCUBoot.
 
 ### Generating and flashing application image
 
-The all cluster app is able to demonstrate the usage of OTA. To have this
-OTA support, prj_ota.conf configurations needs to be used. This can be done
-by adding `-DEXTRA_CONF_FILE=prj_ota.conf` to the west build command.
+The all cluster app is able to demonstrate the usage of OTA. To have this OTA
+support, prj_ota.conf configurations needs to be used. This can be done by
+adding `-DEXTRA_CONF_FILE=prj_ota.conf` to the west build command.
 
 Current OTA implementation automates the following procedures:
--   Generation of MCUBOOT image                                 (File generated: `modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin`)*
--   Generation of Matter application image                      (File generated: `zephyr/zephyr.bin`)*
--   Signature of the application image                          (File generated: `zephyr/zephyr.signed.bin`)*
--   Generation of a single binary merging the signed application 
-    with the MCUBoot Image                                      (File generated: `zephyr/zephyr_full.bin`)*
 
->**Note**: *All paths are relative to the output folder.
+-   Generation of MCUBOOT image (File generated:
+    `modules/connectedhomeip/build_mcuboot/zephyr/zephyr.bin`)\*
+-   Generation of Matter application image (File generated:
+    `zephyr/zephyr.bin`)\*
+-   Signature of the application image (File generated:
+    `zephyr/zephyr.signed.bin`)\*
+-   Generation of a single binary merging the signed application with the
+    MCUBoot Image (File generated: `zephyr/zephyr_full.bin`)\*
+
+> **Note**: \*All paths are relative to the output folder.
 
 The final binary to be used is `zephyr_full.bin`.
 
@@ -79,11 +87,12 @@ The application image have the following format :
 -   Trailer : contains metadata needed by the bootloader such as the image
     signature, the upgrade type, the swap status...
 
-In the all-cluster-app example, the image is signed with the default private key provided by MCUBoot(`/zephyrproject/bootloader/mcuboot/root-rsa-2048.pem`).
-MCUBoot is built with its corresponding public key which would be used to
-verify the integrity of the image. It is possible to generate a new pair of
-keys using the following commands. This procedure should be done prior to
-building the mcuboot application.
+In the all-cluster-app example, the image is signed with the default private key
+provided by MCUBoot(`/zephyrproject/bootloader/mcuboot/root-rsa-2048.pem`).
+MCUBoot is built with its corresponding public key which would be used to verify
+the integrity of the image. It is possible to generate a new pair of keys using
+the following commands. This procedure should be done prior to building the
+mcuboot application.
 
 -   To generate the private key :
 
@@ -96,24 +105,27 @@ user@ubuntu: python3 imgtool.py keygen -k priv_key.pem -t rsa-2048
 ```
 user@ubuntu: python3 imgtool.py getpub -k priv_key.pem
 ```
+
 To use a different key than the default one, `CONFIG_BOOT_SIGNATURE_KEY_FILE`
 and `CONFIG_MCUBOOT_SIGNATURE_KEY_FILE` needs to point to that same key.
 
 -   `CONFIG_BOOT_SIGNATURE_KEY_FILE`: This is used for the MCUboot bootloader
-    image. The path to the key can be either absolute or relative. Relative paths
-    starts from the MCUBoot repository root.
-    This option can be changed in: `config/nxp/app/bootloader.conf`
+    image. The path to the key can be either absolute or relative. Relative
+    paths starts from the MCUBoot repository root. This option can be changed
+    in: `config/nxp/app/bootloader.conf`
 
 -   `CONFIG_BOOT_SIGNATURE_KEY_FILE`: This is used for the application to be
-    loaded by the bootloader. The path can be either absolute or relative. Relative paths starts from the west workspace location.
-    This option can be changed in the application .conf files.
+    loaded by the bootloader. The path can be either absolute or relative.
+    Relative paths starts from the west workspace location. This option can be
+    changed in the application .conf files.
 
 Refer to those two files for more information:
+
 -   [MCUBoot Config used for the MCUBoot Image](https://github.com/zephyrproject-rtos/mcuboot/blob/main/boot/zephyr/Kconfig)
 -   [MCUBoot Config used for the application](https://github.com/zephyrproject-rtos/zephyr/blob/main/modules/Kconfig.mcuboot)
 
-JLink can be used to flash the mixed binary at the base address 0x8000000, using the
-command :
+JLink can be used to flash the mixed binary at the base address 0x8000000, using
+the command :
 
 ```
 J-Link > loadbin zephyr_full.bin 0x8000000
@@ -124,22 +136,27 @@ application and run it.
 
 ### Generating the OTA Update Image
 
-The same procedure can be followed from the 
+The same procedure can be followed from the
 [Generating and flashing application image](#generating-and-flashing-application-image)
-sub-section, replacing `CONFIG_CHIP_DEVICE_SOFTWARE_VERSION` with a number greater than the initial one used on the active application (Candidate application version number
-should be greater than the one used on the active application). By default the value is set
-to 0, try resetting this option to 1 to generate the OTA update Image.
-You can do this by adding `-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1` to the west
-build command.
+sub-section, replacing `CONFIG_CHIP_DEVICE_SOFTWARE_VERSION` with a number
+greater than the initial one used on the active application (Candidate
+application version number should be greater than the one used on the active
+application). By default the value is set to 0, try resetting this option to 1
+to generate the OTA update Image. You can do this by adding
+`-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1` to the west build command.
 
 The current implementation automates the following procedures:
--   Generation of the Image to be used for update                   (File generated: `zephyr/zephyr.bin`)*
--   Signature of the Image                                          (File generated: `zephyr/zephyr.signed.bin`)*
--   Conversion of the signed Image into the OTA format (.ota file)  (File generated: `zephyr/matter.ota`)*
 
->**Note**: *All paths are relative to the output folder.
+-   Generation of the Image to be used for update (File generated:
+    `zephyr/zephyr.bin`)\*
+-   Signature of the Image (File generated: `zephyr/zephyr.signed.bin`)\*
+-   Conversion of the signed Image into the OTA format (.ota file) (File
+    generated: `zephyr/matter.ota`)\*
 
-The generated OTA file `matter.ota` can be used to perform the OTA Software Update. The instructions below describes the procedure step-by-step.
+> **Note**: \*All paths are relative to the output folder.
+
+The generated OTA file `matter.ota` can be used to perform the OTA Software
+Update. The instructions below describes the procedure step-by-step.
 
 ### Performing the OTA Software Update
 
@@ -148,8 +165,7 @@ Setup example :
 -   [Chip-tool](../../examples/chip-tool/README.md) application running on the
     RPi.
 -   OTA Provider application built on the same RPi (as explained below).
--   Board programmed with the example application (with the instructions
-    above).
+-   Board programmed with the example application (with the instructions above).
 
 Before starting the OTA process, the Linux OTA Provider application can be built
 on the RPi (if not already present in the pre-installed apps) :
