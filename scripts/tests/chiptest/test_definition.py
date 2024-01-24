@@ -88,7 +88,7 @@ class App:
         return True
 
     def kill(self):
-        iself.__terminateProcess()
+        self.__terminateProcess()
         self.killed = True
 
     def wait(self, timeout=None):
