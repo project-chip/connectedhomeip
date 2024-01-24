@@ -46,7 +46,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x0]
+              hasMasksClear: [0x1]
 
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
