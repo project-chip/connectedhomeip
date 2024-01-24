@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -58,14 +60,13 @@ class TimeSynchronizationClusterDSTOffsetStruct(
       tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getInt(ContextSpecificTag(TAG_OFFSET))
       val validStarting = tlvReader.getULong(ContextSpecificTag(TAG_VALID_STARTING))
-      val validUntil =
-        if (!tlvReader.isNull()) {
-          tlvReader.getULong(ContextSpecificTag(TAG_VALID_UNTIL))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))
-          null
-        }
-
+      val validUntil = if (!tlvReader.isNull()) {
+      tlvReader.getULong(ContextSpecificTag(TAG_VALID_UNTIL))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_VALID_UNTIL))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return TimeSynchronizationClusterDSTOffsetStruct(offset, validStarting, validUntil)

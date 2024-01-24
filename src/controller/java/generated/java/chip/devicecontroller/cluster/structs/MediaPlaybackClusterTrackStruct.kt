@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MediaPlaybackClusterTrackStruct(
-  val id: String,
-  val trackAttributes: MediaPlaybackClusterTrackAttributesStruct?
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class MediaPlaybackClusterTrackStruct (
+    val id: String,
+    val trackAttributes: MediaPlaybackClusterTrackAttributesStruct?) {
+  override fun toString(): String  = buildString {
     append("MediaPlaybackClusterTrackStruct {\n")
     append("\tid : $id\n")
     append("\ttrackAttributes : $trackAttributes\n")
@@ -38,10 +41,10 @@ class MediaPlaybackClusterTrackStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ID), id)
       if (trackAttributes != null) {
-        trackAttributes.toTlv(ContextSpecificTag(TAG_TRACK_ATTRIBUTES), this)
-      } else {
-        putNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))
-      }
+      trackAttributes.toTlv(ContextSpecificTag(TAG_TRACK_ATTRIBUTES), this)
+    } else {
+      putNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))
+    }
       endStructure()
     }
   }
@@ -50,20 +53,16 @@ class MediaPlaybackClusterTrackStruct(
     private const val TAG_ID = 0
     private const val TAG_TRACK_ATTRIBUTES = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterTrackStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterTrackStruct {
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getString(ContextSpecificTag(TAG_ID))
-      val trackAttributes =
-        if (!tlvReader.isNull()) {
-          MediaPlaybackClusterTrackAttributesStruct.fromTlv(
-            ContextSpecificTag(TAG_TRACK_ATTRIBUTES),
-            tlvReader
-          )
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))
-          null
-        }
-
+      val trackAttributes = if (!tlvReader.isNull()) {
+      MediaPlaybackClusterTrackAttributesStruct.fromTlv(ContextSpecificTag(TAG_TRACK_ATTRIBUTES), tlvReader)
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_TRACK_ATTRIBUTES))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return MediaPlaybackClusterTrackStruct(id, trackAttributes)

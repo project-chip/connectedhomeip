@@ -16,7 +16,9 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -58,34 +60,25 @@ class ThermostatClusterWeeklyScheduleTransitionStruct(
     private const val TAG_HEAT_SETPOINT = 1
     private const val TAG_COOL_SETPOINT = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): ThermostatClusterWeeklyScheduleTransitionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterWeeklyScheduleTransitionStruct {
       tlvReader.enterStructure(tlvTag)
       val transitionTime = tlvReader.getUShort(ContextSpecificTag(TAG_TRANSITION_TIME))
-      val heatSetpoint =
-        if (!tlvReader.isNull()) {
-          tlvReader.getShort(ContextSpecificTag(TAG_HEAT_SETPOINT))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
-          null
-        }
-      val coolSetpoint =
-        if (!tlvReader.isNull()) {
-          tlvReader.getShort(ContextSpecificTag(TAG_COOL_SETPOINT))
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
-          null
-        }
-
+      val heatSetpoint = if (!tlvReader.isNull()) {
+      tlvReader.getShort(ContextSpecificTag(TAG_HEAT_SETPOINT))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_HEAT_SETPOINT))
+      null
+    }
+      val coolSetpoint = if (!tlvReader.isNull()) {
+      tlvReader.getShort(ContextSpecificTag(TAG_COOL_SETPOINT))
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_COOL_SETPOINT))
+      null
+    }
+      
       tlvReader.exitContainer()
 
-      return ThermostatClusterWeeklyScheduleTransitionStruct(
-        transitionTime,
-        heatSetpoint,
-        coolSetpoint
-      )
+      return ThermostatClusterWeeklyScheduleTransitionStruct(transitionTime, heatSetpoint, coolSetpoint)
     }
   }
 }

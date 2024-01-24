@@ -16,13 +16,18 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterSeriesInfoStruct(val season: String, val episode: String) {
+class ChannelClusterSeriesInfoStruct(
+  val season: String,
+  val episode: String
+) {
   override fun toString(): String = buildString {
     append("ChannelClusterSeriesInfoStruct {\n")
     append("\tseason : $season\n")
@@ -47,7 +52,7 @@ class ChannelClusterSeriesInfoStruct(val season: String, val episode: String) {
       tlvReader.enterStructure(tlvTag)
       val season = tlvReader.getString(ContextSpecificTag(TAG_SEASON))
       val episode = tlvReader.getString(ContextSpecificTag(TAG_EPISODE))
-
+      
       tlvReader.exitContainer()
 
       return ChannelClusterSeriesInfoStruct(season, episode)

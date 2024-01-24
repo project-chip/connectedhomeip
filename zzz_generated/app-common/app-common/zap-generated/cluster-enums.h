@@ -2369,6 +2369,57 @@ enum class Feature : uint32_t
 };
 } // namespace DemandResponseLoadControl
 
+namespace Messages {
+
+// Enum for FutureMessagePreferenceEnum
+enum class FutureMessagePreferenceEnum : uint8_t
+{
+    kAllowed    = 0x00,
+    kIncreased  = 0x01,
+    kReduced    = 0x02,
+    kDisallowed = 0x03,
+    kBanned     = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MessagePriorityEnum
+enum class MessagePriorityEnum : uint8_t
+{
+    kLow      = 0x00,
+    kMedium   = 0x01,
+    kHigh     = 0x02,
+    kCritical = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kReceivedConfirmation = 0x1,
+    kConfirmationResponse = 0x2,
+    kConfirmationReply    = 0x3,
+    kProtectedMessages    = 0x4,
+};
+
+// Bitmap for MessageControlBitmap
+enum class MessageControlBitmap : uint32_t
+{
+    kConfirmationRequired = 0x1,
+    kResponseRequired     = 0x2,
+    kReplyMessage         = 0x3,
+    kMessageConfirmed     = 0x4,
+    kMessageProtected     = 0x5,
+};
+} // namespace Messages
+
 namespace DeviceEnergyManagement {
 
 // Enum for AdjustmentCauseEnum

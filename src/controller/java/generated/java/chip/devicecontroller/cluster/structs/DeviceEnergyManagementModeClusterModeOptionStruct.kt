@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DeviceEnergyManagementModeClusterModeOptionStruct(
-  val label: String,
-  val mode: UInt,
-  val modeTags: List<DeviceEnergyManagementModeClusterModeTagStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class DeviceEnergyManagementModeClusterModeOptionStruct (
+    val label: String,
+    val mode: UInt,
+    val modeTags: List<DeviceEnergyManagementModeClusterModeTagStruct>) {
+  override fun toString(): String  = buildString {
     append("DeviceEnergyManagementModeClusterModeOptionStruct {\n")
     append("\tlabel : $label\n")
     append("\tmode : $mode\n")
@@ -55,22 +57,18 @@ class DeviceEnergyManagementModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DeviceEnergyManagementModeClusterModeOptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DeviceEnergyManagementModeClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
-      val modeTags =
-        buildList<DeviceEnergyManagementModeClusterModeTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(DeviceEnergyManagementModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val modeTags = buildList<DeviceEnergyManagementModeClusterModeTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(DeviceEnergyManagementModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementModeClusterModeOptionStruct(label, mode, modeTags)

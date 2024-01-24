@@ -20,15 +20,17 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ModeSelectClusterModeOptionStruct(
-  val label: String,
-  val mode: UInt,
-  val semanticTags: List<ModeSelectClusterSemanticTagStruct>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ModeSelectClusterModeOptionStruct (
+    val label: String,
+    val mode: UInt,
+    val semanticTags: List<ModeSelectClusterSemanticTagStruct>) {
+  override fun toString(): String  = buildString {
     append("ModeSelectClusterModeOptionStruct {\n")
     append("\tlabel : $label\n")
     append("\tmode : $mode\n")
@@ -55,19 +57,18 @@ class ModeSelectClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_SEMANTIC_TAGS = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ModeSelectClusterModeOptionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ModeSelectClusterModeOptionStruct {
       tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
-      val semanticTags =
-        buildList<ModeSelectClusterSemanticTagStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_SEMANTIC_TAGS))
-          while (!tlvReader.isEndOfContainer()) {
-            add(ModeSelectClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val semanticTags = buildList<ModeSelectClusterSemanticTagStruct> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_SEMANTIC_TAGS))
+      while(!tlvReader.isEndOfContainer()) {
+        add(ModeSelectClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return ModeSelectClusterModeOptionStruct(label, mode, semanticTags)

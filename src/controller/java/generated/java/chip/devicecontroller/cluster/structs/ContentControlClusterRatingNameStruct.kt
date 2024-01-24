@@ -17,17 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import java.util.Optional
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ContentControlClusterRatingNameStruct(
-  val ratingName: String,
-  val ratingNameDesc: Optional<String>
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class ContentControlClusterRatingNameStruct (
+    val ratingName: String,
+    val ratingNameDesc: Optional<String>) {
+  override fun toString(): String  = buildString {
     append("ContentControlClusterRatingNameStruct {\n")
     append("\tratingName : $ratingName\n")
     append("\tratingNameDesc : $ratingNameDesc\n")
@@ -39,9 +41,9 @@ class ContentControlClusterRatingNameStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_RATING_NAME), ratingName)
       if (ratingNameDesc.isPresent) {
-        val optratingNameDesc = ratingNameDesc.get()
-        put(ContextSpecificTag(TAG_RATING_NAME_DESC), optratingNameDesc)
-      }
+      val optratingNameDesc = ratingNameDesc.get()
+      put(ContextSpecificTag(TAG_RATING_NAME_DESC), optratingNameDesc)
+    }
       endStructure()
     }
   }
@@ -50,16 +52,15 @@ class ContentControlClusterRatingNameStruct(
     private const val TAG_RATING_NAME = 0
     private const val TAG_RATING_NAME_DESC = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentControlClusterRatingNameStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : ContentControlClusterRatingNameStruct {
       tlvReader.enterStructure(tlvTag)
       val ratingName = tlvReader.getString(ContextSpecificTag(TAG_RATING_NAME))
-      val ratingNameDesc =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATING_NAME_DESC))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_RATING_NAME_DESC)))
-        } else {
-          Optional.empty()
-        }
-
+      val ratingNameDesc = if (tlvReader.isNextTag(ContextSpecificTag(TAG_RATING_NAME_DESC))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_RATING_NAME_DESC)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ContentControlClusterRatingNameStruct(ratingName, ratingNameDesc)

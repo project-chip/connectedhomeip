@@ -6459,6 +6459,218 @@ public static class DemandResponseLoadControlClusterLoadControlProgramStruct {
     return output.toString();
   }
 }
+public static class MessagesClusterMessageResponseOptionStruct {
+  public Long messageResponseID;
+  public String label;
+  private static final long MESSAGE_RESPONSE_I_D_ID = 0L;
+  private static final long LABEL_ID = 1L;
+
+  public MessagesClusterMessageResponseOptionStruct(
+    Long messageResponseID,
+    String label
+  ) {
+    this.messageResponseID = messageResponseID;
+    this.label = label;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_RESPONSE_I_D_ID, new UIntType(messageResponseID)));
+    values.add(new StructElement(LABEL_ID, new StringType(label)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageResponseOptionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Long messageResponseID = null;
+    String label = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_RESPONSE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          messageResponseID = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == LABEL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          label = castingValue.value(String.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageResponseOptionStruct(
+      messageResponseID,
+      label
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageResponseOptionStruct {\n");
+    output.append("\tmessageResponseID: ");
+    output.append(messageResponseID);
+    output.append("\n");
+    output.append("\tlabel: ");
+    output.append(label);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class MessagesClusterMessageStruct {
+  public byte[] messageID;
+  public Integer priority;
+  public Long messageControl;
+  public @Nullable Long startTime;
+  public @Nullable Integer duration;
+  public String messageText;
+  public Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses;
+  public Integer fabricIndex;
+  private static final long MESSAGE_I_D_ID = 0L;
+  private static final long PRIORITY_ID = 1L;
+  private static final long MESSAGE_CONTROL_ID = 2L;
+  private static final long START_TIME_ID = 3L;
+  private static final long DURATION_ID = 4L;
+  private static final long MESSAGE_TEXT_ID = 5L;
+  private static final long RESPONSES_ID = 6L;
+  private static final long FABRIC_INDEX_ID = 254L;
+
+  public MessagesClusterMessageStruct(
+    byte[] messageID,
+    Integer priority,
+    Long messageControl,
+    @Nullable Long startTime,
+    @Nullable Integer duration,
+    String messageText,
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses,
+    Integer fabricIndex
+  ) {
+    this.messageID = messageID;
+    this.priority = priority;
+    this.messageControl = messageControl;
+    this.startTime = startTime;
+    this.duration = duration;
+    this.messageText = messageText;
+    this.responses = responses;
+    this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
+    values.add(new StructElement(PRIORITY_ID, new UIntType(priority)));
+    values.add(new StructElement(MESSAGE_CONTROL_ID, new UIntType(messageControl)));
+    values.add(new StructElement(START_TIME_ID, startTime != null ? new UIntType(startTime) : new NullType()));
+    values.add(new StructElement(DURATION_ID, duration != null ? new UIntType(duration) : new NullType()));
+    values.add(new StructElement(MESSAGE_TEXT_ID, new StringType(messageText)));
+    values.add(new StructElement(RESPONSES_ID, responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType())));
+    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
+
+    return new StructType(values);
+  }
+
+  public static MessagesClusterMessageStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    byte[] messageID = null;
+    Integer priority = null;
+    Long messageControl = null;
+    @Nullable Long startTime = null;
+    @Nullable Integer duration = null;
+    String messageText = null;
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses = Optional.empty();
+    Integer fabricIndex = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == MESSAGE_I_D_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          messageID = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == PRIORITY_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          priority = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MESSAGE_CONTROL_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          messageControl = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == START_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          startTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == DURATION_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          duration = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == MESSAGE_TEXT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.String) {
+          StringType castingValue = element.value(StringType.class);
+          messageText = castingValue.value(String.class);
+        }
+      } else if (element.contextTagNum() == RESPONSES_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Array) {
+          ArrayType castingValue = element.value(ArrayType.class);
+          responses = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.MessagesClusterMessageResponseOptionStruct.decodeTlv(elementcastingValue)));
+        }
+      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          fabricIndex = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new MessagesClusterMessageStruct(
+      messageID,
+      priority,
+      messageControl,
+      startTime,
+      duration,
+      messageText,
+      responses,
+      fabricIndex
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("MessagesClusterMessageStruct {\n");
+    output.append("\tmessageID: ");
+    output.append(Arrays.toString(messageID));
+    output.append("\n");
+    output.append("\tpriority: ");
+    output.append(priority);
+    output.append("\n");
+    output.append("\tmessageControl: ");
+    output.append(messageControl);
+    output.append("\n");
+    output.append("\tstartTime: ");
+    output.append(startTime);
+    output.append("\n");
+    output.append("\tduration: ");
+    output.append(duration);
+    output.append("\n");
+    output.append("\tmessageText: ");
+    output.append(messageText);
+    output.append("\n");
+    output.append("\tresponses: ");
+    output.append(responses);
+    output.append("\n");
+    output.append("\tfabricIndex: ");
+    output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class DeviceEnergyManagementClusterCostStruct {
   public Integer costType;
   public Long value;
