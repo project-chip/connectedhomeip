@@ -48,6 +48,10 @@ public:
     CHIP_ERROR Init();
     void Shutdown();
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    void SendNonConcurrentConnectNetworkResponse();
+#endif
+
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;

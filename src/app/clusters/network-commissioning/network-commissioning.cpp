@@ -135,6 +135,24 @@ void Instance::Shutdown()
     mpBaseDriver->Shutdown();
 }
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+void Instance::SendNonConcurrentConnectNetworkResponse()
+{
+    auto commandHandleRef = std::move(mAsyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
+    {
+        return;
+    }
+
+    chip::DeviceLayer::ConnectivityMgr().GetBleLayer()->SetBleTerminating(true);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode. Send ConnectNetworkResponse(Success)");
+    Commands::ConnectNetworkResponse::Type response;
+    response.networkingStatus = NetworkCommissioning::Status::kSuccess;
+    commandHandle->AddResponse(mPath, response);
+}
+#endif
+
 void Instance::InvokeCommand(HandlerContext & ctxt)
 {
     if (mAsyncCommandHandle.Get() != nullptr)
@@ -177,12 +195,7 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
 
     case Commands::ConnectNetwork::Id: {
         VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
-#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        // If commissionee does not support Concurrent Connections, request the BLE to be stopped.
-        // Start the ConnectNetwork, but this will not complete until the BLE is off.
-        ChipLogProgress(NetworkProvisioning, "Closing BLE connections due to non-concurrent mode");
-        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-#endif
+
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
@@ -708,18 +721,21 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
     mCurrentOperationBreadcrumb = req.breadcrumb;
 
-    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
-    // network has been fully brought up and kWiFiDeviceAvailable is delivered.
-    // mConnectingNetworkIDLen and mConnectingNetworkID contains the received SSID
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
+#else
+    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
+    // network has been fully brought up and kWiFiDeviceAvailable is delivered.
+    // mConnectingNetworkIDLen and mConnectingNetworkID contain the received SSID
+    // As per spec, send the ConnectNetworkResponse(Success) prior to releasing the commissioning channel
+    SendNonConcurrentConnectNetworkResponse();
 #endif
 }
 
 void Instance::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork() SSID=%s", mConnectingNetworkID);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s", mConnectingNetworkID);
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 
@@ -1065,6 +1081,7 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable)
     {
+        // In Non-Concurrent mode connect the Wi-Fi, as BLE has been stopped
         this_->HandleNonConcurrentConnectNetwork();
     }
 }

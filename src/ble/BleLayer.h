@@ -320,6 +320,12 @@ public:
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
 
+    /// Call when waiting for BLE transmission confirmation.
+    void SetBleTerminating(bool value);
+
+    ///  Call to determine if BLE transmission waiting for confirmation
+    bool GetBleTerminating();
+
 #if CHIP_ENABLE_CHIPOBLE_TEST
     BLEEndPoint * mTestBleEndPoint;
 #endif

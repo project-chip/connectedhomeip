@@ -89,8 +89,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
 #if CONFIG_NETWORK_LAYER_BLE
     else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
     {
-        ChipLogProgress(AppServer, "Received kCloseAllBleConnections");
-        mServer->GetBleLayerObject()->CloseAllBleConnections();
+        ChipLogProgress(AppServer, "Received kCloseAllBleConnections:%d",event->Type);
+        mServer->GetBleLayerObject()->Shutdown();
     }
 #endif
 }

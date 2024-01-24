@@ -43,6 +43,10 @@
 
 #include "bluez/BluezEndpoint.h"
 
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#include <platform/DeviceControlServer.h>
+#endif
+
 using namespace ::nl;
 using namespace ::chip::Ble;
 
@@ -215,12 +219,29 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         break;
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        // If BLE has been stopped ignore any write messages as they cannot go anywhere
+        if (GetBleTerminating())
+        {
+            ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE stopped, BLE write write ignored");
+        }
+        else
+#endif
+        {
+            HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+                                PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
+        }
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+        if (GetBleTerminating())
+        {
+            ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE packet acknowledged. Sending CloseAllBLEConnections");
+            DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+        }
+#endif
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -636,8 +657,11 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
-    DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+    if (GetBleTerminating())
+    {
+        // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
+        DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+    }
 #endif
 }
 
