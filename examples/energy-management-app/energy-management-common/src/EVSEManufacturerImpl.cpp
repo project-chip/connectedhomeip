@@ -166,18 +166,24 @@ CHIP_ERROR EVSEManufacturer::SendEnergyReading(EndpointId aEndpointId, int64_t a
     energyExported.energy = aCumulativeEnergyExported;
 
     // call the SDK to update attributes and generate an event
-    NotifyCumulativeEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported));
+    if (!NotifyCumulativeEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
+    {
+        ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return CHIP_NO_ERROR;
 }
 
 struct FakeReadingsData
 {
-    bool bEnabled;                    /* If enabled then the timer callback will re-trigger */
-    EndpointId mEndpointId;           /* Which endpoint the meter is on */
-    uint8_t mInterval_s;              /* Interval in seconds to callback */
-    int64_t mPower_mW;                /* Power on the load in mW (signed value) +ve = imported */
-    uint32_t mPowerRandomness_mW;     /* The amount to randomize the Power on the load in mW */
+    bool bEnabled;                /* If enabled then the timer callback will re-trigger */
+    EndpointId mEndpointId;       /* Which endpoint the meter is on */
+    uint8_t mInterval_s;          /* Interval in seconds to callback */
+    int64_t mPower_mW;            /* Power on the load in mW (signed value) +ve = imported */
+    uint32_t mPowerRandomness_mW; /* The amount to randomize the Power on the load in mW */
+    /* These energy values can only be positive values.
+     * however the underlying energy type (power_mWh) is signed, so keeping with that convention */
     int64_t mTotalEnergyImported = 0; /* Energy Imported which is updated if mPower > 0 */
     int64_t mTotalEnergyExported = 0; /* Energy Imported which is updated if mPower < 0 */
 };
@@ -229,35 +235,36 @@ void EVSEManufacturer::StopFakeReadings()
 void EVSEManufacturer::FakeReadingsUpdate()
 {
     /* Check to see if the fake Load is still running - don't send updates if the timer was already cancelled */
-    if (gFakeReadingsData.bEnabled)
+    if (!gFakeReadingsData.bEnabled)
     {
-        // Update meter values
-        // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
-        // first compute power as a mean + some random value in range 0 to mPowerRandomness_mW
-        int64_t power = (rand() % gFakeReadingsData.mPowerRandomness_mW);
-        power += gFakeReadingsData.mPower_mW; // add in the base power
-
-        // TODO call the EPM cluster to send a power reading
-
-        // update the energy meter - we'll assume that the power has been constant during the previous interval
-        if (gFakeReadingsData.mPower_mW > 0)
-        {
-            // Positive power - means power is imported
-            gFakeReadingsData.mTotalEnergyImported += ((power * gFakeReadingsData.mInterval_s) / 3600);
-        }
-        else
-        {
-            // Negative power - means power is exported, but the cumulative energy is positive
-            gFakeReadingsData.mTotalEnergyExported += ((-power * gFakeReadingsData.mInterval_s) / 3600);
-        }
-
-        SendEnergyReading(gFakeReadingsData.mEndpointId, gFakeReadingsData.mTotalEnergyImported,
-                          gFakeReadingsData.mTotalEnergyExported);
-
-        // start/restart the timer
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(gFakeReadingsData.mInterval_s), FakeReadingsTimerExpiry,
-                                              this);
+        return;
     }
+
+    // Update meter values
+    // Avoid using floats - so we will do a basic rand() call which will generate a integer value between 0 and RAND_MAX
+    // first compute power as a mean + some random value in range 0 to mPowerRandomness_mW
+    int64_t power = (rand() % gFakeReadingsData.mPowerRandomness_mW);
+    power += gFakeReadingsData.mPower_mW; // add in the base power
+
+    // TODO call the EPM cluster to send a power reading
+
+    // update the energy meter - we'll assume that the power has been constant during the previous interval
+    if (gFakeReadingsData.mPower_mW > 0)
+    {
+        // Positive power - means power is imported
+        gFakeReadingsData.mTotalEnergyImported += ((power * gFakeReadingsData.mInterval_s) / 3600);
+    }
+    else
+    {
+        // Negative power - means power is exported, but the cumulative energy is positive
+        gFakeReadingsData.mTotalEnergyExported += ((-power * gFakeReadingsData.mInterval_s) / 3600);
+    }
+
+    SendEnergyReading(gFakeReadingsData.mEndpointId, gFakeReadingsData.mTotalEnergyImported,
+                      gFakeReadingsData.mTotalEnergyExported);
+
+    // start/restart the timer
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(gFakeReadingsData.mInterval_s), FakeReadingsTimerExpiry, this);
 }
 /**
  * @brief   Timer expiry callback to handle fake load
@@ -416,9 +423,9 @@ void SetTestEventTrigger_FakeReadingsLoadStart()
     EVSEManufacturer * mn = GetEvseManufacturer();
     VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
 
-    int64_t aPower_mW            = 1000000; // Fake load 1000 W
-    uint32_t aPowerRandomness_mW = 20000;   // randomness 20W
-    uint8_t aInterval_s          = 2;       // 2s updates
+    int64_t aPower_mW            = 1'000'000; // Fake load 1000 W
+    uint32_t aPowerRandomness_mW = 20'000;    // randomness 20W
+    uint8_t aInterval_s          = 2;         // 2s updates
     bool bReset                  = true;
     mn->StartFakeReadings(EndpointId(1), aPower_mW, aPowerRandomness_mW, aInterval_s, bReset);
 }
@@ -428,9 +435,9 @@ void SetTestEventTrigger_FakeReadingsGeneratorStart()
     EVSEManufacturer * mn = GetEvseManufacturer();
     VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
 
-    int64_t aPower_mW            = -3000000; // Fake Generator -3000 W
-    uint32_t aPowerRandomness_mW = 20000;    // randomness 20W
-    uint8_t aInterval_s          = 5;        // 5s updates
+    int64_t aPower_mW            = -3'000'000; // Fake Generator -3000 W
+    uint32_t aPowerRandomness_mW = 20'000;     // randomness 20W
+    uint8_t aInterval_s          = 5;          // 5s updates
     bool bReset                  = true;
     mn->StartFakeReadings(EndpointId(1), aPower_mW, aPowerRandomness_mW, aInterval_s, bReset);
 }

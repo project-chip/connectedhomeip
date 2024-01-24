@@ -32,11 +32,11 @@ enum class EnergyReportingTrigger : uint64_t
 {
     // We use the Electrical Energy Measurement cluster ID as our TE trigger space
     // Stop Fake readings
-    kFakeReadingsStop = 0x0091000000000000,
+    kFakeReadingsStop = 0x0091'0000'0000'0000,
     // Fake a load (importing) readings at 1kW 230V 4.34A with 2s updates
-    kFakeReadingsLoadStart_1kW_2s = 0x0091000000000001,
+    kFakeReadingsLoadStart_1kW_2s = 0x0091'0000'0000'0001,
     // Fake a generator (exporting) readings at 3kW 230V 3.33A with 5s updates
-    kFakeReadingsGenStart_3kW_5s = 0x0091000000000002,
+    kFakeReadingsGenStart_3kW_5s = 0x0091'0000'0000'0002,
 
 };
 
