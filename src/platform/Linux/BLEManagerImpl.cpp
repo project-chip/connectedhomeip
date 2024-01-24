@@ -190,7 +190,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
     mAdapterId = aAdapterId;
     mIsCentral = aIsCentral;
 
-    mBLEAdvType       = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
     mBLEAdvDurationMs = 2;
     mpBLEAdvUUID      = "0xFFF6";
 
@@ -595,8 +594,7 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs,
-                                                           GetAdvertisingIntervals()));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mpBLEAdvUUID, mBLEAdvDurationMs, GetAdvertisingIntervals()));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 

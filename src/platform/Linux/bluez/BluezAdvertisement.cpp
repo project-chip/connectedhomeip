@@ -75,7 +75,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
     ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
-    bluez_leadvertisement1_set_type_(adv, (mAdvType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
+    bluez_leadvertisement1_set_type_(adv, "peripheral");
     bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
     // empty manufacturer data
     // empty solicit UUIDs
@@ -85,11 +85,8 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
     // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
     // and the flag is necessary to force using LE transport.
-    bluez_leadvertisement1_set_discoverable(adv, (mAdvType & BLUEZ_ADV_TYPE_SCANNABLE) ? TRUE : FALSE);
-
-    // The discoverable timeout shall NOT be set when type is set to "broadcast".
-    if (mAdvType & BLUEZ_ADV_TYPE_CONNECTABLE)
-        bluez_leadvertisement1_set_discoverable_timeout(adv, 0 /* infinite */);
+    bluez_leadvertisement1_set_discoverable(adv, TRUE);
+    bluez_leadvertisement1_set_discoverable_timeout(adv, 0 /* infinite */);
 
     // empty includes
     bluez_leadvertisement1_set_local_name(adv, localNamePtr);
@@ -136,8 +133,8 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
-                                    uint32_t aAdvDurationMs, AdvertisingIntervals aAdvIntervals)
+CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs,
+                                    AdvertisingIntervals aAdvIntervals)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -151,7 +148,6 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
     mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());
-    mAdvType       = aAdvType;
     mpAdvUUID      = g_strdup(aAdvUUID);
     mAdvDurationMs = aAdvDurationMs;
     mAdvIntervals  = aAdvIntervals;
