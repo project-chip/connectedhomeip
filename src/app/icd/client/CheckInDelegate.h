@@ -39,7 +39,7 @@ public:
      * @brief Callback used to let the application know that a check-in message was received and validated.
      *
      * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-                               node that sent the check-in message.
+     *                         node that sent the check-in message.
      */
     virtual void OnCheckInComplete(const ICDClientInfo & clientInfo) = 0;
 
@@ -48,30 +48,30 @@ public:
      * needed to avoid counter rollover problems.
      *
      * The implementer of this function should create a new RefreshKeySender object. They should also generate a new key and store
-       it in the RefreshKeySender object. This object will be tied to the specific key refresh process and will not be used by the
-       caller after that particular key refresh process has ended, regardless of success or failure.
-
+     * it in the RefreshKeySender object. This object will be tied to the specific key refresh process and will not be used by the
+     * caller after that particular key refresh process has ended, regardless of success or failure.
+     *
      * If the callee is unable to provide the RefreshKeySender object, that indicates key
      * refresh is not possible until the callee is able to provide the required resources.
      *
      * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-                               node that sent the check-in message. The callee can use the clientInfo to determine the type of key
-                               to generate.
+     *                         node that sent the check-in message. The callee can use the clientInfo to determine the type of key
+     *                         to generate.
      * @param[in] clientStorage - ICDClientStorage object stores the updated ICDClientInfo after re-registration into
-                                  persistent storage.
+     *                            persistent storage.
      * @return RefreshKeySender - pointer to RefreshKeySender object
      */
     virtual RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) = 0;
 
     /**
- * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for both
-          success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
- *
- * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller will
-                                 NOT use this pointer anymore.
-   @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
-                       Other errors indicate the failure reason.
- */
+     * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for
+     * both success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
+     *
+     * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller
+     * will NOT use this pointer anymore.
+     * @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
+     *                     Other errors indicate the failure reason.
+     */
     virtual void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR aError) = 0;
 };
 
