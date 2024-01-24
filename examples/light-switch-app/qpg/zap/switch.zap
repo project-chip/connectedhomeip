@@ -4983,7 +4983,7 @@
               "defaultValue": "4",
               "reportable": 1,
               "minInterval": 1,
-              "maxInterval": 65534,
+              "maxInterval": 65534
             }
           ]
         },
