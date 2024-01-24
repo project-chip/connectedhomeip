@@ -71,8 +71,8 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         if self.endpoint is None:
             asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                                 "missing argument is --endpoint <endpoint>")
-                                # "PIXIT_ENDPOINT must be included on the command line in "
-                                # "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
+            # "PIXIT_ENDPOINT must be included on the command line in "
+            # "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
             self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S"), "RVCCLEANM.S must be supported")
@@ -101,7 +101,8 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
         # Verify that the supported_run_modes_dut entry matching run_mode_dut does not have the Idle (0x4000) mode tag.
         for t in self.supported_run_modes[current_run_mode].modeTags:
-            asserts.assert_true(t.value != Clusters.RvcRunMode.Enums.ModeTag.kIdle, "The device must be in a mode without the Idle (0x4000) mode tag.")
+            asserts.assert_true(t.value != Clusters.RvcRunMode.Enums.ModeTag.kIdle,
+                                "The device must be in a mode without the Idle (0x4000) mode tag.")
 
         self.print_step(5, "Read the RvcCleanMode SupportedModes attribute")
         supported_clean_modes = await self.read_clean_supported_modes()
