@@ -17,7 +17,7 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/icd/client/DefaultCheckInDelegate.h>
-#include <app/icd/client/ICDRefreshKeyInfo.h>
+#include <app/icd/client/RefreshKeySender.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -43,25 +43,26 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 #endif
 }
 
-ICDRefreshKeyInfo * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
+RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    auto icdRefreshKeyInfo = chip::Platform::New<ICDRefreshKeyInfo>(this, clientInfo, clientStorage);
-    if (icdRefreshKeyInfo == nullptr)
+    auto refreshKeySender = chip::Platform::New<RefreshKeySender>(this, clientInfo, clientStorage);
+    if (refreshKeySender == nullptr)
     {
         return nullptr;
     }
 
-    err = chip::Crypto::DRBG_get_bytes(icdRefreshKeyInfo->mNewKey.Bytes(), icdRefreshKeyInfo->mNewKey.Capacity());
+    err = chip::Crypto::DRBG_get_bytes(refreshKeySender->GetRefreshKeyBuffer().Bytes(),
+                                       refreshKeySender->GetRefreshKeyBuffer().Capacity());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());
-        Platform::Delete(icdRefreshKeyInfo);
+        Platform::Delete(refreshKeySender);
         return nullptr;
     }
-    mICDRefreshKeyMap[clientInfo.peer_node] = icdRefreshKeyInfo;
-    return icdRefreshKeyInfo;
+    mRefreshKeySenderMap[clientInfo.peer_node] = refreshKeySender;
+    return refreshKeySender;
 }
 
 void DefaultCheckInDelegate::OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError)
@@ -77,11 +78,11 @@ void DefaultCheckInDelegate::OnKeyRefreshDone(const ICDClientInfo & clientInfo, 
         ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, aError.Format());
     }
 
-    if (mICDRefreshKeyMap.find(clientInfo.peer_node) != mICDRefreshKeyMap.end())
+    if (mRefreshKeySenderMap.find(clientInfo.peer_node) != mRefreshKeySenderMap.end())
     {
-        auto refreshKeyInfo = mICDRefreshKeyMap.at(clientInfo.peer_node);
-        Platform::Delete(refreshKeyInfo);
-        mICDRefreshKeyMap.erase(clientInfo.peer_node);
+        auto refreshKeySender = mRefreshKeySenderMap.at(clientInfo.peer_node);
+        Platform::Delete(refreshKeySender);
+        mRefreshKeySenderMap.erase(clientInfo.peer_node);
     }
 }
 } // namespace app

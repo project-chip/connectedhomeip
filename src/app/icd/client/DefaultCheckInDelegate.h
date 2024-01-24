@@ -34,7 +34,7 @@ public:
     virtual ~DefaultCheckInDelegate() {}
     CHIP_ERROR Init(ICDClientStorage * storage);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
-    ICDRefreshKeyInfo * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
+    RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
     void OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError) override;
 
 private:
@@ -48,10 +48,10 @@ private:
         }
     };
     ICDClientStorage * mpStorage = nullptr;
-    // Data structure used to store the ICDRefreshKeyInfo created for every node. Since the check-in delegate has to manage key
-    // refresh requests from multiple servers, this is used to keep track of the memory allocated for each node so that it can
+    // Data structure used to store the RefreshKeySender created for every peer node. Since the check-in delegate has to manage key
+    // refresh requests from multiple peers, this is used to keep track of the memory allocated for each peer so that it can
     // be freed up at the end of the key refresh process.
-    unordered_map<ScopedNodeId, ICDRefreshKeyInfo *, HashFunction> mICDRefreshKeyMap;
+    unordered_map<ScopedNodeId, RefreshKeySender *, HashFunction> mRefreshKeySenderMap;
 };
 
 } // namespace app

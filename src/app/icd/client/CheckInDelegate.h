@@ -24,7 +24,7 @@
 namespace chip {
 namespace app {
 
-class ICDRefreshKeyInfo;
+class RefreshKeySender;
 
 /// Callbacks for check in protocol
 /**
@@ -47,11 +47,11 @@ public:
      * @brief Callback used to let the application know that a key refresh is
      * needed to avoid counter rollover problems.
      *
-     * The implementer of this function should create a new ICDRefreshKeyInfo object. They should also generate a new key and store
-       it in the ICDRefreshKeyInfo object. This object will be tied to the specific key refresh process and will not be used by the
+     * The implementer of this function should create a new RefreshKeySender object. They should also generate a new key and store
+       it in the RefreshKeySender object. This object will be tied to the specific key refresh process and will not be used by the
        caller after that particular key refresh process has ended, regardless of success or failure.
 
-     * If the callee is unable to provide the ICDRefreshKeyInfo object, that indicates key
+     * If the callee is unable to provide the RefreshKeySender object, that indicates key
      * refresh is not possible until the callee is able to provide the required resources.
      *
      * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
@@ -59,8 +59,9 @@ public:
                                to generate.
      * @param[in] clientStorage - ICDClientStorage object stores the updated ICDClientInfo after re-registration into
                                   persistent storage.
+     * @return RefreshKeySender - pointer to RefreshKeySender object
      */
-    virtual ICDRefreshKeyInfo * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) = 0;
+    virtual RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) = 0;
 
     /**
  * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for both

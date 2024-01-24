@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "ICDRefreshKeyInfo.h"
+#include "RefreshKeySender.h"
 #include "CheckInDelegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandPathParams.h>
@@ -27,8 +27,8 @@
 namespace chip {
 namespace app {
 
-ICDRefreshKeyInfo::ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo & aICDClientInfo,
-                                     ICDClientStorage * aICDClientStorage) :
+RefreshKeySender::RefreshKeySender(CheckInDelegate * apCheckInDelegate, ICDClientInfo & aICDClientInfo,
+                                   ICDClientStorage * aICDClientStorage) :
     mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
@@ -37,15 +37,15 @@ ICDRefreshKeyInfo::ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDCli
     mpICDClientStorage = aICDClientStorage;
 }
 
-void ICDRefreshKeyInfo::Callback::OnResponse(chip::app::CommandSender * apCommandSender,
-                                             const chip::app::ConcreteCommandPath & aPath, const chip::app::StatusIB & aStatus,
-                                             chip::TLV::TLVReader * aData)
+void RefreshKeySender::Callback::OnResponse(chip::app::CommandSender * apCommandSender,
+                                            const chip::app::ConcreteCommandPath & aPath, const chip::app::StatusIB & aStatus,
+                                            chip::TLV::TLVReader * aData)
 {
     app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType responseData;
     if (aData == nullptr)
     {
-        mpICDRefreshKeyInfo->GetCheckInDelegate()->OnKeyRefreshDone(mpICDRefreshKeyInfo->GetICDClientInfo(),
-                                                                    CHIP_ERROR_INVALID_TLV_ELEMENT);
+        mpRefreshKeySender->GetCheckInDelegate()->OnKeyRefreshDone(mpRefreshKeySender->GetICDClientInfo(),
+                                                                   CHIP_ERROR_INVALID_TLV_ELEMENT);
         return;
     }
 
@@ -53,43 +53,42 @@ void ICDRefreshKeyInfo::Callback::OnResponse(chip::app::CommandSender * apComman
     if (mError != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Failed to decode re-registration response data: %" CHIP_ERROR_FORMAT, mError.Format());
-        mpICDRefreshKeyInfo->GetCheckInDelegate()->OnKeyRefreshDone(mpICDRefreshKeyInfo->GetICDClientInfo(), mError);
+        mpRefreshKeySender->GetCheckInDelegate()->OnKeyRefreshDone(mpRefreshKeySender->GetICDClientInfo(), mError);
         return;
     }
     // Update the ICDClientInfo with new key and start counter and store it to persistence
-    mpICDRefreshKeyInfo->GetICDClientInfo().start_icd_counter = responseData.ICDCounter;
-    mpICDRefreshKeyInfo->GetICDClientInfo().offset            = 0;
-    mpICDRefreshKeyInfo->GetICDClientStorage()->RemoveKey(mpICDRefreshKeyInfo->GetICDClientInfo());
-    mError = mpICDRefreshKeyInfo->GetICDClientStorage()->SetKey(mpICDRefreshKeyInfo->GetICDClientInfo(),
-                                                                mpICDRefreshKeyInfo->mNewKey.Span());
+    mpRefreshKeySender->GetICDClientInfo().start_icd_counter = responseData.ICDCounter;
+    mpRefreshKeySender->GetICDClientInfo().offset            = 0;
+    mpRefreshKeySender->GetICDClientStorage()->RemoveKey(mpRefreshKeySender->GetICDClientInfo());
+    mError = mpRefreshKeySender->GetICDClientStorage()->SetKey(mpRefreshKeySender->GetICDClientInfo(),
+                                                               mpRefreshKeySender->mNewKey.Span());
     if (mError != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Failed to set the new key after re-registration: %" CHIP_ERROR_FORMAT, mError.Format());
-        mpICDRefreshKeyInfo->GetCheckInDelegate()->OnKeyRefreshDone(mpICDRefreshKeyInfo->GetICDClientInfo(), mError);
+        mpRefreshKeySender->GetCheckInDelegate()->OnKeyRefreshDone(mpRefreshKeySender->GetICDClientInfo(), mError);
         return;
     }
 
-    mError = mpICDRefreshKeyInfo->GetICDClientStorage()->StoreEntry(mpICDRefreshKeyInfo->GetICDClientInfo());
+    mError = mpRefreshKeySender->GetICDClientStorage()->StoreEntry(mpRefreshKeySender->GetICDClientInfo());
     if (mError != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Failed to store the new key after re-registration: %" CHIP_ERROR_FORMAT, mError.Format());
-        mpICDRefreshKeyInfo->GetCheckInDelegate()->OnKeyRefreshDone(mpICDRefreshKeyInfo->GetICDClientInfo(), mError);
+        mpRefreshKeySender->GetCheckInDelegate()->OnKeyRefreshDone(mpRefreshKeySender->GetICDClientInfo(), mError);
         return;
     }
 
-    mpICDRefreshKeyInfo->GetCheckInDelegate()->OnCheckInComplete(mpICDRefreshKeyInfo->GetICDClientInfo());
-    mpICDRefreshKeyInfo->GetCheckInDelegate()->OnKeyRefreshDone(mpICDRefreshKeyInfo->GetICDClientInfo(), CHIP_NO_ERROR);
+    mpRefreshKeySender->GetCheckInDelegate()->OnCheckInComplete(mpRefreshKeySender->GetICDClientInfo());
+    mpRefreshKeySender->GetCheckInDelegate()->OnKeyRefreshDone(mpRefreshKeySender->GetICDClientInfo(), CHIP_NO_ERROR);
 }
-void ICDRefreshKeyInfo::Callback::OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError)
+void RefreshKeySender::Callback::OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError)
 {
     mError = aError;
-    mpICDRefreshKeyInfo->GetCheckInDelegate()->OnKeyRefreshDone(mpICDRefreshKeyInfo->GetICDClientInfo(), mError);
+    mpRefreshKeySender->GetCheckInDelegate()->OnKeyRefreshDone(mpRefreshKeySender->GetICDClientInfo(), mError);
 }
 
-void ICDRefreshKeyInfo::Callback::OnDone(chip::app::CommandSender * apCommandSender) {}
+void RefreshKeySender::Callback::OnDone(chip::app::CommandSender * apCommandSender) {}
 
-CHIP_ERROR ICDRefreshKeyInfo::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr,
-                                                       const SessionHandle & sessionHandle)
+CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     using namespace Clusters::IcdManagement;
     EndpointId endpointId = 0;
@@ -97,12 +96,12 @@ CHIP_ERROR ICDRefreshKeyInfo::RegisterClientWithNewKey(Messaging::ExchangeManage
 
     mRegisterCommandSender.Emplace(&mCommandSenderDelegate, &exchangeMgr);
 
-    mCommandSenderDelegate.SetICDRefreshKeyInfo(this);
+    mCommandSenderDelegate.SetRefreshKeySender(this);
 
     Commands::RegisterClient::Type registerClientCommand;
     registerClientCommand.checkInNodeID    = mICDClientInfo.peer_node.GetNodeId();
     registerClientCommand.monitoredSubject = mICDClientInfo.monitored_subject;
-    registerClientCommand.key              = mNewKey.Span();
+    registerClientCommand.key              = GetRefreshKeyBuffer().Span();
     auto commandPathParams =
         CommandPathParams(endpointId, groupId, Id, Commands::RegisterClient::Id, (CommandPathFlags::kEndpointIdValid));
 
@@ -112,7 +111,7 @@ CHIP_ERROR ICDRefreshKeyInfo::RegisterClientWithNewKey(Messaging::ExchangeManage
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ICDRefreshKeyInfo::EstablishSessionToPeer()
+CHIP_ERROR RefreshKeySender::EstablishSessionToPeer()
 {
     ChipLogProgress(ICD, "Trying to establish a CASE session for re-registering an ICD client");
     auto * caseSessionManager = InteractionModelEngine::GetInstance()->GetCASESessionManager();
@@ -121,10 +120,10 @@ CHIP_ERROR ICDRefreshKeyInfo::EstablishSessionToPeer()
     return CHIP_NO_ERROR;
 }
 
-void ICDRefreshKeyInfo::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                              const SessionHandle & sessionHandle)
+void RefreshKeySender::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                             const SessionHandle & sessionHandle)
 {
-    ICDRefreshKeyInfo * const _this = static_cast<ICDRefreshKeyInfo *>(context);
+    RefreshKeySender * const _this = static_cast<RefreshKeySender *>(context);
     VerifyOrDie(_this != nullptr);
 
     CHIP_ERROR err = _this->RegisterClientWithNewKey(exchangeMgr, sessionHandle);
@@ -135,9 +134,9 @@ void ICDRefreshKeyInfo::HandleDeviceConnected(void * context, Messaging::Exchang
     }
 }
 
-void ICDRefreshKeyInfo::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
+void RefreshKeySender::HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err)
 {
-    ICDRefreshKeyInfo * const _this = static_cast<ICDRefreshKeyInfo *>(context);
+    RefreshKeySender * const _this = static_cast<RefreshKeySender *>(context);
     VerifyOrDie(_this != nullptr);
 
     ChipLogError(ICD, "Failed to establish CASE for re-registration with error '%" CHIP_ERROR_FORMAT "'", err.Format());

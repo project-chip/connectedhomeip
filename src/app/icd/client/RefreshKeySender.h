@@ -34,12 +34,12 @@ namespace chip {
 namespace app {
 
 class CheckInDelegate;
-class ICDRefreshKeyInfo;
+class RefreshKeySender;
 
 /**
- * @brief ICDRefreshKeyInfo contains all the data and methods needed for key refresh and re-registration of an ICD client.
+ * @brief RefreshKeySender contains all the data and methods needed for key refresh and re-registration of an ICD client.
  */
-class ICDRefreshKeyInfo
+class RefreshKeySender
 {
 public:
     typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
@@ -55,22 +55,22 @@ public:
         void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
         void OnDone(CommandSender * apCommandSender) override;
 
-        void SetICDRefreshKeyInfo(ICDRefreshKeyInfo * apICDRefreshKeyInfo) { mpICDRefreshKeyInfo = apICDRefreshKeyInfo; }
+        void SetRefreshKeySender(RefreshKeySender * apRefreshKeySender) { mpRefreshKeySender = apRefreshKeySender; }
 
         virtual ~Callback() {}
 
     private:
-        CHIP_ERROR mError                       = CHIP_NO_ERROR;
-        ICDRefreshKeyInfo * mpICDRefreshKeyInfo = nullptr;
+        CHIP_ERROR mError                     = CHIP_NO_ERROR;
+        RefreshKeySender * mpRefreshKeySender = nullptr;
     };
 
-    ICDRefreshKeyInfo(CheckInDelegate * apCheckInDelegate, ICDClientInfo & aICDClientInfo, ICDClientStorage * aICDClientStorage);
+    RefreshKeySender(CheckInDelegate * apCheckInDelegate, ICDClientInfo & aICDClientInfo, ICDClientStorage * aICDClientStorage);
 
     /**
-     * @brief Used by the application to set a new key to avoid counter rollover problems.
+     * @brief Used to send a re-registration command to the peer using a new key.
      *
      * @param[in] clientInfo clientInfo object
-     * @param[in] keyData New key data to use to re-register the client with the server
+     * @param[in] keyData New key to re-register the client with the server
      * @param[in] exchangeMgr exchange manager to use for the re-registration
      * @param[in] sessionHandle session handle to use for the re-registration
      */
@@ -97,7 +97,10 @@ public:
      */
     CheckInDelegate * GetCheckInDelegate(void) { return mpCheckInDelegate; }
 
-    RefreshKeyBuffer mNewKey;
+    /**
+     * @brief Getter for refresh key buffer
+     */
+    RefreshKeyBuffer & GetRefreshKeyBuffer(void) { return mNewKey; }
 
 private:
     // CASE session callbacks
@@ -124,6 +127,7 @@ private:
     ICDClientInfo mICDClientInfo;
     ICDClientStorage * mpICDClientStorage = nullptr;
     CheckInDelegate * mpCheckInDelegate   = nullptr;
+    RefreshKeyBuffer mNewKey;
     chip::Optional<CommandSender> mRegisterCommandSender;
     Callback mCommandSenderDelegate;
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;

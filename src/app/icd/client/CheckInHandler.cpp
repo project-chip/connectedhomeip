@@ -24,7 +24,7 @@
 
 #include <app/InteractionModelTimeout.h>
 #include <app/icd/client/CheckInHandler.h>
-#include <app/icd/client/ICDRefreshKeyInfo.h>
+#include <app/icd/client/RefreshKeySender.h>
 
 #include <cinttypes>
 
@@ -109,14 +109,14 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
 
     if (refreshKey)
     {
-        ICDRefreshKeyInfo * refreshKeyInfo = mpCheckInDelegate->OnKeyRefreshNeeded(clientInfo, mpICDClientStorage);
-        if (refreshKeyInfo == nullptr)
+        RefreshKeySender * refreshKeySender = mpCheckInDelegate->OnKeyRefreshNeeded(clientInfo, mpICDClientStorage);
+        if (refreshKeySender == nullptr)
         {
             ChipLogError(ICD, "Key Refresh failed for node ID:" ChipLogFormatScopedNodeId,
                          ChipLogValueScopedNodeId(clientInfo.peer_node));
             return CHIP_NO_ERROR;
         }
-        err = refreshKeyInfo->EstablishSessionToPeer();
+        err = refreshKeySender->EstablishSessionToPeer();
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(ICD, "CASE session establishment failed with error : %" CHIP_ERROR_FORMAT, err.Format());
