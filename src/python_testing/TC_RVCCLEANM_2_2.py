@@ -67,7 +67,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
 
-        self.endpoint = self.user_params.get("endpoint", 1)
+        self.endpoint = self.matter_test_config.endpoint
         if self.endpoint is None:
             asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
                                 "missing argument is --endpoint <endpoint>")
