@@ -91,9 +91,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // empty includes
     bluez_leadvertisement1_set_local_name(adv, localNamePtr);
     bluez_leadvertisement1_set_appearance(adv, 0xffff /* no appearance */);
-
-    bluez_leadvertisement1_set_duration(adv, mAdvDurationMs);
-    // empty duration, we don't have a clear notion what it would mean to timeslice between toble and anyone else
+    // empty duration
     bluez_leadvertisement1_set_timeout(adv, 0);
     // empty secondary channel for now
 
@@ -130,7 +128,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs)
+CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -143,9 +141,8 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     mpAdapterName = g_strdup(aEndpoint.GetAdapterName());
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
-    mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());
-    mpAdvUUID      = g_strdup(aAdvUUID);
-    mAdvDurationMs = aAdvDurationMs;
+    mpAdvPath = g_strdup_printf("%s/advertising", rootPath.get());
+    mpAdvUUID = g_strdup(aAdvUUID);
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     ReturnErrorOnFailure(err);

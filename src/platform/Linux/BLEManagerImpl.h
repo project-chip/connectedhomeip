@@ -189,8 +189,7 @@ private:
     BluezEndpoint mEndpoint;
 
     BluezAdvertisement mBLEAdvertisement;
-    uint16_t mBLEAdvDurationMs = 20;
-    const char * mpBLEAdvUUID  = nullptr;
+    const char * mpBLEAdvUUID = nullptr;
 
     ChipDeviceScanner mDeviceScanner;
     BLEScanConfig mBLEScanConfig;

@@ -45,7 +45,7 @@ public:
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 
@@ -85,7 +85,6 @@ private:
     char * mpAdvPath        = nullptr;
     char * mpAdapterName    = nullptr;
     char * mpAdvUUID        = nullptr;
-    uint16_t mAdvDurationMs = 0;
 };
 
 } // namespace Internal
