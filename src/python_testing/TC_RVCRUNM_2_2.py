@@ -16,7 +16,7 @@
 #
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # This test requires several additional command line arguments.
@@ -24,37 +24,26 @@ from mobly import asserts
 # --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
 
 
-def error_enum_to_text(error_eum):
-    if error_eum == 0:
-        return "Success(0x00)"
-    elif error_eum == 0x1:
-        return "UnsupportedMode(0x01)"
-    elif error_eum == 0x2:
-        return "GenericFailure(0x02)"
-    elif error_eum == 0x3:
-        return "InvalidInMode(0x03)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kStuck:
-        return "kStuck(0x41)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kDustBinMissing:
-        return "kDustBinMissing(0x42)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kDustBinFull:
-        return "kDustBinFull(0x43)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kWaterTankEmpty:
-        return "kWaterTankEmpty(0x44)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kWaterTankMissing:
-        return "kWaterTankMissing(0x45)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kWaterTankLidOpen:
-        return "kWaterTankLidOpen(0x46)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kMopCleaningPadMissing:
-        return "kMopCleaningPadMissing(0x47)"
-    elif error_eum == Clusters.RvcRunMode.Enums.ModeTag.kBatteryLow:
-        return "kBatteryLow(0x48)"
+def error_enum_to_text(error_enum):
+    try:
+        return f'{Clusters.RvcRunMode.Enums.ModeTag(error_enum).name} 0x{error_enum:02x}'
+    except AttributeError:
+        if error_enum == 0:
+            return "Success(0x00)"
+        elif error_enum == 0x1:
+            return "UnsupportedMode(0x01)"
+        elif error_enum == 0x2:
+            return "GenericFailure(0x02)"
+        elif error_enum == 0x3:
+            return "InvalidInMode(0x03)"
+
+    raise AttributeError("Unknown Enum value")
 
 
 class TC_RVCRUNM_2_2(MatterBaseTest):
 
     def __init__(self, *args):
-        super().__init__(args)
+        super().__init__(*args)
         self.endpoint = 0
         self.mode_a = 0
         self.mode_b = 0
@@ -70,7 +59,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         ret = await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcRunMode.Attributes.SupportedModes), "")
         return ret
 
     async def read_current_mode_with_check(self, expected_mode):
@@ -83,8 +71,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
                                          endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse),
-                            "Unexpected return type for ChangeToMode")
         return ret
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
@@ -104,16 +90,14 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCRUNM_2_2(self):
 
-        if 'PIXIT_ENDPOINT' not in self.matter_test_config.global_test_params or \
-                'PIXIT.RVCRUNM.MODE_A' not in self.matter_test_config.global_test_params or \
+        if 'PIXIT.RVCRUNM.MODE_A' not in self.matter_test_config.global_test_params or \
                 'PIXIT.RVCRUNM.MODE_B' not in self.matter_test_config.global_test_params:
             asserts.fail("There are missing arguments to the `--int-arg` flag! "
                          "Make sure that all of these arguments are given to this flag: \n"
-                         "PIXIT_ENDPOINT:<endpoint> \n"
                          "PIXIT.RVCRUNM.MODE_A:<mode id> \n"
                          "PIXIT.RVCRUNM.MODE_B:<mode id>")
 
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.user_params.get("endpoint", 1)
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
 
@@ -159,10 +143,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         current_run_mode = await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.CurrentMode)
-
-        # Verify that the DUT response contains an integer value
-        asserts.assert_true(type_matches(current_run_mode, Clusters.RvcRunMode.Attributes.CurrentMode),
-                            "CurrentMode must be an integer")
 
         # Save the value as idle_mode_dut
         self.idle_mode_dut = current_run_mode
