@@ -43,7 +43,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     // Our business logic states that we can only switch into the mapping state from the idle state.
     if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
     {
-        response.status = to_underlying(ModeBase::StatusCode::kGenericFailure);
+        response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
         response.statusText.SetValue(chip::CharSpan::fromCharString("Change to the mapping mode is only allowed from idle"));
         return;
     }
