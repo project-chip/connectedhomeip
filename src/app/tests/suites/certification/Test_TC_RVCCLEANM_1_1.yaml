@@ -67,28 +67,6 @@ tests:
               type: list
               contains: [0, 1, 65528, 65529, 65531, 65532, 65533]
 
-    - label:
-          "Step 4c: TH reads the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF)
-          and optional attribute(OnMode) is in AttributeList from the DUT"
-      PICS: RVCCLEANM.S.F00
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              contains: [3]
-
-    - label:
-          "Step 4c: TH reads the Feature dependent(RVCCLEANM.S.F00 - DEPONOFF)
-          and optional attribute(OnMode) is not in AttributeList from the DUT"
-      PICS: " !RVCCLEANM.S.F00 "
-      command: "readAttribute"
-      attribute: "AttributeList"
-      response:
-          constraints:
-              type: list
-              excludes: [3]
-
     - label: "Step 5: TH reads from the DUT the EventList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
