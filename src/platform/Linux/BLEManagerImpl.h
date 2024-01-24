@@ -141,6 +141,7 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
+
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnScanComplete() override;
 
@@ -152,6 +153,7 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
+
     enum class Flags : uint16_t
     {
         kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
@@ -174,10 +176,8 @@ private:
     };
 
     void DriveBLEState();
-    static void DriveBLEState(intptr_t arg);
 
     void InitiateScan(BleScanState scanType);
-    static void InitiateScan(intptr_t arg);
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
