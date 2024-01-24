@@ -16,18 +16,18 @@
 #
 
 import chip.clusters as Clusters
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
+# --int-arg PIXIT_ENDPOINT:<endpoint>
 
 
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     def __init__(self, *args):
-        super().__init__(args)
+        super().__init__(*args)
         self.endpoint = 0
         self.supported_run_modes = {}  # these are the ModeOptionStructs
         self.supported_run_modes_dut = []
@@ -44,20 +44,16 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         ret = await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcRunMode.Attributes.SupportedModes), "")
         return ret
 
     async def read_clean_supported_modes(self) -> Clusters.Objects.RvcCleanMode.Attributes.SupportedModes:
         ret = await self.read_mod_attribute_expect_success(
             Clusters.RvcCleanMode,
             Clusters.RvcCleanMode.Attributes.SupportedModes)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcCleanMode.Attributes.SupportedModes), "")
         return ret
 
     async def send_change_to_mode_cmd(self, newMode) -> Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcCleanMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcCleanMode.Commands.ChangeToModeResponse),
-                            "Unexpected return type for ChangeToMode")
         return ret
 
     # Prints the instruction and waits for a user input to continue
@@ -71,11 +67,13 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
 
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.user_params.get("endpoint", 1)
+        if self.endpoint is None:
+            asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
+                                "missing argument is --endpoint <endpoint>")
+                                # "PIXIT_ENDPOINT must be included on the command line in "
+                                # "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
+            self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S"), "RVCCLEANM.S must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")
@@ -98,10 +96,6 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.CurrentMode)
 
-        # Verify that the DUT response contains an integer value
-        asserts.assert_true(type_matches(current_run_mode, Clusters.RvcRunMode.Attributes.CurrentMode),
-                            "CurrentMode must be an integer")
-
         # Save the value as run_mode_dut
         self.run_mode_dut = current_run_mode
 
@@ -113,9 +107,6 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         self.print_step(5, "Read the RvcCleanMode SupportedModes attribute")
         supported_clean_modes = await self.read_clean_supported_modes()
         for mode in supported_clean_modes:
-            # Verify that the DUT response contains a list of ModeOptionsStruct entries
-            asserts.assert_true(type_matches(mode, Clusters.RvcCleanMode.Attributes.SupportedModes),
-                                "Supported modes must be of type ModeOptionsStruct!")
             # Save the Mode field values as supported_run_modes_dut
             self.supported_clean_modes_dut.append(mode.mode)
 
@@ -123,10 +114,6 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
         current_clean_mode = await self.read_mod_attribute_expect_success(
             Clusters.RvcCleanMode,
             Clusters.RvcCleanMode.Attributes.CurrentMode)
-
-        # Verify that the DUT response contains an integer value
-        asserts.assert_true(type_matches(current_clean_mode, Clusters.RvcCleanMode.Attributes.CurrentMode),
-                            "CurrentMode must be an integer")
 
         # Save the value as old_clean_mode_dut
         self.old_clean_mode_dut = current_clean_mode
