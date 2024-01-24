@@ -17,6 +17,7 @@
 
 
 import asyncio
+from typing import Dict, List
 
 from mdns_discovery.exceptions import DiscoveryNotPerformedError
 from zeroconf import ServiceStateChange, Zeroconf
@@ -40,6 +41,26 @@ class MdnsDiscovery:
             _discovered_services (dict): A dictionary to store discovered services.
             _discovery_performed (bool): Flag to indicate if discovery has been performed.
             dut_operational_service_name (str): The operational service name for the DUT (Device Under Test).
+
+        Main methods, return a list of service info dicts, each dict has keys for querying values
+            - getCommissionerServiceInfo()
+            - getCommissionableServiceInfo()
+            - getOperationalServiceInfo()
+            - getBorderRouterServiceInfo()
+
+        Keys:
+            - service_name: The unique name of the mDNS service.
+            - name: The human-readable name of the service.
+            - type: The type of the service, typically indicating the service protocol and domain.
+            - server: The domain name of the machine hosting the service.
+            - port: The network port on which the service is available.
+            - addresses: A list of IP addresses associated with the service.
+            - txt_record: A dictionary of key-value pairs representing the service's metadata.
+            - priority: The priority of the service, used in service selection when multiple instances are available.
+            - interface_index: The network interface index on which the service is advertised.
+            - weight: The relative weight for records with the same priority, used in load balancing.
+            - host_ttl: The time-to-live value for the host name in the DNS record.
+            - other_ttl: The time-to-live value for other records associated with the service.            
         """
         self._zc: Zeroconf = Zeroconf()
         self._tc = tc
@@ -48,7 +69,7 @@ class MdnsDiscovery:
         self._discovery_performed = False
         self.dut_operational_service_name = self._get_dut_operational_service_name()
 
-    async def discover(self, discovery_duration: float = 3) -> None:
+    async def discover(self, discovery_duration_sec: float = 3) -> None:
         """
         Asynchronously discovers network services of specified types using mDNS.
 
@@ -60,7 +81,7 @@ class MdnsDiscovery:
         asynchronously waits to allow network responses to be received and processed.
 
         Args:
-            discovery_duration (float): The duration in seconds for which the discovery
+            discovery_duration_sec (float): The duration in seconds for which the discovery
                                         process should wait to allow for service announcements.
                                         If not provided, defaults to 3 seconds.
 
@@ -75,13 +96,13 @@ class MdnsDiscovery:
         self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsType}
         AsyncServiceBrowser(zeroconf=self._zc,
                             type_=self._service_types,
-                            handlers=[self.on_service_state_change]
+                            handlers=[self._on_service_state_change]
                             )
         # Wait for discovery
-        await asyncio.sleep(discovery_duration)
+        await asyncio.sleep(discovery_duration_sec)
         self._discovery_performed = True
 
-    def on_service_state_change(
+    def _on_service_state_change(
         self,
         zeroconf: Zeroconf,
         service_type: str,
@@ -104,13 +125,13 @@ class MdnsDiscovery:
             None: This method does not return any value.
         """
         if state_change.value == ServiceStateChange.Added.value:
-            asyncio.ensure_future(self.query_service_info(
+            asyncio.ensure_future(self._query_service_info(
                 zeroconf,
                 service_type,
                 name)
             )
 
-    async def query_service_info(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
+    async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
         """
         This method requests detailed information about an mDNS service, such as its address,
         port, and other service metadata. The information is requested asynchronously.
@@ -124,18 +145,18 @@ class MdnsDiscovery:
             None: This method does not return any value. The results of the query are processed internally.
         """
         # Get service info
-        service_info: AsyncServiceInfo = AsyncServiceInfo(service_type, name)
+        service_info = AsyncServiceInfo(service_type, name)
         is_service_discovered = await service_info.async_request(zeroconf, 3000)
 
         if is_service_discovered:
             # Add service info to discovered services
             for mdns_type in MdnsType:
                 if service_type == mdns_type.value:
-                    service_info_dict = self.service_info_to_dict(service_info)
+                    service_info_dict = self._service_info_to_dict(service_info)
                     self._discovered_services[mdns_type.name].append(service_info_dict)
                     break
 
-    def service_info_to_dict(self, service_info: AsyncServiceInfo):
+    def _service_info_to_dict(self, service_info: AsyncServiceInfo) -> Dict[str, any]:
         """
         Converts an AsyncServiceInfo object to a dictionary for easier access and manipulation.
 
@@ -164,7 +185,7 @@ class MdnsDiscovery:
         }
         return service_info_dict
 
-    def _get_dut_operational_service_name(self):
+    def _get_dut_operational_service_name(self) -> str:
         """
         Constructs the operational service name for the DUT.
 
@@ -175,14 +196,11 @@ class MdnsDiscovery:
             str: A string representing the operational service name.
         """
         node_id = self._tc.dut_node_id
-        node_id_hex = str(hex(int(node_id))[2:].upper()).zfill(16)
-        compressed_fabricid = self._tc.default_controller.GetCompressedFabricId()
-        compressed_fabricid_hex = hex(int(compressed_fabricid))[2:].upper()
-        name = f"{compressed_fabricid_hex}-{node_id_hex}"
-        service_name = f"{name}.{MdnsType.OPERATIONAL}"
+        compressed_fabric_id = self._tc.default_controller.GetCompressedFabricId()
+        service_name = f'{compressed_fabric_id:016X}-{node_id:016X}.{MdnsType.OPERATIONAL.value}'
         return service_name
 
-    def _getServiceInfo(self, mdns_type: MdnsType):
+    def _getServiceInfo(self, mdns_type: MdnsType) -> List[Dict[str, any]]:
         """
         This method returns the discovered service information for a specified mDNS type.
         It raises an exception if the discovery process has not been performed before calling this method.
@@ -201,118 +219,38 @@ class MdnsDiscovery:
 
         return self._discovered_services[mdns_type.name]
 
-    def getCommisionerServiceInfo(self):
+    def getCommissionerServiceInfo(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Commissioner services.
 
-        This method is a convenience wrapper around `_getServiceInfo` specifically for
-        returning Commissioner services.
-
         Returns:
             list: A list of discovered Commissioner services.
-
-        Note: Each element in the array is a service info dict which might have nested
-              dicts as it's value.
-
-        Service Info Dict Keys:
-            service_name: The unique name of the mDNS service.
-            name: The human-readable name of the service.
-            type: The type of the service, typically indicating the service protocol and domain.
-            server: The domain name of the machine hosting the service.
-            port: The network port on which the service is available.
-            addresses: A list of IP addresses associated with the service.
-            txt_record: A dictionary of key-value pairs representing the service's metadata.
-            priority: The priority of the service, used in service selection when multiple instances are available.
-            interface_index: The network interface index on which the service is advertised.
-            weight: The relative weight for records with the same priority, used in load balancing.
-            host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.COMMISIONER)
 
-    def getCommissionableServiceInfo(self):
+    def getCommissionableServiceInfo(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Commissionable services.
 
-        This method is a convenience wrapper around `_getServiceInfo` specifically for
-        returning Commissionable services.
-
         Returns:
             list: A list of discovered Commissionable services.
-
-        Note: Each element in the array is a service info dict which might have nested
-              dicts as it's value.
-
-        Service Info Dict Keys:
-            service_name: The unique name of the mDNS service.
-            name: The human-readable name of the service.
-            type: The type of the service, typically indicating the service protocol and domain.
-            server: The domain name of the machine hosting the service.
-            port: The network port on which the service is available.
-            addresses: A list of IP addresses associated with the service.
-            txt_record: A dictionary of key-value pairs representing the service's metadata.
-            priority: The priority of the service, used in service selection when multiple instances are available.
-            interface_index: The network interface index on which the service is advertised.
-            weight: The relative weight for records with the same priority, used in load balancing.
-            host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.COMMISSIONABLE)
 
-    def getOperationalServiceInfo(self):
+    def getOperationalServiceInfo(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Operational services.
 
-        This method is a convenience wrapper around `_getServiceInfo` specifically for
-        returning Operational services.
-
         Returns:
             list: A list of discovered Operational services.
-
-        Note: Each element in the array is a service info dict which might have nested
-              dicts as it's value.
-
-        Service Info Dict Keys:
-            service_name: The unique name of the mDNS service.
-            name: The human-readable name of the service.
-            type: The type of the service, typically indicating the service protocol and domain.
-            server: The domain name of the machine hosting the service.
-            port: The network port on which the service is available.
-            addresses: A list of IP addresses associated with the service.
-            txt_record: A dictionary of key-value pairs representing the service's metadata.
-            priority: The priority of the service, used in service selection when multiple instances are available.
-            interface_index: The network interface index on which the service is advertised.
-            weight: The relative weight for records with the same priority, used in load balancing.
-            host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.OPERATIONAL)
 
-    def getBorderRouterServiceInfo(self):
+    def getBorderRouterServiceInfo(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Border Router services.
 
-        This method is a convenience wrapper around `_getServiceInfo` specifically for
-        returning Border Router services.
-
         Returns:
             list: A list of discovered Border Router services.
-
-        Note: Each element in the array is a service info dict which might have nested
-              dicts as it's value.
-
-        Service Info Dict Keys:
-            service_name: The unique name of the mDNS service.
-            name: The human-readable name of the service.
-            type: The type of the service, typically indicating the service protocol and domain.
-            server: The domain name of the machine hosting the service.
-            port: The network port on which the service is available.
-            addresses: A list of IP addresses associated with the service.
-            txt_record: A dictionary of key-value pairs representing the service's metadata.
-            priority: The priority of the service, used in service selection when multiple instances are available.
-            interface_index: The network interface index on which the service is advertised.
-            weight: The relative weight for records with the same priority, used in load balancing.
-            host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.BORDER_ROUTER)
