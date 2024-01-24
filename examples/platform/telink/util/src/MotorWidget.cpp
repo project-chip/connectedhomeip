@@ -187,8 +187,13 @@ void MotorWidget::Reverse(void)
 
 void MotorWidget::Start(bool direction)
 {
-    pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
-    pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+    if (isMotorStopped)
+    {
+        pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
+        pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+    }
+
+    isMotorStopped = false;
     LOG_INF("Motor start: %d\n", direction);
     k_timer_stop(&mMotorTimer);
 
@@ -227,8 +232,14 @@ void MotorWidget::MotorStop()
     Coast();
     Sleep(false);
     k_timer_stop(&mMotorTimer);
-    pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
-    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+
+    if (!isMotorStopped)
+    {
+        pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
+        pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+    }
+
+    isMotorStopped = true;
 }
 
 void MotorWidget::ActionMotorStateUpdateHandler(k_timer * timer)
