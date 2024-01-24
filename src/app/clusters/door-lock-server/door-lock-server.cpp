@@ -28,6 +28,7 @@
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <app/util/error-mapping.h>
 #include <cinttypes>
 
@@ -40,12 +41,46 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::DoorLock;
+using namespace chip::app::Clusters::DoorLock::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 
 static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
+
+static constexpr size_t kDoorLockDelegateTableSize =
+    EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+
+static_assert(kDoorLockDelegateTableSize <= kEmberInvalidEndpointIndex, "Door Lock Delegate table size error");
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DoorLock {
+
+Delegate * gDelegateTable[kDoorLockDelegateTableSize] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
+{
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+    return (ep >= kDoorLockDelegateTableSize ? nullptr : gDelegateTable[ep]);
+}
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
+    // if endpoint is found
+    if (ep < kDoorLockDelegateTableSize)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+}
+
+} // namespace DoorLock
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 DoorLockServer DoorLockServer::instance;
 
@@ -1570,8 +1605,15 @@ bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, Cred
         status = emberAfPluginDoorLockGetNumberOfFaceCredentialsSupported(endpointId, maxNumberOfCredentials);
         break;
     case CredentialTypeEnum::kAliroCredentialIssuerKey:
+        status = emberAfPluginDoorLockGetNumberOfAliroCredentialIssuerKeyCredentialsSupported(endpointId, maxNumberOfCredentials);
+        break;
     case CredentialTypeEnum::kAliroEvictableEndpointKey:
+        status = emberAfPluginDoorLockGetNumberOfAliroEvictableEndpointKeyCredentialsSupported(endpointId, maxNumberOfCredentials);
+        break;
     case CredentialTypeEnum::kAliroNonEvictableEndpointKey:
+        status =
+            emberAfPluginDoorLockGetNumberOfAliroNonEvictableEndpointKeyCredentialsSupported(endpointId, maxNumberOfCredentials);
+        break;
     default:
         return false;
     }
@@ -3812,6 +3854,110 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(
     return true;
 }
 
+bool emberAfDoorLockClusterSetAliroReaderConfigCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::DecodableType & commandData)
+{
+    DoorLockServer::Instance().setAliroReaderConfigCommandHandler(commandObj, commandPath, commandData.signingKey,
+                                                                  commandData.verificationKey, commandData.groupIdentifier,
+                                                                  commandData.groupResolvingKey);
+    return true;
+}
+
+bool emberAfDoorLockClusterClearAliroReaderConfigCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType & commandData)
+{
+    DoorLockServer::Instance().clearAliroReaderConfigCommandHandler(commandObj, commandPath);
+    return true;
+}
+
+void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                        const ByteSpan & signingKey, const ByteSpan & verificationKey,
+                                                        const ByteSpan & groupIdentifier,
+                                                        const Optional<ByteSpan> & groupResolvingKey)
+{
+    EndpointId endpointID = commandPath.mEndpointId;
+    ChipLogProgress(Zcl, "[SetAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
+
+    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
+    if (!SupportsAliroProvisioning(endpointID))
+    {
+        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return;
+    }
+
+    Delegate * delegate = GetDelegate(endpointID);
+    VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is nullptr"));
+
+    uint8_t buffer[kAliroReaderVerificationKeyMaxSize];
+    MutableByteSpan aliroReaderVerificationKey(buffer);
+
+    // If Aliro reader verification key attribute is not null, we can't set a new reader config without clearing the previous one,
+    // return INVALID_IN_STATE.
+    if (CHIP_NO_ERROR == delegate->GetAliroReaderVerificationKey(aliroReaderVerificationKey) &&
+        aliroReaderVerificationKey.data() != nullptr)
+    {
+        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro reader verification key is not null. Return INVALID_IN_STATE");
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
+        return;
+    }
+
+    // If Aliro BLE UWB feature is supported and groupResolvingKey is not provided in the command, return INVALID_COMMAND.
+    if (SupportsAliroBLEUWB(endpointID) && !groupResolvingKey.HasValue())
+    {
+        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro BLE UWB supported but Group Resolving Key is not provided");
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return;
+    }
+
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    if (!emberAfPluginDoorLockSetAliroReaderConfig(endpointID, signingKey, verificationKey, groupIdentifier, groupResolvingKey))
+    {
+        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
+    sendClusterResponse(commandObj, commandPath, status);
+}
+
+void DoorLockServer::clearAliroReaderConfigCommandHandler(CommandHandler * commandObj, const ConcreteCommandPath & commandPath)
+{
+    EndpointId endpointID = commandPath.mEndpointId;
+    ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Incoming command [endpointId=%d]", endpointID);
+
+    // If Aliro Provisioning feature is not supported, return UNSUPPORTED_COMMAND.
+    if (!SupportsAliroProvisioning(endpointID))
+    {
+        ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Aliro Provisioning is not supported [endpointId=%d]", endpointID);
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return;
+    }
+
+    Delegate * delegate = GetDelegate(endpointID);
+    VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is nullptr"));
+
+    uint8_t buffer[kAliroReaderVerificationKeyMaxSize];
+    MutableByteSpan aliroReaderVerificationKey(buffer);
+
+    // If Aliro reader verification key attribute is null, there is no reader config to clear. Return INVALID_IN_STATE.
+    if (CHIP_NO_ERROR != delegate->GetAliroReaderVerificationKey(aliroReaderVerificationKey) &&
+        aliroReaderVerificationKey.data() == nullptr)
+    {
+        ChipLogProgress(Zcl, "[ClearAliroReaderConfig] Aliro reader verification key is null. Return INVALID_IN_STATE");
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
+        return;
+    }
+
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    if (!emberAfPluginDoorLockClearAliroReaderConfig(endpointID))
+    {
+        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Unable to set aliro reader config [endpointId=%d]", endpointID);
+        status = EMBER_ZCL_STATUS_FAILURE;
+    }
+    sendClusterResponse(commandObj, commandPath, status);
+}
+
 // =============================================================================
 // SDK callbacks
 // =============================================================================
@@ -3932,6 +4078,8 @@ void MatterDoorLockPluginServerInitCallback()
 {
     ChipLogProgress(Zcl, "Door Lock server initialized");
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate);
+
+    registerAttributeAccessOverride(&DoorLockServer::Instance());
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
@@ -3965,4 +4113,121 @@ void DoorLockServer::DoorLockOnAutoRelockCallback(System::Layer *, void * callba
     {
         ChipLogProgress(Zcl, "Door Auto relock timer expired. %s", "Already locked.");
     }
+}
+
+CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersions(const ConcreteReadAttributePath & aPath,
+                                                                                  AttributeValueEncoder & aEncoder,
+                                                                                  Delegate * delegate)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
+
+    return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+        for (uint8_t i = 0; true; i++)
+        {
+            uint8_t buffer[kProtocolVersionMaxSize];
+            MutableByteSpan protocolVersion(buffer);
+            auto err = delegate->GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(i, protocolVersion);
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+            {
+                return CHIP_NO_ERROR;
+            }
+            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(encoder.Encode(protocolVersion));
+        }
+    });
+}
+
+CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const ConcreteReadAttributePath & aPath,
+                                                                    AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
+
+    return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+        for (uint8_t i = 0; true; i++)
+        {
+            uint8_t buffer[kProtocolVersionMaxSize];
+            MutableByteSpan protocolVersion(buffer);
+            auto err = delegate->GetAliroSupportedBLEUWBProtocolVersionAtIndex(i, protocolVersion);
+            if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+            {
+                return CHIP_NO_ERROR;
+            }
+            ReturnErrorOnFailure(err);
+            ReturnErrorOnFailure(encoder.Encode(protocolVersion));
+        }
+    });
+}
+
+CHIP_ERROR DoorLockServer::ReadAliroByteSpanAttribute(CHIP_ERROR (Delegate::*func)(MutableByteSpan &), MutableByteSpan & data,
+                                                      Delegate * delegate, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is nullptr"));
+
+    ReturnErrorOnFailure((delegate->*func)(data));
+    ReturnErrorOnFailure(aEncoder.Encode(data));
+    return CHIP_NO_ERROR;
+}
+
+// Implements the read functionality for the AttributeAccessInterface.
+CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    if (aPath.mClusterId != Clusters::DoorLock::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    Delegate * delegate = GetDelegate(aPath.mEndpointId);
+
+    switch (aPath.mAttributeId)
+    {
+    case AliroReaderVerificationKey::Id: {
+        uint8_t buffer[kAliroReaderVerificationKeyMaxSize];
+        MutableByteSpan aliroReaderVerificationKey(buffer);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderVerificationKey, aliroReaderVerificationKey, delegate, aEncoder);
+    }
+    case AliroReaderGroupIdentifier::Id: {
+        uint8_t buffer[kAliroAttributeMaxSize_16];
+        MutableByteSpan aliroReaderGroupIdentifier(buffer);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupIdentifier, aliroReaderGroupIdentifier, delegate, aEncoder);
+    }
+    case AliroReaderGroupSubIdentifier::Id: {
+        uint8_t buffer[kAliroAttributeMaxSize_16];
+        MutableByteSpan aliroReaderGroupSubIdentifier(buffer);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupSubIdentifier, aliroReaderGroupSubIdentifier, delegate,
+                                          aEncoder);
+    }
+    case AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+        return ReadAliroExpeditedTransactionSupportedProtocolVersions(aPath, aEncoder, delegate);
+    }
+    case AliroGroupResolvingKey::Id: {
+        uint8_t buffer[kAliroAttributeMaxSize_16];
+        MutableByteSpan aliroGroupResolvingKey(buffer);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, aliroGroupResolvingKey, delegate, aEncoder);
+    }
+    case AliroSupportedBLEUWBProtocolVersions::Id: {
+        return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);
+    }
+    case AliroBLEAdvertisingVersion::Id: {
+        uint8_t aliroBLEAdvertisingVersion;
+        ReturnErrorOnFailure(delegate->GetAliroBLEAdvertisingVersion(aliroBLEAdvertisingVersion));
+        ReturnErrorOnFailure(aEncoder.Encode(aliroBLEAdvertisingVersion));
+        return CHIP_NO_ERROR;
+    }
+    case NumberOfAliroCredentialIssuerKeysSupported::Id: {
+        uint16_t numberOfAliroCredentialIssuerKeysSupported;
+        ReturnErrorOnFailure(delegate->GetNumberOfAliroCredentialIssuerKeysSupported(numberOfAliroCredentialIssuerKeysSupported));
+        ReturnErrorOnFailure(aEncoder.Encode(numberOfAliroCredentialIssuerKeysSupported));
+        return CHIP_NO_ERROR;
+    }
+    case NumberOfAliroEndpointKeysSupported::Id: {
+        uint16_t numberOfAliroEndpointKeysSupported;
+        ReturnErrorOnFailure(delegate->GetNumberOfAliroCredentialIssuerKeysSupported(numberOfAliroEndpointKeysSupported));
+        ReturnErrorOnFailure(aEncoder.Encode(numberOfAliroEndpointKeysSupported));
+        return CHIP_NO_ERROR;
+    }
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
 }
