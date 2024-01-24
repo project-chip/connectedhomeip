@@ -594,7 +594,8 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mpBLEAdvUUID, mBLEAdvDurationMs, GetAdvertisingIntervals()));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mpBLEAdvUUID, mBLEAdvDurationMs));
+                SuccessOrExit(err = mBLEAdvertisement.SetIntervals(GetAdvertisingIntervals()));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 

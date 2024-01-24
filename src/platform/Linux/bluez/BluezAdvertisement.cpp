@@ -97,9 +97,6 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     bluez_leadvertisement1_set_timeout(adv, 0);
     // empty secondary channel for now
 
-    bluez_leadvertisement1_set_min_interval(adv, mAdvIntervals.first * 0.625);
-    bluez_leadvertisement1_set_max_interval(adv, mAdvIntervals.second * 0.625);
-
     bluez_object_skeleton_set_leadvertisement1(object, adv);
     g_signal_connect(adv, "handle-release",
                      G_CALLBACK(+[](BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInv, BluezAdvertisement * self) {
@@ -133,8 +130,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs,
-                                    AdvertisingIntervals aAdvIntervals)
+CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -150,7 +146,6 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     mpAdvPath      = g_strdup_printf("%s/advertising", rootPath.get());
     mpAdvUUID      = g_strdup(aAdvUUID);
     mAdvDurationMs = aAdvDurationMs;
-    mAdvIntervals  = aAdvIntervals;
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     ReturnErrorOnFailure(err);
@@ -168,6 +163,16 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
 
 exit:
     return err;
+}
+
+CHIP_ERROR BluezAdvertisement::SetIntervals(AdvertisingIntervals aAdvIntervals)
+{
+    VerifyOrReturnError(mpAdv != nullptr, CHIP_ERROR_UNINITIALIZED);
+    // If the advertisement is already running, BlueZ will update the intervals
+    // automatically. There is no need to stop and restart the advertisement.
+    bluez_leadvertisement1_set_min_interval(mpAdv, aAdvIntervals.first * 0.625);
+    bluez_leadvertisement1_set_max_interval(mpAdv, aAdvIntervals.second * 0.625);
+    return CHIP_NO_ERROR;
 }
 
 void BluezAdvertisement::Shutdown()

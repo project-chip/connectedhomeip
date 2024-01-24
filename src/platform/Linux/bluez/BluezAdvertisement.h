@@ -45,8 +45,8 @@ public:
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs,
-                    AdvertisingIntervals aAdvIntervals);
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -86,7 +86,6 @@ private:
     char * mpAdapterName    = nullptr;
     char * mpAdvUUID        = nullptr;
     uint16_t mAdvDurationMs = 0;
-    AdvertisingIntervals mAdvIntervals;
 };
 
 } // namespace Internal
