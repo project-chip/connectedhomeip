@@ -5491,6 +5491,10 @@ internal cluster UnitTesting = 4294048773 {
     fabric_idx fabricIndex = 254;
   }
 
+  info event TestDifferentVendorMeiEvent = 4294050030 {
+    int8u arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute Bitmap8MaskMap bitmap8 = 1;
   attribute Bitmap16MaskMap bitmap16 = 2;
@@ -5573,6 +5577,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
   attribute optional int8u writeOnlyInt8u = 16426;
+  attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -5768,6 +5773,15 @@ internal cluster UnitTesting = 4294048773 {
     int8u fillCharacter = 2;
   }
 
+  request struct TestDifferentVendorMeiRequestRequest {
+    int8u arg1 = 0;
+  }
+
+  response struct TestDifferentVendorMeiResponse = 4294049979 {
+    int8u arg1 = 0;
+    int64u eventNumber = 1;
+  }
+
   /** Simple command without any parameters and without a specific response.
         To aid in unit testing, this command will re-initialize attribute storage to defaults. */
   command Test(): DefaultSuccess = 0;
@@ -5838,6 +5852,8 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
+  command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
 
 endpoint 0 {
@@ -6646,6 +6662,7 @@ endpoint 1 {
   server cluster UnitTesting {
     emits event TestEvent;
     emits event TestFabricScopedEvent;
+    emits event TestDifferentVendorMeiEvent;
     ram      attribute boolean default = false;
     ram      attribute bitmap8 default = 0;
     ram      attribute bitmap16 default = 0;
@@ -6726,8 +6743,10 @@ endpoint 1 {
     ram      attribute nullableRangeRestrictedInt8s default = -20;
     ram      attribute nullableRangeRestrictedInt16u default = 200;
     ram      attribute nullableRangeRestrictedInt16s default = -100;
+    callback attribute writeOnlyInt8u default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+    ram      attribute meiInt8u default = 0;
 
     handle command Test;
     handle command TestSpecificResponse;
@@ -6755,6 +6774,10 @@ endpoint 1 {
     handle command TestSimpleOptionalArgumentRequest;
     handle command TestEmitTestEventRequest;
     handle command TestEmitTestFabricScopedEventRequest;
+    handle command TestBatchHelperRequest;
+    handle command TestSecondBatchHelperRequest;
+    handle command TestDifferentVendorMeiRequest;
+    handle command TestDifferentVendorMeiResponse;
   }
 }
 endpoint 2 {

@@ -4280,6 +4280,23 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
 
         return value;
     }
+    case Events::TestDifferentVendorMeiEvent::Id: {
+        Events::TestDifferentVendorMeiEvent::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+
+        __auto_type * value = [MTRUnitTestingClusterTestDifferentVendorMeiEventEvent new];
+
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:cppValue.arg1];
+            value.arg1 = memberValue;
+        } while (0);
+
+        return value;
+    }
     default: {
         break;
     }

@@ -16300,6 +16300,7 @@ public class ClusterIDMapping {
             NullableRangeRestrictedInt16u(16424L),
             NullableRangeRestrictedInt16s(16425L),
             WriteOnlyInt8u(16426L),
+            MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -16327,7 +16328,8 @@ public class ClusterIDMapping {
 
         public enum Event {
             TestEvent(1L),
-            TestFabricScopedEvent(2L),;
+            TestFabricScopedEvent(2L),
+            TestDifferentVendorMeiEvent(4294050030L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -16371,7 +16373,8 @@ public class ClusterIDMapping {
             TestEmitTestEventRequest(20L),
             TestEmitTestFabricScopedEventRequest(21L),
             TestBatchHelperRequest(22L),
-            TestSecondBatchHelperRequest(23L),;
+            TestSecondBatchHelperRequest(23L),
+            TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -16706,6 +16709,23 @@ public class ClusterIDMapping {
                     }
                     public static TestSecondBatchHelperRequestCommandField value(int id) throws NoSuchFieldError {
                         for (TestSecondBatchHelperRequestCommandField field : TestSecondBatchHelperRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum TestDifferentVendorMeiRequestCommandField {Arg1(0),;
+                    private final int id;
+                    TestDifferentVendorMeiRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static TestDifferentVendorMeiRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (TestDifferentVendorMeiRequestCommandField field : TestDifferentVendorMeiRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
