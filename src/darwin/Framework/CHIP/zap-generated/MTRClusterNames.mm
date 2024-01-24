@@ -8560,6 +8560,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"ClusterRevision";
             break;
 
+        case MTRAttributeIDTypeClusterUnitTestingAttributeMeiInt8uID:
+            result = @"MeiInt8u";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
             break;
