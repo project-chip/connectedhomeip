@@ -18,8 +18,8 @@
 
 #pragma once
 
-#import <Matter/MTRDefines.h>
 #import <Matter/MTRClusterConstants.h>
+#import <Matter/MTRDefines.h>
 
 /**
  * This file defines functions to resolve Matter cluster and attribute IDs into
