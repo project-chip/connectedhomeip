@@ -273,16 +273,10 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStartComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStartComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
-
-        if (!sInstance.mFlags.Has(Flags::kAdvertising))
-        {
-            sInstance.mFlags.Set(Flags::kAdvertising);
-        }
-
+        sInstance.mFlags.Set(Flags::kAdvertising);
         break;
     case DeviceEventType::kPlatformLinuxBLEPeripheralAdvStopComplete:
         VerifyOrExit(apEvent->Platform.BLEPeripheralAdvStopComplete.mIsSuccess, err = CHIP_ERROR_INCORRECT_STATE);
-
         sInstance.mFlags.Clear(Flags::kControlOpInProgress).Clear(Flags::kAdvertisingRefreshNeeded);
 
         // Transition to the not Advertising state...
@@ -591,15 +585,20 @@ void BLEManagerImpl::DriveBLEState()
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
                 SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mpBLEAdvUUID));
-                SuccessOrExit(err = mBLEAdvertisement.SetIntervals(GetAdvertisingIntervals()));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
-            // Start advertising. This is an asynchronous step. BLE manager will be notified of
-            // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
-            SuccessOrExit(err = mBLEAdvertisement.Start());
-            mFlags.Set(Flags::kControlOpInProgress);
-            ExitNow();
+            // Set or update the advertising intervals.
+            SuccessOrExit(err = mBLEAdvertisement.SetIntervals(GetAdvertisingIntervals()));
+
+            if (!mFlags.Has(Flags::kAdvertising))
+            {
+                // Start advertising. This is an asynchronous step. BLE manager will be notified of
+                // advertising start completion via a call to NotifyBLEPeripheralAdvStartComplete.
+                SuccessOrExit(err = mBLEAdvertisement.Start());
+                mFlags.Set(Flags::kControlOpInProgress);
+                ExitNow();
+            }
         }
     }
 
