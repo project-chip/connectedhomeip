@@ -2697,21 +2697,6 @@ static BOOL AttributeIsSpecifiedInScenesManagementCluster(AttributeId aAttribute
 {
     using namespace Clusters::ScenesManagement;
     switch (aAttributeId) {
-    case Attributes::SceneCount::Id: {
-        return YES;
-    }
-    case Attributes::CurrentScene::Id: {
-        return YES;
-    }
-    case Attributes::CurrentGroup::Id: {
-        return YES;
-    }
-    case Attributes::SceneValid::Id: {
-        return YES;
-    }
-    case Attributes::NameSupport::Id: {
-        return YES;
-    }
     case Attributes::LastConfiguredBy::Id: {
         return YES;
     }
@@ -3063,6 +3048,9 @@ static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAtt
     case Attributes::Forecast::Id: {
         return YES;
     }
+    case Attributes::OptOutState::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3121,12 +3109,6 @@ static BOOL AttributeIsSpecifiedInEnergyEVSECluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::RandomizationDelayWindow::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfWeeklyTargets::Id: {
-        return YES;
-    }
-    case Attributes::NumberOfDailyTargets::Id: {
         return YES;
     }
     case Attributes::NextChargeStartTime::Id: {
@@ -3205,6 +3187,84 @@ static BOOL AttributeIsSpecifiedInEnergyPreferenceCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::CurrentLowPowerModeSensitivity::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInEnergyEVSEModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvseMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DeviceEnergyManagementMode;
+    switch (aAttributeId) {
+    case Attributes::SupportedModes::Id: {
+        return YES;
+    }
+    case Attributes::CurrentMode::Id: {
+        return YES;
+    }
+    case Attributes::StartUpMode::Id: {
+        return YES;
+    }
+    case Attributes::OnMode::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6264,6 +6324,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::ClusterRevision::Id: {
         return YES;
     }
+    case Attributes::MeiInt8u::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -6503,6 +6566,12 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::EnergyPreference::Id: {
         return AttributeIsSpecifiedInEnergyPreferenceCluster(aAttributeId);
+    }
+    case Clusters::EnergyEvseMode::Id: {
+        return AttributeIsSpecifiedInEnergyEVSEModeCluster(aAttributeId);
+    }
+    case Clusters::DeviceEnergyManagementMode::Id: {
+        return AttributeIsSpecifiedInDeviceEnergyManagementModeCluster(aAttributeId);
     }
     case Clusters::DoorLock::Id: {
         return AttributeIsSpecifiedInDoorLockCluster(aAttributeId);

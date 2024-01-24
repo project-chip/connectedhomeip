@@ -95,10 +95,6 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         /* Optional */
         return aEncoder.Encode(mDelegate.GetRandomizationDelayWindow());
     /* PREF - ChargingPreferences attributes */
-    case NumberOfWeeklyTargets::Id:
-        return aEncoder.Encode(mDelegate.GetNumberOfWeeklyTargets());
-    case NumberOfDailyTargets::Id:
-        return aEncoder.Encode(mDelegate.GetNumberOfDailyTargets());
     case NextChargeStartTime::Id:
         return aEncoder.Encode(mDelegate.GetNextChargeStartTime());
     case NextChargeTargetTime::Id:

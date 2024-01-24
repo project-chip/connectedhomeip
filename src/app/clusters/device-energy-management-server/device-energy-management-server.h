@@ -52,7 +52,7 @@ public:
      * @param duration The duration that the ESA SHALL maintain the requested power for.
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
-    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration) = 0;
+    virtual Status PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate SHALL make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -76,7 +76,7 @@ public:
      * @return Success if the StartTime in the Forecast is updated, otherwise the command SHALL be rejected with appropriate
      * IM_Status.
      */
-    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime) = 0;
+    virtual Status StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for PauseRequest command
@@ -91,7 +91,7 @@ public:
      * @param duration Duration that the ESA SHALL be paused for.
      * @return  Success if the ESA is paused, otherwise returns other IM_Status.
      */
-    virtual Status PauseRequest(const uint32_t duration) = 0;
+    virtual Status PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for ResumeRequest command
@@ -119,7 +119,8 @@ public:
      *          SHALL be rejected returning other IM_Status.
      */
     virtual Status ModifyForecastRequest(const uint32_t forecastId,
-                                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments) = 0;
+                                         const DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> & slotAdjustments,
+                                         AdjustmentCauseEnum cause) = 0;
 
     /**
      * @brief Delegate handler for RequestConstraintBasedForecast
@@ -132,8 +133,27 @@ public:
      * @param constraints  Sequence of turn up/down power requests that the ESA is being asked to constrain its operation within.
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
-    virtual Status
-    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints) = 0;
+    virtual Status RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::Type> & constraints,
+                                                  AdjustmentCauseEnum cause) = 0;
+
+    /**
+     * @brief Delegate handler for CancelRequest
+     *
+     *   The ESA SHALL attempt to cancel the effects of any previous adjustment request commands, and re-evaluate its
+     *   forecast for intended operation ignoring those previous requests.
+     *
+     *   If the ESA ForecastStruct ForecastUpdateReason was already `Internal Optimization`, then the command SHALL
+     *   be rejected with FAILURE.
+     *
+     *   If the command is accepted, the ESA SHALL update its ESAState if required, and the command status returned
+     *   SHALL be SUCCESS.
+     *
+     *   The ESA SHALL update its Forecast attribute to match its new intended operation, and update the
+     *   ForecastStruct.ForecastUpdateReason to `Internal Optimization`
+     *
+     * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
+     */
+    virtual Status CancelRequest() = 0;
 
     // ------------------------------------------------------------------
     // Get attribute methods
@@ -144,6 +164,7 @@ public:
     virtual int64_t GetAbsMaxPower()                                                 = 0;
     virtual PowerAdjustmentCapability::TypeInfo::Type GetPowerAdjustmentCapability() = 0;
     virtual DataModel::Nullable<Structs::ForecastStruct::Type> GetForecast()         = 0;
+    virtual OptOutStateEnum GetOptOutState()                                         = 0;
 
     // ------------------------------------------------------------------
     // Set attribute methods
@@ -159,18 +180,12 @@ protected:
     EndpointId mEndpointId = 0;
 };
 
-enum class OptionalCommands : uint32_t
-{
-    kSupportsModifyForecastRequest          = 0x1,
-    kSupportsRequestConstraintBasedForecast = 0x2
-};
-
 class Instance : public AttributeAccessInterface, public CommandHandlerInterface
 {
 public:
-    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature, OptionalCommands aOptionalCmds) :
+    Instance(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature) :
         AttributeAccessInterface(MakeOptional(aEndpointId), Id), CommandHandlerInterface(MakeOptional(aEndpointId), Id),
-        mDelegate(aDelegate), mFeature(aFeature), mOptionalCmds(aOptionalCmds)
+        mDelegate(aDelegate), mFeature(aFeature)
     {
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
@@ -182,12 +197,10 @@ public:
     void Shutdown();
 
     bool HasFeature(Feature aFeature) const;
-    bool SupportsOptCmd(OptionalCommands aOptionalCmds) const;
 
 private:
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
-    BitMask<OptionalCommands> mOptionalCmds;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
@@ -197,6 +210,7 @@ private:
     void InvokeCommand(HandlerContext & handlerContext) override;
     CHIP_ERROR EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context) override;
 
+    Status CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause);
     void HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData);
     void HandleCancelPowerAdjustRequest(HandlerContext & ctx,
                                         const Commands::CancelPowerAdjustRequest::DecodableType & commandData);
@@ -206,6 +220,7 @@ private:
     void HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData);
     void HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                                               const Commands::RequestConstraintBasedForecast::DecodableType & commandData);
+    void HandleCancelRequest(HandlerContext & ctx, const Commands::CancelRequest::DecodableType & commandData);
 };
 
 } // namespace DeviceEnergyManagement

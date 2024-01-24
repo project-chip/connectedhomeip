@@ -1848,11 +1848,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"CONFIG_USE_INTERACTIVE_MODE=1",
+					"MTR_NO_AVAILABILITY=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples/darwin-framework-tool",
@@ -1924,11 +1926,13 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"CONFIG_USE_INTERACTIVE_MODE=1",
+					"MTR_NO_AVAILABILITY=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples//darwin-framework-tool",
@@ -2032,6 +2036,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -2039,14 +2044,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
+				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
-				SUPPORTS_TEXT_BASED_API = NO;
+				SUPPORTS_TEXT_BASED_API = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				TAPI_ENABLE_PROJECT_HEADERS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -2075,20 +2080,6 @@
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"MTR_ENABLE_PROVISIONAL=1",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/src/include",
-					"$(CHIP_ROOT)/src/lib",
-					"$(CHIP_ROOT)/src/app",
-					"$(CHIP_ROOT)/config/ios",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/src/app/util",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-					"$(TEMP_DIR)/out/gen/include",
-					"$(CHIP_ROOT)/zzz_generated/",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -2131,6 +2122,20 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(TEMP_DIR)/out/gen/include",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/src/app/util",
+					"$(CHIP_ROOT)/zzz_generated/",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+				);
 				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
@@ -2142,6 +2147,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"MTR_NO_AVAILABILITY=1",
+				);
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2197,6 +2206,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -2204,10 +2214,9 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
+				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
@@ -2241,20 +2250,6 @@
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"MTR_ENABLE_PROVISIONAL=1",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/src/include",
-					"$(CHIP_ROOT)/src/lib",
-					"$(CHIP_ROOT)/src/app",
-					"$(CHIP_ROOT)/config/ios",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/src/app/util",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-					"$(TEMP_DIR)/out/gen/include",
-					"$(CHIP_ROOT)/zzz_generated/",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -2298,6 +2293,20 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				STRIP_STYLE = "non-global";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(TEMP_DIR)/out/gen/include",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/src/app/util",
+					"$(CHIP_ROOT)/zzz_generated/",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+				);
 				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
@@ -2310,6 +2319,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"MTR_NO_AVAILABILITY=1",
+				);
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

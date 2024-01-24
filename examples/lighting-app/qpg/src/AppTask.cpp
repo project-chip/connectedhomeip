@@ -43,6 +43,7 @@
 #include <app/util/attribute-storage.h>
 #include <lib/support/TypeTraits.h>
 
+#include <app/DeferredAttributePersistenceProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -72,6 +73,7 @@ using namespace ::chip::DeviceLayer;
 static uint8_t countdown = 0;
 
 namespace {
+constexpr EndpointId kLightEndpointId = 1;
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
@@ -92,6 +94,25 @@ StaticTask_t appTaskStruct;
 
 Clusters::Identify::EffectIdentifierEnum sIdentifyEffect = Clusters::Identify::EffectIdentifierEnum::kStopEffect;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+// Define a custom attribute persister which makes actual write of the attribute value
+// to the non-volatile storage only when it has remained constant for 5 seconds. This is to reduce
+// the flash wearout when the attribute changes frequently as a result of commands.
+// DeferredAttribute object describes a deferred attribute, but also holds a buffer with a value to
+// be written, so it must live so long as the DeferredAttributePersistenceProvider object.
+//
+DeferredAttribute gPersisters[] = { DeferredAttribute(ConcreteAttributePath(kLightEndpointId, Clusters::ColorControl::Id,
+                                                                            Clusters::ColorControl::Attributes::CurrentX::Id)),
+                                    DeferredAttribute(ConcreteAttributePath(kLightEndpointId, Clusters::ColorControl::Id,
+                                                                            Clusters::ColorControl::Attributes::CurrentY::Id)),
+                                    DeferredAttribute(ConcreteAttributePath(kLightEndpointId, Clusters::LevelControl::Id,
+                                                                            Clusters::LevelControl::Attributes::CurrentLevel::Id))
+
+};
+
+DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(),
+                                                                 Span<DeferredAttribute>(gPersisters, 3),
+                                                                 System::Clock::Milliseconds32(5000));
 
 /**********************************************************
  * Identify Callbacks
@@ -249,6 +270,8 @@ void AppTask::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
+
+    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);

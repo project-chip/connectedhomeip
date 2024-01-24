@@ -40,7 +40,7 @@ namespace TimeSynchronization {
 class ExtendedTimeSyncDelegate : public DefaultTimeSyncDelegate
 {
 public:
-    void UTCTimeChanged(uint64_t time) override;
+    void UTCTimeAvailabilityChanged(uint64_t time) override;
 };
 
 } // namespace TimeSynchronization

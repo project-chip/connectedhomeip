@@ -28,7 +28,7 @@ using namespace ::chip;
     if (self = [super init]) {
         // TODO consider range-checking the incoming number to make sure it's
         // actually in the EndpointId range
-        _endpoint = endpointID.unsignedShortValue;
+        _endpointID = endpointID;
         _callbackQueue = queue;
     }
     return self;

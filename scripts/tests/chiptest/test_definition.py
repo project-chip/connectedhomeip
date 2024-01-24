@@ -133,6 +133,9 @@ class App:
         start_time = time.monotonic()
         ready, self.lastLogIndex = outpipe.CapturedLogContains(
             waitForString, self.lastLogIndex)
+        if ready:
+            self.lastLogIndex += 1
+
         while not ready:
             if server_process.poll() is not None:
                 died_str = ('Server died while waiting for %s, returncode %d' %
@@ -144,6 +147,8 @@ class App:
             time.sleep(0.1)
             ready, self.lastLogIndex = outpipe.CapturedLogContains(
                 waitForString, self.lastLogIndex)
+            if ready:
+                self.lastLogIndex += 1
 
         logging.debug('Success waiting for: %s' % waitForString)
 

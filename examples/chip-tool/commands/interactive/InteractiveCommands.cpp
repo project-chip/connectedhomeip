@@ -28,6 +28,7 @@ constexpr char kInteractiveModeStopCommand[]     = "quit()";
 constexpr char kCategoryError[]                  = "Error";
 constexpr char kCategoryProgress[]               = "Info";
 constexpr char kCategoryDetail[]                 = "Debug";
+constexpr char kCategoryAutomation[]             = "Automation";
 
 namespace {
 
@@ -146,6 +147,9 @@ struct InteractiveServerResult
         case chip::Logging::kLogCategory_Detail:
             messageType = kCategoryDetail;
             break;
+        case chip::Logging::kLogCategory_Automation:
+            messageType = kCategoryAutomation;
+            return;
         default:
             // This should not happen.
             chipDie();

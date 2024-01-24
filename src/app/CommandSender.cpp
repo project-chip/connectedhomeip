@@ -63,7 +63,7 @@ CHIP_ERROR GetRef(ParserT aParser, Optional<uint16_t> & aRef, bool commandRefExp
 CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest,
                              bool aSuppressResponse) :
     mExchangeCtx(*this),
-    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
+    mCallbackHandle(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse), mTimedRequest(aIsTimedRequest)
 {
     assertChipStackLockedByCurrentThread();
 }
@@ -71,8 +71,8 @@ CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager *
 CommandSender::CommandSender(ExtendableCallback * apExtendableCallback, Messaging::ExchangeManager * apExchangeMgr,
                              bool aIsTimedRequest, bool aSuppressResponse) :
     mExchangeCtx(*this),
-    mpExtendableCallback(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
-    mTimedRequest(aIsTimedRequest)
+    mCallbackHandle(apExtendableCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(aSuppressResponse),
+    mTimedRequest(aIsTimedRequest), mUseExtendableCallback(true)
 {
     assertChipStackLockedByCurrentThread();
 }
@@ -86,12 +86,6 @@ CHIP_ERROR CommandSender::AllocateBuffer()
 {
     if (!mBufferAllocated)
     {
-        // We are making sure that both callbacks are not set. This should never happen as the constructors
-        // are strongly typed and only one should ever be set, but explicit check is here to ensure that is
-        // always the case.
-        bool bothCallbacksAreSet = mpExtendableCallback != nullptr && mpCallback != nullptr;
-        VerifyOrDie(!bothCallbacksAreSet);
-
         mCommandMessageWriter.Reset();
 
         System::PacketBufferHandle commandPacket = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
@@ -186,7 +180,7 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 
     ReturnErrorOnFailure(
         mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), SendMessageFlags::kExpectResponse));
-    MoveToState(State::CommandSent);
+    MoveToState(State::AwaitingResponse);
 
     return CHIP_NO_ERROR;
 }
@@ -196,13 +190,14 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::CommandSent)
+    if (mState == State::AwaitingResponse)
     {
         MoveToState(State::ResponseReceived);
     }
 
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    bool sendStatusResponse = false;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    bool sendStatusResponse  = false;
+    bool moreChunkedMessages = false;
     VerifyOrExit(apExchangeContext == mExchangeCtx.Get(), err = CHIP_ERROR_INCORRECT_STATE);
     sendStatusResponse = true;
 
@@ -227,8 +222,14 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
 
     if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandResponse))
     {
-        err = ProcessInvokeResponse(std::move(aPayload));
+        err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
+        if (moreChunkedMessages)
+        {
+            StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);
+            MoveToState(State::AwaitingResponse);
+            return CHIP_NO_ERROR;
+        }
         sendStatusResponse = false;
     }
     else if (aPayloadHeader.HasMessageType(MsgType::StatusResponse))
@@ -251,10 +252,10 @@ exit:
 
     if (sendStatusResponse)
     {
-        StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
+        StatusResponse::Send(Status::InvalidAction, apExchangeContext, /*aExpectResponse = */ false);
     }
 
-    if (mState != State::CommandSent)
+    if (mState != State::AwaitingResponse)
     {
         Close();
     }
@@ -263,7 +264,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload)
+CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && payload, bool & moreChunkedMessages)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -289,6 +290,23 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
         InvokeResponseIB::Parser invokeResponse;
         ReturnErrorOnFailure(invokeResponse.Init(invokeResponsesReader));
         ReturnErrorOnFailure(ProcessInvokeResponseIB(invokeResponse));
+    }
+
+    err = invokeResponseMessage.GetMoreChunkedMessages(&moreChunkedMessages);
+    // If the MoreChunkedMessages element is absent, we receive CHIP_END_OF_TLV. In this
+    // case, per the specification, a default value of false is used.
+    if (CHIP_END_OF_TLV == err)
+    {
+        moreChunkedMessages = false;
+        err                 = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+
+    if (suppressResponse && moreChunkedMessages)
+    {
+        ChipLogError(DataManagement, "Spec violation! InvokeResponse has suppressResponse=true, and moreChunkedMessages=true");
+        // TODO Is there a better error to return here?
+        return CHIP_ERROR_INVALID_TLV_ELEMENT;
     }
 
     // if we have exhausted this container
@@ -393,8 +411,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
         // When using ExtendableCallbacks, we are adhering to a different API contract where path
         // specific errors are sent to the OnResponse callback. For more information on the history
         // of this issue please see https://github.com/project-chip/connectedhomeip/issues/30991
-        bool usingExtendableCallbacks = mpExtendableCallback != nullptr;
-        if (statusIB.IsSuccess() || usingExtendableCallbacks)
+        if (statusIB.IsSuccess() || mUseExtendableCallback)
         {
             const ConcreteCommandPath concretePath = ConcreteCommandPath(endpointId, clusterId, commandId);
             ResponseData responseData              = { concretePath, statusIB };
@@ -432,8 +449,7 @@ CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathP
     //
     // We must not be in the middle of preparing a command, and must not have already sent InvokeRequestMessage.
     //
-    bool usingExtendableCallbacks = mpExtendableCallback != nullptr;
-    bool canAddAnotherCommand     = (mState == State::AddedCommand && mBatchCommandsEnabled && usingExtendableCallbacks);
+    bool canAddAnotherCommand = (mState == State::AddedCommand && mBatchCommandsEnabled && mUseExtendableCallback);
     VerifyOrReturnError(mState == State::Idle || canAddAnotherCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mFinishedCommandCount < mRemoteMaxPathsPerInvoke, CHIP_ERROR_MAXIMUM_PATHS_PER_INVOKE_EXCEEDED);
 
@@ -543,8 +559,8 @@ const char * CommandSender::GetStateStr() const
     case State::AwaitingTimedStatus:
         return "AwaitingTimedStatus";
 
-    case State::CommandSent:
-        return "CommandSent";
+    case State::AwaitingResponse:
+        return "AwaitingResponse";
 
     case State::ResponseReceived:
         return "ResponseReceived";
