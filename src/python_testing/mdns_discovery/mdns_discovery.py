@@ -27,6 +27,9 @@ from .mdns_type_enum import MdnsType
 
 
 class MdnsDiscovery:
+
+    DEFAULT_DISCOVERY_DURATION_SEC = 3
+
     def __init__(self, tc):
         """
         Initializes the MdnsDiscovery instance with necessary configurations.
@@ -36,6 +39,7 @@ class MdnsDiscovery:
 
         Attributes:
             _zc (Zeroconf): An instance of Zeroconf to manage mDNS operations.
+            _aiobrowser: An instance of the AsyncServiceBrowser browser to discover services.
             _tc: The test case object.
             _service_types (list): A list of mDNS service types to discover.
             _discovered_services (dict): A dictionary to store discovered services.
@@ -62,14 +66,21 @@ class MdnsDiscovery:
             - host_ttl: The time-to-live value for the host name in the DNS record.
             - other_ttl: The time-to-live value for other records associated with the service.            
         """
-        self._zc: Zeroconf = Zeroconf()
+        self._zc =  None
+        self._aiobrowser = None
         self._tc = tc
         self._service_types = [mdns_type.value for mdns_type in MdnsType]
         self._discovered_services = {}
         self._discovery_performed = False
         self.dut_operational_service_name = self._get_dut_operational_service_name()
 
-    async def discover(self, discovery_duration_sec: float = 3) -> None:
+    @classmethod
+    async def create(cls, tc, discovery_duration_sec: float = DEFAULT_DISCOVERY_DURATION_SEC):
+        instance = cls(tc)
+        await instance.discover(discovery_duration_sec)
+        return instance
+
+    async def discover(self, discovery_duration_sec: float = DEFAULT_DISCOVERY_DURATION_SEC) -> None:
         """
         Asynchronously discovers network services of specified types using mDNS.
 
@@ -93,14 +104,16 @@ class MdnsDiscovery:
             None: This method does not return any value. The results of the service discovery
                   are handled by the callback function.
         """
+        self._zc = Zeroconf()
         self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsType}
-        AsyncServiceBrowser(zeroconf=self._zc,
+        self._aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
                             type_=self._service_types,
                             handlers=[self._on_service_state_change]
                             )
         # Wait for discovery
         await asyncio.sleep(discovery_duration_sec)
         self._discovery_performed = True
+        await self._async_close()
 
     def _on_service_state_change(
         self,
@@ -254,3 +267,9 @@ class MdnsDiscovery:
             list: A list of discovered Border Router services.
         """
         return self._getServiceInfo(MdnsType.BORDER_ROUTER)
+
+    async def _async_close(self) -> None:
+        assert self._zc is not None
+        assert self._aiobrowser is not None
+        await self._aiobrowser.async_cancel()
+        await self._zc.async_unregister_all_services()
