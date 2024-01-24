@@ -53,13 +53,12 @@ JNI_METHOD(jobject, VerifyOrEstablishConnection)
     jfieldID _cppCastingPlayerFieldId = env->GetFieldID(castingPlayerClass, "_cppCastingPlayer", "J");
     VerifyOrReturnValue(
         _cppCastingPlayerFieldId != nullptr, nullptr,
-        ChipLogError(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() Warning: _cppCastingPlayerFieldId == nullptr"));
+        ChipLogError(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() _cppCastingPlayerFieldId == nullptr"));
 
     jlong _cppCastingPlayerValue  = env->GetLongField(thiz, _cppCastingPlayerFieldId);
     CastingPlayer * castingPlayer = reinterpret_cast<CastingPlayer *>(_cppCastingPlayerValue);
-    VerifyOrReturnValue(
-        castingPlayer != nullptr, nullptr,
-        ChipLogError(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() Warning: castingPlayer == nullptr"));
+    VerifyOrReturnValue(castingPlayer != nullptr, nullptr,
+                        ChipLogError(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() castingPlayer == nullptr"));
 
     // Create a new Java CompletableFuture
     jclass completableFutureClass          = env->FindClass("java/util/concurrent/CompletableFuture");
@@ -68,48 +67,45 @@ JNI_METHOD(jobject, VerifyOrEstablishConnection)
     jobject completableFutureObjGlobalRef  = env->NewGlobalRef(completableFutureObj);
     VerifyOrReturnValue(
         completableFutureObjGlobalRef != nullptr, nullptr,
-        ChipLogError(AppServer,
-                     "CastingPlayer-JNI::VerifyOrEstablishConnection() Warning: completableFutureObjGlobalRef == nullptr"));
+        ChipLogError(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() completableFutureObjGlobalRef == nullptr"));
 
     ConnectCallback callback = [completableFutureObjGlobalRef](CHIP_ERROR err, CastingPlayer * playerPtr) {
         ChipLogProgress(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback called");
+        JNIEnv * env                  = JniReferences::GetInstance().GetEnvForCurrentThread();
+        jclass completableFutureClass = env->FindClass("java/util/concurrent/CompletableFuture");
+
         if (completableFutureObjGlobalRef == nullptr)
         {
-            // Prevents an app crash at CallBooleanMethod
             ChipLogError(AppServer,
-                         "CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback, Warning: completableFutureObjGlobalRef "
-                         "== nullptr");
+                         "PHILIPGREGOR CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback called, "
+                         "completableFutureObjGlobalRef == nullptr");
+        }
+
+        if (err == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(
+                AppServer,
+                "CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback, Casting Player connection successful!");
+            jmethodID completeMethod = env->GetMethodID(completableFutureClass, "complete", "(Ljava/lang/Object;)Z");
+            chip::DeviceLayer::StackUnlock unlock;
+            env->CallBooleanMethod(completableFutureObjGlobalRef, completeMethod, nullptr);
         }
         else
         {
-            JNIEnv * env                  = JniReferences::GetInstance().GetEnvForCurrentThread();
-            jclass completableFutureClass = env->FindClass("java/util/concurrent/CompletableFuture");
-
-            if (err == CHIP_NO_ERROR)
-            {
-                ChipLogProgress(
-                    AppServer,
-                    "CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback, Casting Player connection successful!");
-                jmethodID completeMethod = env->GetMethodID(completableFutureClass, "complete", "(Ljava/lang/Object;)Z");
-                env->CallBooleanMethod(completableFutureObjGlobalRef, completeMethod, NULL);
-            }
-            else
-            {
-                ChipLogError(AppServer,
-                             "CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback, Warning: connection error: "
-                             "%" CHIP_ERROR_FORMAT,
-                             err.Format());
-                jmethodID completeExceptionallyMethod =
-                    env->GetMethodID(completableFutureClass, "completeExceptionally", "(Ljava/lang/Throwable;)Z");
-                // Create a Throwable object (e.g., RuntimeException) to pass to completeExceptionallyMethod
-                jclass throwableClass          = env->FindClass("java/lang/RuntimeException");
-                jmethodID throwableConstructor = env->GetMethodID(throwableClass, "<init>", "(Ljava/lang/String;)V");
-                jstring errorMessage           = env->NewStringUTF(err.Format());
-                jobject throwableObject        = env->NewObject(throwableClass, throwableConstructor, errorMessage);
-                env->CallBooleanMethod(completableFutureObjGlobalRef, completeExceptionallyMethod, throwableObject);
-            }
-            env->DeleteGlobalRef(completableFutureObjGlobalRef);
+            ChipLogError(AppServer,
+                         "CastingPlayer-JNI::VerifyOrEstablishConnection() ConnectCallback, connection error: %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            jmethodID completeExceptionallyMethod =
+                env->GetMethodID(completableFutureClass, "completeExceptionally", "(Ljava/lang/Throwable;)Z");
+            // Create a Throwable object (e.g., RuntimeException) to pass to completeExceptionallyMethod
+            jclass throwableClass          = env->FindClass("java/lang/RuntimeException");
+            jmethodID throwableConstructor = env->GetMethodID(throwableClass, "<init>", "(Ljava/lang/String;)V");
+            jstring errorMessage           = env->NewStringUTF(err.Format());
+            jobject throwableObject        = env->NewObject(throwableClass, throwableConstructor, errorMessage);
+            chip::DeviceLayer::StackUnlock unlock;
+            env->CallBooleanMethod(completableFutureObjGlobalRef, completeExceptionallyMethod, throwableObject);
         }
+        env->DeleteGlobalRef(completableFutureObjGlobalRef);
     };
 
     if (desiredEndpointFilterJavaObject == nullptr)
@@ -122,24 +118,36 @@ JNI_METHOD(jobject, VerifyOrEstablishConnection)
     }
     else
     {
-        ChipLogProgress(AppServer,
-                        "CastingPlayer-JNI::VerifyOrEstablishConnection() calling "
-                        "CastingPlayer::VerifyOrEstablishConnection(desiredEndpointFilter) on Casting Player with device ID: %s",
-                        castingPlayer->GetId());
         // Convert the EndpointFilter Java class to a C++ EndpointFilter
         jclass endpointFilterJavaClass = env->GetObjectClass(desiredEndpointFilterJavaObject);
-        jfieldID vendorIdFieldId       = env->GetFieldID(endpointFilterJavaClass, "vendorId", "I");
-        jfieldID productIdFieldId      = env->GetFieldID(endpointFilterJavaClass, "productId", "I");
+        jfieldID vendorIdFieldId       = env->GetFieldID(endpointFilterJavaClass, "vendorId", "Ljava/lang/Integer;");
+        jfieldID productIdFieldId      = env->GetFieldID(endpointFilterJavaClass, "productId", "Ljava/lang/Integer;");
+        jobject vendorIdIntegerObject  = env->GetObjectField(desiredEndpointFilterJavaObject, vendorIdFieldId);
+        jobject productIdIntegerObject = env->GetObjectField(desiredEndpointFilterJavaObject, productIdFieldId);
         // jfieldID requiredDeviceTypesFieldId = env->GetFieldID(endpointFilterJavaClass, "requiredDeviceTypes",
         // "Ljava/util/List;");
 
         matter::casting::core::EndpointFilter desiredEndpointFilter;
-        desiredEndpointFilter.vendorId = static_cast<uint16_t>(env->GetIntField(desiredEndpointFilterJavaObject, vendorIdFieldId));
-        desiredEndpointFilter.productId =
-            static_cast<uint16_t>(env->GetIntField(desiredEndpointFilterJavaObject, productIdFieldId));
+        // Value of 0 means unspecified
+        desiredEndpointFilter.vendorId  = vendorIdIntegerObject != nullptr
+             ? static_cast<uint16_t>(env->CallIntMethod(
+                  vendorIdIntegerObject, env->GetMethodID(env->GetObjectClass(vendorIdIntegerObject), "intValue", "()I")))
+             : 0;
+        desiredEndpointFilter.productId = productIdIntegerObject != nullptr
+            ? static_cast<uint16_t>(env->CallIntMethod(
+                  productIdIntegerObject, env->GetMethodID(env->GetObjectClass(productIdIntegerObject), "intValue", "()I")))
+            : 0;
+        ChipLogProgress(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() desiredEndpointFilter.vendorId: %d",
+                        desiredEndpointFilter.vendorId);
+        ChipLogProgress(AppServer, "CastingPlayer-JNI::VerifyOrEstablishConnection() desiredEndpointFilter.productId: %d",
+                        desiredEndpointFilter.productId);
         // TODO: In following PRs. Translate the Java requiredDeviceTypes list to a C++ requiredDeviceTypes vector. For now we're
         // passing an empty list of.
 
+        ChipLogProgress(AppServer,
+                        "CastingPlayer-JNI::VerifyOrEstablishConnection() calling "
+                        "CastingPlayer::VerifyOrEstablishConnection() on Casting Player with device ID: %s",
+                        castingPlayer->GetId());
         castingPlayer->VerifyOrEstablishConnection(callback, static_cast<unsigned long long int>(commissioningWindowTimeoutSec),
                                                    desiredEndpointFilter);
     }

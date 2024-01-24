@@ -72,10 +72,7 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleConnectionComplete(CastingPlayer castingPlayer) {
-    Log.i(
-        TAG,
-        "MainActivity.handleConnectionComplete() called with CastingPlayer with deviceId: "
-            + castingPlayer.getDeviceId());
+    Log.i(TAG, "MainActivity.handleConnectionComplete() called ");
 
     // TODO: Implement in following PRs. Select Cluster Fragment.
     // showFragment(SelectClusterFragment.newInstance(tvCastingApp));

@@ -27,6 +27,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.R;
 import com.matter.casting.core.CastingPlayer;
+import com.matter.casting.support.DeviceTypeStruct;
+import com.matter.casting.support.EndpointFilter;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 
@@ -36,16 +39,13 @@ public class ConnectionExampleFragment extends Fragment {
   // Time (in sec) to keep the commissioning window open, if commissioning is required.
   // Must be >= 3 minutes.
   private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
-  private final CastingPlayer selectedCastingPlayer;
+  private final CastingPlayer targetCastingPlayer;
   private TextView connectionFragmentStatusTextView;
   private Button connectionFragmentNextButton;
 
-  public ConnectionExampleFragment(CastingPlayer selectedCastingPlayer) {
-    Log.i(
-        TAG,
-        "ConnectionExampleFragment() called with CastingPlayer with deviceId: "
-            + selectedCastingPlayer.getDeviceId());
-    this.selectedCastingPlayer = selectedCastingPlayer;
+  public ConnectionExampleFragment(CastingPlayer targetCastingPlayer) {
+    Log.i(TAG, "ConnectionExampleFragment() called with target CastingPlayer");
+    this.targetCastingPlayer = targetCastingPlayer;
   }
 
   /**
@@ -78,59 +78,46 @@ public class ConnectionExampleFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     Log.i(TAG, "onViewCreated() called");
 
-    connectionFragmentStatusTextView = getView().findViewById(R.id.connectionWindowStatus);
+    connectionFragmentStatusTextView = getView().findViewById(R.id.connectionFragmentStatusText);
     connectionFragmentStatusTextView.setText(
         "Verifying or establishing connection with Casting Player with device name: "
-            + selectedCastingPlayer.getDeviceName());
+            + targetCastingPlayer.getDeviceName());
 
-    connectionFragmentNextButton = getView().findViewById(R.id.connectionWindowNextButton);
+    connectionFragmentNextButton = getView().findViewById(R.id.connectionFragmentNextButton);
     Callback callback = (ConnectionExampleFragment.Callback) this.getActivity();
     connectionFragmentNextButton.setOnClickListener(
         v -> {
-          Log.i(
-              TAG,
-              "onViewCreated() connectionWindowNextButton button clicked. Calling MainActivity.handleConnectionComplete()");
-          callback.handleConnectionComplete(selectedCastingPlayer);
+          Log.i(TAG, "onViewCreated() NEXT clicked. Calling handleConnectionComplete()");
+          callback.handleConnectionComplete(targetCastingPlayer);
         });
 
     Executors.newSingleThreadExecutor()
         .submit(
             () -> {
-              Log.d(
-                  TAG,
-                  "onViewCreated() calling verifyOrEstablishConnection() on CastingPlayer with deviceId: "
-                      + selectedCastingPlayer.getDeviceId());
+              Log.d(TAG, "onViewCreated() calling verifyOrEstablishConnection()");
 
+              EndpointFilter desiredEndpointFilter =
+                  new EndpointFilter(null, 65521, new ArrayList<DeviceTypeStruct>());
+              // The desired commissioning window timeout and EndpointFilter are optional.
               CompletableFuture<Void> completableFuture =
-                  selectedCastingPlayer.VerifyOrEstablishConnection();
-              // Optionally, we can specify the desired commissioning window duration and Endpoint
-              // Filter.
-              // EndpointFilter desiredEndpointFilter = new EndpointFilter(0, 0, new
-              // ArrayList<DeviceTypeStruct>());
-              // CompletableFuture<Void> completableFuture =
-              // selectedCastingPlayer.VerifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC,
-              // desiredEndpointFilter);
+                  targetCastingPlayer.VerifyOrEstablishConnection(
+                      MIN_CONNECTION_TIMEOUT_SEC, desiredEndpointFilter);
 
               Log.d(TAG, "onViewCreated() verifyOrEstablishConnection() called");
-              if (completableFuture == null) {
-                Log.e(
-                    TAG,
-                    "onViewCreated() verifyOrEstablishConnection() Warning: completableFuture == null");
-              }
 
               completableFuture
                   .thenRun(
                       () -> {
                         Log.i(
                             TAG,
-                            "onViewCreated() CompletableFuture.thenRun(), Connected to CastingPlayer with deviceId: "
-                                + selectedCastingPlayer.getDeviceId());
+                            "CompletableFuture.thenRun(), connected to CastingPlayer with deviceId: "
+                                + targetCastingPlayer.getDeviceId());
                         getActivity()
                             .runOnUiThread(
                                 () -> {
                                   connectionFragmentStatusTextView.setText(
                                       "Connected to Casting Player with device name: "
-                                          + selectedCastingPlayer.getDeviceName());
+                                          + targetCastingPlayer.getDeviceName());
                                   connectionFragmentNextButton.setEnabled(true);
                                 });
                       })
@@ -138,7 +125,7 @@ public class ConnectionExampleFragment extends Fragment {
                       exc -> {
                         Log.e(
                             TAG,
-                            "onViewCreated() CompletableFuture.exceptionally(), CastingPlayer connection failed due to exception: "
+                            "CompletableFuture.exceptionally(), CastingPLayer connection failed: "
                                 + exc.getMessage());
                         getActivity()
                             .runOnUiThread(
@@ -154,7 +141,7 @@ public class ConnectionExampleFragment extends Fragment {
 
   /** Interface for notifying the host. */
   public interface Callback {
-    /** Notifies listener to trigger transition on completion of commissioning */
+    /** Notifies listener to trigger transition on completion of connection */
     void handleConnectionComplete(CastingPlayer castingPlayer);
   }
 }

@@ -7,15 +7,15 @@
     android:padding="10sp">
 
     <TextView
-        android:id="@+id/connectionWindowStatus"
+        android:id="@+id/connectionFragmentStatusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"/>
 
     <Button
         android:enabled="false"
-        android:id="@+id/connectionWindowNextButton"
-        android:layout_below="@id/connectionWindowStatus"
+        android:id="@+id/connectionFragmentNextButton"
+        android:layout_below="@id/connectionFragmentStatusText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/matter_connection_next_button_text" />
