@@ -44,20 +44,10 @@ tests:
     - label: "Step 3:TH reads from the DUT the FeatureMap attribute., bit 0:0"
       command: "readAttribute"
       attribute: "FeatureMap"
-      PICS: LWM.S.F00
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x0]
-
-    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
-      command: "readAttribute"
-      attribute: "FeatureMap"
-      PICS: " !LWM.S.F00 "
-      response:
-          value: 0
-          constraints:
-              type: bitmap32
+              hasMasksClear: [0x1]
 
     - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
