@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -31,84 +33,93 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2a: Write 1 to the LifetimeRunningHours attribute to DUT"
+    - label: "Step 2a: TH Write 1 to the LifetimeRunningHours attribute to DUT"
       PICS: PCC.S.A0015
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
           value: 1
 
-    - label: "Step 2b: Reads the attribute: LifetimeRunningHours"
+    - label:
+          "Step 2b: TH reads from the DUT the LifetimeRunningHours attribute."
       PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           value: 1
 
-    - label: "Step 3a: Write 2 to the LifetimeRunningHours attribute to DUT"
+    - label: "Step 3a: TH write 2 to the LifetimeRunningHours attribute of DUT."
       PICS: PCC.S.A0015
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
           value: 2
 
-    - label: "Step 3b: Reads the attribute: LifetimeRunningHours"
+    - label:
+          "Step 3b: TH reads from the DUT the LifetimeRunningHours attribute."
       PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           value: 2
 
-    - label: "Step 4a: Write 3 to the LifetimeRunningHours attribute to DUT"
+    - label: "Step 4a: TH Write 3 to the LifetimeRunningHours attribute to DUT"
       PICS: PCC.S.A0015
       command: "writeAttribute"
       attribute: "LifetimeRunningHours"
       arguments:
           value: 3
 
-    - label: "Step 4b: Reads the attribute: LifetimeRunningHours"
+    - label:
+          "Step 4b: TH reads from the DUT the LifetimeRunningHours attribute."
       PICS: PCC.S.A0015
       command: "readAttribute"
       attribute: "LifetimeRunningHours"
       response:
           value: 3
 
-    - label: "Step 5a: Write 1 to the LifetimeEnergyConsumed attribute to DUT"
+    - label:
+          "Step 5a: TH write 1 to the LifetimeEnergyConsumed attribute of DUT."
       PICS: PCC.S.A0017
       command: "writeAttribute"
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 1
 
-    - label: "Step 5b: Reads the attribute: LifetimeEnergyConsumed"
+    - label:
+          "Step 5b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
       PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
           value: 1
 
-    - label: "Step 6a: Write 2 to the LifetimeEnergyConsumed attribute to DUT"
+    - label:
+          "Step 6a: TH write 2 to the LifetimeEnergyConsumed attribute of DUT."
       PICS: PCC.S.A0017
       command: "writeAttribute"
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 2
 
-    - label: "Step 6b: Reads the attribute: LifetimeEnergyConsumed"
+    - label:
+          "Step 6b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
       PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"
       response:
           value: 2
 
-    - label: "Step 7a: Write 3 to the LifetimeEnergyConsumed attribute to DUT"
+    - label:
+          "Step 7a: TH write 3 to the LifetimeEnergyConsumed attribute of DUT."
       PICS: PCC.S.A0017
       command: "writeAttribute"
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 3
 
-    - label: "Step 7b: Reads the attribute: LifetimeEnergyConsumed"
+    - label:
+          "Step 7b: TH reads from the DUT the LifetimeEnergyConsumed attribute."
       PICS: PCC.S.A0017
       command: "readAttribute"
       attribute: "LifetimeEnergyConsumed"

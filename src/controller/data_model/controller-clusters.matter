@@ -128,199 +128,6 @@ cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
-/** Attributes and commands for scene configuration and manipulation. */
-provisional cluster Scenes = 5 {
-  revision 5;
-
-  bitmap CopyModeBitmap : bitmap8 {
-    kCopyAllScenes = 0x1;
-  }
-
-  bitmap Feature : bitmap32 {
-    kSceneNames = 0x1;
-    kExplicit = 0x2;
-    kTableSize = 0x4;
-    kFabricScenes = 0x8;
-  }
-
-  bitmap NameSupportBitmap : bitmap8 {
-    kSceneNames = 0x80;
-  }
-
-  struct AttributeValuePair {
-    attrib_id attributeID = 0;
-    int32u attributeValue = 1;
-  }
-
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
-  fabric_scoped struct SceneInfoStruct {
-    int8u sceneCount = 0;
-    fabric_sensitive int8u currentScene = 1;
-    fabric_sensitive group_id currentGroup = 2;
-    fabric_sensitive boolean sceneValid = 3;
-    int8u remainingCapacity = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  readonly attribute optional int8u sceneCount = 0;
-  readonly attribute optional int8u currentScene = 1;
-  readonly attribute optional group_id currentGroup = 2;
-  readonly attribute optional boolean sceneValid = 3;
-  readonly attribute NameSupportBitmap nameSupport = 4;
-  readonly attribute optional nullable node_id lastConfiguredBy = 5;
-  readonly attribute int16u sceneTableSize = 6;
-  readonly attribute SceneInfoStruct fabricSceneInfo[] = 7;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct AddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct AddSceneResponse = 0 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct ViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct ViewSceneResponse = 1 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct RemoveSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct RemoveSceneResponse = 2 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RemoveAllScenesRequest {
-    group_id groupID = 0;
-  }
-
-  response struct RemoveAllScenesResponse = 3 {
-    status status = 0;
-    group_id groupID = 1;
-  }
-
-  request struct StoreSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct StoreSceneResponse = 4 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct RecallSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    optional nullable int16u transitionTime = 2;
-  }
-
-  request struct GetSceneMembershipRequest {
-    group_id groupID = 0;
-  }
-
-  response struct GetSceneMembershipResponse = 6 {
-    status status = 0;
-    nullable int8u capacity = 1;
-    group_id groupID = 2;
-    optional int8u sceneList[] = 3;
-  }
-
-  request struct EnhancedAddSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-    int16u transitionTime = 2;
-    char_string sceneName = 3;
-    ExtensionFieldSet extensionFieldSets[] = 4;
-  }
-
-  response struct EnhancedAddSceneResponse = 64 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-  }
-
-  request struct EnhancedViewSceneRequest {
-    group_id groupID = 0;
-    int8u sceneID = 1;
-  }
-
-  response struct EnhancedViewSceneResponse = 65 {
-    status status = 0;
-    group_id groupID = 1;
-    int8u sceneID = 2;
-    optional int16u transitionTime = 3;
-    optional char_string sceneName = 4;
-    optional ExtensionFieldSet extensionFieldSets[] = 5;
-  }
-
-  request struct CopySceneRequest {
-    CopyModeBitmap mode = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-    group_id groupIdentifierTo = 3;
-    int8u sceneIdentifierTo = 4;
-  }
-
-  response struct CopySceneResponse = 66 {
-    status status = 0;
-    group_id groupIdentifierFrom = 1;
-    int8u sceneIdentifierFrom = 2;
-  }
-
-  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
-  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
-  /** Retrieves the requested scene entry from its Scene table. */
-  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
-  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
-  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
-  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
-  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
-  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
-  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
-  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
-  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
-  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
-  /** Allows a scene to be added using a finer scene transition time than the AddScene command. */
-  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
-  /** Allows a scene to be retrieved using a finer scene transition time than the ViewScene command */
-  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
-  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
-  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
-}
-
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
   revision 6;
@@ -2848,6 +2655,11 @@ cluster BooleanState = 69 {
 cluster IcdManagement = 70 {
   revision 2;
 
+  enum OperatingModeEnum : enum8 {
+    kSIT = 0;
+    kLIT = 1;
+  }
+
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
     kUserActiveModeTrigger = 0x2;
@@ -2880,9 +2692,6 @@ cluster IcdManagement = 70 {
     fabric_idx fabricIndex = 254;
   }
 
-  critical event OnTransitionToActiveMode = 0 {
-  }
-
   readonly attribute int32u idleModeDuration = 0;
   readonly attribute int32u activeModeDuration = 1;
   readonly attribute int16u activeModeThreshold = 2;
@@ -2891,6 +2700,7 @@ cluster IcdManagement = 70 {
   readonly attribute optional int16u clientsSupportedPerFabric = 5;
   readonly attribute optional UserActiveModeTriggerBitmap userActiveModeTriggerHint = 6;
   readonly attribute optional char_string<128> userActiveModeTriggerInstruction = 7;
+  readonly attribute optional OperatingModeEnum operatingMode = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3257,7 +3067,7 @@ cluster RefrigeratorAndTemperatureControlledCabinetMode = 82 {
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
-/** This cluster supports remotely monitoring and controling the different typs of functionality available to a washing device, such as a washing machine. */
+/** This cluster supports remotely monitoring and controlling the different types of functionality available to a washing device, such as a washing machine. */
 cluster LaundryWasherControls = 83 {
   revision 1;
 
@@ -3292,6 +3102,7 @@ cluster RvcRunMode = 84 {
   enum ModeTag : enum16 {
     kIdle = 16384;
     kCleaning = 16385;
+    kMapping = 16386;
   }
 
   enum StatusCode : enum8 {
@@ -3433,20 +3244,20 @@ cluster TemperatureControl = 86 {
 cluster RefrigeratorAlarm = 87 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3651,7 +3462,7 @@ cluster SmokeCoAlarm = 92 {
 cluster DishwasherAlarm = 93 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
     kDoorError = 0x4;
@@ -3665,16 +3476,16 @@ cluster DishwasherAlarm = 93 {
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute optional AlarmMap latch = 1;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3683,11 +3494,11 @@ cluster DishwasherAlarm = 93 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ResetRequest {
-    AlarmMap alarms = 0;
+    AlarmBitmap alarms = 0;
   }
 
   request struct ModifyEnabledAlarmsRequest {
-    AlarmMap mask = 0;
+    AlarmBitmap mask = 0;
   }
 
   /** Reset alarm */
@@ -3734,11 +3545,21 @@ provisional cluster MicrowaveOvenMode = 94 {
 provisional cluster MicrowaveOvenControl = 95 {
   revision 1; // NOTE: Default/not specifically set
 
-  readonly attribute elapsed_s cookTime = 1;
-  readonly attribute int8u powerSetting = 2;
+  bitmap Feature : bitmap32 {
+    kPowerAsNumber = 0x1;
+    kPowerInWatts = 0x2;
+    kPowerNumberLimits = 0x4;
+  }
+
+  readonly attribute elapsed_s cookTime = 0;
+  readonly attribute elapsed_s maxCookTime = 1;
+  readonly attribute optional int8u powerSetting = 2;
   readonly attribute optional int8u minPower = 3;
   readonly attribute optional int8u maxPower = 4;
   readonly attribute optional int8u powerStep = 5;
+  readonly attribute optional int16u supportedWatts[] = 6;
+  readonly attribute optional int8u selectedWattIndex = 7;
+  readonly attribute optional int16u wattRating = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3750,6 +3571,8 @@ provisional cluster MicrowaveOvenControl = 95 {
     optional int8u cookMode = 0;
     optional elapsed_s cookTime = 1;
     optional int8u powerSetting = 2;
+    optional int8u wattSettingIndex = 3;
+    optional boolean startAfterSetting = 4;
   }
 
   request struct AddMoreTimeRequest {
@@ -3895,6 +3718,157 @@ cluster RvcOperationalState = 97 {
   command Start(): OperationalCommandResponse = 2;
   /** Upon receipt, the device SHALL resume its operation from the point it was at when it received the Pause command, or from the point when it was paused by means outside of this cluster (for example by manual button press). */
   command Resume(): OperationalCommandResponse = 3;
+  /** On receipt of this command, the device SHALL start seeking the charging dock, if possible in the current state of the device. */
+  command GoHome(): OperationalCommandResponse = 128;
+}
+
+/** Attributes and commands for scene configuration and manipulation. */
+provisional cluster ScenesManagement = 98 {
+  revision 5;
+
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kSceneNames = 0x1;
+  }
+
+  struct AttributeValuePair {
+    attrib_id attributeID = 0;
+    int32u attributeValue = 1;
+  }
+
+  struct ExtensionFieldSet {
+    cluster_id clusterID = 0;
+    AttributeValuePair attributeValueList[] = 1;
+  }
+
+  fabric_scoped struct SceneInfoStruct {
+    int8u sceneCount = 0;
+    fabric_sensitive int8u currentScene = 1;
+    fabric_sensitive group_id currentGroup = 2;
+    fabric_sensitive boolean sceneValid = 3;
+    int8u remainingCapacity = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute optional nullable node_id lastConfiguredBy = 0;
+  readonly attribute int16u sceneTableSize = 1;
+  readonly attribute SceneInfoStruct fabricSceneInfo[] = 2;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct AddSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    int32u transitionTime = 2;
+    char_string sceneName = 3;
+    ExtensionFieldSet extensionFieldSets[] = 4;
+  }
+
+  response struct AddSceneResponse = 0 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+  }
+
+  request struct ViewSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+  }
+
+  response struct ViewSceneResponse = 1 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+    optional int32u transitionTime = 3;
+    optional char_string sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
+  }
+
+  request struct RemoveSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+  }
+
+  response struct RemoveSceneResponse = 2 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+  }
+
+  request struct RemoveAllScenesRequest {
+    group_id groupID = 0;
+  }
+
+  response struct RemoveAllScenesResponse = 3 {
+    status status = 0;
+    group_id groupID = 1;
+  }
+
+  request struct StoreSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+  }
+
+  response struct StoreSceneResponse = 4 {
+    status status = 0;
+    group_id groupID = 1;
+    int8u sceneID = 2;
+  }
+
+  request struct RecallSceneRequest {
+    group_id groupID = 0;
+    int8u sceneID = 1;
+    optional nullable int32u transitionTime = 2;
+  }
+
+  request struct GetSceneMembershipRequest {
+    group_id groupID = 0;
+  }
+
+  response struct GetSceneMembershipResponse = 6 {
+    status status = 0;
+    nullable int8u capacity = 1;
+    group_id groupID = 2;
+    optional int8u sceneList[] = 3;
+  }
+
+  request struct CopySceneRequest {
+    CopyModeBitmap mode = 0;
+    group_id groupIdentifierFrom = 1;
+    int8u sceneIdentifierFrom = 2;
+    group_id groupIdentifierTo = 3;
+    int8u sceneIdentifierTo = 4;
+  }
+
+  response struct CopySceneResponse = 64 {
+    status status = 0;
+    group_id groupIdentifierFrom = 1;
+    int8u sceneIdentifierFrom = 2;
+  }
+
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
+  fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
+  /** Retrieves the requested scene entry from its Scene table. */
+  fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
+  fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
+  fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
+  fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
+  fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
+  fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 64;
 }
 
 /** Attributes and commands for monitoring HEPA filters in a device */
@@ -4104,6 +4078,7 @@ provisional cluster ValveConfigurationAndControl = 129 {
   readonly attribute optional nullable percent targetLevel = 7;
   attribute optional percent defaultOpenLevel = 8;
   readonly attribute optional ValveFaultBitmap valveFault = 9;
+  readonly attribute optional int8u levelStep = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4399,13 +4374,19 @@ provisional cluster DemandResponseLoadControl = 150 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 2;
+  revision 3;
+
+  enum AdjustmentCauseEnum : enum8 {
+    kLocalOptimization = 0;
+    kGridOptimization = 1;
+  }
 
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
     kOffline = 1;
     kFault = 2;
     kUserOptOut = 3;
+    kCancelled = 4;
   }
 
   enum CostTypeEnum : enum8 {
@@ -4419,9 +4400,8 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOffline = 0;
     kOnline = 1;
     kFault = 2;
-    kUserOptOut = 3;
-    kPowerAdjustActive = 4;
-    kPaused = 5;
+    kPowerAdjustActive = 3;
+    kPaused = 4;
   }
 
   enum ESATypeEnum : enum8 {
@@ -4442,11 +4422,27 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOther = 255;
   }
 
+  enum ForecastUpdateReasonEnum : enum8 {
+    kInternalOptimization = 0;
+    kLocalOptimization = 1;
+    kGridOptimization = 2;
+  }
+
+  enum OptOutStateEnum : enum8 {
+    kNoOptOut = 0;
+    kLocalOptOut = 1;
+    kGridOptOut = 2;
+    kOptOut = 3;
+  }
+
   bitmap Feature : bitmap32 {
     kPowerAdjustment = 0x1;
     kPowerForecastReporting = 0x2;
     kStateForecastReporting = 0x4;
-    kForecastAdjustment = 0x8;
+    kStartTimeAdjustment = 0x8;
+    kPausable = 0x10;
+    kForecastAdjustment = 0x20;
+    kConstraintBasedAdjustment = 0x40;
   }
 
   struct CostStruct {
@@ -4462,9 +4458,9 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s defaultDuration = 2;
     elapsed_s elapsedSlotTime = 3;
     elapsed_s remainingSlotTime = 4;
-    boolean slotIsPauseable = 5;
-    elapsed_s minPauseDuration = 6;
-    elapsed_s maxPauseDuration = 7;
+    optional boolean slotIsPauseable = 5;
+    optional elapsed_s minPauseDuration = 6;
+    optional elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
     optional power_mw nominalPower = 9;
     optional power_mw minPower = 10;
@@ -4486,6 +4482,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional epoch_s latestEndTime = 5;
     boolean isPauseable = 6;
     SlotStruct slots[] = 7;
+    ForecastUpdateReasonEnum forecastUpdateReason = 8;
   }
 
   struct ConstraintsStruct {
@@ -4522,6 +4519,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   info event Resumed = 3 {
+    CauseEnum cause = 0;
   }
 
   readonly attribute ESATypeEnum ESAType = 0;
@@ -4531,6 +4529,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute power_mw absMaxPower = 4;
   readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
+  readonly attribute optional OptOutStateEnum optOutState = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4541,23 +4540,28 @@ provisional cluster DeviceEnergyManagement = 152 {
   request struct PowerAdjustRequestRequest {
     power_mw power = 0;
     elapsed_s duration = 1;
+    AdjustmentCauseEnum cause = 2;
   }
 
   request struct StartTimeAdjustRequestRequest {
     epoch_s requestedStartTime = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   request struct PauseRequestRequest {
     elapsed_s duration = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   request struct ModifyForecastRequestRequest {
     int32u forecastId = 0;
     SlotAdjustmentStruct slotAdjustments[] = 1;
+    AdjustmentCauseEnum cause = 2;
   }
 
   request struct RequestConstraintBasedForecastRequest {
     ConstraintsStruct constraints[] = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
@@ -4574,6 +4578,8 @@ provisional cluster DeviceEnergyManagement = 152 {
   command ModifyForecastRequest(ModifyForecastRequestRequest): DefaultSuccess = 5;
   /** Allows a client to ask the ESA to recompute its Forecast based on power and time constraints. */
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
+  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command */
+  command CancelRequest(): DefaultSuccess = 7;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */
@@ -4648,6 +4654,11 @@ provisional cluster EnergyEvse = 153 {
     optional energy_mwh addedEnergy = 2;
   }
 
+  struct ChargingTargetScheduleStruct {
+    TargetDayOfWeekBitmap dayOfWeekForSequence = 0;
+    ChargingTargetStruct chargingTargets[] = 1;
+  }
+
   info event EVConnected = 0 {
     int32u sessionID = 0;
   }
@@ -4695,8 +4706,6 @@ provisional cluster EnergyEvse = 153 {
   readonly attribute optional amperage_ma maximumDischargeCurrent = 8;
   attribute access(write: manage) optional amperage_ma userMaximumChargeCurrent = 9;
   attribute access(write: manage) optional elapsed_s randomizationDelayWindow = 10;
-  readonly attribute optional int8u numberOfWeeklyTargets = 33;
-  readonly attribute optional int8u numberOfDailyTargets = 34;
   readonly attribute optional nullable epoch_s nextChargeStartTime = 35;
   readonly attribute optional nullable epoch_s nextChargeTargetTime = 36;
   readonly attribute optional nullable energy_mwh nextChargeRequiredEnergy = 37;
@@ -4717,8 +4726,7 @@ provisional cluster EnergyEvse = 153 {
   readonly attribute int16u clusterRevision = 65533;
 
   response struct GetTargetsResponse = 0 {
-    TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
-    ChargingTargetStruct chargingTargets[] = 1;
+    ChargingTargetScheduleStruct chargingTargetSchedules[] = 0;
   }
 
   request struct EnableChargingRequest {
@@ -4733,12 +4741,7 @@ provisional cluster EnergyEvse = 153 {
   }
 
   request struct SetTargetsRequest {
-    TargetDayOfWeekBitmap dayOfWeekforSequence = 0;
-    ChargingTargetStruct chargingTargets[] = 1;
-  }
-
-  request struct GetTargetsRequest {
-    TargetDayOfWeekBitmap daysToReturn = 0;
+    ChargingTargetScheduleStruct chargingTargetSchedules[] = 0;
   }
 
   /** Allows a client to disable the EVSE from charging and discharging. */
@@ -4752,7 +4755,7 @@ provisional cluster EnergyEvse = 153 {
   /** Allows a client to set the user specified charging targets. */
   timed command SetTargets(SetTargetsRequest): DefaultSuccess = 5;
   /** Allows a client to retrieve the user specified charging targets. */
-  timed command GetTargets(GetTargetsRequest): GetTargetsResponse = 6;
+  timed command GetTargets(): GetTargetsResponse = 6;
   /** Allows a client to clear all stored charging targets. */
   timed command ClearTargets(): DefaultSuccess = 7;
 }
@@ -4789,6 +4792,107 @@ cluster EnergyPreference = 155 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster EnergyEvseMode = 157 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kManual = 16384;
+    kTimeOfUse = 16385;
+    kSolarCharging = 16386;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+}
+
+/** Attributes and commands for selecting a mode from a list of supported options. */
+provisional cluster DeviceEnergyManagementMode = 159 {
+  revision 1;
+
+  enum ModeTag : enum16 {
+    kNoOptimization = 16384;
+    kDeviceOptimization = 16385;
+    kLocalOptimization = 16386;
+    kGridOptimization = 16387;
+  }
+
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  attribute optional nullable int8u startUpMode = 2;
+  attribute optional nullable int8u onMode = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    int8u newMode = 0;
+  }
+
+  response struct ChangeToModeResponse = 1 {
+    enum8 status = 0;
+    optional char_string<64> statusText = 1;
+  }
+
+  /** This command is used to change device modes.
+        On receipt of this command the device SHALL respond with a ChangeToModeResponse command. */
+  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
 }
 
 /** An interface to a generic way to secure a door */
@@ -5808,6 +5912,16 @@ cluster Thermostat = 513 {
     kCoolingAndHeatingWithReheat = 5;
   }
 
+  enum PresetScenarioEnum : enum8 {
+    kUnspecified = 0;
+    kOccupied = 1;
+    kUnoccupied = 2;
+    kSleep = 3;
+    kWake = 4;
+    kVacation = 5;
+    kUserDefined = 6;
+  }
+
   enum SetpointChangeSourceEnum : enum8 {
     kManual = 0;
     kSchedule = 1;
@@ -5869,6 +5983,10 @@ cluster Thermostat = 513 {
     kSetback = 0x10;
     kAutoMode = 0x20;
     kLocalTemperatureNotExposed = 0x40;
+    kMatterScheduleConfiguration = 0x80;
+    kPresets = 0x100;
+    kSetpoints = 0x200;
+    kQueuedPresetsSupported = 0x400;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5876,6 +5994,11 @@ cluster Thermostat = 513 {
     kHeatingStage = 0xC;
     kHeatingIsHeatPump = 0x10;
     kHeatingUsesFuel = 0x20;
+  }
+
+  bitmap PresetTypeFeaturesBitmap : bitmap16 {
+    kAutomatic = 0x1;
+    kSupportsNames = 0x2;
   }
 
   bitmap ProgrammingOperationModeBitmap : bitmap8 {
@@ -5914,6 +6037,62 @@ cluster Thermostat = 513 {
   bitmap ScheduleModeBitmap : bitmap8 {
     kHeatSetpointPresent = 0x1;
     kCoolSetpointPresent = 0x2;
+  }
+
+  bitmap ScheduleTypeFeaturesBitmap : bitmap16 {
+    kSupportsPresets = 0x1;
+    kSupportsSetpoints = 0x2;
+    kSupportsNames = 0x4;
+    kSupportsOff = 0x8;
+  }
+
+  bitmap TemperatureSetpointHoldPolicyBitmap : bitmap8 {
+    kHoldDurationElapsed = 0x1;
+    kHoldDurationElapsedOrPresetChanged = 0x2;
+  }
+
+  struct ScheduleTransitionStruct {
+    ScheduleDayOfWeekBitmap dayOfWeek = 0;
+    int16u transitionTime = 1;
+    optional octet_string<16> presetHandle = 2;
+    optional SystemModeEnum systemMode = 3;
+    optional temperature coolingSetpoint = 4;
+    optional temperature heatingSetpoint = 5;
+  }
+
+  struct ScheduleStruct {
+    nullable octet_string<16> scheduleHandle = 0;
+    SystemModeEnum systemMode = 1;
+    optional char_string<64> name = 2;
+    optional octet_string<16> presetHandle = 3;
+    ScheduleTransitionStruct transitions[] = 4;
+    optional nullable boolean builtIn = 5;
+  }
+
+  struct PresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    PresetScenarioEnum presetScenario = 1;
+    optional nullable char_string<64> name = 2;
+    optional temperature coolingSetpoint = 3;
+    optional temperature heatingSetpoint = 4;
+    nullable boolean builtIn = 5;
+  }
+
+  struct PresetTypeStruct {
+    PresetScenarioEnum presetScenario = 0;
+    int8u numberOfPresets = 1;
+    PresetTypeFeaturesBitmap presetTypeFeatures = 2;
+  }
+
+  struct QueuedPresetStruct {
+    nullable octet_string<16> presetHandle = 0;
+    nullable epoch_s transitionTimestamp = 1;
+  }
+
+  struct ScheduleTypeStruct {
+    SystemModeEnum systemMode = 0;
+    int8u numberOfSchedules = 1;
+    ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
   }
 
   struct WeeklyScheduleTransitionStruct {
@@ -5971,6 +6150,20 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional ACLouverPositionEnum ACLouverPosition = 69;
   readonly attribute optional nullable temperature ACCoilTemperature = 70;
   attribute access(write: manage) optional ACCapacityFormatEnum ACCapacityformat = 71;
+  readonly attribute optional PresetTypeStruct presetTypes[] = 72;
+  readonly attribute optional ScheduleTypeStruct scheduleTypes[] = 73;
+  readonly attribute optional int8u numberOfPresets = 74;
+  readonly attribute optional int8u numberOfSchedules = 75;
+  readonly attribute optional int8u numberOfScheduleTransitions = 76;
+  readonly attribute optional nullable int8u numberOfScheduleTransitionPerDay = 77;
+  readonly attribute optional nullable octet_string<16> activePresetHandle = 78;
+  readonly attribute optional nullable octet_string<16> activeScheduleHandle = 79;
+  attribute access(write: manage) optional PresetStruct presets[] = 80;
+  attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
+  readonly attribute optional boolean presetsSchedulesEditable = 82;
+  readonly attribute optional TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 83;
+  readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 84;
+  readonly attribute optional nullable QueuedPresetStruct queuedPreset = 85;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6002,14 +6195,45 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  request struct SetActiveScheduleRequestRequest {
+    octet_string<16> scheduleHandle = 0;
+  }
+
+  request struct SetActivePresetRequestRequest {
+    octet_string<16> presetHandle = 0;
+    optional int16u delayMinutes = 1;
+  }
+
+  request struct StartPresetsSchedulesEditRequestRequest {
+    int16u timeoutSeconds = 0;
+  }
+
+  request struct SetTemperatureSetpointHoldPolicyRequest {
+    TemperatureSetpointHoldPolicyBitmap temperatureSetpointHoldPolicy = 0;
+  }
+
   /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
   /** Command description for SetWeeklySchedule */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
-  /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
+  /** This command is used to clear the weekly schedule. The ClearWeeklySchedule command has no payload. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
+  /** This command is used to set the active schedule. */
+  command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
+  /** This command is used to set the active preset. */
+  command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  /** This command is used to start editing the presets and schedules. */
+  command access(invoke: manage) StartPresetsSchedulesEditRequest(StartPresetsSchedulesEditRequestRequest): DefaultSuccess = 7;
+  /** This command is used to cancel editing presets and schedules. */
+  command access(invoke: manage) CancelPresetsSchedulesEditRequest(): DefaultSuccess = 8;
+  /** This command is used to notify the server that all edits are done and should be committed. */
+  command access(invoke: manage) CommitPresetsSchedulesRequest(): DefaultSuccess = 9;
+  /** This command is sent to cancel a queued preset. */
+  command access(invoke: manage) CancelSetActivePresetRequest(): DefaultSuccess = 10;
+  /** This command sets the set point hold policy. */
+  command SetTemperatureSetpointHoldPolicy(SetTemperatureSetpointHoldPolicyRequest): DefaultSuccess = 11;
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
@@ -8510,6 +8734,10 @@ internal cluster UnitTesting = 4294048773 {
     fabric_idx fabricIndex = 254;
   }
 
+  info event TestDifferentVendorMeiEvent = 4294050030 {
+    int8u arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute Bitmap8MaskMap bitmap8 = 1;
   attribute Bitmap16MaskMap bitmap16 = 2;
@@ -8592,6 +8820,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
   attribute optional int8u writeOnlyInt8u = 16426;
+  attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -8787,7 +9016,17 @@ internal cluster UnitTesting = 4294048773 {
     int8u fillCharacter = 2;
   }
 
-  /** Simple command without any parameters and without a specific response */
+  request struct TestDifferentVendorMeiRequestRequest {
+    int8u arg1 = 0;
+  }
+
+  response struct TestDifferentVendorMeiResponse = 4294049979 {
+    int8u arg1 = 0;
+    int64u eventNumber = 1;
+  }
+
+  /** Simple command without any parameters and without a specific response.
+        To aid in unit testing, this command will re-initialize attribute storage to defaults. */
   command Test(): DefaultSuccess = 0;
   /** Simple command without any parameters and without a specific response not handled by the server */
   command TestNotHandled(): DefaultSuccess = 1;
@@ -8856,6 +9095,8 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
+  command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */

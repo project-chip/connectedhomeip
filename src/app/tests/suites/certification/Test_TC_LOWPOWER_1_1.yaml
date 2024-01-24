@@ -33,7 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Read the global attribute: ClusterRevision"
+    - label: "Step 1: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -41,7 +41,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 2: Read the global attribute: FeatureMap"
+    - label: "Step 2: TH reads the FeatureMap attribute from the DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,7 +49,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 3: Read the global attribute: AttributeList"
+    - label: "Step 3: TH reads the AttributeList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -58,7 +58,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 3: Read the global attribute: AttributeList"
+    - label: "Step 3: TH reads the AttributeList attribute from the DUT"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -67,7 +67,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 4: Read the global attribute: AcceptedCommandList"
+    - label: "Step 4: TH reads the AcceptedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -75,7 +75,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 5: Read the global attribute: GeneratedCommandList"
+    - label: "Step 5: TH reads the GeneratedCommandList attribute from the DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -83,7 +83,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: Read the global attribute: EventList"
+    - label: "Step 6: TH reads the EventList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"

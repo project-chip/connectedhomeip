@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
+#include <app/util/config.h>
 #include <static-supported-temperature-levels.h>
-#include <zap-generated/gen_config.h>
 
 using namespace std;
 using namespace chip;

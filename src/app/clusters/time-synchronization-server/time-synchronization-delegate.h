@@ -105,6 +105,11 @@ public:
     virtual CHIP_ERROR UpdateTimeUsingNTPFallback(const CharSpan & fallbackNTP,
                                                   chip::Callback::Callback<OnFallbackNTPCompletion> * callback) = 0;
 
+    /**
+     * @brief Signals application that UTCTime has changed through the timesync cluster.
+     */
+    virtual void UTCTimeAvailabilityChanged(uint64_t time) = 0;
+
     virtual ~Delegate() = default;
 
 private:

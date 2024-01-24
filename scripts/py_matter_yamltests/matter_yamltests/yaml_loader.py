@@ -13,7 +13,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from typing import Tuple, Union
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Tuple, Union
 
 from .errors import (TestStepArgumentsValueError, TestStepError, TestStepGroupEndPointError, TestStepGroupResponseError,
                      TestStepInvalidTypeError, TestStepKeyError, TestStepNodeIdAndGroupIdError, TestStepResponseVariableError,
@@ -29,6 +32,121 @@ except ImportError:
 import os
 
 import yaml
+
+_TOP_LEVEL_SCHEMA = {
+    'name': str,
+    'PICS': (str, list),
+    'config': dict,
+    'tests': list,
+}
+
+_TEST_STEP_SCHEMA = {
+    'label': str,
+    'identity': str,
+    'nodeId': (int, str),  # Can be a variable.
+    'runIf': str,  # Should be a variable.
+    'groupId': (int, str),  # Can be a variable.
+    'endpoint': (int, str),  # Can be a variable
+    'cluster': str,
+    'attribute': str,
+    'command': str,
+    'event': str,
+    'eventNumber': (int, str),  # Can be a variable.
+    'disabled': bool,
+    'fabricFiltered': bool,
+    'verification': str,
+    'PICS': str,
+    'arguments': dict,
+    'response': (dict, list, str),  # Can be a variable
+    'saveResponseAs': str,
+    'minInterval': int,
+    'maxInterval': int,
+    'keepSubscriptions': bool,
+    'timeout': int,
+    'timedInteractionTimeoutMs': int,
+    'dataVersion': (list, int, str),  # Can be a variable
+    'busyWaitMs': int,
+    'wait': str,
+}
+
+_TEST_STEP_ARGUMENTS_SCHEMA = {
+    'values': list,
+    'value': (type(None), bool, str, int, float, dict, list),
+}
+
+_TEST_STEP_ARGUMENTS_VALUES_SCHEMA = {
+    'value': (type(None), bool, str, int, float, dict, list),
+    'name': str,
+}
+
+_TEST_STEP_RESPONSE_SCHEMA = {
+    'value': (type(None), bool, str, int, float, dict, list),
+    'name': str,
+    'error': str,
+    'clusterError': int,
+    'constraints': dict,
+    'saveAs': str,
+    'saveDataVersschemaionAs': str,
+}
+
+_TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA = {
+    'hasValue': bool,
+    'type': str,
+    'minLength': int,
+    'maxLength': int,
+    'isHexString': bool,
+    'startsWith': str,
+    'endsWith': str,
+    'isUpperCase': bool,
+    'isLowerCase': bool,
+    'minValue': (int, float, str),  # Can be a variable
+    'maxValue': (int, float, str),  # Can be a variable
+    'contains': list,
+    'excludes': list,
+    'hasMasksSet': list,
+    'hasMasksClear': list,
+    'notValue': (type(None), bool, str, int, float, list, dict),
+    'anyOf': list
+}
+
+# Note: this is not used in the loader, just provided for information in the schema tree
+_CONFIG_SCHEMA = {
+    'nodeId': int,
+    'cluster': str,
+    'endpoint': int,
+    '_variableName_': str,
+}
+
+# Note: this is not used in the loader, just provided for information in the schema tree
+_CONFIG_VARIABLE_SCHEMA = {
+    'type': type,
+    'defaultValue': Any,
+}
+
+
+@dataclass
+class SchemaTree:
+    schema: dict[str, type]
+    children: Union[dict[str, SchemaTree], None] = None
+
+
+_constraint_tree = SchemaTree(schema=_TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA)
+_response_tree = SchemaTree(schema=_TEST_STEP_RESPONSE_SCHEMA, children={
+                            'constraints': _constraint_tree})
+
+_arguments_values_tree = SchemaTree(schema=_TEST_STEP_ARGUMENTS_VALUES_SCHEMA)
+_arguments_tree = SchemaTree(schema=_TEST_STEP_ARGUMENTS_SCHEMA, children={
+                             'values': _arguments_values_tree})
+
+_test_step_tree = SchemaTree(schema=_TEST_STEP_SCHEMA, children={
+                             'arguments': _arguments_tree, 'response': _response_tree})
+
+_config_variable_tree = SchemaTree(schema=_CONFIG_VARIABLE_SCHEMA)
+_config_tree = SchemaTree(schema=_CONFIG_SCHEMA, children={
+                          '_variableName_': _config_variable_tree})
+
+yaml_tree = SchemaTree(schema=_TOP_LEVEL_SCHEMA, children={
+                       'tests': _test_step_tree, 'config': _config_tree})
 
 
 class YamlLoader:
@@ -58,12 +176,7 @@ class YamlLoader:
         return (filename, name, pics, config, tests)
 
     def __check_content(self, content):
-        schema = {
-            'name': str,
-            'PICS': (str, list),
-            'config': dict,
-            'tests': list,
-        }
+        schema = _TOP_LEVEL_SCHEMA
 
         try:
             self.__check(content, schema)
@@ -86,34 +199,7 @@ class YamlLoader:
                 raise
 
     def __check_test_step(self, config: dict, content):
-        schema = {
-            'label': str,
-            'identity': str,
-            'nodeId': (int, str),  # Can be a variable.
-            'runIf': str,  # Should be a variable.
-            'groupId': (int, str),  # Can be a variable.
-            'endpoint': (int, str),  # Can be a variable
-            'cluster': str,
-            'attribute': str,
-            'command': str,
-            'event': str,
-            'eventNumber': (int, str),  # Can be a variable.
-            'disabled': bool,
-            'fabricFiltered': bool,
-            'verification': str,
-            'PICS': str,
-            'arguments': dict,
-            'response': (dict, list, str),  # Can be a variable
-            'saveResponseAs': str,
-            'minInterval': int,
-            'maxInterval': int,
-            'keepSubscriptions': bool,
-            'timeout': int,
-            'timedInteractionTimeoutMs': int,
-            'dataVersion': (list, int, str),  # Can be a variable
-            'busyWaitMs': int,
-            'wait': str,
-        }
+        schema = _TEST_STEP_SCHEMA
 
         self.__check(content, schema)
         self.__rule_node_id_and_group_id_are_mutually_exclusive(content)
@@ -145,10 +231,7 @@ class YamlLoader:
                 self.__check_test_step_response(response)
 
     def __check_test_step_arguments(self, content):
-        schema = {
-            'values': list,
-            'value': (type(None), bool, str, int, float, dict, list),
-        }
+        schema = _TEST_STEP_ARGUMENTS_SCHEMA
 
         self.__check(content, schema)
 
@@ -158,10 +241,7 @@ class YamlLoader:
                 [self.__check_test_step_argument_value(x) for x in values]
 
     def __check_test_step_argument_value(self, content):
-        schema = {
-            'value': (type(None), bool, str, int, float, dict, list),
-            'name': str,
-        }
+        schema = _TEST_STEP_ARGUMENTS_VALUES_SCHEMA
 
         self.__check(content, schema)
 
@@ -177,15 +257,7 @@ class YamlLoader:
             self.__check_test_step_response_value(content)
 
     def __check_test_step_response_value(self, content, allow_name_key=False):
-        schema = {
-            'value': (type(None), bool, str, int, float, dict, list),
-            'name': str,
-            'error': str,
-            'clusterError': int,
-            'constraints': dict,
-            'saveAs': str,
-            'saveDataVersionAs': str,
-        }
+        schema = _TEST_STEP_RESPONSE_SCHEMA
 
         if allow_name_key:
             schema['name'] = str
@@ -197,25 +269,7 @@ class YamlLoader:
             self.__check_test_step_response_value_constraints(constraints)
 
     def __check_test_step_response_value_constraints(self, content):
-        schema = {
-            'hasValue': bool,
-            'type': str,
-            'minLength': int,
-            'maxLength': int,
-            'isHexString': bool,
-            'startsWith': str,
-            'endsWith': str,
-            'isUpperCase': bool,
-            'isLowerCase': bool,
-            'minValue': (int, float, str),  # Can be a variable
-            'maxValue': (int, float, str),  # Can be a variable
-            'contains': list,
-            'excludes': list,
-            'hasMasksSet': list,
-            'hasMasksClear': list,
-            'notValue': (type(None), bool, str, int, float, list, dict),
-            'anyOf': list
-        }
+        schema = _TEST_STEP_RESPONSE_CONSTRAINTS_SCHEMA
 
         self.__check(content, schema)
 
