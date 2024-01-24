@@ -80,6 +80,7 @@ silabs_executable("efr32_device_tests") {
   deps = [
     ":nl_test_service.nanopb_rpc",
     ":sdk",
+    "${chip_root}/config/efr32/lib/pw_rpc:default_addresses",
     "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
     "${chip_root}/examples/common/pigweed:system_rpc_server",
     "${chip_root}/src:tests",
