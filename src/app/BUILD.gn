@@ -75,8 +75,6 @@ source_set("revision_info") {
     "InteractionModelRevision.h",
     "SpecificationVersion.h",
   ]
-
-  public_deps = [ ":app_config" ]
 }
 
 source_set("path-params") {
@@ -184,7 +182,7 @@ config("config-controller-dynamic-server") {
   ]
 }
 
-source_set("interaction-model") {
+static_library("interaction-model") {
   sources = [
     "CASEClient.cpp",
     "CASEClient.h",
