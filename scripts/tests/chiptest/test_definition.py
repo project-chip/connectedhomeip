@@ -157,7 +157,7 @@ class App:
 
     def __terminateProcess(self):
         if self.process:
-            self.process.terminate() # sends SIGTERM
+            self.process.terminate()  # sends SIGTERM
             try:
                 self.process.wait(10)
             except subprocess.TimeoutExpired:
