@@ -125,8 +125,6 @@ CHIP_ERROR EVSEManufacturer::SendEnergyReading(EndpointId aEndpointId, int64_t a
     EnergyMeasurementStruct::Type energyImported;
     EnergyMeasurementStruct::Type energyExported;
 
-    uint32_t oldTimestamp;
-
     // Get current timestamp
     uint32_t currentTimestamp;
     CHIP_ERROR err = GetEpochTS(currentTimestamp);
@@ -141,11 +139,7 @@ CHIP_ERROR EVSEManufacturer::SendEnergyReading(EndpointId aEndpointId, int64_t a
     energyImported.startTimestamp.ClearValue();
     if (data->cumulativeImported.HasValue())
     {
-        if (data->cumulativeImported.Value().endTimestamp.HasValue())
-        {
-            oldTimestamp = data->cumulativeImported.Value().endTimestamp.Value();
-            energyImported.startTimestamp.SetValue(oldTimestamp);
-        }
+        energyImported.startTimestamp = data->cumulativeImported.Value().endTimestamp;
     }
 
     energyImported.endTimestamp.SetValue(currentTimestamp);
@@ -156,11 +150,7 @@ CHIP_ERROR EVSEManufacturer::SendEnergyReading(EndpointId aEndpointId, int64_t a
     energyExported.startTimestamp.ClearValue();
     if (data->cumulativeExported.HasValue())
     {
-        if (data->cumulativeExported.Value().endTimestamp.HasValue())
-        {
-            oldTimestamp = data->cumulativeExported.Value().endTimestamp.Value();
-            energyExported.startTimestamp.SetValue(oldTimestamp);
-        }
+        energyExported.startTimestamp = data->cumulativeExported.Value().endTimestamp;
     }
     energyExported.endTimestamp.SetValue(currentTimestamp);
     energyExported.energy = aCumulativeEnergyExported;
