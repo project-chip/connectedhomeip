@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class MdnsType(Enum):
     COMMISIONER = "_matterd._udp.local."
     COMMISSIONABLE = "_matterc._udp.local."

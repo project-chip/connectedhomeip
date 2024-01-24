@@ -17,10 +17,12 @@
 
 
 import asyncio
-from zeroconf.asyncio import AsyncServiceInfo, AsyncServiceBrowser
+
 from mdns_discovery.exceptions import DiscoveryNotPerformedError
-from .mdns_type_enum import MdnsType
 from zeroconf import ServiceStateChange, Zeroconf
+from zeroconf.asyncio import AsyncServiceInfo, AsyncServiceBrowser
+
+from .mdns_type_enum import MdnsType
 
 
 class MdnsDiscovery:
@@ -74,7 +76,7 @@ class MdnsDiscovery:
         AsyncServiceBrowser(zeroconf=self._zc,
                             type_=self._service_types,
                             handlers=[self.on_service_state_change]
-        )
+                            )
         # Wait for discovery
         await asyncio.sleep(discovery_duration)
         self._discovery_performed = True
@@ -142,7 +144,7 @@ class MdnsDiscovery:
 
         Args:
             service_info (AsyncServiceInfo): The AsyncServiceInfo object to convert.
-            
+
         Returns:
             dict: A dictionary representation of the AsyncServiceInfo object.
         """
@@ -237,7 +239,7 @@ class MdnsDiscovery:
 
         Returns:
             list: A list of discovered Commissionable services.
-            
+
         Note: Each element in the array is a service info dict which might have nested
               dicts as it's value.
 
@@ -253,7 +255,7 @@ class MdnsDiscovery:
             interface_index: The network interface index on which the service is advertised.
             weight: The relative weight for records with the same priority, used in load balancing.
             host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.            
+            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.COMMISSIONABLE)
 
@@ -266,7 +268,7 @@ class MdnsDiscovery:
 
         Returns:
             list: A list of discovered Operational services.
-            
+
         Note: Each element in the array is a service info dict which might have nested
               dicts as it's value.
 
@@ -282,7 +284,7 @@ class MdnsDiscovery:
             interface_index: The network interface index on which the service is advertised.
             weight: The relative weight for records with the same priority, used in load balancing.
             host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.            
+            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.OPERATIONAL)
 
@@ -295,7 +297,7 @@ class MdnsDiscovery:
 
         Returns:
             list: A list of discovered Border Router services.
-            
+
         Note: Each element in the array is a service info dict which might have nested
               dicts as it's value.
 
@@ -311,6 +313,6 @@ class MdnsDiscovery:
             interface_index: The network interface index on which the service is advertised.
             weight: The relative weight for records with the same priority, used in load balancing.
             host_ttl: The time-to-live value for the host name in the DNS record.
-            other_ttl: The time-to-live value for other records associated with the service.            
+            other_ttl: The time-to-live value for other records associated with the service.
         """
         return self._getServiceInfo(MdnsType.BORDER_ROUTER)
