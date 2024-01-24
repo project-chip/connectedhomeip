@@ -5498,6 +5498,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
+namespace MeiInt8u {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace MeiInt8u
+
 } // namespace Attributes
 } // namespace UnitTesting
 

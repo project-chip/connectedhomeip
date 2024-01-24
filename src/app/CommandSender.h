@@ -26,6 +26,8 @@
 
 #include <type_traits>
 
+#include "CommandSenderLegacyCallback.h"
+
 #include <app/CommandPathParams.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
@@ -53,77 +55,6 @@ namespace app {
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
-    // TODO(#30453) Reorder CommandSender::Callback and CommandSender::ExtendableCallback. To keep follow up
-    // review simple, this was not done initially, and is expected to be completed within day of PR
-    // introducing CommandSender::ExtendableCallback getting merged.
-    /**
-     * @brief Legacy callbacks for CommandSender
-     */
-    class Callback
-    {
-    public:
-        virtual ~Callback() = default;
-
-        /**
-         * OnResponse will be called when a successful response from server has been received and processed.
-         * Specifically:
-         *  - When a status code is received and it is IM::Success, aData will be nullptr.
-         *  - When a data response is received, aData will point to a valid TLVReader initialized to point at the struct container
-         *    that contains the data payload (callee will still need to open and process the container).
-         *
-         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy the object.
-         *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aPath           The command path field in invoke command response.
-         * @param[in] aStatusIB       It will always have a success status. If apData is null, it can be any success status,
-         *                            including possibly a cluster-specific one. If apData is not null it aStatusIB will always
-         *                            be a generic SUCCESS status with no-cluster specific information.
-         * @param[in] apData          The command data, will be nullptr if the server returns a StatusIB.
-         */
-        virtual void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatusIB,
-                                TLV::TLVReader * apData)
-        {}
-
-        /**
-         * OnError will be called when an error occurs *after* a successful call to SendCommandRequest(). The following
-         * errors will be delivered through this call in the aError field:
-         *
-         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
-         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
-         * - CHIP_ERROR encapsulating a StatusIB: If we got a non-path-specific or path-specific
-         *   status response from the server.  In that case,
-         *   StatusIB::InitFromChipError can be used to extract the status.
-         *      - Note: a CommandSender using `CommandSender::Callback` only supports sending
-         *        a single InvokeRequest. As a result, only one path-specific error is expected
-         *        to ever be sent to the OnError callback.
-         * - CHIP_ERROR*: All other cases.
-         *
-         * The CommandSender object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call to destroy and free the object.
-         *
-         * @param[in] apCommandSender The command sender object that initiated the command transaction.
-         * @param[in] aError          A system error code that conveys the overall error code.
-         */
-        virtual void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) {}
-
-        /**
-         * OnDone will be called when CommandSender has finished all work and it is safe to destroy and free the
-         * allocated CommandSender object.
-         *
-         * This function will:
-         *      - Always be called exactly *once* for a given CommandSender instance.
-         *      - Be called even in error circumstances.
-         *      - Only be called after a successful call to SendCommandRequest returns, if SendCommandRequest is used.
-         *      - Always be called before a successful return from SendGroupCommandRequest, if SendGroupCommandRequest is used.
-         *
-         * This function must be implemented to destroy the CommandSender object.
-         *
-         * @param[in] apCommandSender   The command sender object of the terminated invoke command transaction.
-         */
-        virtual void OnDone(CommandSender * apCommandSender) = 0;
-    };
-
     // CommandSender::ExtendableCallback::OnResponse is public SDK API, so we cannot break
     // source compatibility for it. To allow for additional values to be added at a future
     // time without constantly changing the function's declaration parameter list, we are
@@ -228,6 +159,10 @@ public:
          */
         virtual void OnDone(CommandSender * apCommandSender) = 0;
     };
+
+    // `Callback` exists for legacy purposes. If you are developing a new callback implementation,
+    // please use `ExtendableCallback`.
+    using Callback = CommandSenderLegacyCallback;
 
     // SetCommandSenderConfig is a public SDK API, so we cannot break source compatibility
     // for it. By having parameters to that API use this struct instead of individual
@@ -455,7 +390,7 @@ public:
 private:
     friend class TestCommandInteraction;
 
-    enum class State
+    enum class State : uint8_t
     {
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         AddingCommand,       ///< In the process of adding a command.
@@ -464,6 +399,14 @@ private:
         AwaitingResponse,    ///< The command has been sent successfully, and we are awaiting invoke response.
         ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    union CallbackHandle
+    {
+        CallbackHandle(Callback * apCallback) : legacyCallback(apCallback) {}
+        CallbackHandle(ExtendableCallback * apExtendableCallback) : extendableCallback(apExtendableCallback) {}
+        Callback * legacyCallback;
+        ExtendableCallback * extendableCallback;
     };
 
     void MoveToState(const State aTargetState);
@@ -513,46 +456,45 @@ private:
     void OnResponseCallback(const ResponseData & aResponseData)
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
-        if (mpExtendableCallback)
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
         {
-            mpExtendableCallback->OnResponse(this, aResponseData);
+            mCallbackHandle.extendableCallback->OnResponse(this, aResponseData);
         }
-        else if (mpCallback)
+        else if (mCallbackHandle.legacyCallback)
         {
-            mpCallback->OnResponse(this, aResponseData.path, aResponseData.statusIB, aResponseData.data);
+            mCallbackHandle.legacyCallback->OnResponse(this, aResponseData.path, aResponseData.statusIB, aResponseData.data);
         }
     }
 
     void OnErrorCallback(CHIP_ERROR aError)
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
-        if (mpExtendableCallback)
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
         {
             ErrorData errorData = { aError };
-            mpExtendableCallback->OnError(this, errorData);
+            mCallbackHandle.extendableCallback->OnError(this, errorData);
         }
-        else if (mpCallback)
+        else if (mCallbackHandle.legacyCallback)
         {
-            mpCallback->OnError(this, aError);
+            mCallbackHandle.legacyCallback->OnError(this, aError);
         }
     }
 
     void OnDoneCallback()
     {
         // mpExtendableCallback and mpCallback are mutually exclusive.
-        if (mpExtendableCallback)
+        if (mUseExtendableCallback && mCallbackHandle.extendableCallback)
         {
-            mpExtendableCallback->OnDone(this);
+            mCallbackHandle.extendableCallback->OnDone(this);
         }
-        else if (mpCallback)
+        else if (mCallbackHandle.legacyCallback)
         {
-            mpCallback->OnDone(this);
+            mCallbackHandle.legacyCallback->OnDone(this);
         }
     }
 
     Messaging::ExchangeHolder mExchangeCtx;
-    Callback * mpCallback                      = nullptr;
-    ExtendableCallback * mpExtendableCallback  = nullptr;
+    CallbackHandle mCallbackHandle;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
     // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
@@ -564,15 +506,16 @@ private:
     Optional<uint16_t> mTimedInvokeTimeoutMs;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
 
-    State mState = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
 
-    bool mSuppressResponse     = false;
-    bool mTimedRequest         = false;
-    bool mBufferAllocated      = false;
-    bool mBatchCommandsEnabled = false;
+    State mState                = State::Idle;
+    bool mSuppressResponse      = false;
+    bool mTimedRequest          = false;
+    bool mBufferAllocated       = false;
+    bool mBatchCommandsEnabled  = false;
+    bool mUseExtendableCallback = false;
 };
 
 } // namespace app

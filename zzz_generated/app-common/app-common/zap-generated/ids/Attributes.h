@@ -7890,6 +7890,10 @@ namespace ClusterRevision {
 static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
+namespace MeiInt8u {
+static constexpr AttributeId Id = 0xFFF24F01;
+} // namespace MeiInt8u
+
 } // namespace Attributes
 } // namespace UnitTesting
 
