@@ -30,7 +30,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Interface that represents a single CASE session resumption entry.
  */
-MTR_HIDDEN
 @interface MTRCASESessionResumptionInfo : NSObject <NSSecureCoding>
 @property (nonatomic) NSNumber * nodeID;
 @property (nonatomic) NSData * resumptionID;
@@ -42,7 +41,6 @@ MTR_HIDDEN
  * Interface that wraps a type-safe API around
  * MTRDeviceControllerStorageDelegate.
  */
-MTR_HIDDEN
 @interface MTRDeviceControllerDataStore : NSObject
 
 - (nullable instancetype)initWithController:(MTRDeviceController *)controller

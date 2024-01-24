@@ -1128,7 +1128,6 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
 @end
 
-MTR_HIDDEN
 @interface MTRDummyStorage : NSObject <MTRStorage>
 @end
 

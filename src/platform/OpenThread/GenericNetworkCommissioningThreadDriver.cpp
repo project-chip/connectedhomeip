@@ -47,6 +47,7 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
 {
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
     ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
+    ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnThreadStateChangeHandler, reinterpret_cast<intptr_t>(this)));
 
     // If the network configuration backup exists, it means that the device has been rebooted with
     // the fail-safe armed. Since OpenThread persists all operational dataset changes, the backup
@@ -54,6 +55,16 @@ CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCa
     RevertConfiguration();
 
     return CHIP_NO_ERROR;
+}
+
+void GenericThreadDriver::OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    if ((event->Type == DeviceEventType::kThreadStateChange) &&
+        (event->ThreadStateChange.OpenThread.Flags & OT_CHANGED_THREAD_PANID))
+    {
+        // Update the mStagingNetwork when thread panid changed
+        ThreadStackMgrImpl().GetThreadProvision(reinterpret_cast<GenericThreadDriver *>(arg)->mStagingNetwork);
+    }
 }
 
 void GenericThreadDriver::Shutdown()
