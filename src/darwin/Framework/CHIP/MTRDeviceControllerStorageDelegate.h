@@ -67,7 +67,9 @@ typedef NS_ENUM(NSUInteger, MTRStorageSharingType) {
  *    stored and calling MTRDeviceControllerStorageClasses(), is likely to lead
  *    to deadlocks.
  */
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_NEWLY_AVAILABLE
+#endif
 @protocol MTRDeviceControllerStorageDelegate <NSObject>
 @required
 /**
@@ -112,7 +114,10 @@ MTR_NEWLY_AVAILABLE
 @end
 
 // TODO: FIXME: Is this a sane place to put this API?
-MTR_EXTERN MTR_NEWLY_AVAILABLE NSSet<Class> * MTRDeviceControllerStorageClasses(void);
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+MTR_EXTERN MTR_NEWLY_AVAILABLE
+#endif
+NSSet<Class> * MTRDeviceControllerStorageClasses(void);
 
 NS_ASSUME_NONNULL_END
 
