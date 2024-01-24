@@ -64,9 +64,9 @@ class MdnsDiscovery:
             - interface_index: The network interface index on which the service is advertised.
             - weight: The relative weight for records with the same priority, used in load balancing.
             - host_ttl: The time-to-live value for the host name in the DNS record.
-            - other_ttl: The time-to-live value for other records associated with the service.            
+            - other_ttl: The time-to-live value for other records associated with the service.
         """
-        self._zc =  None
+        self._zc = None
         self._aiobrowser = None
         self._tc = tc
         self._service_types = [mdns_type.value for mdns_type in MdnsType]
@@ -107,9 +107,9 @@ class MdnsDiscovery:
         self._zc = Zeroconf()
         self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsType}
         self._aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
-                            type_=self._service_types,
-                            handlers=[self._on_service_state_change]
-                            )
+                                               type_=self._service_types,
+                                               handlers=[self._on_service_state_change]
+                                               )
         # Wait for discovery
         await asyncio.sleep(discovery_duration_sec)
         self._discovery_performed = True
