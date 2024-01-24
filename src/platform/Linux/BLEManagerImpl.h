@@ -177,6 +177,7 @@ private:
 
     void DriveBLEState();
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
+    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
 
