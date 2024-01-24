@@ -18,6 +18,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <utility>
 
 #include <gio/gio.h>
 #include <glib-object.h>
@@ -38,10 +39,14 @@ class BluezEndpoint;
 class BluezAdvertisement
 {
 public:
+    // Minimum and maximum advertising intervals in units of 0.625ms.
+    using AdvertisingIntervals = std::pair<uint16_t, uint16_t>;
+
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
-    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs);
+    CHIP_ERROR Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID, uint32_t aAdvDurationMs,
+                    AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 
     /// Start BLE advertising.
@@ -82,6 +87,7 @@ private:
     char * mpAdvUUID     = nullptr;
     ChipAdvType mAdvType;
     uint16_t mAdvDurationMs = 0;
+    AdvertisingIntervals mAdvIntervals;
 };
 
 } // namespace Internal

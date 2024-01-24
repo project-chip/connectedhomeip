@@ -595,7 +595,8 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs));
+                SuccessOrExit(err = mBLEAdvertisement.Init(mEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs,
+                                                           GetAdvertisingIntervals()));
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
@@ -634,6 +635,13 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
     // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
     DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
 #endif
+}
+
+BluezAdvertisement::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() const
+{
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+        return { CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX };
+    return { CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX };
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)

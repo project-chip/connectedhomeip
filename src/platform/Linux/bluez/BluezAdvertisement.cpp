@@ -76,6 +76,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
     bluez_leadvertisement1_set_type_(adv, (mAdvType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
+    bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
     // empty manufacturer data
     // empty solicit UUIDs
     bluez_leadvertisement1_set_service_data(adv, serviceData);
@@ -85,20 +86,22 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
     // Bluez to set "BR/EDR Not Supported" flag. Bluez doesn't provide API to do that explicitly
     // and the flag is necessary to force using LE transport.
     bluez_leadvertisement1_set_discoverable(adv, (mAdvType & BLUEZ_ADV_TYPE_SCANNABLE) ? TRUE : FALSE);
-    if (mAdvType & BLUEZ_ADV_TYPE_SCANNABLE)
-        bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
-    // advertising name corresponding to the PID and object path, for debug purposes
+    // The discoverable timeout shall NOT be set when type is set to "broadcast".
+    if (mAdvType & BLUEZ_ADV_TYPE_CONNECTABLE)
+        bluez_leadvertisement1_set_discoverable_timeout(adv, 0 /* infinite */);
+
+    // empty includes
     bluez_leadvertisement1_set_local_name(adv, localNamePtr);
-    bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
-
-    // 0xffff means no appearance
-    bluez_leadvertisement1_set_appearance(adv, 0xffff);
+    bluez_leadvertisement1_set_appearance(adv, 0xffff /* no appearance */);
 
     bluez_leadvertisement1_set_duration(adv, mAdvDurationMs);
     // empty duration, we don't have a clear notion what it would mean to timeslice between toble and anyone else
     bluez_leadvertisement1_set_timeout(adv, 0);
     // empty secondary channel for now
+
+    bluez_leadvertisement1_set_min_interval(adv, mAdvIntervals.first * 0.625);
+    bluez_leadvertisement1_set_max_interval(adv, mAdvIntervals.second * 0.625);
 
     bluez_object_skeleton_set_leadvertisement1(object, adv);
     g_signal_connect(adv, "handle-release",
@@ -134,7 +137,7 @@ CHIP_ERROR BluezAdvertisement::InitImpl()
 }
 
 CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType aAdvType, const char * aAdvUUID,
-                                    uint32_t aAdvDurationMs)
+                                    uint32_t aAdvDurationMs, AdvertisingIntervals aAdvIntervals)
 {
     GAutoPtr<char> rootPath;
     CHIP_ERROR err;
@@ -151,6 +154,7 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, ChipAdvType
     mAdvType       = aAdvType;
     mpAdvUUID      = g_strdup(aAdvUUID);
     mAdvDurationMs = aAdvDurationMs;
+    mAdvIntervals  = aAdvIntervals;
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
     ReturnErrorOnFailure(err);

@@ -176,7 +176,7 @@ private:
     };
 
     void DriveBLEState();
-
+    BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
     void CleanScanConfig();
 
