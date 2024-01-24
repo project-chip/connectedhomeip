@@ -28,7 +28,8 @@ from mobly import asserts
 
 class TC_RVCRUNM_1_2(MatterBaseTest):
     def __init__(self, *args):
-        super().__init__(args)
+        super().__init__(*args)
+        self.endpoint = 0
         self.commonTags = {0x0: 'Auto',
                            0x1: 'Quick',
                            0x2: 'Quiet',
@@ -39,8 +40,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
                            0x7: 'Max',
                            0x8: 'Night',
                            0x9: 'Day'}
-        self.runTags = [tag.value for tag in Clusters.RvcRunMode.Enums.ModeTag
-                        if tag is not Clusters.RvcRunMode.Enums.ModeTag.kUnknownEnumValue]
+        self.runTags = [tag.value for tag in Clusters.RvcRunMode.Enums.ModeTag]
         self.supported_modes_dut = []
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
@@ -53,11 +53,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
 
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.matter_test_config.endpoint
 
         attributes = Clusters.RvcRunMode.Attributes
 

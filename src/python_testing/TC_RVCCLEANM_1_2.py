@@ -21,14 +21,11 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
 
 class TC_RVCCLEANM_1_2(MatterBaseTest):
     def __init__(self, *args):
-        super().__init__(args)
+        super().__init__(*args)
+        self.endpoint = 0
         self.commonTags = {0x0: 'Auto',
                            0x1: 'Quick',
                            0x2: 'Quiet',
@@ -39,8 +36,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
                            0x7: 'Max',
                            0x8: 'Night',
                            0x9: 'Day'}
-        self.cleanTags = [tag.value for tag in Clusters.RvcCleanMode.Enums.ModeTag
-                          if tag is not Clusters.RvcCleanMode.Enums.ModeTag.kUnknownEnumValue]
+        self.cleanTags = [tag.value for tag in Clusters.RvcCleanMode.Enums.ModeTag]
         self.supported_modes_dut = []
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
@@ -52,12 +48,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCCLEANM_1_2(self):
-
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        self.endpoint = self.matter_test_config.endpoint
 
         attributes = Clusters.RvcCleanMode.Attributes
 
@@ -116,19 +107,15 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
 
             # Verify that at least one ModeOptionsStruct entry includes either the
             # Vacuum(0x4001) mode tag or the Mop(0x4002)mode tag in the ModeTags field
+            vacuum_mop_tags = [Clusters.RvcCleanMode.Enums.ModeTag.kVacuum, Clusters.RvcCleanMode.Enums.ModeTag.kMop]
             has_vacuum_or_mop_mode_tag = False
             for m in supported_modes:
+                has_vacuum_or_mop_mode_tag = any(t.value in vacuum_mop_tags for t in m.modeTags)
                 if has_vacuum_or_mop_mode_tag:
                     break
 
-                for t in m.modeTags:
-                    if t.value in [Clusters.RvcCleanMode.Enums.ModeTag.kVacuum,
-                                   Clusters.RvcCleanMode.Enums.ModeTag.kMop]:
-                        has_vacuum_or_mop_mode_tag = True
-                        break
-
-            asserts.assert_true(has_vacuum_or_mop_mode_tag, "At least one ModeOptionsStruct entry must include either the ")
-          ```
+            asserts.assert_true(has_vacuum_or_mop_mode_tag,
+                                "At least one ModeOptionsStruct entry must include either the ")
 
         if self.check_pics("RVCCLEANM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")
