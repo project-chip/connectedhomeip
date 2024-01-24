@@ -61,28 +61,22 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
         Platform::Delete(refreshKeySender);
         return nullptr;
     }
-    mRefreshKeySenderMap[clientInfo.peer_node] = refreshKeySender;
     return refreshKeySender;
 }
 
-void DefaultCheckInDelegate::OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError)
+void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR aError)
 {
     if (aError == CHIP_NO_ERROR)
     {
-        ChipLogProgress(ICD,
-                        "Re-registration complete: start_counter=%" PRIu32 " offset=%" PRIu32 " nodeid=" ChipLogFormatScopedNodeId,
-                        clientInfo.start_icd_counter, clientInfo.offset, ChipLogValueScopedNodeId(clientInfo.peer_node));
+        ChipLogProgress(ICD, "Re-registration with new key completed successfully");
     }
     else
     {
         ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, aError.Format());
     }
-
-    if (mRefreshKeySenderMap.find(clientInfo.peer_node) != mRefreshKeySenderMap.end())
+    if (refreshKeySender != nullptr)
     {
-        auto refreshKeySender = mRefreshKeySenderMap.at(clientInfo.peer_node);
         Platform::Delete(refreshKeySender);
-        mRefreshKeySenderMap.erase(clientInfo.peer_node);
     }
 }
 } // namespace app

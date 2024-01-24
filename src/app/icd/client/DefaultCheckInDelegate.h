@@ -20,7 +20,6 @@
 
 #include <app/icd/client/CheckInDelegate.h>
 #include <app/icd/client/ICDClientStorage.h>
-#include <unordered_map> // TODO: update check_includes_config.py
 
 namespace chip {
 namespace app {
@@ -35,23 +34,10 @@ public:
     CHIP_ERROR Init(ICDClientStorage * storage);
     void OnCheckInComplete(const ICDClientInfo & clientInfo) override;
     RefreshKeySender * OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage) override;
-    void OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError) override;
+    void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR aError) override;
 
 private:
-    struct HashFunction
-    {
-        size_t operator()(const ScopedNodeId & peer) const
-        {
-            size_t nodeIdHash    = std::hash<uint64_t>()(peer.GetNodeId());
-            size_t fabricIdxHash = std::hash<uint64_t>()(peer.GetFabricIndex()) << 1;
-            return nodeIdHash ^ fabricIdxHash;
-        }
-    };
     ICDClientStorage * mpStorage = nullptr;
-    // Data structure used to store the RefreshKeySender created for every peer node. Since the check-in delegate has to manage key
-    // refresh requests from multiple peers, this is used to keep track of the memory allocated for each peer so that it can
-    // be freed up at the end of the key refresh process.
-    unordered_map<ScopedNodeId, RefreshKeySender *, HashFunction> mRefreshKeySenderMap;
 };
 
 } // namespace app

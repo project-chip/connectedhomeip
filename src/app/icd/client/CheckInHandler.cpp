@@ -114,13 +114,14 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
         {
             ChipLogError(ICD, "Key Refresh failed for node ID:" ChipLogFormatScopedNodeId,
                          ChipLogValueScopedNodeId(clientInfo.peer_node));
+            mpCheckInDelegate->OnKeyRefreshDone(refreshKeySender, CHIP_ERROR_NO_MEMORY);
             return CHIP_NO_ERROR;
         }
         err = refreshKeySender->EstablishSessionToPeer();
         if (CHIP_NO_ERROR != err)
         {
             ChipLogError(ICD, "CASE session establishment failed with error : %" CHIP_ERROR_FORMAT, err.Format());
-            mpCheckInDelegate->OnKeyRefreshDone(clientInfo, err);
+            mpCheckInDelegate->OnKeyRefreshDone(refreshKeySender, err);
             return CHIP_NO_ERROR;
         }
     }

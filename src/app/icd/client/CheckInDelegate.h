@@ -65,15 +65,14 @@ public:
 
     /**
  * @brief Callback used to let the application know that the re-registration process is done. This callback will be called for both
-          success and failure cases. On failure, the callee should address the error reason and take appropriate corrective action.
+          success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
  *
- * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-                           node that sent the check-in message. This will have the new key used for registration and the updated
-                           icd counter.
+ * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller will
+                                 NOT use this pointer anymore.
    @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
                        Other errors indicate the failure reason.
  */
-    virtual void OnKeyRefreshDone(const ICDClientInfo & clientInfo, CHIP_ERROR aError) = 0;
+    virtual void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR aError) = 0;
 };
 
 } // namespace app
