@@ -29,6 +29,7 @@
 #include <pw_sys_io_mbed/init.h>
 
 #include <rtos/Mutex.h>
+#include <assert.h>
 
 namespace PigweedLogger {
 namespace {
