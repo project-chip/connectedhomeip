@@ -17,11 +17,6 @@ var sController: MTRDeviceController? = nil
 
 var sTestKeys: MTRTestKeys? = nil
 
-// Because we are using things from Matter.framework that are flagged
-// as only being available starting with macOS 13.3, we need to flag our
-// code with the same availabiluty annotation.
-@available(macOS, introduced: 13.3)
-@available(iOS, introduced: 16.4)
 class MTRSwiftDeviceTestControllerDelegate : NSObject, MTRDeviceControllerDelegate {
     let expectation: XCTestExpectation
 
@@ -97,11 +92,6 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
 
 }
 
-// Because we are using things from Matter.framework that are flagged
-// as only being available starting with macOS 14.4, we need to flag our
-// code with the same availability annotation.
-@available(macOS, introduced: 14.4)
-@available(iOS, introduced: 17.4)
 class MTRSwiftDeviceTests : XCTestCase {
     static var sStackInitRan : Bool = false
     static var sNeedsStackShutdown : Bool = true
