@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The latter can be used to pass Thread network credentials via
  * MTRCommissioningParameters.
  */
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRThreadOperationalDataset : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -61,13 +62,13 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
  */
-extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPanId MTR_DEPRECATED(
+MTR_EXTERN size_t const MTRSizeThreadNetworkName MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN size_t const MTRSizeThreadExtendedPanId MTR_DEPRECATED(
     "Please use MTRSizeThreadExtendedPANID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-extern size_t const MTRSizeThreadExtendedPANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-extern size_t const MTRSizeThreadMasterKey;
-extern size_t const MTRSizeThreadPSKc;
-extern size_t const MTRSizeThreadPANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+MTR_EXTERN size_t const MTRSizeThreadExtendedPANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+MTR_EXTERN size_t const MTRSizeThreadMasterKey MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN size_t const MTRSizeThreadPSKc MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN size_t const MTRSizeThreadPANID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The Thread Network name

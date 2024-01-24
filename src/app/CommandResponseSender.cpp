@@ -39,9 +39,10 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::InvalidAction));
 
         // If SendCommandResponse() fails, we are responsible for closing the exchange,
-        // as stipulated by the API contract. We fulfill this obligation by setting
-        // `failureStatusToSend` to a value that triggers the transmission of a final
-        // StatusResponse, which does not expect a response.
+        // as stipulated by the API contract. We fulfill this obligation by not sending
+        // a message expecting a response on the exchange. Since we are in the middle
+        // of processing an incoming message, the exchange will close itself once we are
+        // done processing it, if there is no response to wait for at that point.
         err = SendCommandResponse();
         VerifyOrExit(err == CHIP_NO_ERROR, failureStatusToSend.SetValue(Status::Failure));
 

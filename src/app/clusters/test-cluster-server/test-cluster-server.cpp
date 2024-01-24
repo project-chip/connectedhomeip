@@ -780,6 +780,27 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestDifferentVendorMeiRequest::DecodableType & commandData)
+{
+    Commands::TestDifferentVendorMeiResponse::Type response;
+
+    {
+        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.eventNumber))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+    }
+
+    response.arg1 = commandData.arg1;
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
@@ -833,6 +854,7 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
+
     commandObj->AddResponse(commandPath, responseData);
     return true;
 }
