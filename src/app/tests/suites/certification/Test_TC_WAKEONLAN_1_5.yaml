@@ -25,7 +25,8 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label:
+          "Commission DUT to TH (can be skipped if done in a preceding test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -33,7 +34,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 1: Read the global attribute: ClusterRevision"
+    - label: "Step 1: TH reads the ClusterRevision attribute from the DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -41,7 +42,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 2: Read the global attribute: FeatureMap"
+    - label: "Step 2: TH reads the FeatureMap attribute from the DUT"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -49,7 +50,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 3a: TH reads the AttributeList attribute from the DUT"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -58,7 +59,7 @@ tests:
               type: list
               contains: [65528, 65529, 65530, 65531, 65532, 65533]
 
-    - label: "Step 3a: Read the global attribute: AttributeList"
+    - label: "Step 3a: TH reads the AttributeList attribute from the DUT"
       PICS: "!PICS_EVENT_LIST_ENABLED"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -67,7 +68,8 @@ tests:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 3b: Read the optional attribute(MACAddress) in AttributeList"
+    - label:
+          "Step 3b: TH reads the optional attribute(MACAddress) in AttributeList"
       PICS: WAKEONLAN.S.A0000
       command: "readAttribute"
       attribute: "AttributeList"
@@ -76,7 +78,7 @@ tests:
               type: list
               contains: [0]
 
-    - label: "Step 4: Read the global attribute: AcceptedCommandList"
+    - label: "Step 4: TH reads the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -84,7 +86,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 5: Read the global attribute: GeneratedCommandList"
+    - label: "Step 5: TH reads the global attribute: GeneratedCommandList"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
@@ -92,7 +94,7 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: Read the global attribute: EventList"
+    - label: "Step 6: TH reads the global attribute: EventList"
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "EventList"

@@ -84,7 +84,7 @@ void SampleMeiServer::InvokeCommand(HandlerContext & ctxt)
     {
     case Commands::Ping::Id:
         HandleCommand<Commands::Ping::DecodableType>(
-            ctxt, [this, endpoint, fabricIndex, endpointIndex, ctxt](HandlerContext & ctx, const auto & req) {
+            ctxt, [this, endpoint, fabricIndex, endpointIndex](HandlerContext & ctx, const auto & req) {
                 ChipLogProgress(Zcl, "Ping Command on Ep %d", endpoint);
                 Events::PingCountEvent::Type event{ .count = content[endpointIndex].pingCount++, .fabricIndex = fabricIndex };
                 chip::EventNumber placeholderEventNumber;

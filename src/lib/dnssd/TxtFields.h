@@ -39,14 +39,15 @@ static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 static constexpr size_t kKeyLongIdleTimeICDMaxLength             = 1;
 
 // Commissionable/commissioner node TXT entries
-static constexpr size_t kKeyLongDiscriminatorMaxLength  = 5;
-static constexpr size_t kKeyVendorProductMaxLength      = 11;
-static constexpr size_t kKeyCommissioningModeMaxLength  = 1;
-static constexpr size_t kKeyDeviceTypeMaxLength         = 10;
-static constexpr size_t kKeyDeviceNameMaxLength         = 32;
-static constexpr size_t kKeyRotatingDeviceIdMaxLength   = 100;
-static constexpr size_t kKeyPairingInstructionMaxLength = 128;
-static constexpr size_t kKeyPairingHintMaxLength        = 10;
+static constexpr size_t kKeyLongDiscriminatorMaxLength    = 5;
+static constexpr size_t kKeyVendorProductMaxLength        = 11;
+static constexpr size_t kKeyCommissioningModeMaxLength    = 1;
+static constexpr size_t kKeyDeviceTypeMaxLength           = 10;
+static constexpr size_t kKeyDeviceNameMaxLength           = 32;
+static constexpr size_t kKeyRotatingDeviceIdMaxLength     = 100;
+static constexpr size_t kKeyPairingInstructionMaxLength   = 128;
+static constexpr size_t kKeyPairingHintMaxLength          = 10;
+static constexpr size_t kKeyCommissionerPasscodeMaxLength = 1;
 
 enum class TxtKeyUse : uint8_t
 {
@@ -66,6 +67,7 @@ enum class TxtFieldKey : uint8_t
     kRotatingDeviceId,
     kPairingInstruction,
     kPairingHint,
+    kCommissionerPasscode,
     kSessionIdleInterval,
     kSessionActiveInterval,
     kSessionActiveThreshold,
@@ -93,6 +95,7 @@ constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCoun
     { TxtFieldKey::kRotatingDeviceId, kKeyRotatingDeviceIdMaxLength, "RI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingInstruction, kKeyPairingInstructionMaxLength, "PI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingHint, kKeyPairingHintMaxLength, "PH", TxtKeyUse::kCommission },
+    { TxtFieldKey::kCommissionerPasscode, kKeyCommissionerPasscodeMaxLength, "CP", TxtKeyUse::kCommission },
     { TxtFieldKey::kSessionIdleInterval, kKeySessionIdleIntervalMaxLength, "SII", TxtKeyUse::kCommon },
     { TxtFieldKey::kSessionActiveInterval, kKeySessionActiveIntervalMaxLength, "SAI", TxtKeyUse::kCommon },
     { TxtFieldKey::kSessionActiveThreshold, kKeySessionActiveThresholdMaxLength, "SAT", TxtKeyUse::kCommon },
@@ -112,6 +115,7 @@ void GetDeviceName(const ByteSpan & value, char * name);
 void GetRotatingDeviceId(const ByteSpan & value, uint8_t * rotatingId, size_t * len);
 uint16_t GetPairingHint(const ByteSpan & value);
 void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction);
+uint8_t GetCommissionerPasscode(const ByteSpan & value);
 #endif
 } // namespace Internal
 

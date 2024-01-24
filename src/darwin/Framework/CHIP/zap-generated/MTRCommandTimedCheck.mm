@@ -41,15 +41,6 @@ static BOOL CommandNeedsTimedInvokeInGroupsCluster(AttributeId aAttributeId)
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInScenesCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::Scenes;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInOnOffCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OnOff;
@@ -554,6 +545,15 @@ static BOOL CommandNeedsTimedInvokeInRVCOperationalStateCluster(AttributeId aAtt
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ScenesManagement;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::HepaFilterMonitoring;
@@ -650,6 +650,24 @@ static BOOL CommandNeedsTimedInvokeInEnergyEVSECluster(AttributeId aAttributeId)
 static BOOL CommandNeedsTimedInvokeInEnergyPreferenceCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::EnergyPreference;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInEnergyEVSEModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::EnergyEvseMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::DeviceEnergyManagementMode;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1089,9 +1107,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::Groups::Id: {
         return CommandNeedsTimedInvokeInGroupsCluster(commandID);
     }
-    case Clusters::Scenes::Id: {
-        return CommandNeedsTimedInvokeInScenesCluster(commandID);
-    }
     case Clusters::OnOff::Id: {
         return CommandNeedsTimedInvokeInOnOffCluster(commandID);
     }
@@ -1257,6 +1272,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::RvcOperationalState::Id: {
         return CommandNeedsTimedInvokeInRVCOperationalStateCluster(commandID);
     }
+    case Clusters::ScenesManagement::Id: {
+        return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
+    }
     case Clusters::HepaFilterMonitoring::Id: {
         return CommandNeedsTimedInvokeInHEPAFilterMonitoringCluster(commandID);
     }
@@ -1283,6 +1301,12 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::EnergyPreference::Id: {
         return CommandNeedsTimedInvokeInEnergyPreferenceCluster(commandID);
+    }
+    case Clusters::EnergyEvseMode::Id: {
+        return CommandNeedsTimedInvokeInEnergyEVSEModeCluster(commandID);
+    }
+    case Clusters::DeviceEnergyManagementMode::Id: {
+        return CommandNeedsTimedInvokeInDeviceEnergyManagementModeCluster(commandID);
     }
     case Clusters::DoorLock::Id: {
         return CommandNeedsTimedInvokeInDoorLockCluster(commandID);

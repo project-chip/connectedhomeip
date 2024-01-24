@@ -14,7 +14,7 @@
 
 name:
     Window Covering [TC-WNCV-3.3] StopMotion command & OperationalStatus
-    attribute Verification [DUT_Server]
+    attribute Verification [DUT as Server]
 
 PICS:
     - WNCV.S
@@ -44,7 +44,7 @@ tests:
       command: "DownOrClose"
       PICS: WNCV.S.C01.Rsp
 
-    - label: "Step 1b: TH Waits for 6-8 seconds movement(s) on the device"
+    - label: "Step 1b: TH waits for 6-8 seconds movement(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -58,7 +58,7 @@ tests:
       command: "UpOrOpen"
       PICS: WNCV.S.C00.Rsp
 
-    - label: "Step 1d: TH Waits for 2 seconds movement(s) on the device"
+    - label: "Step 1d: TH waits for 1-5 seconds revert motion(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -74,7 +74,7 @@ tests:
           constraints:
               notValue: 0
 
-    - label: "Step 1d: TH Waits for 2 seconds movement(s) on the device"
+    - label: "Step 1f: TH waits for 2 seconds"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -100,9 +100,7 @@ tests:
       PICS: WNCV.S.C02.Rsp
 
     ### DUT Slow down and stop
-    - label:
-          "Step 2b: TH waits for 3 seconds the end of inertial movement(s) on
-          the device"
+    - label: "Step 2b: TH waits for 1-5 seconds end of motion(s) on the DUT"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -112,9 +110,7 @@ tests:
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
-    - label:
-          "Step 2c: TH reads OperationalStatus attribute from DUT after a
-          StopMotion"
+    - label: "Step 2c: TH reads OperationalStatus attribute from DUT"
       command: "readAttribute"
       attribute: "OperationalStatus"
       PICS: WNCV.S.A000a

@@ -82,7 +82,7 @@ client's specific values for `CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID` and
 
 _{Complete Initialization examples: [Linux](linux/simple-app.cpp) |
 [Android](android/App/app/src/main/java/com/matter/casting/InitializationExample.java)
-| [iOS](darwin/TvCasting/TvCasting/MTRInitializationExample.swift)}_
+| [iOS](darwin/TvCasting/TvCasting/MCInitializationExample.swift)}_
 
 A Casting Client must first initialize the Matter SDK and define the following
 `DataProvider` objects for the the Matter Casting library to use throughout the
@@ -135,10 +135,10 @@ client's lifecycle:
 
     On iOS, define the
     `func castingAppDidReceiveRequestForRotatingDeviceIdUniqueId` in a class,
-    `MTRAppParametersDataSource`, that implements the `MTRDataSource`:
+    `MCAppParametersDataSource`, that implements the `MCDataSource`:
 
     ```swift
-    class MTRAppParametersDataSource : NSObject, MTRDataSource
+    class MCAppParametersDataSource : NSObject, MCDataSource
     {
         func castingAppDidReceiveRequestForRotatingDeviceIdUniqueId(_ sender: Any) -> Data {
             // dummy value, with at least 16 bytes (ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength), for demonstration only
@@ -196,13 +196,13 @@ client's lifecycle:
     ```
 
     On iOS, add a `func commissioningDataProvider` to the
-    `MTRAppParametersDataSource` class defined above, that can provide the
-    required values to the `MTRCastingApp`.
+    `MCAppParametersDataSource` class defined above, that can provide the
+    required values to the `MCCastingApp`.
 
     ```swift
-    func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MTRCommissionableData {
+    func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MCCommissionableData {
         // dummy values for demonstration only
-        return MTRCommissionableData(
+        return MCCommissionableData(
             passcode: 20202021,
             discriminator: 3874,
             spake2pIterationCount: 1000,
@@ -272,8 +272,8 @@ client's lifecycle:
     On iOS, add functions
     `castingAppDidReceiveRequestForDeviceAttestationCredentials` and
     `didReceiveRequestToSignCertificateRequest` to the
-    `MTRAppParametersDataSource` class defined above, that can return
-    `MTRDeviceAttestationCredentials` and sign messages for the Casting Client,
+    `MCAppParametersDataSource` class defined above, that can return
+    `MCDeviceAttestationCredentials` and sign messages for the Casting Client,
     respectively.
 
     ```swift
@@ -284,8 +284,8 @@ client's lifecycle:
     let KPAI_FFF1_8000_Cert_Array: Data = Data(base64Encoded: "MIIB<snipped>4kQ==")!;
     let kCertificationDeclaration: Data = Data(base64Encoded: "MII<snipped>fA==")!;
 
-    func castingAppDidReceiveRequestForDeviceAttestationCredentials(_ sender: Any) -> MTRDeviceAttestationCredentials {
-        return MTRDeviceAttestationCredentials(
+    func castingAppDidReceiveRequestForDeviceAttestationCredentials(_ sender: Any) -> MCDeviceAttestationCredentials {
+        return MCDeviceAttestationCredentials(
             certificationDeclaration: kCertificationDeclaration,
             firmwareInformation: Data(),
             deviceAttestationCert: kDevelopmentDAC_Cert_FFF1_8001,
@@ -321,7 +321,7 @@ client's lifecycle:
         }
 
         // convert ASN.1 DER signature to SEC1 raw format
-        return MTRCryptoUtils.ecdsaAsn1SignatureToRaw(withFeLengthBytes: 32,
+        return MCCryptoUtils.ecdsaAsn1SignatureToRaw(withFeLengthBytes: 32,
                                                     asn1Signature: asn1SignatureData!,
                                                          outRawSignature: &outRawSignature.pointee)
     }
@@ -412,20 +412,20 @@ public static MatterError initAndStart(Context applicationContext) {
 }
 ```
 
-On iOS, call `MTRCastingApp.initialize` with an object of the
-`MTRAppParametersDataSource`.
+On iOS, call `MCCastingApp.initialize` with an object of the
+`MCAppParametersDataSource`.
 
 ```swift
 func initialize() -> MatterError {
-    if let castingApp = MTRCastingApp.getSharedInstance() {
-        return castingApp.initialize(with: MTRAppParametersDataSource())
+    if let castingApp = MCCastingApp.getSharedInstance() {
+        return castingApp.initialize(with: MCAppParametersDataSource())
     } else {
         return MATTER_ERROR_INCORRECT_STATE
     }
 }
 ```
 
-After initialization, on iOS, call `start` and `stop` on the `MTRCastingApp`
+After initialization, on iOS, call `start` and `stop` on the `MCCastingApp`
 shared instance when the App sends the
 `UIApplication.didBecomeActiveNotification` and
 `UIApplication.willResignActiveNotification`
@@ -440,33 +440,33 @@ struct TvCastingApp: App {
         WindowGroup {
             ContentView()
                 .onAppear(perform: {
-                    let err: Error? = MTRInitializationExample().initialize()
+                    let err: Error? = MCInitializationExample().initialize()
                     if err != nil
                     {
-                        self.Log.error("MTRCastingApp initialization failed \(err)")
+                        self.Log.error("MCCastingApp initialization failed \(err)")
                         return
                     }
                 })
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
                     self.Log.info("TvCastingApp: UIApplication.didBecomeActiveNotification")
-                    if let castingApp = MTRCastingApp.getSharedInstance()
+                    if let castingApp = MCCastingApp.getSharedInstance()
                     {
                         castingApp.start(completionBlock: { (err : Error?) -> () in
                             if err != nil
                             {
-                                self.Log.error("MTRCastingApp start failed \(err)")
+                                self.Log.error("MCCastingApp start failed \(err)")
                             }
                         })
                     }
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
                     self.Log.info("TvCastingApp: UIApplication.willResignActiveNotification")
-                    if let castingApp = MTRCastingApp.getSharedInstance()
+                    if let castingApp = MCCastingApp.getSharedInstance()
                     {
                         castingApp.stop(completionBlock: { (err : Error?) -> () in
                             if err != nil
                             {
-                                self.Log.error("MTRCastingApp stop failed \(err)")
+                                self.Log.error("MCCastingApp stop failed \(err)")
                             }
                         })
                     }
@@ -485,13 +485,13 @@ re-establishing the CASE session. This cache can be cleared by calling the
 `ClearCache` API on the `CastingApp`, say when the user signs out of the app.
 See API and its documentation for [Linux](tv-casting-common/core/CastingApp.h),
 Android and
-[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MTRCastingApp.h).
+[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
 
 ### Discover Casting Players
 
 _{Complete Discovery examples: [Linux](linux/simple-app-helper.cpp) |
 [Android](android/App/app/src/main/java/com/matter/casting/DiscoveryExampleFragment.java)
-| [iOS](darwin/TvCasting/TvCasting/MTRDiscoveryExampleViewModel.swift)}_
+| [iOS](darwin/TvCasting/TvCasting/MCDiscoveryExampleViewModel.swift)}_
 
 The Casting Client discovers `CastingPlayers` using Matter Commissioner
 discovery over DNS-SD by listening for `CastingPlayer` events as they are
@@ -577,12 +577,12 @@ func didAddDiscoveredCastingPlayers(notification: Notification)
 {
     Log.info("didAddDiscoveredCastingPlayers() called")
     guard let userInfo = notification.userInfo,
-        let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
-        self.Log.error("didAddDiscoveredCastingPlayers called with no MTRCastingPlayer")
+        let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+        self.Log.error("didAddDiscoveredCastingPlayers called with no MCCastingPlayer")
         return
     }
 
-    self.Log.info("didAddDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+    self.Log.info("didAddDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
     DispatchQueue.main.async
     {
         self.displayedCastingPlayers.append(castingPlayer)
@@ -594,12 +594,12 @@ func didRemoveDiscoveredCastingPlayers(notification: Notification)
 {
     Log.info("didRemoveDiscoveredCastingPlayers() called")
     guard let userInfo = notification.userInfo,
-        let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
-        self.Log.error("didRemoveDiscoveredCastingPlayers called with no MTRCastingPlayer")
+        let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+        self.Log.error("didRemoveDiscoveredCastingPlayers called with no MCCastingPlayer")
         return
     }
 
-    self.Log.info("didRemoveDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+    self.Log.info("didRemoveDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
     DispatchQueue.main.async
     {
         self.displayedCastingPlayers.removeAll(where: {$0 == castingPlayer})
@@ -611,12 +611,12 @@ func didUpdateDiscoveredCastingPlayers(notification: Notification)
 {
     Log.info("didUpdateDiscoveredCastingPlayers() called")
     guard let userInfo = notification.userInfo,
-        let castingPlayer     = userInfo["castingPlayer"] as? MTRCastingPlayer else {
-        self.Log.error("didUpdateDiscoveredCastingPlayers called with no MTRCastingPlayer")
+        let castingPlayer     = userInfo["castingPlayer"] as? MCCastingPlayer else {
+        self.Log.error("didUpdateDiscoveredCastingPlayers called with no MCCastingPlayer")
         return
     }
 
-    self.Log.info("didUpdateDiscoveredCastingPlayers notified of a MTRCastingPlayer with ID: \(castingPlayer.identifier())")
+    self.Log.info("didUpdateDiscoveredCastingPlayers notified of a MCCastingPlayer with ID: \(castingPlayer.identifier())")
     if let index = displayedCastingPlayers.firstIndex(where: { castingPlayer.identifier() == $0.identifier() })
     {
         DispatchQueue.main.async
@@ -672,7 +672,7 @@ if (err.hasError()) {
 
 On iOS, register the listeners by calling `addObserver` on the
 `NotificationCenter` with the appropriate selector, and then call start on the
-`sharedInstance` of `MTRCastingPlayerDiscovery`.
+`sharedInstance` of `MCCastingPlayerDiscovery`.
 
 ```swift
 func startDiscovery() {
@@ -680,7 +680,7 @@ func startDiscovery() {
     NotificationCenter.default.addObserver(self, selector: #selector(self.didRemoveDiscoveredCastingPlayers), name: NSNotification.Name.didRemoveCastingPlayers, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(self.didUpdateDiscoveredCastingPlayers), name: NSNotification.Name.didUpdateCastingPlayers, object: nil)
 
-    MTRCastingPlayerDiscovery.sharedInstance().start()
+    MCCastingPlayerDiscovery.sharedInstance().start()
     ...
 }
 ```
@@ -693,7 +693,7 @@ discover available endpoints supported by a Casting Player.
 ### Connect to a Casting Player
 
 _{Complete Connection examples: [Linux](linux/simple-app-helper.cpp) |
-[iOS](darwin/TvCasting/TvCasting/MTRConnectionExampleViewModel.swift)}_
+[iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
 
 Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
@@ -741,22 +741,22 @@ targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
 ```
 
 On iOS, the Casting Client may call `verifyOrEstablishConnection` on the
-`MTRCastingPlayer` object it wants to connect to and handle any `NSErrors` that
+`MCCastingPlayer` object it wants to connect to and handle any `NSErrors` that
 may happen in the process.
 
 ```swift
-// VendorId of the MTREndpoint on the MTRCastingPlayer that the MTRCastingApp desires to interact with after connection
+// VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
 let kDesiredEndpointVendorId: UInt16 = 65521;
 
 @Published var connectionSuccess: Bool?;
 
 @Published var connectionStatus: String?;
 
-func connect(selectedCastingPlayer: MTRCastingPlayer?) {
-    let desiredEndpointFilter: MTREndpointFilter = MTREndpointFilter()
+func connect(selectedCastingPlayer: MCCastingPlayer?) {
+    let desiredEndpointFilter: MCEndpointFilter = MCEndpointFilter()
     desiredEndpointFilter.vendorId = kDesiredEndpointVendorId
     selectedCastingPlayer?.verifyOrEstablishConnection(completionBlock: { err in
-        self.Log.error("MTRConnectionExampleViewModel connect() completed with \(err)")
+        self.Log.error("MCConnectionExampleViewModel connect() completed with \(err)")
         if(err == nil)
         {
             self.connectionSuccess = true
@@ -969,4 +969,4 @@ void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter
 The Casting client can Shutdown all running Subscriptions by calling the
 `ShutdownAllSubscriptions` API on the `CastingApp`. See API and its
 documentation for [Linux](tv-casting-common/core/CastingApp.h), Android and
-[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MTRCastingApp.h).
+[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).

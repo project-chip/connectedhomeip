@@ -1,0 +1,106 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: "[TC-ICDM-3.4] ICDCounter persistence with DUT as Server"
+
+PICS:
+    - ICDM.S
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Preconditions"
+      verification: |
+          1.Commission DUT to TH (can be skipped if done in a preceding test).
+      disabled: true
+
+    - label: "Step 1: TH reads from the DUT the IdleModeDuration attribute"
+      PICS: ICDM.S.A0000
+      verification: |
+          ./chip-tool icdmanagement read idle-mode-duration 1 0
+
+          [1702414709.798241][3855:3857] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0000 DataVersion: 2130984683
+          [1702414709.798379][3855:3857] CHIP:TOO:   IdleModeDuration: 3600
+      disabled: true
+
+    - label: "Step 2: TH reads from the DUT the ICDCounter attribute."
+      PICS: ICDM.S.A0004
+      verification: |
+          ./chip-tool icdmanagement read icdcounter 1 0
+
+          [1702420930.466437][1422:1425] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 2255930497
+          [1702420930.469162][1422:1425] CHIP:TOO:   ICDCounter: 1706188495
+      disabled: true
+
+    - label:
+          "Step 3a: TH sends RegisterClient command. - CheckInNodeID:
+          registering clients node ID (CheckInNodeID1) - MonitoredSubject:
+          monitored subject ID (MonitorSubID1) - Key: shared secret between the
+          client and the ICD (Key1)"
+      PICS: ICDM.S.C00.Rsp
+      verification: |
+          ./chip-tool icdmanagement register-client 1 1 1234567890abcdef 1 0
+
+          [1702420936.087934][1426:1428] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
+          [1702420936.088020][1426:1428] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
+          [1702420936.088218][1426:1428] CHIP:TOO:   RegisterClientResponse: {
+          [1702420936.088275][1426:1428] CHIP:TOO:     ICDCounter: 1706188495
+          [1702420936.088320][1426:1428] CHIP:TOO:    }
+      disabled: true
+
+    - label:
+          "Step 3b: Verify DUT responds w/ status SUCCESS(0x00); Verify that the
+          DUT response contains IcdCounter1"
+      PICS: ICDM.S.C01.Tx
+      verification: |
+          ./chip-tool icdmanagement register-client 1 1 1234567890abcdef 1 0
+
+          [1702420936.087934][1426:1428] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0001
+          [1702420936.088020][1426:1428] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Command 0x0000_0001
+          [1702420936.088218][1426:1428] CHIP:TOO:   RegisterClientResponse: {
+          [1702420936.088275][1426:1428] CHIP:TOO:     ICDCounter: 1706188495
+          [1702420936.088320][1426:1428] CHIP:TOO:    }
+      disabled: true
+
+    - label: "Step 4: Wait for 1 or more Idle Mode duration."
+      verification: |
+          Wait for 1 or more Idle Mode duration.
+      disabled: true
+
+    - label: "Step 5: TH reads from the DUT the ICDCounter attribute."
+      PICS: ICDM.S.A0004
+      verification: |
+          ./chip-tool icdmanagement read icdcounter 1 0
+
+          [1702421000.635860][1431:1433] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 2255930497
+          [1702421000.635970][1431:1433] CHIP:TOO:   ICDCounter: 1706188496
+      disabled: true
+
+    - label: "Step 6: Reboot DUT"
+      verification: |
+          Reboot DUT
+      disabled: true
+
+    - label: "Step 7: TH reads from the DUT the ICDCounter attribute."
+      PICS: ICDM.S.A0004
+      verification: |
+          ./chip-tool icdmanagement read icdcounter 1 0
+
+          [1702421019.370137][1435:1437] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0046 Attribute 0x0000_0004 DataVersion: 3029212499
+          [1702421019.370232][1435:1437] CHIP:TOO:   ICDCounter: 1706188596
+      disabled: true

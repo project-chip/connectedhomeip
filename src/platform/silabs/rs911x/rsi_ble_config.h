@@ -25,6 +25,7 @@
 #else
 #include <rsi_data_types.h>
 #endif
+
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -40,7 +41,10 @@
 #define RSI_BLE_GATT_WRITE_EVENT (0x03)
 #define RSI_BLE_MTU_EVENT (0x04)
 #define RSI_BLE_GATT_INDICATION_CONFIRMATION (0x05)
+#define RSI_BLE_RESP_ATT_VALUE (0x06)
 #define RSI_BLE_EVENT_GATT_RD (0x08)
+#define RSI_BLE_ADDR_LENGTH 6
+
 #define RSI_SSID (0x0D)
 #define RSI_SECTYPE (0x0E)
 #define RSI_BLE_WLAN_DISCONN_NOTIFY (0x0F)
@@ -71,6 +75,8 @@
 #define RSI_BLE_TX_TIME 2120 // microseconds
 #define RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH 240
 
+#define GATT_READ_ZERO_OFFSET 0x00
+#define GATT_READ_RESP 0x00
 #define ALL_PHYS (0x00)
 
 #define RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE (0)
@@ -133,7 +139,7 @@
 
 #define RSI_BLE_ADV_TYPE UNDIR_CONN
 #define RSI_BLE_ADV_FILTER_TYPE ALLOW_SCAN_REQ_ANY_CONN_REQ_ANY
-#define RSI_BLE_ADV_DIR_ADDR_TYPE LE_PUBLIC_ADDRESS
+#define RSI_BLE_ADV_DIR_ADDR_TYPE LE_RANDOM_ADDRESS
 #define RSI_BLE_ADV_DIR_ADDR "00:15:83:6A:64:17"
 
 //! Reduced the BLE adv interval time to match with EFR BLE

@@ -58,7 +58,7 @@ tests:
       command: "readAttribute"
       attribute: "ActiveModeThreshold"
       response:
-          value: 1000
+          value: 5000
 
     - label: "Read ICDCounter"
       command: "readAttribute"

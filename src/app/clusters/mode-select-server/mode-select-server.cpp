@@ -32,6 +32,7 @@
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <tracing/macros.h>
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -98,6 +99,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandler, const ConcreteCommandPath & commandPath,
                                                   const ModeSelect::Commands::ChangeToMode::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("ChangeToMode", "ModeSelect");
     ChipLogProgress(Zcl, "ModeSelect: Entering emberAfModeSelectClusterChangeToModeCallback");
     EndpointId endpointId = commandPath.mEndpointId;
     uint8_t newMode       = commandData.newMode;
