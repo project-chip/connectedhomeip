@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -72,27 +71,38 @@ class UnitTestingClusterTestEventEvent(
     private const val TAG_ARG5 = 5
     private const val TAG_ARG6 = 6
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterTestEventEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestEventEvent {
       tlvReader.enterStructure(tlvTag)
       val arg1 = tlvReader.getUByte(ContextSpecificTag(TAG_ARG1))
       val arg2 = tlvReader.getUByte(ContextSpecificTag(TAG_ARG2))
       val arg3 = tlvReader.getBoolean(ContextSpecificTag(TAG_ARG3))
-      val arg4 = matter.controller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(ContextSpecificTag(TAG_ARG4), tlvReader)
-      val arg5 = buildList <matter.controller.cluster.structs.UnitTestingClusterSimpleStruct> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG5))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(matter.controller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(AnonymousTag, tlvReader))
+      val arg4 =
+        matter.controller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
+          ContextSpecificTag(TAG_ARG4),
+          tlvReader
+        )
+      val arg5 =
+        buildList<matter.controller.cluster.structs.UnitTestingClusterSimpleStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ARG5))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(
+              matter.controller.cluster.structs.UnitTestingClusterSimpleStruct.fromTlv(
+                AnonymousTag,
+                tlvReader
+              )
+            )
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
-      }
-      val arg6 = buildList <UByte> {
-        tlvReader.enterArray(ContextSpecificTag(TAG_ARG6))
-        while(!tlvReader.isEndOfContainer()) {
-          this.add(tlvReader.getUByte(AnonymousTag))
+      val arg6 =
+        buildList<UByte> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_ARG6))
+          while (!tlvReader.isEndOfContainer()) {
+            this.add(tlvReader.getUByte(AnonymousTag))
+          }
+          tlvReader.exitContainer()
         }
-        tlvReader.exitContainer()
-      }
-      
+
       tlvReader.exitContainer()
 
       return UnitTestingClusterTestEventEvent(arg1, arg2, arg3, arg4, arg5, arg6)

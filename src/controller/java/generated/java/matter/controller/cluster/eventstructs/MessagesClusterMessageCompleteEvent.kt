@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -72,32 +70,41 @@ class MessagesClusterMessageCompleteEvent(
     private const val TAG_REPLY = 4
     private const val TAG_FUTURE_MESSAGES_PREF = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageCompleteEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageCompleteEvent {
       tlvReader.enterStructure(tlvTag)
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
       val timestamp = tlvReader.getUInt(ContextSpecificTag(TAG_TIMESTAMP))
-      val responseID = if (!tlvReader.isNull()) {
-        tlvReader.getUInt(ContextSpecificTag(TAG_RESPONSE_I_D))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_I_D))
-        null
-      }
-      val reply = if (!tlvReader.isNull()) {
-        tlvReader.getString(ContextSpecificTag(TAG_REPLY))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
-        null
-      }
-      val futureMessagesPref = if (!tlvReader.isNull()) {
-        tlvReader.getUByte(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
-      } else {
-        tlvReader.getNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
-        null
-      }
-      
+      val responseID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_RESPONSE_I_D))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_I_D))
+          null
+        }
+      val reply =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_REPLY))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
+          null
+        }
+      val futureMessagesPref =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return MessagesClusterMessageCompleteEvent(messageID, timestamp, responseID, reply, futureMessagesPref)
+      return MessagesClusterMessageCompleteEvent(
+        messageID,
+        timestamp,
+        responseID,
+        reply,
+        futureMessagesPref
+      )
     }
   }
 }

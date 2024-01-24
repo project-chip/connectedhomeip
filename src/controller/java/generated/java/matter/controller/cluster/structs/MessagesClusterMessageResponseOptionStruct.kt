@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MessagesClusterMessageResponseOptionStruct(
-  val messageResponseID: UInt,
-  val label: String
-) {
+class MessagesClusterMessageResponseOptionStruct(val messageResponseID: UInt, val label: String) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageResponseOptionStruct {\n")
     append("\tmessageResponseID : $messageResponseID\n")
@@ -52,7 +47,7 @@ class MessagesClusterMessageResponseOptionStruct(
       tlvReader.enterStructure(tlvTag)
       val messageResponseID = tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      
+
       tlvReader.exitContainer()
 
       return MessagesClusterMessageResponseOptionStruct(messageResponseID, label)

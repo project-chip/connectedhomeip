@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -48,14 +46,22 @@ class GeneralCommissioningClusterBasicCommissioningInfo(
     private const val TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS = 0
     private const val TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralCommissioningClusterBasicCommissioningInfo {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): GeneralCommissioningClusterBasicCommissioningInfo {
       tlvReader.enterStructure(tlvTag)
-      val failSafeExpiryLengthSeconds = tlvReader.getUShort(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
-      val maxCumulativeFailsafeSeconds = tlvReader.getUShort(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
-      
+      val failSafeExpiryLengthSeconds =
+        tlvReader.getUShort(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
+      val maxCumulativeFailsafeSeconds =
+        tlvReader.getUShort(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
+
       tlvReader.exitContainer()
 
-      return GeneralCommissioningClusterBasicCommissioningInfo(failSafeExpiryLengthSeconds, maxCumulativeFailsafeSeconds)
+      return GeneralCommissioningClusterBasicCommissioningInfo(
+        failSafeExpiryLengthSeconds,
+        maxCumulativeFailsafeSeconds
+      )
     }
   }
 }

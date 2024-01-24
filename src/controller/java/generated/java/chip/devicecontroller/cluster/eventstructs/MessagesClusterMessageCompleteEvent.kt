@@ -17,22 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class MessagesClusterMessageCompleteEvent (
-    val messageID: ByteArray,
-    val timestamp: ULong,
-    val responseID: ULong?,
-    val reply: String?,
-    val futureMessagesPref: UInt?) {
-  override fun toString(): String  = buildString {
+class MessagesClusterMessageCompleteEvent(
+  val messageID: ByteArray,
+  val timestamp: ULong,
+  val responseID: ULong?,
+  val reply: String?,
+  val futureMessagesPref: UInt?
+) {
+  override fun toString(): String = buildString {
     append("MessagesClusterMessageCompleteEvent {\n")
     append("\tmessageID : $messageID\n")
     append("\ttimestamp : $timestamp\n")
@@ -48,20 +45,20 @@ class MessagesClusterMessageCompleteEvent (
       put(ContextSpecificTag(TAG_MESSAGE_I_D), messageID)
       put(ContextSpecificTag(TAG_TIMESTAMP), timestamp)
       if (responseID != null) {
-      put(ContextSpecificTag(TAG_RESPONSE_I_D), responseID)
-    } else {
-      putNull(ContextSpecificTag(TAG_RESPONSE_I_D))
-    }
+        put(ContextSpecificTag(TAG_RESPONSE_I_D), responseID)
+      } else {
+        putNull(ContextSpecificTag(TAG_RESPONSE_I_D))
+      }
       if (reply != null) {
-      put(ContextSpecificTag(TAG_REPLY), reply)
-    } else {
-      putNull(ContextSpecificTag(TAG_REPLY))
-    }
+        put(ContextSpecificTag(TAG_REPLY), reply)
+      } else {
+        putNull(ContextSpecificTag(TAG_REPLY))
+      }
       if (futureMessagesPref != null) {
-      put(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF), futureMessagesPref)
-    } else {
-      putNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
-    }
+        put(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF), futureMessagesPref)
+      } else {
+        putNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
+      }
       endStructure()
     }
   }
@@ -73,32 +70,41 @@ class MessagesClusterMessageCompleteEvent (
     private const val TAG_REPLY = 4
     private const val TAG_FUTURE_MESSAGES_PREF = 5
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MessagesClusterMessageCompleteEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageCompleteEvent {
       tlvReader.enterStructure(tlvTag)
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
       val timestamp = tlvReader.getULong(ContextSpecificTag(TAG_TIMESTAMP))
-      val responseID = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_RESPONSE_I_D))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_I_D))
-      null
-    }
-      val reply = if (!tlvReader.isNull()) {
-      tlvReader.getString(ContextSpecificTag(TAG_REPLY))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
-      null
-    }
-      val futureMessagesPref = if (!tlvReader.isNull()) {
-      tlvReader.getUInt(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
-      null
-    }
-      
+      val responseID =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_RESPONSE_I_D))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_I_D))
+          null
+        }
+      val reply =
+        if (!tlvReader.isNull()) {
+          tlvReader.getString(ContextSpecificTag(TAG_REPLY))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
+          null
+        }
+      val futureMessagesPref =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUInt(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_FUTURE_MESSAGES_PREF))
+          null
+        }
+
       tlvReader.exitContainer()
 
-      return MessagesClusterMessageCompleteEvent(messageID, timestamp, responseID, reply, futureMessagesPref)
+      return MessagesClusterMessageCompleteEvent(
+        messageID,
+        timestamp,
+        responseID,
+        reply,
+        futureMessagesPref
+      )
     }
   }
 }
