@@ -56,6 +56,13 @@ static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Cloc
 static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
     System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+// The CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS specifies the transition time
+// starting from advertisement commencement. Since the extended advertisement timer is started after
+// the fast-to-slow transition, we have to subtract the time spent in fast advertising.
+static constexpr System::Clock::Timeout kSlowAdvertiseTimeout = System::Clock::Milliseconds32(
+    CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_CHANGE_TIME_MS - CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
+#endif
 
 const ChipBleUUID ChipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -593,6 +600,8 @@ void BLEManagerImpl::DriveBLEState()
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
 
+            // Setup service data for advertising.
+            SuccessOrExit(err = mBLEAdvertisement.SetupServiceData(mFlags.Has(Flags::kExtAdvertisingEnabled)));
             // Set or update the advertising intervals.
             SuccessOrExit(err = mBLEAdvertisement.SetIntervals(GetAdvertisingIntervals()));
 
@@ -640,6 +649,10 @@ BluezAdvertisement::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals
 {
     if (mFlags.Has(Flags::kFastAdvertisingEnabled))
         return { CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX };
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    if (mFlags.Has(Flags::kExtAdvertisingEnabled))
+        return { CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MAX };
+#endif
     return { CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX };
 }
 
@@ -651,7 +664,20 @@ void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appSta
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
         self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+        self->mFlags.Clear(Flags::kExtAdvertisingEnabled);
+        DeviceLayer::SystemLayer().StartTimer(kSlowAdvertiseTimeout, HandleAdvertisingTimer, self);
+#endif
     }
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    else
+    {
+        ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
+        self->mFlags.Set(Flags::kExtAdvertisingEnabled);
+        // This should trigger advertising update/refresh.
+        self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+    }
+#endif
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)

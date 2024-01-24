@@ -46,6 +46,7 @@ public:
     ~BluezAdvertisement() { Shutdown(); }
 
     CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID);
+    CHIP_ERROR SetupServiceData(bool aExtendedAnnouncement);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 
@@ -81,10 +82,9 @@ private:
     bool mIsInitialized = false;
     bool mIsAdvertising = false;
 
-    Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
-    char * mpAdvPath        = nullptr;
-    char * mpAdapterName    = nullptr;
-    char * mpAdvUUID        = nullptr;
+    char * mpAdvPath     = nullptr;
+    char * mpAdapterName = nullptr;
+    char * mpAdvUUID     = nullptr;
 };
 
 } // namespace Internal

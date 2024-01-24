@@ -166,6 +166,7 @@ private:
         kFastAdvertisingEnabled   = 0x0080, /**< The application has enabled fast advertising. */
         kUseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
+        kExtAdvertisingEnabled    = 0x0400, /**< The application has enabled CHIPoBLE extended advertising. */
     };
 
     enum

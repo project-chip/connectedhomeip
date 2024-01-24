@@ -42,11 +42,8 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
 {
     BluezLEAdvertisement1 * adv;
     BluezObjectSkeleton * object;
-    GVariant * serviceData;
     GVariant * serviceUUID;
-    GVariantBuilder serviceDataBuilder;
     GVariantBuilder serviceUUIDsBuilder;
-    GAutoPtr<char> debugStr;
     const char * localNamePtr;
     char localName[32];
 
@@ -55,11 +52,7 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
 
     adv = bluez_leadvertisement1_skeleton_new();
 
-    g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_init(&serviceUUIDsBuilder, G_VARIANT_TYPE("as"));
-
-    g_variant_builder_add(&serviceDataBuilder, "{sv}", mpAdvUUID,
-                          g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &mDeviceIdInfo, sizeof(mDeviceIdInfo), sizeof(uint8_t)));
     g_variant_builder_add(&serviceUUIDsBuilder, "s", mpAdvUUID);
 
     localNamePtr = mpAdapterName;
@@ -69,17 +62,12 @@ BluezLEAdvertisement1 * BluezAdvertisement::CreateLEAdvertisement()
         localNamePtr = localName;
     }
 
-    serviceData = g_variant_builder_end(&serviceDataBuilder);
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
-
-    debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
-    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
     bluez_leadvertisement1_set_type_(adv, "peripheral");
     bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
     // empty manufacturer data
     // empty solicit UUIDs
-    bluez_leadvertisement1_set_service_data(adv, serviceData);
     // empty data
 
     // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
@@ -144,13 +132,6 @@ CHIP_ERROR BluezAdvertisement::Init(const BluezEndpoint & aEndpoint, const char 
     mpAdvPath = g_strdup_printf("%s/advertising", rootPath.get());
     mpAdvUUID = g_strdup(aAdvUUID);
 
-    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
-    ReturnErrorOnFailure(err);
-
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    mDeviceIdInfo.SetAdditionalDataFlag(true);
-#endif
-
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezAdvertisement * self) { return self->InitImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
@@ -169,6 +150,43 @@ CHIP_ERROR BluezAdvertisement::SetIntervals(AdvertisingIntervals aAdvIntervals)
     // automatically. There is no need to stop and restart the advertisement.
     bluez_leadvertisement1_set_min_interval(mpAdv, aAdvIntervals.first * 0.625);
     bluez_leadvertisement1_set_max_interval(mpAdv, aAdvIntervals.second * 0.625);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezAdvertisement::SetupServiceData(bool aExtendedAnnouncement)
+{
+    VerifyOrReturnError(mpAdv != nullptr, CHIP_ERROR_UNINITIALIZED);
+
+    Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
+    ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceInfo));
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    deviceInfo.SetAdditionalDataFlag(true);
+#endif
+
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+    if (aExtendedAnnouncement)
+    {
+        deviceInfo.SetExtendedAnnouncementFlag(true);
+        // In case of extended advertisement, specification requires that
+        // the vendor ID and product ID are set to 0.
+        deviceInfo.SetVendorId(0);
+        deviceInfo.SetProductId(0);
+    }
+#endif
+
+    GVariantBuilder serviceDataBuilder;
+    g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
+    g_variant_builder_add(&serviceDataBuilder, "{sv}", mpAdvUUID,
+                          g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &deviceInfo, sizeof(deviceInfo), sizeof(uint8_t)));
+
+    GVariant * serviceData = g_variant_builder_end(&serviceDataBuilder);
+
+    GAutoPtr<char> debugStr(g_variant_print(serviceData, TRUE));
+    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
+
+    bluez_leadvertisement1_set_service_data(mpAdv, serviceData);
+
     return CHIP_NO_ERROR;
 }
 
