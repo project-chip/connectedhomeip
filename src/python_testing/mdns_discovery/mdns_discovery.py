@@ -226,7 +226,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Commissioner services.
         """
-        return self._getServiceInfo(MdnsType.COMMISIONER)
+        return self._getServiceInfo(MdnsType.COMMISSIONER)
 
     def getCommissionableServiceInfo(self) -> List[Dict[str, any]]:
         """
