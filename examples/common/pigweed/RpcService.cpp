@@ -131,7 +131,7 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
             pw::hdlc::Frame & frame = result.value();
             if (frame.address() == pw::hdlc::kDefaultRpcAddress)
             {
-                server.ProcessPacket(frame.data()).IgnoreError(); // TODO: b/242598609 - Handle Status properly
+                server.ProcessPacket(frame.data()).IgnoreError();
             }
         }
     }
