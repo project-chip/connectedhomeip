@@ -48,7 +48,6 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 // This class is for storing weak references in a container
-MTR_HIDDEN
 @interface MTRWeakReference<ObjectType> : NSObject
 + (instancetype)weakReferenceWithObject:(ObjectType)object;
 - (instancetype)initWithObject:(ObjectType)object;

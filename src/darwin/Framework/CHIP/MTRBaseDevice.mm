@@ -90,7 +90,6 @@ NSString * const MTREventIsHistoricalKey = @"eventIsHistorical";
 
 class MTRDataValueDictionaryCallbackBridge;
 
-MTR_HIDDEN
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;

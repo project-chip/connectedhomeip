@@ -29,7 +29,6 @@ typedef void (^MTRXPCReportHandler)(id _Nullable values, NSError * _Nullable err
  * Releasing the handle may cause invalidating the XPC connection. Hence, in order to retain the connection, the handle must not be
  * released.
  */
-MTR_HIDDEN
 @interface MTRDeviceControllerXPCProxyHandle : NSObject
 
 @property (nonatomic, readonly, getter=proxy) id<MTRDeviceControllerServerProtocol> proxy;
@@ -43,7 +42,6 @@ typedef void (^MTRGetProxyHandleHandler)(dispatch_queue_t queue, MTRDeviceContro
  *
  * This class is in charge of making a new XPC connection and disconnecting as needed by the clients and by the report handlers.
  */
-MTR_HIDDEN
 @interface MTRDeviceControllerXPCConnection<MTRDeviceControllerClientProtocol> : NSObject
 
 /**
