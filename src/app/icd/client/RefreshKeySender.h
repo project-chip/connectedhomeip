@@ -34,8 +34,6 @@ namespace chip {
 namespace app {
 
 class CheckInDelegate;
-class RefreshKeySender;
-
 /**
  * @brief RefreshKeySender contains all the data and methods needed for key refresh and re-registration of an ICD client.
  */
@@ -69,10 +67,11 @@ public:
     /**
      * @brief Used to send a re-registration command to the peer using a new key.
      *
-     * @param[in] clientInfo clientInfo object
-     * @param[in] keyData New key to re-register the client with the server
-     * @param[in] exchangeMgr exchange manager to use for the re-registration
-     * @param[in] sessionHandle session handle to use for the re-registration
+     * @param[in] clientInfo    - ICDClientInfo object representing the state associated with the node that sent the check-in
+     *                            message. The callee can use the clientInfo to determine the type of key to generate.
+     * @param[in] keyData       - New key to re-register the client with the server
+     * @param[in] exchangeMgr   - exchange manager to use for the re-registration
+     * @param[in] sessionHandle - session handle to use for the re-registration
      */
     CHIP_ERROR RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
@@ -108,9 +107,9 @@ private:
      * @brief Callback received on successfully establishing a CASE session in order to re-register the client with the peer node
      * using a new key to avoid counter rollover problems.
      *
-     * @param[in] context context of the client establishing the CASE session
-     * @param[in] exchangeMgr exchange manager to use for the re-registration
-     * @param[in] sessionHandle session handle to use for the re-registration
+     * @param[in] context       - context of the client establishing the CASE session
+     * @param[in] exchangeMgr   - exchange manager to use for the re-registration
+     * @param[in] sessionHandle - session handle to use for the re-registration
      */
     static void HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
                                       const SessionHandle & sessionHandle);
@@ -118,9 +117,9 @@ private:
      * @brief Callback received on failure to establish a CASE session in order to re-register the client with the peer node using a
      * new key to avoid counter rollover problems.
      *
-     * @param[in] context context of the client establishing the CASE session
-     * @param[in] peerId Scoped Node ID of the peer node
-     * @param[in] err failure reason
+     * @param[in] context - context of the client establishing the CASE session
+     * @param[in] peerId  - Scoped Node ID of the peer node
+     * @param[in] err     - failure reason
      */
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);
 
