@@ -37,7 +37,7 @@ The size reserved for each partition can be found in
 
 Notes :
 
--   When applicable, BLE/15.4/Wi-Fi firmwares are embedded in the application
+-   When applicable, BLE/15.4/Wi-Fi firmware are embedded in the application
     binary, ensuring compatibility between the application and the controllers.
 -   The sizes of the primary and secondary applications are provided as an
     example. The size can be changed by overriding the partitions located at
