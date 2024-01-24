@@ -68,7 +68,7 @@ public:
      * both success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
      *
      * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller
-     * will NOT use this pointer anymore.
+     *                               will NOT use this pointer anymore.
      * @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
      *                     Other errors indicate the failure reason.
      */

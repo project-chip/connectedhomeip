@@ -73,6 +73,7 @@ void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySende
     else
     {
         ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, aError.Format());
+        // The application can take corrective action  based on the error received.
     }
     if (refreshKeySender != nullptr)
     {
