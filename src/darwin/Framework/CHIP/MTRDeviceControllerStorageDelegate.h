@@ -117,7 +117,8 @@ MTR_NEWLY_AVAILABLE
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 MTR_EXTERN MTR_NEWLY_AVAILABLE
 #endif
-NSSet<Class> * MTRDeviceControllerStorageClasses(void);
+    NSSet<Class> *
+    MTRDeviceControllerStorageClasses(void);
 
 NS_ASSUME_NONNULL_END
 
