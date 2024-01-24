@@ -98,7 +98,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
                 for t in m.modeTags:
                     # * the values of the Value fields that are not larger than 16 bits
                     if t.value > 0xFFFF or t.value < 0:
-                        asserts.fail("Mode tage values must not be lager tha 16 bits!")
+                        asserts.fail("Mode tag values must not be larger than 16 bits!")
 
                     # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
                     is_mfg = (0x8000 <= t.value <= 0xBFFF)
@@ -127,9 +127,8 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
                         has_vacuum_or_mop_mode_tag = True
                         break
 
-            if not has_vacuum_or_mop_mode_tag:
-                asserts.fail("At least one ModeOptionsStruct entry must include either the "
-                             "Vacuum(0x4001) mode tag or the Mop(0x4002)mode tag in the ModeTags field")
+            asserts.assert_true(has_vacuum_or_mop_mode_tag, "At least one ModeOptionsStruct entry must include either the ")
+          ```
 
         if self.check_pics("RVCCLEANM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")
