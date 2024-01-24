@@ -93,9 +93,9 @@ CHIP_ERROR Instance::Init()
     // ensure incoming watt level values are valid.
     if (HasFeature(MicrowaveOvenControl::Feature::kPowerInWatts))
     {
-        VerifyOrReturnError(CheckSupportedWattLevelsValid(), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "Microwave Oven Control: invalid watt setting"));
-        mMaxSupportedWattLevelsIndex = GetMaxSupportedWattLevelsIndex();
+        mSupportedWattLevels = GetCountOfSupportedWattLevels();
+        VerifyOrReturnError(mSupportedWattLevels > 0, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "Microwave Oven Control: supported watt levels is empty"));
     }
     return CHIP_NO_ERROR;
 }
@@ -105,7 +105,7 @@ bool Instance::HasFeature(MicrowaveOvenControl::Feature feature) const
     return mFeature.Has(feature);
 }
 
-bool Instance::CheckSupportedWattLevelsValid() const
+uint8_t Instance::GetCountOfSupportedWattLevels() const
 {
     uint8_t wattIndex = 0;
     uint16_t watt     = 0;
@@ -113,19 +113,7 @@ bool Instance::CheckSupportedWattLevelsValid() const
     {
         wattIndex++;
     }
-    return wattIndex > 0 && watt > 0;
-}
-
-uint8_t Instance::GetMaxSupportedWattLevelsIndex() const
-{
-    uint8_t wattIndex = 0, maxWattIndex = 0;
-    uint16_t watt = 0;
-    while (mDelegate->GetWattSettingByIndex(wattIndex, watt) == CHIP_NO_ERROR)
-    {
-        maxWattIndex = wattIndex;
-        wattIndex++;
-    }
-    return maxWattIndex;
+    return wattIndex;
 }
 
 uint32_t Instance::GetCookTimeSec() const
@@ -325,8 +313,13 @@ void Instance::HandleSetCookingParameters(HandlerContext & ctx, const Commands::
             cookMode.HasValue() || cookTimeSec.HasValue() || wattSettingIndex.HasValue(), status = Status::InvalidCommand;
             ChipLogError(Zcl, "Microwave Oven Control: Failed to set cooking parameters, all command fields are missing "));
 
-        reqWattSettingIndex = wattSettingIndex.ValueOr(mMaxSupportedWattLevelsIndex);
-        VerifyOrExit(reqWattSettingIndex <= mMaxSupportedWattLevelsIndex, status = Status::ConstraintError;
+        // count of supported watt levels must greater than 0
+        VerifyOrExit(
+            mSupportedWattLevels > 0,
+            ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, count of supported watt levels is 0"));
+
+        reqWattSettingIndex = wattSettingIndex.ValueOr(static_cast<uint8_t>(mSupportedWattLevels - 1));
+        VerifyOrExit(reqWattSettingIndex <= static_cast<uint8_t>(mSupportedWattLevels - 1), status = Status::ConstraintError;
                      ChipLogError(Zcl, "Microwave Oven Control: Failed to set wattSettingIndex, wattSettingIndex is out of range"));
 
         status = mDelegate->HandleSetCookingParametersCallback(reqCookMode, reqCookTimeSec, reqStartAfterSetting, NullOptional,
