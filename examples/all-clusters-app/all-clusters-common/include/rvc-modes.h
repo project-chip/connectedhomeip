@@ -50,10 +50,9 @@ private:
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Cleaning"),
                                                  .mode     = ModeCleaning,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsCleaning) },
-        detail::Structs::ModeOptionStruct::Type{
-            .label    = CharSpan::fromCharString("Mapping"),
-            .mode     = ModeMapping,
-            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Mapping"),
+                                                 .mode     = ModeMapping,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
 
     CHIP_ERROR Init() override;
