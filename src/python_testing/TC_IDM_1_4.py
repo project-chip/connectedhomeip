@@ -94,7 +94,8 @@ class TC_IDM_1_4(MatterBaseTest):
             await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, list_of_commands_to_send, remoteMaxPathsPerInvoke=number_of_commands_to_send)
             # This might happen after TCP is enabled and DUT supports TCP. See comment above `cap_for_batch_commands`
             # for more information.
-            asserts.assert_not_equal(number_of_commands_to_send, cap_for_batch_commands, "Test needs to be updated! Soft cap `cap_for_batch_commands` added in test is no longer correct")
+            asserts.assert_not_equal(number_of_commands_to_send, cap_for_batch_commands,
+                                     "Test needs to be updated! Soft cap `cap_for_batch_commands` added in test is no longer correct")
             asserts.fail(
                 f"Unexpected success return from sending too many commands, we sent {number_of_commands_to_send}, test capped at {cap_for_batch_commands}")
         except InteractionModelError as e:
