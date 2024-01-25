@@ -116,6 +116,7 @@ public:
 private:
     uint8_t scanNetworkTimeoutSeconds;
     uint8_t connectNetworkTimeout;
+    static void OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg);
     Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
     CHIP_ERROR BackupConfiguration();
 
