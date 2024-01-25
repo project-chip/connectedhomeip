@@ -3854,8 +3854,8 @@ public static class MessagesClusterMessagePresentedEvent {
 }
 public static class MessagesClusterMessageCompleteEvent {
   public byte[] messageID;
-  public @Nullable Optional<Long> responseID;
-  public @Nullable Optional<String> reply;
+  public @Nullable Long responseID;
+  public @Nullable String reply;
   public @Nullable Integer futureMessagesPreference;
   private static final long MESSAGE_I_D_ID = 0L;
   private static final long RESPONSE_I_D_ID = 1L;
@@ -3864,8 +3864,8 @@ public static class MessagesClusterMessageCompleteEvent {
 
   public MessagesClusterMessageCompleteEvent(
     byte[] messageID,
-    @Nullable Optional<Long> responseID,
-    @Nullable Optional<String> reply,
+    @Nullable Long responseID,
+    @Nullable String reply,
     @Nullable Integer futureMessagesPreference
   ) {
     this.messageID = messageID;
@@ -3877,8 +3877,8 @@ public static class MessagesClusterMessageCompleteEvent {
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
-    values.add(new StructElement(RESPONSE_I_D_ID, responseID != null ? responseID.<BaseTLVType>map((nonOptionalresponseID) -> new UIntType(nonOptionalresponseID)).orElse(new EmptyType()) : new NullType()));
-    values.add(new StructElement(REPLY_ID, reply != null ? reply.<BaseTLVType>map((nonOptionalreply) -> new StringType(nonOptionalreply)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(RESPONSE_I_D_ID, responseID != null ? new UIntType(responseID) : new NullType()));
+    values.add(new StructElement(REPLY_ID, reply != null ? new StringType(reply) : new NullType()));
     values.add(new StructElement(FUTURE_MESSAGES_PREFERENCE_ID, futureMessagesPreference != null ? new UIntType(futureMessagesPreference) : new NullType()));
 
     return new StructType(values);
@@ -3889,8 +3889,8 @@ public static class MessagesClusterMessageCompleteEvent {
       return null;
     }
     byte[] messageID = null;
-    @Nullable Optional<Long> responseID = null;
-    @Nullable Optional<String> reply = null;
+    @Nullable Long responseID = null;
+    @Nullable String reply = null;
     @Nullable Integer futureMessagesPreference = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MESSAGE_I_D_ID) {
@@ -3901,12 +3901,12 @@ public static class MessagesClusterMessageCompleteEvent {
       } else if (element.contextTagNum() == RESPONSE_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          responseID = Optional.of(castingValue.value(Long.class));
+          responseID = castingValue.value(Long.class);
         }
       } else if (element.contextTagNum() == REPLY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          reply = Optional.of(castingValue.value(String.class));
+          reply = castingValue.value(String.class);
         }
       } else if (element.contextTagNum() == FUTURE_MESSAGES_PREFERENCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

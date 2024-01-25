@@ -23475,14 +23475,14 @@ class Messages(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="messageID", Tag=0, Type=bytes),
-                        ClusterObjectFieldDescriptor(Label="responseID", Tag=1, Type=typing.Union[None, Nullable, uint]),
-                        ClusterObjectFieldDescriptor(Label="reply", Tag=2, Type=typing.Union[None, Nullable, str]),
+                        ClusterObjectFieldDescriptor(Label="responseID", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="reply", Tag=2, Type=typing.Union[Nullable, str]),
                         ClusterObjectFieldDescriptor(Label="futureMessagesPreference", Tag=3, Type=typing.Union[Nullable, Messages.Enums.FutureMessagePreferenceEnum]),
                     ])
 
             messageID: 'bytes' = b""
-            responseID: 'typing.Union[None, Nullable, uint]' = None
-            reply: 'typing.Union[None, Nullable, str]' = None
+            responseID: 'typing.Union[Nullable, uint]' = NullValue
+            reply: 'typing.Union[Nullable, str]' = NullValue
             futureMessagesPreference: 'typing.Union[Nullable, Messages.Enums.FutureMessagePreferenceEnum]' = NullValue
 
 

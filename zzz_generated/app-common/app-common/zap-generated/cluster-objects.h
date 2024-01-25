@@ -21345,8 +21345,8 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan messageID;
-    Optional<DataModel::Nullable<uint32_t>> responseID;
-    Optional<DataModel::Nullable<chip::CharSpan>> reply;
+    DataModel::Nullable<uint32_t> responseID;
+    DataModel::Nullable<chip::CharSpan> reply;
     DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPreference;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -21360,8 +21360,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
     chip::ByteSpan messageID;
-    Optional<DataModel::Nullable<uint32_t>> responseID;
-    Optional<DataModel::Nullable<chip::CharSpan>> reply;
+    DataModel::Nullable<uint32_t> responseID;
+    DataModel::Nullable<chip::CharSpan> reply;
     DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPreference;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

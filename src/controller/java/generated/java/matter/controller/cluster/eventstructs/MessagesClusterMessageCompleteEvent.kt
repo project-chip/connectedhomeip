@@ -16,7 +16,6 @@
  */
 package matter.controller.cluster.eventstructs
 
-import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -25,8 +24,8 @@ import matter.tlv.TlvWriter
 
 class MessagesClusterMessageCompleteEvent(
   val messageID: ByteArray,
-  val responseID: Optional<UInt>?,
-  val reply: Optional<String>?,
+  val responseID: UInt?,
+  val reply: String?,
   val futureMessagesPreference: UByte?
 ) {
   override fun toString(): String = buildString {
@@ -43,18 +42,12 @@ class MessagesClusterMessageCompleteEvent(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_MESSAGE_I_D), messageID)
       if (responseID != null) {
-        if (responseID.isPresent) {
-          val optresponseID = responseID.get()
-          put(ContextSpecificTag(TAG_RESPONSE_I_D), optresponseID)
-        }
+        put(ContextSpecificTag(TAG_RESPONSE_I_D), responseID)
       } else {
         putNull(ContextSpecificTag(TAG_RESPONSE_I_D))
       }
       if (reply != null) {
-        if (reply.isPresent) {
-          val optreply = reply.get()
-          put(ContextSpecificTag(TAG_REPLY), optreply)
-        }
+        put(ContextSpecificTag(TAG_REPLY), reply)
       } else {
         putNull(ContextSpecificTag(TAG_REPLY))
       }
@@ -78,22 +71,14 @@ class MessagesClusterMessageCompleteEvent(
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
       val responseID =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_RESPONSE_I_D))) {
-            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_RESPONSE_I_D)))
-          } else {
-            Optional.empty()
-          }
+          tlvReader.getUInt(ContextSpecificTag(TAG_RESPONSE_I_D))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_RESPONSE_I_D))
           null
         }
       val reply =
         if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_REPLY))) {
-            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_REPLY)))
-          } else {
-            Optional.empty()
-          }
+          tlvReader.getString(ContextSpecificTag(TAG_REPLY))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_REPLY))
           null

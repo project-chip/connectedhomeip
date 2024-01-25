@@ -2844,32 +2844,24 @@ static id _Nullable DecodeEventPayloadForMessagesCluster(EventId aEventId, TLV::
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.responseID.HasValue()) {
-                if (cppValue.responseID.Value().IsNull()) {
-                    memberValue = nil;
-                } else {
-                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.responseID.Value().Value()];
-                }
-            } else {
+            if (cppValue.responseID.IsNull()) {
                 memberValue = nil;
+            } else {
+                memberValue = [NSNumber numberWithUnsignedInt:cppValue.responseID.Value()];
             }
             value.responseID = memberValue;
         } while (0);
         do {
             NSString * _Nullable memberValue;
-            if (cppValue.reply.HasValue()) {
-                if (cppValue.reply.Value().IsNull()) {
-                    memberValue = nil;
-                } else {
-                    memberValue = AsString(cppValue.reply.Value().Value());
-                    if (memberValue == nil) {
-                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                        *aError = err;
-                        return nil;
-                    }
-                }
-            } else {
+            if (cppValue.reply.IsNull()) {
                 memberValue = nil;
+            } else {
+                memberValue = AsString(cppValue.reply.Value());
+                if (memberValue == nil) {
+                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                    *aError = err;
+                    return nil;
+                }
             }
             value.reply = memberValue;
         } while (0);
