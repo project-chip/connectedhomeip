@@ -762,6 +762,7 @@ class JavaJNIGenerator(__JavaCodeGenerator):
         Renders .CPP files required for JNI support.
         """
 
+
 class JavaClassGenerator(__JavaCodeGenerator):
     """Generates .java files """
 
