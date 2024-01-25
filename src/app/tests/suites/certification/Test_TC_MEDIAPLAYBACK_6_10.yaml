@@ -36,8 +36,8 @@ tests:
           [1706092346.813652][4555:4555] CHIP:EM: Handling via exchange: 39139r, Delegate: 0xaaaaabf7a7c8
           [1706092346.813745][4555:4555] CHIP:DMG: InvokeRequestMessage =
           [1706092346.813775][4555:4555] CHIP:DMG: {
-          [1706092346.813800][4555:4555] CHIP:DMG:         suppressResponse = false,
-          [1706092346.813829][4555:4555] CHIP:DMG:         timedRequest = false,
+          [1706092346.813800][4555:4555] CHIP:DMG:         suppressResponse = false, 
+          [1706092346.813829][4555:4555] CHIP:DMG:         timedRequest = false, 
           [1706092346.813857][4555:4555] CHIP:DMG:         InvokeRequests =
           [1706092346.813892][4555:4555] CHIP:DMG:         [
           [1706092346.813919][4555:4555] CHIP:DMG:                 CommandDataIB =
@@ -48,16 +48,16 @@ tests:
           [1706092346.814077][4555:4555] CHIP:DMG:                                 ClusterId = 0x506,
           [1706092346.814111][4555:4555] CHIP:DMG:                                 CommandId = 0xc,
           [1706092346.814145][4555:4555] CHIP:DMG:                         },
-          [1706092346.814179][4555:4555] CHIP:DMG:
-          [1706092346.814209][4555:4555] CHIP:DMG:                         CommandFields =
+          [1706092346.814179][4555:4555] CHIP:DMG:                         
+          [1706092346.814209][4555:4555] CHIP:DMG:                         CommandFields = 
           [1706092346.814242][4555:4555] CHIP:DMG:                         {
-          [1706092346.814278][4555:4555] CHIP:DMG:                                 0x0 = "activeAudioTrackId_1" (20 chars),
-          [1706092346.814316][4555:4555] CHIP:DMG:                                 0x1 = 0,
+          [1706092346.814278][4555:4555] CHIP:DMG:                                 0x0 = "activeAudioTrackId_1" (20 chars), 
+          [1706092346.814316][4555:4555] CHIP:DMG:                                 0x1 = 0, 
           [1706092346.814351][4555:4555] CHIP:DMG:                         },
           [1706092346.814382][4555:4555] CHIP:DMG:                 },
-          [1706092346.814417][4555:4555] CHIP:DMG:
+          [1706092346.814417][4555:4555] CHIP:DMG:                 
           [1706092346.814443][4555:4555] CHIP:DMG:         ],
-          [1706092346.814476][4555:4555] CHIP:DMG:
+          [1706092346.814476][4555:4555] CHIP:DMG:         
           [1706092346.814502][4555:4555] CHIP:DMG:         InteractionModelRevision = 11
           [1706092346.814527][4555:4555] CHIP:DMG: },
           [1706092346.814651][4555:4555] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=3 p=o
@@ -78,8 +78,8 @@ tests:
           [1706092322.174823][4555:4555] CHIP:EM: Handling via exchange: 27897r, Delegate: 0xaaaaabf7a7c8
           [1706092322.174908][4555:4555] CHIP:DMG: InvokeRequestMessage =
           [1706092322.174936][4555:4555] CHIP:DMG: {
-          [1706092322.174956][4555:4555] CHIP:DMG:         suppressResponse = false,
-          [1706092322.174981][4555:4555] CHIP:DMG:         timedRequest = false,
+          [1706092322.174956][4555:4555] CHIP:DMG:         suppressResponse = false, 
+          [1706092322.174981][4555:4555] CHIP:DMG:         timedRequest = false, 
           [1706092322.175002][4555:4555] CHIP:DMG:         InvokeRequests =
           [1706092322.175030][4555:4555] CHIP:DMG:         [
           [1706092322.175051][4555:4555] CHIP:DMG:                 CommandDataIB =
@@ -90,21 +90,21 @@ tests:
           [1706092322.175184][4555:4555] CHIP:DMG:                                 ClusterId = 0x506,
           [1706092322.175212][4555:4555] CHIP:DMG:                                 CommandId = 0xd,
           [1706092322.175239][4555:4555] CHIP:DMG:                         },
-          [1706092322.175267][4555:4555] CHIP:DMG:
-          [1706092322.175291][4555:4555] CHIP:DMG:                         CommandFields =
+          [1706092322.175267][4555:4555] CHIP:DMG:                         
+          [1706092322.175291][4555:4555] CHIP:DMG:                         CommandFields = 
           [1706092322.175317][4555:4555] CHIP:DMG:                         {
-          [1706092322.175347][4555:4555] CHIP:DMG:                                 0x0 = "activeTextTrackId_1" (19 chars),
+          [1706092322.175347][4555:4555] CHIP:DMG:                                 0x0 = "activeTextTrackId_1" (19 chars), 
           [1706092322.175376][4555:4555] CHIP:DMG:                         },
           [1706092322.175401][4555:4555] CHIP:DMG:                 },
-          [1706092322.175428][4555:4555] CHIP:DMG:
+          [1706092322.175428][4555:4555] CHIP:DMG:                 
           [1706092322.175448][4555:4555] CHIP:DMG:         ],
-          [1706092322.175475][4555:4555] CHIP:DMG:
+          [1706092322.175475][4555:4555] CHIP:DMG:         
           [1706092322.175496][4555:4555] CHIP:DMG:         InteractionModelRevision = 11
           [1706092322.175517][4555:4555] CHIP:DMG: },
           [1706092322.175618][4555:4555] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=3 p=o
           [1706092322.175653][4555:4555] CHIP:DMG: AccessControl: allowed
           [1706092322.175678][4555:4555] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000D
-          [1706092322.175713][4555:4555] CHIP:DL: GetContentAppByEndpointId() - endpoint 3 not found
+          [1706092322.175713][4555:4555] CHIP:DL: GetContentAppByEndpointId() - endpoint 3 not found 
           [1706092322.175733][4555:4555] CHIP:ZCL: MediaPlayback NOT returning ContentApp delegate for endpoint:3
           [1706092322.175784][4555:4555] CHIP:DMG: Command handler moving to [NewRespons]
       disabled: true
@@ -119,8 +119,8 @@ tests:
           On TH (tv-app), Verify the DeactivateTextTrack command is received successfully.
           [1706092292.772177][4555:4555] CHIP:DMG: InvokeRequestMessage =
           [1706092292.772202][4555:4555] CHIP:DMG: {
-          [1706092292.772221][4555:4555] CHIP:DMG:         suppressResponse = false,
-          [1706092292.772242][4555:4555] CHIP:DMG:         timedRequest = false,
+          [1706092292.772221][4555:4555] CHIP:DMG:         suppressResponse = false, 
+          [1706092292.772242][4555:4555] CHIP:DMG:         timedRequest = false, 
           [1706092292.772262][4555:4555] CHIP:DMG:         InvokeRequests =
           [1706092292.772287][4555:4555] CHIP:DMG:         [
           [1706092292.772306][4555:4555] CHIP:DMG:                 CommandDataIB =
@@ -131,14 +131,14 @@ tests:
           [1706092292.772428][4555:4555] CHIP:DMG:                                 ClusterId = 0x506,
           [1706092292.772453][4555:4555] CHIP:DMG:                                 CommandId = 0xe,
           [1706092292.772477][4555:4555] CHIP:DMG:                         },
-          [1706092292.772503][4555:4555] CHIP:DMG:
-          [1706092292.772524][4555:4555] CHIP:DMG:                         CommandFields =
+          [1706092292.772503][4555:4555] CHIP:DMG:                         
+          [1706092292.772524][4555:4555] CHIP:DMG:                         CommandFields = 
           [1706092292.772547][4555:4555] CHIP:DMG:                         {
           [1706092292.772571][4555:4555] CHIP:DMG:                         },
           [1706092292.772592][4555:4555] CHIP:DMG:                 },
-          [1706092292.772615][4555:4555] CHIP:DMG:
+          [1706092292.772615][4555:4555] CHIP:DMG:                 
           [1706092292.772634][4555:4555] CHIP:DMG:         ],
-          [1706092292.772657][4555:4555] CHIP:DMG:
+          [1706092292.772657][4555:4555] CHIP:DMG:         
           [1706092292.772675][4555:4555] CHIP:DMG:         InteractionModelRevision = 11
           [1706092292.772694][4555:4555] CHIP:DMG: },
           [1706092292.772782][4555:4555] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_0506 e=3 p=o

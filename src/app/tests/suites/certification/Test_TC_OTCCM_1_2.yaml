@@ -132,4 +132,7 @@ tests:
 
           Verify on TH(chip-tool) logs, CurrentMode attribute value is an integer value from supported_modes_dut, below is the sample log provided for the raspi platform, Here CurrentMode attribute value is 0
 
+          [1705647748.316225][81944:81949] CHIP:DMG: }
+          [1705647748.316354][81944:81949] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0049 Attribute 0x0000_0001 DataVersion: 3240184500
+          [1705647748.316395][81944:81949] CHIP:TOO:   CurrentMode: 0
       disabled: true
