@@ -77,15 +77,24 @@ source_set("revision_info") {
   ]
 }
 
-source_set("path-params") {
+source_set("paths") {
   sources = [
     "AttributePathParams.h",
+    "ConcreteClusterPath.h",
+    "ConcreteEventPath.h",
+    "DataVersionFilter.h",
     "EventPathParams.h",
   ]
+
+  # This source sets also depends on basic-types.h that is not in any dependency we can use
+  public_deps = [ "${chip_root}/src/lib/core" ]
 }
 
 source_set("global-attributes") {
   sources = [ "GlobalAttributes.h" ]
+
+  # This also depends on zap-generated code which is currently impossible to split outs
+  public_deps = [ "${chip_root}/src/lib/support" ]
 }
 
 source_set("pre-encoded-value") {
@@ -180,7 +189,7 @@ source_set("message-def") {
 
   deps = [
     ":app_config",
-    ":path-params",
+    ":paths",
     ":revision_info",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
@@ -194,10 +203,6 @@ config("config-controller-dynamic-server") {
     "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
     "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
   ]
-}
-
-source_set("persist-subscirptions") {
-  sources = []
 }
 
 # interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
@@ -238,7 +243,7 @@ static_library("interaction-model") {
   public_deps = [
     ":app_config",
     ":message-def",
-    ":path-params",
+    ":paths",
     "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
