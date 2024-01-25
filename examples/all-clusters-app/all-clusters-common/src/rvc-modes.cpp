@@ -132,8 +132,8 @@ void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Command
     if (rvcRunCurrentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString(
-            "Cannot change the cleaning mode when the device is not in idle"));
+        response.statusText.SetValue(
+            chip::CharSpan::fromCharString("Cannot change the cleaning mode when the device is not in idle"));
         return;
     }
 
