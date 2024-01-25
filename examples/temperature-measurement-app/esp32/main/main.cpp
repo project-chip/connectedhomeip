@@ -24,11 +24,13 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <diagnostic-logs-provider-delegate-impl.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include <cmath>
@@ -126,4 +128,11 @@ extern "C" void app_main()
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+}
+
+using namespace chip::app::Clusters::DiagnosticLogs;
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & logProvider = LogProvider::GetInstance();
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
