@@ -19,10 +19,10 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
-#include <app/icd/server/ICDServerConfig.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
 #include <app/icd/server/ICDMonitoringTable.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
