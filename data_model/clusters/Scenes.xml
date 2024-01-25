@@ -55,14 +55,9 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0062" name="Scenes Management" revision="6">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0062" name="Scenes Management" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1745"/>
-    <revision revision="2" summary="TransitionTime field added to the RecallScene command"/>
-    <revision revision="3" summary="CCB 2427 3026"/>
-    <revision revision="4" summary="New data model format and notation"/>
-    <revision revision="5" summary="Added Explicit, TableSize and FabricScenes features; support multi-fabric environment; added attributes SceneTableSize and RemainingCapacity; added fabric-scoped scene information list"/>
-    <revision revision="6" summary="Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
+    <revision revision="1" summary="Based on the ZCL Scenes Cluster, Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
   <features>
