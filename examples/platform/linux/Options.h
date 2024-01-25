@@ -46,6 +46,7 @@ struct LinuxDeviceOptions
     chip::Optional<std::vector<uint8_t>> spake2pSalt;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
+    bool wifiSupports5g        = false;
     bool mWiFi                 = false;
     bool mThread               = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
