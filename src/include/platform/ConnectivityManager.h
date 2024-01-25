@@ -181,6 +181,7 @@ public:
     void MaintainOnDemandWiFiAP();
     System::Clock::Timeout GetWiFiAPIdleTimeout();
     void SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    CHIP_ERROR DisconnectNetwork();
 
     // Thread Methods
     bool IsThreadEnabled();
@@ -557,6 +558,11 @@ inline void ConnectivityManager::OnWiFiScanDone()
 inline void ConnectivityManager::OnWiFiStationProvisionChange()
 {
     static_cast<ImplClass *>(this)->_OnWiFiStationProvisionChange();
+}
+
+inline CHIP_ERROR ConnectivityManager::DisconnectNetwork()
+{
+    return static_cast<ImplClass *>(this)->_DisconnectNetwork();
 }
 
 } // namespace DeviceLayer
