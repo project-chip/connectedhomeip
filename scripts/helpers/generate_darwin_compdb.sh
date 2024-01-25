@@ -29,7 +29,7 @@ CHIP_ROOT="$(dirname "$0")/../.."
 OUTPUT_DIR=$2
 
 # Build the framework
-scripts/examples/gn_build_example.sh $@ gen_compdb=true
+scripts/examples/gn_build_example.sh $@ generate_compilation_database=true
 
 # Cleanup any stale DB files
 find $OUTPUT_DIR -iname compile_commands\*.json | xargs rm
