@@ -36,7 +36,7 @@ unicast queries.
 Example run:
 
 ```sh
-./out/minimal_mdns/minimal-mdns-client -4
+./out/minimal_mdns/minimal-mdns-client
 ```
 
 which is likely to list a lot of answers.
