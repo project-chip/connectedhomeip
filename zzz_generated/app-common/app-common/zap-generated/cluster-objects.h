@@ -21041,7 +21041,6 @@ enum class Fields : uint8_t
     kDuration       = 4,
     kMessageText    = 5,
     kResponses      = 6,
-    kFabricIndex    = 254,
 };
 
 struct Type
@@ -21054,19 +21053,10 @@ public:
     DataModel::Nullable<uint16_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    static constexpr bool kIsFabricScoped = true;
+    static constexpr bool kIsFabricScoped = false;
 
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-
-    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-
-private:
-    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
 struct DecodableType
@@ -21079,15 +21069,10 @@ public:
     DataModel::Nullable<uint16_t> duration;
     chip::CharSpan messageText;
     Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+    static constexpr bool kIsFabricScoped = false;
 };
 
 } // namespace MessageStruct
@@ -21122,7 +21107,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::List<const chip::ByteSpan> messages;
+    DataModel::List<const Structs::MessageStruct::Type> messages;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21137,7 +21122,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::DecodableList<chip::ByteSpan> messages;
+    DataModel::DecodableList<Structs::MessageStruct::DecodableType> messages;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PresentMessagesRequest

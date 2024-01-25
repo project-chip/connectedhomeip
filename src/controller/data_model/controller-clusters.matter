@@ -4411,7 +4411,7 @@ provisional cluster Messages = 151 {
     optional char_string<32> label = 1;
   }
 
-  fabric_scoped struct MessageStruct {
+  struct MessageStruct {
     octet_string<16> messageID = 0;
     MessagePriorityEnum priority = 1;
     MessageControlBitmap messageControl = 2;
@@ -4419,7 +4419,6 @@ provisional cluster Messages = 151 {
     nullable int16u duration = 4;
     char_string<256> messageText = 5;
     optional MessageResponseOptionStruct responses[] = 6;
-    fabric_idx fabricIndex = 254;
   }
 
   info event MessageQueued = 0 {
@@ -4447,7 +4446,7 @@ provisional cluster Messages = 151 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct PresentMessagesRequestRequest {
-    octet_string messages[] = 0;
+    MessageStruct messages[] = 0;
   }
 
   request struct CancelMessagesRequestRequest {

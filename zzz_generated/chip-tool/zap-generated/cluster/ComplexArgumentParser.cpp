@@ -2875,13 +2875,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     }
     valueCopy.removeMember("responses");
 
-    if (value.isMember("fabricIndex"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
-    }
-    valueCopy.removeMember("fabricIndex");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -2894,7 +2887,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Messages::Structs::Mes
     ComplexArgumentParser::Finalize(request.duration);
     ComplexArgumentParser::Finalize(request.messageText);
     ComplexArgumentParser::Finalize(request.responses);
-    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

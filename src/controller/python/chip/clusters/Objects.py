@@ -23247,7 +23247,6 @@ class Messages(Cluster):
                         ClusterObjectFieldDescriptor(Label="duration", Tag=4, Type=typing.Union[Nullable, uint]),
                         ClusterObjectFieldDescriptor(Label="messageText", Tag=5, Type=str),
                         ClusterObjectFieldDescriptor(Label="responses", Tag=6, Type=typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]),
-                        ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             messageID: 'bytes' = b""
@@ -23257,7 +23256,6 @@ class Messages(Cluster):
             duration: 'typing.Union[Nullable, uint]' = NullValue
             messageText: 'str' = ""
             responses: 'typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]' = None
-            fabricIndex: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -23271,10 +23269,10 @@ class Messages(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[Messages.Structs.MessageStruct]),
                     ])
 
-            messages: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            messages: 'typing.List[Messages.Structs.MessageStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class CancelMessagesRequest(ClusterCommand):

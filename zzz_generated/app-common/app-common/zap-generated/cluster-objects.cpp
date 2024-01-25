@@ -14892,21 +14892,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 } // namespace MessageResponseOptionStruct
 
 namespace MessageStruct {
-CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
-    return DoEncode(aWriter, aTag, NullOptional);
-}
-
-CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const
-{
-    return DoEncode(aWriter, aTag, MakeOptional(aAccessingFabricIndex));
-}
-
-CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
-{
-
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-
     encoder.Encode(to_underlying(Fields::kMessageID), messageID);
     encoder.Encode(to_underlying(Fields::kPriority), priority);
     encoder.Encode(to_underlying(Fields::kMessageControl), messageControl);
@@ -14914,11 +14902,6 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     encoder.Encode(to_underlying(Fields::kDuration), duration);
     encoder.Encode(to_underlying(Fields::kMessageText), messageText);
     encoder.Encode(to_underlying(Fields::kResponses), responses);
-    if (aAccessingFabricIndex.HasValue())
-    {
-        encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);
-    }
-
     return encoder.Finalize();
 }
 
@@ -14963,10 +14946,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kResponses))
         {
             err = DataModel::Decode(reader, responses);
-        }
-        else if (__context_tag == to_underlying(Fields::kFabricIndex))
-        {
-            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {

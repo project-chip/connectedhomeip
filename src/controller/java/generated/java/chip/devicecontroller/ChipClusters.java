@@ -29208,16 +29208,16 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messages) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages) {
       presentMessagesRequest(callback, messages, 0);
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messages, int timedInvokeTimeoutMs) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long messagesFieldID = 0L;
-      BaseTLVType messagestlvValue = ArrayType.generateArrayType(messages, (elementmessages) -> new ByteArrayType(elementmessages));
+      BaseTLVType messagestlvValue = ArrayType.generateArrayType(messages, (elementmessages) -> elementmessages.encodeTlv());
       elements.add(new StructElement(messagesFieldID, messagestlvValue));
 
       StructType value = new StructType(elements);
@@ -29274,11 +29274,6 @@ public class ChipClusters {
 
     public void readMessagesAttribute(
         MessagesAttributeCallback callback) {
-      readMessagesAttributeWithFabricFilter(callback, true);
-    }
-
-    public void readMessagesAttributeWithFabricFilter(
-        MessagesAttributeCallback callback, boolean isFabricFiltered) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MESSAGES_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
@@ -29287,7 +29282,7 @@ public class ChipClusters {
             List<ChipStructs.MessagesClusterMessageStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, MESSAGES_ATTRIBUTE_ID, isFabricFiltered);
+        }, MESSAGES_ATTRIBUTE_ID, true);
     }
 
     public void writeMessagesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> value) {

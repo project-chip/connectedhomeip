@@ -6528,7 +6528,6 @@ public static class MessagesClusterMessageStruct {
   public @Nullable Integer duration;
   public String messageText;
   public Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses;
-  public Integer fabricIndex;
   private static final long MESSAGE_I_D_ID = 0L;
   private static final long PRIORITY_ID = 1L;
   private static final long MESSAGE_CONTROL_ID = 2L;
@@ -6536,7 +6535,6 @@ public static class MessagesClusterMessageStruct {
   private static final long DURATION_ID = 4L;
   private static final long MESSAGE_TEXT_ID = 5L;
   private static final long RESPONSES_ID = 6L;
-  private static final long FABRIC_INDEX_ID = 254L;
 
   public MessagesClusterMessageStruct(
     byte[] messageID,
@@ -6545,8 +6543,7 @@ public static class MessagesClusterMessageStruct {
     @Nullable Long startTime,
     @Nullable Integer duration,
     String messageText,
-    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses,
-    Integer fabricIndex
+    Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses
   ) {
     this.messageID = messageID;
     this.priority = priority;
@@ -6555,7 +6552,6 @@ public static class MessagesClusterMessageStruct {
     this.duration = duration;
     this.messageText = messageText;
     this.responses = responses;
-    this.fabricIndex = fabricIndex;
   }
 
   public StructType encodeTlv() {
@@ -6567,7 +6563,6 @@ public static class MessagesClusterMessageStruct {
     values.add(new StructElement(DURATION_ID, duration != null ? new UIntType(duration) : new NullType()));
     values.add(new StructElement(MESSAGE_TEXT_ID, new StringType(messageText)));
     values.add(new StructElement(RESPONSES_ID, responses.<BaseTLVType>map((nonOptionalresponses) -> ArrayType.generateArrayType(nonOptionalresponses, (elementnonOptionalresponses) -> elementnonOptionalresponses.encodeTlv())).orElse(new EmptyType())));
-    values.add(new StructElement(FABRIC_INDEX_ID, new UIntType(fabricIndex)));
 
     return new StructType(values);
   }
@@ -6583,7 +6578,6 @@ public static class MessagesClusterMessageStruct {
     @Nullable Integer duration = null;
     String messageText = null;
     Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>> responses = Optional.empty();
-    Integer fabricIndex = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MESSAGE_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
@@ -6620,11 +6614,6 @@ public static class MessagesClusterMessageStruct {
           ArrayType castingValue = element.value(ArrayType.class);
           responses = Optional.of(castingValue.map((elementcastingValue) -> ChipStructs.MessagesClusterMessageResponseOptionStruct.decodeTlv(elementcastingValue)));
         }
-      } else if (element.contextTagNum() == FABRIC_INDEX_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          fabricIndex = castingValue.value(Integer.class);
-        }
       }
     }
     return new MessagesClusterMessageStruct(
@@ -6634,8 +6623,7 @@ public static class MessagesClusterMessageStruct {
       startTime,
       duration,
       messageText,
-      responses,
-      fabricIndex
+      responses
     );
   }
 
@@ -6663,9 +6651,6 @@ public static class MessagesClusterMessageStruct {
     output.append("\n");
     output.append("\tresponses: ");
     output.append(responses);
-    output.append("\n");
-    output.append("\tfabricIndex: ");
-    output.append(fabricIndex);
     output.append("\n");
     output.append("}\n");
     return output.toString();

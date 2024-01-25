@@ -31,8 +31,7 @@ class MessagesClusterMessageStruct(
   val startTime: ULong?,
   val duration: UInt?,
   val messageText: String,
-  val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>,
-  val fabricIndex: UInt
+  val responses: Optional<List<MessagesClusterMessageResponseOptionStruct>>
 ) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageStruct {\n")
@@ -43,7 +42,6 @@ class MessagesClusterMessageStruct(
     append("\tduration : $duration\n")
     append("\tmessageText : $messageText\n")
     append("\tresponses : $responses\n")
-    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -72,7 +70,6 @@ class MessagesClusterMessageStruct(
         }
         endArray()
       }
-      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -85,7 +82,6 @@ class MessagesClusterMessageStruct(
     private const val TAG_DURATION = 4
     private const val TAG_MESSAGE_TEXT = 5
     private const val TAG_RESPONSES = 6
-    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageStruct {
       tlvReader.enterStructure(tlvTag)
@@ -121,7 +117,6 @@ class MessagesClusterMessageStruct(
         } else {
           Optional.empty()
         }
-      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -132,8 +127,7 @@ class MessagesClusterMessageStruct(
         startTime,
         duration,
         messageText,
-        responses,
-        fabricIndex
+        responses
       )
     }
   }
