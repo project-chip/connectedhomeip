@@ -91,22 +91,4 @@ public interface CastingPlayer {
    *     CastingException will contain the error code and message from the CastingApp.
    */
   CompletableFuture<Void> VerifyOrEstablishConnection();
-
-  // TODO: Implement in following PRs.
-
-  //    ConnectionState getConnectionState();
-  //
-  //    static class ConnectionState extends Observable {
-  //        private boolean connected;
-  //
-  //        void setConnected(boolean connected) {
-  //            this.connected = connected;
-  //            setChanged();
-  //            notifyObservers(this.connected);
-  //        }
-  //
-  //        boolean isConnected() {
-  //            return connected;
-  //        }
-  //    }
 }
