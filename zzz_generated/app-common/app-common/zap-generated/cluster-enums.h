@@ -2405,8 +2405,8 @@ enum class Feature : uint32_t
 {
     kReceivedConfirmation = 0x1,
     kConfirmationResponse = 0x2,
-    kConfirmationReply    = 0x3,
-    kProtectedMessages    = 0x4,
+    kConfirmationReply    = 0x4,
+    kProtectedMessages    = 0x8,
 };
 
 // Bitmap for MessageControlBitmap

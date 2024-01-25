@@ -25,13 +25,13 @@ limitations under the License.
     <field name="ProtectedMessages" mask="0x8"/>
   </bitmap>
 
-  <bitmap name="MessageControlBitmap" type="bitmap32">
+  <bitmap name="MessageControlBitmap" type="bitmap8">
     <cluster code="0x0097"/>
     <field name="ConfirmationRequired" mask="0x1"/>
     <field name="ResponseRequired" mask="0x2"/>
-    <field name="ReplyMessage" mask="0x3"/>
-    <field name="MessageConfirmed" mask="0x4"/>
-    <field name="MessageProtected" mask="0x5"/>
+    <field name="ReplyMessage" mask="0x4"/>
+    <field name="MessageConfirmed" mask="0x8"/>
+    <field name="MessageProtected" mask="0x10"/>
   </bitmap>
 
   <enum name="FutureMessagePreferenceEnum" type="enum8">
@@ -53,19 +53,19 @@ limitations under the License.
 
   <struct name="MessageStruct" isFabricScoped="true">
     <cluster code="0x0097"/>
-    <item fieldId="0" name="MessageID" type="octet_string" length="16" optional="false"/>
-    <item fieldId="1" name="Priority" type="MessagePriorityEnum" optional="false"/>
-    <item fieldId="2" name="MessageControl" type="MessageControlBitmap" default="0" optional="false"/>
-    <item fieldId="3" name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
-    <item fieldId="4" name="Duration" type="int16u" default="0" optional="false" isNullable="true"/>
-    <item fieldId="5" name="MessageText" type="char_string" length="256" optional="false"/>
-    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" optional="true"/>
+    <item fieldId="0" name="MessageID" type="octet_string" length="16" optional="false" isFabricSensitive="true"/>
+    <item fieldId="1" name="Priority" type="MessagePriorityEnum" optional="false" isFabricSensitive="true"/>
+    <item fieldId="2" name="MessageControl" type="MessageControlBitmap" default="0" optional="false" isFabricSensitive="true"/>
+    <item fieldId="3" name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="4" name="Duration" type="int16u" default="0" optional="false" isNullable="true" isFabricSensitive="true"/>
+    <item fieldId="5" name="MessageText" type="char_string" length="256" optional="false" isFabricSensitive="true"/>
+    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" optional="true" isFabricSensitive="true"/>
   </struct>
 
   <struct name="MessageResponseOptionStruct">
     <cluster code="0x0097"/>
-    <item fieldId="0" name="MessageResponseID" type="int32u"/>
-    <item fieldId="1" name="Label" type="char_string" length="32"/>
+    <item fieldId="0" name="MessageResponseID" type="int32u" optional="true"/>
+    <item fieldId="1" name="Label" type="char_string" length="32" optional="true"/>
   </struct>
 
   <cluster apiMaturity="provisional">

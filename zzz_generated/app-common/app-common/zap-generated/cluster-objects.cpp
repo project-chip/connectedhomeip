@@ -29895,6 +29895,10 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::Messages::Id: {
         switch (aCommand)
         {
+        case Clusters::Messages::Commands::PresentMessagesRequest::Id:
+            return true;
+        case Clusters::Messages::Commands::CancelMessagesRequest::Id:
+            return true;
         default:
             return false;
         }

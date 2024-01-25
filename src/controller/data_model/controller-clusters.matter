@@ -4374,7 +4374,7 @@ provisional cluster DemandResponseLoadControl = 150 {
 
 /** This cluster provides an interface for passing messages to be presented by a device. */
 provisional cluster Messages = 151 {
-  revision 1;
+  revision 3;
 
   enum FutureMessagePreferenceEnum : enum8 {
     kAllowed = 0;
@@ -4394,8 +4394,8 @@ provisional cluster Messages = 151 {
   bitmap Feature : bitmap32 {
     kReceivedConfirmation = 0x1;
     kConfirmationResponse = 0x2;
-    kConfirmationReply = 0x3;
-    kProtectedMessages = 0x4;
+    kConfirmationReply = 0x4;
+    kProtectedMessages = 0x8;
   }
 
   bitmap MessageControlBitmap : bitmap32 {
@@ -4456,9 +4456,9 @@ provisional cluster Messages = 151 {
   }
 
   /** Command for requesting messages be presented */
-  command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
+  fabric command PresentMessagesRequest(PresentMessagesRequestRequest): DefaultSuccess = 0;
   /** Command for cancelling message present requests */
-  command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
+  fabric command CancelMessagesRequest(CancelMessagesRequestRequest): DefaultSuccess = 1;
 }
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */

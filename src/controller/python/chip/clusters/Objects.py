@@ -23210,8 +23210,8 @@ class Messages(Cluster):
         class Feature(IntFlag):
             kReceivedConfirmation = 0x1
             kConfirmationResponse = 0x2
-            kConfirmationReply = 0x3
-            kProtectedMessages = 0x4
+            kConfirmationReply = 0x4
+            kProtectedMessages = 0x8
 
         class MessageControlBitmap(IntFlag):
             kConfirmationRequired = 0x1

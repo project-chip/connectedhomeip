@@ -17634,8 +17634,8 @@ typedef NS_ENUM(uint8_t, MTRMessagesMessagePriority) {
 typedef NS_OPTIONS(uint32_t, MTRMessagesFeature) {
     MTRMessagesFeatureReceivedConfirmation MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRMessagesFeatureConfirmationResponse MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRMessagesFeatureConfirmationReply MTR_PROVISIONALLY_AVAILABLE = 0x3,
-    MTRMessagesFeatureProtectedMessages MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRMessagesFeatureConfirmationReply MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRMessagesFeatureProtectedMessages MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRMessagesMessageControlBitmap) {
