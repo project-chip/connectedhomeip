@@ -19,10 +19,6 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
 
 class TC_RVCCLEANM_2_2(MatterBaseTest):
 
@@ -66,14 +62,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
-
         self.endpoint = self.matter_test_config.endpoint
-        if self.endpoint is None:
-            asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                                "missing argument is --endpoint <endpoint>")
-            # "PIXIT_ENDPOINT must be included on the command line in "
-            # "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
-            self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
 
         asserts.assert_true(self.check_pics("RVCCLEANM.S"), "RVCCLEANM.S must be supported")
         asserts.assert_true(self.check_pics("RVCRUNM.S.A0000"), "RVCRUNM.S.A0000 must be supported")

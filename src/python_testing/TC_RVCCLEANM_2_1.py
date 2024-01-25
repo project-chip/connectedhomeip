@@ -23,7 +23,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments
 # run with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
+# --int-arg PIXIT.RVCCLEANM.MODE_CHANGE_OK:<mode id> PIXIT.RVCCLEANM.MODE_CHANGE_FAIL:<mode id>
 
 
 class TC_RVCCLEANM_2_1(MatterBaseTest):

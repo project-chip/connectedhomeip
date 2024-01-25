@@ -21,10 +21,6 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
 
 class TC_RVCRUNM_1_2(MatterBaseTest):
     def __init__(self, *args):
@@ -52,7 +48,6 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
-
         self.endpoint = self.matter_test_config.endpoint
 
         attributes = Clusters.RvcRunMode.Attributes

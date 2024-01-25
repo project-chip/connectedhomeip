@@ -21,7 +21,7 @@ from mobly import asserts
 
 # This test requires several additional command line arguments.
 # Run the test with
-# --int-arg PIXIT_ENDPOINT:<endpoint> PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
+# --int-arg PIXIT.RVCRUNM.MODE_A:<mode id> PIXIT.RVCRUNM.MODE_B:<mode id>
 
 
 def error_enum_to_text(error_enum):
