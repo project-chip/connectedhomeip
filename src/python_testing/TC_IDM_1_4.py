@@ -22,7 +22,7 @@ import chip.clusters as Clusters
 from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter_testing_support import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -35,6 +35,18 @@ class FakeInvalidBasicInformationCommand(Clusters.BasicInformation.Commands.MfgS
 
 class TC_IDM_1_4(MatterBaseTest):
 
+    def steps_TC_IDM_1_4(self) -> list[TestStep]:
+        steps = [TestStep(1, "Get remote node's MaxPathsPerInvoke", is_commissioning=True),
+                 TestStep(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU"),
+                 TestStep(3, "Sending two InvokeRequests with identical paths"),
+                 TestStep(4, "Sending two InvokeRequests with unique paths, but identical CommandRefs"),
+                 TestStep(5, "Verify DUT responds to InvokeRequestMessage containing two valid paths"),
+                 TestStep(6, "Verify DUT responds to InvokeRequestMessage containing one valid paths, and one InvokeRequest to unsupported endpoint"),
+                 TestStep(7, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true, but never sending preceding Timed Invoke Action"),
+                 TestStep(8, "Verify DUT responds to InvokeRequestMessage containing two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true"),
+                 TestStep(9, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
+        return steps
+
     @async_test_body
     async def test_TC_IDM_1_4(self):
         dev_ctrl = self.default_controller
@@ -42,14 +54,14 @@ class TC_IDM_1_4(MatterBaseTest):
 
         self.print_step(0, "Commissioning - already done")
 
-        self.print_step(1, "Get remote node's MaxPathsPerInvoke")
+        self.step(1)
         session_parameters = dev_ctrl.GetRemoteSessionParameters(dut_node_id)
         max_paths_per_invoke = session_parameters.maxPathsPerInvoke
 
         asserts.assert_greater_equal(max_paths_per_invoke, 1, "Max Paths per Invoke less than spec min")
         asserts.assert_less_equal(max_paths_per_invoke, 65535, "Max Paths per Invoke greater than spec max")
 
-        self.print_step(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU")
+        self.step(2)
         # In practice, it was noticed that we could only fit 57 commands before we hit the MTU limit as a result we
         # conservatively try putting up to 100 commands into an Invoke request. We are expecting one of 2 things to
         # happen if max_paths_per_invoke + 1 is greater than what cap_for_batch_commands is set to:
@@ -115,7 +127,7 @@ class TC_IDM_1_4(MatterBaseTest):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
-        self.print_step(3, "Sending sending two InvokeRequests with idential paths")
+        self.step(3)
         command = Clusters.BasicInformation.Commands.MfgSpecificPing()
         endpoint = 0
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
@@ -127,7 +139,7 @@ class TC_IDM_1_4(MatterBaseTest):
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             logging.info("DUT successfully failed to process two InvokeRequests that contains non-unique paths")
 
-        self.print_step(4, "Sending two InvokeRequests with unique paths, but identical CommandRefs")
+        self.step(4)
         endpoint = 0
         command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
             Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate)
@@ -144,7 +156,7 @@ class TC_IDM_1_4(MatterBaseTest):
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             logging.info("DUT successfully failed to process two InvokeRequests that contains non-unique CommandRef")
 
-        self.print_step(5, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths")
+        self.step(5)
         endpoint = 0
         command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
             Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate)
@@ -164,8 +176,7 @@ class TC_IDM_1_4(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
-        self.print_step(
-            6, "Verify DUT is able to responsed to InvokeRequestMessage that contains one paths InvokeRequest, and one InvokeRequest to unsupported endpoint")
+        self.step(6)
         # First finding non-existent endpoint
         wildcard_descriptor = await dev_ctrl.ReadAttribute(dut_node_id, [(Clusters.Descriptor)])
         endpoints = list(wildcard_descriptor.keys())
@@ -195,7 +206,7 @@ class TC_IDM_1_4(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
-        self.print_step(7, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true, but never sent preceding Timed Invoke Action")
+        self.step(7)
         endpoint = 0
         command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
@@ -214,7 +225,7 @@ class TC_IDM_1_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.TimedRequestMismatch,
                                  "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
 
-        self.print_step(8, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true")
+        self.step(8)
         endpoint = 0
         command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
@@ -235,12 +246,12 @@ class TC_IDM_1_4(MatterBaseTest):
             window_not_open_cluster_error = 4
             asserts.assert_equal(result[1].clusterStatus, window_not_open_cluster_error,
                                  "Timed command, RevokeCommissioning, failed with incorrect cluster code")
-            logging.info(
-                8, "DUT successfully responded to a InvokeRequest action with two valid commands. One of which required timed invoke, and TimedRequest in InvokeResponseMessage was set to true")
+            logging.info("DUT successfully responded to a InvokeRequest action with two valid commands. One of which required timed invoke, and TimedRequest in InvokeResponseMessage was set to true")
         except InteractionModelError:
             asserts.fail("DUT failed with non-path specific error when path specific error was expected")
 
-        self.print_step(9, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/31434 resolved")
+        # Skipping test until https://github.com/project-chip/connectedhomeip/issues/31434 resolved
+        self.skip_step(9)
 
 
 if __name__ == "__main__":
