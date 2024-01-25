@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDeviceAttestationDeviceInfo : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -51,8 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  * used for device attestation.  If attestation succeeds, this must match one of
  * the product IDs from the certification declaration.
  */
-@property (nonatomic, readonly) NSNumber * basicInformationProductID MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6))
-    ;
+@property (nonatomic, readonly) NSNumber * basicInformationProductID MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 @property (nonatomic, readonly) MTRCertificateDERBytes dacCertificate;
 @property (nonatomic, readonly) MTRCertificateDERBytes dacPAICertificate;

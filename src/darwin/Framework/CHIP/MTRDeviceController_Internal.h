@@ -33,6 +33,7 @@
 
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #else
@@ -232,6 +233,15 @@ NS_ASSUME_NONNULL_BEGIN
  * and a compressed fabric id that matches this controller has been observed.
  */
 - (void)operationalInstanceAdded:(chip::NodeId)nodeID;
+
+/**
+ * Download log of the desired type from the device.
+ */
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 #pragma mark - Device-specific data and SDK access
 // DeviceController will act as a central repository for this opaque dictionary that MTRDevice manages

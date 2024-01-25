@@ -14523,23 +14523,6 @@ class IcdManagement(Cluster):
 
             value: 'uint' = 0
 
-    class Events:
-        @dataclass
-        class OnTransitionToActiveMode(ClusterEvent):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000046
-
-            @ChipUtility.classproperty
-            def event_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                    ])
-
 
 @dataclass
 class Timer(Cluster):
@@ -46003,6 +45986,7 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=uint),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
+                ClusterObjectFieldDescriptor(Label="meiInt8u", Tag=0xFFF24F01, Type=uint),
             ])
 
     boolean: 'bool' = None
@@ -46093,6 +46077,7 @@ class UnitTesting(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+    meiInt8u: 'uint' = None
 
     class Enums:
         class SimpleEnum(MatterIntEnum):
@@ -46983,6 +46968,40 @@ class UnitTesting(Cluster):
             sleepBeforeResponseTimeMs: 'uint' = 0
             sizeOfResponseBuffer: 'uint' = 0
             fillCharacter: 'uint' = 0
+
+        @dataclass
+        class TestDifferentVendorMeiRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0xFFF200AA
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'TestDifferentVendorMeiResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="arg1", Tag=0, Type=uint),
+                    ])
+
+            arg1: 'uint' = 0
+
+        @dataclass
+        class TestDifferentVendorMeiResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0xFFF1FC05
+            command_id: typing.ClassVar[int] = 0xFFF200BB
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="arg1", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="eventNumber", Tag=1, Type=uint),
+                    ])
+
+            arg1: 'uint' = 0
+            eventNumber: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -48397,6 +48416,22 @@ class UnitTesting(Cluster):
 
             value: 'uint' = 0
 
+        @dataclass
+        class MeiInt8u(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0xFFF24F01
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
     class Events:
         @dataclass
         class TestEvent(ClusterEvent):
@@ -48445,6 +48480,25 @@ class UnitTesting(Cluster):
                     ])
 
             fabricIndex: 'uint' = 0
+
+        @dataclass
+        class TestDifferentVendorMeiEvent(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0xFFF200EE
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="arg1", Tag=1, Type=uint),
+                    ])
+
+            arg1: 'uint' = 0
 
 
 @dataclass

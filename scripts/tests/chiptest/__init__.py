@@ -203,6 +203,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_ACL_2_6.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
         "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_BINFO_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "TestDiagnosticLogs.yaml",          # chip-repl does not implement a BDXTransferServerDelegate
     }
 
 

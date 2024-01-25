@@ -1836,6 +1836,14 @@ namespace TestSecondBatchHelperRequest {
 static constexpr CommandId Id = 0x00000017;
 } // namespace TestSecondBatchHelperRequest
 
+namespace TestDifferentVendorMeiRequest {
+static constexpr CommandId Id = 0xFFF200AA;
+} // namespace TestDifferentVendorMeiRequest
+
+namespace TestDifferentVendorMeiResponse {
+static constexpr CommandId Id = 0xFFF200BB;
+} // namespace TestDifferentVendorMeiResponse
+
 } // namespace Commands
 } // namespace UnitTesting
 

@@ -72,7 +72,7 @@ MTR{{cluster}}Cluster{{command}}Params
     {{/if}}
 
     using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
-    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
@@ -107,7 +107,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
 {{#if (or isWritableAttribute
@@ -126,7 +126,7 @@ MTR{{cluster}}Cluster{{command}}Params
     }
     {{/if}}
 
-    [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
 {{/if}}

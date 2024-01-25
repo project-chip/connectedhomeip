@@ -13384,36 +13384,6 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-namespace Events {
-namespace OnTransitionToActiveMode {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
-
-enum class Fields : uint8_t
-{
-};
-
-struct Type
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::OnTransitionToActiveMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return Events::OnTransitionToActiveMode::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-} // namespace OnTransitionToActiveMode
-} // namespace Events
 } // namespace IcdManagement
 namespace Timer {
 
@@ -40849,6 +40819,16 @@ struct Type;
 struct DecodableType;
 } // namespace TestSecondBatchHelperRequest
 
+namespace TestDifferentVendorMeiRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestDifferentVendorMeiRequest
+
+namespace TestDifferentVendorMeiResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestDifferentVendorMeiResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -42196,6 +42176,73 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestSecondBatchHelperRequest
+namespace TestDifferentVendorMeiRequest {
+enum class Fields : uint8_t
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestDifferentVendorMeiRequest
+namespace TestDifferentVendorMeiResponse {
+enum class Fields : uint8_t
+{
+    kArg1        = 0,
+    kEventNumber = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1         = static_cast<uint8_t>(0);
+    uint64_t eventNumber = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1         = static_cast<uint8_t>(0);
+    uint64_t eventNumber = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestDifferentVendorMeiResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -43237,6 +43284,18 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 };
 } // namespace ClusterRevision
+namespace MeiInt8u {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeiInt8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeiInt8u
 
 struct TypeInfo
 {
@@ -43338,6 +43397,7 @@ struct TypeInfo
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+        Attributes::MeiInt8u::TypeInfo::DecodableType meiInt8u               = static_cast<uint8_t>(0);
     };
 };
 } // namespace Attributes
@@ -43425,6 +43485,39 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kArg1 = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TestDifferentVendorMeiEvent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TestDifferentVendorMeiEvent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TestDifferentVendorMeiEvent
 } // namespace Events
 } // namespace UnitTesting
 namespace FaultInjection {

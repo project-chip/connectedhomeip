@@ -1959,9 +1959,6 @@ cluster IcdManagement = 70 {
     fabric_idx fabricIndex = 254;
   }
 
-  critical event OnTransitionToActiveMode = 0 {
-  }
-
   readonly attribute int32u idleModeDuration = 0;
   readonly attribute int32u activeModeDuration = 1;
   readonly attribute int16u activeModeThreshold = 2;
@@ -2008,7 +2005,7 @@ cluster IcdManagement = 70 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster ScenesManagement = 98 {
-  revision 5;
+  revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;

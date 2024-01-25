@@ -5644,6 +5644,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUnitTestingAttributeAttributeListID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterUnitTestingAttributeFeatureMapID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterUnitTestingAttributeClusterRevisionID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+    MTRAttributeIDTypeClusterUnitTestingAttributeMeiInt8uID MTR_PROVISIONALLY_AVAILABLE = 0xFFF24F01,
 
     // Cluster SampleMEI attributes
     MTRAttributeIDTypeClusterSampleMEIAttributeFlipFlopID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -6895,6 +6896,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000015,
     MTRCommandIDTypeClusterUnitTestingCommandTestBatchHelperRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000016,
     MTRCommandIDTypeClusterUnitTestingCommandTestSecondBatchHelperRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000017,
+    MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiRequestID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200AA,
+    MTRCommandIDTypeClusterUnitTestingCommandTestDifferentVendorMeiResponseID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200BB,
 
     // Cluster SampleMEI commands
     MTRCommandIDTypeClusterSampleMEICommandPingID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
@@ -7099,9 +7102,6 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster BooleanState events
     MTREventIDTypeClusterBooleanStateEventStateChangeID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000000,
 
-    // Cluster ICDManagement events
-    MTREventIDTypeClusterICDManagementEventOnTransitionToActiveModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-
     // Cluster OvenCavityOperationalState events
     MTREventIDTypeClusterOvenCavityOperationalStateEventOperationalErrorID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTREventIDTypeClusterOvenCavityOperationalStateEventOperationCompletionID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
@@ -7287,6 +7287,7 @@ typedef NS_ENUM(uint32_t, MTREventIDType) {
     // Cluster UnitTesting events
     MTREventIDTypeClusterUnitTestingEventTestEventID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000001,
     MTREventIDTypeClusterUnitTestingEventTestFabricScopedEventID MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00000002,
+    MTREventIDTypeClusterUnitTestingEventTestDifferentVendorMeiEventID MTR_PROVISIONALLY_AVAILABLE = 0xFFF200EE,
 
     // Cluster SampleMEI events
     MTREventIDTypeClusterSampleMEIEventPingCountEventID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
