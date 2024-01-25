@@ -2047,6 +2047,11 @@ MTR_DEPRECATED("Please use MTRUnitTestingClusterTestFabricScopedEventEvent", ios
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
+@interface MTRUnitTestingClusterTestDifferentVendorMeiEventEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull arg1 MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
 @interface MTRSampleMEIClusterPingCountEventEvent : NSObject <NSCopying>
 @property (nonatomic, copy, getter=getCount) NSNumber * _Nonnull count MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull fabricIndex MTR_PROVISIONALLY_AVAILABLE;

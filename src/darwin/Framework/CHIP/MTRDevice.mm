@@ -48,7 +48,6 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 // This class is for storing weak references in a container
-MTR_HIDDEN
 @interface MTRWeakReference<ObjectType> : NSObject
 + (instancetype)weakReferenceWithObject:(ObjectType)object;
 - (instancetype)initWithObject:(ObjectType)object;
@@ -1362,6 +1361,18 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 {
     auto * baseDevice = [self newBaseDevice];
     [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
+}
+
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    [_deviceController downloadLogFromNodeWithID:_nodeID
+                                            type:type
+                                         timeout:timeout
+                                           queue:queue
+                                      completion:completion];
 }
 
 #pragma mark - Cache management

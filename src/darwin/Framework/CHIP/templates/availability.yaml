@@ -8544,6 +8544,10 @@
 - release: "Future"
   versions: "future"
   provisional:
+      clusters:
+          # Targeting Spring 2024 Matter release
+          - EnergyEVSEMode
+          - DeviceEnergyManagementMode
       attributes:
           DoorLock:
               # Aliro is not ready yet.

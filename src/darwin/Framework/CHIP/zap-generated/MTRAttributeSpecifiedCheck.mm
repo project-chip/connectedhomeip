@@ -6324,6 +6324,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::ClusterRevision::Id: {
         return YES;
     }
+    case Attributes::MeiInt8u::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
