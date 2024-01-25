@@ -259,7 +259,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
 CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
     rtw_wifi_setting_t wifi_setting;
-    wifi_get_setting(WLAN0_NAME, &wifi_setting);
+    matter_wifi_get_setting(WLAN0_IDX, &wifi_setting);
 
     uint8_t length = strnlen(reinterpret_cast<const char *>(wifi_setting.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
     if (length > sizeof(network.networkID))

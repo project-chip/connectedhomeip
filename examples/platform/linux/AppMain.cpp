@@ -80,6 +80,12 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_SMOKE_CO_TRIGGER
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+#include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerDelegate.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
@@ -187,23 +193,24 @@ void InitNetworkCommissioning()
         emberAfEndpointEnableDisable(sSecondaryNetworkCommissioningEndpoint.Value(), false);
     }
 
-    const bool kThreadEnabled = {
+    bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif
-    };
+    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
 
-    const bool kWiFiEnabled = {
+    bool isWiFiEnabled = false;
 #if CHIP_APP_MAIN_HAS_WIFI_DRIVER
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif
-    };
+    isWiFiEnabled = LinuxDeviceOptions::GetInstance().mWiFi;
 
-    if (kThreadEnabled && kWiFiEnabled)
+    // On Linux, command-line indicates whether Wi-Fi is supported since determining it from
+    // the OS level is not easily portable.
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    sWiFiDriver.Set5gSupport(LinuxDeviceOptions::GetInstance().wifiSupports5g);
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+    if (isThreadEnabled && isWiFiEnabled)
     {
         if (sSecondaryNetworkCommissioningEndpoint.HasValue())
         {
@@ -218,11 +225,11 @@ void InitNetworkCommissioning()
             EnableThreadNetworkCommissioning();
         }
     }
-    else if (kThreadEnabled)
+    else if (isThreadEnabled)
     {
         EnableThreadNetworkCommissioning();
     }
-    else if (kWiFiEnabled)
+    else if (isWiFiEnabled)
     {
         EnableWiFiNetworkCommissioning(kRootEndpointId);
     }
@@ -552,6 +559,19 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     };
     otherDelegate = &smokeCOTestEventTriggerDelegate;
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
+    static BooleanStateConfigurationTestEventTriggerDelegate booleanStateConfigurationTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &booleanStateConfigurationTestEventTriggerDelegate;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
+    static EnergyEvseTestEventTriggerDelegate energyEvseTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &energyEvseTestEventTriggerDelegate;
+#endif
+
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SampleTestEventTriggerDelegate testEventTriggerDelegate;
     VerifyOrDie(testEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey),
@@ -567,6 +587,13 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    // Set ReadHandler Capacity for Subscriptions
+    chip::app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(
+        LinuxDeviceOptions::GetInstance().subscriptionCapacity);
+    chip::app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
+#endif
 
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the

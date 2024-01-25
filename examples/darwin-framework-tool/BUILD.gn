@@ -163,6 +163,8 @@ executable("darwin-framework-tool") {
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
     "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "commands/bdx/Commands.h",
+    "commands/bdx/DownloadLogCommand.mm",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/clusters/ReportCommandBridge.h",
@@ -248,7 +250,7 @@ executable("darwin-framework-tool") {
 
       # pics is needed by tests
       "${chip_root}/src/app/tests/suites/pics",
-      "${chip_root}/src/protocols:im_status",
+      "${chip_root}/src/protocols/interaction_model",
     ]
 
     defines = []

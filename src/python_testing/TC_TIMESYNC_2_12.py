@@ -51,6 +51,9 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         except queue.Empty:
             asserts.fail("Did not receive TZStatus event")
 
+    def pics_TC_TIMESYNC_2_12(self) -> list[str]:
+        return ["TIMESYNC.S.F00"]
+
     @async_test_body
     async def test_TC_TIMESYNC_2_12(self):
 

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:layout_height="match_parent">
 
         <!-- appbar -->
         <include
@@ -13,43 +11,24 @@
             layout="@layout/layout_appbar" />
         <!-- appbar -->
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/nested_scroll_view"
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            android:layout_marginTop="?attr/actionBarSize">
 
-            <ScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <include
+                    android:id="@+id/on_off_switch_on_off_layout"
+                    layout="@layout/layout_item_value_on_off_button" />
 
-                    <!-- title -->
-                    <include
-                        android:id="@+id/on_off_switch_title_layout"
-                        layout="@layout/layout_title" />
-                    <!-- title -->
-
-                    <!-- Top Space -->
-                    <include layout="@layout/layout_space_top" />
-                    <!-- Top Space -->
-
-                    <!-- On Off Button -->
-                    <include
-                        android:id="@+id/on_off_switch_on_off_layout"
-                        layout="@layout/layout_item_value_on_off_button" />
-                    <!-- On Off Button -->
-
-                    <!-- Bottom Space -->
-                    <include layout="@layout/layout_space_bottom" />
-                    <!-- Bottom Space -->
-                </LinearLayout>
-            </ScrollView>
-        </androidx.core.widget.NestedScrollView>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+                <!-- Bottom Space -->
+                <include layout="@layout/layout_bottom_space" />
+                <!-- Bottom Space -->
+            </LinearLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

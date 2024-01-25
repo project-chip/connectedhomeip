@@ -327,12 +327,20 @@ CHIP_ERROR IdentificationDeclaration::ReadPayload(uint8_t * udcPayload, size_t p
             err = reader.Get(mCancelPasscode);
             break;
         }
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "IdentificationDeclaration::ReadPayload read error %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     if (err == CHIP_END_OF_TLV)
     {
         // Exiting container
         ReturnErrorOnFailure(reader.ExitContainer(outerContainerType));
+    }
+    else
+    {
+        ChipLogError(AppServer, "IdentificationDeclaration::ReadPayload exiting early error %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     ChipLogProgress(AppServer, "UDC TLV parse complete");

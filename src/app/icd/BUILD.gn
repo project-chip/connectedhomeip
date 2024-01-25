@@ -24,7 +24,7 @@ buildconfig_header("icd_buildconfig") {
 
   defines = [
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
-    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
+    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_icd_report_on_active_mode}",
     "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
     "ICD_ENFORCE_SIT_SLOW_POLL_LIMIT=${icd_enforce_sit_slow_poll_limit}",
   ]

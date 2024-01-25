@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "DefaultICDClientStorage.h"
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <iterator>
 #include <lib/core/Global.h>
 #include <lib/support/Base64.h>
@@ -410,23 +410,6 @@ CHIP_ERROR DefaultICDClientStorage::UpdateEntryCountForFabric(FabricIndex fabric
                                               backingBuffer.Get(), static_cast<uint16_t>(len));
 }
 
-CHIP_ERROR DefaultICDClientStorage::GetEntry(const ScopedNodeId & peerNode, ICDClientInfo & clientInfo)
-{
-    size_t clientInfoSize = 0;
-    std::vector<ICDClientInfo> clientInfoVector;
-    ReturnErrorOnFailure(Load(peerNode.GetFabricIndex(), clientInfoVector, clientInfoSize));
-    IgnoreUnusedVariable(clientInfoSize);
-    for (auto & info : clientInfoVector)
-    {
-        if (peerNode.GetNodeId() == info.peer_node.GetNodeId())
-        {
-            clientInfo = info;
-            return CHIP_NO_ERROR;
-        }
-    }
-    return CHIP_ERROR_NOT_FOUND;
-}
-
 CHIP_ERROR DefaultICDClientStorage::DeleteEntry(const ScopedNodeId & peerNode)
 {
     size_t clientInfoSize = 0;
@@ -479,10 +462,25 @@ CHIP_ERROR DefaultICDClientStorage::DeleteAllEntries(FabricIndex fabricIndex)
     return mpClientInfoStore->SyncDeleteKeyValue(DefaultStorageKeyAllocator::FabricICDClientInfoCounter(fabricIndex).KeyName());
 }
 
-CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo)
+CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo,
+                                                          CounterType & counter)
 {
-    // TODO: Need to implement default decription code using CheckinMessage::ParseCheckinMessagePayload
-    return CHIP_NO_ERROR;
+    uint8_t appDataBuffer[kAppDataLength];
+    MutableByteSpan appData(appDataBuffer);
+    auto * iterator = IterateICDClientInfo();
+    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    while (iterator->Next(clientInfo))
+    {
+        CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
+            clientInfo.aes_key_handle, clientInfo.hmac_key_handle, payload, counter, appData);
+        if (CHIP_NO_ERROR == err)
+        {
+            iterator->Release();
+            return CHIP_NO_ERROR;
+        }
+    }
+    iterator->Release();
+    return CHIP_ERROR_NOT_FOUND;
 }
 } // namespace app
 } // namespace chip

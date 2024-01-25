@@ -45,6 +45,8 @@ executable("${sample_name}") {
     "${project_dir}/common/chef-air-quality.cpp",
     "${project_dir}/common/chef-channel-manager.cpp",
     "${project_dir}/common/chef-concentration-measurement.cpp",
+    "${project_dir}/common/chef-fan-control-manager.cpp",
+    "${project_dir}/common/chef-resource-monitoring-delegates.cpp",
     "${project_dir}/common/chef-rvc-mode-delegate.cpp",
     "${project_dir}/common/chef-rvc-operational-state-delegate.cpp",
     "${project_dir}/common/stubs.cpp",
@@ -80,7 +82,7 @@ executable("${sample_name}") {
     ]
 
     deps += [
-      "$dir_pw_hdlc:pw_rpc",
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_log",
       "$dir_pw_rpc:server",

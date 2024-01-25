@@ -379,7 +379,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace RvcOperationalState
 
-namespace BooleanSensorConfiguration {
+namespace BooleanStateConfiguration {
 namespace Events {
 
 namespace AlarmsStateChanged {
@@ -391,7 +391,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace SensorFault
 
 } // namespace Events
-} // namespace BooleanSensorConfiguration
+} // namespace BooleanStateConfiguration
 
 namespace ValveConfigurationAndControl {
 namespace Events {
@@ -633,6 +633,10 @@ static constexpr EventId Id = 0x00000001;
 namespace TestFabricScopedEvent {
 static constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
+
+namespace TestDifferentVendorMeiEvent {
+static constexpr EventId Id = 0xFFF200EE;
+} // namespace TestDifferentVendorMeiEvent
 
 } // namespace Events
 } // namespace UnitTesting

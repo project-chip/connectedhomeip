@@ -17,6 +17,8 @@ name: 219.3.1. [TC-TCCM-3.1] On Mode functionality with DUT as Server
 PICS:
     - TCCM.S.A0003
     - TCCM.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
 
 config:
     nodeId: 0x12344321
@@ -31,7 +33,9 @@ config:
         defaultValue: 0
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -48,14 +52,14 @@ tests:
       arguments:
           value: nonNull_OnMode_value
 
-    - label: "Step 2: TH reads the OnMode attribute from the DUT"
+    - label: "Step 2: TH reads from the DUT the OnMode attribute."
       PICS: TCCM.S.A0003 && TCCM.S.F00
       command: "readAttribute"
       attribute: "OnMode"
       response:
           saveAs: on_mode_dut
 
-    - label: "Step 3a: TH reads the CurrentMode attribute from the DUT"
+    - label: "Step 3a: TH reads from the DUT the CurrentMode attribute."
       PICS: TCCM.S.A0001 && TCCM.S.F00
       command: "readAttribute"
       attribute: "CurrentMode"
