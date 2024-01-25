@@ -43,15 +43,15 @@ namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
 
-using ChangeIndicationEnum      = Clusters::detail::Enums::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionEnum;
-using ErrorStateEnum            = Clusters::detail::Enums::ErrorStateEnum;
-using LevelValueEnum            = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum     = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementTypeEnum       = Clusters::detail::Enums::MeasurementTypeEnum;
-using MeasurementUnitEnum       = Clusters::detail::Enums::MeasurementUnitEnum;
-using OperationalStateEnum      = Clusters::detail::Enums::OperationalStateEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
+using ChangeIndicationEnum      = Clusters::detail::ChangeIndicationEnum;
+using DegradationDirectionEnum  = Clusters::detail::DegradationDirectionEnum;
+using ErrorStateEnum            = Clusters::detail::ErrorStateEnum;
+using LevelValueEnum            = Clusters::detail::LevelValueEnum;
+using MeasurementMediumEnum     = Clusters::detail::MeasurementMediumEnum;
+using MeasurementTypeEnum       = Clusters::detail::MeasurementTypeEnum;
+using MeasurementUnitEnum       = Clusters::detail::MeasurementUnitEnum;
+using OperationalStateEnum      = Clusters::detail::OperationalStateEnum;
+using ProductIdentifierTypeEnum = Clusters::detail::ProductIdentifierTypeEnum;
 
 namespace ModeTagStruct {
 enum class Fields : uint8_t
@@ -13721,8 +13721,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Timer
 namespace OvenCavityOperationalState {
-using ErrorStateEnum       = Clusters::detail::Enums::ErrorStateEnum;
-using OperationalStateEnum = Clusters::detail::Enums::OperationalStateEnum;
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
 namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
@@ -17366,8 +17364,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace MicrowaveOvenControl
 namespace OperationalState {
-using ErrorStateEnum       = Clusters::detail::Enums::ErrorStateEnum;
-using OperationalStateEnum = Clusters::detail::Enums::OperationalStateEnum;
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
 namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
@@ -19037,9 +19033,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ScenesManagement
 namespace HepaFilterMonitoring {
-using ChangeIndicationEnum      = Clusters::detail::Enums::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
 namespace Structs {
 namespace ReplacementProductStruct {
 enum class Fields : uint8_t
@@ -19248,9 +19241,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
-using ChangeIndicationEnum      = Clusters::detail::Enums::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
 namespace Structs {
 namespace ReplacementProductStruct {
 enum class Fields : uint8_t
@@ -20137,7 +20127,6 @@ public:
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 namespace ElectricalPowerMeasurement {
-using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
 namespace Structs {
 namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
 namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
@@ -20560,7 +20549,6 @@ public:
 } // namespace Events
 } // namespace ElectricalPowerMeasurement
 namespace ElectricalEnergyMeasurement {
-using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
 namespace Structs {
 namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
 namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
@@ -32333,9 +32321,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OccupancySensing
 namespace CarbonMonoxideConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -32541,9 +32526,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace CarbonMonoxideConcentrationMeasurement
 namespace CarbonDioxideConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -32749,9 +32731,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace CarbonDioxideConcentrationMeasurement
 namespace NitrogenDioxideConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -32957,9 +32936,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace NitrogenDioxideConcentrationMeasurement
 namespace OzoneConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33165,9 +33141,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OzoneConcentrationMeasurement
 namespace Pm25ConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33373,9 +33346,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Pm25ConcentrationMeasurement
 namespace FormaldehydeConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33581,9 +33551,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace FormaldehydeConcentrationMeasurement
 namespace Pm1ConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33789,9 +33756,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Pm1ConcentrationMeasurement
 namespace Pm10ConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33997,9 +33961,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Pm10ConcentrationMeasurement
 namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -34205,9 +34166,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
 namespace RadonConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
