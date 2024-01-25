@@ -46,8 +46,8 @@ class TC_IDM_1_4(MatterBaseTest):
         session_parameters = dev_ctrl.GetRemoteSessionParameters(dut_node_id)
         max_paths_per_invoke = session_parameters.maxPathsPerInvoke
 
-        asserts.assert_greater_equal(max_paths_per_invoke, 1, "Unexpected error returned from unsupported endpoint")
-        asserts.assert_less_equal(max_paths_per_invoke, 65535, "Unexpected error returned from unsupported endpoint")
+        asserts.assert_greater_equal(max_paths_per_invoke, 1, "Max Paths per Invoke less than spec min")
+        asserts.assert_less_equal(max_paths_per_invoke, 65535, "Max Paths per Invoke greater than spec max")
 
         self.print_step(2, "Sending `MaxPathsPerInvoke + 1` InvokeRequest if it fits into single MTU")
         # In practice, it was noticed that we could only fit 57 commands before we hit the MTU limit as a result we
@@ -59,7 +59,7 @@ class TC_IDM_1_4(MatterBaseTest):
         # 2. Client (TH) able to send command. While unexpected we will hit two different test failure depending on
         #    what the server does.
         #    a. Server successfully handle command and send InvokeResponse with results of all individual commands
-        #       being failure. In this case, test fails on unexpected successes like this
+        #       being failure. In this case, test already will fail on unexpected successes.
         #    b. Server fails to handle command that is between cap_for_batch_commands and max_paths_per_invoke + 1.
         #       In this case, test fails as device should have actually succeeded and been caught in 2.a.
         cap_for_batch_commands = 100
@@ -80,34 +80,34 @@ class TC_IDM_1_4(MatterBaseTest):
                                      "Step 2 is always expected to try sending at least 2 command, something wrong with test logic")
         try:
             await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, list_of_commands_to_send, remoteMaxPathsPerInvoke=number_of_commands_to_send)
-            # If you get the assert below it is likely because cap_for_batch_commands is actually too low.
-            # This might happen after TCP is enabled and DUT supports TCP.
+            # This might happen after TCP is enabled and DUT supports TCP. See comment above `cap_for_batch_commands`
+            # for more information.
+            asserts.assert_not_equal(number_of_commands_to_send, cap_for_batch_commands, "Test needs to be updated! Soft cap `cap_for_batch_commands` added in test is no longer correct")
             asserts.fail(
                 f"Unexpected success return from sending too many commands, we sent {number_of_commands_to_send}, test capped at {cap_for_batch_commands}")
         except InteractionModelError as e:
-            # This check is for 2.a., mentioned above introduction of variable cap_for_batch_commands.
+            # This check is for 2.b, mentioned above. If this assert occurs test likely needs updating. Although DUT is still going to fail.
             asserts.assert_equal(number_of_commands_to_send, max_paths_per_invoke + 1,
                                  "Test didn't send as many command as max_paths_per_invoke + 1, likely due to MTU cap_for_batch_commands, but we still got an error from server. This should have been a success from server")
             asserts.assert_equal(e.status, Status.InvalidAction,
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
-            self.print_step(2, "DUT successfully failed to process `MaxPathsPerInvoke + 1` InvokeRequests")
+            logging.info("DUT successfully failed to process `MaxPathsPerInvoke + 1` InvokeRequests")
         except ChipStackError as e:
             chip_error_no_memory = 0x0b
             asserts.assert_equal(e.err, chip_error_no_memory, "Unexpected error while trying to send InvokeRequest")
             # TODO it is possible we want to confirm DUT can handle up to MTU max. But that is not in test plan as of right now.
             # Additionally CommandSender is not currently set up to enable caller to fill up to MTU. This might be coming soon,
             # just that it is not supported today.
-            self.print_step(2, "DUTs reported MaxPathsPerInvoke + 1 is larger than what fits into MTU. Test step is skipped")
+            logging.info("DUTs reported MaxPathsPerInvoke + 1 is larger than what fits into MTU. Test step is skipped")
 
         if max_paths_per_invoke == 1:
-            # TODO(#31139) After issue is resolved use that API properly to mark tests steps as skipped
-            self.print_step(3, "Skipping test step as max_paths_per_invoke == 1")
-            self.print_step(4, "Skipping test step as max_paths_per_invoke == 1")
-            self.print_step(5, "Skipping test step as max_paths_per_invoke == 1")
-            self.print_step(6, "Skipping test step as max_paths_per_invoke == 1")
-            self.print_step(7, "Skipping test step as max_paths_per_invoke == 1")
-            self.print_step(8, "Skipping test step as max_paths_per_invoke == 1")
-            self.print_step(9, "Skipping test step as max_paths_per_invoke == 1")
+            self.skip_step(3)
+            self.skip_step(4)
+            self.skip_step(5)
+            self.skip_step(6)
+            self.skip_step(7)
+            self.skip_step(8)
+            self.skip_step(9)
         else:
             await self.steps_3_to_9(False)
 
@@ -235,7 +235,7 @@ class TC_IDM_1_4(MatterBaseTest):
             window_not_open_cluster_error = 4
             asserts.assert_equal(result[1].clusterStatus, window_not_open_cluster_error,
                                  "Timed command, RevokeCommissioning, failed with incorrect cluster code")
-            self.print_step(
+            logging.info(
                 8, "DUT successfully responded to a InvokeRequest action with two valid commands. One of which required timed invoke, and TimedRequest in InvokeResponseMessage was set to true")
         except InteractionModelError:
             asserts.fail("DUT failed with non-path specific error when path specific error was expected")
