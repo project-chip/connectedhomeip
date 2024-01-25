@@ -2613,6 +2613,18 @@ enum class Feature : uint32_t
 };
 } // namespace EnergyPreference
 
+namespace PowerTopology {
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kNodeTopology     = 0x1,
+    kLeafTopology     = 0x2,
+    kSetTopology      = 0x4,
+    kDynamicPowerFlow = 0x8,
+};
+} // namespace PowerTopology
+
 namespace EnergyEvseMode {
 
 // Enum for ModeTag
