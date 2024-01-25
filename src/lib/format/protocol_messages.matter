@@ -386,6 +386,7 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct InvokeResponseMessage {
     boolean suppress_response = 0;
     InvokeResponseIB invoke_responses[] = 1;
+    optional boolean more_chunked_messages = 2;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;
