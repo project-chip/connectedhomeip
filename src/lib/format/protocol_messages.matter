@@ -166,6 +166,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     optional EventFilterIB event_filters[] = 2;
     optional boolean fabric_filtered = 3;
     optional DataVersionFilterIB data_version_filters[] = 4;
+    optional boolean include_attribution_data = 5;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;
@@ -237,6 +238,24 @@ client cluster IMProtocol = 0xFFFF0001 {
     StatusIB status = 1;
   }
 
+  struct AttributionData {
+    // NOTE: 0 is missing
+    int8u context_information = 1;
+    int32u source_context = 2;
+
+    // at-most-one-of {
+    optional int64u node_id = 3;
+    optional int16u group_id = 4;
+    // }
+
+    // at-most-one-of {
+    optional int64u epoch_timestamp = 5;
+    optional int64u system_timestamp = 6;
+    // }
+
+    int8u fabric_index = 0xFE;
+  }
+
   struct AttributeData {
     optional int32u data_version = 0;
     AttributePathIB path = 1;
@@ -266,6 +285,8 @@ client cluster IMProtocol = 0xFFFF0001 {
     //  }
 
     cluster_event_payload data = 7;
+
+    AttributionData attribution_data = 8;
   }
 
   struct EventReportIB {
@@ -288,6 +309,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     int32u data_version = 0;
     AttributePathIB path = 1;
     cluster_attribute_payload data = 2;
+    AttributionData attribution_data = 3;
   }
 
   struct WriteRequestMessage {
@@ -320,7 +342,26 @@ client cluster IMProtocol = 0xFFFF0001 {
 
   struct CommandDataIB {
     CommandPathIB path = 0;
-    cluster_command_payload data = 1;
+    optional cluster_command_payload data = 1;
+    optional int16u command_ref = 2;
+
+    // at-most-one-of {
+    optional SuppliedAttribution supplied_attribution_data = 3;
+    optional int16u supplied_attribution_data_repeat = 4;
+    // }
+  }
+
+  enum SuppliedAttributionContextInformation : enum8 {
+     kDefaultClientAction = 0;
+     kUserInteraction = 1;
+     kClientAutomationRule = 2;
+     kClientSchedule = 3;
+     kClientTimer = 4;
+  }
+
+  struct  SuppliedAttribution {
+     SuppliedAttributeContextInformation context_information = 0;
+     int32u source_context = 1;
   }
 
   struct InvokeRequestMessage {
