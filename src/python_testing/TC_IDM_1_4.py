@@ -95,11 +95,13 @@ class TC_IDM_1_4(MatterBaseTest):
             # This might happen after TCP is enabled and DUT supports TCP. See comment above `cap_for_batch_commands`
             # for more information.
             asserts.assert_not_equal(number_of_commands_to_send, cap_for_batch_commands,
-                                     "Test needs to be updated! Soft cap `cap_for_batch_commands` added in test is no longer correct")
+                                     "Test needs to be updated! Soft cap `cap_for_batch_commands` used in test is no longer correct")
             asserts.fail(
                 f"Unexpected success return from sending too many commands, we sent {number_of_commands_to_send}, test capped at {cap_for_batch_commands}")
         except InteractionModelError as e:
-            # This check is for 2.b, mentioned above. If this assert occurs test likely needs updating. Although DUT is still going to fail.
+            # This check is for 2.b, mentioned above. If this assert occurs, test likely needs updating. Although DUT
+            # is still going to fail since it seemingly is failing to process a smaller number then it is reporting
+            # that it is capable of processing.
             asserts.assert_equal(number_of_commands_to_send, max_paths_per_invoke + 1,
                                  "Test didn't send as many command as max_paths_per_invoke + 1, likely due to MTU cap_for_batch_commands, but we still got an error from server. This should have been a success from server")
             asserts.assert_equal(e.status, Status.InvalidAction,
@@ -114,13 +116,7 @@ class TC_IDM_1_4(MatterBaseTest):
             logging.info("DUTs reported MaxPathsPerInvoke + 1 is larger than what fits into MTU. Test step is skipped")
 
         if max_paths_per_invoke == 1:
-            self.skip_step(3)
-            self.skip_step(4)
-            self.skip_step(5)
-            self.skip_step(6)
-            self.skip_step(7)
-            self.skip_step(8)
-            self.skip_step(9)
+            self.skip_all_remaining_steps(3)
         else:
             await self.steps_3_to_9(False)
 
