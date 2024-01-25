@@ -23,6 +23,7 @@ limitations under the License.
     <define>CHANNEL_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides an interface for controlling the current Channel on a device.</description>
     <attribute side="server" code="0x0000" define="CHANNEL_LIST"            type="array" entryType="ChannelInfoStruct" length="254"                    writable="false" optional="true">ChannelList</attribute>
     <attribute side="server" code="0x0001" define="CHANNEL_LINEUP"          type="LineupInfoStruct"                    default="0x0" isNullable="true" writable="false" optional="true">Lineup</attribute>
@@ -181,21 +182,22 @@ limitations under the License.
     <item name="Satellite" value="0x00"/>
     <item name="Cable" value="0x01"/>
     <item name="Terrestrial" value="0x02"/>
+    <item name="OTT" value="0x03"/>
   </enum>
 
   <bitmap name="RecordingFlagBitmap" type="bitmap32">
     <cluster code="0x0504"/>
     <field name="Scheduled" mask="0x1"/>
     <field name="RecordSeries"  mask="0x2"/>
-    <field name="Recorded" mask="0x3"/>
+    <field name="Recorded" mask="0x4"/>
   </bitmap>
 
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0504"/>
     <field name="ChannelList" mask="0x1"/>
     <field name="LineupInfo"  mask="0x2"/>
-    <field name="ElectronicGuide" mask="0x3"/>
-    <field name="RecordProgram"  mask="0x4"/>
+    <field name="ElectronicGuide" mask="0x4"/>
+    <field name="RecordProgram"  mask="0x8"/>
   </bitmap>
 
 </configurator>
