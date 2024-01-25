@@ -212,6 +212,7 @@ static_library("app") {
     "CommandResponseHelper.h",
     "CommandResponseSender.cpp",
     "CommandSender.cpp",
+    "SentRequestTrackerImpl.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
     "DeferredAttributePersistenceProvider.cpp",

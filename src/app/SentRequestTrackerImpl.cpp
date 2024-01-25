@@ -1,0 +1,61 @@
+/*
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "SentRequestTrackerImpl.h"
+
+#include <lib/support/CodeUtils.h>
+
+namespace chip {
+namespace app {
+
+CHIP_ERROR SentRequestTrackerImpl::AddCommand(uint16_t aCommandRef)
+{
+    VerifyOrReturnError(mCommandReferenceSet.find(aCommandRef) == mCommandReferenceSet.end(), CHIP_ERROR_INVALID_ARGUMENT);
+    mCommandReferenceSet.insert(aCommandRef);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR SentRequestTrackerImpl::RemoveCommand(uint16_t aCommandRef)
+{
+    VerifyOrReturnError(mCommandReferenceSet.find(aCommandRef) != mCommandReferenceSet.end(), CHIP_ERROR_KEY_NOT_FOUND);
+    mCommandReferenceSet.erase(aCommandRef);
+    return CHIP_NO_ERROR;
+}
+
+bool SentRequestTrackerImpl::IsCommandTracked(uint16_t aCommandRef)
+{
+    return mCommandReferenceSet.find(aCommandRef) != mCommandReferenceSet.end();
+}
+
+size_t SentRequestTrackerImpl::Count()
+{
+    return mCommandReferenceSet.size();
+}
+
+Optional<uint16_t> SentRequestTrackerImpl::PopCommand()
+{
+    if (Count() == 0)
+    {
+        return NullOptional;
+    }
+    uint16_t commandRef = *mCommandReferenceSet.begin();
+    mCommandReferenceSet.erase(mCommandReferenceSet.begin());
+    return Optional<uint16_t>(commandRef);
+}
+
+} // namespace app
+} // namespace chip

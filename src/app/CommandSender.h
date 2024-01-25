@@ -27,6 +27,7 @@
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
+#include "SentRequestTrackerImpl.h"
 
 #include <app/CommandPathParams.h>
 #include <app/MessageDef/InvokeRequestMessage.h>
@@ -229,12 +230,6 @@ public:
         // early in PrepareCommand, even though it's not used until FinishCommand. This proactive
         // validation helps prevent unnecessary writing an InvokeRequest into the packet that later
         // needs to be undone.
-        //
-        // Currently, provided commandRefs for the first request must start at 0 and increment by one
-        // for each subsequent request. This requirement can be relaxed in the future if a compelling
-        // need arises.
-        // TODO(#30453): After introducing Request/Response tracking, remove statement above about
-        // this currently enforced requirement on commandRefs.
         Optional<uint16_t> commandRef;
         // If the InvokeRequest needs to be in a state with a started data TLV struct container
         bool startDataStruct = false;
@@ -278,6 +273,10 @@ public:
         bool endDataStruct = false;
     };
 
+    class TestOnlyMarker
+    {
+    };
+
     /*
      * Constructor.
      *
@@ -287,12 +286,15 @@ public:
      */
     CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false);
-    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
-                  bool aSuppressResponse = false);
     CommandSender(std::nullptr_t, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
                   bool aSuppressResponse = false) :
         CommandSender(static_cast<Callback *>(nullptr), apExchangeMgr, aIsTimedRequest, aSuppressResponse)
     {}
+    CommandSender(ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false,
+                  bool aSuppressResponse = false);
+    CommandSender(TestOnlyMarker aTestMarker, ExtendableCallback * apCallback, Messaging::ExchangeManager * apExchangeMgr,
+                  SentRequestTracker * apSentRequestTracker, bool aIsTimedRequest = false, bool aSuppressResponse = false) :
+        CommandSender(apCallback, apExchangeMgr, aIsTimedRequest, aSuppressResponse) { mpSentRequestTracker = apSentRequestTracker; }
     ~CommandSender();
 
     /**
@@ -311,7 +313,7 @@ public:
      * @return CHIP_ERROR_INVALID_ARGUMENT
      *                      Invalid argument value.
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
-     *                      Device has not enabled CHIP_CONFIG_SENDING_BATCH_COMMANDS_ENABLED.
+     *                      Device has not enabled CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
 
@@ -580,8 +582,12 @@ private:
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
 
+#if CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    SentRequestTrackerImpl mSentRequestTracker;
+#endif // CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS
+    SentRequestTracker * mpSentRequestTracker = nullptr;
+
     uint16_t mInvokeResponseMessageCount = 0;
-    uint16_t mFinishedCommandCount       = 0;
     uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
     State mState                = State::Idle;

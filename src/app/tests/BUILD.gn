@@ -151,6 +151,7 @@ chip_test_suite_using_nltest("tests") {
     "TestPowerSourceCluster.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
+    "TestSentRequestTrackerImpl.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
     "TestTestEventTriggerDelegate.cpp",
