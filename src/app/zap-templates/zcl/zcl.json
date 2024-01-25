@@ -608,7 +608,8 @@
             "CumulativeEnergyImported",
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
-            "PeriodicEnergyExported"
+            "PeriodicEnergyExported",
+            "FeatureMap"
         ],
         "Electrical Power Measurement": [
             "PowerMode",
@@ -629,7 +630,8 @@
             "HarmonicCurrents",
             "HarmonicPhases",
             "PowerFactor",
-            "NeutralCurrent"
+            "NeutralCurrent",
+            "FeatureMap"
         ],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"]
