@@ -153,6 +153,11 @@ public:
          * issues w.r.t the ReadHandler itself.
          */
         virtual ApplicationCallback * GetAppCallback() = 0;
+
+        /*
+         * Retrieve the InteractionalModelEngine that holds this ReadHandler.
+         */
+        virtual InteractionModelEngine * GetReadHandlerImEngine();
     };
 
     // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify
@@ -202,10 +207,10 @@ public:
      *
      *  Constructor.
      *
-     *  The InteractionModelEngine and the callback passed in have to outlive this handler object.
+     *  The callback passed in has to outlive this handler object.
      *
      */
-    ReadHandler(InteractionModelEngine * apImEngine, ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
+    ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType,
                 Observer * observer);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
@@ -565,8 +570,6 @@ private:
 
     // TODO (#27675): Merge all observers into one and that one will dispatch the callbacks to the right place.
     Observer * mObserver = nullptr;
-
-    InteractionModelEngine * mpImEngine = nullptr;
 };
 } // namespace app
 } // namespace chip

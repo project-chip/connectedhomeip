@@ -43,6 +43,10 @@ namespace chip {
 namespace app {
 using Status = Protocols::InteractionModel::Status;
 
+InteractionModelEngine * ReadHandler::ManagementCallback::GetReadHandlerImEngine() {
+    return InteractionModelEngine::GetInstance();
+}
+
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -52,13 +56,11 @@ uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 #endif
 }
 
-ReadHandler::ReadHandler(InteractionModelEngine * apImEngine, ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
+ReadHandler::ReadHandler(ManagementCallback & apCallback, Messaging::ExchangeContext * apExchangeContext,
                          InteractionType aInteractionType, Observer * observer) :
     mExchangeCtx(*this),
-    mManagementCallback(apCallback),
-    mpImEngine(apImEngine)
+    mManagementCallback(apCallback)
 {
-    VerifyOrDie(apImEngine != nullptr);
     VerifyOrDie(apExchangeContext != nullptr);
 
     mExchangeCtx.Grab(apExchangeContext);
@@ -70,7 +72,7 @@ ReadHandler::ReadHandler(InteractionModelEngine * apImEngine, ManagementCallback
 
     mInteractionType            = aInteractionType;
     mLastWrittenEventsBytes     = 0;
-    mTransactionStartGeneration = mpImEngine->GetReportingEngine().GetDirtySetGeneration();
+    mTransactionStartGeneration = mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().GetDirtySetGeneration();
     mFlags.ClearAll();
     SetStateFlag(ReadHandlerFlags::PrimingReports);
 
@@ -104,7 +106,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths.AllocatedSize(); i++)
     {
         AttributePathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths[i].GetParams();
-        CHIP_ERROR err             = mpImEngine->PushFrontAttributePathList(mpAttributePathList, params);
+        CHIP_ERROR err             = mManagementCallback.GetReadHandlerImEngine()->PushFrontAttributePathList(mpAttributePathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -114,7 +116,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths.AllocatedSize(); i++)
     {
         EventPathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths[i].GetParams();
-        CHIP_ERROR err         = mpImEngine->PushFrontEventPathParamsList(mpEventPathList, params);
+        CHIP_ERROR err         = mManagementCallback.GetReadHandlerImEngine()->PushFrontEventPathParamsList(mpEventPathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -139,7 +141,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     ObjectList<AttributePathParams> * attributePath = mpAttributePathList;
     while (attributePath)
     {
-        mpImEngine->GetReportingEngine().SetDirty(attributePath->mValue);
+        mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().SetDirty(attributePath->mValue);
         attributePath = attributePath->mpNext;
     }
 }
@@ -158,11 +160,11 @@ ReadHandler::~ReadHandler()
 
     if (IsAwaitingReportResponse())
     {
-        mpImEngine->GetReportingEngine().OnReportConfirm();
+        mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().OnReportConfirm();
     }
-    mpImEngine->ReleaseAttributePathList(mpAttributePathList);
-    mpImEngine->ReleaseEventPathList(mpEventPathList);
-    mpImEngine->ReleaseDataVersionFilterList(mpDataVersionFilterList);
+    mManagementCallback.GetReadHandlerImEngine()->ReleaseAttributePathList(mpAttributePathList);
+    mManagementCallback.GetReadHandlerImEngine()->ReleaseEventPathList(mpEventPathList);
+    mManagementCallback.GetReadHandlerImEngine()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
 }
 
 void ReadHandler::Close(CloseOptions options)
@@ -170,7 +172,7 @@ void ReadHandler::Close(CloseOptions options)
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     if (IsType(InteractionType::Subscribe) && options == CloseOptions::kDropPersistedSubscription)
     {
-        auto * subscriptionResumptionStorage = mpImEngine->GetSubscriptionResumptionStorage();
+        auto * subscriptionResumptionStorage = mManagementCallback.GetReadHandlerImEngine()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
         {
             subscriptionResumptionStorage->Delete(GetInitiatorNodeId(), GetAccessingFabricIndex(), mSubscriptionId);
@@ -287,7 +289,7 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
 #else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mpImEngine->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = mManagementCallback.GetReadHandlerImEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
@@ -312,7 +314,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
 #else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mpImEngine->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange = mManagementCallback.GetReadHandlerImEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
@@ -322,7 +324,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
     if (!IsReporting())
     {
-        mCurrentReportsBeginGeneration = mpImEngine->GetReportingEngine().GetDirtySetGeneration();
+        mCurrentReportsBeginGeneration = mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().GetDirtySetGeneration();
     }
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
@@ -341,7 +343,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
         {
             // Make sure we're not treated as an in-flight report waiting for a
             // response by the reporting engine.
-            mpImEngine->GetReportingEngine().OnReportConfirm();
+            mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().OnReportConfirm();
         }
 
         // If we just finished a non-priming subscription report, notify our observers.
@@ -355,7 +357,7 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     {
         mPreviousReportsBeginGeneration = mCurrentReportsBeginGeneration;
         ClearForceDirtyFlag();
-        mpImEngine->ReleaseDataVersionFilterList(mpDataVersionFilterList);
+        mManagementCallback.GetReadHandlerImEngine()->ReleaseDataVersionFilterList(mpDataVersionFilterList);
     }
 
     return err;
@@ -491,12 +493,12 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
         AttributePathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
         ReturnErrorOnFailure(path.ParsePath(attribute));
-        ReturnErrorOnFailure(mpImEngine->PushFrontAttributePathList(mpAttributePathList, attribute));
+        ReturnErrorOnFailure(mManagementCallback.GetReadHandlerImEngine()->PushFrontAttributePathList(mpAttributePathList, attribute));
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        mpImEngine->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
+        mManagementCallback.GetReadHandlerImEngine()->RemoveDuplicateConcreteAttributePath(mpAttributePathList);
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributePathList);
         err                          = CHIP_NO_ERROR;
     }
@@ -524,7 +526,7 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
         ReturnErrorOnFailure(path.GetCluster(&(versionFilter.mClusterId)));
         VerifyOrReturnError(versionFilter.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
         ReturnErrorOnFailure(
-            mpImEngine->PushFrontDataVersionFilterList(mpDataVersionFilterList, versionFilter));
+            mManagementCallback.GetReadHandlerImEngine()->PushFrontDataVersionFilterList(mpDataVersionFilterList, versionFilter));
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -546,7 +548,7 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
         ReturnErrorOnFailure(path.ParsePath(event));
-        ReturnErrorOnFailure(mpImEngine->PushFrontEventPathParamsList(mpEventPathList, event));
+        ReturnErrorOnFailure(mManagementCallback.GetReadHandlerImEngine()->PushFrontEventPathParamsList(mpEventPathList, event));
     }
 
     // if we have exhausted this container
@@ -606,7 +608,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
 
     if (IsAwaitingReportResponse() && aTargetState != HandlerState::AwaitingReportResponse)
     {
-        mpImEngine->GetReportingEngine().OnReportConfirm();
+        mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().OnReportConfirm();
     }
 
     mState = aTargetState;
@@ -620,7 +622,7 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
     {
         if (ShouldReportUnscheduled())
         {
-            mpImEngine->GetReportingEngine().ScheduleRun();
+            mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().ScheduleRun();
         }
         else
         {
@@ -816,7 +818,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
 void ReadHandler::PersistSubscription()
 {
-    auto * subscriptionResumptionStorage = mpImEngine->GetSubscriptionResumptionStorage();
+    auto * subscriptionResumptionStorage = mManagementCallback.GetReadHandlerImEngine()->GetSubscriptionResumptionStorage();
     VerifyOrReturn(subscriptionResumptionStorage != nullptr);
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo = { .mNodeId         = GetInitiatorNodeId(),
@@ -845,7 +847,7 @@ void ReadHandler::AttributePathIsDirty(const AttributePathParams & aAttributeCha
 {
     ConcreteAttributePath path;
 
-    mDirtyGeneration = mpImEngine->GetReportingEngine().GetDirtySetGeneration();
+    mDirtyGeneration = mManagementCallback.GetReadHandlerImEngine()->GetReportingEngine().GetDirtySetGeneration();
 
     // We won't reset the path iterator for every AttributePathIsDirty call to reduce the number of full data reports.
     // The iterator will be reset after finishing each report session.
