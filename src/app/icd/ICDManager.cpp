@@ -580,7 +580,7 @@ bool ICDManager::CheckInMessagesWouldBeSent()
         }
     }
 
-    // None of the registrations would require
+    // None of the registrations would require a Check-In message
     return false;
 }
 
