@@ -166,5 +166,5 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         f'has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), '
         'and is available as [bold red]devCtrl')
 
-
-main()
+if __name__ == "__main__":
+    main()
