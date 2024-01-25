@@ -6568,7 +6568,7 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PresentMessagesRequest",
                 "args": {
-                    "messages": "MessageStruct",
+                    "messages": "bytes",
                 },
             },
             0x00000001: {
@@ -6585,6 +6585,7 @@ class ChipClusters:
                 "attributeId": 0x00000000,
                 "type": "",
                 "reportable": True,
+                "writable": True,
             },
             0x00000001: {
                 "attributeName": "ActiveMessageIDs",

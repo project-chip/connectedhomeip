@@ -31,6 +31,9 @@ import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
+import matter.controller.WriteRequest
+import matter.controller.WriteRequests
+import matter.controller.WriteResponse
 import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
@@ -102,7 +105,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun presentMessagesRequest(
-    messages: List<MessagesClusterMessageStruct>,
+    messages: List<ByteArray>,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
@@ -113,7 +116,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
     val TAG_MESSAGES_REQ: Int = 0
     tlvWriter.startArray(ContextSpecificTag(TAG_MESSAGES_REQ))
     for (item in messages.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
+      tlvWriter.put(AnonymousTag, item)
     }
     tlvWriter.endArray()
     tlvWriter.endStructure()
@@ -193,6 +196,53 @@ class MessagesCluster(private val controller: MatterController, private val endp
       }
 
     return MessagesAttribute(decodedValue)
+  }
+
+  suspend fun writeMessagesAttribute(
+    value: List<MessagesClusterMessageStruct>,
+    timedWriteTimeout: Duration? = null
+  ) {
+    val ATTRIBUTE_ID: UInt = 0u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startArray(AnonymousTag)
+    for (item in value.iterator()) {
+      item.toTlv(AnonymousTag, tlvWriter)
+    }
+    tlvWriter.endArray()
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timedWriteTimeout
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
   }
 
   suspend fun subscribeMessagesAttribute(

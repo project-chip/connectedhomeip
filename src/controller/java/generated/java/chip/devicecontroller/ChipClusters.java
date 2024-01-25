@@ -29208,16 +29208,16 @@ public class ChipClusters {
       return 0L;
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messages) {
       presentMessagesRequest(callback, messages, 0);
     }
 
-    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages, int timedInvokeTimeoutMs) {
+    public void presentMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messages, int timedInvokeTimeoutMs) {
       final long commandId = 0L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long messagesFieldID = 0L;
-      BaseTLVType messagestlvValue = ArrayType.generateArrayType(messages, (elementmessages) -> elementmessages.encodeTlv());
+      BaseTLVType messagestlvValue = ArrayType.generateArrayType(messages, (elementmessages) -> new ByteArrayType(elementmessages));
       elements.add(new StructElement(messagesFieldID, messagestlvValue));
 
       StructType value = new StructType(elements);
@@ -29288,6 +29288,15 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, MESSAGES_ATTRIBUTE_ID, isFabricFiltered);
+    }
+
+    public void writeMessagesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> value) {
+      writeMessagesAttribute(callback, value, 0);
+    }
+
+    public void writeMessagesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
+      writeAttribute(new WriteAttributesCallbackImpl(callback), MESSAGES_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
     public void subscribeMessagesAttribute(

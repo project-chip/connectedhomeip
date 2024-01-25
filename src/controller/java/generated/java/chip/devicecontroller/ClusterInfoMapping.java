@@ -23725,11 +23725,13 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> messagespresentMessagesRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
+    CommandParameterInfo messagespresentMessagesRequestmessagesCommandParameterInfo = new CommandParameterInfo("messages", ArrayList.class, ArrayList.class);
+    messagespresentMessagesRequestCommandParams.put("messages",messagespresentMessagesRequestmessagesCommandParameterInfo);
     InteractionInfo messagespresentMessagesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MessagesCluster) cluster)
         .presentMessagesRequest((DefaultClusterCallback) callback
-        , (ArrayList<ChipStructs.MessagesClusterMessageStruct>)
+        , (ArrayList<byte[]>)
         commandArguments.get("messages")
         );
       },

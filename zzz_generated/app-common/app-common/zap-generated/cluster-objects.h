@@ -21122,7 +21122,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::List<const Structs::MessageStruct::Type> messages;
+    DataModel::List<const chip::ByteSpan> messages;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21137,7 +21137,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::DecodableList<Structs::MessageStruct::DecodableType> messages;
+    DataModel::DecodableList<chip::ByteSpan> messages;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PresentMessagesRequest

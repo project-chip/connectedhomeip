@@ -4437,7 +4437,7 @@ provisional cluster Messages = 151 {
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
-  readonly attribute MessageStruct messages[] = 0;
+  attribute MessageStruct messages[] = 0;
   readonly attribute octet_string activeMessageIDs[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4447,7 +4447,7 @@ provisional cluster Messages = 151 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct PresentMessagesRequestRequest {
-    MessageStruct messages[] = 0;
+    octet_string messages[] = 0;
   }
 
   request struct CancelMessagesRequestRequest {

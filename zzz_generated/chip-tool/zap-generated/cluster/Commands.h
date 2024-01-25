@@ -6856,8 +6856,7 @@ public:
 
 private:
     chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>
-        mComplex_Messages;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_Messages;
 };
 
 /*
@@ -20337,7 +20336,7 @@ void registerClusterMessages(Commands & commands, CredentialIssuerCommands * cre
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>>(
-            Id, "messages", Attributes::Messages::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "messages", Attributes::Messages::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::ByteSpan>>>(
             Id, "active-message-ids", Attributes::ActiveMessageIDs::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(

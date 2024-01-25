@@ -59,7 +59,7 @@ limitations under the License.
     <item fieldId="3" name="StartTime" type="epoch_s" default="0" optional="false" isNullable="true"/>
     <item fieldId="4" name="Duration" type="int16u" default="0" optional="false" isNullable="true"/>
     <item fieldId="5" name="MessageText" type="char_string" length="256" optional="false"/>
-    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" optional="true"/>
+    <item fieldId="6" name="Responses" type="MessageResponseOptionStruct" array="true" length="4" optional="true"/>
   </struct>
 
   <struct name="MessageResponseOptionStruct">
@@ -77,13 +77,13 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/><!-- Revision   -->
-    <attribute side="server" code="0x0000" define="MESSAGES_CLUSTER_MESSAGES" type="ARRAY" entryType="MessageStruct" writable="false" max="8" optional="false">Messages</attribute>
+    <attribute side="server" code="0x0000" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8" writable="true" optional="false">Messages</attribute>
     <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8" writable="false" optional="false">ActiveMessageIDs</attribute>
     <command source="client" code="0x00" name="PresentMessagesRequest" isFabricScoped="true" optional="false">
       <description>
         Command for requesting messages be presented
       </description>
-      <arg name="Messages" type="MessageStruct" array="true" optional="false"/>
+      <arg name="Messages" type="octet_string" array="true" optional="false"/>
     </command>
     <command source="client" code="0x01" name="CancelMessagesRequest" isFabricScoped="true" optional="false">
       <description>
