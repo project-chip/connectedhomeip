@@ -18,10 +18,11 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/icd/ICDConfig.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDManager.h>
-#include <app/icd/ICDMonitoringTable.h>
+#include <app/InteractionModelEngine.h>
+#include <app/icd/server/ICDServerConfig.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>

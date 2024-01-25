@@ -18,11 +18,11 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/SubscriptionManager.h>
-#include <app/icd/ICDCheckInSender.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDMonitoringTable.h>
-#include <app/icd/ICDNotifier.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/icd/server/ICDCheckInSender.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDMonitoringTable.h>
+#include <app/icd/server/ICDNotifier.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>

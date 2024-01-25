@@ -16,7 +16,7 @@
  */
 #pragma once
 
-#include <app/icd/ICDMonitoringTable.h>
+#include <app/icd/server/ICDMonitoringTable.h>
 #include <credentials/FabricTable.h>
 #include <lib/address_resolve/AddressResolve.h>
 
