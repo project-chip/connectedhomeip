@@ -74,6 +74,9 @@ public:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
+    CHIP_ERROR _GetNetworkSSID(char * ssid);
+    CHIP_ERROR _GetNetworkPassword(char * credentials);
+    CHIP_ERROR _DisconnectNetwork(void);
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
     static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
@@ -219,6 +222,24 @@ template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPStateToStr(ConnectivityManager::WiFiAPState state)
 {
     return nullptr;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetNetworkSSID(char * ssid)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_GetNetworkPassword(char * credentials)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_DisconnectNetwork(void)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 } // namespace Internal

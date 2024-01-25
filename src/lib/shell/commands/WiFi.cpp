@@ -19,11 +19,14 @@
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
 #include <lib/shell/streamer.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/NetworkCommissioning.h>
 
 using chip::DeviceLayer::ConnectivityManager;
 using chip::DeviceLayer::ConnectivityMgr;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace Shell {
@@ -102,15 +105,172 @@ static CHIP_ERROR WiFiModeHandler(int argc, char ** argv)
     return SetWiFiMode(argv[0]);
 }
 
+static CHIP_ERROR WifiAddNetwork(char * ssid, char * password)
+{
+    if (ConnectivityMgr().GetDriver() == nullptr)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    uint8_t networkIndex;
+    chip::MutableCharSpan debugText;
+    chip::ByteSpan ssidSpan;
+    chip::ByteSpan passwordSpan;
+
+    ssidSpan     = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
+    passwordSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(password), strlen(password));
+
+    if (IsSpanUsable(ssidSpan) && IsSpanUsable(passwordSpan))
+    {
+        ChipLogProgress(DeviceLayer, "[Shell] Adding/Updating network %s", ssidSpan.data());
+
+        /* AddOrUpdateNetwork() checks ssid length and password length. The network info is not persistent. */
+        ConnectivityMgr().GetDriver()->AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, networkIndex);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
 static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
+{
+    if (ConnectivityMgr().GetDriver() == nullptr)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /* Command accepts running either without arguments or either with SSID and password */
+    /* Running without arguments implies that "wifi add ssid password" was executed before */
+    if ((argc != 0) && (argc != 2))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    chip::ByteSpan ssidSpan;
+    bool connectToNetwork = false;
+
+    if (argc == 0)
+    {
+        /* Retrieve previously added SSID */
+        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = { 0 };
+
+        ConnectivityMgr().GetNetworkSSID((char *) &ssid);
+        ssidSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
+
+        if (IsSpanUsable(ssidSpan))
+        {
+            connectToNetwork = true;
+        }
+        else
+        {
+            ChipLogError(
+                DeviceLayer,
+                "[Shell] No network credentials found! Please add using <wifi add ssid password> or <wifi connect ssid password>");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+    else if (argc == 2)
+    {
+        ssidSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(argv[0]), strlen(argv[0]));
+
+        if ((IsSpanUsable(ssidSpan)) && (WifiAddNetwork(argv[0], argv[1]) == CHIP_NO_ERROR))
+        {
+            connectToNetwork = true;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "[Shell] Failed to add network credentials!");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+
+    if (connectToNetwork == true)
+    {
+        ChipLogProgress(DeviceLayer, "[Shell] Progress: Connecting to network");
+        /* Connection event will be returned in OnWiFiConnectivityChange from DeviceCallbacks.cpp */
+        ConnectivityMgr().GetDriver()->ConnectNetwork(ssidSpan, nullptr);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR WiFiDisconnectHandler(int argc, char ** argv)
+{
+    if (argc != 0)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    return ConnectivityMgr().DisconnectNetwork();
+}
+
+static CHIP_ERROR WiFiAddNwkHandler(int argc, char ** argv)
 {
     if (argc != 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // TODO:Provision WiFi using WirelessDriver
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return WifiAddNetwork(argv[0], argv[1]);
+}
+
+static CHIP_ERROR WiFiRemoveNwkHandler(int argc, char ** argv)
+{
+    if (ConnectivityMgr().GetDriver() == nullptr)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    chip::DeviceLayer::NetworkCommissioning::Status status;
+    uint8_t networkIndex;
+    chip::ByteSpan ssidSpan;
+    char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = { 0 };
+    chip::MutableCharSpan debugText;
+
+    ConnectivityMgr().GetNetworkSSID((char *) &ssid);
+    ssidSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
+
+    status = ConnectivityMgr().GetDriver()->RemoveNetwork(ssidSpan, debugText, networkIndex);
+
+    if (status != chip::DeviceLayer::NetworkCommissioning::Status::kSuccess)
+    {
+        ChipLogError(DeviceLayer, "[Shell] Error: RemoveNetwork: %u", (uint8_t) status);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR WiFiScanHandler(int argc, char ** argv)
+{
+    if (ConnectivityMgr().GetDriver() == nullptr)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /* Command accepts running either without arguments or either with ssid */
+    /* Running with argument ssid shall restrict the scan to the interested ssid */
+    if ((argc != 0) && (argc != 1))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    chip::ByteSpan ssidSpan;
+
+    if (argc == 0)
+    {
+        ssidSpan = chip::ByteSpan();
+    }
+    else if (argc == 1)
+    {
+        ssidSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(argv[0]), strlen(argv[0]));
+    }
+
+    ConnectivityMgr().GetDriver()->ScanNetworks(ssidSpan, nullptr);
+
+    return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR WiFiDispatch(int argc, char ** argv)
@@ -127,8 +287,12 @@ void RegisterWiFiCommands()
     /// Subcommands for root command: `device <subcommand>`
     static const shell_command_t sWiFiSubCommands[] = {
         { &WiFiHelpHandler, "help", "" },
-        { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]." },
-        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect ssid psk." },
+        { &WiFiModeHandler, "mode", "Get/Set wifi mode. Usage: wifi mode [disable|ap|sta]" },
+        { &WiFiConnectHandler, "connect", "Connect to AP. Usage: wifi connect <ssid> <psk>. ssid and psk are optional." },
+        { &WiFiDisconnectHandler, "disconnect", "Disconnect device from AP. Usage: wifi disconnect" },
+        { &WiFiAddNwkHandler, "add", "Add credentials for Wi-Fi network. Usage: wifi add <ssid> <psk>" },
+        { &WiFiRemoveNwkHandler, "remove", "Remove credentials for Wi-Fi network. Usage: wifi remove <ssid>" },
+        { &WiFiScanHandler, "scan", "Scan for Wi-Fi networks. Usage: wifi scan <ssid>. ssid is optional." },
     };
     static const shell_command_t sWiFiCommand = { &WiFiDispatch, "wifi", "Usage: wifi <subcommand>" };
 
