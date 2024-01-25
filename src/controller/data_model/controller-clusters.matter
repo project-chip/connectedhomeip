@@ -4412,13 +4412,13 @@ provisional cluster Messages = 151 {
   }
 
   fabric_scoped struct MessageStruct {
-    fabric_sensitive octet_string<16> messageID = 0;
-    fabric_sensitive MessagePriorityEnum priority = 1;
-    fabric_sensitive MessageControlBitmap messageControl = 2;
-    nullable fabric_sensitive epoch_s startTime = 3;
-    nullable fabric_sensitive int16u duration = 4;
-    fabric_sensitive char_string<256> messageText = 5;
-    optional fabric_sensitive MessageResponseOptionStruct responses[] = 6;
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControlBitmap messageControl = 2;
+    nullable epoch_s startTime = 3;
+    nullable int16u duration = 4;
+    char_string<256> messageText = 5;
+    optional MessageResponseOptionStruct responses[] = 6;
     fabric_idx fabricIndex = 254;
   }
 
