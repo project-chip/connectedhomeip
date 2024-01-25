@@ -88,8 +88,8 @@ source_set("paths") {
 
   # This source sets also depends on basic-types.h that is not in any dependency we can use
   public_deps = [
-    "${chip_root}/src/lib/core",
     ":app_config",
+    "${chip_root}/src/lib/core",
   ]
 }
 
