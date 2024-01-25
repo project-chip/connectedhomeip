@@ -88,6 +88,20 @@ source_set("global-attributes") {
   sources = [ "GlobalAttributes.h" ]
 }
 
+source_set("pre-encoded-value") {
+  sources = [
+    "data-model/FabricScopedPreEncodedValue.cpp",
+    "data-model/FabricScopedPreEncodedValue.h",
+    "data-model/PreEncodedValue.cpp",
+    "data-model/PreEncodedValue.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
 source_set("message-def") {
   sources = [
     "MessageDef/ArrayBuilder.cpp",
@@ -182,6 +196,13 @@ config("config-controller-dynamic-server") {
   ]
 }
 
+source_set("persist-subscirptions") {
+  sources = []
+}
+
+# interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
+# which in tern depens on the interaction-model.
+# Using source_set prevents the unit test to build correctly.
 static_library("interaction-model") {
   sources = [
     "CASEClient.cpp",
@@ -214,15 +235,6 @@ static_library("interaction-model") {
     "reporting/reporting.h",
   ]
 
-  if (chip_persist_subscriptions) {
-    sources += [
-      "SimpleSubscriptionResumptionStorage.cpp",
-      "SimpleSubscriptionResumptionStorage.h",
-      "SubscriptionResumptionSessionEstablisher.cpp",
-      "SubscriptionResumptionSessionEstablisher.h",
-    ]
-  }
-
   public_deps = [
     ":app_config",
     ":message-def",
@@ -237,6 +249,15 @@ static_library("interaction-model") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+
+  if (chip_persist_subscriptions) {
+    sources += [
+      "SimpleSubscriptionResumptionStorage.cpp",
+      "SimpleSubscriptionResumptionStorage.h",
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
+    ]
+  }
 
   if (chip_build_controller_dynamic_server) {
     sources += [
@@ -257,6 +278,8 @@ static_library("interaction-model") {
   }
 }
 
+# Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
+# This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
 static_library("app") {
   output_name = "libCHIPDataModel"
 
@@ -287,16 +310,13 @@ static_library("app") {
     "TimerDelegates.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
-    "data-model/FabricScopedPreEncodedValue.cpp",
-    "data-model/FabricScopedPreEncodedValue.h",
-    "data-model/PreEncodedValue.cpp",
-    "data-model/PreEncodedValue.h",
   ]
 
   public_deps = [
     ":app_config",
     ":global-attributes",
     ":interaction-model",
+    ":pre-encoded-value",
     ":revision_info",
     "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/lib/address_resolve",
