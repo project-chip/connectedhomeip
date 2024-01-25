@@ -89,7 +89,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
                 for t in m.modeTags:
                     # * the values of the Value fields that are not larger than 16 bits
                     if t.value > 0xFFFF or t.value < 0:
-                        asserts.fail("Mode tage values must not be lager tha 16 bits!")
+                        asserts.fail("Mode tag values must not be larger than 16 bits!")
 
                     # * for each Value field: {isCommonOrDerivedOrMfgTagsVal}
                     is_mfg = (0x8000 <= t.value <= 0xBFFF)
@@ -129,7 +129,7 @@ class TC_RVCRUNM_1_2(MatterBaseTest):
 
                 if count_of_idle_cleaning_or_mapping_mode_tags > 1:
                     asserts.fail("A ModeOptionsStruct entry includes more than one of the following "
-                                 "mode tags: Idle(0x4000), Cleaning(0x4001), _Mapping(0x4002)!")
+                                 "mode tags: Idle(0x4000), Cleaning(0x4001), Mapping(0x4002)!")
 
             asserts.assert_true(at_least_one_idle_mode_tag,
                                 "The Supported Modes does not have an entry of Idle(0x4000)")

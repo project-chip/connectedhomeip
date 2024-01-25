@@ -115,7 +115,7 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
                     break
 
             asserts.assert_true(has_vacuum_or_mop_mode_tag,
-                                "At least one ModeOptionsStruct entry must include either the ")
+                                "At least one ModeOptionsStruct entry must include either the Vacuum or Mop mode tag")
 
         if self.check_pics("RVCCLEANM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")
