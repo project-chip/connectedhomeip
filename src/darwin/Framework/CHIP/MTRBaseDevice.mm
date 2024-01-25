@@ -743,6 +743,27 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
+NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, id> * value, NSError * __autoreleasing * error)
+{
+    // A single data item cannot be bigger than a packet, so just use 1200 bytes
+    // as the max size of our buffer.  This assumes that lists will not be
+    // passed as-is to this method but will get chunked, with each list item
+    // passed to this method separately.
+    uint8_t buffer[1200];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+
+    CHIP_ERROR err = MTREncodeTLVFromDataValueDictionary(value, writer, TLV::AnonymousTag());
+    if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
+        return nil;
+    }
+
+    return AsData(ByteSpan(buffer, writer.GetLengthWritten()));
+}
+
 // Callback type to pass data value as an NSObject
 typedef void (*MTRDataValueDictionaryCallback)(void * context, id value);
 

@@ -230,4 +230,10 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
 NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
 
+// Convert a data-value dictionary as described in MTRDeviceResponseHandler into
+// TLV Data with an anonymous tag.  This method assumes the encoding of the
+// value fits in a single UDP MTU; for lists this method might need to be used
+// on each list item separately.
+NSData * _Nullable MTREncodeTLVFromDataValueDictionary(NSDictionary<NSString *, id> * value, NSError * __autoreleasing * error);
+
 NS_ASSUME_NONNULL_END
