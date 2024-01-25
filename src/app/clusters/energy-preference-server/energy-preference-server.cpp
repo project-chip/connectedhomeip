@@ -24,7 +24,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/util/error-mapping.h>
 #include <lib/core/CHIPEncoding.h>
 
@@ -45,7 +44,6 @@ public:
     EnergyPrefAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), EnergyPreference::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 };
 
 EnergyPrefAttrAccess gEnergyPrefAttrAccess;
@@ -56,16 +54,16 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
     EndpointId endpoint = aPath.mEndpointId;
     uint32_t ourFeatureMap;
-    bool balanceSupported = (FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
-        ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
-    bool lowPowerSupported = (ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0;
+    const bool featureMapIsGood = FeatureMap::Get(aPath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
+    const bool balanceSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
+    const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
     switch (aPath.mAttributeId)
     {
     case EnergyBalances::Id:
         if (!balanceSupported)
         {
-            return aEncoder.EncodeNull();
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
 
         if (gsDelegate != nullptr)
@@ -90,7 +88,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case EnergyPriorities::Id:
         if (balanceSupported == false)
         {
-            return aEncoder.EncodeNull();
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
 
         if (gsDelegate != nullptr)
@@ -115,7 +113,7 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     case LowPowerModeSensitivities::Id:
         if (lowPowerSupported == false)
         {
-            return aEncoder.EncodeNull();
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
 
         if (gsDelegate != nullptr)
@@ -144,14 +142,6 @@ CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EnergyPrefAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    VerifyOrDie(aPath.mClusterId == EnergyPreference::Id);
-
-    // return CHIP_NO_ERROR and just write to the attribute store in default
-    return CHIP_NO_ERROR;
-}
-
 } // anonymous namespace
 
 namespace chip::app::Clusters::EnergyPreference
@@ -170,15 +160,15 @@ Delegate * GetDelegate()
 } // Set matter energy preferences delegate
 
 Protocols::InteractionModel::Status
-MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
+MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EndpointId endpoint                 = attributePath.mEndpointId;
     Delegate * delegate = GetDelegate();
     uint32_t ourFeatureMap;
-    bool balanceSupported = (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
-        ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
-    bool lowPowerSupported = (ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0;
+    const bool featureMapIsGood = FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS;
+    const bool balanceSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
+    const bool lowPowerSupported = featureMapIsGood && ((ourFeatureMap & to_underlying(Feature::kLowPowerModeSensitivity)) != 0);
 
     if (delegate == nullptr)
         return imcode::UnsupportedWrite;
