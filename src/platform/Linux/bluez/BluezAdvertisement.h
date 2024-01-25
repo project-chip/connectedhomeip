@@ -39,14 +39,18 @@ class BluezEndpoint;
 class BluezAdvertisement
 {
 public:
+    using ServiceDataFlags = uint16_t;
     // Minimum and maximum advertising intervals in units of 0.625ms.
     using AdvertisingIntervals = std::pair<uint16_t, uint16_t>;
+
+    static constexpr ServiceDataFlags kServiceDataNone                 = 0;
+    static constexpr ServiceDataFlags kServiceDataExtendedAnnouncement = 1 << 0;
 
     BluezAdvertisement() = default;
     ~BluezAdvertisement() { Shutdown(); }
 
     CHIP_ERROR Init(const BluezEndpoint & aEndpoint, const char * aAdvUUID);
-    CHIP_ERROR SetupServiceData(bool aExtendedAnnouncement);
+    CHIP_ERROR SetupServiceData(ServiceDataFlags aFlags);
     CHIP_ERROR SetIntervals(AdvertisingIntervals aAdvIntervals);
     void Shutdown();
 

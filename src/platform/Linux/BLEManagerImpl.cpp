@@ -601,7 +601,13 @@ void BLEManagerImpl::DriveBLEState()
             }
 
             // Setup service data for advertising.
-            SuccessOrExit(err = mBLEAdvertisement.SetupServiceData(mFlags.Has(Flags::kExtAdvertisingEnabled)));
+            auto serviceDataFlags = BluezAdvertisement::kServiceDataNone;
+#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
+            if (mFlags.Has(Flags::kExtAdvertisingEnabled))
+                serviceDataFlags |= BluezAdvertisement::kServiceDataExtendedAnnouncement;
+#endif
+            SuccessOrExit(err = mBLEAdvertisement.SetupServiceData(serviceDataFlags));
+
             // Set or update the advertising intervals.
             SuccessOrExit(err = mBLEAdvertisement.SetIntervals(GetAdvertisingIntervals()));
 
@@ -667,17 +673,15 @@ void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appSta
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
         self->mFlags.Clear(Flags::kExtAdvertisingEnabled);
         DeviceLayer::SystemLayer().StartTimer(kSlowAdvertiseTimeout, HandleAdvertisingTimer, self);
-#endif
     }
-#if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
     else
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start extended advertisement");
         self->mFlags.Set(Flags::kExtAdvertisingEnabled);
-        // This should trigger advertising update/refresh.
+        // This will trigger advertising intervals update in the DriveBLEState() function.
         self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
-    }
 #endif
+    }
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)

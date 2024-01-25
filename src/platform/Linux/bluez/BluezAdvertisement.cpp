@@ -153,7 +153,7 @@ CHIP_ERROR BluezAdvertisement::SetIntervals(AdvertisingIntervals aAdvIntervals)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezAdvertisement::SetupServiceData(bool aExtendedAnnouncement)
+CHIP_ERROR BluezAdvertisement::SetupServiceData(ServiceDataFlags aFlags)
 {
     VerifyOrReturnError(mpAdv != nullptr, CHIP_ERROR_UNINITIALIZED);
 
@@ -165,7 +165,7 @@ CHIP_ERROR BluezAdvertisement::SetupServiceData(bool aExtendedAnnouncement)
 #endif
 
 #if CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING
-    if (aExtendedAnnouncement)
+    if (aFlags & kServiceDataExtendedAnnouncement)
     {
         deviceInfo.SetExtendedAnnouncementFlag(true);
         // In case of extended advertisement, specification requires that
