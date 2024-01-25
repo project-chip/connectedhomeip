@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ import asyncio
 from typing import Dict, List
 
 from mdns_discovery.exceptions import DiscoveryNotPerformedError
-from zeroconf import ServiceStateChange, Zeroconf
+from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo
 
 from .mdns_type_enum import MdnsType
@@ -47,10 +47,10 @@ class MdnsDiscovery:
             dut_operational_service_name (str): The operational service name for the DUT (Device Under Test).
 
         Main methods, return a list of service info dicts, each dict has keys for querying values
-            - getCommissionerServiceInfo()
-            - getCommissionableServiceInfo()
-            - getOperationalServiceInfo()
-            - getBorderRouterServiceInfo()
+            - get_commissioner_service_info()
+            - get_commissionable_service_info()
+            - get_operational_service_info()
+            - get_border_router_service_info()
 
         Keys:
             - service_name: The unique name of the mDNS service.
@@ -104,7 +104,7 @@ class MdnsDiscovery:
             None: This method does not return any value. The results of the service discovery
                   are handled by the callback function.
         """
-        self._zc = Zeroconf()
+        self._zc = Zeroconf(ip_version=IPVersion.V6Only)
         self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsType}
         self._aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
                                                type_=self._service_types,
@@ -232,7 +232,7 @@ class MdnsDiscovery:
 
         return self._discovered_services[mdns_type.name]
 
-    def getCommissionerServiceInfo(self) -> List[Dict[str, any]]:
+    def get_commissioner_service_info(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Commissioner services.
 
@@ -241,7 +241,7 @@ class MdnsDiscovery:
         """
         return self._getServiceInfo(MdnsType.COMMISSIONER)
 
-    def getCommissionableServiceInfo(self) -> List[Dict[str, any]]:
+    def get_commissionable_service_info(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Commissionable services.
 
@@ -250,7 +250,7 @@ class MdnsDiscovery:
         """
         return self._getServiceInfo(MdnsType.COMMISSIONABLE)
 
-    def getOperationalServiceInfo(self) -> List[Dict[str, any]]:
+    def get_operational_service_info(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Operational services.
 
@@ -259,7 +259,7 @@ class MdnsDiscovery:
         """
         return self._getServiceInfo(MdnsType.OPERATIONAL)
 
-    def getBorderRouterServiceInfo(self) -> List[Dict[str, any]]:
+    def get_border_router_service_info(self) -> List[Dict[str, any]]:
         """
         Retrieves the service information for Border Router services.
 
