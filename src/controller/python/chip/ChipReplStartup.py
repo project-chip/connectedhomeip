@@ -4,10 +4,8 @@ import builtins
 import logging
 import os
 import pathlib
-import sys
 
 import chip.CertificateAuthority
-import chip.clusters as Clusters
 import chip.FabricAdmin
 import chip.logging
 import chip.native
