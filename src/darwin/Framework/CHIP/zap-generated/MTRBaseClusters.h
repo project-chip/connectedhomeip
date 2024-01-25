@@ -17638,12 +17638,12 @@ typedef NS_OPTIONS(uint32_t, MTRMessagesFeature) {
     MTRMessagesFeatureProtectedMessages MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRMessagesMessageControlBitmap) {
+typedef NS_OPTIONS(uint8_t, MTRMessagesMessageControlBitmap) {
     MTRMessagesMessageControlBitmapConfirmationRequired MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRMessagesMessageControlBitmapResponseRequired MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRMessagesMessageControlBitmapReplyMessage MTR_PROVISIONALLY_AVAILABLE = 0x3,
-    MTRMessagesMessageControlBitmapMessageConfirmed MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRMessagesMessageControlBitmapMessageProtected MTR_PROVISIONALLY_AVAILABLE = 0x5,
+    MTRMessagesMessageControlBitmapReplyMessage MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRMessagesMessageControlBitmapMessageConfirmed MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRMessagesMessageControlBitmapMessageProtected MTR_PROVISIONALLY_AVAILABLE = 0x10,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDeviceEnergyManagementAdjustmentCause) {

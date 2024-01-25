@@ -2410,13 +2410,13 @@ enum class Feature : uint32_t
 };
 
 // Bitmap for MessageControlBitmap
-enum class MessageControlBitmap : uint32_t
+enum class MessageControlBitmap : uint8_t
 {
     kConfirmationRequired = 0x1,
     kResponseRequired     = 0x2,
-    kReplyMessage         = 0x3,
-    kMessageConfirmed     = 0x4,
-    kMessageProtected     = 0x5,
+    kReplyMessage         = 0x4,
+    kMessageConfirmed     = 0x8,
+    kMessageProtected     = 0x10,
 };
 } // namespace Messages
 

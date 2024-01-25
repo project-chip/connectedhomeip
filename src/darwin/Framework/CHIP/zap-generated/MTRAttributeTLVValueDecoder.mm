@@ -8272,7 +8272,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
                 newElement_0 = [MTRMessagesClusterMessageStruct new];
                 newElement_0.messageID = AsData(entry_0.messageID);
                 newElement_0.priority = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.priority)];
-                newElement_0.messageControl = [NSNumber numberWithUnsignedInt:entry_0.messageControl.Raw()];
+                newElement_0.messageControl = [NSNumber numberWithUnsignedChar:entry_0.messageControl.Raw()];
                 if (entry_0.startTime.IsNull()) {
                     newElement_0.startTime = nil;
                 } else {
@@ -8297,12 +8297,20 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
                             auto & entry_3 = iter_3.GetValue();
                             MTRMessagesClusterMessageResponseOptionStruct * newElement_3;
                             newElement_3 = [MTRMessagesClusterMessageResponseOptionStruct new];
-                            newElement_3.messageResponseID = [NSNumber numberWithUnsignedInt:entry_3.messageResponseID];
-                            newElement_3.label = AsString(entry_3.label);
-                            if (newElement_3.label == nil) {
-                                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                                *aError = err;
-                                return nil;
+                            if (entry_3.messageResponseID.HasValue()) {
+                                newElement_3.messageResponseID = [NSNumber numberWithUnsignedInt:entry_3.messageResponseID.Value()];
+                            } else {
+                                newElement_3.messageResponseID = nil;
+                            }
+                            if (entry_3.label.HasValue()) {
+                                newElement_3.label = AsString(entry_3.label.Value());
+                                if (newElement_3.label == nil) {
+                                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                                    *aError = err;
+                                    return nil;
+                                }
+                            } else {
+                                newElement_3.label = nil;
                             }
                             [array_3 addObject:newElement_3];
                         }

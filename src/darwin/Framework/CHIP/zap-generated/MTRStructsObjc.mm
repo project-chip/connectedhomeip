@@ -4818,9 +4818,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _messageResponseID = @(0);
+        _messageResponseID = nil;
 
-        _label = @"";
+        _label = nil;
     }
     return self;
 }

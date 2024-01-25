@@ -2798,18 +2798,19 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("MessageResponseOptionStruct.messageResponseID",
-                                                                  "messageResponseID", value.isMember("messageResponseID")));
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("MessageResponseOptionStruct.label", "label", value.isMember("label")));
-
     char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "messageResponseID");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.messageResponseID, value["messageResponseID"]));
+    if (value.isMember("messageResponseID"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "messageResponseID");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.messageResponseID, value["messageResponseID"]));
+    }
     valueCopy.removeMember("messageResponseID");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
+    if (value.isMember("label"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "label");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.label, value["label"]));
+    }
     valueCopy.removeMember("label");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);

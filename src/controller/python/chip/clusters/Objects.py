@@ -23216,9 +23216,9 @@ class Messages(Cluster):
         class MessageControlBitmap(IntFlag):
             kConfirmationRequired = 0x1
             kResponseRequired = 0x2
-            kReplyMessage = 0x3
-            kMessageConfirmed = 0x4
-            kMessageProtected = 0x5
+            kReplyMessage = 0x4
+            kMessageConfirmed = 0x8
+            kMessageProtected = 0x10
 
     class Structs:
         @dataclass
@@ -23227,12 +23227,12 @@ class Messages(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="messageResponseID", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="label", Tag=1, Type=str),
+                        ClusterObjectFieldDescriptor(Label="messageResponseID", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="label", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            messageResponseID: 'uint' = 0
-            label: 'str' = ""
+            messageResponseID: 'typing.Optional[uint]' = None
+            label: 'typing.Optional[str]' = None
 
         @dataclass
         class MessageStruct(ClusterObject):

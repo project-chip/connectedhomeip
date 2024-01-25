@@ -17,12 +17,16 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class MessagesClusterMessageResponseOptionStruct(val messageResponseID: ULong, val label: String) {
+class MessagesClusterMessageResponseOptionStruct(
+  val messageResponseID: Optional<ULong>,
+  val label: Optional<String>
+) {
   override fun toString(): String = buildString {
     append("MessagesClusterMessageResponseOptionStruct {\n")
     append("\tmessageResponseID : $messageResponseID\n")
@@ -33,8 +37,14 @@ class MessagesClusterMessageResponseOptionStruct(val messageResponseID: ULong, v
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      put(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D), messageResponseID)
-      put(ContextSpecificTag(TAG_LABEL), label)
+      if (messageResponseID.isPresent) {
+        val optmessageResponseID = messageResponseID.get()
+        put(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D), optmessageResponseID)
+      }
+      if (label.isPresent) {
+        val optlabel = label.get()
+        put(ContextSpecificTag(TAG_LABEL), optlabel)
+      }
       endStructure()
     }
   }
@@ -45,8 +55,18 @@ class MessagesClusterMessageResponseOptionStruct(val messageResponseID: ULong, v
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MessagesClusterMessageResponseOptionStruct {
       tlvReader.enterStructure(tlvTag)
-      val messageResponseID = tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D))
-      val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val messageResponseID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_RESPONSE_I_D)))
+        } else {
+          Optional.empty()
+        }
+      val label =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LABEL))) {
+          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_LABEL)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 

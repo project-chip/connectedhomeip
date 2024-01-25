@@ -21863,10 +21863,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            newElement_0_priorityCtorSignature.c_str(),
                                                                            jninewElement_0_priority, newElement_0_priority);
                 jobject newElement_0_messageControl;
-                std::string newElement_0_messageControlClassName     = "java/lang/Long";
-                std::string newElement_0_messageControlCtorSignature = "(J)V";
-                jlong jninewElement_0_messageControl                 = static_cast<jlong>(entry_0.messageControl.Raw());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                std::string newElement_0_messageControlClassName     = "java/lang/Integer";
+                std::string newElement_0_messageControlCtorSignature = "(I)V";
+                jint jninewElement_0_messageControl                  = static_cast<jint>(entry_0.messageControl.Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                     newElement_0_messageControlClassName.c_str(), newElement_0_messageControlCtorSignature.c_str(),
                     jninewElement_0_messageControl, newElement_0_messageControl);
                 jobject newElement_0_startTime;
@@ -21916,14 +21916,36 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         auto & entry_3 = iter_newElement_0_responsesInsideOptional_3.GetValue();
                         jobject newElement_3;
                         jobject newElement_3_messageResponseID;
-                        std::string newElement_3_messageResponseIDClassName     = "java/lang/Long";
-                        std::string newElement_3_messageResponseIDCtorSignature = "(J)V";
-                        jlong jninewElement_3_messageResponseID                 = static_cast<jlong>(entry_3.messageResponseID);
-                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                            newElement_3_messageResponseIDClassName.c_str(), newElement_3_messageResponseIDCtorSignature.c_str(),
-                            jninewElement_3_messageResponseID, newElement_3_messageResponseID);
+                        if (!entry_3.messageResponseID.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_messageResponseID);
+                        }
+                        else
+                        {
+                            jobject newElement_3_messageResponseIDInsideOptional;
+                            std::string newElement_3_messageResponseIDInsideOptionalClassName     = "java/lang/Long";
+                            std::string newElement_3_messageResponseIDInsideOptionalCtorSignature = "(J)V";
+                            jlong jninewElement_3_messageResponseIDInsideOptional =
+                                static_cast<jlong>(entry_3.messageResponseID.Value());
+                            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                                newElement_3_messageResponseIDInsideOptionalClassName.c_str(),
+                                newElement_3_messageResponseIDInsideOptionalCtorSignature.c_str(),
+                                jninewElement_3_messageResponseIDInsideOptional, newElement_3_messageResponseIDInsideOptional);
+                            chip::JniReferences::GetInstance().CreateOptional(newElement_3_messageResponseIDInsideOptional,
+                                                                              newElement_3_messageResponseID);
+                        }
                         jobject newElement_3_label;
-                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_3.label, newElement_3_label));
+                        if (!entry_3.label.HasValue())
+                        {
+                            chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_3_label);
+                        }
+                        else
+                        {
+                            jobject newElement_3_labelInsideOptional;
+                            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_3.label.Value(),
+                                                                                                 newElement_3_labelInsideOptional));
+                            chip::JniReferences::GetInstance().CreateOptional(newElement_3_labelInsideOptional, newElement_3_label);
+                        }
 
                         jclass messageResponseOptionStructStructClass_4;
                         err = chip::JniReferences::GetInstance().GetClassRef(
@@ -21937,7 +21959,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                         jmethodID messageResponseOptionStructStructCtor_4;
                         err = chip::JniReferences::GetInstance().FindMethod(env, messageResponseOptionStructStructClass_4, "<init>",
-                                                                            "(Ljava/lang/Long;Ljava/lang/String;)V",
+                                                                            "(Ljava/util/Optional;Ljava/util/Optional;)V",
                                                                             &messageResponseOptionStructStructCtor_4);
                         if (err != CHIP_NO_ERROR || messageResponseOptionStructStructCtor_4 == nullptr)
                         {
@@ -21972,7 +21994,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jmethodID messageStructStructCtor_1;
                 err = chip::JniReferences::GetInstance().FindMethod(
                     env, messageStructStructClass_1, "<init>",
-                    "([BLjava/lang/Integer;Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/util/"
+                    "([BLjava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;Ljava/lang/String;Ljava/util/"
                     "Optional;Ljava/lang/Integer;)V",
                     &messageStructStructCtor_1);
                 if (err != CHIP_NO_ERROR || messageStructStructCtor_1 == nullptr)

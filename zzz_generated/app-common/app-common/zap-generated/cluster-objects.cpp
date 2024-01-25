@@ -14904,16 +14904,38 @@ CHIP_ERROR Type::EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIn
 
 CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const
 {
+    bool includeSensitive = !aAccessingFabricIndex.HasValue() || (aAccessingFabricIndex.Value() == fabricIndex);
 
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
 
-    encoder.Encode(to_underlying(Fields::kMessageID), messageID);
-    encoder.Encode(to_underlying(Fields::kPriority), priority);
-    encoder.Encode(to_underlying(Fields::kMessageControl), messageControl);
-    encoder.Encode(to_underlying(Fields::kStartTime), startTime);
-    encoder.Encode(to_underlying(Fields::kDuration), duration);
-    encoder.Encode(to_underlying(Fields::kMessageText), messageText);
-    encoder.Encode(to_underlying(Fields::kResponses), responses);
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kMessageID), messageID);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kPriority), priority);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kMessageControl), messageControl);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kStartTime), startTime);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kDuration), duration);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kMessageText), messageText);
+    }
+    if (includeSensitive)
+    {
+        encoder.Encode(to_underlying(Fields::kResponses), responses);
+    }
     if (aAccessingFabricIndex.HasValue())
     {
         encoder.Encode(to_underlying(Fields::kFabricIndex), fabricIndex);

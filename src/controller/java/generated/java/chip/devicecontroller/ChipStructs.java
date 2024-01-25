@@ -6460,14 +6460,14 @@ public static class DemandResponseLoadControlClusterLoadControlProgramStruct {
   }
 }
 public static class MessagesClusterMessageResponseOptionStruct {
-  public Long messageResponseID;
-  public String label;
+  public Optional<Long> messageResponseID;
+  public Optional<String> label;
   private static final long MESSAGE_RESPONSE_I_D_ID = 0L;
   private static final long LABEL_ID = 1L;
 
   public MessagesClusterMessageResponseOptionStruct(
-    Long messageResponseID,
-    String label
+    Optional<Long> messageResponseID,
+    Optional<String> label
   ) {
     this.messageResponseID = messageResponseID;
     this.label = label;
@@ -6475,8 +6475,8 @@ public static class MessagesClusterMessageResponseOptionStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(MESSAGE_RESPONSE_I_D_ID, new UIntType(messageResponseID)));
-    values.add(new StructElement(LABEL_ID, new StringType(label)));
+    values.add(new StructElement(MESSAGE_RESPONSE_I_D_ID, messageResponseID.<BaseTLVType>map((nonOptionalmessageResponseID) -> new UIntType(nonOptionalmessageResponseID)).orElse(new EmptyType())));
+    values.add(new StructElement(LABEL_ID, label.<BaseTLVType>map((nonOptionallabel) -> new StringType(nonOptionallabel)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -6485,18 +6485,18 @@ public static class MessagesClusterMessageResponseOptionStruct {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Long messageResponseID = null;
-    String label = null;
+    Optional<Long> messageResponseID = Optional.empty();
+    Optional<String> label = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MESSAGE_RESPONSE_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          messageResponseID = castingValue.value(Long.class);
+          messageResponseID = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == LABEL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          label = castingValue.value(String.class);
+          label = Optional.of(castingValue.value(String.class));
         }
       }
     }
@@ -6523,7 +6523,7 @@ public static class MessagesClusterMessageResponseOptionStruct {
 public static class MessagesClusterMessageStruct {
   public byte[] messageID;
   public Integer priority;
-  public Long messageControl;
+  public Integer messageControl;
   public @Nullable Long startTime;
   public @Nullable Integer duration;
   public String messageText;
@@ -6541,7 +6541,7 @@ public static class MessagesClusterMessageStruct {
   public MessagesClusterMessageStruct(
     byte[] messageID,
     Integer priority,
-    Long messageControl,
+    Integer messageControl,
     @Nullable Long startTime,
     @Nullable Integer duration,
     String messageText,
@@ -6578,7 +6578,7 @@ public static class MessagesClusterMessageStruct {
     }
     byte[] messageID = null;
     Integer priority = null;
-    Long messageControl = null;
+    Integer messageControl = null;
     @Nullable Long startTime = null;
     @Nullable Integer duration = null;
     String messageText = null;
@@ -6598,7 +6598,7 @@ public static class MessagesClusterMessageStruct {
       } else if (element.contextTagNum() == MESSAGE_CONTROL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          messageControl = castingValue.value(Long.class);
+          messageControl = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == START_TIME_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {

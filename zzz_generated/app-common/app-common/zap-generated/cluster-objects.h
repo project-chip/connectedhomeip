@@ -21018,8 +21018,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    uint32_t messageResponseID = static_cast<uint32_t>(0);
-    chip::CharSpan label;
+    Optional<uint32_t> messageResponseID;
+    Optional<chip::CharSpan> label;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

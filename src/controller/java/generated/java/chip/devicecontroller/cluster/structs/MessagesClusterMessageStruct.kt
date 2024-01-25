@@ -27,7 +27,7 @@ import matter.tlv.TlvWriter
 class MessagesClusterMessageStruct(
   val messageID: ByteArray,
   val priority: UInt,
-  val messageControl: ULong,
+  val messageControl: UInt,
   val startTime: ULong?,
   val duration: UInt?,
   val messageText: String,
@@ -91,7 +91,7 @@ class MessagesClusterMessageStruct(
       tlvReader.enterStructure(tlvTag)
       val messageID = tlvReader.getByteArray(ContextSpecificTag(TAG_MESSAGE_I_D))
       val priority = tlvReader.getUInt(ContextSpecificTag(TAG_PRIORITY))
-      val messageControl = tlvReader.getULong(ContextSpecificTag(TAG_MESSAGE_CONTROL))
+      val messageControl = tlvReader.getUInt(ContextSpecificTag(TAG_MESSAGE_CONTROL))
       val startTime =
         if (!tlvReader.isNull()) {
           tlvReader.getULong(ContextSpecificTag(TAG_START_TIME))
