@@ -78,6 +78,8 @@ class {{asUpperCamelCase name}}(Cluster):
         class {{asType label}}(IntFlag):
 {{#zcl_bitmap_items}}
             k{{asUpperCamelCase label}} = {{asHex mask}}
+{{else}}
+            kInternalDoNotUseNone = 0
 {{/zcl_bitmap_items}}
 
 {{/zcl_bitmaps}}
