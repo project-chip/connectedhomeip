@@ -17,15 +17,12 @@
 
 #include "energy-preference-server.h"
 
-#include <app/util/af.h>
-
 #include <app/util/attribute-storage.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/error-mapping.h>
@@ -52,7 +49,7 @@ public:
 };
 
 EnergyPrefAttrAccess gEnergyPrefAttrAccess;
-EnergyPreferenceDelegate * gsDelegate = nullptr;
+Delegate * gsDelegate = nullptr;
 
 CHIP_ERROR EnergyPrefAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -157,22 +154,27 @@ CHIP_ERROR EnergyPrefAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
 
 } // anonymous namespace
 
-void SetMatterEnergyPreferencesDelegate(EnergyPreferenceDelegate * aDelegate)
+namespace chip::app::Clusters::EnergyPreference
+{
+
+void SetDelegate(Delegate * aDelegate)
 {
     gsDelegate = aDelegate;
 }
 
-EnergyPreferenceDelegate * GetMatterEnergyPreferencesDelegate()
+Delegate * GetDelegate()
 {
     return gsDelegate;
 }
+
+} // Set matter energy preferences delegate
 
 Protocols::InteractionModel::Status
 MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::ConcreteAttributePath & attributePath,
                                                                EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
     EndpointId endpoint                 = attributePath.mEndpointId;
-    EnergyPreferenceDelegate * delegate = GetMatterEnergyPreferencesDelegate();
+    Delegate * delegate = GetDelegate();
     uint32_t ourFeatureMap;
     bool balanceSupported = (FeatureMap::Get(attributePath.mEndpointId, &ourFeatureMap) == EMBER_ZCL_STATUS_SUCCESS) &&
         ((ourFeatureMap & to_underlying(Feature::kEnergyBalance)) != 0);
@@ -185,13 +187,15 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::Concre
     {
     case CurrentEnergyBalance::Id: {
         if (balanceSupported == false)
+        {
             return imcode::UnsupportedAttribute;
+        }
 
-        uint8_t index    = chip::Encoding::Get8(value);
+        uint8_t index    = Encoding::Get8(value);
         size_t arraySize = delegate->GetNumEnergyBalances(endpoint);
         if (index >= arraySize)
         {
-            return imcode::InvalidValue;
+            return imcode::ConstraintError;
         }
 
         return imcode::Success;
@@ -199,13 +203,15 @@ MatterEnergyPreferenceClusterServerPreAttributeChangedCallback(const app::Concre
 
     case CurrentLowPowerModeSensitivity::Id: {
         if (lowPowerSupported == false)
+        {
             return imcode::UnsupportedAttribute;
+        }
 
-        uint8_t index    = chip::Encoding::Get8(value);
+        uint8_t index    = Encoding::Get8(value);
         size_t arraySize = delegate->GetNumLowPowerModes(endpoint);
         if (index >= arraySize)
         {
-            return imcode::InvalidValue;
+            return imcode::ConstraintError;
         }
 
         return imcode::Success;

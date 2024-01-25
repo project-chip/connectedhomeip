@@ -24,7 +24,7 @@ static BalanceStruct::Type gsPowerBalances[] = {
 };
 
 // assumes it'll be the only delegate for it's lifetime.
-struct EPrefDelegate : public EnergyPreferenceDelegate
+struct EPrefDelegate : public Delegate
 {
     EPrefDelegate();
     virtual ~EPrefDelegate();
@@ -37,16 +37,16 @@ struct EPrefDelegate : public EnergyPreferenceDelegate
     size_t GetNumLowPowerModes(chip::EndpointId aEndpoint) override;
 };
 
-EPrefDelegate::EPrefDelegate() : EnergyPreferenceDelegate()
+EPrefDelegate::EPrefDelegate() : Delegate()
 {
-    VerifyOrDie(GetMatterEnergyPreferencesDelegate() == nullptr);
-    SetMatterEnergyPreferencesDelegate(this);
+    VerifyOrDie(GetDelegate() == nullptr);
+    SetDelegate(this);
 }
 
 EPrefDelegate::~EPrefDelegate()
 {
-    VerifyOrDie(GetMatterEnergyPreferencesDelegate() == this);
-    SetMatterEnergyPreferencesDelegate(nullptr);
+    VerifyOrDie(GetDelegate() == this);
+    SetDelegate(nullptr);
 }
 
 size_t EPrefDelegate::GetNumEnergyBalances(chip::EndpointId aEndpoint)

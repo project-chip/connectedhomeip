@@ -24,14 +24,25 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 
-struct EnergyPreferenceDelegate
+namespace chip::app::Clusters::EnergyPreference
 {
-    virtual ~EnergyPreferenceDelegate() {}
 
+struct Delegate
+{
+    virtual ~Delegate() {}
+
+    // Gives a reference to the energy balance struct at aIndex
+    // Balance struct should exist for the life time of the matter server
     virtual CHIP_ERROR GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
                                                chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & balance) = 0;
+
+    // Gives a reference to the  at aIndex
     virtual CHIP_ERROR GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
                                                 chip::app::Clusters::EnergyPreference::EnergyPriorityEnum & priority)         = 0;
+
+
+    // Gives a reference to the low power mode sensitivity balance struct at aIndex
+    // Balance struct should exist for the life time of the matter server
     virtual CHIP_ERROR
     GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, size_t aIndex,
                                       chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & balance) = 0;
@@ -40,5 +51,7 @@ struct EnergyPreferenceDelegate
     virtual size_t GetNumLowPowerModes(chip::EndpointId aEndpoint)  = 0;
 };
 
-void SetMatterEnergyPreferencesDelegate(EnergyPreferenceDelegate * aDelegate);
-EnergyPreferenceDelegate * GetMatterEnergyPreferencesDelegate();
+void SetDelegate(Delegate * aDelegate);
+Delegate * GetDelegate();
+
+} // namespace chip::app::Clusters::EnergyPreference
