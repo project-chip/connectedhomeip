@@ -152,7 +152,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         for t in self.supported_run_modes[current_run_mode].modeTags:
             if t.value == Clusters.RvcRunMode.Enums.ModeTag.kIdle:
                 idle_tag_present = True
-        asserts.assert_true(idle_tag_present, "The device must be is a mode with the Idle (0x4000) mode tag.")
+        asserts.assert_true(idle_tag_present, "The device must be in a mode with the Idle (0x4000) mode tag.")
 
         self.print_step(5, "Send ChangeToMode MODE_A command")
         await self.send_change_to_mode_with_check(self.mode_a, 0)
@@ -167,7 +167,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         # This step is not described in the test plan, but it ought to be
         await self.read_current_mode_with_check(self.idle_mode_dut)
 
-        self.print_step(8, "Send ChangeToMode idle command")
+        self.print_step(8, "Send ChangeToMode MODE_B command")
         await self.send_change_to_mode_with_check(self.mode_b, 0)
         # This step is not described in the test plan, but it ought to be
         await self.read_current_mode_with_check(self.mode_b)
