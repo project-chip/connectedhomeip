@@ -6,8 +6,8 @@ import os
 import pathlib
 import sys
 
-import chip.clusters as Clusters
 import chip.CertificateAuthority
+import chip.clusters as Clusters
 import chip.FabricAdmin
 import chip.logging
 import chip.native
@@ -114,7 +114,6 @@ Note that you are still running from {os.getcwd()} so other relative paths may b
                     ''')
                     break
                 prefix = prefix.parent
-        
 
     if not os.path.exists(args.trust_store):
         console.print(f'''
@@ -168,5 +167,6 @@ or run `os.chdir` to the root of your CHIP repository checkout.
         f'\n\n[blue]Default CHIP Device Controller (NodeId: {devCtrl.nodeId}): '
         f'has been initialized to manage [bold red]caList[0].adminList[0][blue] (FabricId = {caList[0].adminList[0].fabricId}), '
         'and is available as [bold red]devCtrl')
+
 
 main()
