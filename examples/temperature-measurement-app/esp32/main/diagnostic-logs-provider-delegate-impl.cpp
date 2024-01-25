@@ -119,7 +119,7 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
     // If the session handle rolls over to UINT16_MAX which is invalid, reset to 0.
     VerifyOrDo(mLogSessionHandle != kInvalidLogSessionHandle, mLogSessionHandle = 0);
 
-    outHandle                 = mLogSessionHandle;
+    outHandle                          = mLogSessionHandle;
     mSessionSpanMap[mLogSessionHandle] = span;
     return CHIP_NO_ERROR;
 }
