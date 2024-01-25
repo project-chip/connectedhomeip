@@ -26,9 +26,11 @@ Usage:
 
 ## Additional details
 
-This example demonstrates the utilization of the diagnostics logs cluster to send diagnostic logs to the client.
+This example demonstrates the utilization of the diagnostics logs cluster to
+send diagnostic logs to the client.
 
-In this scenario, the [main/diagnostic_logs](main/diagnostic_logs) directory contains three files:
+In this scenario, the [main/diagnostic_logs](main/diagnostic_logs) directory
+contains three files:
 
 ```
 main/diagnostic_logs
@@ -51,7 +53,6 @@ chip-tool diagnosticlogs retrieve-logs-request 0 0 1 0
 # Read network diagnostic using bdx protocol
 chip-tool diagnosticlogs retrieve-logs-request 1 0 1 0 --TransferFileDesignator network-diag.log
 ```
-
 
 ## Optimization
 
