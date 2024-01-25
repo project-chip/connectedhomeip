@@ -4432,8 +4432,8 @@ provisional cluster Messages = 151 {
 
   info event MessageComplete = 2 {
     octet_string messageID = 0;
-    nullable int32u responseID = 1;
-    nullable char_string reply = 2;
+    optional nullable int32u responseID = 1;
+    optional nullable char_string reply = 2;
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
@@ -4451,7 +4451,7 @@ provisional cluster Messages = 151 {
   }
 
   request struct CancelMessagesRequestRequest {
-    MessageStruct messages[] = 0;
+    octet_string messageIDs[] = 0;
   }
 
   /** Command for requesting messages be presented */

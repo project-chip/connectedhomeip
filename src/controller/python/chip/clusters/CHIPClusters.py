@@ -6575,7 +6575,7 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "CancelMessagesRequest",
                 "args": {
-                    "messages": "MessageStruct",
+                    "messageIDs": "bytes",
                 },
             },
         },

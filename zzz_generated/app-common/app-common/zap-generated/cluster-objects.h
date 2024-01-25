@@ -21144,7 +21144,7 @@ public:
 namespace CancelMessagesRequest {
 enum class Fields : uint8_t
 {
-    kMessages = 0,
+    kMessageIDs = 0,
 };
 
 struct Type
@@ -21154,7 +21154,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::List<const Structs::MessageStruct::Type> messages;
+    DataModel::List<const chip::ByteSpan> messageIDs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21169,7 +21169,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::DecodableList<Structs::MessageStruct::DecodableType> messages;
+    DataModel::DecodableList<chip::ByteSpan> messageIDs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelMessagesRequest
@@ -21345,8 +21345,8 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan messageID;
-    DataModel::Nullable<uint32_t> responseID;
-    DataModel::Nullable<chip::CharSpan> reply;
+    Optional<DataModel::Nullable<uint32_t>> responseID;
+    Optional<DataModel::Nullable<chip::CharSpan>> reply;
     DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPreference;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -21360,8 +21360,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
     chip::ByteSpan messageID;
-    DataModel::Nullable<uint32_t> responseID;
-    DataModel::Nullable<chip::CharSpan> reply;
+    Optional<DataModel::Nullable<uint32_t>> responseID;
+    Optional<DataModel::Nullable<chip::CharSpan>> reply;
     DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPreference;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

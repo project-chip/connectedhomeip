@@ -29228,17 +29228,17 @@ public class ChipClusters {
         }}, commandId, value, timedInvokeTimeoutMs);
     }
 
-    public void cancelMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages) {
-      cancelMessagesRequest(callback, messages, 0);
+    public void cancelMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messageIDs) {
+      cancelMessagesRequest(callback, messageIDs, 0);
     }
 
-    public void cancelMessagesRequest(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> messages, int timedInvokeTimeoutMs) {
+    public void cancelMessagesRequest(DefaultClusterCallback callback, ArrayList<byte[]> messageIDs, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
-      final long messagesFieldID = 0L;
-      BaseTLVType messagestlvValue = ArrayType.generateArrayType(messages, (elementmessages) -> elementmessages.encodeTlv());
-      elements.add(new StructElement(messagesFieldID, messagestlvValue));
+      final long messageIDsFieldID = 0L;
+      BaseTLVType messageIDstlvValue = ArrayType.generateArrayType(messageIDs, (elementmessageIDs) -> new ByteArrayType(elementmessageIDs));
+      elements.add(new StructElement(messageIDsFieldID, messageIDstlvValue));
 
       StructType value = new StructType(elements);
       invoke(new InvokeCallbackImpl(callback) {

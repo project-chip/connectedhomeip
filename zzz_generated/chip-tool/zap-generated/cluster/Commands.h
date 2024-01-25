@@ -6867,9 +6867,9 @@ class MessagesCancelMessagesRequest : public ClusterCommand
 {
 public:
     MessagesCancelMessagesRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("cancel-messages-request", credsIssuerConfig), mComplex_Messages(&mRequest.messages)
+        ClusterCommand("cancel-messages-request", credsIssuerConfig), mComplex_MessageIDs(&mRequest.messageIDs)
     {
-        AddArgument("Messages", &mComplex_Messages);
+        AddArgument("MessageIDs", &mComplex_MessageIDs);
         ClusterCommand::AddArguments();
     }
 
@@ -6896,8 +6896,7 @@ public:
 
 private:
     chip::app::Clusters::Messages::Commands::CancelMessagesRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>
-        mComplex_Messages;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_MessageIDs;
 };
 
 /*----------------------------------------------------------------------------*\

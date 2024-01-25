@@ -15018,7 +15018,7 @@ namespace CancelMessagesRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kMessages), messages);
+    encoder.Encode(to_underlying(Fields::kMessageIDs), messageIDs);
     return encoder.Finalize();
 }
 
@@ -15036,9 +15036,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
 
-        if (__context_tag == to_underlying(Fields::kMessages))
+        if (__context_tag == to_underlying(Fields::kMessageIDs))
         {
-            err = DataModel::Decode(reader, messages);
+            err = DataModel::Decode(reader, messageIDs);
         }
         else
         {

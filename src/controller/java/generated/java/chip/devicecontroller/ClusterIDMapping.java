@@ -9406,7 +9406,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CancelMessagesRequestCommandField {Messages(0),;
+                }public enum CancelMessagesRequestCommandField {MessageIDs(0),;
                     private final int id;
                     CancelMessagesRequestCommandField(int id) {
                         this.id = id;

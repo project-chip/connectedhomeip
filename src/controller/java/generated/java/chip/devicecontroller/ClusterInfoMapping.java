@@ -23740,12 +23740,14 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> messagescancelMessagesRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
+    CommandParameterInfo messagescancelMessagesRequestmessageIDsCommandParameterInfo = new CommandParameterInfo("messageIDs", ArrayList.class, ArrayList.class);
+    messagescancelMessagesRequestCommandParams.put("messageIDs",messagescancelMessagesRequestmessageIDsCommandParameterInfo);
     InteractionInfo messagescancelMessagesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MessagesCluster) cluster)
         .cancelMessagesRequest((DefaultClusterCallback) callback
-        , (ArrayList<ChipStructs.MessagesClusterMessageStruct>)
-        commandArguments.get("messages")
+        , (ArrayList<byte[]>)
+        commandArguments.get("messageIDs")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
