@@ -18,7 +18,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/InteractionModelEngine.h>
 #include <app/icd/ICDConfig.h>
 #include <app/icd/ICDConfigurationData.h>
 #include <app/icd/ICDManager.h>
@@ -41,12 +40,13 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager)
+                      Messaging::ExchangeManager * exchangeManager, SubscriptionManager * manager)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
+    VerifyOrDie(manager != nullptr);
 
     // LIT ICD Verification Checks
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
@@ -63,11 +63,13 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
         //                    "LIT support is required for slow polling intervals superior to 15 seconds");
     }
 
-    mStorage     = storage;
-    mFabricTable = fabricTable;
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
+
+    mStorage           = storage;
+    mFabricTable       = fabricTable;
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
+    mSubManager        = manager;
 
     VerifyOrDie(InitCounter() == CHIP_NO_ERROR);
 
@@ -78,14 +80,19 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 void ICDManager::Shutdown()
 {
     ICDNotifier::GetInstance().Unsubscribe(this);
+
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnTransitionToIdle, this);
+
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
     mOperationalState = OperationalState::ActiveMode;
-    mStorage          = nullptr;
-    mFabricTable      = nullptr;
+
+    mStorage     = nullptr;
+    mFabricTable = nullptr;
+    mSubManager  = nullptr;
+
     mStateObserverPool.ReleaseAll();
     mICDSenderPool.ReleaseAll();
 }
@@ -137,8 +144,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            bool active =
-                InteractionModelEngine::GetInstance()->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
+            bool active = mSubManager->SubjectHasActiveSubcription(entry.fabricIndex, entry.monitoredSubject);
             if (active)
             {
                 continue;
@@ -570,13 +576,8 @@ bool ICDManager::CheckInMessagesWouldBeSent()
                 continue;
             }
 
-            bool isActive =
-                InteractionModelEngine::GetInstance()->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
-            if (!isActive)
-            {
-                // At least one registration would require a Check-In message
-                return true;
-            }
+            // At least one registration would require a Check-In message
+            VerifyOrReturnValue(mSubManager->SubjectHasActiveSubcription(entry.fabricIndex, entry.monitoredSubject), true);
         }
     }
 

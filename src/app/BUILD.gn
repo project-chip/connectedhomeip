@@ -114,6 +114,12 @@ source_set("pre-encoded-value") {
   ]
 }
 
+source_set("subscription-manager") {
+  sources = [ "SubscriptionManager.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
 source_set("message-def") {
   sources = [
     "MessageDef/ArrayBuilder.cpp",
@@ -247,6 +253,8 @@ static_library("interaction-model") {
     ":app_config",
     ":message-def",
     ":paths",
+    ":subscription-manager",
+    "${chip_root}/src/app/icd:configuration-data",
     "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",

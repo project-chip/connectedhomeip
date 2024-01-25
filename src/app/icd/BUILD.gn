@@ -70,7 +70,7 @@ source_set("manager") {
     ":notifier",
     ":observer",
     ":sender",
-    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app:subscription-manager",
     "${chip_root}/src/credentials:credentials",
   ]
 }
