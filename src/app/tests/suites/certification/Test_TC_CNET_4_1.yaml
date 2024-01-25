@@ -193,5 +193,6 @@ tests:
       attribute: "SupportedWiFiBands"
       response:
           constraints:
-              type: enum8
+              type: list
               minLength: 1
+              maxLength: 6
