@@ -30,7 +30,6 @@ static_library("pw_rpc") {
   deps = [
     "$dir_pw_rpc:server",
     "${chip_root}/examples/platform/mbed/pw_sys_io:pw_sys_io_mbed",
-    "${dir_pigweed}/pw_hdlc:pw_rpc",
     dir_pw_assert,
     dir_pw_hdlc,
     dir_pw_log,

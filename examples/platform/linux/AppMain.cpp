@@ -196,23 +196,24 @@ void InitNetworkCommissioning()
         emberAfEndpointEnableDisable(sSecondaryNetworkCommissioningEndpoint.Value(), false);
     }
 
-    const bool kThreadEnabled = {
+    bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
-        LinuxDeviceOptions::GetInstance().mThread
-#else
-        false
-#endif
-    };
+    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
+#endif // CHIP_APP_MAIN_HAS_THREAD_DRIVER
 
-    const bool kWiFiEnabled = {
+    bool isWiFiEnabled = false;
 #if CHIP_APP_MAIN_HAS_WIFI_DRIVER
-        LinuxDeviceOptions::GetInstance().mWiFi
-#else
-        false
-#endif
-    };
+    isWiFiEnabled = LinuxDeviceOptions::GetInstance().mWiFi;
 
-    if (kThreadEnabled && kWiFiEnabled)
+    // On Linux, command-line indicates whether Wi-Fi is supported since determining it from
+    // the OS level is not easily portable.
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    sWiFiDriver.Set5gSupport(LinuxDeviceOptions::GetInstance().wifiSupports5g);
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
+
+#endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
+
+    if (isThreadEnabled && isWiFiEnabled)
     {
         if (sSecondaryNetworkCommissioningEndpoint.HasValue())
         {
@@ -227,11 +228,11 @@ void InitNetworkCommissioning()
             EnableThreadNetworkCommissioning();
         }
     }
-    else if (kThreadEnabled)
+    else if (isThreadEnabled)
     {
         EnableThreadNetworkCommissioning();
     }
-    else if (kWiFiEnabled)
+    else if (isWiFiEnabled)
     {
         EnableWiFiNetworkCommissioning(kRootEndpointId);
     }

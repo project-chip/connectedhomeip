@@ -105,6 +105,7 @@ qpg_executable("lighting_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "${chip_root}/config/qpg/lib/pw_rpc:pw_rpc",

@@ -11052,10 +11052,10 @@ public:
     {
         AddArgument("StartTime", 0, UINT32_MAX, &mRequest.startTime);
         AddArgument("EndTime", 0, UINT32_MAX, &mRequest.endTime);
-        AddArgument("ChannelList", &mComplex_ChannelList);
-        AddArgument("PageToken", &mComplex_PageToken);
+        AddArgument("ChannelList", &mComplex_ChannelList, "", Argument::kOptional);
+        AddArgument("PageToken", &mComplex_PageToken, "", Argument::kOptional);
         AddArgument("RecordingFlag", 0, UINT32_MAX, &mRequest.recordingFlag);
-        AddArgument("ExternalIDList", &mComplex_ExternalIDList);
+        AddArgument("ExternalIDList", &mComplex_ExternalIDList, "", Argument::kOptional);
         AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
     }
@@ -12103,7 +12103,7 @@ public:
         AddArgument("Search", &mComplex_Search);
         AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay);
         AddArgument("Data", &mRequest.data);
-        AddArgument("PlaybackPreferences", &mComplex_PlaybackPreferences);
+        AddArgument("PlaybackPreferences", &mComplex_PlaybackPreferences, "", Argument::kOptional);
         AddArgument("UseCurrentContext", 0, 1, &mRequest.useCurrentContext);
         ClusterCommand::AddArguments();
     }
@@ -12147,7 +12147,7 @@ public:
     {
         AddArgument("ContentURL", &mRequest.contentURL);
         AddArgument("DisplayString", &mRequest.displayString);
-        AddArgument("BrandingInformation", &mComplex_BrandingInformation);
+        AddArgument("BrandingInformation", &mComplex_BrandingInformation, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -12303,7 +12303,7 @@ public:
     ApplicationLauncherLaunchApp(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("launch-app", credsIssuerConfig), mComplex_Application(&mRequest.application)
     {
-        AddArgument("Application", &mComplex_Application);
+        AddArgument("Application", &mComplex_Application, "", Argument::kOptional);
         AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
     }
@@ -12344,7 +12344,7 @@ public:
     ApplicationLauncherStopApp(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("stop-app", credsIssuerConfig), mComplex_Application(&mRequest.application)
     {
-        AddArgument("Application", &mComplex_Application);
+        AddArgument("Application", &mComplex_Application, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -12384,7 +12384,7 @@ public:
     ApplicationLauncherHideApp(CredentialIssuerCommands * credsIssuerConfig) :
         ClusterCommand("hide-app", credsIssuerConfig), mComplex_Application(&mRequest.application)
     {
-        AddArgument("Application", &mComplex_Application);
+        AddArgument("Application", &mComplex_Application, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -14032,11 +14032,11 @@ public:
         AddArgument("OptionalString", &mRequest.optionalString);
         AddArgument("NullableOptionalString", &mRequest.nullableOptionalString);
         AddArgument("NullableStruct", &mComplex_NullableStruct);
-        AddArgument("OptionalStruct", &mComplex_OptionalStruct);
-        AddArgument("NullableOptionalStruct", &mComplex_NullableOptionalStruct);
+        AddArgument("OptionalStruct", &mComplex_OptionalStruct, "", Argument::kOptional);
+        AddArgument("NullableOptionalStruct", &mComplex_NullableOptionalStruct, "", Argument::kOptional);
         AddArgument("NullableList", &mComplex_NullableList);
-        AddArgument("OptionalList", &mComplex_OptionalList);
-        AddArgument("NullableOptionalList", &mComplex_NullableOptionalList);
+        AddArgument("OptionalList", &mComplex_OptionalList, "", Argument::kOptional);
+        AddArgument("NullableOptionalList", &mComplex_NullableOptionalList, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
