@@ -65,7 +65,7 @@ limitations under the License.
     <!--Conformance feature [POLY] - for now optional-->
     <attribute code="0x0011" side="server" define="POWER_FACTOR" type="int64s" isNullable="true" min="-10000" max="10000" optional="true">PowerFactor</attribute>
     <attribute code="0x0012" side="server" type="amperage_ma" define="NEUTRAL_CURRENT" isNullable="true" min="-4611686018427387904" max="4611686018427387904" optional="true">NeutralCurrent</attribute>
-    <event code="0x00" name="MeasurementPeriodRanges" priority="info" apiMaturity="provisional" optional="true">
+    <event code="0x00" side="server" name="MeasurementPeriodRanges" priority="info" apiMaturity="provisional" optional="true">
       <description>MeasurementPeriodRanges</description>
       <field id="0" name="Ranges" array="true" type="MeasurementRangeStruct"/>
     </event>
