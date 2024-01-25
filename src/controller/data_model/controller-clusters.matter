@@ -4448,11 +4448,11 @@ provisional cluster Messages = 151 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct PresentMessagesRequestRequest {
-    octet_string messages[] = 0;
+    MessageStruct messages[] = 0;
   }
 
   request struct CancelMessagesRequestRequest {
-    octet_string messages[] = 0;
+    MessageStruct messages[] = 0;
   }
 
   /** Command for requesting messages be presented */

@@ -21122,7 +21122,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::List<const chip::ByteSpan> messages;
+    DataModel::List<const Structs::MessageStruct::Type> messages;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21137,7 +21137,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::DecodableList<chip::ByteSpan> messages;
+    DataModel::DecodableList<Structs::MessageStruct::DecodableType> messages;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PresentMessagesRequest
@@ -21154,7 +21154,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::List<const chip::ByteSpan> messages;
+    DataModel::List<const Structs::MessageStruct::Type> messages;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21169,7 +21169,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::DecodableList<chip::ByteSpan> messages;
+    DataModel::DecodableList<Structs::MessageStruct::DecodableType> messages;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace CancelMessagesRequest

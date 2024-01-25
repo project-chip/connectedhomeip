@@ -23271,10 +23271,10 @@ class Messages(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[Messages.Structs.MessageStruct]),
                     ])
 
-            messages: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            messages: 'typing.List[Messages.Structs.MessageStruct]' = field(default_factory=lambda: [])
 
         @dataclass
         class CancelMessagesRequest(ClusterCommand):
@@ -23287,10 +23287,10 @@ class Messages(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[bytes]),
+                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[Messages.Structs.MessageStruct]),
                     ])
 
-            messages: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            messages: 'typing.List[Messages.Structs.MessageStruct]' = field(default_factory=lambda: [])
 
     class Attributes:
         @dataclass

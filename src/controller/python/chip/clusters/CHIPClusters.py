@@ -6568,14 +6568,14 @@ class ChipClusters:
                 "commandId": 0x00000000,
                 "commandName": "PresentMessagesRequest",
                 "args": {
-                    "messages": "bytes",
+                    "messages": "MessageStruct",
                 },
             },
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "CancelMessagesRequest",
                 "args": {
-                    "messages": "bytes",
+                    "messages": "MessageStruct",
                 },
             },
         },

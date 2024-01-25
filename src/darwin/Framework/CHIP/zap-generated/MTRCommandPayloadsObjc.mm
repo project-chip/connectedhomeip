@@ -15463,12 +15463,60 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.messages.count; ++i_0) {
-                    if (![self.messages[i_0] isKindOfClass:[NSData class]]) {
+                    if (![self.messages[i_0] isKindOfClass:[MTRMessagesClusterMessageStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSData *) self.messages[i_0];
-                    listHolder_0->mList[i_0] = AsByteSpan(element_0);
+                    auto element_0 = (MTRMessagesClusterMessageStruct *) self.messages[i_0];
+                    listHolder_0->mList[i_0].messageID = AsByteSpan(element_0.messageID);
+                    listHolder_0->mList[i_0].priority = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].priority)>>(element_0.priority.unsignedCharValue);
+                    listHolder_0->mList[i_0].messageControl = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].messageControl)>>(element_0.messageControl.unsignedCharValue);
+                    if (element_0.startTime == nil) {
+                        listHolder_0->mList[i_0].startTime.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].startTime.SetNonNull();
+                        nonNullValue_2 = element_0.startTime.unsignedIntValue;
+                    }
+                    if (element_0.duration == nil) {
+                        listHolder_0->mList[i_0].duration.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].duration.SetNonNull();
+                        nonNullValue_2 = element_0.duration.unsignedShortValue;
+                    }
+                    listHolder_0->mList[i_0].messageText = AsCharSpan(element_0.messageText);
+                    if (element_0.responses != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].responses.Emplace();
+                        {
+                            using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                            using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                            if (element_0.responses.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.responses.count);
+                                if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_3);
+                                for (size_t i_3 = 0; i_3 < element_0.responses.count; ++i_3) {
+                                    if (![element_0.responses[i_3] isKindOfClass:[MTRMessagesClusterMessageResponseOptionStruct class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_3 = (MTRMessagesClusterMessageResponseOptionStruct *) element_0.responses[i_3];
+                                    if (element_3.messageResponseID != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].messageResponseID.Emplace();
+                                        definedValue_5 = element_3.messageResponseID.unsignedIntValue;
+                                    }
+                                    if (element_3.label != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].label.Emplace();
+                                        definedValue_5 = AsCharSpan(element_3.label);
+                                    }
+                                }
+                                definedValue_2 = ListType_3(listHolder_3->mList, element_0.responses.count);
+                            } else {
+                                definedValue_2 = ListType_3();
+                            }
+                        }
+                    }
+                    listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                 }
                 encodableStruct.messages = ListType_0(listHolder_0->mList, self.messages.count);
             } else {
@@ -15563,12 +15611,60 @@ NS_ASSUME_NONNULL_BEGIN
                 }
                 listFreer.add(listHolder_0);
                 for (size_t i_0 = 0; i_0 < self.messages.count; ++i_0) {
-                    if (![self.messages[i_0] isKindOfClass:[NSData class]]) {
+                    if (![self.messages[i_0] isKindOfClass:[MTRMessagesClusterMessageStruct class]]) {
                         // Wrong kind of value.
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
-                    auto element_0 = (NSData *) self.messages[i_0];
-                    listHolder_0->mList[i_0] = AsByteSpan(element_0);
+                    auto element_0 = (MTRMessagesClusterMessageStruct *) self.messages[i_0];
+                    listHolder_0->mList[i_0].messageID = AsByteSpan(element_0.messageID);
+                    listHolder_0->mList[i_0].priority = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].priority)>>(element_0.priority.unsignedCharValue);
+                    listHolder_0->mList[i_0].messageControl = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].messageControl)>>(element_0.messageControl.unsignedCharValue);
+                    if (element_0.startTime == nil) {
+                        listHolder_0->mList[i_0].startTime.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].startTime.SetNonNull();
+                        nonNullValue_2 = element_0.startTime.unsignedIntValue;
+                    }
+                    if (element_0.duration == nil) {
+                        listHolder_0->mList[i_0].duration.SetNull();
+                    } else {
+                        auto & nonNullValue_2 = listHolder_0->mList[i_0].duration.SetNonNull();
+                        nonNullValue_2 = element_0.duration.unsignedShortValue;
+                    }
+                    listHolder_0->mList[i_0].messageText = AsCharSpan(element_0.messageText);
+                    if (element_0.responses != nil) {
+                        auto & definedValue_2 = listHolder_0->mList[i_0].responses.Emplace();
+                        {
+                            using ListType_3 = std::remove_reference_t<decltype(definedValue_2)>;
+                            using ListMemberType_3 = ListMemberTypeGetter<ListType_3>::Type;
+                            if (element_0.responses.count != 0) {
+                                auto * listHolder_3 = new ListHolder<ListMemberType_3>(element_0.responses.count);
+                                if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_3);
+                                for (size_t i_3 = 0; i_3 < element_0.responses.count; ++i_3) {
+                                    if (![element_0.responses[i_3] isKindOfClass:[MTRMessagesClusterMessageResponseOptionStruct class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_3 = (MTRMessagesClusterMessageResponseOptionStruct *) element_0.responses[i_3];
+                                    if (element_3.messageResponseID != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].messageResponseID.Emplace();
+                                        definedValue_5 = element_3.messageResponseID.unsignedIntValue;
+                                    }
+                                    if (element_3.label != nil) {
+                                        auto & definedValue_5 = listHolder_3->mList[i_3].label.Emplace();
+                                        definedValue_5 = AsCharSpan(element_3.label);
+                                    }
+                                }
+                                definedValue_2 = ListType_3(listHolder_3->mList, element_0.responses.count);
+                            } else {
+                                definedValue_2 = ListType_3();
+                            }
+                        }
+                    }
+                    listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                 }
                 encodableStruct.messages = ListType_0(listHolder_0->mList, self.messages.count);
             } else {

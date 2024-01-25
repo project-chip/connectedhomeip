@@ -102,7 +102,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun presentMessagesRequest(
-    messages: List<ByteArray>,
+    messages: List<MessagesClusterMessageStruct>,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 0u
@@ -113,7 +113,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
     val TAG_MESSAGES_REQ: Int = 0
     tlvWriter.startArray(ContextSpecificTag(TAG_MESSAGES_REQ))
     for (item in messages.iterator()) {
-      tlvWriter.put(AnonymousTag, item)
+      item.toTlv(AnonymousTag, tlvWriter)
     }
     tlvWriter.endArray()
     tlvWriter.endStructure()
@@ -130,7 +130,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
   }
 
   suspend fun cancelMessagesRequest(
-    messages: List<ByteArray>,
+    messages: List<MessagesClusterMessageStruct>,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 1u
@@ -141,7 +141,7 @@ class MessagesCluster(private val controller: MatterController, private val endp
     val TAG_MESSAGES_REQ: Int = 0
     tlvWriter.startArray(ContextSpecificTag(TAG_MESSAGES_REQ))
     for (item in messages.iterator()) {
-      tlvWriter.put(AnonymousTag, item)
+      item.toTlv(AnonymousTag, tlvWriter)
     }
     tlvWriter.endArray()
     tlvWriter.endStructure()

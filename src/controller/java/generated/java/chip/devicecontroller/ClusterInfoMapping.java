@@ -23725,13 +23725,11 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> messagespresentMessagesRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo messagespresentMessagesRequestmessagesCommandParameterInfo = new CommandParameterInfo("messages", ArrayList.class, ArrayList.class);
-    messagespresentMessagesRequestCommandParams.put("messages",messagespresentMessagesRequestmessagesCommandParameterInfo);
     InteractionInfo messagespresentMessagesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MessagesCluster) cluster)
         .presentMessagesRequest((DefaultClusterCallback) callback
-        , (ArrayList<byte[]>)
+        , (ArrayList<ChipStructs.MessagesClusterMessageStruct>)
         commandArguments.get("messages")
         );
       },
@@ -23742,13 +23740,11 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> messagescancelMessagesRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo messagescancelMessagesRequestmessagesCommandParameterInfo = new CommandParameterInfo("messages", ArrayList.class, ArrayList.class);
-    messagescancelMessagesRequestCommandParams.put("messages",messagescancelMessagesRequestmessagesCommandParameterInfo);
     InteractionInfo messagescancelMessagesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MessagesCluster) cluster)
         .cancelMessagesRequest((DefaultClusterCallback) callback
-        , (ArrayList<byte[]>)
+        , (ArrayList<ChipStructs.MessagesClusterMessageStruct>)
         commandArguments.get("messages")
         );
       },

@@ -6856,7 +6856,8 @@ public:
 
 private:
     chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_Messages;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>
+        mComplex_Messages;
 };
 
 /*
@@ -6895,7 +6896,8 @@ public:
 
 private:
     chip::app::Clusters::Messages::Commands::CancelMessagesRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::ByteSpan>> mComplex_Messages;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>
+        mComplex_Messages;
 };
 
 /*----------------------------------------------------------------------------*\

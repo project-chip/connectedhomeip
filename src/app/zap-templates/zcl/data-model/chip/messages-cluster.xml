@@ -83,13 +83,13 @@ limitations under the License.
       <description>
         Command for requesting messages be presented
       </description>
-      <arg name="Messages" type="octet_string" array="true"/>
+      <arg name="Messages" type="MessageStruct" array="true"/>
     </command>
     <command source="client" code="0x01" name="CancelMessagesRequest" isFabricScoped="true" optional="false">
       <description>
         Command for cancelling message present requests
       </description>
-      <arg name="Messages" type="octet_string" array="true"/>
+      <arg name="Messages" type="MessageStruct" array="true"/>
     </command>
     <event side="server" code="0x00" name="MessageQueued" priority="info" optional="false">
       <description>This event SHALL be generated when the message is confirmed by the user, or when the expiration date of the message is reached.</description>
