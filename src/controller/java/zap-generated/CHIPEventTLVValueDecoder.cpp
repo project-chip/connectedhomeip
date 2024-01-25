@@ -5217,51 +5217,63 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                     reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
             value_messageID = value_messageIDByteArray;
 
-            jobject value_timestamp;
-            std::string value_timestampClassName     = "java/lang/Long";
-            std::string value_timestampCtorSignature = "(J)V";
-            jlong jnivalue_timestamp                 = static_cast<jlong>(cppValue.timestamp);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
-                value_timestampClassName.c_str(), value_timestampCtorSignature.c_str(), jnivalue_timestamp, value_timestamp);
-
             jobject value_responseID;
-            if (cppValue.responseID.IsNull())
+            if (!cppValue.responseID.HasValue())
             {
-                value_responseID = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_responseID);
             }
             else
             {
-                std::string value_responseIDClassName     = "java/lang/Long";
-                std::string value_responseIDCtorSignature = "(J)V";
-                jlong jnivalue_responseID                 = static_cast<jlong>(cppValue.responseID.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(value_responseIDClassName.c_str(),
-                                                                            value_responseIDCtorSignature.c_str(),
-                                                                            jnivalue_responseID, value_responseID);
+                jobject value_responseIDInsideOptional;
+                if (cppValue.responseID.Value().IsNull())
+                {
+                    value_responseIDInsideOptional = nullptr;
+                }
+                else
+                {
+                    std::string value_responseIDInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_responseIDInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_responseIDInsideOptional = static_cast<jlong>(cppValue.responseID.Value().Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_responseIDInsideOptionalClassName.c_str(), value_responseIDInsideOptionalCtorSignature.c_str(),
+                        jnivalue_responseIDInsideOptional, value_responseIDInsideOptional);
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_responseIDInsideOptional, value_responseID);
             }
 
             jobject value_reply;
-            if (cppValue.reply.IsNull())
+            if (!cppValue.reply.HasValue())
             {
-                value_reply = nullptr;
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_reply);
             }
             else
             {
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.reply.Value(), value_reply));
+                jobject value_replyInsideOptional;
+                if (cppValue.reply.Value().IsNull())
+                {
+                    value_replyInsideOptional = nullptr;
+                }
+                else
+                {
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.reply.Value().Value(),
+                                                                                         value_replyInsideOptional));
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_replyInsideOptional, value_reply);
             }
 
-            jobject value_futureMessagesPref;
-            if (cppValue.futureMessagesPref.IsNull())
+            jobject value_futureMessagesPreference;
+            if (cppValue.futureMessagesPreference.IsNull())
             {
-                value_futureMessagesPref = nullptr;
+                value_futureMessagesPreference = nullptr;
             }
             else
             {
-                std::string value_futureMessagesPrefClassName     = "java/lang/Integer";
-                std::string value_futureMessagesPrefCtorSignature = "(I)V";
-                jint jnivalue_futureMessagesPref                  = static_cast<jint>(cppValue.futureMessagesPref.Value());
-                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_futureMessagesPrefClassName.c_str(),
-                                                                           value_futureMessagesPrefCtorSignature.c_str(),
-                                                                           jnivalue_futureMessagesPref, value_futureMessagesPref);
+                std::string value_futureMessagesPreferenceClassName     = "java/lang/Integer";
+                std::string value_futureMessagesPreferenceCtorSignature = "(I)V";
+                jint jnivalue_futureMessagesPreference = static_cast<jint>(cppValue.futureMessagesPreference.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_futureMessagesPreferenceClassName.c_str(), value_futureMessagesPreferenceCtorSignature.c_str(),
+                    jnivalue_futureMessagesPreference, value_futureMessagesPreference);
             }
 
             jclass messageCompleteStructClass;
@@ -5274,17 +5286,17 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
 
             jmethodID messageCompleteStructCtor;
-            err = chip::JniReferences::GetInstance().FindMethod(
-                env, messageCompleteStructClass, "<init>",
-                "([BLjava/lang/Long;Ljava/lang/Long;Ljava/lang/String;Ljava/lang/Integer;)V", &messageCompleteStructCtor);
+            err = chip::JniReferences::GetInstance().FindMethod(env, messageCompleteStructClass, "<init>",
+                                                                "([BLjava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &messageCompleteStructCtor);
             if (err != CHIP_NO_ERROR || messageCompleteStructCtor == nullptr)
             {
                 ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessageCompleteEvent constructor");
                 return nullptr;
             }
 
-            jobject value = env->NewObject(messageCompleteStructClass, messageCompleteStructCtor, value_messageID, value_timestamp,
-                                           value_responseID, value_reply, value_futureMessagesPref);
+            jobject value = env->NewObject(messageCompleteStructClass, messageCompleteStructCtor, value_messageID, value_responseID,
+                                           value_reply, value_futureMessagesPreference);
 
             return value;
         }

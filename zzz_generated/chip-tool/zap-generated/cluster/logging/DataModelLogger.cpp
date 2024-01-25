@@ -6163,14 +6163,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("Timestamp", indent + 1, value.timestamp);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Timestamp'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = DataModelLogger::LogValue("ResponseID", indent + 1, value.responseID);
         if (err != CHIP_NO_ERROR)
         {
@@ -6187,10 +6179,10 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = DataModelLogger::LogValue("FutureMessagesPref", indent + 1, value.futureMessagesPref);
+        CHIP_ERROR err = DataModelLogger::LogValue("FutureMessagesPreference", indent + 1, value.futureMessagesPreference);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FutureMessagesPref'");
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FutureMessagesPreference'");
             return err;
         }
     }

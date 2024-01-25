@@ -4952,13 +4952,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _messageID = [NSData data];
 
-        _timestamp = @(0);
-
         _responseID = nil;
 
         _reply = nil;
 
-        _futureMessagesPref = nil;
+        _futureMessagesPreference = nil;
     }
     return self;
 }
@@ -4968,17 +4966,16 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMessagesClusterMessageCompleteEvent alloc] init];
 
     other.messageID = self.messageID;
-    other.timestamp = self.timestamp;
     other.responseID = self.responseID;
     other.reply = self.reply;
-    other.futureMessagesPref = self.futureMessagesPref;
+    other.futureMessagesPreference = self.futureMessagesPreference;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; timestamp:%@; responseID:%@; reply:%@; futureMessagesPref:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _timestamp, _responseID, _reply, _futureMessagesPref];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; responseID:%@; reply:%@; futureMessagesPreference:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _responseID, _reply, _futureMessagesPreference];
     return descriptionString;
 }
 

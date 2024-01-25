@@ -15154,10 +15154,9 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     TLV::TLVType outer;
     ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMessageID), messageID));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kTimestamp), timestamp));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kResponseID), responseID));
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kReply), reply));
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFutureMessagesPref), futureMessagesPref));
+    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFutureMessagesPreference), futureMessagesPreference));
     return aWriter.EndContainer(outer);
 }
 
@@ -15179,10 +15178,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, messageID);
         }
-        else if (__context_tag == to_underlying(Fields::kTimestamp))
-        {
-            err = DataModel::Decode(reader, timestamp);
-        }
         else if (__context_tag == to_underlying(Fields::kResponseID))
         {
             err = DataModel::Decode(reader, responseID);
@@ -15191,9 +15186,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, reply);
         }
-        else if (__context_tag == to_underlying(Fields::kFutureMessagesPref))
+        else if (__context_tag == to_underlying(Fields::kFutureMessagesPreference))
         {
-            err = DataModel::Decode(reader, futureMessagesPref);
+            err = DataModel::Decode(reader, futureMessagesPreference);
         }
         else
         {

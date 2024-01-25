@@ -4432,10 +4432,9 @@ provisional cluster Messages = 151 {
 
   info event MessageComplete = 2 {
     octet_string messageID = 0;
-    epoch_s timestamp = 2;
-    nullable int32u responseID = 3;
-    nullable long_char_string reply = 4;
-    nullable FutureMessagePreferenceEnum futureMessagesPref = 5;
+    optional nullable int32u responseID = 1;
+    optional nullable char_string reply = 2;
+    nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
   readonly attribute MessageStruct messages[] = 0;

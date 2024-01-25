@@ -21330,11 +21330,10 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
 enum class Fields : uint8_t
 {
-    kMessageID          = 0,
-    kTimestamp          = 2,
-    kResponseID         = 3,
-    kReply              = 4,
-    kFutureMessagesPref = 5,
+    kMessageID                = 0,
+    kResponseID               = 1,
+    kReply                    = 2,
+    kFutureMessagesPreference = 3,
 };
 
 struct Type
@@ -21346,10 +21345,9 @@ public:
     static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan messageID;
-    uint32_t timestamp = static_cast<uint32_t>(0);
-    DataModel::Nullable<uint32_t> responseID;
-    DataModel::Nullable<chip::CharSpan> reply;
-    DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPref;
+    Optional<DataModel::Nullable<uint32_t>> responseID;
+    Optional<DataModel::Nullable<chip::CharSpan>> reply;
+    DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPreference;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -21362,10 +21360,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
     chip::ByteSpan messageID;
-    uint32_t timestamp = static_cast<uint32_t>(0);
-    DataModel::Nullable<uint32_t> responseID;
-    DataModel::Nullable<chip::CharSpan> reply;
-    DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPref;
+    Optional<DataModel::Nullable<uint32_t>> responseID;
+    Optional<DataModel::Nullable<chip::CharSpan>> reply;
+    DataModel::Nullable<FutureMessagePreferenceEnum> futureMessagesPreference;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

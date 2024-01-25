@@ -3854,37 +3854,32 @@ public static class MessagesClusterMessagePresentedEvent {
 }
 public static class MessagesClusterMessageCompleteEvent {
   public byte[] messageID;
-  public Long timestamp;
-  public @Nullable Long responseID;
-  public @Nullable String reply;
-  public @Nullable Integer futureMessagesPref;
+  public @Nullable Optional<Long> responseID;
+  public @Nullable Optional<String> reply;
+  public @Nullable Integer futureMessagesPreference;
   private static final long MESSAGE_I_D_ID = 0L;
-  private static final long TIMESTAMP_ID = 2L;
-  private static final long RESPONSE_I_D_ID = 3L;
-  private static final long REPLY_ID = 4L;
-  private static final long FUTURE_MESSAGES_PREF_ID = 5L;
+  private static final long RESPONSE_I_D_ID = 1L;
+  private static final long REPLY_ID = 2L;
+  private static final long FUTURE_MESSAGES_PREFERENCE_ID = 3L;
 
   public MessagesClusterMessageCompleteEvent(
     byte[] messageID,
-    Long timestamp,
-    @Nullable Long responseID,
-    @Nullable String reply,
-    @Nullable Integer futureMessagesPref
+    @Nullable Optional<Long> responseID,
+    @Nullable Optional<String> reply,
+    @Nullable Integer futureMessagesPreference
   ) {
     this.messageID = messageID;
-    this.timestamp = timestamp;
     this.responseID = responseID;
     this.reply = reply;
-    this.futureMessagesPref = futureMessagesPref;
+    this.futureMessagesPreference = futureMessagesPreference;
   }
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
     values.add(new StructElement(MESSAGE_I_D_ID, new ByteArrayType(messageID)));
-    values.add(new StructElement(TIMESTAMP_ID, new UIntType(timestamp)));
-    values.add(new StructElement(RESPONSE_I_D_ID, responseID != null ? new UIntType(responseID) : new NullType()));
-    values.add(new StructElement(REPLY_ID, reply != null ? new StringType(reply) : new NullType()));
-    values.add(new StructElement(FUTURE_MESSAGES_PREF_ID, futureMessagesPref != null ? new UIntType(futureMessagesPref) : new NullType()));
+    values.add(new StructElement(RESPONSE_I_D_ID, responseID != null ? responseID.<BaseTLVType>map((nonOptionalresponseID) -> new UIntType(nonOptionalresponseID)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(REPLY_ID, reply != null ? reply.<BaseTLVType>map((nonOptionalreply) -> new StringType(nonOptionalreply)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(FUTURE_MESSAGES_PREFERENCE_ID, futureMessagesPreference != null ? new UIntType(futureMessagesPreference) : new NullType()));
 
     return new StructType(values);
   }
@@ -3894,44 +3889,37 @@ public static class MessagesClusterMessageCompleteEvent {
       return null;
     }
     byte[] messageID = null;
-    Long timestamp = null;
-    @Nullable Long responseID = null;
-    @Nullable String reply = null;
-    @Nullable Integer futureMessagesPref = null;
+    @Nullable Optional<Long> responseID = null;
+    @Nullable Optional<String> reply = null;
+    @Nullable Integer futureMessagesPreference = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == MESSAGE_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
           ByteArrayType castingValue = element.value(ByteArrayType.class);
           messageID = castingValue.value(byte[].class);
         }
-      } else if (element.contextTagNum() == TIMESTAMP_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          timestamp = castingValue.value(Long.class);
-        }
       } else if (element.contextTagNum() == RESPONSE_I_D_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          responseID = castingValue.value(Long.class);
+          responseID = Optional.of(castingValue.value(Long.class));
         }
       } else if (element.contextTagNum() == REPLY_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.String) {
           StringType castingValue = element.value(StringType.class);
-          reply = castingValue.value(String.class);
+          reply = Optional.of(castingValue.value(String.class));
         }
-      } else if (element.contextTagNum() == FUTURE_MESSAGES_PREF_ID) {
+      } else if (element.contextTagNum() == FUTURE_MESSAGES_PREFERENCE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          futureMessagesPref = castingValue.value(Integer.class);
+          futureMessagesPreference = castingValue.value(Integer.class);
         }
       }
     }
     return new MessagesClusterMessageCompleteEvent(
       messageID,
-      timestamp,
       responseID,
       reply,
-      futureMessagesPref
+      futureMessagesPreference
     );
   }
 
@@ -3942,17 +3930,14 @@ public static class MessagesClusterMessageCompleteEvent {
     output.append("\tmessageID: ");
     output.append(Arrays.toString(messageID));
     output.append("\n");
-    output.append("\ttimestamp: ");
-    output.append(timestamp);
-    output.append("\n");
     output.append("\tresponseID: ");
     output.append(responseID);
     output.append("\n");
     output.append("\treply: ");
     output.append(reply);
     output.append("\n");
-    output.append("\tfutureMessagesPref: ");
-    output.append(futureMessagesPref);
+    output.append("\tfutureMessagesPreference: ");
+    output.append(futureMessagesPreference);
     output.append("\n");
     output.append("}\n");
     return output.toString();

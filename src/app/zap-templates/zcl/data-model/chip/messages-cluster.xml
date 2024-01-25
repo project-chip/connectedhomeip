@@ -93,19 +93,18 @@ limitations under the License.
     </command>
     <event side="server" code="0x00" name="MessageQueued" priority="info" optional="false">
       <description>This event SHALL be generated when the message is confirmed by the user, or when the expiration date of the message is reached.</description>
-      <field id="0" name="MessageID" type="octet_string"/>
+      <field id="0" name="MessageID" type="octet_string" length="16"/>
     </event>
     <event side="server" code="0x01" name="MessagePresented" priority="info" optional="false">
       <description>This event SHALL be generated when the message is presented to the user.</description>
-      <field id="0" name="MessageID" type="octet_string"/>
+      <field id="0" name="MessageID" type="octet_string" length="16"/>
     </event>
     <event side="server" code="0x02" name="MessageComplete" priority="info" optional="false">
       <description>This event SHALL be generated when the message is confirmed by the user, or when the expiration date of the message is reached.</description>
-      <field id="0" name="MessageID" type="octet_string"/>
-      <field id="2" name="Timestamp" type="epoch_s"/>
-      <field id="3" name="ResponseID" type="int32u" isNullable="true"/>
-      <field id="4" name="Reply" type="long_char_string" length="256" isNullable="true"/>
-      <field id="5" name="FutureMessagesPref" type="FutureMessagePreferenceEnum" isNullable="true"/>
+      <field id="0" name="MessageID" type="octet_string" optional="false"/>
+      <field id="1" name="ResponseID" type="int32u" isNullable="true" optional="true"/>
+      <field id="2" name="Reply" type="char_string" length="256" isNullable="true" optional="true"/>
+      <field id="3" name="FutureMessagesPreference" type="FutureMessagePreferenceEnum" isNullable="true" optional="false"/>
     </event>
   </cluster>
 </configurator>

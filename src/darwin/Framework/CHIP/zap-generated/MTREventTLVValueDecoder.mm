@@ -2843,41 +2843,44 @@ static id _Nullable DecodeEventPayloadForMessagesCluster(EventId aEventId, TLV::
             value.messageID = memberValue;
         } while (0);
         do {
-            NSNumber * _Nonnull memberValue;
-            memberValue = [NSNumber numberWithUnsignedInt:cppValue.timestamp];
-            value.timestamp = memberValue;
-        } while (0);
-        do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.responseID.IsNull()) {
-                memberValue = nil;
+            if (cppValue.responseID.HasValue()) {
+                if (cppValue.responseID.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = [NSNumber numberWithUnsignedInt:cppValue.responseID.Value().Value()];
+                }
             } else {
-                memberValue = [NSNumber numberWithUnsignedInt:cppValue.responseID.Value()];
+                memberValue = nil;
             }
             value.responseID = memberValue;
         } while (0);
         do {
             NSString * _Nullable memberValue;
-            if (cppValue.reply.IsNull()) {
-                memberValue = nil;
-            } else {
-                memberValue = AsString(cppValue.reply.Value());
-                if (memberValue == nil) {
-                    CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                    *aError = err;
-                    return nil;
+            if (cppValue.reply.HasValue()) {
+                if (cppValue.reply.Value().IsNull()) {
+                    memberValue = nil;
+                } else {
+                    memberValue = AsString(cppValue.reply.Value().Value());
+                    if (memberValue == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
                 }
+            } else {
+                memberValue = nil;
             }
             value.reply = memberValue;
         } while (0);
         do {
             NSNumber * _Nullable memberValue;
-            if (cppValue.futureMessagesPref.IsNull()) {
+            if (cppValue.futureMessagesPreference.IsNull()) {
                 memberValue = nil;
             } else {
-                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.futureMessagesPref.Value())];
+                memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.futureMessagesPreference.Value())];
             }
-            value.futureMessagesPref = memberValue;
+            value.futureMessagesPreference = memberValue;
         } while (0);
 
         return value;
