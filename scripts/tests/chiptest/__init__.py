@@ -248,42 +248,6 @@ def target_for_name(name: str):
     return TestTarget.ALL_CLUSTERS
 
 
-def tests_with_command(chip_tool: str, is_manual: bool):
-    """Executes `chip_tool` binary to see what tests are available, using cmd
-    to get the list.
-    """
-    cmd = "list"
-    if is_manual:
-        cmd += "-manual"
-
-    cmd = [chip_tool, "tests", cmd]
-    result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
-    if result.returncode != 0:
-        logging.error(f'Failed to run {cmd}:')
-        logging.error('STDOUT: ' + result.stdout)
-        logging.error('STDERR: ' + result.stderr)
-        result.check_returncode()
-
-    test_tags = set()
-    if is_manual:
-        test_tags.add(TestTag.MANUAL)
-
-    in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
-
-    for name in result.stdout.split("\n"):
-        if not name:
-            continue
-
-        target = target_for_name(name)
-        tags = test_tags.copy()
-        if name in in_development_tests:
-            tags.add(TestTag.IN_DEVELOPMENT)
-
-        yield TestDefinition(
-            run_name=name, name=name, target=target, tags=tags
-        )
-
-
 def _AllFoundYamlTests(treat_repl_unsupported_as_in_development: bool, use_short_run_name: bool):
     """
     use_short_run_name should be true if we want the run_name to be "Test_ABC" instead of "some/path/Test_ABC.yaml"
@@ -342,14 +306,6 @@ def AllReplYamlTests():
 
 def AllChipToolYamlTests():
     for test in _AllFoundYamlTests(treat_repl_unsupported_as_in_development=False, use_short_run_name=True):
-        yield test
-
-
-def AllChipToolTests(chip_tool: str):
-    for test in tests_with_command(chip_tool, is_manual=False):
-        yield test
-
-    for test in tests_with_command(chip_tool, is_manual=True):
         yield test
 
 

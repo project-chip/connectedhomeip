@@ -242,10 +242,8 @@ class TestTag(Enum):
 
 
 class TestRunTime(Enum):
-    CHIP_TOOL_BUILTIN = auto()  # run via chip-tool built-in test commands
     CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
     CHIP_REPL_PYTHON = auto()       # use the python yaml test runner
-    DARWIN_FRAMEWORK_TOOL_BUILTIN = auto()  # run via darwin-framework-tool built-in test commands
 
 
 @dataclass
@@ -272,7 +270,7 @@ class TestDefinition:
         return ", ".join([t.to_s() for t in self.tags])
 
     def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str,
-            timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_BUILTIN):
+            timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_PYTHON):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -349,9 +347,6 @@ class TestDefinition:
                         (' ' if len(tool_storage_args) else '') + ' '.join(tool_storage_args)]
                 pairing_cmd += server_args
                 test_cmd += server_args
-            elif test_runtime == TestRunTime.CHIP_TOOL_BUILTIN:
-                pairing_cmd += tool_storage_args
-                test_cmd += tool_storage_args
 
             if dry_run:
                 # Some of our command arguments have spaces in them, so if we are

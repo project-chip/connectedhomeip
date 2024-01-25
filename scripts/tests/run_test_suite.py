@@ -138,13 +138,10 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    runtime = TestRunTime.CHIP_TOOL_BUILTIN
     if runner == 'chip_repl_python':
         runtime = TestRunTime.CHIP_REPL_PYTHON
     elif runner == 'chip_tool_python':
         runtime = TestRunTime.CHIP_TOOL_PYTHON
-    elif chip_tool is not None and os.path.basename(chip_tool) == "darwin-framework-tool":
-        runtime = TestRunTime.DARWIN_FRAMEWORK_TOOL_BUILTIN
 
     if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
         # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool
@@ -160,10 +157,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.CHIP_REPL_PYTHON:
         all_tests = [test for test in chiptest.AllReplYamlTests()]
-    elif runtime == TestRunTime.CHIP_TOOL_PYTHON and os.path.basename(chip_tool) != "darwin-framework-tool":
+    elif runtime == TestRunTime.CHIP_TOOL_PYTHON:
         all_tests = [test for test in chiptest.AllChipToolYamlTests()]
-    else:
-        all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
 
     tests = all_tests
 
