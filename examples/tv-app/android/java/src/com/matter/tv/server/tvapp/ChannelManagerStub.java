@@ -18,11 +18,10 @@
 package com.matter.tv.server.tvapp;
 
 import android.util.Log;
+import com.matter.tv.server.tvapp.ChannelInfo.ChannelType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.matter.tv.server.tvapp.ChannelInfo.ChannelType;
 
 public class ChannelManagerStub implements ChannelManager {
   private static final String TAG = ChannelManagerStub.class.getSimpleName();
@@ -32,22 +31,29 @@ public class ChannelManagerStub implements ChannelManager {
   private ChannelInfo currentChannel;
 
   ChannelInfo chanAbc = new ChannelInfo(6, 0, "ABC", "KAAL-TV", "KAAL", "id-1", ChannelType.Cable);
-  ChannelInfo chanPbs = new ChannelInfo(9, 1, "PBS", "KCTS-TV", "KCTS", "id-2", ChannelType.Satellite);
-  ChannelInfo chanWor = new ChannelInfo(9, 3, "World Channel", "KCTS-TV", "KCTS","id-4", ChannelType.Terrestrial);
+  ChannelInfo chanPbs =
+      new ChannelInfo(9, 1, "PBS", "KCTS-TV", "KCTS", "id-2", ChannelType.Satellite);
+  ChannelInfo chanWor =
+      new ChannelInfo(9, 3, "World Channel", "KCTS-TV", "KCTS", "id-4", ChannelType.Terrestrial);
 
   private ChannelInfo[] channelList = {
     chanAbc,
     chanPbs,
     chanWor,
-    new ChannelInfo(9, 2, "PBS Kids", "KCTS-TV", "KCTS","id-3", ChannelType.OTT)
+    new ChannelInfo(9, 2, "PBS Kids", "KCTS-TV", "KCTS", "id-3", ChannelType.OTT)
   };
 
   private ChannelProgramInfo[] programList = {
-    new ChannelProgramInfo("progid-abc1", chanAbc, 0, 30*60, "First Show", "First subtitle", "First Description"),
-    new ChannelProgramInfo("progid-pbs1", chanPbs, 0, 30*60, "Show 2", "subtitle 2", "Description 2"),
-    new ChannelProgramInfo("progid-abc2", chanAbc, 30*60, 60*60, "Show 3", "subtitle 3", "Description 3"),
-    new ChannelProgramInfo("progid-abc3", chanAbc, 30*60, 60*60, "Show 4", "subtitle 4", "Description 4"),
-    new ChannelProgramInfo("id-5", chanWor, 60*60, 90*60, "Show 5", "subtitle 5", "Description 5"),
+    new ChannelProgramInfo(
+        "progid-abc1", chanAbc, 0, 30 * 60, "First Show", "First subtitle", "First Description"),
+    new ChannelProgramInfo(
+        "progid-pbs1", chanPbs, 0, 30 * 60, "Show 2", "subtitle 2", "Description 2"),
+    new ChannelProgramInfo(
+        "progid-abc2", chanAbc, 30 * 60, 60 * 60, "Show 3", "subtitle 3", "Description 3"),
+    new ChannelProgramInfo(
+        "progid-abc3", chanAbc, 30 * 60, 60 * 60, "Show 4", "subtitle 4", "Description 4"),
+    new ChannelProgramInfo(
+        "id-5", chanWor, 60 * 60, 90 * 60, "Show 5", "subtitle 5", "Description 5"),
   };
 
   public ChannelManagerStub(int endpoint) {
@@ -160,16 +166,22 @@ public class ChannelManagerStub implements ChannelManager {
   }
 
   @Override
-  public ChannelProgramResponse getProgramGuide(long startTime, long endTime, ChannelInfo[] channels, String pageToken, boolean series, Map.Entry<String, String>[] externalIDList, String data)
-  {
+  public ChannelProgramResponse getProgramGuide(
+      long startTime,
+      long endTime,
+      ChannelInfo[] channels,
+      String pageToken,
+      boolean series,
+      Map.Entry<String, String>[] externalIDList,
+      String data) {
     ChannelProgramResponse resp = new ChannelProgramResponse();
     resp.programs = programList;
     return resp;
   }
 
   @Override
-  public boolean recordProgram(String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data)
-  {
+  public boolean recordProgram(
+      String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data) {
     for (ChannelProgramInfo program : programList) {
       if (program.identifier.equals(identifier)) {
         program.recordFlagSeries = series;
@@ -181,12 +193,11 @@ public class ChannelManagerStub implements ChannelManager {
   }
 
   @Override
-  public boolean cancelRecordProgram(String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data)
-  {
+  public boolean cancelRecordProgram(
+      String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data) {
     for (ChannelProgramInfo program : programList) {
       if (program.identifier.equals(identifier)) {
-        if (series)
-        {
+        if (series) {
           program.recordFlagSeries = false;
         }
         program.recordFlagScheduled = false;
@@ -195,5 +206,4 @@ public class ChannelManagerStub implements ChannelManager {
     }
     return false;
   }
-
 }

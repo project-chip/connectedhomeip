@@ -139,6 +139,7 @@ public interface MediaPlaybackManager {
 
   /**
    * Deactivate the current test track
+   *
    * @return the response status defined in RESPONSE_STATUS_XXX
    */
   int deactivateTextTrack();
@@ -150,5 +151,4 @@ public interface MediaPlaybackManager {
    * @return active track or null
    */
   MediaTrack getActiveTrack(boolean audio);
-
 }

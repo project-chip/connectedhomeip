@@ -40,7 +40,13 @@ public class ChannelInfo {
   public ChannelType type;
 
   public ChannelInfo(
-      int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign, String identifier, ChannelType type) {
+      int majorNumber,
+      int minorNumber,
+      String name,
+      String callSign,
+      String affiliateCallSign,
+      String identifier,
+      ChannelType type) {
     this.status = kSuccess;
     this.majorNumber = majorNumber;
     this.minorNumber = minorNumber;
