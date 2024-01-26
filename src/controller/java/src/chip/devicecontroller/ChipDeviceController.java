@@ -1193,8 +1193,8 @@ public class ChipDeviceController {
   public static byte[] createRootCertificate(
       KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
     // current time
-    Calendar start = Calendar.getInstance();
-    Calendar end = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
     end.add(Calendar.YEAR, 10);
     return createRootCertificate(keypair, issuerId, fabricId, start, end);
@@ -1215,9 +1215,9 @@ public class ChipDeviceController {
       long issuerId,
       @Nullable Long fabricId) {
     // current time
-    Calendar start = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
-    Calendar end = Calendar.getInstance();
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     end.add(Calendar.YEAR, 10);
     return createIntermediateCertificate(
         rootKeypair, rootCertificate, intermediatePublicKey, issuerId, fabricId, start, end);
@@ -1251,9 +1251,9 @@ public class ChipDeviceController {
       long nodeId,
       List<Integer> caseAuthenticatedTags) {
     // current time
-    Calendar start = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
-    Calendar end = Calendar.getInstance();
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     end.add(Calendar.YEAR, 10);
     return createOperationalCertificate(
         signingKeypair,
