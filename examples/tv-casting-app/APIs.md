@@ -67,6 +67,9 @@ Next, you're ready to:
 1. [Read](#read-operations) endpoint attributes like playback state.
 1. [Subscribe](#subscriptions) to playback events.
 
+In order to illustrate more specifically these steps,refer to the below figure
+![workflow of casting video player](./diagram/workflow%20of%20casting%20video%20player%20.png)
+
 ## Build and Setup
 
 The Casting Client is expected to consume the Matter TV Casting library built
