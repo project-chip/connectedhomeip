@@ -4183,7 +4183,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     {
     case AliroReaderVerificationKey::Id: {
         uint8_t buffer[kAliroReaderVerificationKeyMaxSize];
-        MutableByteSpan aliroReaderVerificationKey(buffer);
+        MutableByteSpan readerVerificationKey(buffer);
         return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderVerificationKey, aliroReaderVerificationKey, delegate, aEncoder);
     }
     case AliroReaderGroupIdentifier::Id: {

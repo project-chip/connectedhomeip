@@ -48,7 +48,7 @@ public:
      * @param[out] verificationKey The MutableByteSpan to copy the verification key into. On success,
      *             the callee must update the length to the length of the copied data.
      */
-    virtual CHIP_ERROR GetAliroReaderVerificationKey(MutableByteSpan & aliroVerificationKey) = 0;
+    virtual CHIP_ERROR GetAliroReaderVerificationKey(MutableByteSpan & verificationKey) = 0;
 
     /**
      * @brief Get the Reader's group identifier
@@ -56,7 +56,7 @@ public:
      * @param[out] groupIdentifier The MutableByteSpan to copy the group identifier into. On success,
      *             the callee must update the length to the length of the copied data.
      */
-    virtual CHIP_ERROR GetAliroReaderGroupIdentifier(MutableByteSpan & aliroGroupIdentifier) = 0;
+    virtual CHIP_ERROR GetAliroReaderGroupIdentifier(MutableByteSpan & groupIdentifier) = 0;
 
     /**
      * @brief Get the Reader's group subidentifier
@@ -64,7 +64,7 @@ public:
      * @param[out] groupSubIdentifier  The MutableByteSpan to copy the group subidentifier into. On success,
      *             the callee must update the length to the length of the copied data.
      */
-    virtual CHIP_ERROR GetAliroReaderGroupSubIdentifier(MutableByteSpan & aliroGroupSubIdentifier) = 0;
+    virtual CHIP_ERROR GetAliroReaderGroupSubIdentifier(MutableByteSpan & groupSubIdentifier) = 0;
 
     /**
      * @brief Get the Aliro expedited transaction supported protocol version at the given index.
@@ -79,10 +79,10 @@ public:
     /**
      * @brief Get the Reader's group resolving key.
      *
-     * @param[out] aliroGroupResolvingKey The MutableByteSpan to copy the aliro group resolving key into. On success,
+     * @param[out] groupResolvingKey The MutableByteSpan to copy the group resolving key into. On success,
      *             the callee must update the length to the length of the copied data.
      */
-    virtual CHIP_ERROR GetAliroGroupResolvingKey(MutableByteSpan & aliroGroupResolvingKey) = 0;
+    virtual CHIP_ERROR GetAliroGroupResolvingKey(MutableByteSpan & groupResolvingKey) = 0;
 
     /**
      * @brief Get the Aliro supported BLE UWB protocol version at the given index.
@@ -96,9 +96,9 @@ public:
     /**
      * @brief Get the Aliro BLE Advertising Version.
      *
-     * @param[out] aliroBLEAdvertisingVersion The BLE Advertising Version.
+     * @param[out] bleAdvertisingVersion The BLE Advertising Version.
      */
-    virtual CHIP_ERROR GetAliroBLEAdvertisingVersion(uint8_t & aliroBLEAdvertisingVersion) = 0;
+    virtual CHIP_ERROR GetAliroBLEAdvertisingVersion(uint8_t & bleAdvertisingVersion) = 0;
 
     /**
      * @brief Get the maximum number of Aliro credential issuer keys supported.

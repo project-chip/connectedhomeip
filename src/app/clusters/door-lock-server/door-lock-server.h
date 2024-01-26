@@ -1321,7 +1321,6 @@ bool emberAfPluginDoorLockSetAliroReaderConfig(chip::EndpointId endpointId, cons
 /**
  * @brief This callback is called when Door Lock cluster needs to clear an existing Aliro reader configuration from the door lock.
  *
- * @note This function is used for clearing the existing Aliro reader configuration.
  *
  * @param endpointId ID of the endpoint which contains the lock.
  *
