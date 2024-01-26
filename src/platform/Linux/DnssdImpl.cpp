@@ -893,7 +893,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
             avahi_service_resolver_free(resolver);
             context->mResolver = avahi_service_resolver_new(
                 context->mInstance->mClient, context->mInterface, context->mTransport, context->mName, context->mFullType.c_str(),
-                nullptr, context->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve, context);
+                nullptr, context->mAddressType, static_cast<AvahiLookupFlags>(0), HandleResolve, userdata);
             if (context->mResolver == nullptr)
             {
                 ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
