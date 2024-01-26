@@ -1,4 +1,4 @@
-# Requirements for running chip-repl in jypyterlab
+# Requirements for running chip-repl in jupyterlab
 # Once installed, start with
 #
 # jupyter-lab
