@@ -20,10 +20,9 @@ import asyncio
 from typing import Dict, List
 
 from mdns_discovery.exceptions import DiscoveryNotPerformedError
+from mdns_discovery.mdns_service_info import MdnsServiceInfo
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo
-
-from mdns_discovery.mdns_service_info import MdnsServiceInfo
 
 from .mdns_type_enum import MdnsType
 
