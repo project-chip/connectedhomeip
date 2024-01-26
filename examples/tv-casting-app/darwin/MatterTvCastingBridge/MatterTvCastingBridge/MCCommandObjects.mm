@@ -19,7 +19,6 @@
 
 #import "MCCastingApp.h"
 #import "MCCommand_Internal.h"
-
 #import "MCErrorUtils.h"
 
 #include "core/Command.h"

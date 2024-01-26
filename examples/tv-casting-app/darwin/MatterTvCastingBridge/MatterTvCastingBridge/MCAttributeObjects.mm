@@ -19,7 +19,6 @@
 
 #import "MCAttribute_Internal.h"
 #import "MCCastingApp.h"
-
 #import "MCErrorUtils.h"
 
 #include "core/Attribute.h"

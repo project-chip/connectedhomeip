@@ -89,7 +89,7 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
 
 - (NSString * _Nonnull)description
 {
-    return [NSString stringWithFormat:@"%@ with Product ID: %@ and Vendor ID: %@. Resolved IPAddr?: %@",
+    return [NSString stringWithFormat:@"%@ with Product ID: %hu and Vendor ID: %hu. Resolved IPAddr?: %@",
                      self.deviceName, self.productId, self.vendorId, self.ipAddresses != nil && self.ipAddresses.count > 0 ? @"YES" : @"NO"];
 }
 
@@ -103,19 +103,19 @@ static const NSInteger kMinCommissioningWindowTimeoutSec = matter::casting::core
     return [NSString stringWithCString:_cppCastingPlayer->GetDeviceName() encoding:NSUTF8StringEncoding];
 }
 
-- (NSNumber * _Nonnull)productId
+- (uint16_t)productId
 {
-    return [NSNumber numberWithUnsignedShort:_cppCastingPlayer->GetProductId()];
+    return _cppCastingPlayer->GetProductId();
 }
 
-- (NSNumber * _Nonnull)vendorId
+- (uint16_t)vendorId
 {
-    return [NSNumber numberWithUnsignedShort:_cppCastingPlayer->GetVendorId()];
+    return _cppCastingPlayer->GetVendorId();
 }
 
-- (NSNumber * _Nonnull)deviceType
+- (uint32_t)deviceType
 {
-    return [NSNumber numberWithUnsignedInt:_cppCastingPlayer->GetDeviceType()];
+    return _cppCastingPlayer->GetDeviceType();
 }
 
 - (NSArray * _Nonnull)ipAddresses

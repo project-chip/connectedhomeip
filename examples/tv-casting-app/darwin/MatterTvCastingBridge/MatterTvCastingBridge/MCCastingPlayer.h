@@ -67,9 +67,9 @@
 
 - (NSString * _Nonnull)identifier;
 - (NSString * _Nonnull)deviceName;
-- (NSNumber * _Nonnull)vendorId;
-- (NSNumber * _Nonnull)productId;
-- (NSNumber * _Nonnull)deviceType;
+- (uint16_t)vendorId;
+- (uint16_t)productId;
+- (uint32_t)deviceType;
 - (NSArray * _Nonnull)ipAddresses;
 
 /**
