@@ -79,7 +79,7 @@ class TC_IDM_1_4(MatterBaseTest):
         asserts.assert_greater_equal(len(list_of_commands_to_send), 2,
                                      "Step 2 is always expected to try sending at least 2 command, something wrong with test logic")
         try:
-            await dev_ctrl.SendBatchCommands(dut_node_id, list_of_commands_to_send)
+            await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, list_of_commands_to_send, remoteMaxPathsPerInvoke=number_of_commands_to_send)
             # If you get the assert below it is likely because cap_for_batch_commands is actually too low.
             # This might happen after TCP is enabled and DUT supports TCP.
             asserts.fail(
@@ -115,7 +115,7 @@ class TC_IDM_1_4(MatterBaseTest):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id
 
-        self.print_step(3, "Sending sending two InvokeRequest with idential paths")
+        self.print_step(3, "Sending sending two InvokeRequests with idential paths")
         command = Clusters.BasicInformation.Commands.MfgSpecificPing()
         endpoint = 0
         invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
@@ -127,7 +127,22 @@ class TC_IDM_1_4(MatterBaseTest):
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             logging.info("DUT successfully failed to process two InvokeRequests that contains non-unique paths")
 
-        self.print_step(4, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
+        self.print_step(4, "Sending two InvokeRequests with unique paths, but identical CommandRefs")
+        endpoint = 0
+        command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
+            Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate)
+        invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+
+        command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
+        invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+        commandRefsOverride = [1, 1]
+        try:
+            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], commandRefsOverride=commandRefsOverride)
+            asserts.fail("Unexpected success return after sending two unique commands with identical CommandRef in the InvokeRequest")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidAction,
+                                 "DUT sent back an unexpected error, we were expecting InvalidAction")
+            logging.info("DUT successfully failed to process two InvokeRequests that contains non-unique CommandRef")
 
         self.print_step(5, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths")
         endpoint = 0
@@ -145,13 +160,59 @@ class TC_IDM_1_4(MatterBaseTest):
                 result[0], Clusters.OperationalCredentials.Commands.CertificateChainResponse), "Unexpected return type for first InvokeRequest")
             asserts.assert_true(type_matches(
                 result[1], Clusters.GroupKeyManagement.Commands.KeySetReadResponse), "Unexpected return type for second InvokeRequest")
-            self.print_step(5, "DUT successfully responded to a InvokeRequest action with two valid commands")
+            logging.info("DUT successfully responded to a InvokeRequest action with two valid commands")
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
-        self.print_step(6, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30991 resolved")
+        self.print_step(
+            6, "Verify DUT is able to responsed to InvokeRequestMessage that contains one paths InvokeRequest, and one InvokeRequest to unsupported endpoint")
+        # First finding non-existent endpoint
+        wildcard_descriptor = await dev_ctrl.ReadAttribute(dut_node_id, [(Clusters.Descriptor)])
+        endpoints = list(wildcard_descriptor.keys())
+        endpoints.sort()
+        non_existent_endpoint = next(i for i, e in enumerate(endpoints + [None]) if i != e)
 
-        self.print_step(7, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
+        endpoint = 0
+        command = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
+            Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate)
+        invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+
+        endpoint = non_existent_endpoint
+        command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
+        invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+        try:
+            result = await dev_ctrl.SendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2])
+            asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
+            asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")
+            asserts.assert_true(type_matches(
+                result[0], Clusters.OperationalCredentials.Commands.CertificateChainResponse), "Unexpected return type for first InvokeRequest")
+            asserts.assert_true(type_matches(
+                result[1], InteractionModelError), "Unexpected return type for second InvokeRequest")
+            asserts.assert_equal(result[1].status, Status.UnsupportedEndpoint,
+                                 "Unexpected Interaction model error, was expecting UnsupportedEndpoint")
+            logging.info(
+                "DUT successfully responded to first valid InvokeRequest, and successfully errored with UnsupportedEndpoint for the second")
+        except InteractionModelError:
+            asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
+
+        self.print_step(7, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true, but never sent preceding Timed Invoke Action")
+        endpoint = 0
+        command = Clusters.GroupKeyManagement.Commands.KeySetRead(0)
+        invoke_request_1 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+
+        command = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
+        invoke_request_2 = Clusters.Command.InvokeRequestInfo(endpoint, command)
+        # It is safe to use RevokeCommissioning in this test without opening the commissioning window because
+        # we expect a non-path-specific error. As per the specification, non-path-specific errors of this
+        # nature is generated before command dispatch to cluster. In the next test step, we anticipate
+        # receiving a path-specific response to the same command, with the TimedRequestMessage sent before
+        # the InvokeRequestMessage.
+        try:
+            result = await dev_ctrl.TestOnlySendBatchCommands(dut_node_id, [invoke_request_1, invoke_request_2], suppressTimedRequestMessage=True)
+            asserts.fail("Unexpected success call to sending Batch command when non-path specific error expected")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.TimedRequestMismatch,
+                                 "Unexpected error response from Invoke with TimedRequest flag and no TimedInvoke")
 
         self.print_step(8, "Verify DUT is able to responsed to InvokeRequestMessage that contains two valid paths. One of which requires timed invoke, and TimedRequest in InvokeResponseMessage set to true")
         endpoint = 0
@@ -177,9 +238,9 @@ class TC_IDM_1_4(MatterBaseTest):
             self.print_step(
                 8, "DUT successfully responded to a InvokeRequest action with two valid commands. One of which required timed invoke, and TimedRequest in InvokeResponseMessage was set to true")
         except InteractionModelError:
-            asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
+            asserts.fail("DUT failed with non-path specific error when path specific error was expected")
 
-        self.print_step(9, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/30986 resolved")
+        self.print_step(9, "Skipping test until https://github.com/project-chip/connectedhomeip/issues/31434 resolved")
 
 
 if __name__ == "__main__":

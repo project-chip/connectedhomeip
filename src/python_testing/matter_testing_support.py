@@ -25,6 +25,7 @@ import logging
 import os
 import pathlib
 import queue
+import random
 import re
 import sys
 import typing
@@ -44,6 +45,7 @@ from chip.tlv import float32, uint
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
+from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
@@ -401,6 +403,12 @@ def cluster_id_str(id):
 
 
 @dataclass
+class CustomCommissioningParameters:
+    commissioningParameters: CommissioningParameters
+    randomDiscriminator: int
+
+
+@dataclass
 class AttributePathLocation:
     endpoint_id: int
     cluster_id: Optional[int] = None
@@ -748,6 +756,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         picsd = self.matter_test_config.pics
         pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
+
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+        rnd_discriminator = random.randint(0, 4095)
+        try:
+            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                    discriminator=rnd_discriminator, option=1)
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
+            return params
+
+        except InteractionModelError as e:
+            asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:

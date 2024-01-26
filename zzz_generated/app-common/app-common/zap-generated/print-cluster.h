@@ -477,6 +477,20 @@
 #define CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER
 #endif
 
+#if defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_SERVER) || defined(ZCL_USING_ENERGY_EVSE_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER { chip::app::Clusters::EnergyEvseMode::Id, "Energy EVSE Mode" },
+#else
+#define CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER
+#endif
+
+#if defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_SERVER) ||                                                             \
+    defined(ZCL_USING_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER                                                                    \
+    { chip::app::Clusters::DeviceEnergyManagementMode::Id, "Device Energy Management Mode" },
+#else
+#define CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER
+#endif
+
 #if defined(ZCL_USING_DOOR_LOCK_CLUSTER_SERVER) || defined(ZCL_USING_DOOR_LOCK_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER { chip::app::Clusters::DoorLock::Id, "Door Lock" },
 #else
@@ -836,6 +850,8 @@
     CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ENERGY_EVSE_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_ENERGY_PREFERENCE_CLUSTER                                                                                    \
+    CHIP_PRINTCLUSTER_ENERGY_EVSE_MODE_CLUSTER                                                                                     \
+    CHIP_PRINTCLUSTER_DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER                                                                        \
     CHIP_PRINTCLUSTER_DOOR_LOCK_CLUSTER                                                                                            \
     CHIP_PRINTCLUSTER_WINDOW_COVERING_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BARRIER_CONTROL_CLUSTER                                                                                      \

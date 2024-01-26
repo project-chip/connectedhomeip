@@ -4,16 +4,12 @@ import("//build_overrides/chip.gni")
 # Templates used for generation
 matter_idl_generator_templates = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/CallbackStubSource.jinja",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/ClusterInitCallbackSource.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/application/PluginApplicationCallbacksHeader.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/tlvmeta/TLVMetaData_cpp.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/cpp/tlvmeta/TLVMetaData_h.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/idl/MatterIdl.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/CHIPCallbackTypes.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersCpp.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipClustersRead.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipEventStructs.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/CHIPGlobalCallbacks_cpp.jinja",
-  "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/CHIPReadCallbacks_h.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ChipStructs.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ClusterIDMapping.jinja",
   "${chip_root}/scripts/py_matter_idl/matter_idl/generators/java/ClusterReadMapping.jinja",

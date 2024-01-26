@@ -2798,29 +2798,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRICDManagementClusterOnTransitionToActiveModeEvent
-- (instancetype)init
-{
-    if (self = [super init]) {
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRICDManagementClusterOnTransitionToActiveModeEvent alloc] init];
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTROvenCavityOperationalStateClusterErrorStateStruct
 - (instancetype)init
 {
@@ -4887,11 +4864,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _remainingSlotTime = @(0);
 
-        _slotIsPauseable = @(0);
+        _slotIsPauseable = nil;
 
-        _minPauseDuration = @(0);
+        _minPauseDuration = nil;
 
-        _maxPauseDuration = @(0);
+        _maxPauseDuration = nil;
 
         _manufacturerESAState = nil;
 
@@ -4970,6 +4947,8 @@ NS_ASSUME_NONNULL_BEGIN
         _isPauseable = @(0);
 
         _slots = [NSArray array];
+
+        _forecastUpdateReason = @(0);
     }
     return self;
 }
@@ -4986,13 +4965,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.latestEndTime = self.latestEndTime;
     other.isPauseable = self.isPauseable;
     other.slots = self.slots;
+    other.forecastUpdateReason = self.forecastUpdateReason;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPauseable:%@; slots:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPauseable, _slots];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: forecastId:%@; activeSlotNumber:%@; startTime:%@; endTime:%@; earliestStartTime:%@; latestEndTime:%@; isPauseable:%@; slots:%@; forecastUpdateReason:%@; >", NSStringFromClass([self class]), _forecastId, _activeSlotNumber, _startTime, _endTime, _earliestStartTime, _latestEndTime, _isPauseable, _slots, _forecastUpdateReason];
     return descriptionString;
 }
 
@@ -5189,6 +5169,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
+
+        _cause = @(0);
     }
     return self;
 }
@@ -5197,12 +5179,14 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRDeviceEnergyManagementClusterResumedEvent alloc] init];
 
+    other.cause = self.cause;
+
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: cause:%@; >", NSStringFromClass([self class]), _cause];
     return descriptionString;
 }
 
@@ -5236,6 +5220,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTimeMinutesPastMidnight:%@; targetSoC:%@; addedEnergy:%@; >", NSStringFromClass([self class]), _targetTimeMinutesPastMidnight, _targetSoC, _addedEnergy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEClusterChargingTargetScheduleStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _dayOfWeekForSequence = @(0);
+
+        _chargingTargets = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyEVSEClusterChargingTargetScheduleStruct alloc] init];
+
+    other.dayOfWeekForSequence = self.dayOfWeekForSequence;
+    other.chargingTargets = self.chargingTargets;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeekForSequence:%@; chargingTargets:%@; >", NSStringFromClass([self class]), _dayOfWeekForSequence, _chargingTargets];
     return descriptionString;
 }
 
@@ -5464,6 +5478,132 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: step:%@; label:%@; >", NSStringFromClass([self class]), _step, _label];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyEVSEModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTREnergyEVSEModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTREnergyEVSEModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRDeviceEnergyManagementModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDeviceEnergyManagementModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
     return descriptionString;
 }
 
@@ -7961,6 +8101,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTestClusterClusterTestFabricScopedEventEvent : MTRUnitTestingClusterTestFabricScopedEventEvent
 @dynamic fabricIndex;
+@end
+
+@implementation MTRUnitTestingClusterTestDifferentVendorMeiEventEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRUnitTestingClusterTestDifferentVendorMeiEventEvent alloc] init];
+
+    other.arg1 = self.arg1;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; >", NSStringFromClass([self class]), _arg1];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTRSampleMEIClusterPingCountEventEvent
