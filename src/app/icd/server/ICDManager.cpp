@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/icd/server/ICDConfigurationData.h>
 #include <app/icd/server/ICDManager.h>
-#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -43,14 +42,17 @@ static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::mOpenExchangeContextCount cannot hold count for the max exchange count");
 
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeystore,
-                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * manager)
+                      Messaging::ExchangeManager * exchangeManager, SubscriptionsInfoProvider * subInfoProvider)
 {
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(symmetricKeystore != nullptr);
     VerifyOrDie(exchangeManager != nullptr);
-    VerifyOrDie(manager != nullptr);
+    VerifyOrDie(subInfoProvider != nullptr);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
+#if CHIP_CONFIG_ENABLE_ICD_LIT
     // LIT ICD Verification Checks
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
@@ -65,18 +67,21 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
         // VerifyOrDieWithMsg((GetSlowPollingInterval() <= GetSITPollingThreshold()) , AppServer,
         //                    "LIT support is required for slow polling intervals superior to 15 seconds");
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     mStorage           = storage;
     mFabricTable       = fabricTable;
     mSymmetricKeystore = symmetricKeystore;
     mExchangeManager   = exchangeManager;
-    mSubManager        = manager;
+    mSubInfoProvider   = subInfoProvider;
 
     VerifyOrDie(ICDConfigurationData::GetInstance().GetICDCounter().Init(mStorage, DefaultStorageKeyAllocator::ICDCheckInCounter(),
                                                                          ICDConfigurationData::kICDCounterPersistenceIncrement) ==
                 CHIP_NO_ERROR);
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::IdleMode);
@@ -93,13 +98,14 @@ void ICDManager::Shutdown()
 
     ICDConfigurationData::GetInstance().SetICDMode(ICDConfigurationData::ICDMode::SIT);
     mOperationalState = OperationalState::ActiveMode;
-
-    mStorage     = nullptr;
-    mFabricTable = nullptr;
-    mSubManager  = nullptr;
-
     mStateObserverPool.ReleaseAll();
+
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+    mStorage         = nullptr;
+    mFabricTable     = nullptr;
+    mSubInfoProvider = nullptr;
     mICDSenderPool.ReleaseAll();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 }
 
 bool ICDManager::SupportsFeature(Feature feature)
@@ -114,6 +120,7 @@ bool ICDManager::SupportsFeature(Feature feature)
 #endif // !CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
 void ICDManager::SendCheckInMsgs()
 {
 #if !CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -150,7 +157,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            bool active = mSubManager->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
+            bool active = mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
             if (active)
             {
                 continue;
@@ -181,12 +188,66 @@ void ICDManager::SendCheckInMsgs()
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 }
 
+bool ICDManager::CheckInMessagesWouldBeSent()
+{
+    for (const auto & fabricInfo : *mFabricTable)
+    {
+        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
+
+        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
+                                 mSymmetricKeystore);
+        if (table.IsEmpty())
+        {
+            continue;
+        }
+
+        for (uint16_t i = 0; i < table.Limit(); i++)
+        {
+            ICDMonitoringEntry entry(mSymmetricKeystore);
+            CHIP_ERROR err = table.Get(i, entry);
+            if (err == CHIP_ERROR_NOT_FOUND)
+            {
+                break;
+            }
+
+            if (err != CHIP_NO_ERROR)
+            {
+                // Try to fetch the next entry upon failure (should not happen).
+                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
+                continue;
+            }
+
+            // At least one registration would require a Check-In message
+            VerifyOrReturnValue(mSubInfoProvider->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
+        }
+    }
+
+    // None of the registrations would require a Check-In message
+    return false;
+}
+
+void ICDManager::TriggerCheckInMessages()
+{
+    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
+
+    // Only trigger Check-In messages when we are in IdleMode.
+    // If we are already in ActiveMode, Check-In messages have already been sent.
+    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
+
+    // If we don't have any Check-In messages to send, do nothing
+    VerifyOrReturn(CheckInMessagesWouldBeSent());
+
+    UpdateOperationState(OperationalState::ActiveMode);
+}
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+
 void ICDManager::UpdateICDMode()
 {
     assertChipStackLockedByCurrentThread();
 
     ICDConfigurationData::ICDMode tempMode = ICDConfigurationData::ICDMode::SIT;
 
+#if CHIP_CONFIG_ENABLE_ICD_LIT
     // Device can only switch to the LIT operating mode if LIT support is present
     if (SupportsFeature(Feature::kLongIdleTimeSupport))
     {
@@ -204,6 +265,7 @@ void ICDManager::UpdateICDMode()
             }
         }
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
     if (ICDConfigurationData::GetInstance().GetICDMode() != tempMode)
     {
@@ -238,15 +300,21 @@ void ICDManager::UpdateOperationState(OperationalState state)
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         // unless the device would need to send Check-In messages
         // TODO(#30281) : Verify how persistent subscriptions affects this at ICDManager::Init
-        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero || CheckInMessagesWouldBeSent())
+        if (ICDConfigurationData::GetInstance().GetActiveModeDuration() > kZero
+#if CHIP_CONFIG_ENABLE_ICD_CIP
+            || CheckInMessagesWouldBeSent()
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
+        )
         {
             DeviceLayer::SystemLayer().StartTimer(ICDConfigurationData::GetInstance().GetIdleModeDuration(), OnIdleModeDone, this);
         }
 
         Milliseconds32 slowPollInterval = ICDConfigurationData::GetInstance().GetSlowPollingInterval();
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
         // Going back to Idle, all Check-In messages are sent
         mICDSenderPool.ReleaseAll();
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
         CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(slowPollInterval);
         if (err != CHIP_NO_ERROR)
@@ -287,10 +355,12 @@ void ICDManager::UpdateOperationState(OperationalState state)
                 ChipLogError(AppServer, "Failed to set Fast Polling Interval: err %" CHIP_ERROR_FORMAT, err.Format());
             }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
             if (SupportsFeature(Feature::kCheckInProtocolSupport))
             {
                 SendCheckInMsgs();
             }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
             postObserverEvent(ObserverEventType::EnterActiveMode);
         }
@@ -373,12 +443,14 @@ void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
         this->mOpenExchangeContextCount++;
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
         // There can be multiple check-in at the same time.
         // Keep track of the requests count.
         this->mCheckInRequestCount++;
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     this->SetKeepActiveModeRequirements(request, true /* state */);
 }
@@ -408,6 +480,7 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
         }
     }
 
+#if CHIP_CONFIG_ENABLE_ICD_CIP
     if (request.Has(KeepActiveFlag::kCheckInInProgress))
     {
         // There can be multiple open exchange contexts at the same time.
@@ -426,6 +499,7 @@ void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
             this->SetKeepActiveModeRequirements(KeepActiveFlag::kCheckInInProgress, false /* state */);
         }
     }
+#endif // CHIP_CONFIG_ENABLE_ICD_CIP
 
     if (request.Has(KeepActiveFlag::kCommissioningWindowOpen) || request.Has(KeepActiveFlag::kFailSafeArmed))
     {
@@ -506,58 +580,6 @@ void ICDManager::postObserverEvent(ObserverEventType event)
         }
         }
     });
-}
-
-bool ICDManager::CheckInMessagesWouldBeSent()
-{
-    for (const auto & fabricInfo : *mFabricTable)
-    {
-        uint16_t supported_clients = ICDConfigurationData::GetInstance().GetClientsSupportedPerFabric();
-
-        ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), supported_clients /*Table entry limit*/,
-                                 mSymmetricKeystore);
-        if (table.IsEmpty())
-        {
-            continue;
-        }
-
-        for (uint16_t i = 0; i < table.Limit(); i++)
-        {
-            ICDMonitoringEntry entry(mSymmetricKeystore);
-            CHIP_ERROR err = table.Get(i, entry);
-            if (err == CHIP_ERROR_NOT_FOUND)
-            {
-                break;
-            }
-
-            if (err != CHIP_NO_ERROR)
-            {
-                // Try to fetch the next entry upon failure (should not happen).
-                ChipLogError(AppServer, "Failed to retrieved ICDMonitoring entry, will try next entry.");
-                continue;
-            }
-
-            // At least one registration would require a Check-In message
-            VerifyOrReturnValue(mSubManager->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
-        }
-    }
-
-    // None of the registrations would require a Check-In message
-    return false;
-}
-
-void ICDManager::TriggerCheckInMessages()
-{
-    VerifyOrReturn(SupportsFeature(Feature::kCheckInProtocolSupport));
-
-    // Only trigger Check-In messages when we are in IdleMode.
-    // If we are already in ActiveMode, Check-In messages have already been sent.
-    VerifyOrReturn(mOperationalState == OperationalState::IdleMode);
-
-    // If we don't have any Check-In messages to send, do nothing
-    VerifyOrReturn(CheckInMessagesWouldBeSent());
-
-    UpdateOperationState(OperationalState::ActiveMode);
 }
 
 } // namespace app
