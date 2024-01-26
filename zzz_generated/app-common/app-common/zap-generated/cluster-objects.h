@@ -43,16 +43,6 @@ namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
 
-using ChangeIndicationEnum      = Clusters::detail::Enums::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionEnum;
-using ErrorStateEnum            = Clusters::detail::Enums::ErrorStateEnum;
-using LevelValueEnum            = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum     = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementTypeEnum       = Clusters::detail::Enums::MeasurementTypeEnum;
-using MeasurementUnitEnum       = Clusters::detail::Enums::MeasurementUnitEnum;
-using OperationalStateEnum      = Clusters::detail::Enums::OperationalStateEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
-
 namespace ModeTagStruct {
 enum class Fields : uint8_t
 {
@@ -13721,8 +13711,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Timer
 namespace OvenCavityOperationalState {
-using ErrorStateEnum       = Clusters::detail::Enums::ErrorStateEnum;
-using OperationalStateEnum = Clusters::detail::Enums::OperationalStateEnum;
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
 namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
@@ -17366,8 +17354,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace MicrowaveOvenControl
 namespace OperationalState {
-using ErrorStateEnum       = Clusters::detail::Enums::ErrorStateEnum;
-using OperationalStateEnum = Clusters::detail::Enums::OperationalStateEnum;
 namespace Structs {
 namespace ErrorStateStruct       = Clusters::detail::Structs::ErrorStateStruct;
 namespace OperationalStateStruct = Clusters::detail::Structs::OperationalStateStruct;
@@ -19037,9 +19023,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ScenesManagement
 namespace HepaFilterMonitoring {
-using ChangeIndicationEnum      = Clusters::detail::Enums::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
 namespace Structs {
 namespace ReplacementProductStruct {
 enum class Fields : uint8_t
@@ -19248,9 +19231,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace HepaFilterMonitoring
 namespace ActivatedCarbonFilterMonitoring {
-using ChangeIndicationEnum      = Clusters::detail::Enums::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::Enums::DegradationDirectionEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
 namespace Structs {
 namespace ReplacementProductStruct {
 enum class Fields : uint8_t
@@ -20137,7 +20117,6 @@ public:
 } // namespace Events
 } // namespace ValveConfigurationAndControl
 namespace ElectricalPowerMeasurement {
-using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
 namespace Structs {
 namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
 namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
@@ -20560,7 +20539,6 @@ public:
 } // namespace Events
 } // namespace ElectricalPowerMeasurement
 namespace ElectricalEnergyMeasurement {
-using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
 namespace Structs {
 namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
 namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
@@ -32333,9 +32311,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OccupancySensing
 namespace CarbonMonoxideConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -32541,9 +32516,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace CarbonMonoxideConcentrationMeasurement
 namespace CarbonDioxideConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -32749,9 +32721,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace CarbonDioxideConcentrationMeasurement
 namespace NitrogenDioxideConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -32957,9 +32926,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace NitrogenDioxideConcentrationMeasurement
 namespace OzoneConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33165,9 +33131,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OzoneConcentrationMeasurement
 namespace Pm25ConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33373,9 +33336,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Pm25ConcentrationMeasurement
 namespace FormaldehydeConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33581,9 +33541,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace FormaldehydeConcentrationMeasurement
 namespace Pm1ConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33789,9 +33746,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Pm1ConcentrationMeasurement
 namespace Pm10ConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -33997,9 +33951,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Pm10ConcentrationMeasurement
 namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -34205,9 +34156,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TotalVolatileOrganicCompoundsConcentrationMeasurement
 namespace RadonConcentrationMeasurement {
-using LevelValueEnum        = Clusters::detail::Enums::LevelValueEnum;
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
-using MeasurementUnitEnum   = Clusters::detail::Enums::MeasurementUnitEnum;
 
 namespace Attributes {
 
@@ -41388,6 +41336,16 @@ struct Type;
 struct DecodableType;
 } // namespace TestSecondBatchHelperRequest
 
+namespace TestDifferentVendorMeiRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestDifferentVendorMeiRequest
+
+namespace TestDifferentVendorMeiResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestDifferentVendorMeiResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -42735,6 +42693,73 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestSecondBatchHelperRequest
+namespace TestDifferentVendorMeiRequest {
+enum class Fields : uint8_t
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestDifferentVendorMeiRequest
+namespace TestDifferentVendorMeiResponse {
+enum class Fields : uint8_t
+{
+    kArg1        = 0,
+    kEventNumber = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1         = static_cast<uint8_t>(0);
+    uint64_t eventNumber = static_cast<uint64_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestDifferentVendorMeiResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1         = static_cast<uint8_t>(0);
+    uint64_t eventNumber = static_cast<uint64_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestDifferentVendorMeiResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -43776,6 +43801,18 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
 };
 } // namespace ClusterRevision
+namespace MeiInt8u {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeiInt8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MeiInt8u
 
 struct TypeInfo
 {
@@ -43877,6 +43914,7 @@ struct TypeInfo
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+        Attributes::MeiInt8u::TypeInfo::DecodableType meiInt8u               = static_cast<uint8_t>(0);
     };
 };
 } // namespace Attributes
@@ -43964,6 +44002,39 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 } // namespace TestFabricScopedEvent
+namespace TestDifferentVendorMeiEvent {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+
+enum class Fields : uint8_t
+{
+    kArg1 = 1,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TestDifferentVendorMeiEvent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return Events::TestDifferentVendorMeiEvent::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace TestDifferentVendorMeiEvent
 } // namespace Events
 } // namespace UnitTesting
 namespace FaultInjection {

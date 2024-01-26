@@ -20091,6 +20091,17 @@ public class ClusterReadMapping {
           readUnitTestingWriteOnlyInt8uCommandParams
         );
         result.put("readWriteOnlyInt8uAttribute", readUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingMeiInt8uCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingMeiInt8uAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readMeiInt8uAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readUnitTestingMeiInt8uCommandParams
+        );
+        result.put("readMeiInt8uAttribute", readUnitTestingMeiInt8uAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

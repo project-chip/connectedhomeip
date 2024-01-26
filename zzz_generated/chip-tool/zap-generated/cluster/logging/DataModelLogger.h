@@ -599,6 +599,8 @@ static CHIP_ERROR LogValue(const char * label, size_t indent,
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::UnitTesting::Events::TestFabricScopedEvent::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::UnitTesting::Events::TestDifferentVendorMeiEvent::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::SampleMei::Events::PingCountEvent::DecodableType & value);
 
 static CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -771,5 +773,7 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::UnitTesting::Commands::TestBatchHelperResponse::DecodableType & value);
+static CHIP_ERROR LogValue(const char * label, size_t indent,
+                           const chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType & value);
 static CHIP_ERROR LogValue(const char * label, size_t indent,
                            const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & value);

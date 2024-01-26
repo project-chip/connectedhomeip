@@ -610,7 +610,30 @@
             "CumulativeEnergyImported",
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
-            "PeriodicEnergyExported"
+            "PeriodicEnergyExported",
+            "FeatureMap"
+        ],
+        "Electrical Power Measurement": [
+            "PowerMode",
+            "NumberOfMeasurementTypes",
+            "Accuracy",
+            "Ranges",
+            "Voltage",
+            "ActiveCurrent",
+            "ReactiveCurrent",
+            "ApparentCurrent",
+            "ActivePower",
+            "ReactivePower",
+            "ApparentPower",
+            "RMSVoltage",
+            "RMSCurrent",
+            "RMSPower",
+            "Frequency",
+            "HarmonicCurrents",
+            "HarmonicPhases",
+            "PowerFactor",
+            "NeutralCurrent",
+            "FeatureMap"
         ],
         "Electrical Power Measurement": [
             "PowerMode",

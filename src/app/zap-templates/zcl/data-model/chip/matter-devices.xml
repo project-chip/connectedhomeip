@@ -87,8 +87,6 @@ limitations under the License.
             <include cluster="WiFi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="ICD Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Electrical Power Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Electrical Energy Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -110,17 +108,17 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-electricalmeasurement</name>
+        <name>MA-electricalsensor</name>
         <domain>CHIP</domain>
-        <typeName>Matter Electrical Measurement</typeName>
+        <typeName>Matter Electrical Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0xFFF10010</deviceId><!-- TODO: ID-TBD -->
+        <deviceId editable="false">0x0510</deviceId>
         <class>Utility</class>
         <scope>Node</scope>
         <clusters lockOthers="true">
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Electrical Energy Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Power Measurement" client="false" server="true" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>

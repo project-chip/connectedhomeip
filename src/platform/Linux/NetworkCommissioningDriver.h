@@ -77,6 +77,8 @@ public:
         uint8_t credentialsLen = 0;
     };
 
+    void Set5gSupport(bool is5gSupported) { mIs5gSupported = is5gSupported; }
+
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
     CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
@@ -99,11 +101,23 @@ public:
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
+    uint32_t GetSupportedWiFiBandsMask() const override
+    {
+        uint32_t supportedBands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+        if (mIs5gSupported)
+        {
+            supportedBands |= static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k5g));
+        }
+        return supportedBands;
+    }
+
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
+    bool mIs5gSupported = false;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 

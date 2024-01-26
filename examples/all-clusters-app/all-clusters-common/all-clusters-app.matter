@@ -3492,7 +3492,7 @@ cluster RvcOperationalState = 97 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster ScenesManagement = 98 {
-  revision 5;
+  revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
@@ -6721,6 +6721,10 @@ internal cluster UnitTesting = 4294048773 {
     fabric_idx fabricIndex = 254;
   }
 
+  info event TestDifferentVendorMeiEvent = 4294050030 {
+    int8u arg1 = 1;
+  }
+
   attribute boolean boolean = 0;
   attribute Bitmap8MaskMap bitmap8 = 1;
   attribute Bitmap16MaskMap bitmap16 = 2;
@@ -6803,6 +6807,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute nullable int16u nullableRangeRestrictedInt16u = 16424;
   attribute nullable int16s nullableRangeRestrictedInt16s = 16425;
   attribute optional int8u writeOnlyInt8u = 16426;
+  attribute int8u meiInt8u = 4294070017;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6998,6 +7003,15 @@ internal cluster UnitTesting = 4294048773 {
     int8u fillCharacter = 2;
   }
 
+  request struct TestDifferentVendorMeiRequestRequest {
+    int8u arg1 = 0;
+  }
+
+  response struct TestDifferentVendorMeiResponse = 4294049979 {
+    int8u arg1 = 0;
+    int64u eventNumber = 1;
+  }
+
   /** Simple command without any parameters and without a specific response.
         To aid in unit testing, this command will re-initialize attribute storage to defaults. */
   command Test(): DefaultSuccess = 0;
@@ -7068,6 +7082,8 @@ internal cluster UnitTesting = 4294048773 {
   command TestBatchHelperRequest(TestBatchHelperRequestRequest): TestBatchHelperResponse = 22;
   /** Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with fillCharacter. */
   command TestSecondBatchHelperRequest(TestSecondBatchHelperRequestRequest): TestBatchHelperResponse = 23;
+  /** Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent. */
+  command TestDifferentVendorMeiRequest(TestDifferentVendorMeiRequestRequest): TestDifferentVendorMeiResponse = 4294049962;
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
@@ -7333,10 +7349,15 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
 
     handle command RetrieveLogsRequest;
+    handle command RetrieveLogsResponse;
   }
 
   server cluster GeneralDiagnostics {
@@ -8074,7 +8095,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -8197,7 +8218,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -8213,7 +8234,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x000F;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -8839,6 +8860,7 @@ endpoint 1 {
   server cluster UnitTesting {
     emits event TestEvent;
     emits event TestFabricScopedEvent;
+    emits event TestDifferentVendorMeiEvent;
     ram      attribute boolean default = false;
     ram      attribute bitmap8 default = 0;
     ram      attribute bitmap16 default = 0;
@@ -8922,6 +8944,7 @@ endpoint 1 {
     callback attribute writeOnlyInt8u default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+    ram      attribute meiInt8u default = 0;
 
     handle command Test;
     handle command TestSpecificResponse;
@@ -8951,6 +8974,8 @@ endpoint 1 {
     handle command TestEmitTestFabricScopedEventRequest;
     handle command TestBatchHelperRequest;
     handle command TestSecondBatchHelperRequest;
+    handle command TestDifferentVendorMeiRequest;
+    handle command TestDifferentVendorMeiResponse;
   }
 }
 endpoint 2 {
@@ -9053,7 +9078,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;

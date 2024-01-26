@@ -24,9 +24,9 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::ChangeIndicationEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ChangeIndicationEnum val)
 {
-    using EnumType = detail::Enums::ChangeIndicationEnum;
+    using EnumType = detail::ChangeIndicationEnum;
     switch (val)
     {
     case EnumType::kOk:
@@ -37,9 +37,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::ChangeIn
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::DegradationDirectionEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::DegradationDirectionEnum val)
 {
-    using EnumType = detail::Enums::DegradationDirectionEnum;
+    using EnumType = detail::DegradationDirectionEnum;
     switch (val)
     {
     case EnumType::kUp:
@@ -49,9 +49,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::Degradat
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::ErrorStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ErrorStateEnum val)
 {
-    using EnumType = detail::Enums::ErrorStateEnum;
+    using EnumType = detail::ErrorStateEnum;
     switch (val)
     {
     case EnumType::kNoError:
@@ -63,9 +63,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::ErrorSta
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::LevelValueEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::LevelValueEnum val)
 {
-    using EnumType = detail::Enums::LevelValueEnum;
+    using EnumType = detail::LevelValueEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -78,9 +78,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::LevelVal
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::MeasurementMediumEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementMediumEnum val)
 {
-    using EnumType = detail::Enums::MeasurementMediumEnum;
+    using EnumType = detail::MeasurementMediumEnum;
     switch (val)
     {
     case EnumType::kAir:
@@ -91,9 +91,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::Measurem
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::MeasurementTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementTypeEnum val)
 {
-    using EnumType = detail::Enums::MeasurementTypeEnum;
+    using EnumType = detail::MeasurementTypeEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -116,9 +116,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::Measurem
         return static_cast<EnumType>(15);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::MeasurementUnitEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::MeasurementUnitEnum val)
 {
-    using EnumType = detail::Enums::MeasurementUnitEnum;
+    using EnumType = detail::MeasurementUnitEnum;
     switch (val)
     {
     case EnumType::kPpm:
@@ -134,9 +134,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::Measurem
         return static_cast<EnumType>(8);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::OperationalStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::OperationalStateEnum val)
 {
-    using EnumType = detail::Enums::OperationalStateEnum;
+    using EnumType = detail::OperationalStateEnum;
     switch (val)
     {
     case EnumType::kStopped:
@@ -148,9 +148,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::Operatio
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::ProductIdentifierTypeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::ProductIdentifierTypeEnum val)
 {
-    using EnumType = detail::Enums::ProductIdentifierTypeEnum;
+    using EnumType = detail::ProductIdentifierTypeEnum;
     switch (val)
     {
     case EnumType::kUpc:

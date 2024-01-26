@@ -10,9 +10,9 @@ namespace Clusters {
 {{#zcl_enums}}
 {{#if has_more_than_one_cluster}}
 {{#unless (isInConfigList (concat "::" label) "EnumsNotUsedAsTypeInXML")}}
-static auto __attribute__((unused)) EnsureKnownEnumValue(detail::Enums::{{asType label}} val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(detail::{{asType label}} val)
 {
-    using EnumType = detail::Enums::{{asType label}};
+    using EnumType = detail::{{asType label}};
     switch (val) {
     {{#zcl_enum_items}}
     case EnumType::k{{asUpperCamelCase label}}:

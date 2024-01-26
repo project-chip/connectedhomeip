@@ -1946,11 +1946,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ElectricalPowerMeasurement {
 namespace Attributes {
 
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
@@ -1961,11 +1956,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace ElectricalEnergyMeasurement {
 namespace Attributes {
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
 
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
@@ -5513,6 +5503,11 @@ namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
+
+namespace MeiInt8u {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace MeiInt8u
 
 } // namespace Attributes
 } // namespace UnitTesting

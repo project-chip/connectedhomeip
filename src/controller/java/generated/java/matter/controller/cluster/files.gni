@@ -207,6 +207,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ThreadNetworkDiagnosticsClusterNetworkFaultChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/TimeSynchronizationClusterDSTStatusEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/TimeSynchronizationClusterTimeZoneStatusEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/UnitTestingClusterTestDifferentVendorMeiEventEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/UnitTestingClusterTestEventEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/UnitTestingClusterTestFabricScopedEventEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/ValveConfigurationAndControlClusterValveFaultEvent.kt",

@@ -40,12 +40,12 @@ limitations under the License.
     <cluster code="0x0091"/>
     <item fieldId="0" name="RangeMin" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
     <item fieldId="1" name="RangeMax" type="int64s" min="-4611686018427387904" max="4611686018427387904"/>
-    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true" default="0"/>
-    <item fieldId="3" name="PercentMin" type="percent100ths" optional="true" default="0"/>
-    <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true" default="0"/>
-    <item fieldId="5" name="FixedMax" type="int64u" optional="true" default="0" max="4611686018427387903"/>
-    <item fieldId="6" name="FixedMin" type="int64u" optional="true" default="0" max="4611686018427387903"/>
-    <item fieldId="7" name="FixedTypical" type="int64u" optional="true" default="0" max="4611686018427387903"/>
+    <item fieldId="2" name="PercentMax" type="percent100ths" optional="true"/>
+    <item fieldId="3" name="PercentMin" type="percent100ths" optional="true"/>
+    <item fieldId="4" name="PercentTypical" type="percent100ths" optional="true"/>
+    <item fieldId="5" name="FixedMax" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="6" name="FixedMin" type="int64u" optional="true" max="4611686018427387903"/>
+    <item fieldId="7" name="FixedTypical" type="int64u" optional="true" max="4611686018427387903"/>
   </struct>
   <struct name="MeasurementAccuracyStruct" apiMaturity="provisional">
     <cluster code="0x0090"/>

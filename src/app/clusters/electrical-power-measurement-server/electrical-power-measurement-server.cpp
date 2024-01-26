@@ -207,7 +207,8 @@ CHIP_ERROR Instance::ReadAccuracy(AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     auto accuracies = mDelegate.IterateAccuracy();
-    err             = aEncoder.EncodeList([&accuracies](const auto & encoder) -> CHIP_ERROR {
+    VerifyOrReturnError(accuracies != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    err = aEncoder.EncodeList([&accuracies](const auto & encoder) -> CHIP_ERROR {
         Structs::MeasurementAccuracyStruct::Type accuracy;
         while (accuracies->Next(accuracy))
         {
@@ -228,7 +229,8 @@ CHIP_ERROR Instance::ReadRanges(AttributeValueEncoder & aEncoder)
     }
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto ranges    = mDelegate.IterateRanges();
-    err            = aEncoder.EncodeList([&ranges](const auto & encoder) -> CHIP_ERROR {
+    VerifyOrReturnError(ranges != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    err = aEncoder.EncodeList([&ranges](const auto & encoder) -> CHIP_ERROR {
         Structs::MeasurementRangeStruct::Type range;
         while (ranges->Next(range))
         {
@@ -248,7 +250,8 @@ CHIP_ERROR Instance::ReadHarmonicCurrents(AttributeValueEncoder & aEncoder)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto currents  = mDelegate.IterateHarmonicCurrents();
-    err            = aEncoder.EncodeList([&currents](const auto & encoder) -> CHIP_ERROR {
+    VerifyOrReturnError(currents != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    err = aEncoder.EncodeList([&currents](const auto & encoder) -> CHIP_ERROR {
         Structs::HarmonicMeasurementStruct::Type current;
         while (currents->Next(current))
         {
@@ -267,7 +270,8 @@ CHIP_ERROR Instance::ReadHarmonicPhases(AttributeValueEncoder & aEncoder)
                         ChipLogError(Zcl, "Electrical Power Measurement: can not get HarmonicPhases, feature is not supported"));
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto phases    = mDelegate.IterateHarmonicPhases();
-    err            = aEncoder.EncodeList([&phases](const auto & encoder) -> CHIP_ERROR {
+    VerifyOrReturnError(phases != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+    err = aEncoder.EncodeList([&phases](const auto & encoder) -> CHIP_ERROR {
         Structs::HarmonicMeasurementStruct::Type phase;
         while (phases->Next(phase))
         {

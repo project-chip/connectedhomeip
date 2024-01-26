@@ -27,7 +27,6 @@ namespace Clusters {
 
 namespace detail {
 // Enums shared across multiple clusters.
-namespace Enums {
 
 // Enum for ChangeIndicationEnum
 enum class ChangeIndicationEnum : uint8_t
@@ -168,10 +167,7 @@ enum class ProductIdentifierTypeEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
-} // namespace Enums
-
 // Bitmaps shared across multiple clusters.
-namespace Bitmaps {} // namespace Bitmaps
 
 } // namespace detail
 
@@ -1666,9 +1662,9 @@ enum class Feature : uint32_t
 
 namespace OvenCavityOperationalState {
 
-using ErrorStateEnum = Clusters::detail::Enums::ErrorStateEnum;
+using ErrorStateEnum = Clusters::detail::ErrorStateEnum;
 
-using OperationalStateEnum = Clusters::detail::Enums::OperationalStateEnum;
+using OperationalStateEnum = Clusters::detail::OperationalStateEnum;
 } // namespace OvenCavityOperationalState
 
 namespace OvenMode {
@@ -2084,9 +2080,9 @@ enum class Feature : uint32_t
 
 namespace OperationalState {
 
-using ErrorStateEnum = Clusters::detail::Enums::ErrorStateEnum;
+using ErrorStateEnum = Clusters::detail::ErrorStateEnum;
 
-using OperationalStateEnum = Clusters::detail::Enums::OperationalStateEnum;
+using OperationalStateEnum = Clusters::detail::OperationalStateEnum;
 } // namespace OperationalState
 
 namespace RvcOperationalState {
@@ -2140,11 +2136,11 @@ enum class Feature : uint32_t
 
 namespace HepaFilterMonitoring {
 
-using ChangeIndicationEnum = Clusters::detail::Enums::ChangeIndicationEnum;
+using ChangeIndicationEnum = Clusters::detail::ChangeIndicationEnum;
 
-using DegradationDirectionEnum = Clusters::detail::Enums::DegradationDirectionEnum;
+using DegradationDirectionEnum = Clusters::detail::DegradationDirectionEnum;
 
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
+using ProductIdentifierTypeEnum = Clusters::detail::ProductIdentifierTypeEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -2157,11 +2153,11 @@ enum class Feature : uint32_t
 
 namespace ActivatedCarbonFilterMonitoring {
 
-using ChangeIndicationEnum = Clusters::detail::Enums::ChangeIndicationEnum;
+using ChangeIndicationEnum = Clusters::detail::ChangeIndicationEnum;
 
-using DegradationDirectionEnum = Clusters::detail::Enums::DegradationDirectionEnum;
+using DegradationDirectionEnum = Clusters::detail::DegradationDirectionEnum;
 
-using ProductIdentifierTypeEnum = Clusters::detail::Enums::ProductIdentifierTypeEnum;
+using ProductIdentifierTypeEnum = Clusters::detail::ProductIdentifierTypeEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -2244,7 +2240,7 @@ enum class ValveFaultBitmap : uint16_t
 
 namespace ElectricalPowerMeasurement {
 
-using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
+using MeasurementTypeEnum = Clusters::detail::MeasurementTypeEnum;
 
 // Enum for PowerModeEnum
 enum class PowerModeEnum : uint8_t
@@ -2272,7 +2268,7 @@ enum class Feature : uint32_t
 
 namespace ElectricalEnergyMeasurement {
 
-using MeasurementTypeEnum = Clusters::detail::Enums::MeasurementTypeEnum;
+using MeasurementTypeEnum = Clusters::detail::MeasurementTypeEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4046,11 +4042,11 @@ enum class OccupancySensorTypeBitmap : uint8_t
 
 namespace CarbonMonoxideConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4066,11 +4062,11 @@ enum class Feature : uint32_t
 
 namespace CarbonDioxideConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4086,11 +4082,11 @@ enum class Feature : uint32_t
 
 namespace NitrogenDioxideConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4106,11 +4102,11 @@ enum class Feature : uint32_t
 
 namespace OzoneConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4126,11 +4122,11 @@ enum class Feature : uint32_t
 
 namespace Pm25ConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4146,11 +4142,11 @@ enum class Feature : uint32_t
 
 namespace FormaldehydeConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4166,11 +4162,11 @@ enum class Feature : uint32_t
 
 namespace Pm1ConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4186,11 +4182,11 @@ enum class Feature : uint32_t
 
 namespace Pm10ConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4206,11 +4202,11 @@ enum class Feature : uint32_t
 
 namespace TotalVolatileOrganicCompoundsConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t
@@ -4226,11 +4222,11 @@ enum class Feature : uint32_t
 
 namespace RadonConcentrationMeasurement {
 
-using LevelValueEnum = Clusters::detail::Enums::LevelValueEnum;
+using LevelValueEnum = Clusters::detail::LevelValueEnum;
 
-using MeasurementMediumEnum = Clusters::detail::Enums::MeasurementMediumEnum;
+using MeasurementMediumEnum = Clusters::detail::MeasurementMediumEnum;
 
-using MeasurementUnitEnum = Clusters::detail::Enums::MeasurementUnitEnum;
+using MeasurementUnitEnum = Clusters::detail::MeasurementUnitEnum;
 
 // Bitmap for Feature
 enum class Feature : uint32_t

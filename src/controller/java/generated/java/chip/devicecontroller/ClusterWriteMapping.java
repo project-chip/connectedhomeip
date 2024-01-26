@@ -5511,6 +5511,28 @@ public class ClusterWriteMapping {
       writeUnitTestingWriteOnlyInt8uCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeWriteOnlyInt8uAttribute", writeUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingMeiInt8uCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingmeiInt8uCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeUnitTestingMeiInt8uCommandParams.put(
+        "value",
+        unitTestingmeiInt8uCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingMeiInt8uAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeMeiInt8uAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingMeiInt8uCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeMeiInt8uAttribute", writeUnitTestingMeiInt8uAttributeInteractionInfo);
     writeAttributeMap.put("unitTesting", writeUnitTestingInteractionInfo);
     Map<String, InteractionInfo> writeFaultInjectionInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("faultInjection", writeFaultInjectionInteractionInfo);

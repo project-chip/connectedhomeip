@@ -7926,6 +7926,44 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             return value;
         }
+        case Events::TestDifferentVendorMeiEvent::Id: {
+            Events::TestDifferentVendorMeiEvent::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_arg1;
+            std::string value_arg1ClassName     = "java/lang/Integer";
+            std::string value_arg1CtorSignature = "(I)V";
+            jint jnivalue_arg1                  = static_cast<jint>(cppValue.arg1);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_arg1ClassName.c_str(), value_arg1CtorSignature.c_str(),
+                                                                       jnivalue_arg1, value_arg1);
+
+            jclass testDifferentVendorMeiEventStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$UnitTestingClusterTestDifferentVendorMeiEventEvent",
+                testDifferentVendorMeiEventStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$UnitTestingClusterTestDifferentVendorMeiEventEvent");
+                return nullptr;
+            }
+
+            jmethodID testDifferentVendorMeiEventStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, testDifferentVendorMeiEventStructClass, "<init>",
+                                                                "(Ljava/lang/Integer;)V", &testDifferentVendorMeiEventStructCtor);
+            if (err != CHIP_NO_ERROR || testDifferentVendorMeiEventStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$UnitTestingClusterTestDifferentVendorMeiEventEvent constructor");
+                return nullptr;
+            }
+
+            jobject value =
+                env->NewObject(testDifferentVendorMeiEventStructClass, testDifferentVendorMeiEventStructCtor, value_arg1);
+
+            return value;
+        }
         default:
             *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
             break;
