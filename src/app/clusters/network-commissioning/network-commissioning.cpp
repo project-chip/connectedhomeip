@@ -735,7 +735,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 void Instance::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s", mConnectingNetworkID);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen, mConnectingNetworkID);
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 
@@ -842,6 +842,11 @@ exit:
 void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t interfaceStatus)
 {
     auto commandHandleRef = std::move(mAsyncCommandHandle);
+
+    // In Non-concurrent mode the commandHandle will be null here, the ConnectNetworkResponse
+    // has already been sent and the BLE will have been stopped, however the other functionality
+    // is still required
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
@@ -849,6 +854,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
         // We may receive the callback after it and should make it noop.
         return;
     }
+#endif
 
     Commands::ConnectNetworkResponse::Type response;
     response.networkingStatus = commissioningError;
@@ -872,13 +878,10 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
-#if CONFIG_NETWORK_LAYER_BLE && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, ConnectNetworkResponse will NOT be sent");
-    // Do not send the ConnectNetworkResponse if in non-concurrent mode
-    // Issue #30576 raised to modify CommandHandler to notify it if no response required
-#else
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     commandHandle->AddResponse(mPath, response);
 #endif
+
     if (commissioningError == Status::kSuccess)
     {
         CommitSavedBreadcrumb();
