@@ -78,7 +78,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/><!-- Revision   -->
-    <attribute side="server" code="0x0000" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8" writable="true" optional="false">Messages</attribute>
+    <attribute side="server" code="0x0000" define="LIST_MESSAGES" type="array" entryType="MessageStruct" length="8" writable="false" optional="false">Messages</attribute>
     <attribute side="server" code="0x0001" define="MESSAGES_CLUSTER_ACTIVE_MESSAGES_IDS" type="ARRAY" entryType="octet_string" max="8" writable="false" optional="false">ActiveMessageIDs</attribute>
     <command source="client" code="0x00" name="PresentMessagesRequest" isFabricScoped="true" optional="false">
       <description>

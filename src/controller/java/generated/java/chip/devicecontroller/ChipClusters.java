@@ -29285,15 +29285,6 @@ public class ChipClusters {
         }, MESSAGES_ATTRIBUTE_ID, true);
     }
 
-    public void writeMessagesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> value) {
-      writeMessagesAttribute(callback, value, 0);
-    }
-
-    public void writeMessagesAttribute(DefaultClusterCallback callback, ArrayList<ChipStructs.MessagesClusterMessageStruct> value, int timedWriteTimeoutMs) {
-      BaseTLVType tlvValue = ArrayType.generateArrayType(value, (elementvalue) -> elementvalue.encodeTlv());
-      writeAttribute(new WriteAttributesCallbackImpl(callback), MESSAGES_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
-    }
-
     public void subscribeMessagesAttribute(
         MessagesAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MESSAGES_ATTRIBUTE_ID);

@@ -4436,7 +4436,7 @@ provisional cluster Messages = 151 {
     nullable FutureMessagePreferenceEnum futureMessagesPreference = 3;
   }
 
-  attribute MessageStruct messages[] = 0;
+  readonly attribute MessageStruct messages[] = 0;
   readonly attribute octet_string activeMessageIDs[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
