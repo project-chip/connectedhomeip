@@ -90,11 +90,11 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * If nodeID is not nil, then it represents the node id the node was assigned, as encoded in its operational certificate.
  *
- * The metrics object contains metrics information for the commissioning session.
+ * The metrics object contains information corresponding to the commissioning session.
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
-                   nodeID:(NSNumber * _Nullable)nodeID 
+                   nodeID:(NSNumber * _Nullable)nodeID
                    metrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
 
 /**

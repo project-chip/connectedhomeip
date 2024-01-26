@@ -20,6 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+MTR_EXTERN NSString * const MTRMetricCommissioningStatusKey MTR_NEWLY_AVAILABLE;
+
 /**
  * A representation of a (vendor, product) pair that identifies a specific product.
  */

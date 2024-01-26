@@ -14,9 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRDefines.h>
+#import "MTRLogging_Internal.h"
 #import "MTRMetrics.h"
-#import "MTRMetrics_Internal.h"
 
+NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissioningStatus";
 
 @implementation MTRMetrics {
     NSMutableDictionary<NSString*, id> * _metricsData;
@@ -33,16 +35,34 @@
 
 - (nullable id)valueForKey:(NSString *)key
 {
-    return [_metricsData[key] copy];
+    if (!key)
+    {
+        MTR_LOG_ERROR("Cannot get metrics value for nil key");
+        return nil;
+    }
+
+    return _metricsData[key];
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key
 {
+    if (!key)
+    {
+        MTR_LOG_ERROR("Cannot set metrics value for nil key");
+        return;
+    }
+
     [_metricsData setObject:value forKey:key];
 }
 
 - (void)removeValueForKey:(NSString *)key
 {
+    if (!key)
+    {
+        MTR_LOG_ERROR("Cannot remove metrics value for nil key");
+        return;
+    }
+
     [_metricsData removeObjectForKey:key];
 }
 
