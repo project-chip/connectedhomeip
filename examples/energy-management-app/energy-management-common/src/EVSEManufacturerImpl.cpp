@@ -105,8 +105,7 @@ CHIP_ERROR EVSEManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aA
     EVSEManufacturer * mn = GetEvseManufacturer();
     VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    ElectricalPowerMeasurementDelegate * dg;
-    mn->GetEPMDelegate();
+    ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     dg->SetActivePower(MakeNullable(aActivePower_mW));
