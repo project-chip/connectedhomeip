@@ -557,7 +557,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             sub_children = set()
             for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
                 sub_children.update(get_all_children(child, self.endpoints))
-            if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
+            if not all(item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList] for item in sub_children):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
                                   problem='Flat parts list does not include all the sub-parts', spec_location='Endpoint composition')
