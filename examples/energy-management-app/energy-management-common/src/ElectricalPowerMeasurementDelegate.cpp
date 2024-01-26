@@ -158,7 +158,7 @@ CHIP_ERROR ElectricalPowerMeasurementDelegate::SetApparentCurrent(DataModel::Nul
     mApparentCurrent = newValue;
     if (oldValue != newValue)
     {
-        // We won't log raw values since these could change  frequently
+        // We won't log raw values since these could change frequently
         MatterReportingAttributeChangeCallback(mEndpointId, ElectricalPowerMeasurement::Id, ApparentCurrent::Id);
     }
 
