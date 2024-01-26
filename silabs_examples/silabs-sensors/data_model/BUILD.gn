@@ -17,38 +17,10 @@ import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/platform/device.gni")
 import("args.gni")
 
-
-
-if (!is_occupancy_sensor && !is_temperature_sensor && !is_contact_sensor) {
-  # Default app will be the occupancy sensor
-  is_occupancy_sensor = true
-}
-
-if (is_occupancy_sensor){
-  assert(!(is_temperature_sensor || is_contact_sensor))
-} else if (is_contact_sensor) {
-  assert(!(is_temperature_sensor || is_occupancy_sensor))
-} else if (is_temperature_sensor){
-  assert(!(is_contact_sensor || is_occupancy_sensor))
-}
-
 config("config") {
-  if (is_occupancy_sensor) {
-    defines = [
-      "SL_SENSOR_TYPE=1",
-      "BLE_DEV_NAME=\"SL-OCC-SENSOR\"",
-    ]
-  } else if (is_temperature_sensor) {
-    defines = [
-      "SL_SENSOR_TYPE=2",
-      "BLE_DEV_NAME=\"TEMP-SENSOR\"",
-      ]
-  } else if (is_contact_sensor) {
-    defines = [
-      "SL_SENSOR_TYPE=3",
-      "BLE_DEV_NAME=\"CONTACT-SENSOR\"",
-      ]
-  }
+  defines = [
+    "BLE_DEV_NAME=\"SL-SENSOR\""
+  ]
 }
 
 chip_data_model("sensor_data_model") {
@@ -58,13 +30,7 @@ chip_data_model("sensor_data_model") {
     network = "thread"
   }
 
-  if (is_occupancy_sensor) {
-    zap_file = "./occupancy-sensor/occupancy-${network}-app.zap"
-  } else if (is_temperature_sensor) {
-    zap_file = "./temperature-sensor/temperature-${network}-app.zap"
-  } else if (is_contact_sensor) {
-    zap_file = "./contact-sensor/contact-${network}-app.zap"
-  }
+  zap_file = "./sensor-${network}-app.zap"
 
   # TODO remove this once the cleanup is fully completed regarding the af-gen-event.h
   zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"

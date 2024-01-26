@@ -138,8 +138,12 @@ silabs_executable("sensors_app") {
     "src/AppTask.cpp",
     "src/ZclCallbacks.cpp",
     "${examples_common_plat_dir}/main.cpp",
-    "src/SensorsCallbacks.cpp"
+    "src/SensorsCallbacks.cpp",
   ]
+
+  if (!disable_lcd) {
+    sources += [ "src/SensorsUI.cpp" ]
+  }
 
   deps = [
     ":sdk",

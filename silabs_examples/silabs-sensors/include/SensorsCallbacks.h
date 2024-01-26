@@ -21,42 +21,65 @@
 
 
 #include "AppEvent.h"
+#include "BaseApplication.h"
+#include "FreeRTOS.h"
+#include "timers.h" // provides FreeRTOS timer support
 
-/*
- * Callbacks for All of the Sensor Applications
- */
+#include <lib/core/CHIPError.h>
 
-#if SL_SENSOR_TYPE == 1
-#define SENSOR_NAME "Occupancy-App"
-#elif SL_SENSOR_TYPE == 2
 #if DISPLAY_ENABLED
 #include "glib.h"
-#endif
-#define SENSOR_NAME "Temperature-App"
-#elif SL_SENSOR_TYPE == 3
-#define SENSOR_NAME "Contact-App"
 #endif
 
 /*
  * Common methods
  */
 
+// Determines current mode of sensor app. BTN0 to swap between modes
+enum CurrentSensorEnum
+{
+    OccupancySensor = 0,
+    TemperatureSensor = 1,
+    ContactSensor = 2,
+    StatusScreen = 3,
+#ifdef QR_CODE_ENABLED
+    QrCode = 4,
+#endif
+    InvalidSensor = 5
+};
+
+
 class SilabsSensors
 {
 public:
-    static void InitSensor(void);
-
+    static void UpdateSensorDisplay(void);
     static void ActionTriggered(AppEvent * aEvent);
-#if SL_SENSOR_TYPE == 2
 #ifdef DISPLAY_ENABLED
     static void TemperatureUI(GLIB_Context_t * glibContext);
 #endif
-#endif
+
+    inline uint16_t getCurrentSensorMode() { return currentSensorMode;};
+    CHIP_ERROR Init();
+
+    /**
+     * @brief Timer Event processing function
+     *        Trigger factory if Press and Hold duration is respected
+     *
+     * @param aEvent post event being processed
+     */
+    static void CycleSensor(AppEvent * aEvent);
 
 private :
-#if (SL_SENSOR_TYPE == 1) || (SL_SENSOR_TYPE == 3)
+    static uint16_t currentSensorMode;
     static bool mIsSensorTriggered;
     static void UpdateBinarySensor(bool state);
-#endif
+    friend SilabsSensors & SensorMgr();
+    static std::string getSensorModeString(uint16_t);
 
+    static SilabsSensors sSensorManager;
 };
+
+inline SilabsSensors & SensorMgr()
+{
+    return SilabsSensors::sSensorManager;
+}

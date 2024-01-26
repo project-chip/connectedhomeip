@@ -57,6 +57,7 @@ LEDWidget sSensorLED;
 
 using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Silabs;
 
 AppTask AppTask::sAppTask;
 
@@ -78,7 +79,7 @@ CHIP_ERROR AppTask::Init()
     sSensorLED.Init(SENSOR_LED);
     sSensorLED.Set(false);
 
-    SilabsSensors::InitSensor();
+    err = SensorMgr().Init();
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED
@@ -131,6 +132,11 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
+void AppTask::UpdateDisplay()
+{
+    SilabsSensors::UpdateSensorDisplay();
+}
+
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
 
@@ -145,6 +151,17 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
     else if (button == APP_FUNCTION_BUTTON)
     {
+    
+        if(btnAction == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
+        {
+            AppEvent button_event2           = {};
+            button_event2.Type               = AppEvent::kEventType_Button;
+            button_event2.ButtonEvent.Action = btnAction;
+
+            button_event2.Handler = SilabsSensors::CycleSensor;
+            sAppTask.PostEvent(&button_event2);
+       }
+        // button_event2 is used to change the sensor state, so it needs to go first
         button_event.Handler = BaseApplication::ButtonHandler;
         sAppTask.PostEvent(&button_event);
     }

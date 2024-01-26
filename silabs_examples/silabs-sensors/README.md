@@ -53,28 +53,20 @@ Silicon Labs platform.
 
 ### Note 1 examples 3 Devices type
 
-This example differs from other Silicon Labs as it got 3 different device type sharing the same common code.
-With this example you can build :
+This example differs from other Silicon Labs as it showcases a device that has the following different devices types on different endpoints 
 
 - Occupancy Sensor
 - Temperature Sensor
 - Contact Sensor
 
+The application can cycle between the 3 different sensor modes by pressing BTN0. 
+
 All sensors behave in the same way. A Press of BTN1 will trigger a state change. For the Temperature sensor this will trigger a change in a preset array of temperature.
 
-The goal here is really to demonstrate the bare minimum for a Matter Sensor Application. Feel free to modify the SensorCallbacks.cpp to add real sensors and your own logic.
-
-By default if no extra arguments are provided to the build script, the occupancy sensor will be build.
-
-to change the sensor type just use one of the following arguments :
-
-    - "is_temperature_sensor=true"
-    - "is_contact_sensor=true"
-    - "is_occupancy_sensor=true"
 
 example :
 
-    - ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensor/efr32/ ./out/temperature-sensor BRD4187C "is_temperature_sensor=true"
+    - ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensor/efr32/ ./out/silabs-sensor BRD4187C 
 ___
 
 

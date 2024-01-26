@@ -23,137 +23,221 @@
 
 #include "SensorsCallbacks.h"
 #include "AppTask.h"
+#include "AppConfig.h"
+#include "SensorsUI.h"
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#if SL_SENSOR_TYPE == 1
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
-#elif SL_SENSOR_TYPE == 2
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#elif SL_SENSOR_TYPE == 3
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
+SilabsSensors SilabsSensors::sSensorManager;
+uint16_t SilabsSensors::currentSensorMode;
+bool SilabsSensors::mIsSensorTriggered;
+
+#define stringify( name ) #name
+
+// Sensor mode increments on APP_FUNCTION_BUTTON press
+#ifdef QR_CODE_ENABLED
+uint16_t sensorMode = CurrentSensorEnum::QrCode;
+#else
+uint16_t sensorMode = CurrentSensorEnum::OccupancySensor;
 #endif
 
-#if SL_SENSOR_TYPE == 2
+#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+
 #define SIMULATED_TEMP_ARRAY_SIZE 9
 static uint8_t mCurrentTempIndex = 0;
 static int16_t mSimulatedTempArray[SIMULATED_TEMP_ARRAY_SIZE] = {2152,2435,1966,1533,1111,3333,2921,2566, -4242} ;
 static int16_t mMinMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
 static int16_t mMaxMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
-#endif
 
 using namespace ::chip::DeviceLayer::Silabs;
 
-void SilabsSensors::InitSensor(void)
+CHIP_ERROR SilabsSensors::Init()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+#ifdef QR_CODE_ENABLED
+    currentSensorMode = CurrentSensorEnum::QrCode;
+#else
+    currentSensorMode = CurrentSensorEnum::OccupancySensor;
+#endif
+
+    UpdateSensorDisplay();
+
+    return err;
+
+}
+
+void SilabsSensors::UpdateSensorDisplay(void)
+{
+    if (currentSensorMode == CurrentSensorEnum::OccupancySensor)
+    {
+#ifdef DISPLAY_ENABLED
+        AppTask::GetAppTask().GetLCD().SetCustomUI(SensorsUI::DrawUI);
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(mIsSensorTriggered);
+#endif
+    }
+    else if (currentSensorMode == CurrentSensorEnum::TemperatureSensor)
+    {
+#ifdef DISPLAY_ENABLED
+        AppTask::GetAppTask().GetLCD().SetCustomUI(SilabsSensors::TemperatureUI);
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(mIsSensorTriggered);
+
+#endif
+    }
+    else if (currentSensorMode == CurrentSensorEnum::ContactSensor)
+    {
+#ifdef DISPLAY_ENABLED
+        AppTask::GetAppTask().GetLCD().SetCustomUI(SensorsUI::DrawUI);
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(mIsSensorTriggered);
+#endif
+    }
+    else if (currentSensorMode == CurrentSensorEnum::StatusScreen)
+    {
+#ifdef DISPLAY_ENABLED
+        BaseApplication::UpdateLCDStatusScreen();
+        AppTask::GetAppTask().GetLCD().WriteStatus();
+#endif
+    }
+#ifdef QR_CODE_ENABLED
+    else if (currentSensorMode == CurrentSensorEnum::QrCode)
+    {
+#ifdef DISPLAY_ENABLED
+        AppTask::GetAppTask().GetLCD().ShowQRCode(true);
+#endif
+    }
+#endif
+
+
+}
+
+inline const char* convert_enum_to_string[] = {
+    stringify(CurrentSensorEnum::OccupancySensor),
+    stringify(CurrentSensorEnum::TemperatureSensor),
+    stringify(CurrentSensorEnum::ContactSensor),
+    stringify(CurrentSensorEnum::StatusScreen),
+#ifdef QR_CODE_ENABLED
+    stringify(CurrentSensorEnum::QrCode)
+#endif
+};
+
+// Swap LCD screens and apps
+void SilabsSensors::CycleSensor(AppEvent * aEvent)
 {
 
-    // TODO Add Specific Hardware Init here
-#if SL_SENSOR_TYPE == 1
-#ifdef DISPLAY_ENABLED
-    AppTask::GetAppTask().GetLCD().WriteDemoUI(mIsSensorTriggered);
+#ifdef QR_CODE_ENABLED
+    if (sensorMode < CurrentSensorEnum::QrCode)
+#else
+    if (sensorMode < CurrentSensorEnum::StatusScreen)
 #endif
-#elif SL_SENSOR_TYPE == 2
-#ifdef DISPLAY_ENABLED
-AppTask::GetAppTask().GetLCD().SetCustomUI(SilabsSensors::TemperatureUI);
-#endif
+    {
+        sensorMode++;
+    }
+    else
+    {
+        sensorMode = CurrentSensorEnum::OccupancySensor;
+    }
 
-#elif SL_SENSOR_TYPE == 3
-#ifdef DISPLAY_ENABLED
-    AppTask::GetAppTask().GetLCD().WriteDemoUI(mIsSensorTriggered);
-#endif
-#endif
+    currentSensorMode = sensorMode;
+
+    SILABS_LOG("Current Sensor Mode is %s", convert_enum_to_string[currentSensorMode]);
+
 }
+
+
 
 void SilabsSensors::ActionTriggered(AppEvent * aEvent)
 {
-#if SL_SENSOR_TYPE == 1
-    if (aEvent->Type == AppEvent::kEventType_Button)
+    if(currentSensorMode == CurrentSensorEnum::OccupancySensor)
     {
-        if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+        if (aEvent->Type == AppEvent::kEventType_Button)
         {
-            mIsSensorTriggered = true;
-        }
-        else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
-        {
-            mIsSensorTriggered = false;
-        }
-        UpdateBinarySensor(mIsSensorTriggered);
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        halOccupancyStateChangedCallback(1, static_cast<HalOccupancyState>(mIsSensorTriggered));
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
-
-#elif SL_SENSOR_TYPE == 2
-
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
-        {
-            if(++mCurrentTempIndex >= SIMULATED_TEMP_ARRAY_SIZE)
+            if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
             {
-                mCurrentTempIndex = 0;
+                mIsSensorTriggered = true;
             }
-
-            if (mSimulatedTempArray[mCurrentTempIndex] > mMaxMeasuredTemp)
+            else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
             {
-                mMaxMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
+                mIsSensorTriggered = false;
             }
-
-            if (mSimulatedTempArray[mCurrentTempIndex] < mMinMeasuredTemp)
-            {
-                mMinMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
-            }
-
+            UpdateBinarySensor(mIsSensorTriggered);
             chip::DeviceLayer::PlatformMgr().LockChipStack();
-            chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, mSimulatedTempArray[mCurrentTempIndex]);
-            chip::app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(1, mMinMeasuredTemp);
-            chip::app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(1, mMaxMeasuredTemp);
+            halOccupancyStateChangedCallback(1, static_cast<HalOccupancyState>(mIsSensorTriggered));
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-            #ifdef DISPLAY_ENABLED
-            AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't Matter
-            #endif
+        }
+    }
+    
+    else if(currentSensorMode == CurrentSensorEnum::TemperatureSensor)
+    {
+        if (aEvent->Type == AppEvent::kEventType_Button)
+        {
+            if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+            {
+                if(++mCurrentTempIndex >= SIMULATED_TEMP_ARRAY_SIZE)
+                {
+                    mCurrentTempIndex = 0;
+                }
+    
+                if (mSimulatedTempArray[mCurrentTempIndex] > mMaxMeasuredTemp)
+                {
+                    mMaxMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
+                }
+    
+                if (mSimulatedTempArray[mCurrentTempIndex] < mMinMeasuredTemp)
+                {
+                    mMinMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
+                }
+    
+                chip::DeviceLayer::PlatformMgr().LockChipStack();
+                chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, mSimulatedTempArray    [mCurrentTempIndex]);
+                chip::app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(2, mMinMeasuredTemp);
+                chip::app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(2, mMaxMeasuredTemp);
+                chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+                #ifdef DISPLAY_ENABLED
+                AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't Matter
+                #endif
+            }
+        }
+    }
+    
+    else if(currentSensorMode == CurrentSensorEnum::ContactSensor)
+    {
+        if (aEvent->Type == AppEvent::kEventType_Button)
+        {
+            if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
+            {
+                mIsSensorTriggered = true;
+            }
+            else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
+            {
+                mIsSensorTriggered = false;
+            }
+            UpdateBinarySensor(mIsSensorTriggered);
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
+            chip::app::Clusters::BooleanState::Attributes::StateValue::Set(3, mIsSensorTriggered);
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
 
-#elif SL_SENSOR_TYPE == 3
-    if (aEvent->Type == AppEvent::kEventType_Button)
-    {
-        if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
-        {
-            mIsSensorTriggered = true;
-        }
-        else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
-        {
-            mIsSensorTriggered = false;
-        }
-        UpdateBinarySensor(mIsSensorTriggered);
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-        chip::app::Clusters::BooleanState::Attributes::StateValue::Set(1, mIsSensorTriggered);
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
-#endif
 }
 
-#if (SL_SENSOR_TYPE == 1) || (SL_SENSOR_TYPE == 3)
-bool SilabsSensors::mIsSensorTriggered;
 void SilabsSensors::UpdateBinarySensor(bool state)
 {
+    if(currentSensorMode == CurrentSensorEnum::ContactSensor || currentSensorMode == CurrentSensorEnum::OccupancySensor)
+    {
         AppTask::GetAppTask().SetAppLED(state);
 
 #ifdef DISPLAY_ENABLED
-        AppTask::GetAppTask().GetLCD().WriteDemoUI(state);
+        SensorUIMgr().UpdateDemoState(state);
 #endif
+    }
 }
-#endif
 
 
 
 // UI For Temperature Sensor
-#if SL_SENSOR_TYPE == 2
 #ifdef DISPLAY_ENABLED
 #include "dmd.h"
 #include "glib.h"
@@ -194,5 +278,4 @@ void SilabsSensors::TemperatureUI(GLIB_Context_t * glibContext)
     DMD_updateDisplay();
 }
 
-#endif
 #endif

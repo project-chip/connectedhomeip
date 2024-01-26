@@ -79,6 +79,8 @@ public:
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
     // void PostSensorActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 
+    void UpdateDisplay();
+
 private:
     static AppTask sAppTask;
 
