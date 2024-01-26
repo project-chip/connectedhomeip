@@ -274,8 +274,11 @@ CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsEnabled::Get(ep, &alarmsEnabled),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsEnabled), CHIP_IM_GLOBAL_STATUS(Failure));
-    emitAlarmsStateChangedEvent(ep);
+    if (alarmsEnabled.HasAny())
+    {
+        VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsEnabled), CHIP_IM_GLOBAL_STATUS(Failure));
+        emitAlarmsStateChangedEvent(ep);
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -283,21 +286,34 @@ CHIP_ERROR SetAllEnabledAlarmsActive(EndpointId ep)
 CHIP_ERROR ClearAllAlarms(EndpointId ep)
 {
     BitMask<BooleanStateConfiguration::AlarmModeBitmap> alarmsActive, alarmsSuppressed;
+    bool emitEvent = false;
+
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Get(ep, &alarmsActive),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Get(ep, &alarmsSuppressed),
                         CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
-    if (alarmsActive.HasAny() || alarmsSuppressed.HasAny())
+    if (alarmsActive.HasAny())
     {
         alarmsActive.ClearAll();
-        alarmsSuppressed.ClearAll();
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsActive::Set(ep, alarmsActive),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        emitEvent = true;
+    }
+
+    if (alarmsSuppressed.HasAny())
+    {
+        alarmsSuppressed.ClearAll();
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AlarmsSuppressed::Set(ep, alarmsSuppressed),
                             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+        emitEvent = true;
+    }
+
+    if (emitEvent)
+    {
         emitAlarmsStateChangedEvent(ep);
     }
+
     return CHIP_NO_ERROR;
 }
 

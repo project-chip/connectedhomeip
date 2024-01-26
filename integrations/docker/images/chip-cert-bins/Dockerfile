@@ -30,16 +30,19 @@ RUN case ${TARGETPLATFORM} in \
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
+    && apt-get upgrade -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
     autoconf \
     automake \
     bison \
+    bluez \
     bridge-utils \
     clang \
     clang-format \
     clang-tidy \
     curl \
     flex \
+    gcc \
     g++ \
     git \
     gperf \
@@ -252,7 +255,7 @@ RUN case ${TARGETPLATFORM} in \
     *) ;; \
     esac
 
-RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:22.04
@@ -280,8 +283,9 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-a
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
 
-# Stage 3.1 Setup the Matter Python environment
+# Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_env python_env
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt

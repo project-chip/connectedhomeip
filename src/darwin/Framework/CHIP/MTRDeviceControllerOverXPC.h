@@ -24,7 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef NSXPCConnection * _Nonnull (^MTRXPCConnectBlock)(void);
 
-MTR_HIDDEN
 @interface MTRDeviceControllerOverXPC : MTRDeviceController
 
 - (instancetype)init NS_UNAVAILABLE;

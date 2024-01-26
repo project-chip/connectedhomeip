@@ -1599,7 +1599,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Default value for the ICD Management cluster ActiveModeThreshold attribute, in milliseconds
  */
 #ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 300
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS 5000
 #endif
 
 /**
@@ -1719,6 +1719,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE
 #define CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+ *
+ * @brief Enables support for diagnostic logs transfer using the BDX protocol
+ *
+ */
+#ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+#define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
 #endif
 
 /**

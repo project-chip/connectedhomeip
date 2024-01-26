@@ -63,6 +63,12 @@ buildconfig_header("app_buildconfig") {
   visibility = [ ":app_config" ]
 }
 
+source_set("app_config") {
+  sources = [ "AppConfig.h" ]
+
+  deps = [ ":app_buildconfig" ]
+}
+
 source_set("revision_info") {
   sources = [
     "DataModelRevision.h",
@@ -71,45 +77,45 @@ source_set("revision_info") {
   ]
 }
 
-source_set("app_config") {
-  sources = [ "AppConfig.h" ]
+source_set("paths") {
+  sources = [
+    "AttributePathParams.h",
+    "ConcreteClusterPath.h",
+    "ConcreteEventPath.h",
+    "DataVersionFilter.h",
+    "EventPathParams.h",
+  ]
 
-  deps = [ ":app_buildconfig" ]
+  # This source sets also depends on basic-types.h that is not in any dependency we can use
+  public_deps = [
+    ":app_config",
+    "${chip_root}/src/lib/core",
+  ]
 }
 
-static_library("app") {
-  output_name = "libCHIPDataModel"
+source_set("global-attributes") {
+  sources = [ "GlobalAttributes.h" ]
 
+  # This also depends on zap-generated code which is currently impossible to split outs
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
+
+source_set("pre-encoded-value") {
   sources = [
-    "AttributeAccessInterface.cpp",
-    "AttributePathExpandIterator.cpp",
-    "AttributePathExpandIterator.h",
-    "AttributePathParams.h",
-    "AttributePersistenceProvider.h",
-    "CASEClient.cpp",
-    "CASEClient.h",
-    "CASEClientPool.h",
-    "CASESessionManager.cpp",
-    "CASESessionManager.h",
-    "ChunkedWriteCallback.cpp",
-    "ChunkedWriteCallback.h",
-    "CommandHandler.cpp",
-    "CommandResponseHelper.h",
-    "CommandResponseSender.cpp",
-    "CommandSender.cpp",
-    "DefaultAttributePersistenceProvider.cpp",
-    "DefaultAttributePersistenceProvider.h",
-    "DeferredAttributePersistenceProvider.cpp",
-    "DeferredAttributePersistenceProvider.h",
-    "DeviceProxy.cpp",
-    "DeviceProxy.h",
-    "EventManagement.cpp",
-    "EventPathParams.h",
-    "FailSafeContext.cpp",
-    "FailSafeContext.h",
-    "GlobalAttributes.h",
-    "InteractionModelEngine.cpp",
-    "InteractionModelTimeout.h",
+    "data-model/FabricScopedPreEncodedValue.cpp",
+    "data-model/FabricScopedPreEncodedValue.h",
+    "data-model/PreEncodedValue.cpp",
+    "data-model/PreEncodedValue.h",
+  ]
+
+  deps = [
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+source_set("message-def") {
+  sources = [
     "MessageDef/ArrayBuilder.cpp",
     "MessageDef/ArrayParser.cpp",
     "MessageDef/AttributeDataIB.cpp",
@@ -182,25 +188,51 @@ static_library("app") {
     "MessageDef/TimedRequestMessage.cpp",
     "MessageDef/WriteRequestMessage.cpp",
     "MessageDef/WriteResponseMessage.cpp",
-    "OTAUserConsentCommon.h",
+  ]
+
+  deps = [
+    ":app_config",
+    ":paths",
+    ":revision_info",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/src/protocols/secure_channel",
+  ]
+}
+
+config("config-controller-dynamic-server") {
+  defines = [
+    "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+    "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
+  ]
+}
+
+# interaction-model is a static-library because it currently requires global functions (app/util/...) that are stubbed in different test files that depend on the app static_library
+# which in tern depens on the interaction-model.
+# Using source_set prevents the unit test to build correctly.
+static_library("interaction-model") {
+  sources = [
+    "CASEClient.cpp",
+    "CASEClient.h",
+    "CASEClientPool.h",
+    "CASESessionManager.cpp",
+    "CASESessionManager.h",
+    "DeviceProxy.cpp",
+    "DeviceProxy.h",
+    "InteractionModelEngine.cpp",
+    "InteractionModelEngine.h",
+    "InteractionModelTimeout.h",
     "OperationalSessionSetup.cpp",
     "OperationalSessionSetup.h",
     "OperationalSessionSetupPool.h",
-    "ReadHandler.cpp",
     "RequiredPrivilege.cpp",
     "RequiredPrivilege.h",
-    "SafeAttributePersistenceProvider.h",
     "StatusResponse.cpp",
     "StatusResponse.h",
     "SubscriptionResumptionStorage.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
-    "TimedRequest.cpp",
-    "TimedRequest.h",
-    "TimerDelegates.cpp",
-    "TimerDelegates.h",
-    "WriteClient.cpp",
-    "WriteHandler.cpp",
     "reporting/Engine.cpp",
     "reporting/Engine.h",
     "reporting/ReportScheduler.h",
@@ -211,18 +243,31 @@ static_library("app") {
     "reporting/reporting.h",
   ]
 
+  public_deps = [
+    ":app_config",
+    ":message-def",
+    ":paths",
+    "${chip_root}/src/app/icd:icd_config",
+    "${chip_root}/src/app/icd:observer",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/src/protocols/secure_channel",
+    "${chip_root}/src/system",
+  ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+
   if (chip_persist_subscriptions) {
     sources += [
       "SimpleSubscriptionResumptionStorage.cpp",
       "SimpleSubscriptionResumptionStorage.h",
+      "SubscriptionResumptionSessionEstablisher.cpp",
+      "SubscriptionResumptionSessionEstablisher.h",
     ]
   }
 
   if (chip_build_controller_dynamic_server) {
-    defines = [
-      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
-      "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
-    ]
     sources += [
       "clusters/ota-provider/ota-provider.cpp",
       "dynamic_server/AccessControl.cpp",
@@ -231,14 +276,64 @@ static_library("app") {
       "util/privilege-storage.cpp",
       "util/privilege-storage.h",
     ]
-  }
 
-  if (chip_persist_subscriptions) {
-    sources += [
-      "SubscriptionResumptionSessionEstablisher.cpp",
-      "SubscriptionResumptionSessionEstablisher.h",
+    public_deps += [
+      ":global-attributes",
+      "${chip_root}/src/access",
     ]
+
+    public_configs += [ ":config-controller-dynamic-server" ]
   }
+}
+
+# Note to developpers, instead of continuously adding files in the app librabry, it is recommand to create smaller source_sets that app can depend on.
+# This way, we can have a better understanding of dependencies and other componenets can depend on the different source_sets without needing to depend on the entire app library.
+static_library("app") {
+  output_name = "libCHIPDataModel"
+
+  sources = [
+    "AttributeAccessInterface.cpp",
+    "AttributePathExpandIterator.cpp",
+    "AttributePathExpandIterator.h",
+    "AttributePersistenceProvider.h",
+    "ChunkedWriteCallback.cpp",
+    "ChunkedWriteCallback.h",
+    "CommandHandler.cpp",
+    "CommandResponseHelper.h",
+    "CommandResponseSender.cpp",
+    "CommandSender.cpp",
+    "DefaultAttributePersistenceProvider.cpp",
+    "DefaultAttributePersistenceProvider.h",
+    "DeferredAttributePersistenceProvider.cpp",
+    "DeferredAttributePersistenceProvider.h",
+    "EventManagement.cpp",
+    "FailSafeContext.cpp",
+    "FailSafeContext.h",
+    "OTAUserConsentCommon.h",
+    "ReadHandler.cpp",
+    "SafeAttributePersistenceProvider.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
+    "TimerDelegates.cpp",
+    "TimerDelegates.h",
+    "WriteClient.cpp",
+    "WriteHandler.cpp",
+  ]
+
+  public_deps = [
+    ":app_config",
+    ":global-attributes",
+    ":interaction-model",
+    ":pre-encoded-value",
+    ":revision_info",
+    "${chip_root}/src/app/icd:icd_config",
+    "${chip_root}/src/lib/address_resolve",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/interaction_model",
+    "${chip_root}/src/system",
+    "${nlio_root}:nlio",
+  ]
 
   if (chip_enable_read_client) {
     sources += [
@@ -248,21 +343,6 @@ static_library("app") {
       "ReadClient.cpp",
     ]
   }
-
-  public_deps = [
-    ":app_config",
-    ":revision_info",
-    "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:icd_config",
-    "${chip_root}/src/app/icd:observer",
-    "${chip_root}/src/lib/address_resolve",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols/interaction_model",
-    "${chip_root}/src/protocols/secure_channel",
-    "${chip_root}/src/system",
-    "${nlio_root}:nlio",
-  ]
 
   if (chip_enable_icd_server) {
     public_deps += [

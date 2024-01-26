@@ -2297,34 +2297,6 @@ public static class BooleanStateClusterStateChangeEvent {
     return output.toString();
   }
 }
-public static class IcdManagementClusterOnTransitionToActiveModeEvent {
-
-  public IcdManagementClusterOnTransitionToActiveModeEvent(
-  ) {
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-
-    return new StructType(values);
-  }
-
-  public static IcdManagementClusterOnTransitionToActiveModeEvent decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    return new IcdManagementClusterOnTransitionToActiveModeEvent(
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("IcdManagementClusterOnTransitionToActiveModeEvent {\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
 public static class OvenCavityOperationalStateClusterOperationalErrorEvent {
   public ChipStructs.OvenCavityOperationalStateClusterErrorStateStruct errorState;
   private static final long ERROR_STATE_ID = 0L;
@@ -5861,6 +5833,52 @@ public static class UnitTestingClusterTestFabricScopedEventEvent {
     output.append("UnitTestingClusterTestFabricScopedEventEvent {\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+public static class UnitTestingClusterTestDifferentVendorMeiEventEvent {
+  public Integer arg1;
+  private static final long ARG1_ID = 1L;
+
+  public UnitTestingClusterTestDifferentVendorMeiEventEvent(
+    Integer arg1
+  ) {
+    this.arg1 = arg1;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(ARG1_ID, new UIntType(arg1)));
+
+    return new StructType(values);
+  }
+
+  public static UnitTestingClusterTestDifferentVendorMeiEventEvent decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer arg1 = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == ARG1_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          arg1 = castingValue.value(Integer.class);
+        }
+      }
+    }
+    return new UnitTestingClusterTestDifferentVendorMeiEventEvent(
+      arg1
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("UnitTestingClusterTestDifferentVendorMeiEventEvent {\n");
+    output.append("\targ1: ");
+    output.append(arg1);
     output.append("\n");
     output.append("}\n");
     return output.toString();
