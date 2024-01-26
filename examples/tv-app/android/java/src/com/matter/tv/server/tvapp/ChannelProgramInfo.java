@@ -42,6 +42,6 @@ public class ChannelProgramInfo {
         this.endTime = endTime;
         this.title = title;
         this.subTitle = subTitle;
-        this.description = description;        
+        this.description = description;
     }
 }
