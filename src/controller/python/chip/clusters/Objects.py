@@ -16705,7 +16705,7 @@ class RvcRunMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kInternalDoNotUseNone = 0
+            kNoFeatures = 0x0
 
     class Structs:
         @dataclass
@@ -16949,7 +16949,7 @@ class RvcCleanMode(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kInternalDoNotUseNone = 0
+            kNoFeatures = 0x0
 
     class Structs:
         @dataclass

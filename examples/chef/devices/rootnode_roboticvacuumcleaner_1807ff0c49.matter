@@ -1020,6 +1020,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
+    kNoFeatures = 0x0;
   }
 
   struct ModeTagStruct {
@@ -1071,6 +1072,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
+    kNoFeatures = 0x0;
   }
 
   struct ModeTagStruct {
