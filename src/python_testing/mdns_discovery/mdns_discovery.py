@@ -23,6 +23,8 @@ from mdns_discovery.exceptions import DiscoveryNotPerformedError
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo
 
+from mdns_discovery.mdns_service_info import MdnsServiceInfo
+
 from .mdns_type_enum import MdnsType
 
 
@@ -37,41 +39,37 @@ class MdnsDiscovery:
         Args:
             tc: A test case object containing node and fabric information.
 
-        Attributes:
-            _zc (Zeroconf): An instance of Zeroconf to manage mDNS operations.
-            _aiobrowser: An instance of the AsyncServiceBrowser browser to discover services.
-            _tc: The test case object.
-            _service_types (list): A list of mDNS service types to discover.
-            _discovered_services (dict): A dictionary to store discovered services.
-            _discovery_performed (bool): Flag to indicate if discovery has been performed.
-            dut_operational_service_name (str): The operational service name for the DUT (Device Under Test).
-
-        Main methods, return a list of service info dicts, each dict has keys for querying values
+        Main methods, return a list of MdnsServiceInfo objects
             - get_commissioner_service_info()
             - get_commissionable_service_info()
             - get_operational_service_info()
             - get_border_router_service_info()
-
-        Keys:
-            - service_name: The unique name of the mDNS service.
-            - name: The human-readable name of the service.
-            - type: The type of the service, typically indicating the service protocol and domain.
-            - server: The domain name of the machine hosting the service.
-            - port: The network port on which the service is available.
-            - addresses: A list of IP addresses associated with the service.
-            - txt_record: A dictionary of key-value pairs representing the service's metadata.
-            - priority: The priority of the service, used in service selection when multiple instances are available.
-            - interface_index: The network interface index on which the service is advertised.
-            - weight: The relative weight for records with the same priority, used in load balancing.
-            - host_ttl: The time-to-live value for the host name in the DNS record.
-            - other_ttl: The time-to-live value for other records associated with the service.
         """
+        # An instance of Zeroconf to manage mDNS operations.
+        # This is used for handling the low-level details of mDNS.
         self._zc = None
+
+        # An instance of the AsyncServiceBrowser browser to discover services.
+        # This browser is responsible for actively looking for services on the network.
         self._aiobrowser = None
+
+        # The test case object.
+        # This is used for integrating the service discovery into test suites.
         self._tc = tc
+
+        # A list of mDNS service types to discover.
+        # This list defines the types of services that we are interested in discovering.
         self._service_types = [mdns_type.value for mdns_type in MdnsType]
+
+        # A dictionary to store discovered services.
+        # As services are discovered, they are added to this dictionary.
         self._discovered_services = {}
+
+        # Flag to indicate if discovery has been performed.
+        # This helps in managing the state of service discovery.
         self._discovery_performed = False
+
+        # The operational service name of the Device Under Test (DUT).
         self.dut_operational_service_name = self._get_dut_operational_service_name()
 
     @classmethod
@@ -165,11 +163,11 @@ class MdnsDiscovery:
             # Add service info to discovered services
             for mdns_type in MdnsType:
                 if service_type == mdns_type.value:
-                    service_info_dict = self._service_info_to_dict(service_info)
+                    service_info_dict = self._service_info_to_class(service_info)
                     self._discovered_services[mdns_type.name].append(service_info_dict)
                     break
 
-    def _service_info_to_dict(self, service_info: AsyncServiceInfo) -> Dict[str, any]:
+    def _service_info_to_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
         Converts an AsyncServiceInfo object to a dictionary for easier access and manipulation.
 
@@ -180,23 +178,25 @@ class MdnsDiscovery:
             service_info (AsyncServiceInfo): The AsyncServiceInfo object to convert.
 
         Returns:
-            dict: A dictionary representation of the AsyncServiceInfo object.
+            MdnsServiceInfo: A dataclass representation of the AsyncServiceInfo object.
         """
-        service_info_dict = {
-            "service_name": service_info.name,
-            "name": service_info.get_name(),
-            "type": service_info.type,
-            "server": service_info.server,
-            "port": service_info.port,
-            "addresses": service_info.parsed_addresses(),
-            "txt_record": service_info.decoded_properties,
-            "priority": service_info.priority,
-            "interface_index": service_info.interface_index,
-            "weight": service_info.weight,
-            "host_ttl": service_info.host_ttl,
-            "other_ttl": service_info.other_ttl
-        }
-        return service_info_dict
+
+        mdns_service_info = MdnsServiceInfo(
+            service_name=service_info.name,
+            name=service_info.get_name(),
+            type=service_info.type,
+            server=service_info.server,
+            port=service_info.port,
+            addresses=service_info.parsed_addresses(),
+            txt_record=service_info.decoded_properties,
+            priority=service_info.priority,
+            interface_index=service_info.interface_index,
+            weight=service_info.weight,
+            host_ttl=service_info.host_ttl,
+            other_ttl=service_info.other_ttl
+        )
+
+        return mdns_service_info
 
     def _get_dut_operational_service_name(self) -> str:
         """
@@ -213,7 +213,7 @@ class MdnsDiscovery:
         service_name = f'{compressed_fabric_id:016X}-{node_id:016X}.{MdnsType.OPERATIONAL.value}'
         return service_name
 
-    def _getServiceInfo(self, mdns_type: MdnsType) -> List[Dict[str, any]]:
+    def _get_service_info(self, mdns_type: MdnsType) -> List[Dict[str, any]]:
         """
         This method returns the discovered service information for a specified mDNS type.
         It raises an exception if the discovery process has not been performed before calling this method.
@@ -239,7 +239,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Commissioner services.
         """
-        return self._getServiceInfo(MdnsType.COMMISSIONER)
+        return self._get_service_info(MdnsType.COMMISSIONER)
 
     def get_commissionable_service_info(self) -> List[Dict[str, any]]:
         """
@@ -248,7 +248,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Commissionable services.
         """
-        return self._getServiceInfo(MdnsType.COMMISSIONABLE)
+        return self._get_service_info(MdnsType.COMMISSIONABLE)
 
     def get_operational_service_info(self) -> List[Dict[str, any]]:
         """
@@ -257,7 +257,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Operational services.
         """
-        return self._getServiceInfo(MdnsType.OPERATIONAL)
+        return self._get_service_info(MdnsType.OPERATIONAL)
 
     def get_border_router_service_info(self) -> List[Dict[str, any]]:
         """
@@ -266,7 +266,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Border Router services.
         """
-        return self._getServiceInfo(MdnsType.BORDER_ROUTER)
+        return self._get_service_info(MdnsType.BORDER_ROUTER)
 
     async def _async_close(self) -> None:
         assert self._zc is not None
