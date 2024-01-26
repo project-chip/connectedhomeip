@@ -26,7 +26,7 @@ namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
 
-class ElectricalPowerMeasurementDelegate : public Delegate
+class ElectricalPowerMeasurementDelegate : public ElectricalPowerMeasurement::Delegate
 {
 public:
     ~ElectricalPowerMeasurementDelegate() = default;
@@ -37,8 +37,11 @@ public:
     // Attribute Accessors
     PowerModeEnum GetPowerMode() override { return mPowerMode; }
     uint8_t GetNumberOfMeasurementTypes() override { return mNumberOfMeasurementTypes; };
-    DataModel::List<const Structs::MeasurementAccuracyStruct::Type> GetAccuracy() override;
-    DataModel::List<const Structs::MeasurementRangeStruct::Type> GetRanges() override;
+
+    // TODO
+    AccuracyIterator * IterateAccuracy() override { return nullptr; }
+    RangeIterator * IterateRanges() override { return nullptr; }
+
     DataModel::Nullable<int64_t> GetVoltage() override { return mVoltage; }
     DataModel::Nullable<int64_t> GetActiveCurrent() override { return mActiveCurrent; }
     DataModel::Nullable<int64_t> GetReactiveCurrent() override { return mReactiveCurrent; }
@@ -50,16 +53,16 @@ public:
     DataModel::Nullable<int64_t> GetRMSCurrent() override { return mRMSCurrent; }
     DataModel::Nullable<int64_t> GetRMSPower() override { return mRMSPower; }
     DataModel::Nullable<int64_t> GetFrequency() override { return mFrequency; }
-    DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicCurrents() override;
-    DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>> GetHarmonicPhases() override;
+    // TODO
+    HarmonicMeasurementIterator * IterateHarmonicCurrents() override { return nullptr; }
+    HarmonicMeasurementIterator * IterateHarmonicPhases() override { return nullptr; }
+
     DataModel::Nullable<int64_t> GetPowerFactor() override { return mPowerFactor; }
     DataModel::Nullable<int64_t> GetNeutralCurrent() override { return mNeutralCurrent; };
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetPowerMode(PowerModeEnum);
     CHIP_ERROR SetNumberOfMeasurementTypes(uint8_t);
-    CHIP_ERROR SetAccuracy(); // TODO
-    CHIP_ERROR SetRanges();   // TODO
     CHIP_ERROR SetVoltage(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetActiveCurrent(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetReactiveCurrent(DataModel::Nullable<int64_t>);
@@ -71,8 +74,6 @@ public:
     CHIP_ERROR SetRMSCurrent(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetRMSPower(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetFrequency(DataModel::Nullable<int64_t>);
-    // DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>>;// TODO
-    // DataModel::Nullable<DataModel::List<Structs::HarmonicMeasurementStruct::Type>>;// TODO
     CHIP_ERROR SetPowerFactor(DataModel::Nullable<int64_t>);
     CHIP_ERROR SetNeutralCurrent(DataModel::Nullable<int64_t>);
 
