@@ -26,6 +26,14 @@
 #include <cstring>
 
 using chip::Protocols::InteractionModel::Status;
+
+/**
+ * @brief   Helper function to get current timestamp in Epoch format
+ *
+ * @param   chipEpoch reference to hold return timestamp
+ */
+CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
+
 namespace chip {
 namespace app {
 namespace Clusters {
