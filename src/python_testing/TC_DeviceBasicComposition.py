@@ -29,7 +29,7 @@ from matter_testing_support import (AttributePathLocation, ClusterPathLocation, 
                                     async_test_body, default_matter_test_main)
 from mobly import asserts
 from taglist_and_topology_test_support import (create_device_type_list_for_root, create_device_type_lists, find_tag_list_problems,
-                                               find_tree_roots, get_all_children, get_direct_children_of_root, parts_list_cycles,
+                                               find_tree_roots, flat_list_ok, get_direct_children_of_root, parts_list_cycles,
                                                separate_endpoint_types)
 
 
