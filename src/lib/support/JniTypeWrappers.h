@@ -193,7 +193,7 @@ public:
     jobject classRef() { return mGlobalRef; }
 
 private:
-    jobject mGlobalRef;
+    jobject mGlobalRef = nullptr;
 };
 
 class JniLocalReferenceManager
