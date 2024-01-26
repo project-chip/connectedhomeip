@@ -36,7 +36,7 @@ void ElectricalPowerMeasurementInstance::Shutdown()
 {
     Instance::Shutdown();
 }
-
+#if 0
 DataModel::List<const Structs::MeasurementAccuracyStruct::Type> ElectricalPowerMeasurementDelegate::GetAccuracy()
 {
 
@@ -68,6 +68,7 @@ ElectricalPowerMeasurementDelegate::GetHarmonicPhases()
 {
     return {};
 }
+#endif
 
 // --------------- Internal Attribute Set APIs
 CHIP_ERROR ElectricalPowerMeasurementDelegate::SetPowerMode(PowerModeEnum newValue)

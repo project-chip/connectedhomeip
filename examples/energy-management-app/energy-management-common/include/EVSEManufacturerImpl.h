@@ -19,6 +19,7 @@
 #pragma once
 
 #include <DeviceEnergyManagementManager.h>
+#include <ElectricalPowerMeasurementDelegate.h>
 #include <EnergyEvseManager.h>
 
 using chip::Protocols::InteractionModel::Status;
@@ -34,13 +35,29 @@ namespace EnergyEvse {
 class EVSEManufacturer
 {
 public:
-    EVSEManufacturer(EnergyEvseManager * aInstance) { mInstance = aInstance; }
-    EnergyEvseManager * GetInstance() { return mInstance; }
-    EnergyEvseDelegate * GetDelegate()
+    EVSEManufacturer(EnergyEvseManager * aEvseInstance,
+                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance)
     {
-        if (mInstance)
+        mEvseInstance = aEvseInstance;
+        mEPMInstance  = aEPMInstance;
+    }
+    EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
+
+    EnergyEvseDelegate * GetEvseDelegate()
+    {
+        if (mEvseInstance)
         {
-            return mInstance->GetDelegate();
+            return mEvseInstance->GetDelegate();
+        }
+        return nullptr;
+    }
+
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * GetEPMDelegate()
+    {
+        if (mEPMInstance)
+        {
+            return mEPMInstance->GetDelegate();
         }
         return nullptr;
     }
@@ -63,10 +80,10 @@ public:
     /**
      * @brief   Allows a client application to send in power readings into the system
      *
-     * @param[in]  aEndpointId     - Endpoint to send to EPM Cluster
-     * @param[in]  aActivePower_mW - Power measured in milli-watts
-     * @param[in]  aVoltage_mV     - Voltage measured in milli-volts
-     * @param[in]  aCurrent_mA     - Current measured in milli-amps
+     * @param[in]  aEndpointId       - Endpoint to send to EPM Cluster
+     * @param[in]  aActivePower_mW   - ActivePower measured in milli-watts
+     * @param[in]  aVoltage_mV       - Voltage measured in milli-volts
+     * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
      */
     CHIP_ERROR SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV, int64_t aCurrent_mA);
 
@@ -88,14 +105,20 @@ public:
      * @param[in]   aPower_mW    - the mean power of the load
      *                             Positive power indicates Imported energy (e.g. a load)
      *                             Negative power indicated Exported energy (e.g. a generator)
-     * @param[in]   aPowerRandomness_mW  This is used to scale random power fluctuations around the mean power of the load
-     *
+     * @param[in]   aPowerRandomness_mW  This is used to define the max randomness of the
+     *                             random power values around the mean power of the load
+     * @param[in]   aVoltage_mV  - the nominal voltage measurement
+     * @param[in]   aVoltageRandomness_mV  This is used to define the max randomness of the
+     *                             random voltage values
+     * @param[in]   aCurrent_mA  - the nominal current measurement
+     * @param[in]   aCurrentRandomness_mA  This is used to define the max randomness of the
+     *                             random current values
      * @param[in]   aInterval_s  - the callback interval in seconds
      * @param[in]   bReset       - boolean: true will reset the energy values to 0
      */
-    void StartFakeReadings(EndpointId aEndpointId, int64_t aPower_mW, uint32_t aPowerRandomness_mW, uint8_t aInterval_s,
+    void StartFakeReadings(EndpointId aEndpointId, int64_t aPower_mW, uint32_t aPowerRandomness_mW, int64_t aVoltage_mV,
+                           uint32_t aVoltageRandomness_mV, int64_t aCurrent_mA, uint32_t aCurrentRandomness_mA, uint8_t aInterval_s,
                            bool bReset);
-
     /**
      * @brief   Stops any active updates to the fake load data callbacks
      */
@@ -111,7 +134,8 @@ public:
     static void FakeReadingsTimerExpiry(System::Layer * systemLayer, void * manufacturer);
 
 private:
-    EnergyEvseManager * mInstance;
+    EnergyEvseManager * mEvseInstance;
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;
