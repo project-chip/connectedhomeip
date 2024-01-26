@@ -28,7 +28,7 @@ MTR_EXTERN NSString * const MTRMetricCommissioningStatusKey MTR_NEWLY_AVAILABLE;
 MTR_NEWLY_AVAILABLE
 @interface MTRMetrics : NSObject
 
-@property (nonatomic, readonly, copy) NSArray<NSString *> *allKeys;
+@property (nonatomic, readonly, copy) NSArray<NSString *> * allKeys;
 
 - (nullable id)valueForKey:(NSString *)key;
 

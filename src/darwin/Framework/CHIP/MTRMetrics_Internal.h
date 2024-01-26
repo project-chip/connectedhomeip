@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MTRMetrics()
+@interface MTRMetrics ()
 
 - (void)setValue:(id)value forKey:(NSString *)key;
 

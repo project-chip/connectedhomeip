@@ -131,18 +131,16 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
                 }
 
                 if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-                    MTRMetrics* metrics = [MTRMetrics new];
+                    MTRMetrics * metrics = [MTRMetrics new];
 
                     if (nsError) {
                         [metrics setValue:nsError forKey:MTRMetricCommissioningStatusKey];
-                    }
-                    else {
+                    } else {
                         auto * error = [NSError errorWithDomain:MTRErrorDomain code:0 userInfo:nil];
                         [metrics setValue:error forKey:MTRMetricCommissioningStatusKey];
                     }
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID metrics:metrics];
-                }
-                else {
+                } else {
                     [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
                 }
             });

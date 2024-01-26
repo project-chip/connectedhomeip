@@ -14,20 +14,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import <Matter/MTRDefines.h>
-#import "MTRLogging_Internal.h"
 #import "MTRMetrics.h"
+#import "MTRLogging_Internal.h"
+#import <Matter/MTRDefines.h>
 
 NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissioningStatus";
 
 @implementation MTRMetrics {
-    NSMutableDictionary<NSString*, id> * _metricsData;
+    NSMutableDictionary<NSString *, id> * _metricsData;
 }
 
 - (instancetype)init
 {
-    if (self = [super init])
-    {
+    if (self = [super init]) {
         _metricsData = [NSMutableDictionary dictionary];
     }
     return self;
@@ -35,8 +34,7 @@ NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissio
 
 - (nullable id)valueForKey:(NSString *)key
 {
-    if (!key)
-    {
+    if (!key) {
         MTR_LOG_ERROR("Cannot get metrics value for nil key");
         return nil;
     }
@@ -46,8 +44,7 @@ NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissio
 
 - (void)setValue:(id)value forKey:(NSString *)key
 {
-    if (!key)
-    {
+    if (!key) {
         MTR_LOG_ERROR("Cannot set metrics value for nil key");
         return;
     }
@@ -57,8 +54,7 @@ NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissio
 
 - (void)removeValueForKey:(NSString *)key
 {
-    if (!key)
-    {
+    if (!key) {
         MTR_LOG_ERROR("Cannot remove metrics value for nil key");
         return;
     }
