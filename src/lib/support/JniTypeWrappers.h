@@ -185,7 +185,11 @@ class JniGlobalRefWrapper
 {
 public:
     explicit JniGlobalRefWrapper(jobject mGlobalRef) : mGlobalRef(mGlobalRef) {}
-    ~JniGlobalRefWrapper() { chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mGlobalRef); }
+    ~JniGlobalRefWrapper()
+    {
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mGlobalRef);
+        mGlobalRef = nullptr;
+    }
     jobject classRef() { return mGlobalRef; }
 
 private:
