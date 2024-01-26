@@ -18,7 +18,8 @@
 #pragma once
 
 #include <inet/EndpointQueueFilter.h>
-#include <lwip/ip4_addr.h>
+#include <inet/IPAddress.h>
+#include <lwip/ip_addr.h>
 
 namespace chip {
 namespace Inet {
@@ -60,20 +61,20 @@ private:
     // TODO: Add unit tests for these static functions
     static bool IsMdnsBroadcastPacket(const IPPacketInfo & pktInfo)
     {
+        if (pktInfo.DestPort == 5353)
+        {
 #if INET_CONFIG_ENABLE_IPV4
-        if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == 5353)
-        {
-            ip4_addr_t mdnsBroadcastAddr4;
-            ip4addr_aton("224.0.0.251", &mdnsBroadcastAddr4);
-            return pktInfo.DestAddress.ToIPv4().addr == mdnsBroadcastAddr4.addr;
-        }
+            ip_addr_t mdnsIPv4BroadcastAddr = IPADDR4_INIT_BYTES(224, 0, 0, 251);
+            if (pktInfo.DestAddress == chip::Inet::IPAddress(mdnsIPv4BroadcastAddr))
+            {
+                return true;
+            }
 #endif
-        if (pktInfo.DestAddress.IsIPv6() && pktInfo.DestPort == 5353)
-        {
-            ip6_addr_t mdnsBroadcastAddr6;
-            ip6addr_aton("ff02::fb", &mdnsBroadcastAddr6);
-            ip6_addr_t dstAddr6 = pktInfo.DestAddress.ToIPv6();
-            return ip6_addr_cmp(&mdnsBroadcastAddr6, &dstAddr6);
+            ip_addr_t mdnsIPv6BroadcastAddr = IPADDR6_INIT_HOST(0xFF020000, 0, 0, 0xFB);
+            if (pktInfo.DestAddress == chip::Inet::IPAddress(mdnsIPv6BroadcastAddr))
+            {
+                return true;
+            }
         }
         return false;
     }
