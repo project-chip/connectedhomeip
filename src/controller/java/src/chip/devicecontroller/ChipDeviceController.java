@@ -118,13 +118,14 @@ public class ChipDeviceController {
    * @param attestationTrustStoreDelegate Delegate for attestation trust store
    * @param cdTrustKeys certification Declaration Trust Keys
    */
-
-   public void setAttestationTrustStoreDelegate(
-      AttestationTrustStoreDelegate attestationTrustStoreDelegate, @Nullable List<byte[]> cdTrustKeys) {
-    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate, cdTrustKeys);
+  public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate,
+      @Nullable List<byte[]> cdTrustKeys) {
+    setAttestationTrustStoreDelegate(
+        deviceControllerPtr, attestationTrustStoreDelegate, cdTrustKeys);
   }
 
-   public void setAttestationTrustStoreDelegate(
+  public void setAttestationTrustStoreDelegate(
       AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
     setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate, null);
   }
@@ -1373,7 +1374,9 @@ public class ChipDeviceController {
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
 
   private native void setAttestationTrustStoreDelegate(
-      long deviceControllerPtr, AttestationTrustStoreDelegate delegate, @Nullable List<byte[]> cdTrustKeys);
+      long deviceControllerPtr,
+      AttestationTrustStoreDelegate delegate,
+      @Nullable List<byte[]> cdTrustKeys);
 
   private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
 
