@@ -3169,9 +3169,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelTypeEnu
     case EnumType::kSatellite:
     case EnumType::kCable:
     case EnumType::kTerrestrial:
+    case EnumType::kOtt:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(4);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoTypeEnum val)
