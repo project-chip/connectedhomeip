@@ -544,7 +544,7 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
     if (attestationTrustStoreDelegate != nullptr)
     {
         jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        err                                      = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
+        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
         SuccessOrExit(err);
     }
 
