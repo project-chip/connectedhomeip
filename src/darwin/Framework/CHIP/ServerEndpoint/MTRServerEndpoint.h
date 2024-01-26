@@ -18,7 +18,7 @@
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceType.h>
-#import <Matter/MTRServerClusterDescription.h>
+#import <Matter/MTRServerCluster.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * A representation of an endpoint implemented by an MTRDeviceController.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTREndpointDescription : NSObject <NSCopying>
+@interface MTRServerEndpoint : NSObject <NSCopying>
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -36,20 +36,41 @@ MTR_NEWLY_AVAILABLE
  * types provided must be nonempty (but may include vendor-specific device
  * types).
  */
-- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceType *> *)deviceTypes error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceType *> *)deviceTypes;
+
+/**
+ * Add an access grant to the endpoint.
+ */
+- (BOOL)addAccessGrant:(MTRAccessGrant *)accessGrant;
+
+/**
+ * Remove an access grant from the endpoint.
+ */
+- (BOOL)removeAccessGrant:(MTRAccessGrant *)accessGrant;
+
+/**
+ * Add a server cluster to the endpoint.  This can only be done before the
+ * endpoint has been added to a controller.
+ *
+ * The cluster must not have the same cluster ID as another cluster on
+ * this endpoint.
+ *
+ * The cluster must not already be added to another endpoint.
+ */
+- (BOOL)addServerCluster:(MTRServerCluster *)serverCluster;
 
 @property (nonatomic, copy, readonly) NSNumber * endpointID;
 
 @property (nonatomic, copy, readonly) NSArray<MTRDeviceType *> * deviceTypes;
 
 /**
- * A list of entities that are allowed to access all clusters on this endpoint.
+ * The set of entities that are allowed to access all clusters on this endpoint.
  * If more fine-grained access control is desired, access grants should be
  * defined on individual clusters.
  *
- * Defaults to no access granted.
+ * Defaults to empty set, which means no access granted.
  */
-@property (nonatomic, copy) NSArray<MTRAccessGrant *> * accessGrants;
+@property (nonatomic, copy, readonly) NSSet<MTRAccessGrant *> * accessGrants;
 
 /**
  * A list of server clusters supported on this endpoint.  The Descriptor cluster
@@ -57,13 +78,7 @@ MTR_NEWLY_AVAILABLE
  * unless it has a non-empty PartsList.  If not included, the Descriptor cluster
  * will be generated automatically.
  */
-@property (nonatomic, copy) NSArray<MTRServerClusterDescription *> * serverClusters;
-
-/**
- * Whether the endpoint should be enabled as soon as the description is
- * provided.  Defaults to YES.
- */
-@property (nonatomic, assign) BOOL autoEnable;
+@property (nonatomic, copy, readonly) NSArray<MTRServerCluster *> * serverClusters;
 
 @end
 

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#import "MTRError_Internal.h"
+#import "MTRDefines_Internal.h"
 #import "MTRLogging_Internal.h"
 #import <Matter/MTRAccessGrant.h>
 
@@ -25,62 +25,48 @@
 
 using namespace chip;
 
+MTR_DIRECT_MEMBERS
 @implementation MTRAccessGrant
 
-- (nullable instancetype)initWithNodeID:(NSNumber *)nodeID privilege:(MTRAccessControlEntryPrivilege)privilege error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithNodeID:(NSNumber *)nodeID privilege:(MTRAccessControlEntryPrivilege)privilege
 {
     NodeId id = nodeID.unsignedLongLongValue;
     if (!IsOperationalNodeId(id)) {
         MTR_LOG_ERROR("MTRAccessGrant provided non-operational node ID: 0x%llx", id);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
     return [self initWithSubject:[nodeID copy] privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
 }
 
-- (nullable instancetype)initWithCASEAuthenticatedTag:(NSNumber *)caseAuthenticatedTag privilege:(MTRAccessControlEntryPrivilege)privilege error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithCASEAuthenticatedTag:(NSNumber *)caseAuthenticatedTag privilege:(MTRAccessControlEntryPrivilege)privilege
 {
     auto value = caseAuthenticatedTag.unsignedLongLongValue;
     if (!CanCastTo<CASEAuthTag>(value)) {
         MTR_LOG_ERROR("MTRAccessGrant provided too-large CAT value: 0x%llx", value);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
     CASEAuthTag tag = static_cast<CASEAuthTag>(value);
     if (!IsValidCASEAuthTag(tag)) {
         MTR_LOG_ERROR("MTRAccessGrant provided invalid CAT value: 0x%" PRIx32, tag);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
     return [self initWithSubject:@(NodeIdFromCASEAuthTag(tag)) privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
 }
 
-- (nullable instancetype)initWithGroupID:(NSNumber *)groupID privilege:(MTRAccessControlEntryPrivilege)privilege error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithGroupID:(NSNumber *)groupID privilege:(MTRAccessControlEntryPrivilege)privilege
 {
     auto value = groupID.unsignedLongLongValue;
     if (!CanCastTo<GroupId>(value)) {
         MTR_LOG_ERROR("MTRAccessGrant provided too-large group id: 0x%llx", value);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
     GroupId id = static_cast<GroupId>(value);
     if (!IsValidGroupId(id)) {
         MTR_LOG_ERROR("MTRAccessGrant provided invalid group id: 0x%" PRIx32, id);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
@@ -108,7 +94,8 @@ using namespace chip;
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [[MTRAccessGrant alloc] initWithSubject:[_subjectID copy] privilege:_grantedPrivilege authenticationMode:_authenticationMode];
+    // We have no mutable state.
+    return self;
 }
 
 - (BOOL)isEqual:(id)object
@@ -119,7 +106,7 @@ using namespace chip;
 
     MTRAccessGrant * other = object;
 
-    BOOL sameSubjectID = (_subjectID == nil && other.subjectID == nil) || (_subjectID != nil && other.subjectID != nil && [_subjectID isEqual:other.subjectID]);
+    BOOL sameSubjectID = (_subjectID == nil && other.subjectID == nil) || [_subjectID isEqual:other.subjectID];
     return sameSubjectID && _grantedPrivilege == other.grantedPrivilege && _authenticationMode == other.authenticationMode;
 }
 

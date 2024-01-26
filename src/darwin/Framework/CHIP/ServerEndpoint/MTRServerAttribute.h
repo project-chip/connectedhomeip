@@ -15,6 +15,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -25,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * may not be writable.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRAttributeDescription : NSObject <NSCopying>
+@interface MTRServerAttribute : NSObject <NSCopying>
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -34,23 +35,30 @@ MTR_NEWLY_AVAILABLE
  * Initialize as a readonly attribute.  The value is a data-value as documented
  * in MTRBaseDevice.h.
  *
- * Will fail if the attribute ID is not valid or the attribute value is not a
- * valid data-value.
+ * Will fail if the attribute ID is not valid per the Matter specification or
+ * the attribute value is not a valid data-value.
+ *
+ * requiredPrivilege is the privilege required to read the attribute.
  */
-- (nullable instancetype)initReadonlyAttributeWithID:(NSNumber *)attributeID initialValue:(NSDictionary<NSString *, id> *)value error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initReadonlyAttributeWithID:(NSNumber *)attributeID initialValue:(NSDictionary<NSString *, id> *)value requiredPrivilege:(MTRAccessControlEntryPrivilege)requiredPrivilege;
 
 /**
- * Initialize as a writable attribute.  The value is a data-value as documented
+ * Change the value of the attribute to a new value.  The value is a data-value as documented
  * in MTRBaseDevice.h.
  *
- * Will fail if the attribute ID is not valid or the attribute value is not a
- * valid data-value.
+ * Will fail if the attribute is not a valid data-value or if the attribute is
+ * on an endpoint that used to be defined on a controller and isn't any longer,
+ * whether because it was removed or because the controller was shut down.
  */
-- (nullable instancetype)initWritableAttributeWithID:(NSNumber *)attributeID initialValue:(NSDictionary<NSString *, id> *)value error:(NSError * __autoreleasing *)error;
+- (BOOL)setValue:(NSDictionary<NSString *, id> *)value;
 
 @property (nonatomic, copy, readonly) NSNumber * attributeID;
 @property (nonatomic, copy, readonly) NSDictionary<NSString *, id> * value;
-@property (nonatomic, readonly, getter=isWritable) BOOL writable;
+/**
+ * The privilege level necessary to read this attribute.
+ */
+@property (nonatomic, assign, readonly) MTRAccessControlEntryPrivilege requiredReadPrivilege;
+@property (nonatomic, assign, readonly, getter=isWritable) BOOL writable;
 
 @end
 

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#import "MTRError_Internal.h"
+#import "MTRDefines_Internal.h"
 #import "MTRLogging_Internal.h"
 #import <Matter/MTRDeviceType.h>
 
@@ -24,43 +24,35 @@
 
 using namespace chip;
 
+MTR_DIRECT_MEMBERS
 @implementation MTRDeviceType
 
-- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision error:(NSError * __autoreleasing *)error
+- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
     auto deviceTypeIDValue = deviceTypeID.unsignedLongLongValue;
     if (!CanCastTo<DeviceTypeId>(deviceTypeIDValue)) {
         MTR_LOG_ERROR("MTRDeviceType provided too-large device type ID: 0x%llx", deviceTypeIDValue);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
     auto id = static_cast<DeviceTypeId>(deviceTypeIDValue);
     if (!IsValidDeviceTypeId(id)) {
         MTR_LOG_ERROR("MTRDeviceType provided invalid device type ID: 0x%" PRIx32, id);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
     auto revisionValue = revision.unsignedLongLongValue;
     if (!CanCastTo<uint16_t>(revisionValue) || revisionValue < 1) {
         MTR_LOG_ERROR("MTRDeviceType provided invalid device type revision: 0x%llx", revisionValue);
-        if (error) {
-            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
-        }
         return nil;
     }
 
-    return [self initWithDeviceTypeID:[deviceTypeID copy] revision:[revision copy]];
+    return [self initInternalWithDeviceTypeID:[deviceTypeID copy] revision:[revision copy]];
 }
 
-// initWithDeviceTypeID:revision assumes that the device type ID and device
+// initInternalWithDeviceTypeID:revision assumes that the device type ID and device
 // revision have already been validated and, if needed, copied from the input.
-- (instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
+- (instancetype)initInternalWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
     if (!(self = [super init])) {
         return nil;
@@ -73,7 +65,8 @@ using namespace chip;
 
 - (id)copyWithZone:(NSZone *)zone
 {
-    return [[MTRDeviceType alloc] initWithDeviceTypeID:[_deviceTypeID copy] revision:[_deviceTypeRevision copy]];
+    // We have no mutable state.
+    return self;
 }
 
 - (BOOL)isEqual:(id)object

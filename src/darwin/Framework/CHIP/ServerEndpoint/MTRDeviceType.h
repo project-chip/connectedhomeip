@@ -35,7 +35,7 @@ MTR_NEWLY_AVAILABLE
  *
  * The provided deviceTypeRevision must be in the range 1-65535.
  */
-- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision;
 
 @property (nonatomic, copy, readonly) NSNumber * deviceTypeID;
 @property (nonatomic, copy, readonly) NSNumber * deviceTypeRevision;

@@ -21,7 +21,6 @@
 
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
-#import <Matter/MTRAttributeDescription.h>
 #import <Matter/MTRBackwardsCompatShims.h>
 #import <Matter/MTRBaseClusters.h>
 #import <Matter/MTRBaseDevice.h>
@@ -49,7 +48,6 @@
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
 #import <Matter/MTRDeviceType.h>
 #import <Matter/MTRDiagnosticLogsType.h>
-#import <Matter/MTREndpointDescription.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRFabricInfo.h>
 #import <Matter/MTRKeypair.h>
@@ -60,7 +58,9 @@
 #import <Matter/MTROnboardingPayloadParser.h>
 #import <Matter/MTROperationalCertificateIssuer.h>
 #import <Matter/MTRQRCodeSetupPayloadParser.h>
-#import <Matter/MTRServerClusterDescription.h>
+#import <Matter/MTRServerAttribute.h>
+#import <Matter/MTRServerCluster.h>
+#import <Matter/MTRServerEndpoint.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>

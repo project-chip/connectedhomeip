@@ -34,7 +34,7 @@ MTR_NEWLY_AVAILABLE
  * Grant access at the provided level to a specific node on the fabric.  The
  * provided nodeID must be an operational node identifier.
  */
-- (nullable instancetype)initWithNodeID:(NSNumber *)nodeID privilege:(MTRAccessControlEntryPrivilege)privilege error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithNodeID:(NSNumber *)nodeID privilege:(MTRAccessControlEntryPrivilege)privilege;
 
 /**
  * Grant access to any node on the fabric that has a matching CASE Authenticated
@@ -42,14 +42,14 @@ MTR_NEWLY_AVAILABLE
  * be a 32-bit unsigned integer with lower 16 bits not 0, per the Matter
  * specification.
  */
-- (nullable instancetype)initWithCASEAuthenticatedTag:(NSNumber *)caseAuthenticatedTag privilege:(MTRAccessControlEntryPrivilege)privilege error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithCASEAuthenticatedTag:(NSNumber *)caseAuthenticatedTag privilege:(MTRAccessControlEntryPrivilege)privilege;
 
 /**
  * Grant access to any node on the fabric that is communicating with us via
  * group messages sent to the given group.  The provided groupID must be a valid
  * group identifier in the range 1-65535.
  */
-- (nullable instancetype)initWithGroupID:(NSNumber *)groupID privilege:(MTRAccessControlEntryPrivilege)privilege error:(NSError * __autoreleasing *)error;
+- (nullable instancetype)initWithGroupID:(NSNumber *)groupID privilege:(MTRAccessControlEntryPrivilege)privilege;
 
 /**
  * Grant access to any node on the fabric, as long as it's communicating with us
