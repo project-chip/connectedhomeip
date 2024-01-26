@@ -556,7 +556,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
             # ensure that every sub-id in the parts list is included in the parent
             sub_children = set()
             for child in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]:
-                sub_children.update(get_all_children(child))
+                sub_children.update(get_all_children(child, self.endpoints))
             if not all(item in sub_children for item in self.endpoints[endpoint_id][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]):
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 self.record_error(self.get_test_name(), location=location,
