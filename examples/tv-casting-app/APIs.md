@@ -68,7 +68,7 @@ Next, you're ready to:
 1. [Subscribe](#subscriptions) to playback events.
 
 In order to illustrate more specifically these steps,refer to the below figure
-![workflow of casting video player](./diagram/workflow%20of%20casting%20video%20player%20.png)
+![workflow of casting video player](./diagram/workflow_of_casting_video_player.png)
 
 ## Build and Setup
 
