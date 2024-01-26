@@ -1258,48 +1258,6 @@ bool emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::Endpoin
 bool emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
 
 /**
- * @brief This callback is called when the Door Lock server needs to find out
- * the number of Aliro credential issuer keys supported, since there is no attribute
- * that represents that value.
- *
- * @param[in] endpointId ID of the endpoint that contains the door lock.
- * @param[out] maxNumberOfCredentials the number of Aliro credential issuer keys supported by the lock.
- *
- * @return false on failure, true on success.  On failure, the cluster
- * implementation will assume that 0 Aliro credential issuer keys are supported.
- */
-bool emberAfPluginDoorLockGetNumberOfAliroCredentialIssuerKeyCredentialsSupported(chip::EndpointId endpointId,
-                                                                                  uint16_t & maxNumberOfCredentials);
-
-/**
- * @brief This callback is called when the Door Lock server needs to find out
- * the number of Aliro evictable endpoint key credentials supported, since there is no attribute
- * that represents that value.
- *
- * @param[in] endpointId ID of the endpoint that contains the door lock.
- * @param[out] maxNumberOfCredentials the number of Aliro evictable endpoint key credentials supported by the lock.
- *
- * @return false on failure, true on success.  On failure, the cluster
- * implementation will assume that 0 Aliro evictable endpoint key credentials are supported.
- */
-bool emberAfPluginDoorLockGetNumberOfAliroEvictableEndpointKeyCredentialsSupported(chip::EndpointId endpointId,
-                                                                                   uint16_t & maxNumberOfCredentials);
-
-/**
- * @brief This callback is called when the Door Lock server needs to find out
- * the number of Aliro non-evictable endpoint key credentials supported, since there is no attribute
- * that represents that value.
- *
- * @param[in] endpointId ID of the endpoint that contains the door lock.
- * @param[out] maxNumberOfCredentials the number of Aliro non-evictable endpoint key credentials supported by the lock.
- *
- * @return false on failure, true on success.  On failure, the cluster
- * implementation will assume that 0 Aliro non-evictable endpoint key credentials are supported.
- */
-bool emberAfPluginDoorLockGetNumberOfAliroNonEvictableEndpointKeyCredentialsSupported(chip::EndpointId endpointId,
-                                                                                      uint16_t & maxNumberOfCredentials);
-
-/**
  * @brief This callback is called when Door Lock cluster needs to communicate the Aliro reader configuration to the door lock.
  *
  * @note This function is used for communicating the Aliro signing key, verification key, group identifier and group resolving key

@@ -24,11 +24,15 @@ namespace app {
 namespace Clusters {
 namespace DoorLock {
 
-static constexpr size_t kAliroReaderVerificationKeyMaxSize = 65;
+static constexpr size_t kAliroReaderVerificationKeySize = 65;
 
-static constexpr size_t kAliroAttributeMaxSize_16 = 16;
+static constexpr size_t kAliroReaderGroupIdentifierSize = 16;
 
-static constexpr size_t kProtocolVersionMaxSize = 2;
+static constexpr size_t kAliroReaderGroupSubIdentifierSize = 16;
+
+static constexpr size_t kAliroGroupResolvingKeySize = 16;
+
+static constexpr size_t kProtocolVersionSize = 2;
 
 /** @brief
  *  Defines methods for implementing application-specific logic for the door lock cluster.
@@ -46,23 +50,26 @@ public:
      * @brief Get the Aliro verification key component of the Reader's key pair.
      *
      * @param[out] verificationKey The MutableByteSpan to copy the verification key into. On success,
-     *             the callee must update the length to the length of the copied data.
+     *             the callee must update the length to the length of the copied data. If the value of
+     *             the attribute is null, the callee must set the MutableByteSpan to empty.
      */
     virtual CHIP_ERROR GetAliroReaderVerificationKey(MutableByteSpan & verificationKey) = 0;
 
     /**
-     * @brief Get the Reader's group identifier
+     * @brief Get the Aliro Reader's group identifier
      *
      * @param[out] groupIdentifier The MutableByteSpan to copy the group identifier into. On success,
-     *             the callee must update the length to the length of the copied data.
+     *             the callee must update the length to the length of the copied data. If the value of
+     *             the attribute is null, the callee must set the MutableByteSpan to empty.
      */
     virtual CHIP_ERROR GetAliroReaderGroupIdentifier(MutableByteSpan & groupIdentifier) = 0;
 
     /**
-     * @brief Get the Reader's group subidentifier
+     * @brief Get the Aliro Reader's group subidentifier
      *
      * @param[out] groupSubIdentifier  The MutableByteSpan to copy the group subidentifier into. On success,
-     *             the callee must update the length to the length of the copied data.
+     *             the callee must update the length to the length of the copied data. The MutableByteSpan
+     *             must not be empty since the attribute is not nullable.
      */
     virtual CHIP_ERROR GetAliroReaderGroupSubIdentifier(MutableByteSpan & groupSubIdentifier) = 0;
 
@@ -71,7 +78,8 @@ public:
      *
      * @param[in] index The index of the protocol version in the list.
      * @param[out] protocolVersion The MutableByteSpan to copy the expedited transaction supported protocol version at the given
-     * index into. On success, the callee must update the length to the length of the copied data.
+     *             index into. On success, the callee must update the length to the length of the copied data.
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the attribute list.
      */
     virtual CHIP_ERROR GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(size_t index,
                                                                                    MutableByteSpan & protocolVersion) = 0;
@@ -80,7 +88,8 @@ public:
      * @brief Get the Reader's group resolving key.
      *
      * @param[out] groupResolvingKey The MutableByteSpan to copy the group resolving key into. On success,
-     *             the callee must update the length to the length of the copied data.
+     *             the callee must update the length to the length of the copied data. If the value of
+     *             the attribute is null, the callee must set the MutableByteSpan to empty.
      */
     virtual CHIP_ERROR GetAliroGroupResolvingKey(MutableByteSpan & groupResolvingKey) = 0;
 
@@ -90,29 +99,30 @@ public:
      * @param[in] index The index of the protocol version in the list.
      * @param[out] protocolVersion  The MutableByteSpan to copy the supported BLE UWB protocol version at the given index into.
      *             On success, the callee must update the length to the length of the copied data.
+     * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the attribute list.
      */
     virtual CHIP_ERROR GetAliroSupportedBLEUWBProtocolVersionAtIndex(size_t index, MutableByteSpan & protocolVersion) = 0;
 
     /**
      * @brief Get the Aliro BLE Advertising Version.
      *
-     * @param[out] bleAdvertisingVersion The BLE Advertising Version.
+     * @return The BLE Advertising Version.
      */
-    virtual CHIP_ERROR GetAliroBLEAdvertisingVersion(uint8_t & bleAdvertisingVersion) = 0;
+    virtual uint8_t GetAliroBLEAdvertisingVersion() = 0;
 
     /**
      * @brief Get the maximum number of Aliro credential issuer keys supported.
      *
-     * @param[out] numberOfAliroCredentialIssuerKeysSupported The max number of Aliro credential issuer keys supported.
+     * @return The max number of Aliro credential issuer keys supported.
      */
-    virtual CHIP_ERROR GetNumberOfAliroCredentialIssuerKeysSupported(uint16_t & numberOfAliroCredentialIssuerKeysSupported) = 0;
+    virtual uint16_t GetNumberOfAliroCredentialIssuerKeysSupported() = 0;
 
     /**
      * @brief Get the maximum number of Aliro endpoint keys supported.
      *
-     * @param[out] numberOfAliroEndpointKeysSupported The max number of Aliro endpoint keys supported.
+     * @return The max number of Aliro endpoint keys supported.
      */
-    virtual CHIP_ERROR GetNumberOfAliroEndpointKeysSupported(uint16_t & numberOfAliroEndpointKeysSupported) = 0;
+    virtual uint16_t GetNumberOfAliroEndpointKeysSupported() = 0;
 };
 
 } // namespace DoorLock
