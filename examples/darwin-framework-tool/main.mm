@@ -20,6 +20,7 @@
 
 #import "logging/logging.h"
 
+#include "commands/bdx/Commands.h"
 #include "commands/common/Commands.h"
 #include "commands/delay/Commands.h"
 #include "commands/discover/Commands.h"
@@ -38,6 +39,7 @@ int main(int argc, const char * argv[])
         dft::logging::Setup();
 
         Commands commands;
+        registerCommandsBdx(commands);
         registerCommandsPairing(commands);
         registerCommandsDelay(commands);
         registerCommandsDiscover(commands);

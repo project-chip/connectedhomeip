@@ -8544,6 +8544,10 @@
 - release: "Future"
   versions: "future"
   provisional:
+      clusters:
+          # Targeting Spring 2024 Matter release
+          - EnergyEVSEMode
+          - DeviceEnergyManagementMode
       attributes:
           DoorLock:
               # Aliro is not ready yet.
@@ -8575,6 +8579,10 @@
               - SetpointHoldExpiryTimestamp
               - QueuedPreset
               - ActiveScheduleHandle
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - MeiInt8u
       commands:
           DoorLock:
               # Aliro is not ready yet.
@@ -8592,6 +8600,11 @@
           RVCOperationalState:
               # Targeting Spring 2024 Matter release
               - GoHome
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestDifferentVendorMeiRequest
+              - TestDifferentVendorMeiResponse
       structs:
           Thermostat:
               # Targeting Spring 2024 Matter release
@@ -8601,6 +8614,11 @@
               - PresetTypeStruct
               - ScheduleTypeStruct
               - QueuedPresetStruct
+      events:
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestDifferentVendorMeiEvent
       enums:
           Thermostat:
               # Targeting Spring 2024 Matter release
