@@ -43,16 +43,6 @@ namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
 
-using ChangeIndicationEnum      = Clusters::detail::ChangeIndicationEnum;
-using DegradationDirectionEnum  = Clusters::detail::DegradationDirectionEnum;
-using ErrorStateEnum            = Clusters::detail::ErrorStateEnum;
-using LevelValueEnum            = Clusters::detail::LevelValueEnum;
-using MeasurementMediumEnum     = Clusters::detail::MeasurementMediumEnum;
-using MeasurementTypeEnum       = Clusters::detail::MeasurementTypeEnum;
-using MeasurementUnitEnum       = Clusters::detail::MeasurementUnitEnum;
-using OperationalStateEnum      = Clusters::detail::OperationalStateEnum;
-using ProductIdentifierTypeEnum = Clusters::detail::ProductIdentifierTypeEnum;
-
 namespace ModeTagStruct {
 enum class Fields : uint8_t
 {
