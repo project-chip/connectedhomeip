@@ -3492,7 +3492,7 @@ cluster RvcOperationalState = 97 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional cluster ScenesManagement = 98 {
-  revision 5;
+  revision 1;
 
   bitmap CopyModeBitmap : bitmap8 {
     kCopyAllScenes = 0x1;
@@ -7063,7 +7063,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -7644,7 +7644,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -7990,7 +7990,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -8915,7 +8915,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -8944,7 +8944,7 @@ endpoint 2 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 1;
 
     handle command AddScene;
     handle command AddSceneResponse;
@@ -8984,7 +8984,7 @@ endpoint 65534 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 

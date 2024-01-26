@@ -1216,6 +1216,20 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     [device nodeMayBeAdvertisingOperational];
 }
 
+- (void)downloadLogFromNodeWithID:(NSNumber *)nodeID
+                             type:(MTRDiagnosticLogType)type
+                          timeout:(NSTimeInterval)timeout
+                            queue:(dispatch_queue_t)queue
+                       completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    [_factory downloadLogFromNodeWithID:nodeID
+                             controller:self
+                                   type:type
+                                timeout:timeout
+                                  queue:queue
+                             completion:completion];
+}
+
 @end
 
 /**
