@@ -9116,12 +9116,6 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: RVCCLEANM.S.A0001
 
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCCLEANM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCCLEANM.S.A0003
-
     #
     # server / Commands received
     #
@@ -9334,11 +9328,8 @@ PICS:
     - label: "Does the device implement the CurrentMode attribute?"
       id: RVCRUNM.S.A0001
 
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: RVCRUNM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: RVCRUNM.S.A0003
+    - label: "Can the mode change be manually controlled?"
+      id: RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED
 
     #Commands received
     - label: "Does the device implement receiving the ChangeToMode command?"
