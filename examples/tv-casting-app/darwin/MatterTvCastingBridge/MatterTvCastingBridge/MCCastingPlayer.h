@@ -48,20 +48,20 @@
 - (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion timeout:(long long)timeout desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter;
 
 /**
- * @brief (async) Verifies that a connection exists with this CastingPlayer, or triggers a new session request. If the
- * CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk, this will execute the user
+ * @brief (async) Verifies that a connection exists with this MCCastingPlayer, or triggers a new session request. If the
+ * MCCastingApp does not have the nodeId and fabricIndex of this MCCastingPlayer cached on disk, this will execute the user
  * directed commissioning process.
  *
  * @param completion - called back when the connection process completes. Parameter is nil if it completed successfully
- * @param desiredEndpointFilter - Attributes (such as VendorId) describing an Endpoint that the client wants to interact
+ * @param desiredEndpointFilter - Attributes (such as VendorId) describing an MCEndpoint that the client wants to interact
  * with after commissioning. If this value is passed in, the VerifyOrEstablishConnection will force User Directed
- * Commissioning, in case the desired Endpoint is not found in the on-device cached information about the CastingPlayer
+ * Commissioning, in case the desired Endpoint is not found in the on-device cached information about the MCCastingPlayer
  * (if any)
  */
 - (void)verifyOrEstablishConnectionWithCompletionBlock:(void (^_Nonnull)(NSError * _Nullable))completion desiredEndpointFilter:(MCEndpointFilter * _Nullable)desiredEndpointFilter;
 
 /**
- * @brief Sets the internal connection state of this CastingPlayer to "disconnected"
+ * @brief Sets the internal connection state of this MCCastingPlayer to "disconnected"
  */
 - (void)disconnect;
 
@@ -72,8 +72,10 @@
 - (uint32_t)deviceType;
 - (NSArray * _Nonnull)ipAddresses;
 
-// TODO
-// - (NSArray<MCEndpoint *> * _Nonnull)endpoints;
+/**
+ * @brief Returns the NSArray of MCEndpoints associated with this MCCastingPlayer
+ */
+- (NSArray<MCEndpoint *> * _Nonnull)endpoints;
 
 - (nonnull instancetype)init UNAVAILABLE_ATTRIBUTE;
 + (nonnull instancetype)new UNAVAILABLE_ATTRIBUTE;

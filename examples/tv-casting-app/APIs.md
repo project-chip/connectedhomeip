@@ -773,7 +773,8 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
 
 ### Select an Endpoint on the Casting Player
 
-_{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp) |
+[iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
 On a successful connection with a `CastingPlayer`, a Casting Client may select
 one of the Endpoints to interact with based on its attributes (e.g. Vendor ID,
@@ -799,6 +800,19 @@ if (it != endpoints.end())
 }
 ```
 
+On iOS, it can select an `MCEndpoint` similarly and as shown below.
+
+```swift
+// VendorId of the MCEndpoint on the MCCastingPlayer that the MCCastingApp desires to interact with after connection
+let sampleEndpointVid: Int = 65521
+...
+// select the MCEndpoint on the MCCastingPlayer to invoke the command on
+if let endpoint: MCEndpoint = castingPlayer.endpoints().filter({ $0.vendorId().intValue == sampleEndpointVid}).first
+{
+...
+}
+```
+
 ## Interacting with a Casting Endpoint
 
 Once the Casting Client has selected an `Endpoint`, it is ready to
@@ -819,13 +833,14 @@ response types to use with these APIs:
 
 ### Issuing Commands
 
-_{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp) |
+[iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
-The Casting Client can get a reference to a `endpoint` on a `CastingPlayer`,
+The Casting Client can get a reference to an `Endpoint` on a `CastingPlayer`,
 check if it supports the required cluster/command, and send commands to it. It
 can then handle any command response / error the `CastingPlayer` sends back.
 
-On Linux, for example, given an `endpoint`, it can send a `LaunchURL` command
+On Linux, for example, given an `Endpoint`, it can send a `LaunchURL` command
 (part of the Content Launcher cluster) by calling the `Invoke` API on a
 `Command` of type
 `matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type>`
@@ -865,9 +880,65 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
 }
 ```
 
+On iOS, given an `MCEndpoint` endpoint, it can send a `LaunchURL` command (part
+of the Content Launcher cluster) by calling the `invoke` API on a
+`MCContentLauncherClusterLaunchURLCommand`
+
+```swift
+// validate that the selected endpoint supports the ContentLauncher cluster
+if(!endpoint.hasCluster(MCEndpointClusterTypeContentLauncher))
+{
+    self.Log.error("No ContentLauncher cluster supporting endpoint found")
+    DispatchQueue.main.async
+    {
+        self.status = "No ContentLauncher cluster supporting endpoint found"
+    }
+    return
+}
+
+// get ContentLauncher cluster from the endpoint
+let contentLaunchercluster: MCContentLauncherCluster = endpoint.cluster(for: MCEndpointClusterTypeContentLauncher) as! MCContentLauncherCluster
+
+// get the launchURLCommand from the contentLauncherCluster
+let launchURLCommand: MCContentLauncherClusterLaunchURLCommand? = contentLaunchercluster.launchURLCommand()
+if(launchURLCommand == nil)
+{
+    self.Log.error("LaunchURL not supported on cluster")
+    DispatchQueue.main.async
+    {
+        self.status = "LaunchURL not supported on cluster"
+    }
+    return
+}
+
+// create the LaunchURL request
+let request: MCContentLauncherClusterLaunchURLRequest = MCContentLauncherClusterLaunchURLRequest()
+request.contentURL = contentUrl
+request.displayString = displayString
+
+// call invoke on launchURLCommand while passing in a completion block
+launchURLCommand!.invoke(request, context: nil, completion: { context, err, response in
+    DispatchQueue.main.async
+    {
+        if(err == nil)
+        {
+            self.Log.info("LaunchURLCommand invoke completion success with \(String(describing: response))")
+            self.status = "Success. Response data: \(String(describing: response?.data))"
+        }
+        else
+        {
+            self.Log.error("LaunchURLCommand invoke completion failure with \(String(describing: err))")
+            self.status = "Failure: \(String(describing: err))"
+        }
+    }
+},
+timedInvokeTimeoutMs: 5000) // time out after 5000ms
+```
+
 ### Read Operations
 
-_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp)}_
+_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp) |
+[iOS](darwin/TvCasting/TvCasting/MCApplicationBasicReadVendorIDExampleViewModel.swift)}_
 
 The `CastingClient` may read an Attribute from the `Endpoint` on the
 `CastingPlayer`. It should ensure that the desired cluster / attribute are
@@ -914,10 +985,68 @@ void ReadApplicationBasicVendorID(matter::casting::memory::Strong<matter::castin
 }
 ```
 
+On iOS, given a `MCEndpoint`, the `VendorID` can be read similarly, by calling
+the `read` API on the `MCApplicationBasicClusterVendorIDAttribute`
+
+```swift
+// validate that the selected endpoint supports the ApplicationBasic cluster
+if(!endpoint.hasCluster(MCEndpointClusterTypeApplicationBasic))
+{
+    self.Log.error("No ApplicationBasic cluster supporting endpoint found")
+    DispatchQueue.main.async
+    {
+        self.status = "No ApplicationBasic cluster supporting endpoint found"
+    }
+    return
+}
+
+// get ApplicationBasic cluster from the endpoint
+let applicationBasiccluster: MCApplicationBasicCluster = endpoint.cluster(for: MCEndpointClusterTypeApplicationBasic) as! MCApplicationBasicCluster
+
+// get the vendorIDAttribute from the applicationBasiccluster
+let vendorIDAttribute: MCApplicationBasicClusterVendorIDAttribute? = applicationBasiccluster.vendorIDAttribute()
+if(vendorIDAttribute == nil)
+{
+    self.Log.error("VendorID attribute not supported on cluster")
+    DispatchQueue.main.async
+    {
+        self.status = "VendorID attribute not supported on cluster"
+    }
+    return
+}
+
+// call read on vendorIDAttribute and pass in a completion block
+vendorIDAttribute!.read(nil) { context, before, after, err in
+    DispatchQueue.main.async
+    {
+        if(err != nil)
+        {
+            self.Log.error("Error when reading VendorID value \(String(describing: err))")
+            self.status = "Error when reading VendorID value \(String(describing: err))"
+            return
+        }
+
+        if(before != nil)
+        {
+            self.Log.info("Read VendorID value: \(String(describing: after)) Before: \(String(describing: before))")
+            self.status = "Read VendorID value: \(String(describing: after)) Before: \(String(describing: before))"
+        }
+        else
+        {
+            self.Log.info("Read VendorID value: \(String(describing: after))")
+            self.status = "Read VendorID value: \(String(describing: after))"
+        }
+    }
+}
+```
+
 ### Subscriptions
 
 _{Complete Attribute subscription examples:
 [Linux](linux/simple-app-helper.cpp)}_
+
+_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp) |
+[iOS](darwin/TvCasting/TvCasting/MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift)}_
 
 A Casting Client may subscribe to an attribute on an `Endpoint` of the
 `CastingPlayer` to get data reports when the attributes change.
@@ -966,7 +1095,69 @@ void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter
 }
 ```
 
+On iOS, given a `MCEndpoint`, `CurrentState` can be subscribed to by calling the
+`subscribe` API on the it can subscribe to the `CurrentState` (part of the Media
+Playback Basic cluster) by calling the `Subscribe` API on the
+`MCMediaPlaybackClusterCurrentStateAttribute`
+
+```swift
+// validate that the selected endpoint supports the MediaPlayback cluster
+if(!endpoint.hasCluster(MCEndpointClusterTypeMediaPlayback))
+{
+    self.Log.error("No MediaPlayback cluster supporting endpoint found")
+    DispatchQueue.main.async
+    {
+        self.status = "No MediaPlayback cluster supporting endpoint found"
+    }
+    return
+}
+
+// get MediaPlayback cluster from the endpoint
+let mediaPlaybackCluster: MCMediaPlaybackCluster = endpoint.cluster(for: MCEndpointClusterTypeMediaPlayback) as! MCMediaPlaybackCluster
+
+// get the currentStateAttribute from the mediaPlaybackCluster
+let currentStateAttribute: MCMediaPlaybackClusterCurrentStateAttribute? = mediaPlaybackCluster.currentStateAttribute()
+if(currentStateAttribute == nil)
+{
+    self.Log.error("CurrentState attribute not supported on cluster")
+    DispatchQueue.main.async
+    {
+        self.status = "CurrentState attribute not supported on cluster"
+    }
+    return
+}
+
+// call read on currentStateAttribute and pass in a completion block
+currentStateAttribute!.read(nil) { context, before, after, err in
+
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "HH:mm:ss"
+    let currentTime = dateFormatter.string(from: Date())
+    DispatchQueue.main.async
+    {
+        if(err != nil)
+        {
+            self.Log.error("Error when reading CurrentState value \(String(describing: err)) at \(currentTime)")
+            self.status = "Error when reading CurrentState value \(String(describing: err)) at \(currentTime)"
+            return
+        }
+        if(before != nil)
+        {
+            self.Log.info("Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)")
+            self.status = "Read CurrentState value: \(String(describing: after)) Before: \(String(describing: before)) at \(currentTime)"
+        }
+        else
+        {
+            self.Log.info("Read CurrentState value: \(String(describing: after)) at \(currentTime)")
+            self.status = "Read CurrentState value: \(String(describing: after)) at \(currentTime)"
+        }
+    }
+}
+```
+
 The Casting client can Shutdown all running Subscriptions by calling the
-`ShutdownAllSubscriptions` API on the `CastingApp`. See API and its
-documentation for [Linux](tv-casting-common/core/CastingApp.h), Android and
-[iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).
+`ShutdownAllSubscriptions` API on the `CastingApp` on Linux/Android and
+`MCCastingApp` on iOS. See API and its documentation for
+[Linux](tv-casting-common/core/CastingApp.h),
+[Android](android/App/app/src/main/jni/com/matter/casting/core/CastingApp.java)
+and [iOS](darwin/MatterTvCastingBridge/MatterTvCastingBridge/MCCastingApp.h).

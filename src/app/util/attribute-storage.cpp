@@ -123,8 +123,10 @@ constexpr const chip::EventId generatedEvents[] = GENERATED_EVENTS;
 constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
+#ifdef GENERATED_CLUSTERS
 constexpr const EmberAfCluster generatedClusters[] = GENERATED_CLUSTERS;
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+#endif
 
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;

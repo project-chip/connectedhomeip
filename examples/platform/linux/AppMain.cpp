@@ -86,6 +86,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerDelegate.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerDelegate.h>
+#endif
 #include <app/TestEventTriggerDelegate.h>
 
 #include <signal.h>
@@ -570,6 +573,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
     };
     otherDelegate = &energyEvseTestEventTriggerDelegate;
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
+    static EnergyReportingTestEventTriggerDelegate energyReportingTestEventTriggerDelegate{
+        ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey), otherDelegate
+    };
+    otherDelegate = &energyReportingTestEventTriggerDelegate;
 #endif
 
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.

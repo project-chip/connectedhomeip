@@ -39900,11 +39900,12 @@ class Channel(Cluster):
             kSatellite = 0x00
             kCable = 0x01
             kTerrestrial = 0x02
+            kOtt = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 3,
+            kUnknownEnumValue = 4,
 
         class LineupInfoTypeEnum(MatterIntEnum):
             kMso = 0x00
@@ -39928,13 +39929,13 @@ class Channel(Cluster):
         class Feature(IntFlag):
             kChannelList = 0x1
             kLineupInfo = 0x2
-            kElectronicGuide = 0x3
-            kRecordProgram = 0x4
+            kElectronicGuide = 0x4
+            kRecordProgram = 0x8
 
         class RecordingFlagBitmap(IntFlag):
             kScheduled = 0x1
             kRecordSeries = 0x2
-            kRecorded = 0x3
+            kRecorded = 0x4
 
     class Structs:
         @dataclass
@@ -40751,9 +40752,9 @@ class MediaPlayback(Cluster):
         class Feature(IntFlag):
             kAdvancedSeek = 0x1
             kVariableSpeed = 0x2
-            kTextTracks = 0x3
-            kAudioTracks = 0x4
-            kAudioAdvance = 0x5
+            kTextTracks = 0x4
+            kAudioTracks = 0x8
+            kAudioAdvance = 0x10
 
     class Structs:
         @dataclass
@@ -43463,9 +43464,9 @@ class ContentControl(Cluster):
         class Feature(IntFlag):
             kScreenTime = 0x1
             kPINManagement = 0x2
-            kBlockUnrated = 0x3
-            kOnDemandContentRating = 0x4
-            kScheduledContentRating = 0x5
+            kBlockUnrated = 0x4
+            kOnDemandContentRating = 0x8
+            kScheduledContentRating = 0x10
 
     class Structs:
         @dataclass
