@@ -44,6 +44,11 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
     return CHIP_NO_ERROR;
 }
 
+void ElectricalEnergyMeasurementAttrAccess::Shutdown()
+{
+    unregisterAttributeAccessOverride(this);
+}
+
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
                                                        app::AttributeValueEncoder & aEncoder)
 {

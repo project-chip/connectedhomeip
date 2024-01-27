@@ -44,7 +44,11 @@ public:
         mFeature(aFeature)
     {}
 
+    ~ElectricalEnergyMeasurementAttrAccess() { Shutdown(); }
+
     CHIP_ERROR Init();
+    void Shutdown();
+
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
