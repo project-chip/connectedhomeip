@@ -1,9 +1,8 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
 | codeql                                  |           0 |
-| builds                                  |          92 |
-| darwin                                  |          92 |
-| tests                                   |          92 |
+| builds                                  |          91 |
+| qemu                                    |         100 |
 | build-example-nrf-connect-sdk           |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | build-example-efr32                     |         100 |
@@ -11,8 +10,8 @@
 | build-example-esp32                     |         100 |
 | issue-labeler                           |         100 |
 | build-example-tizen                     |         100 |
-| qemu                                    |         100 |
 | unit-integration-tests                  |         100 |
+| tests                                   |         100 |
 | build-example-ti-cc26x2x7               |         100 |
 | build-example-k32w                      |         100 |
 | cirque                                  |         100 |
@@ -31,13 +30,13 @@
 | build-example-qpg                       |         100 |
 | build-example-mw320                     |         100 |
 | build-example-infineon                  |         100 |
-| run-misspell                            |         100 |
-| java-tests                              |         100 |
+| build-example-i-mx-linux                |         100 |
 | full-builds-android                     |         100 |
 | build-example-linux-standalone          |         100 |
 | validate-gradle-wrapper                 |         100 |
 | minimal-build-linux-configure           |         100 |
 | build-example-asr                       |         100 |
+| darwin                                  |         100 |
 | build-example-linux-arm                 |         100 |
-| build-example-i-mx-linux                |         100 |
+| java-tests                              |         100 |
 | documentation-build                     |         100 |
