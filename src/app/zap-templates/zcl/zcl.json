@@ -608,8 +608,7 @@
             "CumulativeEnergyImported",
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
-            "PeriodicEnergyExported",
-            "FeatureMap"
+            "PeriodicEnergyExported"
         ],
         "Electrical Power Measurement": [
             "PowerMode",
