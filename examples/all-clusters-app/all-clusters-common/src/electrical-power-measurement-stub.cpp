@@ -63,6 +63,7 @@ bool StubAccuracyIterator::Next(MeasurementAccuracyStruct::Type & output)
 
 void StubAccuracyIterator::Release()
 {
+    mIndex = 0;
     return;
 }
 
@@ -254,7 +255,9 @@ void emberAfElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpo
     if (gDelegate)
     {
         gInstance = std::make_unique<Instance>(
-            endpointId, *gDelegate, BitMask<Feature, uint32_t>(Feature::kAlternatingCurrent),
+            endpointId, *gDelegate,
+            BitMask<Feature, uint32_t>(Feature::kDirectCurrent, Feature::kAlternatingCurrent, Feature::kPolyphasePower,
+                                       Feature::kHarmonics, Feature::kPowerQuality),
             BitMask<OptionalAttributes, uint32_t>(
                 OptionalAttributes::kOptionalAttributeRanges, OptionalAttributes::kOptionalAttributeVoltage,
                 OptionalAttributes::kOptionalAttributeActiveCurrent, OptionalAttributes::kOptionalAttributeReactiveCurrent,

@@ -208,15 +208,22 @@ CHIP_ERROR Instance::ReadAccuracy(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err  = CHIP_NO_ERROR;
     auto accuracies = mDelegate.IterateAccuracy();
     VerifyOrReturnError(accuracies != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    err = aEncoder.EncodeList([&accuracies](const auto & encoder) -> CHIP_ERROR {
-        Structs::MeasurementAccuracyStruct::Type accuracy;
-        while (accuracies->Next(accuracy))
-        {
-            encoder.Encode(accuracy);
-        }
+    if (accuracies->Count() == 0)
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+    else
+    {
+        err = aEncoder.EncodeList([&accuracies](const auto & encoder) -> CHIP_ERROR {
+            Structs::MeasurementAccuracyStruct::Type accuracy;
+            while (accuracies->Next(accuracy))
+            {
+                encoder.Encode(accuracy);
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
+    }
     accuracies->Release();
     return err;
 }
@@ -230,15 +237,22 @@ CHIP_ERROR Instance::ReadRanges(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto ranges    = mDelegate.IterateRanges();
     VerifyOrReturnError(ranges != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    err = aEncoder.EncodeList([&ranges](const auto & encoder) -> CHIP_ERROR {
-        Structs::MeasurementRangeStruct::Type range;
-        while (ranges->Next(range))
-        {
-            encoder.Encode(range);
-        }
+    if (ranges->Count() == 0)
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+    else
+    {
+        err = aEncoder.EncodeList([&ranges](const auto & encoder) -> CHIP_ERROR {
+            Structs::MeasurementRangeStruct::Type range;
+            while (ranges->Next(range))
+            {
+                encoder.Encode(range);
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
+    }
     ranges->Release();
     return err;
 }
@@ -251,15 +265,22 @@ CHIP_ERROR Instance::ReadHarmonicCurrents(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto currents  = mDelegate.IterateHarmonicCurrents();
     VerifyOrReturnError(currents != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    err = aEncoder.EncodeList([&currents](const auto & encoder) -> CHIP_ERROR {
-        Structs::HarmonicMeasurementStruct::Type current;
-        while (currents->Next(current))
-        {
-            encoder.Encode(current);
-        }
+    if (currents->Count() == 0)
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+    else
+    {
+        err = aEncoder.EncodeList([&currents](const auto & encoder) -> CHIP_ERROR {
+            Structs::HarmonicMeasurementStruct::Type current;
+            while (currents->Next(current))
+            {
+                encoder.Encode(current);
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
+    }
     currents->Release();
     return err;
 }
@@ -271,15 +292,22 @@ CHIP_ERROR Instance::ReadHarmonicPhases(AttributeValueEncoder & aEncoder)
     CHIP_ERROR err = CHIP_NO_ERROR;
     auto phases    = mDelegate.IterateHarmonicPhases();
     VerifyOrReturnError(phases != nullptr, CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
-    err = aEncoder.EncodeList([&phases](const auto & encoder) -> CHIP_ERROR {
-        Structs::HarmonicMeasurementStruct::Type phase;
-        while (phases->Next(phase))
-        {
-            encoder.Encode(phase);
-        }
+    if (phases->Count() == 0)
+    {
+        err = aEncoder.EncodeEmptyList();
+    }
+    else
+    {
+        err = aEncoder.EncodeList([&phases](const auto & encoder) -> CHIP_ERROR {
+            Structs::HarmonicMeasurementStruct::Type phase;
+            while (phases->Next(phase))
+            {
+                encoder.Encode(phase);
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
+    }
     phases->Release();
     return err;
 }
