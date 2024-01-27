@@ -20,10 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_EXTERN NSString * const MTRMetricCommissioningStatusKey MTR_NEWLY_AVAILABLE;
-
 /**
- * A representation of a (vendor, product) pair that identifies a specific product.
+ * A representation of metrics data for an operation.
  */
 MTR_NEWLY_AVAILABLE
 @interface MTRMetrics : NSObject
@@ -32,6 +30,6 @@ MTR_NEWLY_AVAILABLE
 
 - (nullable id)valueForKey:(NSString *)key;
 
-@end
 
+@end
 NS_ASSUME_NONNULL_END

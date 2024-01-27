@@ -18,6 +18,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+#define MTRMetricCommissioningStatusKey  @"com.matter.metric.commissioningStatus"
+
 @interface MTRMetrics ()
 
 - (void)setValue:(id)value forKey:(NSString *)key;

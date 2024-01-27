@@ -18,8 +18,6 @@
 #import "MTRLogging_Internal.h"
 #import <Matter/MTRDefines.h>
 
-NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissioningStatus";
-
 @implementation MTRMetrics {
     NSMutableDictionary<NSString *, id> * _metricsData;
 }
@@ -60,6 +58,11 @@ NSString * const MTRMetricCommissioningStatusKey = @"com.matter.metric.commissio
     }
 
     [_metricsData removeObjectForKey:key];
+}
+
+- (NSString *)description
+{
+    return [_metricsData description];
 }
 
 @end
