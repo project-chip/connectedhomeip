@@ -949,7 +949,7 @@ provisional cluster ElectricalEnergyMeasurement = 145 {
   }
 
   struct EnergyMeasurementStruct {
-    int64s energy = 0;
+    energy_mwh energy = 0;
     optional epoch_s startTimestamp = 1;
     optional epoch_s endTimestamp = 2;
     optional systime_ms startSystime = 3;
@@ -1685,7 +1685,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
