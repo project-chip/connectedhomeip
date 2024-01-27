@@ -253,8 +253,16 @@ void emberAfElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpo
     gDelegate = std::make_unique<ElectricalPowerMeasurementDelegate>();
     if (gDelegate)
     {
-        gInstance = std::make_unique<Instance>(endpointId, *gDelegate, BitMask<Feature, uint32_t>(Feature::kAlternatingCurrent),
-                                               BitMask<OptionalAttributes, uint32_t>());
+        gInstance = std::make_unique<Instance>(
+            endpointId, *gDelegate, BitMask<Feature, uint32_t>(Feature::kAlternatingCurrent),
+            BitMask<OptionalAttributes, uint32_t>(
+                OptionalAttributes::kOptionalAttributeRanges, OptionalAttributes::kOptionalAttributeVoltage,
+                OptionalAttributes::kOptionalAttributeActiveCurrent, OptionalAttributes::kOptionalAttributeReactiveCurrent,
+                OptionalAttributes::kOptionalAttributeApparentCurrent, OptionalAttributes::kOptionalAttributeReactivePower,
+                OptionalAttributes::kOptionalAttributeApparentPower, OptionalAttributes::kOptionalAttributeRMSVoltage,
+                OptionalAttributes::kOptionalAttributeRMSCurrent, OptionalAttributes::kOptionalAttributeRMSPower,
+                OptionalAttributes::kOptionalAttributeFrequency, OptionalAttributes::kOptionalAttributePowerFactor,
+                OptionalAttributes::kOptionalAttributeNeutralCurrent));
 
         gInstance->Init();
     }
