@@ -33,4 +33,5 @@
     <string name="matter_discovery_message_initializing_text">Initializing</string>
     <string name="matter_discovery_message_discovering_text">Casting Players on-network:</string>
     <string name="matter_discovery_message_stopped_text">Discovery Stopped</string>
+    <string name="matter_connection_next_button_text">Next</string>
 </resources>

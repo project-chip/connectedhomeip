@@ -38,6 +38,8 @@ shared_library("jni") {
   sources += [
     "App/app/src/main/jni/cpp/core/CastingApp-JNI.cpp",
     "App/app/src/main/jni/cpp/core/CastingApp-JNI.h",
+    "App/app/src/main/jni/cpp/core/CastingPlayer-JNI.cpp",
+    "App/app/src/main/jni/cpp/core/CastingPlayer-JNI.h",
     "App/app/src/main/jni/cpp/core/CastingPlayerDiscovery-JNI.cpp",
     "App/app/src/main/jni/cpp/core/CastingPlayerDiscovery-JNI.h",
     "App/app/src/main/jni/cpp/support/CastingPlayerConverter-JNI.cpp",
@@ -109,6 +111,8 @@ android_library("java") {
     "App/app/src/main/jni/com/matter/casting/support/CommissionableData.java",
     "App/app/src/main/jni/com/matter/casting/support/DACProvider.java",
     "App/app/src/main/jni/com/matter/casting/support/DataProvider.java",
+    "App/app/src/main/jni/com/matter/casting/support/DeviceTypeStruct.java",
+    "App/app/src/main/jni/com/matter/casting/support/EndpointFilter.java",
     "App/app/src/main/jni/com/matter/casting/support/MatterError.java",
   ]
 
