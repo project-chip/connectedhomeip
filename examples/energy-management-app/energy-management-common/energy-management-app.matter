@@ -1685,7 +1685,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 5;
+    callback attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
 
