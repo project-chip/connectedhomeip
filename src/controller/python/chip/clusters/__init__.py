@@ -54,6 +54,7 @@ __all__ = [Attribute, CHIPClusters, Command, AccessControl, AccountLogin, Action
            ColorControl, ContentLauncher, Descriptor, DeviceEnergyManagementMode, DeviceEnergyManagement, DiagnosticLogs, DishwasherAlarm, DishwasherMode,
            DoorLock, ElectricalMeasurement, ElectricalPowerMeasurement, ElectricalEnergyMeasurement,  EnergyEvse, EnergyEvseMode, EthernetNetworkDiagnostics, FanControl, FaultInjection, FixedLabel, FlowMeasurement,
            FormaldehydeConcentrationMeasurement, GeneralCommissioning, GeneralDiagnostics, GroupKeyManagement, Groups,
+           HepaFilterMonitoring, IcdManagement, Identify, IlluminanceMeasurement, KeypadInput, LaundryDryerControls,
            LaundryWasherControls, LaundryWasherMode, LevelControl, LocalizationConfiguration, LowPower, MediaInput, MediaPlayback, MicrowaveOvenControl,
            MicrowaveOvenMode, ModeSelect, NetworkCommissioning, NitrogenDioxideConcentrationMeasurement,
            OccupancySensing, OnOff, OnOffSwitchConfiguration, OperationalCredentials, OperationalState,
