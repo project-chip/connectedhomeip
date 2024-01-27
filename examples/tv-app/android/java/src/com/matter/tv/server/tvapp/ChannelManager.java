@@ -33,10 +33,18 @@ public interface ChannelManager {
 
   boolean skipChannel(int count);
 
-  ChannelProgramResponse getProgramGuide(long startTime, long endTime, ChannelInfo[] channels, String pageToken, boolean series, Map.Entry<String, String>[] externalIDList, String data);
+  ChannelProgramResponse getProgramGuide(
+      long startTime,
+      long endTime,
+      ChannelInfo[] channels,
+      String pageToken,
+      boolean series,
+      Map.Entry<String, String>[] externalIDList,
+      String data);
 
-  boolean recordProgram(String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data);
+  boolean recordProgram(
+      String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data);
 
-  boolean cancelRecordProgram(String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data);
-
+  boolean cancelRecordProgram(
+      String identifier, boolean series, Map.Entry<String, String>[] externalIDList, String data);
 }

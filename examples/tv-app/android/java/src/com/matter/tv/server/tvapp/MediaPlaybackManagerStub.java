@@ -82,7 +82,7 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         Log.d(TAG, "getAttributes SampledPosition SeekRangeStart " + startTime + " at " + endpoint);
         return startTime;
 
-      // TODO: add audio/text track available/active attributes
+        // TODO: add audio/text track available/active attributes
     }
 
     return -1;
@@ -231,8 +231,7 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   }
 
   @Override
-  public MediaTrack getActiveTrack(boolean audio)
-  {
+  public MediaTrack getActiveTrack(boolean audio) {
     return (audio ? activeAudioTrack : activeTextTrack);
   }
 }

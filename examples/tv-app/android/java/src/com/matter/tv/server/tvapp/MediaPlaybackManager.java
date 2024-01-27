@@ -122,16 +122,16 @@ public interface MediaPlaybackManager {
 
   /**
    * Get the available tracks
-   * 
-   * @param audio true=audio, false=text 
+   *
+   * @param audio true=audio, false=text
    * @return list of available tracks
    */
   MediaTrack[] getAvailableTracks(boolean audio);
 
   /**
    * activate the given track
-   * 
-   * @param audio true=audio, false=text 
+   *
+   * @param audio true=audio, false=text
    * @param id track id
    * @return the response status defined in RESPONSE_STATUS_XXX
    */
@@ -139,16 +139,16 @@ public interface MediaPlaybackManager {
 
   /**
    * Deactivate the current test track
+   *
    * @return the response status defined in RESPONSE_STATUS_XXX
    */
   int deactivateTextTrack();
 
   /**
    * Get the active track
-   * 
-   * @param audio true=audio, false=text 
+   *
+   * @param audio true=audio, false=text
    * @return active track or null
    */
   MediaTrack getActiveTrack(boolean audio);
-
 }

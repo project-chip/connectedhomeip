@@ -105,10 +105,10 @@ public:
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;
 
 private:
-    jobject mMediaPlaybackManagerObject = nullptr;
-    jmethodID mRequestMethod            = nullptr;
-    jmethodID mGetAttributeMethod       = nullptr;
-    jmethodID mGetPositionMethod        = nullptr;
+    jobject mMediaPlaybackManagerObject  = nullptr;
+    jmethodID mRequestMethod             = nullptr;
+    jmethodID mGetAttributeMethod        = nullptr;
+    jmethodID mGetPositionMethod         = nullptr;
     jmethodID mGetAvailableTracksMethod  = nullptr;
     jmethodID mActivateTrackMethod       = nullptr;
     jmethodID mDeactivateTextTrackMethod = nullptr;
