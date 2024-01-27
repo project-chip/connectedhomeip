@@ -1,6 +1,5 @@
 package com.matter.tv.server.tvapp;
 
-
 public class MediaTrack {
   public String id;
   public String languageCode;
