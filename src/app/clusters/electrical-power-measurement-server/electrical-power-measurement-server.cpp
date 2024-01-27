@@ -288,5 +288,3 @@ CHIP_ERROR Instance::ReadHarmonicPhases(AttributeValueEncoder & aEncoder)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
