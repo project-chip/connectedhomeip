@@ -204,7 +204,7 @@ MTR_DIRECT_MEMBERS
 
 - (NSUInteger)hash
 {
-    return _attributeID.unsignedLongValue ^ [_value hash] ^ _requiredReadPrivilege ^ _writable;
+    return _attributeID.unsignedLongValue ^ [_value hash] ^ _requiredReadPrivilege ^ static_cast<NSUInteger>(_writable);
 }
 
 @end

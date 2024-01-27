@@ -49,14 +49,14 @@ MTR_DIRECT_MEMBERS
 
     auto id = static_cast<EndpointId>(endpointIDValue);
     if (!IsValidEndpointId(id)) {
-        MTR_LOG_ERROR("MTRServerEndpoint provided invalid endpoint ID: 0x%" PRIx16, id);
+        MTR_LOG_ERROR("MTRServerEndpoint provided invalid endpoint ID: 0x%x", id);
         return nil;
     }
 
     if (id == kRootEndpointId) {
         // We don't allow this; we use that endpoint for our own purposes in
         // Matter.framework.
-        MTR_LOG_ERROR("MTRServerEndpoint provided invalid endpoint ID: 0x%" PRIx16, id);
+        MTR_LOG_ERROR("MTRServerEndpoint provided invalid endpoint ID: 0x%x", id);
         return nil;
     }
 
