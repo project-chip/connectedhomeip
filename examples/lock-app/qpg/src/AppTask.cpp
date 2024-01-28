@@ -193,7 +193,7 @@ void AppTask::InitServer(intptr_t arg)
     // Use GenericFaultTestEventTriggerHandler to inject faults
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static GenericFaultTestEventTriggerHandler sFaultTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(  ByteSpan(sTestEventTriggerEnableKey)  ) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;

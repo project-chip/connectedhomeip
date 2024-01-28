@@ -26,11 +26,11 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <OTAConfig.h>
 #endif
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/TestEventTriggerDelegate.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/shell/Engine.h>
@@ -195,7 +195,7 @@ void InitApp(intptr_t args)
     /* Start CHIP datamodel server */
     static chip::SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static chip::OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(  chip::ByteSpan(sTestEventTriggerEnableKey)  ) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(chip::ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

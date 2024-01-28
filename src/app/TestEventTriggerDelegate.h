@@ -39,7 +39,6 @@ public:
     virtual CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) = 0;
 };
 
-
 class TestEventTriggerDelegate
 {
 public:
@@ -68,7 +67,7 @@ public:
     virtual CHIP_ERROR HandleEventTriggers(uint64_t eventTrigger)
     {
         CHIP_ERROR last_error;
-        for (TestEventTriggerHandler & handler: mHandlerList)
+        for (TestEventTriggerHandler & handler : mHandlerList)
         {
             last_error = handler.HandleEventTrigger(eventTrigger);
             if (last_error == CHIP_NO_ERROR)
@@ -93,10 +92,7 @@ public:
         mHandlerList.Remove(handler);
     }
 
-    void ClearAllHandlers()
-    {
-        mHandlerList.Clear();
-    }
+    void ClearAllHandlers() { mHandlerList.Clear(); }
 
 protected:
     IntrusiveList<TestEventTriggerHandler, IntrusiveMode::AutoUnlink> mHandlerList;
@@ -125,6 +121,7 @@ public:
     }
 
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override { return enableKey.data_equal(ByteSpan(mEnableKey)); }
+
 private:
     uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength];
 };

@@ -194,7 +194,7 @@ void InitApp(intptr_t args)
     /* Start CHIP datamodel server */
     static chip::SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static chip::OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(  chip::ByteSpan(sTestEventTriggerEnableKey)  ) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(chip::ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();

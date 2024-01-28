@@ -318,7 +318,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(  ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey) ) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey)) ==
+                CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif

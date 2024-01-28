@@ -28,6 +28,7 @@ public:
     explicit DefaultTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
 
     bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
+
 private:
     ByteSpan mEnableKey;
 };

@@ -29,7 +29,7 @@ namespace {
 
 class TestEventHandler : public TestEventTriggerHandler
 {
-  public:
+public:
     TestEventHandler() = delete;
 
     explicit TestEventHandler(uint64_t supportedEventTriggerValue) : mSupportedEventTriggerValue(supportedEventTriggerValue) {}
@@ -47,46 +47,46 @@ class TestEventHandler : public TestEventTriggerHandler
     int GetCount() const { return mCount; }
     void ClearCount() { mCount = 0; }
 
-  private:
+private:
     uint64_t mSupportedEventTriggerValue;
     int mCount = 0;
 };
 
 class TestEventDelegate : public TestEventTriggerDelegate
 {
-    public:
-      explicit TestEventDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
+public:
+    explicit TestEventDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
 
-      bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override
-      {
-          return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-      }
+    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override
+    {
+        return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
+    }
 
-  private:
+private:
     ByteSpan mEnableKey;
 };
 
 void TestKeyChecking(nlTestSuite * aSuite, void * aContext)
 {
-    const uint8_t kTestKey[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    const uint8_t kBadKey[16] = {255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-    const uint8_t kDiffLenBadKey[17] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
-    TestEventDelegate delegate{ByteSpan{kTestKey}};
+    const uint8_t kTestKey[16]       = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    const uint8_t kBadKey[16]        = { 255, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+    const uint8_t kDiffLenBadKey[17] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+    TestEventDelegate delegate{ ByteSpan{ kTestKey } };
 
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{kTestKey}) == true);
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{kBadKey}) == false);
-    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{kDiffLenBadKey}) == false);
+    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{ kTestKey }) == true);
+    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{ kBadKey }) == false);
+    NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{ kDiffLenBadKey }) == false);
     NL_TEST_ASSERT(aSuite, delegate.DoesEnableKeyMatch(ByteSpan{}) == false);
 }
 
 void TestHandlerManagement(nlTestSuite * aSuite, void * aContext)
 {
-    const uint8_t kTestKey[16] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+    const uint8_t kTestKey[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
 
-    TestEventDelegate delegate{ByteSpan{kTestKey}};
+    TestEventDelegate delegate{ ByteSpan{ kTestKey } };
 
-    TestEventHandler event1Handler{1};
-    TestEventHandler event2Handler{2};
+    TestEventHandler event1Handler{ 1 };
+    TestEventHandler event2Handler{ 2 };
 
     // Add 2, check 2 works 1 doesn't.
     NL_TEST_ASSERT(aSuite, delegate.HandleEventTriggers(1) != CHIP_NO_ERROR);
@@ -166,7 +166,6 @@ int TestSetup(void * inContext)
     return SUCCESS;
 }
 
-
 int TestTeardown(void * inContext)
 {
     return SUCCESS;
@@ -177,8 +176,7 @@ int TestTeardown(void * inContext)
 int TestTestEventTriggerDelegate()
 {
     static nlTest sTests[] = { NL_TEST_DEF("TestKeyChecking", TestKeyChecking),
-                               NL_TEST_DEF("TestHandlerManagement", TestHandlerManagement),
-                               NL_TEST_SENTINEL() };
+                               NL_TEST_DEF("TestHandlerManagement", TestHandlerManagement), NL_TEST_SENTINEL() };
 
     nlTestSuite theSuite = {
         "TestTestEventTriggerDelegate",

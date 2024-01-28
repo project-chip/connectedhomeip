@@ -172,7 +172,7 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
     }
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(  ByteSpan(sTestEventTriggerEnableKey)  ) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED

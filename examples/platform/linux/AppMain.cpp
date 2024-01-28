@@ -333,8 +333,8 @@ static bool EnsureWiFiIsStarted()
 
 class SampleTestEventTriggerHandler : public TestEventTriggerHandler
 {
-    /// NOTE: If you copy this for NON-STANDARD CLUSTERS OR USAGES, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your trigger codes.
-    /// NOTE: Standard codes are <CLUSTER_ID_HEX>_xxxx_xxxx_xxxx.
+    /// NOTE: If you copy this for NON-STANDARD CLUSTERS OR USAGES, please use the reserved range FFFF_FFFF_<VID_HEX>_xxxx for your
+    /// trigger codes. NOTE: Standard codes are <CLUSTER_ID_HEX>_xxxx_xxxx_xxxx.
     static constexpr uint64_t kSampleTestEventTriggerAlwaysSuccess = static_cast<uint64_t>(0xFFFF'FFFF'FFF1'0000ull);
 
 public:
@@ -527,7 +527,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // For general testing of TestEventTrigger, we have a common "core" event trigger delegate.
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     static SampleTestEventTriggerHandler sTestEventTriggerHandler;
-    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey)) ==
+                CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sTestEventTriggerHandler) == CHIP_NO_ERROR);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR

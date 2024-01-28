@@ -20,17 +20,18 @@
 
 #include <stdint.h>
 
+#include <app/TestEventTriggerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <app/TestEventTriggerDelegate.h>
 
 namespace chip {
 
 class AmebaTestEventTriggerDelegate : public TestEventTriggerDelegate, TestEventTriggerHandler
 {
 public:
-    explicit AmebaTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {
+    explicit AmebaTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey)
+    {
         VerifyOrDie(AddHandler(this) == CHIP_NO_ERROR);
     }
 

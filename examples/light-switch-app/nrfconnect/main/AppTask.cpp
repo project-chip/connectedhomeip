@@ -24,11 +24,11 @@
 #include "LightSwitch.h"
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <app/TestEventTriggerDelegate.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/CHIPMem.h>
@@ -218,7 +218,7 @@ CHIP_ERROR AppTask::Init()
     static CommonCaseDeviceServerInitParams initParams;
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
-    VerifyOrDie(sTestEventTriggerDelegate.Init(  ByteSpan(sTestEventTriggerEnableKey)  ) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
     VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
