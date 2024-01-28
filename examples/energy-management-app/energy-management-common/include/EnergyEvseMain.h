@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,29 +16,7 @@
  *    limitations under the License.
  */
 
-#include <AppMain.h>
-#include <EnergyEvseMain.h>
+#pragma once
 
-void ApplicationInit()
-{
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationInit()");
-    EvseApplicationInit();
-}
-
-void ApplicationShutdown()
-{
-    ChipLogDetail(AppServer, "Energy Management App: ApplicationShutdown()");
-    EvseApplicationShutdown();
-}
-
-int main(int argc, char * argv[])
-{
-    if (ChipLinuxAppInit(argc, argv) != 0)
-    {
-        return -1;
-    }
-
-    ChipLinuxAppMainLoop();
-
-    return 0;
-}
+void EvseApplicationInit();
+void EvseApplicationShutdown();
