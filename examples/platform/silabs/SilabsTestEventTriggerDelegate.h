@@ -25,6 +25,22 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
+/**
+ * @brief User handler for handling the test event trigger
+ *
+ * @note If TestEventTrigger is enabled, it needs to be implemented in the app
+ *
+ * @param eventTrigger Event trigger to handle
+ *
+ * @warning *** DO NOT USE FOR STANDARD CLUSTER EVENT TRIGGERS ***
+ *
+ * TODO(#31723): Rename `emberAfHandleEventTrigger` to `AmebaHandleGlobalTestEventTrigger`
+ *
+ * @retval true on success
+ * @retval false if error happened
+ */
+bool emberAfHandleEventTrigger(uint64_t eventTrigger);
+
 namespace chip {
 
 class SilabsTestEventTriggerDelegate : public TestEventTriggerDelegate, TestEventTriggerHandler
@@ -59,19 +75,3 @@ private:
 };
 
 } // namespace chip
-
-/**
- * @brief User handler for handling the test event trigger
- *
- * @note If TestEventTrigger is enabled, it needs to be implemented in the app
- *
- * @param eventTrigger Event trigger to handle
- *
- * @warning *** DO NOT USE FOR STANDARD CLUSTER EVENT TRIGGERS ***
- *
- * TODO(#31723): Rename `emberAfHandleEventTrigger` to `AmebaHandleGlobalTestEventTrigger`
- *
- * @retval true on success
- * @retval false if error happened
- */
-bool emberAfHandleEventTrigger(uint64_t eventTrigger);
