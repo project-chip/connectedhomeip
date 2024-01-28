@@ -64,7 +64,6 @@ bool StubAccuracyIterator::Next(MeasurementAccuracyStruct::Type & output)
 void StubAccuracyIterator::Release()
 {
     mIndex = 0;
-    return;
 }
 
 class StubRangeIterator : public Delegate::RangeIterator
@@ -85,10 +84,7 @@ bool StubRangeIterator::Next(MeasurementRangeStruct::Type & output)
     return false;
 }
 
-void StubRangeIterator::Release()
-{
-    return;
-}
+void StubRangeIterator::Release() {}
 
 class StubHarmonicMeasurementIterator : public Delegate::HarmonicMeasurementIterator
 {
@@ -108,10 +104,7 @@ bool StubHarmonicMeasurementIterator::Next(HarmonicMeasurementStruct::Type & out
     return false;
 }
 
-void StubHarmonicMeasurementIterator::Release()
-{
-    return;
-}
+void StubHarmonicMeasurementIterator::Release() {}
 
 static StubAccuracyIterator accuracyIterator;
 static StubRangeIterator rangeIterator;
