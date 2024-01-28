@@ -11,6 +11,7 @@ import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.util.GlobalCastingConstants;
 import com.chip.casting.util.PreferencesConfigurationManager;
+import com.matter.casting.ConnectionExampleFragment;
 import com.matter.casting.DiscoveryExampleFragment;
 import com.matter.casting.InitializationExample;
 import com.matter.casting.core.CastingPlayer;
@@ -20,7 +21,8 @@ public class MainActivity extends AppCompatActivity
     implements CommissionerDiscoveryFragment.Callback,
         ConnectionFragment.Callback,
         SelectClusterFragment.Callback,
-        DiscoveryExampleFragment.Callback {
+        DiscoveryExampleFragment.Callback,
+        ConnectionExampleFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -58,15 +60,22 @@ public class MainActivity extends AppCompatActivity
   }
 
   @Override
-  public void handleConnectionButtonClicked(CastingPlayer player) {
+  public void handleConnectionButtonClicked(CastingPlayer castingPlayer) {
     Log.i(TAG, "MainActivity.handleConnectionButtonClicked() called");
-    // TODO: In future PR, show fragment that connects to the player.
-    // showFragment(ConnectionFragment.newInstance(CastingPlayer player));
+    showFragment(ConnectionExampleFragment.newInstance(castingPlayer));
   }
 
   @Override
   public void handleCommissioningComplete() {
     showFragment(SelectClusterFragment.newInstance(tvCastingApp));
+  }
+
+  @Override
+  public void handleConnectionComplete(CastingPlayer castingPlayer) {
+    Log.i(TAG, "MainActivity.handleConnectionComplete() called ");
+
+    // TODO: Implement in following PRs. Select Cluster Fragment.
+    // showFragment(SelectClusterFragment.newInstance(tvCastingApp));
   }
 
   @Override
@@ -115,7 +124,7 @@ public class MainActivity extends AppCompatActivity
   private void showFragment(Fragment fragment, boolean showOnBack) {
     Log.d(
         TAG,
-        "showFragment called with " + fragment.getClass().getSimpleName() + " and " + showOnBack);
+        "showFragment() called with " + fragment.getClass().getSimpleName() + " and " + showOnBack);
     FragmentTransaction fragmentTransaction =
         getSupportFragmentManager()
             .beginTransaction()

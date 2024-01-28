@@ -26,25 +26,28 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-namespace {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ElectricalEnergyMeasurement {
 
 using namespace chip;
-using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
 MeasurementData
     gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
-class ElectricalEnergyMeasurementAttrAccess : public app::AttributeAccessInterface
+CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Init()
 {
-public:
-    ElectricalEnergyMeasurementAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ElectricalEnergyMeasurement::Id)
-    {}
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
 
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
-};
+void ElectricalEnergyMeasurementAttrAccess::Shutdown()
+{
+    unregisterAttributeAccessOverride(this);
+}
 
 CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
                                                        app::AttributeValueEncoder & aEncoder)
@@ -55,6 +58,9 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAt
 
     switch (aPath.mAttributeId)
     {
+    case FeatureMap::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
+        break;
     case Accuracy::Id:
         if (data == nullptr)
         {
@@ -89,15 +95,6 @@ CHIP_ERROR ElectricalEnergyMeasurementAttrAccess::Read(const app::ConcreteReadAt
 
     return CHIP_NO_ERROR;
 }
-
-ElectricalEnergyMeasurementAttrAccess gAttrAccess;
-
-} // namespace
-
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace ElectricalEnergyMeasurement {
 
 MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
 {
@@ -192,8 +189,3 @@ bool NotifyPeriodicEnergyMeasured(EndpointId endpointId, const Optional<EnergyMe
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-void MatterElectricalEnergyMeasurementPluginServerInitCallback()
-{
-    registerAttributeAccessOverride(&gAttrAccess);
-}

@@ -40,9 +40,9 @@ public:
 
     void SetEndpointId(EndpointId aEndpoint) { mEndpointId = aEndpoint; }
 
-    using AccuracyIterator            = CommonIterator<const Structs::MeasurementAccuracyStruct::Type>;
-    using RangeIterator               = CommonIterator<const Structs::MeasurementRangeStruct::Type>;
-    using HarmonicMeasurementIterator = CommonIterator<const Structs::HarmonicMeasurementStruct::Type>;
+    using AccuracyIterator            = CommonIterator<Structs::MeasurementAccuracyStruct::Type>;
+    using RangeIterator               = CommonIterator<Structs::MeasurementRangeStruct::Type>;
+    using HarmonicMeasurementIterator = CommonIterator<Structs::HarmonicMeasurementStruct::Type>;
 
     virtual PowerModeEnum GetPowerMode()                            = 0;
     virtual uint8_t GetNumberOfMeasurementTypes()                   = 0;

@@ -20,6 +20,7 @@
 #include <lib/core/Optional.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -33,6 +34,25 @@ struct MeasurementData
     Optional<Structs::EnergyMeasurementStruct::Type> cumulativeExported;
     Optional<Structs::EnergyMeasurementStruct::Type> periodicImported;
     Optional<Structs::EnergyMeasurementStruct::Type> periodicExported;
+};
+
+class ElectricalEnergyMeasurementAttrAccess : public AttributeAccessInterface
+{
+public:
+    ElectricalEnergyMeasurementAttrAccess(BitMask<Feature> aFeature) :
+        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ElectricalEnergyMeasurement::Id),
+        mFeature(aFeature)
+    {}
+
+    ~ElectricalEnergyMeasurementAttrAccess() { Shutdown(); }
+
+    CHIP_ERROR Init();
+    void Shutdown();
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    BitMask<Feature> mFeature;
 };
 
 bool NotifyCumulativeEnergyMeasured(EndpointId endpointId, const Optional<Structs::EnergyMeasurementStruct::Type> & energyImported,
