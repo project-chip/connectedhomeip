@@ -23,7 +23,10 @@
 #endif // CONFIG_USE_LOCAL_STORAGE
 
 #include "Command.h"
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/ScopedNodeId.h>
 #include <map>
+#include <vector>
 
 class Commands
 {
@@ -44,7 +47,19 @@ public:
     int Run(int argc, char ** argv);
     int RunInteractive(const char * command, const chip::Optional<char *> & storageDirectory, bool advertiseOperational);
 
+    void RunAllQueuedCommandsForNode(chip::ScopedNodeId nodeId, const chip::Optional<char *> & interactiveStorageDirectory,
+                                     bool interactiveAdvertiseOperational);
+
 private:
+    struct ScopedNodeIdComparer
+    {
+        bool operator()(const chip::ScopedNodeId & lhs, const chip::ScopedNodeId & rhs) const
+        {
+            return lhs.GetFabricIndex() == rhs.GetFabricIndex() ? lhs.GetNodeId() < rhs.GetNodeId()
+                                                                : lhs.GetFabricIndex() < rhs.GetFabricIndex();
+        }
+    };
+
     struct CommandSet
     {
         CommandsVector commands;
@@ -66,6 +81,8 @@ private:
     bool IsEventCommand(std::string commandName) const;
     bool IsGlobalCommand(std::string commandName) const;
 
+    void DumpState() const;
+
     void ShowCommandSets(std::string executable);
     static void ShowCommandSetOverview(std::string commandSetName, const CommandSet & commandSet);
     void ShowCommandSet(std::string executable, std::string commandSetName, CommandsVector & commands, const char * helpText);
@@ -83,6 +100,7 @@ private:
     void Register(const char * commandSetName, commands_list commandsList, const char * helpText, bool isCluster);
 
     CommandSetMap mCommandSets;
+    std::map<chip::ScopedNodeId, std::vector<std::vector<std::string>>, ScopedNodeIdComparer> mQueuedCommands;
 #ifdef CONFIG_USE_LOCAL_STORAGE
     PersistentStorage mStorage;
 #endif // CONFIG_USE_LOCAL_STORAGE

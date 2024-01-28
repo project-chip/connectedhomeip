@@ -50,7 +50,7 @@ chip::Credentials::GroupDataProviderImpl CHIPCommand::sGroupDataProvider{ kMaxGr
 // All fabrics share the same ICD client storage.
 chip::app::DefaultICDClientStorage CHIPCommand::sICDClientStorage;
 chip::Crypto::RawKeySessionKeystore CHIPCommand::sSessionKeystore;
-chip::app::DefaultCheckInDelegate CHIPCommand::sCheckInDelegate;
+CheckInDelegate CHIPCommand::sCheckInDelegate;
 chip::app::CheckInHandler CHIPCommand::sCheckInHandler;
 
 namespace {

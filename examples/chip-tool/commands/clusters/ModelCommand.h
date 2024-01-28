@@ -69,6 +69,13 @@ public:
 
     void Shutdown() override;
 
+    chip::ScopedNodeId GetDestination() override
+    {
+        return chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
+    }
+
+    bool IsDestinationRegisteredLIT() override;
+
 protected:
     bool IsPeerLIT() { return mIsPeerLIT.ValueOr(false); }
 

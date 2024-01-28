@@ -32,6 +32,7 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <commands/example/ExampleCredentialIssuerCommands.h>
+#include <commands/icd/CheckInDelegate.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
@@ -117,6 +118,10 @@ public:
         StopWaiting();
     }
 
+    void AddExtraCheckInDelegate(chip::app::CheckInDelegate * delegate) { sCheckInDelegate.AddExtraDelegate(delegate); }
+
+    void RemoveExtraCheckInDelegate(chip::app::CheckInDelegate * delegate) { sCheckInDelegate.RemoveExtraDelegate(delegate); }
+
 protected:
     // Will be called in a setting in which it's safe to touch the CHIP
     // stack. The rules for Run() are as follows:
@@ -164,7 +169,7 @@ protected:
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     static chip::app::DefaultICDClientStorage sICDClientStorage;
-    static chip::app::DefaultCheckInDelegate sCheckInDelegate;
+    static CheckInDelegate sCheckInDelegate;
     static chip::app::CheckInHandler sCheckInHandler;
     CredentialIssuerCommands * mCredIssuerCmds;
 

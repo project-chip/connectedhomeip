@@ -23,6 +23,7 @@
 #include <commands/clusters/CustomArgument.h>
 #include <inet/InetInterface.h>
 #include <lib/core/Optional.h>
+#include <lib/core/ScopedNodeId.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -276,6 +277,10 @@ public:
     }
 
     const chip::Optional<char *> & GetStorageDirectory() const { return mStorageDirectory; }
+
+    virtual chip::ScopedNodeId GetDestination() { return chip::ScopedNodeId(); }
+
+    virtual bool IsDestinationRegisteredLIT() { return false; }
 
 protected:
     // mStorageDirectory lives here so we can just set it in RunAsInteractive.

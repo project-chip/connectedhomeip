@@ -71,6 +71,8 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
+    "commands/icd/CheckInDelegate.cpp",
+    "commands/icd/CheckInDelegate.h",
     "commands/icd/ICDCommand.cpp",
     "commands/icd/ICDCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",

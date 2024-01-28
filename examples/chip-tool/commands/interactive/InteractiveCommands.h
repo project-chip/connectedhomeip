@@ -18,15 +18,22 @@
 
 #pragma once
 
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+#include <thread>
+
 #include "../clusters/DataModelLogger.h"
 #include "../common/CHIPCommand.h"
 #include "../common/Commands.h"
+#include "../icd/CheckInDelegate.h"
+#include <lib/support/Variant.h>
 
 #include <websocket-server/WebSocketServer.h>
 
 class Commands;
 
-class InteractiveCommand : public CHIPCommand
+class InteractiveCommand : public CHIPCommand, public CheckInDelegate
 {
 public:
     InteractiveCommand(const char * name, Commands * commandsHandler, const char * helpText,
@@ -44,9 +51,40 @@ public:
 
     bool ParseCommand(char * command, int * status);
 
+    void OnCheckInComplete(const chip::app::ICDClientInfo & clientInfo) override;
+
+protected:
+    void StartCommandExecutorThread();
+    void JoinCommandExecutorThread();
+
 private:
+    void CommandExecutor();
+
     Commands * mHandler = nullptr;
     chip::Optional<bool> mAdvertiseOperational;
+
+    class CommandExecutorTask
+    {
+    public:
+        chip::Variant<chip::ScopedNodeId, bool> payload;
+
+        enum class Kind
+        {
+            ON_CHECK_IN_COMPLETE,
+            STOP,
+        } kind;
+
+        CommandExecutorTask(chip::ScopedNodeId nodeId) : kind(Kind::ON_CHECK_IN_COMPLETE)
+        {
+            payload.Set<chip::ScopedNodeId>(nodeId);
+        }
+        CommandExecutorTask(bool stop) : kind(Kind::STOP) { payload.Set<bool>(stop); }
+    };
+
+    std::mutex commandExecutorMutex;
+    std::condition_variable commandExecutorCv;
+    std::queue<CommandExecutorTask> commandExecutorQueue;
+    std::thread commandExecutorThread;
 };
 
 class InteractiveStartCommand : public InteractiveCommand
