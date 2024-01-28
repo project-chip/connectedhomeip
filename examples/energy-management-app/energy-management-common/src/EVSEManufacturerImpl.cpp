@@ -19,6 +19,7 @@
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
+#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 
 using namespace chip;
