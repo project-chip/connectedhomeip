@@ -66,7 +66,7 @@ public:
      */
     virtual CHIP_ERROR HandleEventTriggers(uint64_t eventTrigger)
     {
-        CHIP_ERROR last_error;
+        CHIP_ERROR last_error = CHIP_ERROR_INVALID_ARGUMENT;
         for (TestEventTriggerHandler & handler : mHandlerList)
         {
             last_error = handler.HandleEventTrigger(eventTrigger);
