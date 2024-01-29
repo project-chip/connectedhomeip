@@ -20,6 +20,18 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
 
+/**
+ * @brief User handler for handling the test event trigger
+ *
+ * @note If TestEventTrigger is enabled, it needs to be implemented in the app
+ *
+ * @param eventTrigger Event trigger to handle
+ *
+ * @retval true on success
+ * @retval false if error happened
+ */
+bool HandleEnergyReportingTestEventTrigger(uint64_t eventTrigger);
+
 namespace chip {
 
 /*
@@ -40,44 +52,19 @@ enum class EnergyReportingTrigger : uint64_t
 
 };
 
-class EnergyReportingTestEventTriggerDelegate : public TestEventTriggerDelegate
+class EnergyReportingTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
-    /**
-     * This class expects the enableKey ByteSpan to be valid forever.
-     * Typically this feature is only enabled in certification testing
-     * and uses a static secret key in the device for testing (e.g. in factory data)
-     */
-    explicit EnergyReportingTestEventTriggerDelegate(const ByteSpan & enableKey, TestEventTriggerDelegate * otherDelegate) :
-        mEnableKey(enableKey), mOtherDelegate(otherDelegate)
-    {}
+    EnergyReportingTestEventTriggerHandler() {}
 
-    /* This function returns True if the enableKey received in the TestEventTrigger command
-     * matches the value passed into the constructor.
-     */
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
-
-    /** This function must return True if the eventTrigger is recognised and handled
-     *  It must return False to allow a higher level TestEvent handler to check other
-     *  clusters that may handle it.
-     */
-    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-
-private:
-    ByteSpan mEnableKey;
-    TestEventTriggerDelegate * mOtherDelegate;
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
+    {
+        if (HandleEnergyReportingTestEventTrigger(eventTrigger))
+        {
+            return CHIP_NO_ERROR;
+        }
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 };
 
 } // namespace chip
-
-/**
- * @brief User handler for handling the test event trigger
- *
- * @note If TestEventTrigger is enabled, it needs to be implemented in the app
- *
- * @param eventTrigger Event trigger to handle
- *
- * @retval true on success
- * @retval false if error happened
- */
-bool HandleEnergyReportingTestEventTrigger(uint64_t eventTrigger);

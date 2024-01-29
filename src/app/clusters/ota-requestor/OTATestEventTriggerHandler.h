@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,28 +16,21 @@
  *    limitations under the License.
  */
 
-#include "SmokeCOTestEventTriggerDelegate.h"
+#pragma once
 
-using namespace chip::app::Clusters::SmokeCoAlarm;
+#include <app/TestEventTriggerDelegate.h>
 
 namespace chip {
 
-bool SmokeCOTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
+class OTATestEventTriggerHandler : public TestEventTriggerHandler
 {
-    return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-}
+public:
+    static constexpr uint64_t kOtaQueryTrigger         = 0x002a'0000'0000'0100;
+    static constexpr uint64_t kOtaQueryFabricIndexMask = 0xff;
 
-CHIP_ERROR SmokeCOTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
-{
-    if (HandleSmokeCOTestEventTrigger(eventTrigger))
-    {
-        return CHIP_NO_ERROR;
-    }
-    if (mOtherDelegate != nullptr)
-    {
-        return mOtherDelegate->HandleEventTrigger(eventTrigger);
-    }
-    return CHIP_ERROR_INVALID_ARGUMENT;
-}
+    OTATestEventTriggerHandler() {}
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+};
 
 } // namespace chip
