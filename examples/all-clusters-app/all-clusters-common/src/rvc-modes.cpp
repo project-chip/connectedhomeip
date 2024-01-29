@@ -113,7 +113,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
     gRvcRunModeInstance =
-        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, to_underlying(RvcRunMode::Feature::kNoFeatures));
+        new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
     gRvcRunModeInstance->Init();
 }
 
@@ -203,6 +203,6 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
     gRvcCleanModeInstance =
-        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, to_underlying(RvcRunMode::Feature::kNoFeatures));
+        new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcRunMode::Feature::kNoFeatures));
     gRvcCleanModeInstance->Init();
 }
