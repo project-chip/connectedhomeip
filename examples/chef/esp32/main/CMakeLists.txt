@@ -145,7 +145,7 @@ pw_proto_library(boolean_state_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/boolean_state_service.proto
   PREFIX
-    boolean_sate_service
+    boolean_state_service
   STRIP_PREFIX
     ${CHIP_ROOT}/examples/common/pigweed/protos
   DEPS
