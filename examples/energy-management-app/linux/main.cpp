@@ -208,7 +208,6 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    // TODO  this takes just the EVSE Instance for now, but will need the DEM adding
     gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get());
     if (!gEvseManufacturer)
     {

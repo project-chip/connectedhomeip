@@ -71,6 +71,7 @@
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "network-commissioning-cluster.xml",
