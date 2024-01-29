@@ -26,7 +26,7 @@
 #define RETURN_STATUS_IF_NOT_OK(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        pw::Status __status = chip::rpc::EmberOrChipStatusToPwStatus(expr);                                                              \
+        pw::Status __status = chip::rpc::EmberOrChipStatusToPwStatus(expr);                                                        \
         if (!__status.ok())                                                                                                        \
         {                                                                                                                          \
             return __status;                                                                                                       \

@@ -36,7 +36,7 @@ public:
     virtual pw::Status Set(const chip_rpc_BooleanStateSetRequest & request, chip_rpc_BooleanStateSetResponse & response)
     {
         EndpointId endpointId = request.endpoint_id;
-        bool newState = request.state_value;
+        bool newState         = request.state_value;
 
         EventNumber eventNumber;
         {
@@ -56,7 +56,7 @@ public:
     virtual pw::Status Get(const chip_rpc_BooleanStateGetRequest & request, chip_rpc_BooleanStateGetResponse & response)
     {
         EndpointId endpointId = request.endpoint_id;
-        bool state_value = false;
+        bool state_value      = false;
 
         {
             DeviceLayer::StackLock lock;
