@@ -161,7 +161,7 @@ class App:
             try:
                 self.process.wait(10)
             except subprocess.TimeoutExpired:
-                logging.debug('Subprocess did not terminated on SIGTERM, killing it now')
+                logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
                 self.process.kill()
                 self.process.wait(10)
             self.process = None

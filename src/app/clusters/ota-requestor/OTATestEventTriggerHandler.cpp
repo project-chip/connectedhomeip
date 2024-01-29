@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +16,25 @@
  *    limitations under the License.
  */
 
-#include "EnergyEvseTestEventTriggerDelegate.h"
+#include "OTATestEventTriggerHandler.h"
 
-using namespace chip::app::Clusters::EnergyEvse;
+#include "OTARequestorInterface.h"
+
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
-bool EnergyEvseTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
+CHIP_ERROR OTATestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
 {
-    return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-}
+    if ((eventTrigger & ~kOtaQueryFabricIndexMask) == kOtaQueryTrigger)
+    {
+        OTARequestorInterface * requestor = GetRequestorInstance();
+        const FabricIndex fabricIndex     = eventTrigger & kOtaQueryFabricIndexMask;
 
-CHIP_ERROR EnergyEvseTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
-{
-    if (HandleEnergyEvseTestEventTrigger(eventTrigger))
-    {
-        return CHIP_NO_ERROR;
+        VerifyOrReturnError(requestor != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        return requestor->TriggerImmediateQuery(fabricIndex);
     }
-    if (mOtherDelegate != nullptr)
-    {
-        return mOtherDelegate->HandleEventTrigger(eventTrigger);
-    }
+
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 

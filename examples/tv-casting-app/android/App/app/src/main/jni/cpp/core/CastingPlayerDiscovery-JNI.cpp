@@ -88,6 +88,7 @@ public:
                                     "CastingPlayer jobject"));
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        chip::DeviceLayer::StackUnlock unlock;
         env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onAddedCallbackJavaMethodID, matterCastingPlayerJavaObject);
     }
 
@@ -113,6 +114,7 @@ public:
                                     "create CastingPlayer jobject"));
 
         JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        chip::DeviceLayer::StackUnlock unlock;
         env->CallVoidMethod(castingPlayerChangeListenerJavaObject, onChangedCallbackJavaMethodID, matterCastingPlayerJavaObject);
     }
 

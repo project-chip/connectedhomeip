@@ -255,8 +255,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultOTARequestorUserConsent.h",
           "${_app_root}/clusters/${cluster}/ExtendedOTARequestorDriver.cpp",
           "${_app_root}/clusters/${cluster}/OTARequestorStorage.h",
-          "${_app_root}/clusters/${cluster}/OTATestEventTriggerDelegate.cpp",
-          "${_app_root}/clusters/${cluster}/OTATestEventTriggerDelegate.h",
+          "${_app_root}/clusters/${cluster}/OTATestEventTriggerHandler.cpp",
+          "${_app_root}/clusters/${cluster}/OTATestEventTriggerHandler.h",
         ]
       } else if (cluster == "bindings") {
         sources += [
@@ -322,15 +322,14 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
-          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.cpp",
-          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerDelegate.h",
+          "${_app_root}/clusters/${cluster}/SmokeCOTestEventTriggerHandler.h",
         ]
       } else if (cluster == "boolean-state-configuration-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
-          "${_app_root}/clusters/${cluster}/BooleanStateConfigurationTestEventTriggerDelegate.cpp",
-          "${_app_root}/clusters/${cluster}/BooleanStateConfigurationTestEventTriggerDelegate.h",
+          "${_app_root}/clusters/${cluster}/BooleanStateConfigurationTestEventTriggerHandler.cpp",
+          "${_app_root}/clusters/${cluster}/BooleanStateConfigurationTestEventTriggerHandler.h",
         ]
       } else if (cluster == "air-quality-server") {
         sources += [
@@ -341,8 +340,7 @@ template("chip_data_model") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
-          "${_app_root}/clusters/${cluster}/EnergyEvseTestEventTriggerDelegate.cpp",
-          "${_app_root}/clusters/${cluster}/EnergyEvseTestEventTriggerDelegate.h",
+          "${_app_root}/clusters/${cluster}/EnergyEvseTestEventTriggerHandler.h",
         ]
       } else if (cluster == "diagnostic-logs-server") {
         sources += [
@@ -351,6 +349,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/BDXDiagnosticLogsProvider.cpp",
           "${_app_root}/clusters/${cluster}/BDXDiagnosticLogsProvider.h",
           "${_app_root}/clusters/${cluster}/DiagnosticLogsProviderDelegate.h",
+        ]
+      } else if (cluster == "electrical-energy-measurement-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/EnergyReportingTestEventTriggerHandler.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

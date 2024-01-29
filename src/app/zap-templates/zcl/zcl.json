@@ -71,6 +71,7 @@
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
+        "messages-cluster.xml",
         "mode-base-cluster.xml",
         "mode-select-cluster.xml",
         "network-commissioning-cluster.xml",
@@ -411,18 +412,8 @@
             "OnMode",
             "FeatureMap"
         ],
-        "RVC Clean Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "OnMode",
-            "FeatureMap"
-        ],
-        "RVC Run Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "RVC Clean Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "RVC Run Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Operational State": [
             "OperationalState",
             "OperationalError",

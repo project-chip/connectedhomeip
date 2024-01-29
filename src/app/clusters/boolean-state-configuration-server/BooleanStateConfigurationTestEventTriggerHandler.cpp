@@ -15,26 +15,17 @@
  *    limitations under the License.
  */
 
-#include "BooleanStateConfigurationTestEventTriggerDelegate.h"
+#include "BooleanStateConfigurationTestEventTriggerHandler.h"
 
 using namespace chip::app::Clusters::BooleanStateConfiguration;
 
 namespace chip {
 
-bool BooleanStateConfigurationTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
-{
-    return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-}
-
-CHIP_ERROR BooleanStateConfigurationTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
+CHIP_ERROR BooleanStateConfigurationTestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
 {
     if (HandleBooleanStateConfigurationTestEventTrigger(eventTrigger))
     {
         return CHIP_NO_ERROR;
-    }
-    if (mOtherDelegate != nullptr)
-    {
-        return mOtherDelegate->HandleEventTrigger(eventTrigger);
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
