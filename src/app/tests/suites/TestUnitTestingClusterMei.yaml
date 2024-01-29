@@ -1,0 +1,103 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Unit Testing Cluster MEI Elements Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Testing"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Write different vendor MEI attribute"
+      command: "writeAttribute"
+      attribute: "mei_int8u"
+      arguments:
+          value: 201
+
+    - label: "Verify different vendor MEI attribute"
+      command: "readAttribute"
+      attribute: "mei_int8u"
+      response:
+          value: 201
+
+    - label: "Validate AcceptedCommandList attribute"
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              contains: [4294049962]
+
+    - label: "Validate GeneratedCommandList attribute"
+      command: "readAttribute"
+      attribute: "GeneratedCommandList"
+      response:
+          constraints:
+              contains: [0, 1, 4, 5, 6, 8, 9, 10, 11, 12, 4294049979]
+
+    - label: "Validate presence of MEI attribute"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [4294070017]
+
+    - label: "Send MEI command and force event generation"
+      command: "TestDifferentVendorMeiRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 76
+      response:
+          values:
+              - name: "arg1"
+                value: 76
+              - name: "eventNumber"
+                saveAs: firstMeiEventNumber
+
+    - label: "Validate event generation 1/2"
+      command: "readEvent"
+      event: "TestDifferentVendorMeiEvent"
+      eventNumber: firstMeiEventNumber
+      response:
+          value: { arg1: 76 }
+
+    - label: "Force event generation"
+      command: "TestEmitTestEventRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 42
+              - name: "arg2"
+                value: 1
+              - name: "arg3"
+                value: true
+      response:
+          values:
+              - name: "value"
+                saveAs: firstEventNumber
+
+    - label: "Validate event generation 2/2"
+      command: "readEvent"
+      event: "TestEvent"
+      eventNumber: firstEventNumber

@@ -20,9 +20,9 @@
 #import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
-FOUNDATION_EXPORT NSErrorDomain const MTRErrorDomain;
 
-FOUNDATION_EXPORT NSErrorDomain const MTRInteractionErrorDomain;
+MTR_EXTERN NSErrorDomain const MTRErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 /**
  * MTRErrorDomain contains errors caused by data processing the framework

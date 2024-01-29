@@ -870,28 +870,12 @@ namespace GetSceneMembershipResponse {
 static constexpr CommandId Id = 0x00000006;
 } // namespace GetSceneMembershipResponse
 
-namespace EnhancedAddScene {
-static constexpr CommandId Id = 0x00000040;
-} // namespace EnhancedAddScene
-
-namespace EnhancedAddSceneResponse {
-static constexpr CommandId Id = 0x00000040;
-} // namespace EnhancedAddSceneResponse
-
-namespace EnhancedViewScene {
-static constexpr CommandId Id = 0x00000041;
-} // namespace EnhancedViewScene
-
-namespace EnhancedViewSceneResponse {
-static constexpr CommandId Id = 0x00000041;
-} // namespace EnhancedViewSceneResponse
-
 namespace CopyScene {
-static constexpr CommandId Id = 0x00000042;
+static constexpr CommandId Id = 0x00000040;
 } // namespace CopyScene
 
 namespace CopySceneResponse {
-static constexpr CommandId Id = 0x00000042;
+static constexpr CommandId Id = 0x00000040;
 } // namespace CopySceneResponse
 
 } // namespace Commands
@@ -1046,6 +1030,34 @@ static constexpr CommandId Id = 0x00000007;
 
 } // namespace Commands
 } // namespace EnergyEvse
+
+namespace EnergyEvseMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace EnergyEvseMode
+
+namespace DeviceEnergyManagementMode {
+namespace Commands {
+
+namespace ChangeToMode {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ChangeToMode
+
+namespace ChangeToModeResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ChangeToModeResponse
+
+} // namespace Commands
+} // namespace DeviceEnergyManagementMode
 
 namespace DoorLock {
 namespace Commands {
@@ -1831,6 +1843,14 @@ static constexpr CommandId Id = 0x00000016;
 namespace TestSecondBatchHelperRequest {
 static constexpr CommandId Id = 0x00000017;
 } // namespace TestSecondBatchHelperRequest
+
+namespace TestDifferentVendorMeiRequest {
+static constexpr CommandId Id = 0xFFF200AA;
+} // namespace TestDifferentVendorMeiRequest
+
+namespace TestDifferentVendorMeiResponse {
+static constexpr CommandId Id = 0xFFF200BB;
+} // namespace TestDifferentVendorMeiResponse
 
 } // namespace Commands
 } // namespace UnitTesting

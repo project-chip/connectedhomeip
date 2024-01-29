@@ -28,10 +28,10 @@ config:
 
     Step1bWaitTime:
         type: int16u
-        defaultValue: 10000
+        defaultValue: 5000
     Step2bWaitTime:
         type: int16u
-        defaultValue: 500
+        defaultValue: 200
     Step2eWaitTime:
         type: int16u
         defaultValue: 1000
@@ -171,79 +171,17 @@ tests:
     ### Depends on the FeatureMap
     # The value of bit 0..1 must be 01b & if (LF) value of bit 2..3 must be 01b else 00b & if (TL) value of bit 4..5 must be 01b else 00b
     # Only 3 possibilities are possible here : 05h =  5, 11h = 17 or 15h = 21 then check a range for simplicity [5  - 21]
-    - label: "Step 3a1: TH reads OperationalStatus attribute's bit 0..1"
+    - label: "Step 3a: TH reads OperationalStatus attribute from DUT"
       PICS: WNCV.S.A000a
       command: "readAttribute"
       attribute: "OperationalStatus"
       response:
-          saveAs: OperationalStatusValue
           constraints:
               type: bitmap8
-              hasMasksSet: [0x1]
-              hasMasksClear: [0x2]
-
-    - label:
-          "Step 3a2: Write attribute BITMAP8 with OperationalStatusValue to do
-          the bits checks in upcoming OperationalStatus read steps."
-      PICS: WNCV.S.A000a
-      cluster: "Unit Testing"
-      command: "writeAttribute"
-      attribute: "bitmap8"
-      arguments:
-          value: OperationalStatusValue
-
-    - label:
-          "Step 3a3: TH checks OperationalStatus value bit 2..3 (WNCV.S.F00(LF))"
-      PICS: WNCV.S.A000a && WNCV.S.F00
-      cluster: "Unit Testing"
-      command: "readAttribute"
-      attribute: "bitmap8"
-      response:
-          value: OperationalStatusValue
-          constraints:
-              type: bitmap8
-              hasMasksSet: [0x4]
-              hasMasksClear: [0x8]
-
-    - label:
-          "Step 3a4: TH check OperationalStatus value bit 2..3 (WNCV.S.F00(LF))"
-      PICS: WNCV.S.A000a && !WNCV.S.F00
-      cluster: "Unit Testing"
-      command: "readAttribute"
-      attribute: "bitmap8"
-      response:
-          value: OperationalStatusValue
-          constraints:
-              type: bitmap8
-              hasMasksClear: [0x4, 0x8]
-
-    - label:
-          "Step 3a5: TH checks OperationalStatus value bit 4..5 (WNCV.S.F01(TL))"
-      PICS: WNCV.S.A000a && WNCV.S.F01
-      cluster: "Unit Testing"
-      command: "readAttribute"
-      attribute: "bitmap8"
-      response:
-          value: OperationalStatusValue
-          constraints:
-              type: bitmap8
-              hasMasksSet: [0x10]
-              hasMasksClear: [0x20]
-
-    - label:
-          "Step 3a6: TH checks OperationalStatus value bit 4..5 (WNCV.S.F01(TL))"
-      PICS: WNCV.S.A000a && !WNCV.S.F01
-      cluster: "Unit Testing"
-      command: "readAttribute"
-      attribute: "bitmap8"
-      response:
-          value: OperationalStatusValue
-          constraints:
-              type: bitmap8
-              hasMasksClear: [0x10, 0x20]
+              anyOf: [5, 17, 21]
 
     ### Depending on the DUT specs we might prefer a arguments here
-    - label: "Step 3a7: DUT updates its attributes"
+    - label: "Step 3a: DUT updates its attributes"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

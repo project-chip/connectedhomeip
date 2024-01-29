@@ -21,6 +21,8 @@
 #include <EVSEManufacturerImpl.h>
 #include <EnergyEvseManager.h>
 #include <EnergyManagementManager.h>
+#include <device-energy-management-modes.h>
+#include <energy-evse-modes.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -75,8 +77,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
         BitMask<DeviceEnergyManagement::Feature, uint32_t>(
             DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
             DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-            DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
-            DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+            DeviceEnergyManagement::Feature::kPausable));
 
     if (!gDEMInstance)
     {
@@ -207,7 +208,6 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    // TODO  this takes just the EVSE Instance for now, but will need the DEM adding
     gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get());
     if (!gEvseManufacturer)
     {
@@ -268,6 +268,9 @@ void ApplicationShutdown()
     EVSEManufacturerShutdown();       /* Free the EVSEManufacturer */
     EnergyEvseShutdown();             /* Free the EnergyEvse */
     DeviceEnergyManagementShutdown(); /* Free the DEM */
+
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::EnergyEvseMode::Shutdown();
 }
 
 int main(int argc, char * argv[])

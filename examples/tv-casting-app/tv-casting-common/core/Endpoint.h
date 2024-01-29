@@ -46,6 +46,7 @@ public:
 };
 
 class CastingPlayer;
+class BaseCluster;
 
 /**
  * @brief An Endpoint on a CastingPlayer e.g. a Speaker or a Matter Content App

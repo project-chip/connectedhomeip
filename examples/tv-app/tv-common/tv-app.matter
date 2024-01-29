@@ -2025,7 +2025,7 @@ cluster RelativeHumidityMeasurement = 1029 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 cluster WakeOnLan = 1283 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
   readonly attribute optional octet_string<16> linkLocalAddress = 1;
@@ -2039,12 +2039,13 @@ cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 cluster Channel = 1284 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum ChannelTypeEnum : enum8 {
     kSatellite = 0;
     kCable = 1;
     kTerrestrial = 2;
+    kOTT = 3;
   }
 
   enum LineupInfoTypeEnum : enum8 {
@@ -2060,14 +2061,14 @@ cluster Channel = 1284 {
   bitmap Feature : bitmap32 {
     kChannelList = 0x1;
     kLineupInfo = 0x2;
-    kElectronicGuide = 0x3;
-    kRecordProgram = 0x4;
+    kElectronicGuide = 0x4;
+    kRecordProgram = 0x8;
   }
 
   bitmap RecordingFlagBitmap : bitmap32 {
     kScheduled = 0x1;
     kRecordSeries = 0x2;
-    kRecorded = 0x3;
+    kRecorded = 0x4;
   }
 
   struct ProgramCastStruct {
@@ -2213,7 +2214,7 @@ cluster Channel = 1284 {
 
 /** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 cluster TargetNavigator = 1285 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum StatusEnum : enum8 {
     kSuccess = 0;
@@ -2257,7 +2258,7 @@ cluster TargetNavigator = 1285 {
 
 /** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 cluster MediaPlayback = 1286 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum CharacteristicEnum : enum8 {
     kForcedSubtitles = 0;
@@ -2299,9 +2300,9 @@ cluster MediaPlayback = 1286 {
   bitmap Feature : bitmap32 {
     kAdvancedSeek = 0x1;
     kVariableSpeed = 0x2;
-    kTextTracks = 0x3;
-    kAudioTracks = 0x4;
-    kAudioAdvance = 0x5;
+    kTextTracks = 0x4;
+    kAudioTracks = 0x8;
+    kAudioAdvance = 0x10;
   }
 
   struct TrackAttributesStruct {
@@ -2904,7 +2905,7 @@ cluster ApplicationBasic = 1293 {
 
 /** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 cluster AccountLogin = 1294 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   critical event LoggedOut = 0 {
     optional node_id node = 0;
@@ -2950,9 +2951,9 @@ cluster ContentControl = 1295 {
   bitmap Feature : bitmap32 {
     kScreenTime = 0x1;
     kPINManagement = 0x2;
-    kBlockUnrated = 0x3;
-    kOnDemandContentRating = 0x4;
-    kScheduledContentRating = 0x5;
+    kBlockUnrated = 0x4;
+    kOnDemandContentRating = 0x8;
+    kScheduledContentRating = 0x10;
   }
 
   struct RatingNameStruct {
@@ -3070,7 +3071,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -3428,7 +3429,7 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -3578,7 +3579,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 28;
     ram      attribute clusterRevision default = 1;
 
     handle command UpdatePIN;
@@ -3641,7 +3642,7 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 }
@@ -3655,7 +3656,7 @@ endpoint 3 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -3809,7 +3810,7 @@ endpoint 3 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 28;
     ram      attribute clusterRevision default = 1;
 
     handle command UpdatePIN;

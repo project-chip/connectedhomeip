@@ -32,7 +32,7 @@ ATTRIBUTE_NAME = "TestAttribute"
 ATTRIBUTE_ID = 0x0000
 
 
-def single_attribute_cluster_xml(read_access: str, write_access: str):
+def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str):
     xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
     revision_table = ('<revisionHistory>'
                       '<revision revision="1" summary="Initial Release"/>'
@@ -41,7 +41,7 @@ def single_attribute_cluster_xml(read_access: str, write_access: str):
                       '</revisionHistory>')
     classification = '<classification hierarchy="base" role="utility" picsCode="TEST" scope="Node"/>'
     read_access_str = f'read="true" readPrivilege="{read_access}"' if read_access is not None else ""
-    write_access_str = f'write="true" writePrivilege="{write_access}"' if write_access is not None else ""
+    write_access_str = f'write="{write_supported}" writePrivilege="{write_access}"' if write_access is not None else ""
     attribute = ('<attributes>'
                  f'<attribute id="{ATTRIBUTE_ID}" name="{ATTRIBUTE_NAME}" type="uint16" default="MS">'
                  f'<access {read_access_str} {write_access_str}/>'
@@ -82,7 +82,7 @@ class TestSpecParsingSupport(MatterBaseTest):
         strs = [None, 'view', 'operate', 'manage', 'admin']
         for read in strs:
             for write in strs:
-                xml = single_attribute_cluster_xml(read, write)
+                xml = single_attribute_cluster_xml(read, write, "true")
                 xml_cluster = parse_cluster(xml)
                 asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
                 asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
@@ -93,6 +93,18 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      get_access_enum_from_string(read), "Unexpected read access")
                 asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].write_access,
                                      get_access_enum_from_string(write), "Unexpected write access")
+
+    def test_write_optional(self):
+        for write_support in ['true', 'optional']:
+            xml = single_attribute_cluster_xml('view', 'view', write_support)
+            xml_cluster = parse_cluster(xml)
+            asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
+            asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
+            asserts.assert_equal(len(xml_cluster.attributes), len(GlobalAttributeIds) + 1, "Unexpected number of attributes")
+            asserts.assert_true(ATTRIBUTE_ID in xml_cluster.attributes.keys(),
+                                "Did not find test attribute in XmlCluster.attributes")
+            asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].write_optional,
+                                 write_support == 'optional', "Unexpected write_optional value")
 
 
 if __name__ == "__main__":

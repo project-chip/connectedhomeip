@@ -80,3 +80,7 @@ examples/thermostat/ameba/build
 # https://github.com/espressif/idf-component-manager#using-with-a-project
 examples/*/esp32/managed_components
 examples/*/esp32/dependencies.lock
+
+# jupyter temporary files
+.ipynb_checkpoints
+

@@ -235,6 +235,12 @@ static constexpr ClusterId Id = 0x00000099;
 namespace EnergyPreference {
 static constexpr ClusterId Id = 0x0000009B;
 } // namespace EnergyPreference
+namespace EnergyEvseMode {
+static constexpr ClusterId Id = 0x0000009D;
+} // namespace EnergyEvseMode
+namespace DeviceEnergyManagementMode {
+static constexpr ClusterId Id = 0x0000009F;
+} // namespace DeviceEnergyManagementMode
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
