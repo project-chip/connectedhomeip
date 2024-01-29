@@ -26,7 +26,7 @@
 #define RETURN_STATUS_IF_NOT_OK(expr)                                                                                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        pw::Status __status = chip::rpc::EmberOrChipStatusToPwStatus(expr);                                                        \
+        pw::Status __status = chip::rpc::ToPwStatus(expr);                                                                         \
         if (!__status.ok())                                                                                                        \
         {                                                                                                                          \
             return __status;                                                                                                       \
@@ -36,7 +36,7 @@
 namespace chip {
 namespace rpc {
 
-constexpr pw::Status EmberOrChipStatusToPwStatus(EmberAfStatus ember_status)
+constexpr pw::Status ToPwStatus(EmberAfStatus ember_status)
 {
     switch (ember_status)
     {
@@ -51,7 +51,7 @@ constexpr pw::Status EmberOrChipStatusToPwStatus(EmberAfStatus ember_status)
     }
 }
 
-constexpr pw::Status EmberOrChipStatusToPwStatus(CHIP_ERROR chip_error_status)
+constexpr pw::Status ToPwStatus(CHIP_ERROR chip_error_status)
 {
     switch (chip_error_status.AsInteger())
     {
