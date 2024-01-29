@@ -40,6 +40,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -335,7 +336,7 @@ CHIP_ERROR SetValveLevel(EndpointId ep, DataModel::Nullable<Percent> level, Data
             VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == AutoCloseTime::SetNull(ep), attribute_error);
         }
 #else
-        return CHIP_FAILURE;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
     }
 
