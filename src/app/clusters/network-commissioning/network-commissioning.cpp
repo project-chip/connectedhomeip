@@ -735,7 +735,8 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 void Instance::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen, mConnectingNetworkID);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen,
+                    mConnectingNetworkID);
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 
@@ -847,7 +848,7 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     // has already been sent and the BLE will have been stopped, however the other functionality
     // is still required
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    auto commandHandle    = commandHandleRef.Get();
+    auto commandHandle = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
         // When the platform shutted down, interaction model engine will invalidate all commandHandle to avoid dangling references.
