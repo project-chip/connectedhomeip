@@ -20,23 +20,64 @@ import asyncio
 from typing import Dict, List
 
 from mdns_discovery.exceptions import DiscoveryNotPerformedError
-from mdns_discovery.mdns_service_info import MdnsServiceInfo
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo
+from dataclasses import dataclass
+from enum import Enum
 
-from .mdns_type_enum import MdnsType
+
+@dataclass
+class MdnsServiceInfo:
+    # The unique name of the mDNS service.
+    service_name: str
+
+    # The human-readable name of the service.
+    name: str
+
+    # The type of the service, typically indicating the service protocol and domain.
+    type: str
+
+    # The domain name of the machine hosting the service.
+    server: str
+
+    # The network port on which the service is available.
+    port: int
+
+    # A list of IP addresses associated with the service.
+    addresses: list
+
+    # A dictionary of key-value pairs representing the service's metadata.
+    txt_record: dict
+
+    # The priority of the service, used in service selection when multiple instances are available.
+    priority: int
+
+    # The network interface index on which the service is advertised.
+    interface_index: int
+
+    # The relative weight for records with the same priority, used in load balancing.
+    weight: int
+
+    # The time-to-live value for the host name in the DNS record.
+    host_ttl: int
+
+    # The time-to-live value for other records associated with the service.
+    other_ttl: int
+
+class MdnsServiceType(Enum):
+    COMMISSIONER = "_matterd._udp.local."
+    COMMISSIONABLE = "_matterc._udp.local."
+    OPERATIONAL = "_matter._tcp.local."
+    BORDER_ROUTER = "_meshcop._udp.local."
 
 
 class MdnsDiscovery:
 
     DEFAULT_DISCOVERY_DURATION_SEC = 3
 
-    def __init__(self, tc):
+    def __init__(self):
         """
         Initializes the MdnsDiscovery instance with necessary configurations.
-
-        Args:
-            tc: A test case object containing node and fabric information.
 
         Main methods, return a list of MdnsServiceInfo objects
             - get_commissioner_service_info()
@@ -52,13 +93,9 @@ class MdnsDiscovery:
         # This browser is responsible for actively looking for services on the network.
         self._aiobrowser = None
 
-        # The test case object.
-        # This is used for integrating the service discovery into test suites.
-        self._tc = tc
-
         # A list of mDNS service types to discover.
         # This list defines the types of services that we are interested in discovering.
-        self._service_types = [mdns_type.value for mdns_type in MdnsType]
+        self._service_types = [mdns_type.value for mdns_type in MdnsServiceType]
 
         # A dictionary to store discovered services.
         # As services are discovered, they are added to this dictionary.
@@ -68,12 +105,9 @@ class MdnsDiscovery:
         # This helps in managing the state of service discovery.
         self._discovery_performed = False
 
-        # The operational service name of the Device Under Test (DUT).
-        self.dut_operational_service_name = self._get_dut_operational_service_name()
-
     @classmethod
-    async def create(cls, tc, discovery_duration_sec: float = DEFAULT_DISCOVERY_DURATION_SEC):
-        instance = cls(tc)
+    async def create(cls,discovery_duration_sec: float = DEFAULT_DISCOVERY_DURATION_SEC):
+        instance = cls()
         await instance.discover(discovery_duration_sec)
         return instance
 
@@ -82,7 +116,7 @@ class MdnsDiscovery:
         Asynchronously discovers network services of specified types using mDNS.
 
         This method initiates a multicast DNS (mDNS) service discovery process to find
-        network services matching the specified types in the `MdnsType` enum. It uses
+        network services matching the specified types in the `MdnsServiceType` enum. It uses
         an asynchronous service browser to listen for service announcements and updates.
 
         The discovery process is given a configurable period to operate, during which the method
@@ -102,7 +136,7 @@ class MdnsDiscovery:
                   are handled by the callback function.
         """
         self._zc = Zeroconf(ip_version=IPVersion.V6Only)
-        self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsType}
+        self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsServiceType}
         self._aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
                                                type_=self._service_types,
                                                handlers=[self._on_service_state_change]
@@ -160,7 +194,7 @@ class MdnsDiscovery:
 
         if is_service_discovered:
             # Add service info to discovered services
-            for mdns_type in MdnsType:
+            for mdns_type in MdnsServiceType:
                 if service_type == mdns_type.value:
                     service_info_dict = self._service_info_to_class(service_info)
                     self._discovered_services[mdns_type.name].append(service_info_dict)
@@ -197,28 +231,13 @@ class MdnsDiscovery:
 
         return mdns_service_info
 
-    def _get_dut_operational_service_name(self) -> str:
-        """
-        Constructs the operational service name for the DUT.
-
-        This method generates a service name string based on the DUT's node ID and the compressed
-        fabric ID, following the operational service naming convention.
-
-        Returns:
-            str: A string representing the operational service name.
-        """
-        node_id = self._tc.dut_node_id
-        compressed_fabric_id = self._tc.default_controller.GetCompressedFabricId()
-        service_name = f'{compressed_fabric_id:016X}-{node_id:016X}.{MdnsType.OPERATIONAL.value}'
-        return service_name
-
-    def _get_service_info(self, mdns_type: MdnsType) -> List[Dict[str, any]]:
+    def _get_service_info(self, mdns_type: MdnsServiceType) -> List[Dict[str, any]]:
         """
         This method returns the discovered service information for a specified mDNS type.
         It raises an exception if the discovery process has not been performed before calling this method.
 
         Args:
-            mdns_type (MdnsType): The mDNS type for which to retrieve the service info.
+            mdns_type (MdnsServiceType): The mDNS type for which to retrieve the service info.
 
         Returns:
             list: A list of discovered services of the specified mDNS type.
@@ -238,7 +257,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Commissioner services.
         """
-        return self._get_service_info(MdnsType.COMMISSIONER)
+        return self._get_service_info(MdnsServiceType.COMMISSIONER)
 
     def get_commissionable_service_info(self) -> List[Dict[str, any]]:
         """
@@ -247,7 +266,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Commissionable services.
         """
-        return self._get_service_info(MdnsType.COMMISSIONABLE)
+        return self._get_service_info(MdnsServiceType.COMMISSIONABLE)
 
     def get_operational_service_info(self) -> List[Dict[str, any]]:
         """
@@ -256,7 +275,7 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Operational services.
         """
-        return self._get_service_info(MdnsType.OPERATIONAL)
+        return self._get_service_info(MdnsServiceType.OPERATIONAL)
 
     def get_border_router_service_info(self) -> List[Dict[str, any]]:
         """
@@ -265,10 +284,10 @@ class MdnsDiscovery:
         Returns:
             list: A list of discovered Border Router services.
         """
-        return self._get_service_info(MdnsType.BORDER_ROUTER)
+        return self._get_service_info(MdnsServiceType.BORDER_ROUTER)
 
     async def _async_close(self) -> None:
-        assert self._zc is not None
-        assert self._aiobrowser is not None
-        await self._aiobrowser.async_cancel()
-        await self._zc.async_unregister_all_services()
+        if self._aiobrowser is not None:
+            await self._aiobrowser.async_cancel()
+        self._zc = None
+        self._aiobrowser = None
