@@ -26,8 +26,8 @@ Usage:
 
 ## Additional details
 
-This example demonstrates the utilization of the diagnostic logs cluster to
-send diagnostic logs to the client.
+This example demonstrates the utilization of the diagnostic logs cluster to send
+diagnostic logs to the client.
 
 In this scenario, the [main/diagnostic_logs](main/diagnostic_logs) directory
 contains three files:
