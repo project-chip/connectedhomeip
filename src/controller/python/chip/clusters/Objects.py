@@ -25072,7 +25072,7 @@ class PowerTopology(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kNodeTopology = 0x1
-            kLeafTopology = 0x2
+            kTreeTopology = 0x2
             kSetTopology = 0x4
             kDynamicPowerFlow = 0x8
 

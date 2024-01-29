@@ -4800,7 +4800,7 @@ cluster PowerTopology = 156 {
 
   bitmap Feature : bitmap32 {
     kNodeTopology = 0x1;
-    kLeafTopology = 0x2;
+    kTreeTopology = 0x2;
     kSetTopology = 0x4;
     kDynamicPowerFlow = 0x8;
   }

@@ -2619,7 +2619,7 @@ namespace PowerTopology {
 enum class Feature : uint32_t
 {
     kNodeTopology     = 0x1,
-    kLeafTopology     = 0x2,
+    kTreeTopology     = 0x2,
     kSetTopology      = 0x4,
     kDynamicPowerFlow = 0x8,
 };

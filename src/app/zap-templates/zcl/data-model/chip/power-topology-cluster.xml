@@ -19,7 +19,7 @@ limitations under the License.
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x009C"/>
     <field name="NodeTopology" mask="0x01"/>
-    <field name="LeafTopology" mask="0x02"/>
+    <field name="TreeTopology" mask="0x02"/>
     <field name="SetTopology" mask="0x04"/>
     <field name="DynamicPowerFlow" mask="0x08"/>
   </bitmap>

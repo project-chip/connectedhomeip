@@ -17748,7 +17748,7 @@ typedef NS_OPTIONS(uint32_t, MTREnergyPreferenceFeature) {
 
 typedef NS_OPTIONS(uint32_t, MTRPowerTopologyFeature) {
     MTRPowerTopologyFeatureNodeTopology MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRPowerTopologyFeatureLeafTopology MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRPowerTopologyFeatureTreeTopology MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRPowerTopologyFeatureSetTopology MTR_PROVISIONALLY_AVAILABLE = 0x4,
     MTRPowerTopologyFeatureDynamicPowerFlow MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
