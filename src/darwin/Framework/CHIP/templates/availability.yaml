@@ -8548,6 +8548,7 @@
           # Targeting Spring 2024 Matter release
           - EnergyEVSEMode
           - DeviceEnergyManagementMode
+          - Messages
       attributes:
           DoorLock:
               # Aliro is not ready yet.

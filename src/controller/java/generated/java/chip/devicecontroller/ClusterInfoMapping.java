@@ -7567,27 +7567,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedRvcRunModeClusterOnModeAttributeCallback implements ChipClusters.RvcRunModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedRvcRunModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.RvcRunModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -7708,27 +7687,6 @@ public class ClusterInfoMapping {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.RvcCleanModeClusterModeOptionStruct>");
       responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedRvcCleanModeClusterOnModeAttributeCallback implements ChipClusters.RvcCleanModeCluster.OnModeAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(@Nullable Integer value) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
-      responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
 
@@ -23252,30 +23210,6 @@ public class ClusterInfoMapping {
         rvcOperationalStatepauseCommandParams
       );
     rvcOperationalStateClusterInteractionInfoMap.put("pause", rvcOperationalStatepauseInteractionInfo);
-
-    Map<String, CommandParameterInfo> rvcOperationalStatestopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo rvcOperationalStatestopInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.RvcOperationalStateCluster) cluster)
-          .stop((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
-            );
-        },
-        () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
-        rvcOperationalStatestopCommandParams
-      );
-    rvcOperationalStateClusterInteractionInfoMap.put("stop", rvcOperationalStatestopInteractionInfo);
-
-    Map<String, CommandParameterInfo> rvcOperationalStatestartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo rvcOperationalStatestartInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.RvcOperationalStateCluster) cluster)
-          .start((ChipClusters.RvcOperationalStateCluster.OperationalCommandResponseCallback) callback
-            );
-        },
-        () -> new DelegatedRvcOperationalStateClusterOperationalCommandResponseCallback(),
-        rvcOperationalStatestartCommandParams
-      );
-    rvcOperationalStateClusterInteractionInfoMap.put("start", rvcOperationalStatestartInteractionInfo);
 
     Map<String, CommandParameterInfo> rvcOperationalStateresumeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo rvcOperationalStateresumeInteractionInfo = new InteractionInfo(

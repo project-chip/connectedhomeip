@@ -29,58 +29,58 @@ config:
         defaultValue: "hex:00112233445566778899aabbccddeeff"
     TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000090"
+        defaultValue: "0x005c000000000090"
     TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff0000009c"
+        defaultValue: "0x005c00000000009c"
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a0"
+        defaultValue: "0x005c0000000000a0"
     TEST_EVENT_TRIGGER_WARNING_CO_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000091"
+        defaultValue: "0x005c000000000091"
     TEST_EVENT_TRIGGER_CRITICAL_CO_ALARM:
         type: int64u
-        defaultValue: "0xffffffff0000009d"
+        defaultValue: "0x005c00000000009d"
     TEST_EVENT_TRIGGER_CO_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a1"
+        defaultValue: "0x005c0000000000a1"
     TEST_EVENT_TRIGGER_DEVICE_MUTED:
         type: int64u
-        defaultValue: "0xffffffff0000009b"
+        defaultValue: "0x005c00000000009b"
     TEST_EVENT_TRIGGER_DEVICE_MUTED_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000ab"
+        defaultValue: "0x005c0000000000ab"
     TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000092"
+        defaultValue: "0x005c000000000092"
     TEST_EVENT_TRIGGER_INTERCONNECT_SMOKE_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a2"
+        defaultValue: "0x005c0000000000a2"
     TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000094"
+        defaultValue: "0x005c000000000094"
     TEST_EVENT_TRIGGER_INTERCONNECT_CO_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a4"
+        defaultValue: "0x005c0000000000a4"
     TEST_EVENT_TRIGGER_CONTAMINATION_STATE_HIGH:
         type: int64u
-        defaultValue: "0xffffffff00000096"
+        defaultValue: "0x005c000000000096"
     TEST_EVENT_TRIGGER_CONTAMINATION_STATE_LOW:
         type: int64u
-        defaultValue: "0xffffffff00000097"
+        defaultValue: "0x005c000000000097"
     TTEST_EVENT_TRIGGER_CONTAMINATION_STATE_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a6"
+        defaultValue: "0x005c0000000000a6"
     TEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_HIGH:
         type: int64u
-        defaultValue: "0xffffffff00000098"
+        defaultValue: "0x005c000000000098"
     TEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_LOW:
         type: int64u
-        defaultValue: "0xffffffff00000099"
+        defaultValue: "0x005c000000000099"
     TTEST_EVENT_TRIGGER_SENSITIVITY_LEVEL_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a8"
+        defaultValue: "0x005c0000000000a8"
 
 tests:
     - label: "Step 1: Commission DUT to TH"
