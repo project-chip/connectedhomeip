@@ -16,8 +16,10 @@
  */
 package com.matter.casting.core;
 
+import com.matter.casting.support.EndpointFilter;
 import java.net.InetAddress;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The CastingPlayer interface defines a Matter commissioner that is able to play media to a
@@ -55,24 +57,38 @@ public interface CastingPlayer {
   @Override
   int hashCode();
 
-  // TODO: Implement in following PRs. Related to player connection implementation.
-  //    List<Endpoint> getEndpoints();
-  //
-  //    ConnectionState getConnectionState();
-  //
-  //    CompletableFuture<Void> connect(long timeout);
-  //
-  //    static class ConnectionState extends Observable {
-  //        private boolean connected;
-  //
-  //        void setConnected(boolean connected) {
-  //            this.connected = connected;
-  //            setChanged();
-  //            notifyObservers(this.connected);
-  //        }
-  //
-  //        boolean isConnected() {
-  //            return connected;
-  //        }
-  //    }
+  /**
+   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
+   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
+   * disk, this will execute the user directed commissioning process.
+   *
+   * @param commissioningWindowTimeoutSec (Optional) time (in sec) to keep the commissioning window
+   *     open, if commissioning is required. Needs to be >= MIN_CONNECTION_TIMEOUT_SEC.
+   * @param desiredEndpointFilter (Optional) Attributes (such as VendorId) describing an Endpoint
+   *     that the client wants to interact with after commissioning. If this value is passed in, the
+   *     VerifyOrEstablishConnection will force User Directed Commissioning, in case the desired
+   *     Endpoint is not found in the on device CastingStore.
+   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
+   *     The CompletableFuture will be completed with a Void value if the
+   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
+   *     completed with an Exception. The Exception will be of type
+   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
+   *     CastingException will contain the error code and message from the CastingApp.
+   */
+  CompletableFuture<Void> VerifyOrEstablishConnection(
+      long commissioningWindowTimeoutSec, EndpointFilter desiredEndpointFilter);
+
+  /**
+   * Verifies that a connection exists with this CastingPlayer, or triggers a new session request.
+   * If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on
+   * disk, this will execute the user directed commissioning process.
+   *
+   * @return A CompletableFuture that completes when the VerifyOrEstablishConnection is completed.
+   *     The CompletableFuture will be completed with a Void value if the
+   *     VerifyOrEstablishConnection is successful. Otherwise, the CompletableFuture will be
+   *     completed with an Exception. The Exception will be of type
+   *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
+   *     CastingException will contain the error code and message from the CastingApp.
+   */
+  CompletableFuture<Void> VerifyOrEstablishConnection();
 }

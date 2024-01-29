@@ -47,7 +47,7 @@ public:
     /**
      * @brief Initializes the CastingApp with appParameters
      *
-     * @param appParameters
+     * @param appParameters AppParameters required to Start up the CastingApp
      * @return CHIP_ERROR
      */
     CHIP_ERROR Initialize(const matter::casting::support::AppParameters & appParameters);

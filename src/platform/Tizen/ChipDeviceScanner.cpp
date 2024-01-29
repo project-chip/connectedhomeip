@@ -173,15 +173,11 @@ static bool __IsScanFilterSupported()
     return is_supported;
 }
 
-void ChipDeviceScanner::CheckScanFilter(ScanFilterType filterType, ScanFilterData & filterData)
+int ChipDeviceScanner::SetupScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
 {
-    int ret = BT_ERROR_NONE;
+    VerifyOrReturnValue(__IsScanFilterSupported(), BT_ERROR_NONE, ChipLogError(DeviceLayer, "BLE scan filter not supported"));
 
-    // Scan Filter check
-    if (!__IsScanFilterSupported())
-        return;
-
-    ret = CreateLEScanFilter(filterType, filterData);
+    int ret = CreateLEScanFilter(filterType);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "BLE scan filter creation failed: %s. Do Normal Scan", get_error_message(ret)));
 
@@ -189,19 +185,21 @@ void ChipDeviceScanner::CheckScanFilter(ScanFilterType filterType, ScanFilterDat
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "BLE scan filter registration failed: %s. Do Normal Scan", get_error_message(ret)));
 
-    return;
+    return ret;
 
 exit:
     UnRegisterScanFilter();
+    return ret;
 }
 
-CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, ScanFilterData & filterData)
+CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType,
+                                            const ScanFilterData & filterData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     // Scan Filter Setup if supported: silently bypass error & do filterless scan in case of error
-    CheckScanFilter(filterType, filterData);
+    SetupScanFilter(filterType, filterData);
 
     mScanTimeoutMs = System::Clock::Milliseconds32(timeout).count();
 
@@ -251,7 +249,7 @@ void ChipDeviceScanner::UnRegisterScanFilter()
     }
 }
 
-int ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, ScanFilterData & filterData)
+int ChipDeviceScanner::RegisterScanFilter(ScanFilterType filterType, const ScanFilterData & filterData)
 {
     int ret = BT_ERROR_NONE;
 
@@ -293,7 +291,7 @@ exit:
     return ret;
 }
 
-int ChipDeviceScanner::CreateLEScanFilter(ScanFilterType filterType, ScanFilterData & filterData)
+int ChipDeviceScanner::CreateLEScanFilter(ScanFilterType filterType)
 {
     int ret = bt_adapter_le_scan_filter_create(&mScanFilter);
     VerifyOrExit(ret == BT_ERROR_NONE,
