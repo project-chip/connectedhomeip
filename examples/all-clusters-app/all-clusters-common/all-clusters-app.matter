@@ -8071,6 +8071,7 @@ endpoint 1 {
     ram      attribute targetLevel;
     persist  attribute defaultOpenLevel default = 100;
     ram      attribute valveFault default = 0;
+    ram      attribute levelStep default = 1;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
