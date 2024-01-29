@@ -315,6 +315,7 @@ exit:
     {
         ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
+        DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
         sInstance.mFlags.Clear(Flags::kControlOpInProgress);
     }
 
