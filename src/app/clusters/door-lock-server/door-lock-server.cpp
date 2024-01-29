@@ -3906,23 +3906,39 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     Delegate * delegate = GetDelegate(endpointID);
     VerifyOrReturn(delegate != nullptr, ChipLogError(Zcl, "Delegate is null"));
 
-    uint8_t buffer[kAliroReaderVerificationKeySize];
-    MutableByteSpan readerVerificationKey(buffer);
-
-    // If Aliro reader verification key attribute is not null (i.e not empty), we can't set a new reader config without clearing the
-    // previous one, return INVALID_IN_STATE.
-    if (CHIP_NO_ERROR == delegate->GetAliroReaderVerificationKey(readerVerificationKey) && !readerVerificationKey.empty())
-    {
-        ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro reader verification key is not null. Return INVALID_IN_STATE");
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
-        return;
-    }
-
     // If Aliro BLE UWB feature is supported and groupResolvingKey is not provided in the command, return INVALID_COMMAND.
     if (SupportsAliroBLEUWB(endpointID) && !groupResolvingKey.HasValue())
     {
         ChipLogProgress(Zcl, "[SetAliroReaderConfig] Aliro BLE UWB supported but Group Resolving Key is not provided");
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return;
+    }
+
+    // Check if the size of the signingKey, verificationKey, groupIdentifier, groupResolvingKey parameters conform to the spec.
+    // Return INVALID_COMMAND if not.
+    if (signingKey.size() != kAliroSigningKeySize || verificationKey.size() != kAliroReaderVerificationKeySize ||
+        groupIdentifier.size() != kAliroReaderGroupIdentifierSize ||
+        (groupResolvingKey.HasValue() && groupResolvingKey.Value().size() != kAliroGroupResolvingKeySize))
+    {
+        ChipLogProgress(Zcl,
+                        "[SetAliroReaderConfig] One or more parameters in the command do not meet the size constraint as per spec");
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return;
+    }
+
+    uint8_t buffer[kAliroReaderVerificationKeySize];
+    MutableByteSpan readerVerificationKey(buffer);
+
+    CHIP_ERROR err = delegate->GetAliroReaderVerificationKey(readerVerificationKey);
+
+    // If Aliro reader verification key attribute was not read successfuly, return INVALID_IN_STATE. Or if the verification key was
+    // read and is not null (i.e not empty), we can't set a new reader config without clearing the previous one, return
+    // INVALID_IN_STATE.
+    if (err != CHIP_NO_ERROR || (err == CHIP_NO_ERROR && !readerVerificationKey.empty()))
+    {
+        ChipLogProgress(
+            Zcl, "[SetAliroReaderConfig] Aliro reader verification key was not read or is not null. Return INVALID_IN_STATE");
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return;
     }
 
@@ -4118,12 +4134,12 @@ CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersion
                                                                                   AttributeValueEncoder & aEncoder,
                                                                                   Delegate * delegate)
 {
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+    VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
 
     return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
-            uint8_t buffer[kProtocolVersionSize];
+            uint8_t buffer[kAliroProtocolVersionSize];
             MutableByteSpan protocolVersion(buffer);
             auto err = delegate->GetAliroExpeditedTransactionSupportedProtocolVersionAtIndex(i, protocolVersion);
             if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -4139,12 +4155,12 @@ CHIP_ERROR DoorLockServer::ReadAliroExpeditedTransactionSupportedProtocolVersion
 CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const ConcreteReadAttributePath & aPath,
                                                                     AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+    VerifyOrReturnValue(delegate != nullptr, aEncoder.EncodeEmptyList());
 
     return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t i = 0; true; i++)
         {
-            uint8_t buffer[kProtocolVersionSize];
+            uint8_t buffer[kAliroProtocolVersionSize];
             MutableByteSpan protocolVersion(buffer);
             auto err = delegate->GetAliroSupportedBLEUWBProtocolVersionAtIndex(i, protocolVersion);
             if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -4158,12 +4174,19 @@ CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const Concre
 }
 
 CHIP_ERROR DoorLockServer::ReadAliroByteSpanAttribute(CHIP_ERROR (Delegate::*func)(MutableByteSpan &), MutableByteSpan & data,
-                                                      Delegate * delegate, AttributeValueEncoder & aEncoder)
+                                                      Delegate * delegate, AttributeValueEncoder & aEncoder, bool isNullable)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
     ReturnErrorOnFailure((delegate->*func)(data));
-    ReturnErrorOnFailure(aEncoder.Encode(data));
+    if (isNullable && data.empty())
+    {
+        ReturnErrorOnFailure(aEncoder.EncodeNull());
+    }
+    else
+    {
+        ReturnErrorOnFailure(aEncoder.Encode(data));
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -4183,18 +4206,20 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     case AliroReaderVerificationKey::Id: {
         uint8_t buffer[kAliroReaderVerificationKeySize];
         MutableByteSpan readerVerificationKey(buffer);
-        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderVerificationKey, readerVerificationKey, delegate, aEncoder);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderVerificationKey, readerVerificationKey, delegate, aEncoder,
+                                          true);
     }
     case AliroReaderGroupIdentifier::Id: {
         uint8_t buffer[kAliroReaderGroupIdentifierSize];
         MutableByteSpan readerGroupIdentifier(buffer);
-        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupIdentifier, readerGroupIdentifier, delegate, aEncoder);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupIdentifier, readerGroupIdentifier, delegate, aEncoder,
+                                          true);
     }
     case AliroReaderGroupSubIdentifier::Id: {
         uint8_t buffer[kAliroReaderGroupSubIdentifierSize];
         MutableByteSpan readerGroupSubIdentifier(buffer);
-        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupSubIdentifier, readerGroupSubIdentifier, delegate,
-                                          aEncoder);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupSubIdentifier, readerGroupSubIdentifier, delegate, aEncoder,
+                                          false);
     }
     case AliroExpeditedTransactionSupportedProtocolVersions::Id: {
         return ReadAliroExpeditedTransactionSupportedProtocolVersions(aPath, aEncoder, delegate);
@@ -4202,7 +4227,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     case AliroGroupResolvingKey::Id: {
         uint8_t buffer[kAliroGroupResolvingKeySize];
         MutableByteSpan groupResolvingKey(buffer);
-        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, groupResolvingKey, delegate, aEncoder);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, groupResolvingKey, delegate, aEncoder, true);
     }
     case AliroSupportedBLEUWBProtocolVersions::Id: {
         return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);

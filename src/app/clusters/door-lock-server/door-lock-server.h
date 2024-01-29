@@ -548,16 +548,8 @@ private:
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
                       EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
 
-    /**
-     * @brief Reads non generic attributes for door lock.
-     *
-     * @param aPath         attribute path.
-     * @param aEncoder      attribute value encoder.
-     *
-     * @return CHIP_NO_ERROR  on success
-     * @return CHIP_ERROR     if attribute read failed
-     */
-    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder);
+    // AttributeAccessInterface's Read API
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
 
     /**
      * @brief Reads AliroExpeditedTransactionSupportedProtocolVersions attribute for door lock
@@ -600,7 +592,7 @@ private:
      */
     CHIP_ERROR ReadAliroByteSpanAttribute(CHIP_ERROR (chip::app::Clusters::DoorLock::Delegate::*func)(chip::MutableByteSpan & data),
                                           chip::MutableByteSpan & data, chip::app::Clusters::DoorLock::Delegate * delegate,
-                                          chip::app::AttributeValueEncoder & aEncoder);
+                                          chip::app::AttributeValueEncoder & aEncoder, bool isNullable);
 
     friend bool
     emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,

@@ -34,6 +34,8 @@ static constexpr size_t kAliroGroupResolvingKeySize = 16;
 
 static constexpr size_t kAliroProtocolVersionSize = 2;
 
+static constexpr size_t kAliroSigningKeySize = 32;
+
 /** @brief
  *  Defines methods for implementing application-specific logic for the door lock cluster.
  *  It defines the interfaces that a door lock should implement to support Aliro provisioning attributes.
