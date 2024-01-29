@@ -19,29 +19,34 @@ package com.matter.tv.server.tvapp;
 
 import java.util.Map;
 
-import com.matter.tv.server.tvapp.ChannelInfo.ChannelType;
-
 public class ChannelProgramInfo {
 
-    public String identifier;
-    public ChannelInfo channel;
-    public long startTime;
-    public long endTime;
-    public String title;
-    public String subTitle;
-    public String description;
-    public boolean recordFlagScheduled = false;
-    public boolean recordFlagSeries = false;
-    public boolean recordFlagRecorded = false;
-    public Map.Entry<String, String>[] externalIDList;
+  public String identifier;
+  public ChannelInfo channel;
+  public long startTime;
+  public long endTime;
+  public String title;
+  public String subTitle;
+  public String description;
+  public boolean recordFlagScheduled = false;
+  public boolean recordFlagSeries = false;
+  public boolean recordFlagRecorded = false;
+  public Map.Entry<String, String>[] externalIDList;
 
-    public ChannelProgramInfo(String identifier, ChannelInfo channel, long startTime, long endTime, String title, String subTitle, String description) {
-        this.identifier = identifier;
-        this.channel = channel;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.title = title;
-        this.subTitle = subTitle;
-        this.description = description;        
-    }
+  public ChannelProgramInfo(
+      String identifier,
+      ChannelInfo channel,
+      long startTime,
+      long endTime,
+      String title,
+      String subTitle,
+      String description) {
+    this.identifier = identifier;
+    this.channel = channel;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.title = title;
+    this.subTitle = subTitle;
+    this.description = description;
+  }
 }
