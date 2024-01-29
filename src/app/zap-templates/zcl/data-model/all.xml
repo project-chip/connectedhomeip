@@ -55,6 +55,7 @@
    <xi:include href="chip/low-power-cluster.xml" />
    <xi:include href="chip/media-input-cluster.xml" />
    <xi:include href="chip/media-playback-cluster.xml" />
+   <xi:include href="chip/messages-cluster.xml" />   
    <xi:include href="chip/mode-base-cluster.xml" />
    <xi:include href="chip/mode-select-cluster.xml" />
    <xi:include href="chip/network-commissioning-cluster.xml" />

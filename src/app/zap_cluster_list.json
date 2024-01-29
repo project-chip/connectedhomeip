@@ -64,6 +64,7 @@
         "MEDIA_INPUT_CLUSTER": [],
         "MEDIA_PLAYBACK_CLUSTER": [],
         "MICROWAVE_OVEN_CONTROL_CLUSTER": [],
+        "MESSAGES_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
         "SAMPLE_MEI_CLUSTER": [],
@@ -213,6 +214,7 @@
         "MEDIA_INPUT_CLUSTER": ["media-input-server"],
         "MEDIA_PLAYBACK_CLUSTER": ["media-playback-server"],
         "MICROWAVE_OVEN_CONTROL_CLUSTER": ["microwave-oven-control-server"],
+        "MESSAGES_CLUSTER": ["messages-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
