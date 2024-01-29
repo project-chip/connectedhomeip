@@ -77,8 +77,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
         BitMask<DeviceEnergyManagement::Feature, uint32_t>(
             DeviceEnergyManagement::Feature::kPowerAdjustment, DeviceEnergyManagement::Feature::kPowerForecastReporting,
             DeviceEnergyManagement::Feature::kStateForecastReporting, DeviceEnergyManagement::Feature::kStartTimeAdjustment,
-            DeviceEnergyManagement::Feature::kPausable, DeviceEnergyManagement::Feature::kForecastAdjustment,
-            DeviceEnergyManagement::Feature::kConstraintBasedAdjustment));
+            DeviceEnergyManagement::Feature::kPausable));
 
     if (!gDEMInstance)
     {
@@ -209,7 +208,6 @@ CHIP_ERROR EVSEManufacturerInit()
     }
 
     /* Now create EVSEManufacturer */
-    // TODO  this takes just the EVSE Instance for now, but will need the DEM adding
     gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get());
     if (!gEvseManufacturer)
     {

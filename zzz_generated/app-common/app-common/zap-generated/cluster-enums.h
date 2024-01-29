@@ -2369,6 +2369,57 @@ enum class Feature : uint32_t
 };
 } // namespace DemandResponseLoadControl
 
+namespace Messages {
+
+// Enum for FutureMessagePreferenceEnum
+enum class FutureMessagePreferenceEnum : uint8_t
+{
+    kAllowed    = 0x00,
+    kIncreased  = 0x01,
+    kReduced    = 0x02,
+    kDisallowed = 0x03,
+    kBanned     = 0x04,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 5,
+};
+
+// Enum for MessagePriorityEnum
+enum class MessagePriorityEnum : uint8_t
+{
+    kLow      = 0x00,
+    kMedium   = 0x01,
+    kHigh     = 0x02,
+    kCritical = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kReceivedConfirmation = 0x1,
+    kConfirmationResponse = 0x2,
+    kConfirmationReply    = 0x4,
+    kProtectedMessages    = 0x8,
+};
+
+// Bitmap for MessageControlBitmap
+enum class MessageControlBitmap : uint8_t
+{
+    kConfirmationRequired = 0x1,
+    kResponseRequired     = 0x2,
+    kReplyMessage         = 0x4,
+    kMessageConfirmed     = 0x8,
+    kMessageProtected     = 0x10,
+};
+} // namespace Messages
+
 namespace DeviceEnergyManagement {
 
 // Enum for AdjustmentCauseEnum
@@ -4615,11 +4666,12 @@ enum class ChannelTypeEnum : uint8_t
     kSatellite   = 0x00,
     kCable       = 0x01,
     kTerrestrial = 0x02,
+    kOtt         = 0x03,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 3,
+    kUnknownEnumValue = 4,
 };
 
 // Enum for LineupInfoTypeEnum
@@ -4651,8 +4703,8 @@ enum class Feature : uint32_t
 {
     kChannelList     = 0x1,
     kLineupInfo      = 0x2,
-    kElectronicGuide = 0x3,
-    kRecordProgram   = 0x4,
+    kElectronicGuide = 0x4,
+    kRecordProgram   = 0x8,
 };
 
 // Bitmap for RecordingFlagBitmap
@@ -4660,7 +4712,7 @@ enum class RecordingFlagBitmap : uint32_t
 {
     kScheduled    = 0x1,
     kRecordSeries = 0x2,
-    kRecorded     = 0x3,
+    kRecorded     = 0x4,
 };
 } // namespace Channel
 
@@ -4745,9 +4797,9 @@ enum class Feature : uint32_t
 {
     kAdvancedSeek  = 0x1,
     kVariableSpeed = 0x2,
-    kTextTracks    = 0x3,
-    kAudioTracks   = 0x4,
-    kAudioAdvance  = 0x5,
+    kTextTracks    = 0x4,
+    kAudioTracks   = 0x8,
+    kAudioAdvance  = 0x10,
 };
 } // namespace MediaPlayback
 
@@ -5080,9 +5132,9 @@ enum class Feature : uint32_t
 {
     kScreenTime             = 0x1,
     kPINManagement          = 0x2,
-    kBlockUnrated           = 0x3,
-    kOnDemandContentRating  = 0x4,
-    kScheduledContentRating = 0x5,
+    kBlockUnrated           = 0x4,
+    kOnDemandContentRating  = 0x8,
+    kScheduledContentRating = 0x10,
 };
 } // namespace ContentControl
 

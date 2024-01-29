@@ -31,7 +31,7 @@ public:
     {
         {{#zcl_command_arguments}}
         {{#if_chip_complex}}
-        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
+        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}}{{#if isOptional}}, "", Argument::kOptional{{/if}});
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &mRequest.{{asLowerCamelCase label}});
         {{else}}

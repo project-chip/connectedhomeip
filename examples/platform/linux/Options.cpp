@@ -90,6 +90,7 @@ enum
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     kDeviceOption_SubscriptionCapacity = 0x1024,
 #endif
+    kDeviceOption_WiFiSupports5g = 0x1025
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -100,6 +101,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
+    { "wifi-supports-5g", kNoArgument, kDeviceOption_WiFiSupports5g },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_ENABLE_OPENTHREAD
     { "thread", kNoArgument, kDeviceOption_Thread },
@@ -161,8 +163,13 @@ const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"
     "  --wifi\n"
-    "       Enable WiFi management via wpa_supplicant.\n"
+    "       Enable Wi-Fi management via wpa_supplicant.\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    "\n"
+    "  --wifi-supports-5g\n"
+    "       Indicate that local Wi-Fi hardware should report 5GHz support.\n"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
     "\n"
     "  --thread\n"
@@ -309,6 +316,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_WiFi:
         LinuxDeviceOptions::GetInstance().mWiFi = true;
+        break;
+
+    case kDeviceOption_WiFiSupports5g:
+        LinuxDeviceOptions::GetInstance().wifiSupports5g = true;
         break;
 
     case kDeviceOption_Thread:

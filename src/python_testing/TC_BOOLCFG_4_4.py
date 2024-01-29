@@ -109,7 +109,7 @@ class TC_BOOLCFG_4_4(MatterBaseTest):
             logging.info("Test step skipped")
 
         self.step("5b")
-        if is_vis_feature_supported:
+        if is_aud_feature_supported:
             enabledAlarms |= Clusters.BooleanStateConfiguration.Bitmaps.AlarmModeBitmap.kAudible
         else:
             logging.info("Test step skipped")

@@ -3023,6 +3023,39 @@ static BOOL AttributeIsSpecifiedInDemandResponseLoadControlCluster(AttributeId a
     }
     }
 }
+static BOOL AttributeIsSpecifiedInMessagesCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::Messages;
+    switch (aAttributeId) {
+    case Attributes::Messages::Id: {
+        return YES;
+    }
+    case Attributes::ActiveMessageIDs::Id: {
+        return YES;
+    }
+    case Attributes::GeneratedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::AcceptedCommandList::Id: {
+        return YES;
+    }
+    case Attributes::EventList::Id: {
+        return YES;
+    }
+    case Attributes::AttributeList::Id: {
+        return YES;
+    }
+    case Attributes::FeatureMap::Id: {
+        return YES;
+    }
+    case Attributes::ClusterRevision::Id: {
+        return YES;
+    }
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL AttributeIsSpecifiedInDeviceEnergyManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::DeviceEnergyManagement;
@@ -6557,6 +6590,9 @@ BOOL MTRAttributeIsSpecified(ClusterId aClusterId, AttributeId aAttributeId)
     }
     case Clusters::DemandResponseLoadControl::Id: {
         return AttributeIsSpecifiedInDemandResponseLoadControlCluster(aAttributeId);
+    }
+    case Clusters::Messages::Id: {
+        return AttributeIsSpecifiedInMessagesCluster(aAttributeId);
     }
     case Clusters::DeviceEnergyManagement::Id: {
         return AttributeIsSpecifiedInDeviceEnergyManagementCluster(aAttributeId);
