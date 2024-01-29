@@ -1040,7 +1040,7 @@ menu "CHIP Device Layer"
 
     config CHIP_ENABLE_BDX_LOG_TRANSFER
         bool "Enable BDX log transfer"
-        default y
+        default n
         help
             Enables the BDX protocol for diagnostics log transfer
 

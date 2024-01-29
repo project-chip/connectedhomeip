@@ -26,7 +26,7 @@ Usage:
 
 ## Additional details
 
-This example demonstrates the utilization of the diagnostics logs cluster to
+This example demonstrates the utilization of the diagnostic logs cluster to
 send diagnostic logs to the client.
 
 In this scenario, the [main/diagnostic_logs](main/diagnostic_logs) directory
@@ -50,7 +50,7 @@ chip-tool pairing ble-wifi 1 SSID PASSPHRASE 20202021 3840
 # Read end user support logs using response payload protocol
 chip-tool diagnosticlogs retrieve-logs-request 0 0 1 0
 
-# Read network diagnostic using bdx protocol
+# Read network diagnostic using BDX protocol
 chip-tool diagnosticlogs retrieve-logs-request 1 0 1 0 --TransferFileDesignator network-diag.log
 ```
 
