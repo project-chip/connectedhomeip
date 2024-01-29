@@ -550,7 +550,8 @@ private:
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const StatusIB & aStatus);
 
     /**
-     * Non-templated function called before DataModel::Encode when attempting to add a response.
+     * Non-templated function called before DataModel::Encode when attempting to add a response,
+     * which does all the work needed before encoding the actual type-dependent data into the buffer.
      *
      * **Important:** If this function fails, the TLV buffer may be left in an inconsistent state.
      * Callers should create snapshots as necessary before invoking this function and implement
