@@ -104,11 +104,12 @@ CHIP_ERROR MediaPlaybackManager::HandleGetActiveTrack(bool audio, AttributeValue
     jobject trackObj;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetActiveAudioTrack");
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetActiveTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     trackObj = env->CallObjectMethod(mMediaPlaybackManagerObject, mGetActiveTrackMethod, static_cast<jboolean>(audio));
@@ -171,11 +172,12 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTracks(bool audio, AttributeV
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetAvailableAudioTracks");
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAvailableTracksMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     return aEncoder.EncodeList([this, env, audio](const auto & encoder) -> CHIP_ERROR {
         jobjectArray trackList = (jobjectArray) env->CallObjectMethod(mMediaPlaybackManagerObject, mGetAvailableTracksMethod,
@@ -320,11 +322,12 @@ bool MediaPlaybackManager::HandleActivateTrack(bool audio, const chip::CharSpan 
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleActivateAudioTrack");
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mActivateTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
     {
         UtfString jniid(env, id.c_str());
         env->ExceptionClear();
@@ -350,11 +353,12 @@ bool MediaPlaybackManager::HandleDeactivateTextTrack()
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleDeactivateTextTrack");
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeactivateTextTrackMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     ret = env->CallIntMethod(mMediaPlaybackManagerObject, mDeactivateTextTrackMethod);
@@ -438,11 +442,12 @@ uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackReque
     jlong jAttributeValue = -1;
     CHIP_ERROR err        = CHIP_NO_ERROR;
     JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, ret, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetAttribute:%d", attribute);
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     jAttributeValue = env->CallLongMethod(mMediaPlaybackManagerObject, mGetAttributeMethod, static_cast<jint>(attribute));
     if (env->ExceptionCheck())
@@ -477,11 +482,12 @@ long MediaPlaybackManager::HandleMediaRequestGetLongAttribute(MediaPlaybackReque
     jlong jAttributeValue = -1;
     CHIP_ERROR err        = CHIP_NO_ERROR;
     JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::HandleMediaRequestGetLongAttribute:%d", attribute);
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAttributeMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     jAttributeValue = env->CallLongMethod(mMediaPlaybackManagerObject, mGetAttributeMethod, static_cast<jint>(attribute));
     if (env->ExceptionCheck())
@@ -512,12 +518,13 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, response, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::Request %d-%ld", mediaPlaybackRequest,
                     static_cast<long>(deltaPositionMilliseconds));
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRequestMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     ret = env->CallIntMethod(mMediaPlaybackManagerObject, mRequestMethod, static_cast<jint>(mediaPlaybackRequest),
@@ -550,11 +557,12 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
     jobject positionObj;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "MediaPlaybackManager::HandleGetSampledPosition");
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetPositionMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     positionObj = env->CallObjectMethod(mMediaPlaybackManagerObject, mGetPositionMethod);
@@ -577,7 +585,7 @@ CHIP_ERROR MediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s", err.AsString());
+        ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return aEncoder.Encode(response);

@@ -59,11 +59,12 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(AttributeValueEncoder & aEncoder
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetChannelList");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mChannelManagerObject, mGetChannelListMethod);
@@ -135,11 +136,12 @@ CHIP_ERROR ChannelManager::HandleGetLineup(AttributeValueEncoder & aEncoder)
     chip::app::Clusters::Channel::Structs::LineupInfoStruct::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetLineup");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetLineupMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
@@ -197,10 +199,12 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(AttributeValueEncoder & aEnco
     chip::app::Clusters::Channel::Structs::ChannelInfoStruct::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
+
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentChannelMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject, mGetCurrentChannelMethod);
@@ -270,11 +274,12 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
 {
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannel name %s", name.c_str());
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     {
         UtfString jniname(env, name.c_str());
@@ -315,12 +320,13 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
                     minorNumber);
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelByNumberMethod != nullptr, ChipLogError(Zcl, "mChangeChannelByNumberMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     env->ExceptionClear();
 
@@ -342,11 +348,12 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleSkipChannel count %d", count);
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mSkipChannelMethod != nullptr, ChipLogError(Zcl, "mSkipChannelMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     env->ExceptionClear();
 
@@ -374,11 +381,17 @@ void ChannelManager::HandleGetProgramGuide(
     ProgramGuideResponseType response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
+
+    std::vector<ProgramType *> needToFreePrograms;
+    std::vector<ChannelInfoType *> needToFreeChannels;
+    std::vector<ProgramType> tempPrograms;
+    std::vector<JniUtfString *> needToFreeStrings;
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleGetProgramGuide");
     VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetProgramGuideMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         // NOTE: this example app does not pass the Data, PageToken, ChannelsArray or ExternalIdList through to the Java layer
@@ -405,22 +418,20 @@ void ChannelManager::HandleGetProgramGuide(
         jfieldID programsFid = env->GetFieldID(respCls, "programs", "[Lcom/matter/tv/server/tvapp/ChannelProgramInfo;");
         VerifyOrExit(programsFid != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
 
-        std::vector<ProgramType *> needToFreePrograms;
-        std::vector<ChannelInfoType *> needToFreeChannels;
-        std::vector<ProgramType> tempPrograms;
-        std::vector<JniUtfString *> needToFreeStrings;
-
         jobjectArray programsArray = (jobjectArray) env->GetObjectField(resp, programsFid);
         jint size                  = env->GetArrayLength(programsArray);
         for (jint i = 0; i < size; i++)
         {
             ProgramType * program = new ProgramType();
+            VerifyOrExit(program != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
             jobject programObject = env->GetObjectArrayElement(programsArray, i);
             jclass programClass   = env->GetObjectClass(programObject);
 
             jfieldID getIdentifierField = env->GetFieldID(programClass, "identifier", "Ljava/lang/String;");
             jstring jidentifier         = static_cast<jstring>(env->GetObjectField(programObject, getIdentifierField));
             JniUtfString * identifier   = new JniUtfString(env, jidentifier);
+            VerifyOrExit(identifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
             needToFreeStrings.push_back(identifier);
             if (jidentifier != nullptr)
             {
@@ -434,10 +445,12 @@ void ChannelManager::HandleGetProgramGuide(
                 jclass channelClass = env->GetObjectClass(channelInfoObject);
 
                 ChannelInfoType * channelInfo = new ChannelInfoType();
+                VerifyOrExit(channelInfo != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
                 jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
                 jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getCallSignField));
                 JniUtfString * callsign   = new JniUtfString(env, jcallSign);
+                VerifyOrExit(callsign != nullptr, err = CHIP_ERROR_NO_MEMORY);
                 needToFreeStrings.push_back(callsign);
                 if (jcallSign != nullptr)
                 {
@@ -447,6 +460,7 @@ void ChannelManager::HandleGetProgramGuide(
                 jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
                 jstring jname         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getNameField));
                 JniUtfString * name   = new JniUtfString(env, jname);
+                VerifyOrExit(name != nullptr, err = CHIP_ERROR_NO_MEMORY);
                 needToFreeStrings.push_back(name);
                 if (jname != nullptr)
                 {
@@ -457,6 +471,7 @@ void ChannelManager::HandleGetProgramGuide(
                 jstring jaffiliateCallSign =
                     static_cast<jstring>(env->GetObjectField(channelInfoObject, getJaffiliateCallSignField));
                 JniUtfString * affiliateCallSign = new JniUtfString(env, jaffiliateCallSign);
+                VerifyOrExit(affiliateCallSign != nullptr, err = CHIP_ERROR_NO_MEMORY);
                 needToFreeStrings.push_back(affiliateCallSign);
                 if (jaffiliateCallSign != nullptr)
                 {
@@ -466,6 +481,7 @@ void ChannelManager::HandleGetProgramGuide(
                 jfieldID getJchanIdentifierField = env->GetFieldID(channelClass, "identifier", "Ljava/lang/String;");
                 jstring jchanidentifier = static_cast<jstring>(env->GetObjectField(channelInfoObject, getJchanIdentifierField));
                 JniUtfString * chanidentifier = new JniUtfString(env, jchanidentifier);
+                VerifyOrExit(chanidentifier != nullptr, err = CHIP_ERROR_NO_MEMORY);
                 needToFreeStrings.push_back(chanidentifier);
                 if (jchanidentifier != nullptr)
                 {
@@ -487,6 +503,7 @@ void ChannelManager::HandleGetProgramGuide(
             jfieldID getTitleField = env->GetFieldID(programClass, "title", "Ljava/lang/String;");
             jstring jtitle         = static_cast<jstring>(env->GetObjectField(programObject, getTitleField));
             JniUtfString * title   = new JniUtfString(env, jtitle);
+            VerifyOrExit(title != nullptr, err = CHIP_ERROR_NO_MEMORY);
             needToFreeStrings.push_back(title);
             if (jtitle != nullptr)
             {
@@ -496,6 +513,7 @@ void ChannelManager::HandleGetProgramGuide(
             jfieldID getSubTitleField = env->GetFieldID(programClass, "subTitle", "Ljava/lang/String;");
             jstring jsubTitle         = static_cast<jstring>(env->GetObjectField(programObject, getSubTitleField));
             JniUtfString * subTitle   = new JniUtfString(env, jsubTitle);
+            VerifyOrExit(subTitle != nullptr, err = CHIP_ERROR_NO_MEMORY);
             needToFreeStrings.push_back(subTitle);
             if (jsubTitle != nullptr)
             {
@@ -505,6 +523,7 @@ void ChannelManager::HandleGetProgramGuide(
             jfieldID getDescriptionField = env->GetFieldID(programClass, "description", "Ljava/lang/String;");
             jstring jdescription         = static_cast<jstring>(env->GetObjectField(programObject, getDescriptionField));
             JniUtfString * description   = new JniUtfString(env, jdescription);
+            VerifyOrExit(description != nullptr, err = CHIP_ERROR_NO_MEMORY);
             needToFreeStrings.push_back(description);
             if (jdescription != nullptr)
             {
@@ -548,20 +567,19 @@ void ChannelManager::HandleGetProgramGuide(
         response.programList = DataModel::List<const ProgramType>(tempPrograms.data(), tempPrograms.size());
 
         err = helper.Success(response);
-
-        for (ProgramType * program : needToFreePrograms)
-        {
-            delete program;
-        }
-
-        for (JniUtfString * str : needToFreeStrings)
-        {
-            delete str;
-        }
     }
 
 exit:
-    ChipLogProgress(Zcl, " -- HandleGetProgramGuide -- 55");
+    for (ProgramType * program : needToFreePrograms)
+    {
+        delete program;
+    }
+
+    for (JniUtfString * str : needToFreeStrings)
+    {
+        delete str;
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "ChannelManager::HandleGetProgramGuide status error: %s", err.AsString());
@@ -574,11 +592,12 @@ bool ChannelManager::HandleRecordProgram(const chip::CharSpan & programIdentifie
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleRecordProgram");
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mRecordProgramMethod != nullptr, ChipLogError(Zcl, "mRecordProgramMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     env->ExceptionClear();
 
@@ -610,11 +629,12 @@ bool ChannelManager::HandleCancelRecordProgram(const chip::CharSpan & programIde
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnValue(env != nullptr, false, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleCancelRecordProgram");
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mCancelRecordProgramMethod != nullptr, ChipLogError(Zcl, "mCancelRecordProgramMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     env->ExceptionClear();
 
