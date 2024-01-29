@@ -245,27 +245,6 @@ emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpoin
 }
 
 bool __attribute__((weak))
-emberAfPluginDoorLockGetNumberOfAliroCredentialIssuerKeyCredentialsSupported(chip::EndpointId endpointId,
-                                                                             uint16_t & maxNumberOfCredentials)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockGetNumberOfAliroEvictableEndpointKeyCredentialsSupported(chip::EndpointId endpointId,
-                                                                              uint16_t & maxNumberOfCredentials)
-{
-    return false;
-}
-
-bool __attribute__((weak))
-emberAfPluginDoorLockGetNumberOfAliroNonEvictableEndpointKeyCredentialsSupported(chip::EndpointId endpointId,
-                                                                                 uint16_t & maxNumberOfCredentials)
-{
-    return false;
-}
-
-bool __attribute__((weak))
 emberAfPluginDoorLockSetAliroReaderConfig(EndpointId endpointId, const ByteSpan & signingKey, const ByteSpan & verificationKey,
                                           const ByteSpan & groupIdentifier, const Optional<ByteSpan> groupResolvingKey)
 {

@@ -32,7 +32,7 @@ static constexpr size_t kAliroReaderGroupSubIdentifierSize = 16;
 
 static constexpr size_t kAliroGroupResolvingKeySize = 16;
 
-static constexpr size_t kProtocolVersionSize = 2;
+static constexpr size_t kAliroProtocolVersionSize = 2;
 
 /** @brief
  *  Defines methods for implementing application-specific logic for the door lock cluster.
