@@ -16,7 +16,7 @@
  */
 
 #include "SmokeCOAlarmManager.h"
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerDelegate.h>
+#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <lib/support/TypeTraits.h>
 
 using namespace chip;
