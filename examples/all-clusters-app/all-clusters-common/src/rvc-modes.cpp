@@ -26,8 +26,6 @@ template <typename T>
 using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 
-const uint32_t NO_FEATURES = 0;
-
 // RVC Run
 
 static RvcRunModeDelegate * gRvcRunModeDelegate = nullptr;
@@ -114,7 +112,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
     gRvcRunModeDelegate = new RvcRunMode::RvcRunModeDelegate;
-    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, NO_FEATURES);
+    gRvcRunModeInstance = new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, RvcRunMode::Feature::kNoFeatures);
     gRvcRunModeInstance->Init();
 }
 
@@ -203,6 +201,6 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
     gRvcCleanModeDelegate = new RvcCleanMode::RvcCleanModeDelegate;
-    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, NO_FEATURES);
+    gRvcCleanModeInstance = new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, RvcRunMode::Feature::kNoFeatures);
     gRvcCleanModeInstance->Init();
 }
