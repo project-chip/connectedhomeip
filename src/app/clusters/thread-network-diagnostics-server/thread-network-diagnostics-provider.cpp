@@ -273,7 +273,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
 
 #else // OPENTHREAD_MTD
             otError otErr = otThreadGetParentInfo(otInst, &routerInfo);
-            ReturnErrorOnFailure(Internal::Internal::MapOpenThreadError ::Attributes::(otErr));
+            ReturnErrorOnFailure(Internal::MapOpenThreadError(otErr));
 
             Structs::RouteTableStruct::Type routeTable;
 
