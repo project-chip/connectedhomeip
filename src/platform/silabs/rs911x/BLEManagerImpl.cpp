@@ -247,6 +247,7 @@ namespace {
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
 #define BLE_DEFAULT_TIMER_PERIOD_MS (1)
+#define BLE_SEND_INDICATION_TIMER_PERIOD_MS (10)
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
@@ -465,12 +466,22 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return (conState != NULL) ? conState->mtu : 0;
 }
 
+void BLEManagerImpl::OnSendIndicationTimeout(System::Layer * aLayer, void * appState)
+{
+    BLEManagerImpl * pBLEManagerImpl = reinterpret_cast<BLEManagerImpl *>(appState);
+    pBLEManagerImpl->HandleSoftTimerEvent();
+}
+
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle data)
 {
     int32_t status = 0;
-    status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
+        status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
+    
+    // start timer for light indication confirmation. Long delay for spake2 indication
+    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS), OnSendIndicationTimeout, this);
+
     if (status != RSI_SUCCESS)
     {
         ChipLogProgress(DeviceLayer, "indication failed with error code %lx ", status);
@@ -924,13 +935,20 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
+    DeviceLayer::SystemLayer().CancelTimer(BLEManagerImpl, this);
     PlatformMgr().PostEventOrDie(&event);
 }
 
-// TODO:: Need to Implement
+
 void BLEManagerImpl::HandleSoftTimerEvent(void)
 {
-    // TODO:: Need to Implement
+    ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
+    ChipDeviceEvent event;
+    event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
+    event.CHIPoBLEConnectionError.ConId                          = mIndConfId[evt->data.evt_system_soft_timer.handle];
+    sInstance.mIndConfId[evt->data.evt_system_soft_timer.handle] = kUnusedIndex;
+    event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
+    PlatformMgr().PostEventOrDie(&event);
 }
 
 bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
