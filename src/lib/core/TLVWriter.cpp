@@ -662,7 +662,7 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
         return CHIP_ERROR_TLV_CONTAINER_OPEN;
 
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
-    uint8_t * p = stagingBuf;
+    uint8_t * p     = stagingBuf;
     uint32_t tagNum = TagNumFromTag(tag);
 
     if (IsSpecialTag(tag))
