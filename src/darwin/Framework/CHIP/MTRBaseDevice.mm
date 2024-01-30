@@ -87,6 +87,7 @@ NSString * const MTREventTimeTypeKey = @"eventTimeType";
 NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
 NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
 NSString * const MTREventIsHistoricalKey = @"eventIsHistorical";
+NSString * const MTRPreviousDataKey = @"previousData";
 
 class MTRDataValueDictionaryCallbackBridge;
 

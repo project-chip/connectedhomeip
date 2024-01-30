@@ -55,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
  *                MTREventIsHistoricalKey : NSNumber-wrapped BOOL value.
  *                                          Value is YES if the event is in the far past or not realtime.
  *                                          Only present when MTREventPathKey is present.
+ *                MTRPreviousDataKey: Data-value NSDictionary object.
+ *                                  Included when there is MTRDataKey and when a previous value is known.
  *
  *                Only one of MTREventTimestampDateKey and MTREventSystemUpTimeKey will be present, depending on the value for
  *                MTREventTimeTypeKey.
@@ -145,6 +147,7 @@ MTR_EXTERN NSString * const MTREventTimeTypeKey MTR_AVAILABLE(ios(16.5), macos(1
 MTR_EXTERN NSString * const MTREventSystemUpTimeKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 MTR_EXTERN NSString * const MTREventTimestampDateKey MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 MTR_EXTERN NSString * const MTREventIsHistoricalKey MTR_AVAILABLE(ios(17.3), macos(14.3), watchos(10.3), tvos(17.3));
+MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 @class MTRClusterStateCacheContainer;
 @class MTRAttributeCacheContainer;
