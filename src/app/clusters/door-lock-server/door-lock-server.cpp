@@ -4174,12 +4174,12 @@ CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const Concre
 }
 
 CHIP_ERROR DoorLockServer::ReadAliroByteSpanAttribute(CHIP_ERROR (Delegate::*func)(MutableByteSpan &), MutableByteSpan & data,
-                                                      Delegate * delegate, AttributeValueEncoder & aEncoder, bool isNullable)
+                                                      Delegate * delegate, AttributeValueEncoder & aEncoder, AttributeNullabilityType nullabilityType)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
     ReturnErrorOnFailure((delegate->*func)(data));
-    if (isNullable && data.empty())
+    if (nullabilityType == AttributeNullabilityType::kNullable && data.empty())
     {
         ReturnErrorOnFailure(aEncoder.EncodeNull());
     }
@@ -4207,19 +4207,19 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
         uint8_t buffer[kAliroReaderVerificationKeySize];
         MutableByteSpan readerVerificationKey(buffer);
         return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderVerificationKey, readerVerificationKey, delegate, aEncoder,
-                                          true);
+                                          AttributeNullabilityType::kNullable);
     }
     case AliroReaderGroupIdentifier::Id: {
         uint8_t buffer[kAliroReaderGroupIdentifierSize];
         MutableByteSpan readerGroupIdentifier(buffer);
         return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupIdentifier, readerGroupIdentifier, delegate, aEncoder,
-                                          true);
+                                          AttributeNullabilityType::kNullable);
     }
     case AliroReaderGroupSubIdentifier::Id: {
         uint8_t buffer[kAliroReaderGroupSubIdentifierSize];
         MutableByteSpan readerGroupSubIdentifier(buffer);
         return ReadAliroByteSpanAttribute(&Delegate::GetAliroReaderGroupSubIdentifier, readerGroupSubIdentifier, delegate, aEncoder,
-                                          false);
+                                          AttributeNullabilityType::kNotNullable);
     }
     case AliroExpeditedTransactionSupportedProtocolVersions::Id: {
         return ReadAliroExpeditedTransactionSupportedProtocolVersions(aPath, aEncoder, delegate);
@@ -4227,7 +4227,7 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     case AliroGroupResolvingKey::Id: {
         uint8_t buffer[kAliroGroupResolvingKeySize];
         MutableByteSpan groupResolvingKey(buffer);
-        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, groupResolvingKey, delegate, aEncoder, true);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, groupResolvingKey, delegate, aEncoder, AttributeNullabilityType::kNullable);
     }
     case AliroSupportedBLEUWBProtocolVersions::Id: {
         return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);

@@ -78,6 +78,14 @@ static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of 
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
     DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
 
+enum class AttributeNullabilityType : uint8_t
+{
+    kNullable  = 0,
+    /**< Used to indicate if an attribute can be nullable */
+    kNotNullable  = 1,
+    /**< Used to indicate if an attribute is not nullable */
+};
+
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
 
@@ -586,13 +594,14 @@ private:
      * @param data          buffer for the data.
      * @param delegate      door lock cluster delegate that will provide the value
      * @param aEncoder      attribute value encoder.
+     * @param nullabilityType enum value indicating whether the attribute is nullable or not.
      *
      * @return CHIP_NO_ERROR  on success
      * @return CHIP_ERROR     if attribute read failed
      */
     CHIP_ERROR ReadAliroByteSpanAttribute(CHIP_ERROR (chip::app::Clusters::DoorLock::Delegate::*func)(chip::MutableByteSpan & data),
                                           chip::MutableByteSpan & data, chip::app::Clusters::DoorLock::Delegate * delegate,
-                                          chip::app::AttributeValueEncoder & aEncoder, bool isNullable);
+                                          chip::app::AttributeValueEncoder & aEncoder, AttributeNullabilityType nullabilityType);
 
     friend bool
     emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
