@@ -150,6 +150,7 @@ private:
     static BLEManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
+
     enum class Flags : uint16_t
     {
         kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
@@ -163,6 +164,9 @@ private:
         kUseCustomDeviceName      = 0x0100, /**< The application has configured a custom BLE device name. */
         kAdvertisingRefreshNeeded = 0x0200, /**< The advertising configuration/state in BLE layer needs to be updated. */
     };
+
+    // Minimum and maximum advertising intervals in units of 0.625ms.
+    using AdvertisingIntervals = std::pair<uint16_t, uint16_t>;
 
     static CHIP_ERROR _BleInitialize(void * userData);
     void DriveBLEState();
@@ -204,6 +208,7 @@ private:
     void NotifyBLESubscribed(bool indicationsEnabled, BLE_CONNECTION_OBJECT conId);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
+    AdvertisingIntervals GetAdvertisingIntervals() const;
 
     // ==== Connection.
     static CHIP_ERROR ConnectChipThing(const char * userData);

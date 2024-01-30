@@ -94,10 +94,8 @@ const char desc_uuid_short[] = "2902";
 
 const char chip_ble_service_uuid_short[] = "FFF6";
 
-/* Tizen Default Scan Timeout */
-static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
-/* Tizen Default Connect Timeout */
-static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
 
 static void __BLEConnectionFree(BLEConnection * conn)
 {
@@ -184,6 +182,13 @@ static constexpr const char * __ConvertAttTypeToStr(bt_gatt_type_e type)
     default:
         return "(unknown)";
     }
+}
+
+BLEManagerImpl::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() const
+{
+    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
+        return { CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX };
+    return { CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN, CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX };
 }
 
 void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
@@ -635,6 +640,7 @@ exit:
 CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 {
     Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
+    auto intervals = GetAdvertisingIntervals();
     PlatformVersion version;
     CHIP_ERROR err;
     int ret;
@@ -664,20 +670,9 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
                      ChipLogError(DeviceLayer, "bt_adapter_le_clear_advertising_data() failed: %s", get_error_message(ret)));
     }
 
-    if (mFlags.Has(Flags::kFastAdvertisingEnabled))
-    {
-        ret = bt_adapter_le_set_advertising_mode(mAdvertiser, BT_ADAPTER_LE_ADVERTISING_MODE_LOW_LATENCY);
-        VerifyOrExit(ret == BT_ERROR_NONE,
-                     ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_mode() failed: %s", get_error_message(ret)));
-
-        // NOTE: Check specification for recommended Advertising Interval range for Fast Advertising
-        // ret = bt_adapter_le_set_advertising_interval(mAdvertiser, BT_LE_ADV_INTERVAL_MIN, BT_LE_ADV_INTERVAL_MIN);
-    }
-    else
-    {
-        // NOTE: Check specification for recommended Advertising Interval range for Slow Advertising
-        // ret = bt_adapter_le_set_advertising_interval(mAdvertiser, BT_LE_ADV_INTERVAL_MAX, BT_LE_ADV_INTERVAL_MAX);
-    }
+    ret = bt_adapter_le_set_advertising_interval(mAdvertiser, intervals.first, intervals.second);
+    VerifyOrExit(ret == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "bt_adapter_le_set_advertising_interval() failed: %s", get_error_message(ret)));
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     VerifyOrExit(err == CHIP_NO_ERROR,
