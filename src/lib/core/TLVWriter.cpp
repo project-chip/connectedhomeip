@@ -757,9 +757,9 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, Tag tag, uint64_
         break;
     }
 
-    size_t bytesStaged = (p - stagingBuf);
+    uint32_t bytesStaged = static_cast<uint32_t>(p - stagingBuf);
     VerifyOrDie(bytesStaged <= sizeof(stagingBuf));
-    return WriteData(stagingBuf, static_cast<uint32_t>(bytesStaged));
+    return WriteData(stagingBuf, bytesStaged);
 }
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, Tag tag, const uint8_t * data, uint32_t dataLen)
