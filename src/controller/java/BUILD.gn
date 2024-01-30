@@ -53,6 +53,7 @@ shared_library("jni") {
     "AndroidCurrentFabricRemover.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
+    "AndroidInteractionClient.cpp",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
     "AttestationTrustStoreBridge.cpp",
@@ -62,8 +63,7 @@ shared_library("jni") {
     "CHIPDeviceController-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
-    "AndroidInteractionClient.cpp",
-    "MatterController-JNI.cpp"
+    "MatterController-JNI.cpp",
   ]
 
   deps = [
