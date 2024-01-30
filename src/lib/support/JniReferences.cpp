@@ -161,7 +161,10 @@ CHIP_ERROR JniReferences::FindMethod(JNIEnv * env, jobject object, const char * 
         env->ExceptionClear();
     }
 
-    VerifyOrReturnError(*methodId != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    if (*methodId == nullptr) {
+        ChipLogError(Support, "methodId is null : %s, %s", methodName, methodSignature);
+        return CHIP_JNI_ERROR_METHOD_NOT_FOUND;
+    }
 
     return CHIP_NO_ERROR;
 }

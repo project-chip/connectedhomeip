@@ -33,6 +33,14 @@ public class ChipEventPath {
     this.isUrgent = isUrgent;
   }
 
+  ChipEventPath(
+      int endpointId, long clusterId, long eventId, boolean isUrgent) {
+    this.endpointId = ChipPathId.forId(endpointId);
+    this.clusterId = ChipPathId.forId(clusterId);
+    this.eventId = ChipPathId.forId(eventId);
+    this.isUrgent = isUrgent;
+  }
+
   public ChipPathId getEndpointId() {
     return endpointId;
   }
@@ -46,15 +54,15 @@ public class ChipEventPath {
   }
 
   // For use in JNI.
-  long getEndpointId(long wildcardValue) {
+  private long getEndpointId(long wildcardValue) {
     return endpointId.getId(wildcardValue);
   }
 
-  long getClusterId(long wildcardValue) {
+  private long getClusterId(long wildcardValue) {
     return clusterId.getId(wildcardValue);
   }
 
-  long getEventId(long wildcardValue) {
+  private long getEventId(long wildcardValue) {
     return eventId.getId(wildcardValue);
   }
 

@@ -18,6 +18,7 @@
 package matter.controller
 
 import java.time.Duration
+import java.util.Optional
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
 import matter.controller.model.EventPath
@@ -154,7 +155,36 @@ sealed class SubscriptionState {
 class WriteRequest(
   val attributePath: AttributePath,
   val tlvPayload: ByteArray,
-)
+  val jsonString: String? = null,
+  val dataVersion: UInt? = null
+) {
+  @Suppress("UNUSED_PARAMETER")
+  fun getEndpointId(wildcardId: Long): Long {
+    return attributePath.endpointId.toLong()
+  }
+
+  @Suppress("UNUSED_PARAMETER")
+  fun getClusterId(wildcardId: Long): Long {
+    return attributePath.clusterId.toLong()
+  }
+
+  @Suppress("UNUSED_PARAMETER")
+  fun getAttributeId(wildcardId: Long): Long {
+    return attributePath.attributeId.toLong()
+  }
+
+  fun getTlvByteArray(): ByteArray {
+    return tlvPayload
+  }
+
+  fun hasDataVersion(): Boolean {
+    return dataVersion != null
+  }
+
+  fun getDataVersion(): Int {
+    return dataVersion?.toInt() ?: 0
+  }
+}
 
 /**
  * Information about a collection of write request elements.
@@ -189,8 +219,40 @@ sealed interface WriteResponse {
 class InvokeRequest(
   val commandPath: CommandPath,
   val tlvPayload: ByteArray,
-  val timedRequest: Duration?
-)
+  val timedRequest: Duration?,
+  val jsonString: String? = null
+) {
+  @Suppress("UNUSED_PARAMETER")
+  fun getEndpointId(wildcardId: Long): Long {
+    return commandPath.endpointId.toLong()
+  }
+
+  @Suppress("UNUSED_PARAMETER")
+  fun getClusterId(wildcardId: Long): Long {
+    return commandPath.clusterId.toLong()
+  }
+
+  @Suppress("UNUSED_PARAMETER")
+  fun getCommandId(wildcardId: Long): Long {
+    return commandPath.commandId.toLong()
+  }
+
+  fun getGroupId(): Optional<Int> {
+    return commandPath.groupId.map { it.toInt() }
+  }
+
+  fun isEndpointIdValid(): Boolean {
+    return commandPath.groupId.isEmpty
+  }
+
+  fun isGroupIdValid(): Boolean {
+    return commandPath.groupId.isPresent
+  }
+
+  fun getTlvByteArray(): ByteArray {
+    return tlvPayload
+  }
+}
 
 /**
  * InvokeResponse will be received when a invoke response has been successful received and
@@ -198,4 +260,4 @@ class InvokeRequest(
  *
  * @param payload An invoke response that could contain tlv data or empty.
  */
-class InvokeResponse(val payload: ByteArray)
+class InvokeResponse(val payload: ByteArray, val path: CommandPath, val jsonString: String? = null)

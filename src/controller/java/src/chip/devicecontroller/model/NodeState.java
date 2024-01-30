@@ -34,8 +34,7 @@ public final class NodeState {
     return endpoints;
   }
 
-  // Called from native code only, which ignores access modifiers.
-  private void setDataVersion(int endpointId, long clusterId, long dataVersion) {
+  public void setDataVersion(int endpointId, long clusterId, long dataVersion) {
     EndpointState endpointState = getEndpointState(endpointId);
     ClusterState clusterState = endpointState.getClusterState(clusterId);
 
@@ -44,8 +43,7 @@ public final class NodeState {
     }
   }
 
-  // Called from native code only, which ignores access modifiers.
-  private void addAttribute(
+  public void addAttribute(
       int endpointId, long clusterId, long attributeId, AttributeState attributeStateToAdd) {
     EndpointState endpointState = getEndpointState(endpointId);
     if (endpointState == null) {
@@ -63,7 +61,7 @@ public final class NodeState {
     clusterState.getAttributeStates().put(attributeId, attributeStateToAdd);
   }
 
-  private void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
+  public void addEvent(int endpointId, long clusterId, long eventId, EventState eventStateToAdd) {
     EndpointState endpointState = getEndpointState(endpointId);
     if (endpointState == null) {
       endpointState = new EndpointState(new HashMap<>());

@@ -30,6 +30,12 @@ public class ChipAttributePath {
     this.attributeId = attributeId;
   }
 
+  ChipAttributePath(int endpointId, long clusterId, long attributeId) {
+    this.endpointId = ChipPathId.forId(endpointId);
+    this.clusterId = ChipPathId.forId(clusterId);
+    this.attributeId = ChipPathId.forId(attributeId);
+  }
+
   public ChipPathId getEndpointId() {
     return endpointId;
   }
@@ -43,15 +49,15 @@ public class ChipAttributePath {
   }
 
   // For use in JNI.
-  long getEndpointId(long wildcardValue) {
+  private long getEndpointId(long wildcardValue) {
     return endpointId.getId(wildcardValue);
   }
 
-  long getClusterId(long wildcardValue) {
+  private long getClusterId(long wildcardValue) {
     return clusterId.getId(wildcardValue);
   }
 
-  long getAttributeId(long wildcardValue) {
+  private long getAttributeId(long wildcardValue) {
     return attributeId.getId(wildcardValue);
   }
 

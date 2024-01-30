@@ -77,8 +77,11 @@ using namespace chip::Inet;
 using namespace chip::Controller;
 using namespace chip::Credentials;
 
-#define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
+#define JAVA_JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
+
+#define KOTLIN_JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
+    extern "C" JNIEXPORT RETURN JNICALL Java_matter_controller_MatterControllerImpl_##METHOD_NAME
 
 static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
                                          std::vector<app::AttributePathParams> & outAttributePathParamsList);
@@ -97,7 +100,7 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
 CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs, jint imTimeoutMs);
 CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs, jint imTimeoutMs);
 
-JNI_METHOD(void, subscribe)
+JAVA_JNI_METHOD(void, subscribe)
 (JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
  jint imTimeoutMs, jobject eventMin)
@@ -109,7 +112,7 @@ exit:
     ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.AsString());
 }
 
-JNI_METHOD(void, read)
+JAVA_JNI_METHOD(void, read)
 (JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
  jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
@@ -120,7 +123,7 @@ exit:
     ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
-JNI_METHOD(void, write)
+JAVA_JNI_METHOD(void, write)
 (JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
@@ -131,8 +134,53 @@ exit:
     ChipLogError(Controller, "JNI IM Write Error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
-JNI_METHOD(void, invoke)
+JAVA_JNI_METHOD(void, invoke)
 (JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = invoke(env, handle, callbackHandle, devicePtr, invokeElement, timedRequestTimeoutMs, imTimeoutMs));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+KOTLIN_JNI_METHOD(void, subscribe)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, nullptr, minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, nullptr));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.AsString());
+}
+
+KOTLIN_JNI_METHOD(void, read)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jboolean isFabricFiltered, jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, nullptr, isFabricFiltered, imTimeoutMs, nullptr));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+KOTLIN_JNI_METHOD(void, write)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = write(env, handle, callbackHandle, devicePtr, attributeList, timedRequestTimeoutMs, imTimeoutMs));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Write Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+KOTLIN_JNI_METHOD(void, invoke)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
  jint imTimeoutMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

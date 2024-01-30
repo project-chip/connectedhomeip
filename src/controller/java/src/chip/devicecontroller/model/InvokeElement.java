@@ -78,15 +78,15 @@ public final class InvokeElement {
   }
 
   // For use in JNI.
-  long getEndpointId(long wildcardValue) {
+  private long getEndpointId(long wildcardValue) {
     return endpointId.getId(wildcardValue);
   }
 
-  long getClusterId(long wildcardValue) {
+  private long getClusterId(long wildcardValue) {
     return clusterId.getId(wildcardValue);
   }
 
-  long getCommandId(long wildcardValue) {
+  private long getCommandId(long wildcardValue) {
     return commandId.getId(wildcardValue);
   }
 

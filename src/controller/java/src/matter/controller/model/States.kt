@@ -22,7 +22,33 @@ package matter.controller.model
  *
  * @param endpoints A mapping of endpoint IDs with the associated cluster data.
  */
-data class NodeState(val endpoints: Map<Int, EndpointState>)
+data class NodeState(val endpoints: MutableMap<Int, EndpointState> = mutableMapOf()) {
+  fun addAttribute(
+    endpointId: UShort,
+    clusterId: UInt,
+    attributeId: UInt,
+    attributeState: AttributeState
+  ) {
+    getEndpointState(endpointId).addAttribute(clusterId, attributeId, attributeState)
+  }
+
+  fun addEvent(endpointId: UShort, clusterId: UInt, eventId: UInt, eventState: EventState) {
+    getEndpointState(endpointId).addEvent(clusterId, eventId, eventState)
+  }
+
+  fun setDataVersion(endpointId: UShort, clusterId: UInt, dataVersion: UInt) {
+    getEndpointState(endpointId).clusters[clusterId.toLong()]?.dataVersion = dataVersion
+  }
+
+  private fun getEndpointState(endpointId: UShort): EndpointState {
+    var endpointState: EndpointState? = endpoints[endpointId.toInt()]
+    if (endpointState == null) {
+      endpointState = EndpointState(endpointId.toInt())
+      endpoints[endpointId.toInt()] = endpointState
+    }
+    return endpointState
+  }
+}
 
 /**
  * Represents information about an endpoint and its cluster data.
@@ -30,7 +56,27 @@ data class NodeState(val endpoints: Map<Int, EndpointState>)
  * @param id The endpoint ID.
  * @param clusters A mapping of cluster IDs to the cluster data.
  */
-data class EndpointState(val id: Int, val clusters: Map<Long, ClusterState>)
+data class EndpointState(
+  val id: Int,
+  val clusters: MutableMap<Long, ClusterState> = mutableMapOf()
+) {
+  fun addAttribute(clusterId: UInt, attributeId: UInt, attributeState: AttributeState) {
+    getClusterState(clusterId).addAttribute(attributeId, attributeState)
+  }
+
+  fun addEvent(clusterId: UInt, eventId: UInt, eventState: EventState) {
+    getClusterState(clusterId).addEvent(eventId, eventState)
+  }
+
+  private fun getClusterState(clusterId: UInt): ClusterState {
+    var clusterState: ClusterState? = clusters[clusterId.toLong()]
+    if (clusterState == null) {
+      clusterState = ClusterState(clusterId.toLong())
+      clusters[clusterId.toLong()] = clusterState
+    }
+    return clusterState
+  }
+}
 
 /**
  * Represents information about a cluster.
@@ -42,9 +88,24 @@ data class EndpointState(val id: Int, val clusters: Map<Long, ClusterState>)
  */
 data class ClusterState(
   val id: Long,
-  val attributes: Map<Long, AttributeState>,
-  val events: Map<Long, List<EventState>>
-)
+  val attributes: MutableMap<Long, AttributeState> = mutableMapOf(),
+  val events: MutableMap<Long, MutableList<EventState>> = mutableMapOf(),
+  var dataVersion: UInt? = null
+) {
+  fun addAttribute(attributeId: UInt, attributeState: AttributeState) {
+    attributes[attributeId.toLong()] = attributeState
+  }
+
+  fun addEvent(eventId: UInt, eventState: EventState) {
+    var eventStateList = events[eventId.toLong()]
+    if (eventStateList == null) {
+      eventStateList = mutableListOf()
+      events[eventId.toLong()] = eventStateList
+    }
+
+    eventStateList.add(eventState)
+  }
+}
 
 /**
  * Represents information about an attribute.
@@ -53,7 +114,13 @@ data class ClusterState(
  * @param tlvValue The raw TLV-encoded attribute value.
  * @param jsonValue A JSON string representing the raw attribute value.
  */
-data class AttributeState(val id: Long, val tlvValue: ByteArray, val jsonValue: String)
+data class AttributeState(
+  val id: Long,
+  val tlvValue: ByteArray,
+  val jsonValue: String,
+  val path: AttributePath,
+  val valueObject: Any? = null
+)
 
 /**
  * Represents information about an event.
@@ -71,5 +138,22 @@ data class EventState(
   val priorityLevel: Int,
   val timestampType: Int,
   val timestampValue: Long,
-  val tlvValue: ByteArray
-)
+  val tlvValue: ByteArray,
+  val path: EventPath,
+  val jsonValue: String? = null,
+  val valueObject: Any? = null,
+) {
+  enum class TypeStampTypeEnum(val type: Int) {
+    MILLIS_SINCE_BOOT(0),
+    MILLIS_SINCE_EPOCH(1)
+  }
+
+  fun getTimestampType(): TypeStampTypeEnum? {
+    for (type in TypeStampTypeEnum.values()) {
+      if (type.type == timestampType) {
+        return type
+      }
+    }
+    return null
+  }
+}
