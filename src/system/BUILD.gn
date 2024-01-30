@@ -118,7 +118,6 @@ buildconfig_header("system_buildconfig") {
     "HAVE_NETINET_ICMP6_H=true",
     "HAVE_ICMP6_FILTER=true",
     "CONFIG_HAVE_VCBPRINTF=false",
-    "CONFIG_HAVE_VSNPRINTF_EX=false",
     "HAVE_SYS_SOCKET_H=${chip_system_config_use_sockets}",
   ]
 
