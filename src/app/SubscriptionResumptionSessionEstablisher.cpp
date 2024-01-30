@@ -36,16 +36,17 @@ private:
     SubscriptionResumptionSessionEstablisher * mSessionEstablisher;
 };
 
-struct SubscriptionResumptionSessionEstablishRecord {
+struct SubscriptionResumptionSessionEstablishRecord
+{
     chip::SubscriptionId mSubscriptionId;
     uint16_t mSessionEstablishRetries = UINT16_MAX;
 };
 
 static SubscriptionResumptionSessionEstablishRecord sSubscriptionResumptionRecords[CHIP_IM_MAX_NUM_SUBSCRIPTIONS];
 
-static SubscriptionResumptionSessionEstablishRecord *FindRecordOrFirstEmptyEntry(chip::SubscriptionId subscriptionId)
+static SubscriptionResumptionSessionEstablishRecord * FindRecordOrFirstEmptyEntry(chip::SubscriptionId subscriptionId)
 {
-    SubscriptionResumptionSessionEstablishRecord *ret = nullptr;
+    SubscriptionResumptionSessionEstablishRecord * ret = nullptr;
     for (size_t i = 0; i < CHIP_IM_MAX_NUM_SUBSCRIPTIONS; ++i)
     {
         if (sSubscriptionResumptionRecords[i].mSubscriptionId == subscriptionId)
@@ -111,12 +112,12 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
 {
     AutoDeleteEstablisher establisher(static_cast<SubscriptionResumptionSessionEstablisher *>(context));
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
-    SubscriptionResumptionSessionEstablishRecord *record = FindRecordOrFirstEmptyEntry(subscriptionInfo.mSubscriptionId) ;
+    SubscriptionResumptionSessionEstablishRecord * record = FindRecordOrFirstEmptyEntry(subscriptionInfo.mSubscriptionId);
     if (record && record->mSubscriptionId == subscriptionInfo.mSubscriptionId)
     {
         record->mSessionEstablishRetries = UINT16_MAX;
     }
-    InteractionModelEngine * imEngine                                  = InteractionModelEngine::GetInstance();
+    InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
     if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, subscriptionInfo.mAttributePaths.AllocatedSize(),
                                                  subscriptionInfo.mEventPaths.AllocatedSize()))
     {
@@ -139,9 +140,9 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
     SubscriptionResumptionStorage::SubscriptionInfo & subscriptionInfo = establisher->mSubscriptionInfo;
     ChipLogError(DataManagement, "Failed to establish CASE for subscription-resumption with error '%" CHIP_ERROR_FORMAT "'",
                  error.Format());
-    SubscriptionResumptionSessionEstablishRecord *record = FindRecordOrFirstEmptyEntry(subscriptionInfo.mSubscriptionId) ;
+    SubscriptionResumptionSessionEstablishRecord * record = FindRecordOrFirstEmptyEntry(subscriptionInfo.mSubscriptionId);
     VerifyOrReturn(record);
-    record->mSubscriptionId = subscriptionInfo.mSubscriptionId;
+    record->mSubscriptionId          = subscriptionInfo.mSubscriptionId;
     record->mSessionEstablishRetries = record->mSessionEstablishRetries == UINT16_MAX ? 1 : record->mSessionEstablishRetries + 1;
     if (record->mSessionEstablishRetries > CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION_MAX_FIBONACCI_STEP_INDEX)
     {
