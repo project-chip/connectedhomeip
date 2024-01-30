@@ -458,11 +458,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             // - Cycle LCD screen
             CancelFunctionTimer();
 
-            OutputQrCode(false);
-#ifdef DISPLAY_ENABLED
-            UpdateLCDStatusScreen();
-            slLCD.CycleScreens();
-#endif
+            AppTask::GetAppTask().UpdateDisplay();
 
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
@@ -485,12 +481,21 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
                 // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
                 PlatformMgr().LockChipStack();
-                ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+                ICDNotifier::GetInstance().NotifyNetworkActivityNotification();
                 PlatformMgr().UnlockChipStack();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }
         }
     }
+}
+
+void BaseApplication::UpdateDisplay()
+{
+    OutputQrCode(false);
+#ifdef DISPLAY_ENABLED
+    UpdateLCDStatusScreen();
+    slLCD.CycleScreens();
+#endif
 }
 
 void BaseApplication::CancelFunctionTimer()

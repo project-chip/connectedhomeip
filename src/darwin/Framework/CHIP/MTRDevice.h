@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRBaseDevice.h>
 #import <Matter/MTRDefines.h>
+#import <Matter/MTRDiagnosticLogsType.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,6 +32,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @protocol MTRDeviceDelegate;
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDevice : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -324,6 +326,26 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  */
 - (void)removeClientDataForKey:(NSString *)key endpointID:(NSNumber *)endpointID MTR_UNSTABLE_API;
 
+/**
+ * Download log of the desired type from the device.
+ *
+ * Note: The consumer of this API should move the file that the url points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion that will be called to return the URL of the requested log if successful. Otherwise
+ *                   returns an error.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
 @end
 
 @protocol MTRDeviceDelegate <NSObject>

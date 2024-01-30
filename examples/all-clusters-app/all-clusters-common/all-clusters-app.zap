@@ -19,17 +19,17 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
+      "path": "../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "version": "chip-v1"
+    },
+    {
+      "pathRelativity": "relativeToZap",
       "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data with some extensions"
-    },
-    {
-      "pathRelativity": "relativeToZap",
-      "path": "../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -459,10 +459,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -2723,9 +2723,81 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "RetrieveLogsResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "FeatureMap",
               "code": 65532,
@@ -7472,10 +7544,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -8326,6 +8398,24 @@
           "side": "server",
           "enabled": 1,
           "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ],
           "attributes": [
             {
               "name": "SupportedModes",
@@ -9380,22 +9470,6 @@
               "reportableChange": 0
             },
             {
-              "name": "OnMode",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -9422,6 +9496,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -9536,22 +9626,6 @@
               "reportableChange": 0
             },
             {
-              "name": "OnMode",
-              "code": 3,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -9578,6 +9652,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -11264,6 +11354,22 @@
               "reportableChange": 0
             },
             {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "AttributeList",
               "code": 65531,
               "mfgCode": null,
@@ -11443,40 +11549,8 @@
               "isEnabled": 1
             },
             {
-              "name": "EnhancedAddScene",
-              "code": 64,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedAddSceneResponse",
-              "code": 64,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedViewScene",
-              "code": 65,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedViewSceneResponse",
-              "code": 65,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
               "name": "CopyScene",
-              "code": 66,
+              "code": 64,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -11484,7 +11558,7 @@
             },
             {
               "name": "CopySceneResponse",
-              "code": 66,
+              "code": 64,
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
@@ -11493,24 +11567,8 @@
           ],
           "attributes": [
             {
-              "name": "NameSupport",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "NameSupportBitmap",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x80",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
               "name": "LastConfiguredBy",
-              "code": 5,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "node_id",
@@ -11526,7 +11584,7 @@
             },
             {
               "name": "SceneTableSize",
-              "code": 6,
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
@@ -11542,7 +11600,7 @@
             },
             {
               "name": "FabricSceneInfo",
-              "code": 7,
+              "code": 2,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -11630,7 +11688,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "15",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -11646,7 +11704,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -13080,7 +13138,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -13748,6 +13806,320 @@
               "mfgCode": null,
               "side": "server",
               "included": 1
+            }
+          ]
+        },
+        {
+          "name": "Energy EVSE Mode",
+          "code": 157,
+          "mfgCode": null,
+          "define": "ENERGY_EVSE_MODE_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "SupportedModes",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentMode",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Device Energy Management Mode",
+          "code": 159,
+          "mfgCode": null,
+          "define": "DEVICE_ENERGY_MANAGEMENT_MODE_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "commands": [
+            {
+              "name": "ChangeToMode",
+              "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "ChangeToModeResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            }
+          ],
+          "attributes": [
+            {
+              "name": "SupportedModes",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CurrentMode",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "GeneratedCommandList",
+              "code": 65528,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AcceptedCommandList",
+              "code": 65529,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "EventList",
+              "code": 65530,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int16u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
             }
           ]
         },
@@ -20853,6 +21225,22 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "TestDifferentVendorMeiRequest",
+              "code": 4294049962,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "TestDifferentVendorMeiResponse",
+              "code": 4294049979,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -22183,6 +22571,22 @@
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
+            },
+            {
+              "name": "mei_int8u",
+              "code": 4294070017,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 0,
+              "maxInterval": 65344,
+              "reportableChange": 0
             }
           ],
           "events": [
@@ -22196,6 +22600,13 @@
             {
               "name": "TestFabricScopedEvent",
               "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "TestDifferentVendorMeiEvent",
+              "code": 4294050030,
               "mfgCode": null,
               "side": "server",
               "included": 1
@@ -22994,10 +23405,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -23353,40 +23764,8 @@
               "isEnabled": 1
             },
             {
-              "name": "EnhancedAddScene",
-              "code": 64,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedAddSceneResponse",
-              "code": 64,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedViewScene",
-              "code": 65,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
-              "name": "EnhancedViewSceneResponse",
-              "code": 65,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
               "name": "CopyScene",
-              "code": 66,
+              "code": 64,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -23394,7 +23773,7 @@
             },
             {
               "name": "CopySceneResponse",
-              "code": 66,
+              "code": 64,
               "mfgCode": null,
               "source": "server",
               "isIncoming": 0,
@@ -23403,24 +23782,8 @@
           ],
           "attributes": [
             {
-              "name": "NameSupport",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "NameSupportBitmap",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x80",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
               "name": "LastConfiguredBy",
-              "code": 5,
+              "code": 0,
               "mfgCode": null,
               "side": "server",
               "type": "node_id",
@@ -23436,7 +23799,7 @@
             },
             {
               "name": "SceneTableSize",
-              "code": 6,
+              "code": 1,
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
@@ -23452,7 +23815,7 @@
             },
             {
               "name": "FabricSceneInfo",
-              "code": 7,
+              "code": 2,
               "mfgCode": null,
               "side": "server",
               "type": "array",
@@ -23540,7 +23903,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "15",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -23556,7 +23919,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -23826,10 +24189,10 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

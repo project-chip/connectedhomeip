@@ -33,6 +33,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29786
     - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"

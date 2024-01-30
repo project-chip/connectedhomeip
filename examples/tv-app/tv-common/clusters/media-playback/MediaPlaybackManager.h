@@ -88,11 +88,7 @@ protected:
                 chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
                     { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName2", 12)) }) }) }
     };
-    TrackType mActiveTextTrack                  = { chip::CharSpan("activeTextTrackId_0", 19),
-                                                    chip::app::DataModel::Nullable<TrackAttributesType>(
-                                       { chip::CharSpan("languageCode1", 13),
-                                                          chip::Optional<chip::app::DataModel::Nullable<chip::CharSpan>>(
-                                             { chip::app::DataModel::MakeNullable(chip::CharSpan("displayName1", 12)) }) }) };
+    TrackType mActiveTextTrack                  = {};
     std::vector<TrackType> mAvailableTextTracks = {
         { chip::CharSpan("activeTextTrackId_0", 19),
           chip::app::DataModel::Nullable<TrackAttributesType>(

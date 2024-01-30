@@ -24,6 +24,7 @@ import logging
 import os
 import pathlib
 import queue
+import random
 import re
 import sys
 import typing
@@ -42,6 +43,7 @@ from chip.tlv import float32, uint
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
+from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
@@ -377,6 +379,12 @@ def cluster_id_str(id):
         return f'{id_str(id)} {s}'
     except TypeError:
         return 'HERE IS THE PROBLEM'
+
+
+@dataclass
+class CustomCommissioningParameters:
+    commissioningParameters: CommissioningParameters
+    randomDiscriminator: int
 
 
 @dataclass
@@ -728,6 +736,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
 
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+        rnd_discriminator = random.randint(0, 4095)
+        try:
+            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                    discriminator=rnd_discriminator, option=1)
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
+            return params
+
+        except InteractionModelError as e:
+            asserts.fail(e.status, 'Failed to open commissioning window')
+
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
@@ -869,7 +888,6 @@ class MatterBaseTest(base_test.BaseTestClass):
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
                 asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
-            print(self.current_step_index-1)
             num = steps[self.current_step_index-1].test_plan_number
         except KeyError:
             num = self.current_step_index
@@ -886,6 +904,17 @@ class MatterBaseTest(base_test.BaseTestClass):
     def skip_step(self, step):
         self.step(step)
         self.mark_current_step_skipped()
+
+    def skip_all_remaining_steps(self, starting_step):
+        ''' Skips all remaining test steps starting with provided starting step
+
+            starting_step must be provided, and is not derived intentionally. By providing argument
+                test is more deliberately identifying where test skips are starting from, making
+                it easier to validate against the test plan for correctness.
+        '''
+        last_step = len(self.get_test_steps(self.current_test_info.name)) + 1
+        for index in range(starting_step, last_step):
+            self.skip_step(index)
 
     def step(self, step: typing.Union[int, str]):
         test_name = self.current_test_info.name

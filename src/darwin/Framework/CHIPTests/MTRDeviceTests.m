@@ -2892,6 +2892,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertFalse([clusterPath1 isEqual:eventPath1]);
 }
 
+- (void)test030_DeviceAndClusterProperties
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:sController];
+    XCTAssertEqual(device.deviceController, sController);
+    XCTAssertEqualObjects(device.nodeID, @(kDeviceId));
+
+    __auto_type * cluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    XCTAssertEqual(cluster.device, device);
+    XCTAssertEqualObjects(cluster.endpointID, @(0));
+}
+
 - (void)test999_TearDown
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);

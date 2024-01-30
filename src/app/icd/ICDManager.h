@@ -105,6 +105,7 @@ public:
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
     void OnICDManagementServerEvent(ICDManagementEvents event) override;
+    void OnSubscriptionReport() override;
 
 protected:
     friend class TestICDManager;

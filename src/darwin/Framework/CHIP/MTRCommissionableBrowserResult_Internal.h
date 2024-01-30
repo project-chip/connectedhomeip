@@ -24,7 +24,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MTR_HIDDEN
 @interface MTRCommissionableBrowserResultInterfaces : NSObject
 
 @property (nonatomic, readwrite) chip::Optional<chip::Dnssd::CommonResolutionData> resolutionData;

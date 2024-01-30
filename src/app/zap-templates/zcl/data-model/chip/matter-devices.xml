@@ -2365,4 +2365,18 @@ limitations under the License.
             </include>
         </clusters>
     </deviceType>
+    <deviceType>
+        <name>Cook Surface</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Cook Surface</typeName>
+        <class>Simple</class>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0077</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Temperature Control" client="false" server="true" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+        </clusters>
+    </deviceType>
 </configurator>

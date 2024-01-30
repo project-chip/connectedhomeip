@@ -55,16 +55,13 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="" name="WaterHeater" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x050F" name="Water Heater" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions/>
   <clusters>
-    <cluster id="" name="Water Heater Mode" side="server">
-      <mandatoryConform/>
-    </cluster>
     <cluster id="0x0003" name="Identify" side="server">
       <optionalConform/>
     </cluster>
@@ -81,6 +78,9 @@ Davis, CA 95616, USA
           <optionalConform/>
         </feature>
       </features>
+    </cluster>
+    <cluster id="0x009E" name="Water Heater Mode" side="server">
+      <mandatoryConform/>
     </cluster>
     <cluster id="0x0201" name="Thermostat" side="server">
       <mandatoryConform/>

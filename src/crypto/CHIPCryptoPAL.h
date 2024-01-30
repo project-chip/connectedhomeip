@@ -222,8 +222,16 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n);
 template <typename Sig>
 class ECPKey
 {
+protected:
+    // This base type can't be copied / assigned directly.
+    // Sub-types should be either uncopyable or final.
+    ECPKey()                           = default;
+    ECPKey(const ECPKey &)             = default;
+    ECPKey & operator=(const ECPKey &) = default;
+
 public:
-    virtual ~ECPKey() {}
+    virtual ~ECPKey() = default;
+
     virtual SupportedECPKeyTypes Type() const  = 0;
     virtual size_t Length() const              = 0;
     virtual bool IsUncompressed() const        = 0;
@@ -377,10 +385,11 @@ using IdentityProtectionKeySpan = FixedByteSpan<Crypto::CHIP_CRYPTO_SYMMETRIC_KE
 
 using AttestationChallenge = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 
-class P256PublicKey : public ECPKey<P256ECDSASignature>
+class P256PublicKey final // final due to being copyable
+    : public ECPKey<P256ECDSASignature>
 {
 public:
-    P256PublicKey() {}
+    P256PublicKey() = default;
 
     template <size_t N>
     constexpr P256PublicKey(const uint8_t (&raw_value)[N])
@@ -430,8 +439,15 @@ private:
 template <typename PK, typename Secret, typename Sig>
 class ECPKeypair
 {
+protected:
+    // This base type can't be copied / assigned directly.
+    // Sub-types should be either uncopyable or final.
+    ECPKeypair()                               = default;
+    ECPKeypair(const ECPKeypair &)             = default;
+    ECPKeypair & operator=(const ECPKeypair &) = default;
+
 public:
-    virtual ~ECPKeypair() {}
+    virtual ~ECPKeypair() = default;
 
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR in DER format
@@ -472,6 +488,13 @@ using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256
 
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
+protected:
+    // This base type can't be copied / assigned directly.
+    // Sub-types should be either uncopyable or final.
+    P256KeypairBase()                                    = default;
+    P256KeypairBase(const P256KeypairBase &)             = default;
+    P256KeypairBase & operator=(const P256KeypairBase &) = default;
+
 public:
     /**
      * @brief Initialize the keypair.
@@ -495,8 +518,12 @@ public:
 class P256Keypair : public P256KeypairBase
 {
 public:
-    P256Keypair() {}
+    P256Keypair() = default;
     ~P256Keypair() override;
+
+    // P256Keypair can't be copied / assigned.
+    P256Keypair(const P256Keypair &)             = delete;
+    P256Keypair & operator=(const P256Keypair &) = delete;
 
     /**
      * @brief Initialize the keypair.
@@ -919,8 +946,8 @@ private:
 class HKDF_sha
 {
 public:
-    HKDF_sha() {}
-    virtual ~HKDF_sha() {}
+    HKDF_sha()          = default;
+    virtual ~HKDF_sha() = default;
 
     /**
      * @brief A function that implements SHA-256 based HKDF
@@ -952,8 +979,8 @@ public:
 class HMAC_sha
 {
 public:
-    HMAC_sha() {}
-    virtual ~HMAC_sha() {}
+    HMAC_sha()          = default;
+    virtual ~HMAC_sha() = default;
 
     /**
      * @brief A function that implements SHA-256 based HMAC per FIPS1981.
@@ -1043,8 +1070,8 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
 class PBKDF2_sha256
 {
 public:
-    PBKDF2_sha256() {}
-    virtual ~PBKDF2_sha256() {}
+    PBKDF2_sha256()          = default;
+    virtual ~PBKDF2_sha256() = default;
 
     /** @brief Function to derive key using password. SHA256 hashing algorithm is used for calculating hmac.
      * @param password password used for key derivation
@@ -1085,7 +1112,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p() {}
+    virtual ~Spake2p() = default;
 
     /**
      * @brief Initialize Spake2+ with some context specific information.

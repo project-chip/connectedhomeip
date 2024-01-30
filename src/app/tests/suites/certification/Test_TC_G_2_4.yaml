@@ -32,7 +32,9 @@ config:
     Groups.Endpoint2: 2
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -58,7 +60,13 @@ tests:
 
     - label:
           "Step 2: TH sends KeySetWrite command in the GroupKeyManagement
-          cluster to DUT."
+          cluster to DUT on EP0 using a key that is pre-installed on the TH.
+          GroupKeySet fields are as follows: 1)GroupKeySetID: 1
+          2)GroupKeySecurityPolicy: TrustFirst (0) 3)EpochKey0:
+          d0d1d2d3d4d5d6d7d8d9dadbdcdddedf 4)EpochStartTime0: 1 5)EpochKey1:
+          d1d1d2d3d4d5d6d7d8d9dadbdcdddedf 6)EpochStartTime1:
+          18446744073709551613 7)EpochKey2: d2d1d2d3d4d5d6d7d8d9dadbdcdddedf
+          8)EpochStartTime2: 18446744073709551614"
       PICS: GRPKEY.S.C00.Rsp
       cluster: "Group Key Management"
       command: "KeySetWrite"
@@ -102,7 +110,7 @@ tests:
 
     - label:
           "Step 5a: TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT with
-          the following fields: GroupID as 0x0001,GroupName as 'Gp1'"
+          the following fields:1) GroupID as 0x0001, 2)GroupName as 'Gp1'"
       PICS: G.S.C00.Rsp && G.S.C00.Tx
       endpoint: Groups.Endpoint1
       command: "AddGroup"

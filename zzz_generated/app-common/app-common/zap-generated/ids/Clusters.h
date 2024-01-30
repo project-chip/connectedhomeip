@@ -226,6 +226,9 @@ static constexpr ClusterId Id = 0x00000091;
 namespace DemandResponseLoadControl {
 static constexpr ClusterId Id = 0x00000096;
 } // namespace DemandResponseLoadControl
+namespace Messages {
+static constexpr ClusterId Id = 0x00000097;
+} // namespace Messages
 namespace DeviceEnergyManagement {
 static constexpr ClusterId Id = 0x00000098;
 } // namespace DeviceEnergyManagement
@@ -235,6 +238,12 @@ static constexpr ClusterId Id = 0x00000099;
 namespace EnergyPreference {
 static constexpr ClusterId Id = 0x0000009B;
 } // namespace EnergyPreference
+namespace EnergyEvseMode {
+static constexpr ClusterId Id = 0x0000009D;
+} // namespace EnergyEvseMode
+namespace DeviceEnergyManagementMode {
+static constexpr ClusterId Id = 0x0000009F;
+} // namespace DeviceEnergyManagementMode
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

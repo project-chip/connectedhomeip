@@ -100,7 +100,7 @@ tests:
     - label:
           "Step 5: Manually put the device in a state from which it will FAIL to
           transition to PIXIT.TCCM.MODE_CHANGE_FAIL"
-      PICS: TCCM.S.M.CAN_MANUALLY_CONTROLLED && TCCM.S.M.CAN_TEST_MODE_FAILURE
+      PICS: TCCM.S.M.CAN_TEST_MODE_FAILURE && TCCM.S.M.CAN_MANUALLY_CONTROLLED
       verification: |
           Manual operation required
       disabled: true

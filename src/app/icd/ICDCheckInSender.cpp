@@ -41,12 +41,12 @@ void ICDCheckInSender::OnNodeAddressResolved(const PeerId & peerId, const Addres
         ChipLogError(AppServer, "Failed to send the ICD Check-In message");
     }
 
-    ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCheckInInProgress);
+    ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCheckInInProgress);
 }
 
 void ICDCheckInSender::OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason)
 {
-    ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCheckInInProgress);
+    ICDNotifier::GetInstance().NotifyActiveRequestWithdrawal(ICDListener::KeepActiveFlag::kCheckInInProgress);
     ChipLogProgress(AppServer, "Node Address resolution failed for ICD Check-In with Node ID " ChipLogFormatX64,
                     ChipLogValueX64(peerId.GetNodeId()));
 }
@@ -110,7 +110,7 @@ CHIP_ERROR ICDCheckInSender::RequestResolve(ICDMonitoringEntry & entry, FabricTa
 
     if (err == CHIP_NO_ERROR)
     {
-        ICDNotifier::GetInstance().BroadcastActiveRequestNotification(ICDListener::KeepActiveFlag::kCheckInInProgress);
+        ICDNotifier::GetInstance().NotifyActiveRequestNotification(ICDListener::KeepActiveFlag::kCheckInInProgress);
     }
 
     return err;

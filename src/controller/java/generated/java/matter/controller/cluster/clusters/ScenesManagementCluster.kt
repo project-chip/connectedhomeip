@@ -22,7 +22,6 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import matter.controller.BooleanSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
@@ -30,7 +29,6 @@ import matter.controller.ReadData
 import matter.controller.ReadRequest
 import matter.controller.SubscribeRequest
 import matter.controller.SubscriptionState
-import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
 import matter.controller.cluster.structs.*
@@ -51,7 +49,7 @@ class ScenesManagementCluster(
     val status: UByte,
     val groupID: UShort,
     val sceneID: UByte,
-    val transitionTime: UShort?,
+    val transitionTime: UInt?,
     val sceneName: String?,
     val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?
   )
@@ -67,17 +65,6 @@ class ScenesManagementCluster(
     val capacity: UByte?,
     val groupID: UShort,
     val sceneList: List<UByte>?
-  )
-
-  class EnhancedAddSceneResponse(val status: UByte, val groupID: UShort, val sceneID: UByte)
-
-  class EnhancedViewSceneResponse(
-    val status: UByte,
-    val groupID: UShort,
-    val sceneID: UByte,
-    val transitionTime: UShort?,
-    val sceneName: String?,
-    val extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>?
   )
 
   class CopySceneResponse(
@@ -150,7 +137,7 @@ class ScenesManagementCluster(
   suspend fun addScene(
     groupID: UShort,
     sceneID: UByte,
-    transitionTime: UShort,
+    transitionTime: UInt,
     sceneName: String,
     extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
     timedInvokeTimeout: Duration? = null
@@ -275,7 +262,7 @@ class ScenesManagementCluster(
     var sceneID_decoded: UByte? = null
 
     val TAG_TRANSITION_TIME: Int = 3
-    var transitionTime_decoded: UShort? = null
+    var transitionTime_decoded: UInt? = null
 
     val TAG_SCENE_NAME: Int = 4
     var sceneName_decoded: String? = null
@@ -305,7 +292,7 @@ class ScenesManagementCluster(
             null
           } else {
             if (tlvReader.isNextTag(tag)) {
-              tlvReader.getUShort(tag)
+              tlvReader.getUInt(tag)
             } else {
               null
             }
@@ -580,7 +567,7 @@ class ScenesManagementCluster(
   suspend fun recallScene(
     groupID: UShort,
     sceneID: UByte,
-    transitionTime: UShort?,
+    transitionTime: UInt?,
     timedInvokeTimeout: Duration? = null
   ) {
     val commandId: UInt = 5u
@@ -715,232 +702,6 @@ class ScenesManagementCluster(
     )
   }
 
-  suspend fun enhancedAddScene(
-    groupID: UShort,
-    sceneID: UByte,
-    transitionTime: UShort,
-    sceneName: String,
-    extensionFieldSets: List<ScenesManagementClusterExtensionFieldSet>,
-    timedInvokeTimeout: Duration? = null
-  ): EnhancedAddSceneResponse {
-    val commandId: UInt = 64u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
-
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
-
-    val TAG_TRANSITION_TIME_REQ: Int = 2
-    tlvWriter.put(ContextSpecificTag(TAG_TRANSITION_TIME_REQ), transitionTime)
-
-    val TAG_SCENE_NAME_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_NAME_REQ), sceneName)
-
-    val TAG_EXTENSION_FIELD_SETS_REQ: Int = 4
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTENSION_FIELD_SETS_REQ))
-    for (item in extensionFieldSets.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
-    }
-    tlvWriter.endArray()
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_STATUS: Int = 0
-    var status_decoded: UByte? = null
-
-    val TAG_GROUP_I_D: Int = 1
-    var groupID_decoded: UShort? = null
-
-    val TAG_SCENE_I_D: Int = 2
-    var sceneID_decoded: UByte? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_STATUS)) {
-        status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
-        groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
-        sceneID_decoded = tlvReader.getUByte(tag)
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (status_decoded == null) {
-      throw IllegalStateException("status not found in TLV")
-    }
-
-    if (groupID_decoded == null) {
-      throw IllegalStateException("groupID not found in TLV")
-    }
-
-    if (sceneID_decoded == null) {
-      throw IllegalStateException("sceneID not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return EnhancedAddSceneResponse(status_decoded, groupID_decoded, sceneID_decoded)
-  }
-
-  suspend fun enhancedViewScene(
-    groupID: UShort,
-    sceneID: UByte,
-    timedInvokeTimeout: Duration? = null
-  ): EnhancedViewSceneResponse {
-    val commandId: UInt = 65u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_GROUP_I_D_REQ: Int = 0
-    tlvWriter.put(ContextSpecificTag(TAG_GROUP_I_D_REQ), groupID)
-
-    val TAG_SCENE_I_D_REQ: Int = 1
-    tlvWriter.put(ContextSpecificTag(TAG_SCENE_I_D_REQ), sceneID)
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_STATUS: Int = 0
-    var status_decoded: UByte? = null
-
-    val TAG_GROUP_I_D: Int = 1
-    var groupID_decoded: UShort? = null
-
-    val TAG_SCENE_I_D: Int = 2
-    var sceneID_decoded: UByte? = null
-
-    val TAG_TRANSITION_TIME: Int = 3
-    var transitionTime_decoded: UShort? = null
-
-    val TAG_SCENE_NAME: Int = 4
-    var sceneName_decoded: String? = null
-
-    val TAG_EXTENSION_FIELD_SETS: Int = 5
-    var extensionFieldSets_decoded: List<ScenesManagementClusterExtensionFieldSet>? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_STATUS)) {
-        status_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_GROUP_I_D)) {
-        groupID_decoded = tlvReader.getUShort(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_I_D)) {
-        sceneID_decoded = tlvReader.getUByte(tag)
-      }
-
-      if (tag == ContextSpecificTag(TAG_TRANSITION_TIME)) {
-        transitionTime_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getUShort(tag)
-            } else {
-              null
-            }
-          }
-      }
-
-      if (tag == ContextSpecificTag(TAG_SCENE_NAME)) {
-        sceneName_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              tlvReader.getString(tag)
-            } else {
-              null
-            }
-          }
-      }
-
-      if (tag == ContextSpecificTag(TAG_EXTENSION_FIELD_SETS)) {
-        extensionFieldSets_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (tlvReader.isNextTag(tag)) {
-              buildList<ScenesManagementClusterExtensionFieldSet> {
-                tlvReader.enterArray(tag)
-                while (!tlvReader.isEndOfContainer()) {
-                  add(ScenesManagementClusterExtensionFieldSet.fromTlv(AnonymousTag, tlvReader))
-                }
-                tlvReader.exitContainer()
-              }
-            } else {
-              null
-            }
-          }
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (status_decoded == null) {
-      throw IllegalStateException("status not found in TLV")
-    }
-
-    if (groupID_decoded == null) {
-      throw IllegalStateException("groupID not found in TLV")
-    }
-
-    if (sceneID_decoded == null) {
-      throw IllegalStateException("sceneID not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return EnhancedViewSceneResponse(
-      status_decoded,
-      groupID_decoded,
-      sceneID_decoded,
-      transitionTime_decoded,
-      sceneName_decoded,
-      extensionFieldSets_decoded
-    )
-  }
-
   suspend fun copyScene(
     mode: UByte,
     groupIdentifierFrom: UShort,
@@ -949,7 +710,7 @@ class ScenesManagementCluster(
     sceneIdentifierTo: UByte,
     timedInvokeTimeout: Duration? = null
   ): CopySceneResponse {
-    val commandId: UInt = 66u
+    val commandId: UInt = 64u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -1030,453 +791,8 @@ class ScenesManagementCluster(
     )
   }
 
-  suspend fun readSceneCountAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 0u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Scenecount attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeSceneCountAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 0u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Scenecount attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readCurrentSceneAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 1u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Currentscene attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUByte(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeCurrentSceneAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Currentscene attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUByte(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readCurrentGroupAttribute(): UShort? {
-    val ATTRIBUTE_ID: UInt = 2u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Currentgroup attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UShort? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getUShort(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeCurrentGroupAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UShortSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Currentgroup attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UShort? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getUShort(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UShortSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readSceneValidAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 3u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Scenevalid attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getBoolean(AnonymousTag)
-      } else {
-        null
-      }
-
-    return decodedValue
-  }
-
-  suspend fun subscribeSceneValidAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 3u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            BooleanSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Scenevalid attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getBoolean(AnonymousTag)
-            } else {
-              null
-            }
-
-          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(BooleanSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readNameSupportAttribute(): UByte {
-    val ATTRIBUTE_ID: UInt = 4u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Namesupport attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-    return decodedValue
-  }
-
-  suspend fun subscribeNameSupportAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 4u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong())
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            UByteSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Namesupport attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
-
-          emit(UByteSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(UByteSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
   suspend fun readLastConfiguredByAttribute(): LastConfiguredByAttribute {
-    val ATTRIBUTE_ID: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1520,7 +836,7 @@ class ScenesManagementCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<LastConfiguredByAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 0u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1579,7 +895,7 @@ class ScenesManagementCluster(
   }
 
   suspend fun readSceneTableSizeAttribute(): UShort {
-    val ATTRIBUTE_ID: UInt = 6u
+    val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1613,7 +929,7 @@ class ScenesManagementCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<UShortSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 6u
+    val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1662,7 +978,7 @@ class ScenesManagementCluster(
   }
 
   suspend fun readFabricSceneInfoAttribute(): FabricSceneInfoAttribute {
-    val ATTRIBUTE_ID: UInt = 7u
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1703,7 +1019,7 @@ class ScenesManagementCluster(
     minInterval: Int,
     maxInterval: Int
   ): Flow<FabricSceneInfoAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 7u
+    val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)

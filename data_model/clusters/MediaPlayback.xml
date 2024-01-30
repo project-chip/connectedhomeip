@@ -203,22 +203,12 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="VS"/>
       </mandatoryConform>
-      <field id="0" name="AudioAdvanceUnmuted" type="bool" default="false">
-        <mandatoryConform>
-          <feature name="AA"/>
-        </mandatoryConform>
-      </field>
     </command>
     <command id="0x07" name="FastForward" response="PlaybackResponse">
       <access invokePrivilege="operate"/>
       <mandatoryConform>
         <feature name="VS"/>
       </mandatoryConform>
-      <field id="0" name="AudioAdvanceUnmuted" type="bool" default="false">
-        <mandatoryConform>
-          <feature name="AA"/>
-        </mandatoryConform>
-      </field>
     </command>
     <command id="0x08" name="SkipForward" response="PlaybackResponse">
       <access invokePrivilege="operate"/>

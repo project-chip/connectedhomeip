@@ -25,9 +25,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/MessageDef/AttributeDataIB.h>
+#include <app/data-model/FabricScopedPreEncodedValue.h>
+#include <app/data-model/PreEncodedValue.h>
+#include <lib/core/TLVTags.h>
+#include <lib/core/TLVWriter.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
+
+#include <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -43,6 +49,7 @@ constexpr ClusterId kRandomClusterId     = 0xaa;
 constexpr AttributeId kRandomAttributeId = 0xcc;
 constexpr DataVersion kRandomDataVersion = 0x99;
 constexpr FabricIndex kTestFabricIndex   = 1;
+constexpr TLV::Tag kFabricIndexTag       = TLV::ContextTag(254);
 
 template <size_t N>
 struct LimitedTestSetup
@@ -553,6 +560,288 @@ void TestEncodeListChunking2(nlTestSuite * aSuite, void * aContext)
     }
 }
 
+void TestEncodePreEncoded(nlTestSuite * aSuite, void * aContext)
+{
+    TestSetup test(aSuite);
+
+    uint8_t buffer[128];
+    TLV::TLVWriter writer;
+    writer.Init(buffer);
+    // Use a random tag that is not the right tag.
+    CHIP_ERROR err = writer.PutString(TLV::ProfileTag(0x1234abcd, 0x5678fedc), "hello");
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    err = writer.Finalize();
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    ByteSpan value(buffer, writer.GetLengthWritten());
+    err = test.encoder.Encode(DataModel::PreEncodedValue(value));
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    const uint8_t expected[] = {
+        // clang-format off
+        0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
+        0x15, // Start anonymous struct
+          0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+            0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
+              0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
+              0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
+              0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
+            0x18, // End of container
+            0x2C, 0x02, 0x05, 0x68, 0x65, 0x6C, 0x6C, 0x6F, // Tag (02) Value "hello", with 1-byte length of 0x05 (Attribute Value)
+          0x18, // End of container
+        0x18, // End of container
+        // clang-format on
+    };
+    VERIFY_BUFFER_STATE(aSuite, test, expected);
+}
+
+void TestEncodeListOfPreEncoded(nlTestSuite * aSuite, void * aContext)
+{
+    TestSetup test(aSuite);
+
+    uint8_t buffers[2][128];
+    std::optional<DataModel::PreEncodedValue> values[2];
+
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffers[0]);
+        // Use a random tag that is not the right tag.
+        CHIP_ERROR err = writer.PutString(TLV::ProfileTag(0x1234abcd, 0x5678fedc), "hello");
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        values[0].emplace(ByteSpan(buffers[0], writer.GetLengthWritten()));
+    }
+
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffers[1]);
+        // Use a random tag that is not the right tag.
+        CHIP_ERROR err = writer.PutString(TLV::ProfileTag(0x1234abcd, 0x00010002), "bye");
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        values[1].emplace(ByteSpan(buffers[1], writer.GetLengthWritten()));
+    }
+
+    CHIP_ERROR err = test.encoder.EncodeList([&values](const auto & encoder) {
+        for (auto & value : values)
+        {
+            ReturnErrorOnFailure(encoder.Encode(value.value()));
+        }
+        return CHIP_NO_ERROR;
+    });
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    const uint8_t expected[] = {
+        // clang-format off
+        0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
+        0x15, // Start anonymous struct
+          0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+            0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
+              0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
+              0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
+              0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
+            0x18, // End of container
+            0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
+              0x0C, 0x05, 0x68, 0x65, 0x6C, 0x6C, 0x6F, // "hello", with 1-byte length of 0x05
+              0x0C, 0x03, 0x62, 0x79, 0x65, // "bye", with 1-byte length of 0x03
+            0x18, // End of array
+          0x18, // End of container
+        0x18, // End of container
+        // clang-format on
+    };
+    VERIFY_BUFFER_STATE(aSuite, test, expected);
+}
+
+void TestEncodeListOfFabricScopedPreEncoded(nlTestSuite * aSuite, void * aContext)
+{
+    TestSetup test(aSuite);
+
+    uint8_t buffers[2][128];
+    std::optional<DataModel::FabricScopedPreEncodedValue> values[2];
+
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffers[0]);
+        // Use a random tag that is not the right tag.
+        TLV::TLVType outerContainerType;
+        CHIP_ERROR err =
+            writer.StartContainer(TLV::ProfileTag(0x1234abcd, 0x5678fedc), TLV::kTLVType_Structure, outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutString(TLV::ContextTag(7), "hello");
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Put(kFabricIndexTag, kTestFabricIndex);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.EndContainer(outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        values[0].emplace(ByteSpan(buffers[0], writer.GetLengthWritten()));
+    }
+
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffers[1]);
+        // Use a random tag that is not the right tag.
+        TLV::TLVType outerContainerType;
+        CHIP_ERROR err =
+            writer.StartContainer(TLV::ProfileTag(0x1234abcd, 0x00010002), TLV::kTLVType_Structure, outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutString(TLV::ContextTag(7), "bye");
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Put(kFabricIndexTag, static_cast<FabricIndex>(kTestFabricIndex + 1));
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.EndContainer(outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        values[1].emplace(ByteSpan(buffers[1], writer.GetLengthWritten()));
+    }
+
+    CHIP_ERROR err = test.encoder.EncodeList([&values](const auto & encoder) {
+        for (auto & value : values)
+        {
+            ReturnErrorOnFailure(encoder.Encode(value.value()));
+        }
+        return CHIP_NO_ERROR;
+    });
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    const uint8_t expected[] = {
+        // clang-format off
+        0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
+        0x15, // Start anonymous struct
+          0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+            0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
+              0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
+              0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
+              0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
+            0x18, // End of container
+            0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
+              0x15, // Start of struct
+                0x2C, 0x07, 0x05, 0x68, 0x65, 0x6C, 0x6C, 0x6F, // "hello", with tag 07 and 1-byte length of 0x05
+                0x24, 0xFE, 0x01, // Fabric index, tag 254, value 1
+              0x18, // End of struct
+              0x15, // Start of struct
+                0x2C, 0x07, 0x03, 0x62, 0x79, 0x65, // "bye", with tag 07 and 1-byte length of 0x03
+                0x24, 0xFE, 0x02, // Fabric index, tag 254, value 2
+              0x18, // End of struct
+            0x18, // End of array
+          0x18, // End of container
+        0x18, // End of container
+        // clang-format on
+    };
+    VERIFY_BUFFER_STATE(aSuite, test, expected);
+}
+
+void TestEncodeFabricFilteredListOfPreEncoded(nlTestSuite * aSuite, void * aContext)
+{
+    TestSetup test(aSuite, kTestFabricIndex);
+
+    uint8_t buffers[2][128];
+    std::optional<DataModel::FabricScopedPreEncodedValue> values[2];
+
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffers[0]);
+        // Use a random tag that is not the right tag.
+        TLV::TLVType outerContainerType;
+        CHIP_ERROR err =
+            writer.StartContainer(TLV::ProfileTag(0x1234abcd, 0x5678fedc), TLV::kTLVType_Structure, outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutString(TLV::ContextTag(7), "hello");
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Put(kFabricIndexTag, kTestFabricIndex);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.EndContainer(outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        values[0].emplace(ByteSpan(buffers[0], writer.GetLengthWritten()));
+    }
+
+    {
+        TLV::TLVWriter writer;
+        writer.Init(buffers[1]);
+        // Use a random tag that is not the right tag.
+        TLV::TLVType outerContainerType;
+        CHIP_ERROR err =
+            writer.StartContainer(TLV::ProfileTag(0x1234abcd, 0x00010002), TLV::kTLVType_Structure, outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.PutString(TLV::ContextTag(7), "bye");
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Put(kFabricIndexTag, static_cast<FabricIndex>(kTestFabricIndex + 1));
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.EndContainer(outerContainerType);
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+        values[1].emplace(ByteSpan(buffers[1], writer.GetLengthWritten()));
+    }
+
+    CHIP_ERROR err = test.encoder.EncodeList([&values](const auto & encoder) {
+        for (auto & value : values)
+        {
+            ReturnErrorOnFailure(encoder.Encode(value.value()));
+        }
+        return CHIP_NO_ERROR;
+    });
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    const uint8_t expected[] = {
+        // clang-format off
+        0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
+        0x15, // Start anonymous struct
+          0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+            0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
+              0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
+              0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
+              0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
+            0x18, // End of container
+            0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
+              0x15, // Start of struct
+                0x2C, 0x07, 0x05, 0x68, 0x65, 0x6C, 0x6C, 0x6F, // "hello", with tag 07 and 1-byte length of 0x05
+                0x24, 0xFE, 0x01, // Fabric index, tag 254, value 1
+              0x18, // End of struct
+              // No second struct, because we are doing fabric filtering
+            0x18, // End of array
+          0x18, // End of container
+        0x18, // End of container
+        // clang-format on
+    };
+    VERIFY_BUFFER_STATE(aSuite, test, expected);
+}
+
 #undef VERIFY_BUFFER_STATE
 
 } // anonymous namespace
@@ -569,6 +858,11 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TestEncodeListChunking", TestEncodeListChunking),
     NL_TEST_DEF("TestEncodeListChunking2", TestEncodeListChunking2),
     NL_TEST_DEF("TestEncodeFabricScoped", TestEncodeFabricScoped),
+    NL_TEST_DEF("TestEncodePreEncoded", TestEncodePreEncoded),
+    NL_TEST_DEF("TestEncodeListOfPreEncoded", TestEncodeListOfPreEncoded),
+    NL_TEST_DEF("TestEncodeListFabricScopedPreEncoded", TestEncodeListOfPreEncoded),
+    NL_TEST_DEF("TestEncodeListOfFabricScopedPreEncoded", TestEncodeListOfFabricScopedPreEncoded),
+    NL_TEST_DEF("TestEncodeFabricFilteredListOfPreEncoded", TestEncodeFabricFilteredListOfPreEncoded),
     NL_TEST_SENTINEL()
     // clang-format on
 };
