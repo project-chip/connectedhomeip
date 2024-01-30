@@ -953,6 +953,17 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN < CHIP_DEVICE_
 #ifndef CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER
 #define CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER 0
 #endif
+
+/**
+ * CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
+ *
+ * Indicate if the matter device thread stack is implemented using the ot-br-posix dbus API
+ * Rather than the standard openthread stack api
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK
+#define CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK 0
+#endif
 /**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME
  *
