@@ -114,7 +114,7 @@ private:
      *                                                is returned if idleModeDuration_s is smaller than 1 seconds
      *                    CHIP_NO_ERROR is returned if the new intervals were set
      */
-    CHIP_ERROR SetDurations(uint32_t activeModeDuration_ms, uint32_t idleModeDuration_s);
+    CHIP_ERROR SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeDuration_s);
 
     static constexpr uint32_t kMaxIdleModeDuration_s = 64800;
     static constexpr uint32_t kMinIdleModeDuration_s = 1;

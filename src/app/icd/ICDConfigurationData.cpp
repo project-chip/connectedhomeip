@@ -37,7 +37,7 @@ System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
     return mSlowPollingInterval;
 }
 
-CHIP_ERROR ICDConfigurationData::SetDurations(uint32_t activeModeDuration_ms, uint32_t idleModeInterval_s)
+CHIP_ERROR ICDConfigurationData::SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeInterval_s)
 {
     VerifyOrReturnError(activeModeDuration_ms <= (idleModeInterval_s * 1000), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(idleModeInterval_s <= kMaxIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
