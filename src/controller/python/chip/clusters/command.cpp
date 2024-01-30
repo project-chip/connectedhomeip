@@ -56,12 +56,12 @@ namespace chip {
 namespace python {
 
 using OnCommandSenderResponseCallback     = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                     chip::CommandId commandId, size_t index,
-                                                     std::underlying_type_t<Protocols::InteractionModel::Status> status,
-                                                     chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
+                                                 chip::CommandId commandId, size_t index,
+                                                 std::underlying_type_t<Protocols::InteractionModel::Status> status,
+                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
 using OnCommandSenderErrorCallback        = void (*)(PyObject appContext,
-                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
-                                                  chip::ClusterStatus clusterStatus, PyChipError chiperror);
+                                              std::underlying_type_t<Protocols::InteractionModel::Status> status,
+                                              chip::ClusterStatus clusterStatus, PyChipError chiperror);
 using OnCommandSenderDoneCallback         = void (*)(PyObject appContext);
 using TestOnlyOnCommandSenderDoneCallback = void (*)(PyObject appContext, python::TestOnlyPyOnDoneInfo testOnlyDoneInfo);
 
@@ -233,7 +233,7 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
     }
 
-    bool isBatchedCommands = true;
+    bool isBatchedCommands  = true;
     bool callTestOnlyOnDone = testOnlyOverrides != nullptr;
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
@@ -348,7 +348,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
-    bool isBatchedCommands = false;
+    bool isBatchedCommands  = false;
     bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
@@ -425,7 +425,7 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
-    bool isBatchedCommands = false;
+    bool isBatchedCommands  = false;
     bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
         std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
