@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-provider.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPEncoding.h>
@@ -29,7 +30,6 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/ConnectivityManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -125,7 +125,7 @@ CHIP_ERROR ThreadDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aP
     case ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id:
     case ThreadNetworkDiagnostics::Attributes::Delay::Id:
     case ThreadNetworkDiagnostics::Attributes::ChannelPage0Mask::Id:
-        return ConnectivityMgr().WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
+        return WriteThreadNetworkDiagnosticAttributeToTlv(aPath.mAttributeId, aEncoder);
     default:
         break;
     }

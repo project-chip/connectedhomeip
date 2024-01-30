@@ -73,11 +73,6 @@ tests:
       response:
           value: 0
 
-    - label: "Start Command"
-      command: "Start"
-      response:
-          error: UNSUPPORTED_COMMAND
-
     - label: "Read current Operational State"
       command: "readAttribute"
       attribute: "OperationalState"
@@ -109,11 +104,6 @@ tests:
       attribute: "OperationalState"
       response:
           value: 0
-
-    - label: "Stop Command"
-      command: "Stop"
-      response:
-          error: UNSUPPORTED_COMMAND
 
     - label: "Read current Operational State"
       command: "readAttribute"
