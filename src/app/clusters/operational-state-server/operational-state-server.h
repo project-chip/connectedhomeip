@@ -354,7 +354,8 @@ public:
      * The start command is not supported by the RvcOpeartionalState cluster hence this method shold never de called.
      * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
      */
-    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override {
+    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override
+    {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
     };
 
@@ -362,10 +363,10 @@ public:
      * The stop command is not supported by the RvcOpeartionalState cluster hence this method shold never de called.
      * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
      */
-    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override {
+    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override
+    {
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue));
     };
-
 };
 
 class Instance : public OperationalState::Instance
