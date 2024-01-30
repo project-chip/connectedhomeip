@@ -1,7 +1,7 @@
 {{> header excludeZapComment=true}}
 
 
-#import "MTRClusterNames.h"
+#import <Matter/MTRClusterNames.h>
 
 // @implementation MTRClusterAttributeIDType
 
