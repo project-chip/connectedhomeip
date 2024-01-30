@@ -199,9 +199,6 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
-            - name: clean out build output
-              run: rm -rf ./out
-
             - name: Build example Telink (B91) Shell App
               run: |
                   ./scripts/run_in_build_env.sh \
