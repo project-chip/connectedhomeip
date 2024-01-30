@@ -1,5 +1,15 @@
 # Silicon Labs Matter New Features
 
+## New Features for v2.3.0-1.3-alpha.1
+
+- Update to use [Gecko SDK (GSDK) v4.4.0](https://docs.silabs.com/gecko-platform/4.4.0/platform-overview/)
+- Update to use [WiSeConnect 3 SDK (WiFi SDK) v3.1.1](https://docs.silabs.com/wiseconnect/3.1.1/wiseconnect-developing-with-wiseconnect-sdk/)
+- Matter 1.3 alpha support
+- Matter ICD Long Idle Time (LIT) provisional support
+  - **Note**: Controllers do not fully support at time of release
+- 917 SoC OTA Upgrade
+- 917 SoC Custom Part Manufacturing Service (CPMS) Feature
+
 ## New Features for v2.2.0-1.2
 
 - GA support for Intermittently Connected Devices
