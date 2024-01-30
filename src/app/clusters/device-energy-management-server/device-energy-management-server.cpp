@@ -53,11 +53,6 @@ bool Instance::HasFeature(Feature aFeature) const
     return mFeature.Has(aFeature);
 }
 
-bool Instance::SupportsOptCmd(OptionalCommands aOptionalCmds) const
-{
-    return mOptionalCmds.Has(aOptionalCmds);
-}
-
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -87,6 +82,16 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
             return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
         }
         return aEncoder.Encode(mDelegate.GetForecast());
+    case OptOutState::Id:
+        /* PA | STA | PAU | FA | CON */
+        if (!HasFeature(Feature::kPowerAdjustment) && !HasFeature(Feature::kStartTimeAdjustment) &&
+            !HasFeature(Feature::kPausable) && !HasFeature(Feature::kForecastAdjustment) &&
+            !HasFeature(Feature::kConstraintBasedAdjustment))
+        {
+            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
+        }
+        return aEncoder.Encode(mDelegate.GetOptOutState());
+
     /* FeatureMap - is held locally */
     case FeatureMap::Id:
         return aEncoder.Encode(mFeature);
@@ -112,26 +117,31 @@ CHIP_ERROR Instance::EnumerateAcceptedCommands(const ConcreteClusterPath & clust
         }
     }
 
-    if (HasFeature(Feature::kForecastAdjustment))
+    if (HasFeature(Feature::kStartTimeAdjustment))
     {
-        for (auto && cmd : {
-                 StartTimeAdjustRequest::Id,
-                 PauseRequest::Id,
-                 ResumeRequest::Id,
-             })
-        {
-            VerifyOrExit(callback(cmd, context) == Loop::Continue, /**/);
-        }
+        VerifyOrExit(callback(StartTimeAdjustRequest::Id, context) == Loop::Continue, /**/);
     }
 
-    if (SupportsOptCmd(OptionalCommands::kSupportsModifyForecastRequest))
+    if (HasFeature(Feature::kPausable))
+    {
+        VerifyOrExit(callback(PauseRequest::Id, context) == Loop::Continue, /**/);
+        VerifyOrExit(callback(ResumeRequest::Id, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kForecastAdjustment))
     {
         VerifyOrExit(callback(ModifyForecastRequest::Id, context) == Loop::Continue, /**/);
     }
 
-    if (SupportsOptCmd(OptionalCommands::kSupportsRequestConstraintBasedForecast))
+    if (HasFeature(Feature::kConstraintBasedAdjustment))
     {
         VerifyOrExit(callback(RequestConstraintBasedForecast::Id, context) == Loop::Continue, /**/);
+    }
+
+    if (HasFeature(Feature::kStartTimeAdjustment) || HasFeature(Feature::kForecastAdjustment) ||
+        HasFeature(Feature::kConstraintBasedAdjustment))
+    {
+        VerifyOrExit(callback(CancelRequest::Id, context) == Loop::Continue, /**/);
     }
 
 exit:
@@ -169,7 +179,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case StartTimeAdjustRequest::Id:
-        if (!HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kStartTimeAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -181,7 +191,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case PauseRequest::Id:
-        if (!HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kPausable))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -192,7 +202,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case ResumeRequest::Id:
-        if (!HasFeature(Feature::kForecastAdjustment))
+        if (!HasFeature(Feature::kPausable))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -203,7 +213,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case ModifyForecastRequest::Id:
-        if (!SupportsOptCmd(OptionalCommands::kSupportsModifyForecastRequest))
+        if (!HasFeature(Feature::kForecastAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -215,7 +225,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     case RequestConstraintBasedForecast::Id:
-        if (!SupportsOptCmd(OptionalCommands::kSupportsRequestConstraintBasedForecast))
+        if (!HasFeature(Feature::kConstraintBasedAdjustment))
         {
             handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
         }
@@ -226,19 +236,88 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
                 [this](HandlerContext & ctx, const auto & commandData) { HandleRequestConstraintBasedForecast(ctx, commandData); });
         }
         return;
+    case CancelRequest::Id:
+        if (!HasFeature(Feature::kStartTimeAdjustment) && !HasFeature(Feature::kForecastAdjustment) &&
+            !HasFeature(Feature::kConstraintBasedAdjustment))
+        {
+            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
+        }
+        else
+        {
+            HandleCommand<CancelRequest::DecodableType>(
+                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleCancelRequest(ctx, commandData); });
+        }
+        return;
+    }
+}
+
+Status Instance::CheckOptOutAllowsRequest(AdjustmentCauseEnum adjustmentCause)
+{
+    OptOutStateEnum optOutState = mDelegate.GetOptOutState();
+
+    if (adjustmentCause == AdjustmentCauseEnum::kUnknownEnumValue)
+    {
+        ChipLogError(Zcl, "DEM: adjustment cause is invalid (%d)", static_cast<int>(adjustmentCause));
+        return Status::InvalidValue;
+    }
+
+    switch (optOutState)
+    {
+    case OptOutStateEnum::kNoOptOut: /* User has NOT opted out so allow it */
+        ChipLogProgress(Zcl, "DEM: OptOutState = kNoOptOut");
+        return Status::Success;
+
+    case OptOutStateEnum::kLocalOptOut: /* User has opted out from Local only*/
+        ChipLogProgress(Zcl, "DEM: OptOutState = kLocalOptOut");
+        switch (adjustmentCause)
+        {
+        case AdjustmentCauseEnum::kGridOptimization:
+            return Status::Success;
+        case AdjustmentCauseEnum::kLocalOptimization:
+        default:
+            return Status::Failure;
+        }
+
+    case OptOutStateEnum::kGridOptOut: /* User has opted out from Grid only */
+        ChipLogProgress(Zcl, "DEM: OptOutState = kGridOptOut");
+        switch (adjustmentCause)
+        {
+        case AdjustmentCauseEnum::kLocalOptimization:
+            return Status::Success;
+        case AdjustmentCauseEnum::kGridOptimization:
+        default:
+            return Status::Failure;
+        }
+
+    case OptOutStateEnum::kOptOut: /* User has opted out from both local and grid */
+        ChipLogProgress(Zcl, "DEM: OptOutState = kOptOut");
+        return Status::Failure;
+
+    default:
+        ChipLogError(Zcl, "DEM: invalid optOutState %d", static_cast<int>(optOutState));
+        return Status::InvalidValue;
     }
 }
 
 void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::PowerAdjustRequest::DecodableType & commandData)
 {
-    int64_t power        = commandData.power;
-    uint32_t durationSec = commandData.duration;
-    bool validArgs       = false;
-    Status status        = Status::Success;
-
+    Status status;
+    bool validArgs = false;
     PowerAdjustmentCapability::TypeInfo::Type powerAdjustmentCapability;
-    powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
 
+    int64_t power                       = commandData.power;
+    uint32_t durationSec                = commandData.duration;
+    AdjustmentCauseEnum adjustmentCause = commandData.cause;
+
+    status = CheckOptOutAllowsRequest(adjustmentCause);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: PowerAdjustRequest command rejected");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
+
+    powerAdjustmentCapability = mDelegate.GetPowerAdjustmentCapability();
     if (powerAdjustmentCapability.IsNull())
     {
         ChipLogError(Zcl, "DEM: powerAdjustmentCapability IsNull");
@@ -267,7 +346,7 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
 
     ChipLogProgress(Zcl, "DEM: Good PowerAdjustRequest() args.");
 
-    status = mDelegate.PowerAdjustRequest(power, durationSec);
+    status = mDelegate.PowerAdjustRequest(power, durationSec, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -278,11 +357,10 @@ void Instance::HandlePowerAdjustRequest(HandlerContext & ctx, const Commands::Po
 void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
                                               const Commands::CancelPowerAdjustRequest::DecodableType & commandData)
 {
-    Status status = Status::Success;
-    ESAStateEnum esaStatus;
+    Status status;
 
     /* Check that the ESA state is PowerAdjustActive */
-    esaStatus = mDelegate.GetESAState();
+    ESAStateEnum esaStatus = mDelegate.GetESAState();
     if (ESAStateEnum::kPowerAdjustActive != esaStatus)
     {
         ChipLogError(Zcl, "DEM: kPowerAdjustActive != esaStatus");
@@ -302,24 +380,27 @@ void Instance::HandleCancelPowerAdjustRequest(HandlerContext & ctx,
 void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
                                             const Commands::StartTimeAdjustRequest::DecodableType & commandData)
 {
-    Status status                    = Status::Success;
-    uint32_t earliestStartTimeEpoch  = 0;
-    uint32_t latestEndTimeEpoch      = 0;
-    uint32_t requestedStartTimeEpoch = commandData.requestedStartTime;
+    Status status;
+    uint32_t earliestStartTimeEpoch = 0;
+    uint32_t latestEndTimeEpoch     = 0;
     uint32_t duration;
+
+    uint32_t requestedStartTimeEpoch    = commandData.requestedStartTime;
+    AdjustmentCauseEnum adjustmentCause = commandData.cause;
+
+    status = CheckOptOutAllowsRequest(adjustmentCause);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: StartTimeAdjustRequest command rejected");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
 
     DataModel::Nullable<Structs::ForecastStruct::Type> forecastNullable = mDelegate.GetForecast();
 
     if (forecastNullable.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-        return;
-    }
-
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
-    {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -395,7 +476,7 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
     }
 
     ChipLogProgress(Zcl, "DEM: Good requestedStartTimeEpoch %ld.", static_cast<long unsigned int>(requestedStartTimeEpoch));
-    status = mDelegate.StartTimeAdjustRequest(requestedStartTimeEpoch);
+    status = mDelegate.StartTimeAdjustRequest(requestedStartTimeEpoch, adjustmentCause);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
@@ -410,18 +491,20 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
     CHIP_ERROR err                                              = CHIP_NO_ERROR;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
 
-    uint32_t duration = commandData.duration;
+    uint32_t duration                   = commandData.duration;
+    AdjustmentCauseEnum adjustmentCause = commandData.cause;
+
+    status = CheckOptOutAllowsRequest(adjustmentCause);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: PauseRequest command rejected");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        return;
+    }
 
     if (forecast.IsNull())
     {
         ChipLogError(Zcl, "DEM: Forecast is Null");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-        return;
-    }
-
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
-    {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
@@ -446,15 +529,37 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable)
+    /* We expect that there should be a slotIsPauseable entry (but it is optional) */
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.HasValue())
+    {
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include slotIsPauseable.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    if (!forecast.Value().slots[activeSlotNumber].minPauseDuration.HasValue())
+    {
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include minPauseDuration.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    if (!forecast.Value().slots[activeSlotNumber].maxPauseDuration.HasValue())
+    {
+        ChipLogError(Zcl, "DEM: activeSlotNumber %d does not include minPauseDuration.", activeSlotNumber);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        return;
+    }
+
+    if (!forecast.Value().slots[activeSlotNumber].slotIsPauseable.Value())
     {
         ChipLogError(Zcl, "DEM: activeSlotNumber %d is NOT pauseable.", activeSlotNumber);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration) &&
-        (duration > forecast.Value().slots[activeSlotNumber].maxPauseDuration))
+    if ((duration < forecast.Value().slots[activeSlotNumber].minPauseDuration.Value()) &&
+        (duration > forecast.Value().slots[activeSlotNumber].maxPauseDuration.Value()))
     {
         ChipLogError(Zcl, "DEM: out of range pause duration %ld", static_cast<long unsigned int>(duration));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
@@ -469,19 +574,18 @@ void Instance::HandlePauseRequest(HandlerContext & ctx, const Commands::PauseReq
         return;
     }
 
-    status = mDelegate.PauseRequest(duration);
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    status = mDelegate.PauseRequest(duration, adjustmentCause);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
+        ChipLogError(Zcl, "DEM: PauseRequest(%ld) FAILURE", static_cast<long unsigned int>(duration));
         return;
     }
 }
 
 void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeRequest::DecodableType & commandData)
 {
-    Status status                                               = Status::Success;
-    DataModel::Nullable<Structs::ForecastStruct::Type> forecast = mDelegate.GetForecast();
+    Status status;
 
     if (ESAStateEnum::kPaused != mDelegate.GetESAState())
     {
@@ -491,24 +595,28 @@ void Instance::HandleResumeRequest(HandlerContext & ctx, const Commands::ResumeR
     }
 
     status = mDelegate.ResumeRequest();
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.ResumeRequest() FAILURE");
+        ChipLogError(Zcl, "DEM: ResumeRequest FAILURE");
         return;
     }
 }
 
 void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands::ModifyForecastRequest::DecodableType & commandData)
 {
-    Status status       = Status::Success;
-    uint32_t forecastId = commandData.forecastId;
+    Status status;
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast;
 
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    uint32_t forecastId                                                           = commandData.forecastId;
+    DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> slotAdjustments = commandData.slotAdjustments;
+    AdjustmentCauseEnum adjustmentCause                                           = commandData.cause;
+
+    status = CheckOptOutAllowsRequest(adjustmentCause);
+    if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ChipLogError(Zcl, "DEM: ModifyForecastRequest command rejected");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
@@ -520,12 +628,11 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
         return;
     }
 
-    DataModel::DecodableList<Structs::SlotAdjustmentStruct::Type> slotAdjustments = commandData.slotAdjustments;
-    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments);
+    status = mDelegate.ModifyForecastRequest(forecastId, slotAdjustments, adjustmentCause);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.ModifyForecastRequest() FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ChipLogError(Zcl, "DEM: ModifyForecastRequest FAILURE");
         return;
     }
 }
@@ -533,20 +640,37 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
 void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
                                                     const Commands::RequestConstraintBasedForecast::DecodableType & commandData)
 {
-    Status status = Status::Success;
+    Status status;
 
-    if (ESAStateEnum::kUserOptOut == mDelegate.GetESAState())
+    DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> constraints = commandData.constraints;
+    AdjustmentCauseEnum adjustmentCause                                             = commandData.cause;
+
+    status = CheckOptOutAllowsRequest(adjustmentCause);
+    if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: ESAState = kUserOptOut");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast command rejected");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
-    status = mDelegate.RequestConstraintBasedForecast(commandData.constraints);
+    status = mDelegate.RequestConstraintBasedForecast(constraints, adjustmentCause);
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status != Status::Success)
     {
-        ChipLogError(Zcl, "DEM: mDelegate.commandData.constraints() FAILURE");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+        ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast FAILURE");
+        return;
+    }
+}
+
+void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelRequest::DecodableType & commandData)
+{
+    Status status;
+
+    status = mDelegate.CancelRequest();
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+    if (status != Status::Success)
+    {
+        ChipLogError(Zcl, "DEM: CancelRequest FAILURE");
         return;
     }
 }

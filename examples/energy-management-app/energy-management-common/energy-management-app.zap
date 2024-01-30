@@ -2581,6 +2581,14 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "CancelRequest",
+              "code": 7,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -2697,6 +2705,22 @@
               "reportableChange": 0
             },
             {
+              "name": "OptOutState",
+              "code": 7,
+              "mfgCode": null,
+              "side": "server",
+              "type": "OptOutStateEnum",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -2786,7 +2810,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "3",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3427,6 +3451,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

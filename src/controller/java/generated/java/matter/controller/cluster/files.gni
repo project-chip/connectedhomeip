@@ -146,6 +146,7 @@ matter_eventstructs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/BridgedDeviceBasicInformationClusterStartUpEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/DemandResponseLoadControlClusterLoadControlEventStatusChangeEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/DeviceEnergyManagementClusterPowerAdjustEndEvent.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/DeviceEnergyManagementClusterResumedEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/DishwasherAlarmClusterNotifyEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/DoorLockClusterDoorLockAlarmEvent.kt",
   "${chip_root}/src/controller/java/generated/java/matter/controller/cluster/eventstructs/DoorLockClusterDoorStateChangeEvent.kt",

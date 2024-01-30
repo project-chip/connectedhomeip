@@ -163,6 +163,10 @@ Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const 
     {
     case Attributes::SelectedDrynessLevel::Id: {
         uint8_t drynessLevelIdx = 0;
+        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        {
+            return Status::Success;
+        }
         while (true)
         {
             DrynessLevelEnum supportedDryness;

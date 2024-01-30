@@ -78,7 +78,9 @@ limitations under the License.
                 <requireAttribute>HOUR_FORMAT</requireAttribute>
             </include>
             <include cluster="Unit Localization" client="false" server="true" clientLocked="true" serverLocked="false"></include>
-            <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="General Diagnostics" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>UP_TIME</requireAttribute>
+            </include>
             <include cluster="Diagnostic Logs" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Software Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
@@ -1871,7 +1873,7 @@ limitations under the License.
             <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Scenes Management" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>            
+            <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>

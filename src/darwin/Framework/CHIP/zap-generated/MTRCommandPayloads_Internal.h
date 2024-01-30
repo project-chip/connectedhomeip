@@ -1096,6 +1096,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRDeviceEnergyManagementClusterCancelRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTREnergyEVSEClusterGetTargetsResponseParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::EnergyEvse::Commands::GetTargetsResponse::DecodableType &)decodableStruct;

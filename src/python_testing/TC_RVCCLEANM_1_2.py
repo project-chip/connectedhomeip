@@ -33,6 +33,9 @@ class TC_RVCCLEANM_1_2(MatterBaseTest):
         cluster = Clusters.Objects.RvcCleanMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    def pics_TC_RVCCLEANM_1_2(self) -> list[str]:
+        return ["RVCCLEANM.S"]
+
     @async_test_body
     async def test_TC_RVCCLEANM_1_2(self):
 

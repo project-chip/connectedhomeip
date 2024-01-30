@@ -196,6 +196,7 @@ static_library("support") {
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
+    "Scoped.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
     "SetupDiscriminator.h",

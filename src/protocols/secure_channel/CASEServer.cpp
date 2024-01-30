@@ -21,6 +21,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <tracing/macros.h>
 #include <transport/SessionManager.h>
 
 using namespace ::chip::Inet;
@@ -58,6 +59,7 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
 
 CHIP_ERROR CASEServer::InitCASEHandshake(Messaging::ExchangeContext * ec)
 {
+    MATTER_TRACE_SCOPE("InitCASEHandshake", "CASEServer");
     ReturnErrorCodeIf(ec == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Hand over the exchange context to the CASE session.
@@ -76,6 +78,7 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
+    MATTER_TRACE_SCOPE("OnMessageReceived", "CASEServer");
     if (GetSession().GetState() != CASESession::State::kInitialized)
     {
         // We are in the middle of CASE handshake
@@ -177,6 +180,7 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
 
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
+    MATTER_TRACE_SCOPE("OnSessionEstablishmentError", "CASEServer");
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
 
     PrepareForSessionEstablishment();
@@ -184,6 +188,7 @@ void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 
 void CASEServer::OnSessionEstablished(const SessionHandle & session)
 {
+    MATTER_TRACE_SCOPE("OnSessionEstablished", "CASEServer");
     ChipLogProgress(Inet, "CASE Session established to peer: " ChipLogFormatScopedNodeId,
                     ChipLogValueScopedNodeId(session->GetPeer()));
     PrepareForSessionEstablishment(session->GetPeer());
@@ -191,6 +196,7 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
 
 CHIP_ERROR CASEServer::SendBusyStatusReport(Messaging::ExchangeContext * ec, System::Clock::Milliseconds16 minimumWaitTime)
 {
+    MATTER_TRACE_SCOPE("SendBusyStatusReport", "CASEServer");
     ChipLogProgress(Inet, "Already in the middle of CASE handshake, sending busy status report");
 
     System::PacketBufferHandle handle = Protocols::SecureChannel::StatusReport::MakeBusyStatusReportMessage(minimumWaitTime);

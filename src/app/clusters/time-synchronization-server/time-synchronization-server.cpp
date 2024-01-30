@@ -776,7 +776,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         ChipLogError(Zcl, "Error setting UTC time on the device");
         return err;
     }
-    GetDelegate()->UTCTimeChanged(utcTime);
+    GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
     mGranularity         = granularity;
     EmberAfStatus status = TimeSource::Set(ep, source);
     if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))

@@ -24,6 +24,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -378,6 +379,7 @@ void Instance::UnregisterThisInstance()
 
 void Instance::HandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("ChangeToMode", "ModeBase");
     uint8_t newMode = commandData.newMode;
 
     Commands::ChangeToModeResponse::Type response;

@@ -3247,20 +3247,20 @@ cluster TemperatureControl = 86 {
 cluster RefrigeratorAlarm = 87 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kDoorOpen = 0x1;
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3465,7 +3465,7 @@ cluster SmokeCoAlarm = 92 {
 cluster DishwasherAlarm = 93 {
   revision 1; // NOTE: Default/not specifically set
 
-  bitmap AlarmMap : bitmap32 {
+  bitmap AlarmBitmap : bitmap32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
     kDoorError = 0x4;
@@ -3479,16 +3479,16 @@ cluster DishwasherAlarm = 93 {
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute optional AlarmMap latch = 1;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute optional AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3497,11 +3497,11 @@ cluster DishwasherAlarm = 93 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ResetRequest {
-    AlarmMap alarms = 0;
+    AlarmBitmap alarms = 0;
   }
 
   request struct ModifyEnabledAlarmsRequest {
-    AlarmMap mask = 0;
+    AlarmBitmap mask = 0;
   }
 
   /** Reset alarm */
@@ -4421,13 +4421,19 @@ provisional cluster DemandResponseLoadControl = 150 {
 
 /** This cluster allows a client to manage the power draw of a device. An example of such a client could be an Energy Management System (EMS) which controls an Energy Smart Appliance (ESA). */
 provisional cluster DeviceEnergyManagement = 152 {
-  revision 2;
+  revision 3;
+
+  enum AdjustmentCauseEnum : enum8 {
+    kLocalOptimization = 0;
+    kGridOptimization = 1;
+  }
 
   enum CauseEnum : enum8 {
     kNormalCompletion = 0;
     kOffline = 1;
     kFault = 2;
     kUserOptOut = 3;
+    kCancelled = 4;
   }
 
   enum CostTypeEnum : enum8 {
@@ -4441,9 +4447,8 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOffline = 0;
     kOnline = 1;
     kFault = 2;
-    kUserOptOut = 3;
-    kPowerAdjustActive = 4;
-    kPaused = 5;
+    kPowerAdjustActive = 3;
+    kPaused = 4;
   }
 
   enum ESATypeEnum : enum8 {
@@ -4464,11 +4469,27 @@ provisional cluster DeviceEnergyManagement = 152 {
     kOther = 255;
   }
 
+  enum ForecastUpdateReasonEnum : enum8 {
+    kInternalOptimization = 0;
+    kLocalOptimization = 1;
+    kGridOptimization = 2;
+  }
+
+  enum OptOutStateEnum : enum8 {
+    kNoOptOut = 0;
+    kLocalOptOut = 1;
+    kGridOptOut = 2;
+    kOptOut = 3;
+  }
+
   bitmap Feature : bitmap32 {
     kPowerAdjustment = 0x1;
     kPowerForecastReporting = 0x2;
     kStateForecastReporting = 0x4;
-    kForecastAdjustment = 0x8;
+    kStartTimeAdjustment = 0x8;
+    kPausable = 0x10;
+    kForecastAdjustment = 0x20;
+    kConstraintBasedAdjustment = 0x40;
   }
 
   struct CostStruct {
@@ -4484,9 +4505,9 @@ provisional cluster DeviceEnergyManagement = 152 {
     elapsed_s defaultDuration = 2;
     elapsed_s elapsedSlotTime = 3;
     elapsed_s remainingSlotTime = 4;
-    boolean slotIsPauseable = 5;
-    elapsed_s minPauseDuration = 6;
-    elapsed_s maxPauseDuration = 7;
+    optional boolean slotIsPauseable = 5;
+    optional elapsed_s minPauseDuration = 6;
+    optional elapsed_s maxPauseDuration = 7;
     optional int16u manufacturerESAState = 8;
     optional power_mw nominalPower = 9;
     optional power_mw minPower = 10;
@@ -4508,6 +4529,7 @@ provisional cluster DeviceEnergyManagement = 152 {
     optional epoch_s latestEndTime = 5;
     boolean isPauseable = 6;
     SlotStruct slots[] = 7;
+    ForecastUpdateReasonEnum forecastUpdateReason = 8;
   }
 
   struct ConstraintsStruct {
@@ -4544,6 +4566,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   }
 
   info event Resumed = 3 {
+    CauseEnum cause = 0;
   }
 
   readonly attribute ESATypeEnum ESAType = 0;
@@ -4553,6 +4576,7 @@ provisional cluster DeviceEnergyManagement = 152 {
   readonly attribute power_mw absMaxPower = 4;
   readonly attribute optional nullable PowerAdjustStruct powerAdjustmentCapability[] = 5;
   readonly attribute optional nullable ForecastStruct forecast = 6;
+  readonly attribute optional OptOutStateEnum optOutState = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4563,23 +4587,28 @@ provisional cluster DeviceEnergyManagement = 152 {
   request struct PowerAdjustRequestRequest {
     power_mw power = 0;
     elapsed_s duration = 1;
+    AdjustmentCauseEnum cause = 2;
   }
 
   request struct StartTimeAdjustRequestRequest {
     epoch_s requestedStartTime = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   request struct PauseRequestRequest {
     elapsed_s duration = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   request struct ModifyForecastRequestRequest {
     int32u forecastId = 0;
     SlotAdjustmentStruct slotAdjustments[] = 1;
+    AdjustmentCauseEnum cause = 2;
   }
 
   request struct RequestConstraintBasedForecastRequest {
     ConstraintsStruct constraints[] = 0;
+    AdjustmentCauseEnum cause = 1;
   }
 
   /** Allows a client to request an adjustment in the power consumption of an ESA for a specified duration. */
@@ -4596,6 +4625,8 @@ provisional cluster DeviceEnergyManagement = 152 {
   command ModifyForecastRequest(ModifyForecastRequestRequest): DefaultSuccess = 5;
   /** Allows a client to ask the ESA to recompute its Forecast based on power and time constraints. */
   command RequestConstraintBasedForecast(RequestConstraintBasedForecastRequest): DefaultSuccess = 6;
+  /** Allows a client to request cancellation of a previous adjustment request in a StartTimeAdjustRequest, ModifyForecastRequest or RequestConstraintBasedForecast command */
+  command CancelRequest(): DefaultSuccess = 7;
 }
 
 /** Electric Vehicle Supply Equipment (EVSE) is equipment used to charge an Electric Vehicle (EV) or Plug-In Hybrid Electric Vehicle. This cluster provides an interface to the functionality of Electric Vehicle Supply Equipment (EVSE) management. */

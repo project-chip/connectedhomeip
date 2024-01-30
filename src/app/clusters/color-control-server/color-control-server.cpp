@@ -24,6 +24,7 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
+#include <tracing/macros.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES_MANAGEMENT
 #include <app/clusters/scenes-server/scenes-server.h>
@@ -1354,6 +1355,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
                                         HueMoveMode moveMode, uint16_t rate, uint8_t optionsMask, uint8_t optionsOverride,
                                         bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("moveHue", "ColorControl");
     EndpointId endpoint                               = commandPath.mEndpointId;
     Status status                                     = Status::Success;
     ColorHueTransitionState * colorHueTransitionState = getColorHueTransitionState(endpoint);
@@ -1459,6 +1461,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
                                           uint16_t hue, HueDirection moveDirection, uint16_t transitionTime, uint8_t optionsMask,
                                           uint8_t optionsOverride, bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("moveToHue", "ColorControl");
     EndpointId endpoint = commandPath.mEndpointId;
 
     Status status       = Status::Success;
@@ -1593,6 +1596,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
                                                        uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                                        uint8_t optionsOverride, bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("moveToHueAndSaturation", "ColorControl");
     // limit checking:  hue and saturation are 0..254.  Spec dictates we ignore
     // this and report a constraint error.
     if ((!isEnhanced && hue > MAX_HUE_VALUE) || saturation > MAX_SATURATION_VALUE)
@@ -1632,6 +1636,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
                                         HueStepMode stepMode, uint16_t stepSize, uint16_t transitionTime, uint8_t optionsMask,
                                         uint8_t optionsOverride, bool isEnhanced)
 {
+    MATTER_TRACE_SCOPE("stepHue", "ColorControl");
     EndpointId endpoint = commandPath.mEndpointId;
 
     Status status = Status::Success;
@@ -1715,6 +1720,7 @@ exit:
 bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::MoveSaturation::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("moveSaturation", "ColorControl");
     auto & moveMode        = commandData.moveMode;
     auto & rate            = commandData.rate;
     auto & optionsMask     = commandData.optionsMask;
@@ -1798,6 +1804,7 @@ exit:
 bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToSaturation::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("moveToSaturation", "ColorControl");
     // limit checking: saturation is 0..254.  Spec dictates we ignore
     // this and report a malformed packet.
     if (commandData.saturation > MAX_SATURATION_VALUE)
@@ -1822,6 +1829,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
 bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::StepSaturation::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("stepSaturation", "ColorControl");
     auto stepMode             = commandData.stepMode;
     uint8_t stepSize          = commandData.stepSize;
     uint8_t transitionTime    = commandData.transitionTime;
@@ -1885,6 +1893,7 @@ exit:
 bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::ColorLoopSet::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("colorLoop", "ColorControl");
     auto updateFlags          = commandData.updateFlags;
     auto action               = commandData.action;
     auto direction            = commandData.direction;
@@ -2010,6 +2019,7 @@ exit:
  */
 void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
 {
+    MATTER_TRACE_SCOPE("updateHueSat", "ColorControl");
     ColorHueTransitionState * colorHueTransitionState        = getColorHueTransitionState(endpoint);
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
 

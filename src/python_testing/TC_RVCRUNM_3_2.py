@@ -69,6 +69,9 @@ class TC_RVCRUNM_3_2(MatterBaseTest):
 
         return False
 
+    def pics_TC_RVCRUNM_3_2(self) -> list[str]:
+        return ["RVCRUNM.S"]
+
     @async_test_body
     async def test_TC_RVCRUNM_3_2(self):
 

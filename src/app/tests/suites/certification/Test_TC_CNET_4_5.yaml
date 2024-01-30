@@ -79,7 +79,7 @@ tests:
                 value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
               - name: "Credentials"
                 value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_CREDENTIALS
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 1
       response:
           error: FAILSAFE_REQUIRED

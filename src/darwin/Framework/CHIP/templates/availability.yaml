@@ -8557,12 +8557,54 @@
               - NumberOfAliroCredentialIssuerKeysSupported
               - NumberOfAliroEndpointKeysSupported
           ICDManagement:
+              # Targeting Spring 2024 Matter release
               - OperatingMode
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - PresetTypes
+              - ScheduleTypes
+              - NumberOfPresets
+              - NumberOfSchedules
+              - NumberOfScheduleTransitions
+              - NumberOfScheduleTransitionPerDay
+              - ActivePresetHandle
+              - Presets
+              - Schedules
+              - PresetsSchedulesEditable
+              - TemperatureSetpointHoldPolicy
+              - SetpointHoldExpiryTimestamp
+              - QueuedPreset
+              - ActiveScheduleHandle
       commands:
           DoorLock:
               # Aliro is not ready yet.
               - SetAliroReaderConfig
               - ClearAliroReaderConfig
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - SetActiveScheduleRequest
+              - SetActivePresetRequest
+              - StartPresetsSchedulesEditRequest
+              - CancelPresetsSchedulesEditRequest
+              - CommitPresetsSchedulesRequest
+              - CancelSetActivePresetRequest
+              - SetTemperatureSetpointHoldPolicy
+          RVCOperationalState:
+              # Targeting Spring 2024 Matter release
+              - GoHome
+      structs:
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - ScheduleTransitionStruct
+              - ScheduleStruct
+              - PresetStruct
+              - PresetTypeStruct
+              - ScheduleTypeStruct
+              - QueuedPresetStruct
+      enums:
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - PresetScenarioEnum
       enum values:
           DoorLock:
               CredentialTypeEnum:
@@ -8578,9 +8620,26 @@
               OperationSourceEnum:
                   # Aliro is not ready yet.
                   - Aliro
+          RVCRunMode:
+              ModeTag:
+                  # Targeting Spring 2024 Matter release
+                  - Mapping
+      bitmaps:
+          Thermostat:
+              # Targeting Spring 2024 Matter release
+              - PresetTypeFeaturesBitmap
+              - ScheduleTypeFeaturesBitmap
+              - TemperatureSetpointHoldPolicyBitmap
       bitmap values:
           DoorLock:
               Feature:
                   # Aliro is not ready yet.
                   - AliroProvisioning
                   - AliroBLEUWB
+          Thermostat:
+              Feature:
+                  # Targeting Spring 2024 Matter release
+                  - QueuedPresetsSupported
+                  - Setpoints
+                  - Presets
+                  - MatterScheduleConfiguration

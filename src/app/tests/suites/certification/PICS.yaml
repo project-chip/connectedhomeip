@@ -757,6 +757,12 @@ PICS:
           "Does the device implement an Application Device Type on any endpoint"
       id: APPDEVICE.S
 
+    # Content App Observer Cluster
+    - label:
+          "Does the device implement the Content App Observer cluster as a
+          server?"
+      id: APPOBSERVER.S
+
     # Actions Cluster Test Plan
     - label: "Does the device implement the Actions cluster as a server?"
       id: ACT.S
@@ -2005,6 +2011,12 @@ PICS:
 
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BINFO.S.A0014
+
+    - label: "Does the DUT(server) support the SpecificationVersion attribute?"
+      id: BINFO.S.A0015
+
+    - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
+      id: BINFO.S.A0016
 
     #####
     - label: "Does the DUT(server) support the NOC list attribute?"

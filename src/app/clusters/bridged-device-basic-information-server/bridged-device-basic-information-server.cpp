@@ -26,6 +26,7 @@
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -36,6 +37,7 @@ namespace {
 
 void ReachableChanged(EndpointId endpointId)
 {
+    MATTER_TRACE_INSTANT("ReachableChanged", "BridgeBasicInfo");
     bool reachable = false;
     if (EMBER_ZCL_STATUS_SUCCESS != Attributes::Reachable::Get(endpointId, &reachable))
     {

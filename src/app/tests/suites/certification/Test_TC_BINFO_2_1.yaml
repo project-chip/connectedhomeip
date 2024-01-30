@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 11.2.1. [TC-BINFO-2.1] Attributes [DUT-Server]
 
@@ -720,3 +719,87 @@ tests:
       attribute: "ProductAppearance"
       response:
           value: ProductAppearancevalue
+
+    - label: "Step 62: TH reads SpecificationVersion from the DUT."
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          saveAs: SpecificationVersionValue
+
+    - label:
+          "Step 62: If the SpecificationVersion value is absent or zero this
+          step cannot be verified, move on to the next step"
+      PICS: BINFO.S.A0015
+      cluster: "EqualityCommands"
+      command: "UnsignedNumberEquals"
+      arguments:
+          values:
+              - name: "Value1"
+                value: SpecificationVersionValue
+              - name: "Value2"
+                value: null
+      response:
+          - values:
+                - name: "Equals"
+                  saveAs: IsExpectedValue
+
+    - label:
+          "Step 62: SpecificationVersion value should in the inclusive range of
+          (0 to 4294967295) and the initial 7 bits are set to zero."
+      runIf: "!IsExpectedValue"
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          value: SpecificationVersionValue
+          constraints:
+              minValue: 0
+              maxValue: 4294967295
+              hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40]
+
+    - label:
+          "Step 63: TH sends Write request message to DUT to change the value of
+          SpecificationVersion to '0x0103AAF1'."
+      PICS: BINFO.S.A0015
+      command: "writeAttribute"
+      attribute: "SpecificationVersion"
+      arguments:
+          value: "0x0103AAF1"
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 64: TH reads SpecificationVersion attribute from DUT"
+      PICS: BINFO.S.A0015
+      command: "readAttribute"
+      attribute: "SpecificationVersion"
+      response:
+          value: SpecificationVersionValue
+
+    - label: "Step 65: TH reads MaxPathsPerInvoke from the DUT."
+      PICS: BINFO.S.A0016
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      response:
+          saveAs: MaxPathsPerInvokeValue
+          constraints:
+              minValue: 1
+              maxValue: 65535
+
+    - label:
+          "Step 66: TH sends Write request message to DUT to change
+          MaxPathsPerInvoke to a different value."
+      PICS: BINFO.S.A0016
+      command: "writeAttribute"
+      attribute: "MaxPathsPerInvoke"
+      arguments:
+          value: 12345
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Step 67: TH reads MaxPathsPerInvoke attribute from DUT"
+      PICS: BINFO.S.A0016
+      command: "readAttribute"
+      attribute: "MaxPathsPerInvoke"
+      response:
+          value: MaxPathsPerInvokeValue

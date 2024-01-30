@@ -2863,6 +2863,12 @@ static id _Nullable DecodeEventPayloadForDeviceEnergyManagementCluster(EventId a
 
         __auto_type * value = [MTRDeviceEnergyManagementClusterResumedEvent new];
 
+        do {
+            NSNumber * _Nonnull memberValue;
+            memberValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.cause)];
+            value.cause = memberValue;
+        } while (0);
+
         return value;
     }
     default: {

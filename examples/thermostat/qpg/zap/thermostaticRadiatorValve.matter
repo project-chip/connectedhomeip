@@ -2016,7 +2016,6 @@ endpoint 0 {
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
-    handle command AddOrUpdateWiFiNetwork;
     handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;

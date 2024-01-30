@@ -1522,18 +1522,21 @@ namespace RefrigeratorAlarm {
 namespace Attributes {
 
 namespace Mask {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
 } // namespace Mask
 
 namespace State {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
 } // namespace State
 
 namespace Supported {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
 } // namespace Supported
 
 namespace FeatureMap {
@@ -1657,23 +1660,27 @@ namespace DishwasherAlarm {
 namespace Attributes {
 
 namespace Mask {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 } // namespace Mask
 
 namespace Latch {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 } // namespace Latch
 
 namespace State {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 } // namespace State
 
 namespace Supported {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value); // AlarmMap
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value); // AlarmBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 } // namespace Supported
 
 namespace FeatureMap {

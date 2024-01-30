@@ -2727,6 +2727,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("ForecastUpdateReason", indent + 1, value.forecastUpdateReason);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ForecastUpdateReason'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -6071,6 +6079,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DeviceEnergyManagement::Events::Resumed::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Cause", indent + 1, value.cause);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Cause'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -11143,17 +11159,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case RefrigeratorAlarm::Attributes::Mask::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
         case RefrigeratorAlarm::Attributes::State::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
         }
         case RefrigeratorAlarm::Attributes::Supported::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Supported", 1, value);
         }
@@ -11393,22 +11409,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case DishwasherAlarm::Attributes::Mask::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
         case DishwasherAlarm::Attributes::Latch::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Latch", 1, value);
         }
         case DishwasherAlarm::Attributes::State::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
         }
         case DishwasherAlarm::Attributes::Supported::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Supported", 1, value);
         }
@@ -12280,6 +12296,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Forecast", 1, value);
+        }
+        case DeviceEnergyManagement::Attributes::OptOutState::Id: {
+            chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OptOutState", 1, value);
         }
         case DeviceEnergyManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

@@ -6619,6 +6619,7 @@ class ChipClusters:
                 "args": {
                     "power": "int",
                     "duration": "int",
+                    "cause": "int",
                 },
             },
             0x00000001: {
@@ -6632,6 +6633,7 @@ class ChipClusters:
                 "commandName": "StartTimeAdjustRequest",
                 "args": {
                     "requestedStartTime": "int",
+                    "cause": "int",
                 },
             },
             0x00000003: {
@@ -6639,6 +6641,7 @@ class ChipClusters:
                 "commandName": "PauseRequest",
                 "args": {
                     "duration": "int",
+                    "cause": "int",
                 },
             },
             0x00000004: {
@@ -6653,6 +6656,7 @@ class ChipClusters:
                 "args": {
                     "forecastId": "int",
                     "slotAdjustments": "SlotAdjustmentStruct",
+                    "cause": "int",
                 },
             },
             0x00000006: {
@@ -6660,6 +6664,13 @@ class ChipClusters:
                 "commandName": "RequestConstraintBasedForecast",
                 "args": {
                     "constraints": "ConstraintsStruct",
+                    "cause": "int",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "CancelRequest",
+                "args": {
                 },
             },
         },
@@ -6704,6 +6715,12 @@ class ChipClusters:
                 "attributeName": "Forecast",
                 "attributeId": 0x00000006,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "OptOutState",
+                "attributeId": 0x00000007,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
