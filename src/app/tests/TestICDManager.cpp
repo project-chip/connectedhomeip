@@ -542,8 +542,10 @@ namespace {
 static const nlTest sTests[] = {
     NL_TEST_DEF("TestICDModeDurations", TestICDManager::TestICDModeDurations),
     NL_TEST_DEF("TestOnSubscriptionReport", TestICDManager::TestOnSubscriptionReport),
-    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub", TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
-    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithActiveSub", TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithActiveSub),
+    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub",
+                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithoutActiveSub),
+    NL_TEST_DEF("TestICDModeDurationsWith0ActiveModeDurationWithActiveSub",
+                TestICDManager::TestICDModeDurationsWith0ActiveModeDurationWithActiveSub),
     NL_TEST_DEF("TestKeepActivemodeRequests", TestICDManager::TestKeepActivemodeRequests),
     NL_TEST_DEF("TestICDMRegisterUnregisterEvents", TestICDManager::TestICDMRegisterUnregisterEvents),
     NL_TEST_DEF("TestICDCounter", TestICDManager::TestICDCounter),

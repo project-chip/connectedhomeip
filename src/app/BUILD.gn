@@ -254,7 +254,6 @@ static_library("interaction-model") {
     ":message-def",
     ":paths",
     ":subscription-manager",
-    "${chip_root}/src/app/icd:configuration-data",
     "${chip_root}/src/app/icd:icd_config",
     "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",

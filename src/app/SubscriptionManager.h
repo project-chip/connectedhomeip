@@ -19,44 +19,43 @@
 /**
  *    @file
  *      This file defines an interface that exposes all the public subscription management APIs.
- *      The interface is implemented by the InteractionModelEngine to avoid creating unnecessary dependencies 
+ *      The interface is implemented by the InteractionModelEngine to avoid creating unnecessary dependencies
  *      Since the IMEgine has more dependency than its consummers need.
  *      By leveraging the SubscriptionManager APIs, a consummer avoids depending on the global data model functions.
  */
 
 #pragma once
 
-#include <lib/core/NodeId.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/NodeId.h>
 
 namespace chip {
 namespace app {
 
-class SubscriptionManager {
+class SubscriptionManager
+{
 public:
-    
-    virtual ~SubscriptionManager() {};
+    virtual ~SubscriptionManager(){};
 
     /**
      * @brief Check if a given subject (CAT or operational NodeId) has at least 1 active subscription.
-     * 
+     *
      * @param[in] aFabricIndex fabric index of the subject
      * @param[in] subject NodeId of the subect
-     * 
+     *
      * @return true subject has at least one active subscription with the device
      *         false subject doesn't have any acitve subscription with the device
      */
     virtual bool SubjectHasActiveSubcription(const FabricIndex & aFabricIndex, const NodeId & subject) = 0;
 
-    
     /**
      * @brief Check if a given subject (CAT or operational NodeId) has at least 1 persisted subscription.
      *        If CHIP_CONFIG_PERSIST_SUBSCRIPTIONS is not enable, function alweays returns false.
      *        See the CHIP_CONFIG_PERSIST_SUBSCRIPTIONS for more information on persisted subscriptions.
-     * 
+     *
      * @param[in] aFabricIndex fabric index of the subject
      * @param[in] subject NodeId of the subect
-     * 
+     *
      * @return true subject has at least one persisted subscription with the device
      *         false subject doesn't have any acitve subscription with the device
      *         false If CHIP_CONFIG_PERSIST_SUBSCRIPTIONS is not enabled
