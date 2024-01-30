@@ -42,20 +42,19 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     # Map clusters to common XML template if needed
     accessControlCluster = "AccessControl"
-    diagnosticLogsCluster = "Diagnostic Logs"
     groupKeyManagementCluster = "GroupKeyManagement"
     lowPowerCluster = "Low Power"
     onOffCluster = "On/Off"
     operationalCredentialsCluster = "Operational Credentials"
     otaProviderCluster = "OTA Software Update Provider"
     otaRequestorCluster = "OTA Software Update Requestor"
-    thermostatUserInterfaceConfigurationCluster = "Thermostat User Interface Configuration"
+    thermostatCluster = "Thermostat"
     wakeOnLANCluster = "Wake on LAN"
 
     if accessControlCluster in clusterName:
         clusterName = "Access Control"
 
-    if otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
+    elif otaProviderCluster in clusterName or otaRequestorCluster in clusterName:
         clusterName = "OTA Software Update"
 
     elif onOffCluster == clusterName:
@@ -64,17 +63,14 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     elif groupKeyManagementCluster == clusterName:
         clusterName = "Group Communication"
 
-    elif diagnosticLogsCluster == clusterName:
-        clusterName = "Diagnostics Logs Cluster"
-
-    elif thermostatUserInterfaceConfigurationCluster == clusterName:
-        clusterName = "Thermostat User Configuration Cluster"
-
     elif wakeOnLANCluster == clusterName or lowPowerCluster == clusterName:
         clusterName = "Media Cluster"
 
     elif operationalCredentialsCluster == clusterName:
         clusterName = "Node Operational Credentials"
+
+    elif thermostatCluster == clusterName:
+        clusterName = "Thermostat Cluster"
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
@@ -124,57 +120,61 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     # Feature PICS
     # console.print(featurePicsList)
     featureNode = root.find("./clusterSide[@type='Server']/features")
-    for picsItem in featureNode:
-        itemNumberElement = picsItem.find('itemNumber')
+    if featureNode is not None:
+        for picsItem in featureNode:
+            itemNumberElement = picsItem.find('itemNumber')
 
-        console.print(f"Searching for {itemNumberElement.text}")
+            console.print(f"Searching for {itemNumberElement.text}")
 
-        if f"{itemNumberElement.text}" in featurePicsList:
-            console.print("Found feature PICS value in XML template ✅")
-            supportElement = picsItem.find('support')
-            supportElement.text = "true"
+            if f"{itemNumberElement.text}" in featurePicsList:
+                console.print("Found feature PICS value in XML template ✅")
+                supportElement = picsItem.find('support')
+                supportElement.text = "true"
 
     # Attributes PICS
     # TODO: Only check if list is not empty
     # console.print(attributePicsList)
     serverAttributesNode = root.find("./clusterSide[@type='Server']/attributes")
-    for picsItem in serverAttributesNode:
-        itemNumberElement = picsItem.find('itemNumber')
+    if serverAttributesNode is not None:
+        for picsItem in serverAttributesNode:
+            itemNumberElement = picsItem.find('itemNumber')
 
-        console.print(f"Searching for {itemNumberElement.text}")
+            console.print(f"Searching for {itemNumberElement.text}")
 
-        if f"{itemNumberElement.text}" in attributePicsList:
-            console.print("Found attribute PICS value in XML template ✅")
-            supportElement = picsItem.find('support')
-            supportElement.text = "true"
+            if f"{itemNumberElement.text}" in attributePicsList:
+                console.print("Found attribute PICS value in XML template ✅")
+                supportElement = picsItem.find('support')
+                supportElement.text = "true"
 
     # AcceptedCommandList PICS
     # TODO: Only check if list is not empty
     # console.print(acceptedCommandPicsList)
     serverCommandsReceivedNode = root.find("./clusterSide[@type='Server']/commandsReceived")
-    for picsItem in serverCommandsReceivedNode:
-        itemNumberElement = picsItem.find('itemNumber')
+    if serverCommandsReceivedNode is not None:
+        for picsItem in serverCommandsReceivedNode:
+            itemNumberElement = picsItem.find('itemNumber')
 
-        console.print(f"Searching for {itemNumberElement.text}")
+            console.print(f"Searching for {itemNumberElement.text}")
 
-        if f"{itemNumberElement.text}" in acceptedCommandPicsList:
-            console.print("Found acceptedCommand PICS value in XML template ✅")
-            supportElement = picsItem.find('support')
-            supportElement.text = "true"
+            if f"{itemNumberElement.text}" in acceptedCommandPicsList:
+                console.print("Found acceptedCommand PICS value in XML template ✅")
+                supportElement = picsItem.find('support')
+                supportElement.text = "true"
 
     # GeneratedCommandList PICS
     # console.print(generatedCommandPicsList)
     # TODO: Only check if list is not empty
     serverCommandsGeneratedNode = root.find("./clusterSide[@type='Server']/commandsGenerated")
-    for picsItem in serverCommandsGeneratedNode:
-        itemNumberElement = picsItem.find('itemNumber')
+    if serverCommandsGeneratedNode is not None:
+        for picsItem in serverCommandsGeneratedNode:
+            itemNumberElement = picsItem.find('itemNumber')
 
-        console.print(f"Searching for {itemNumberElement.text}")
+            console.print(f"Searching for {itemNumberElement.text}")
 
-        if f"{itemNumberElement.text}" in generatedCommandPicsList:
-            console.print("Found generatedCommand PICS value in XML template ✅")
-            supportElement = picsItem.find('support')
-            supportElement.text = "true"
+            if f"{itemNumberElement.text}" in generatedCommandPicsList:
+                console.print("Found generatedCommand PICS value in XML template ✅")
+                supportElement = picsItem.find('support')
+                supportElement.text = "true"
 
     # Event PICS (Work in progress)
     # The ability to set event PICS is fairly limited, due to EventList not being supported,
@@ -184,35 +184,36 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     # 1) Event is mandatody
     # 2) The event is mandatory based on a feature that is supported (Cross check against feature list) (Not supported yet)
     serverEventsNode = root.find("./clusterSide[@type='Server']/events")
-    for picsItem in serverEventsNode:
-        itemNumberElement = picsItem.find('itemNumber')
-        statusElement = picsItem.find('status')
+    if serverEventsNode is not None:
+        for picsItem in serverEventsNode:
+            itemNumberElement = picsItem.find('itemNumber')
+            statusElement = picsItem.find('status')
 
-        try:
-            condition = statusElement.attrib['cond']
-            console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text} and condition {condition}")
-        except ET.ParseError:
-            condition = ""
-            console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text}")
+            try:
+                condition = statusElement.attrib['cond']
+                console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text} and condition {condition}")
+            except ET.ParseError:
+                condition = ""
+                console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text}")
 
-        if statusElement.text == "M":
+            if statusElement.text == "M":
 
-            # Is event mandated by the server
-            if condition == clusterPicsCode:
-                console.print("Found event mandated by server ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
-                continue
+                # Is event mandated by the server
+                if condition == clusterPicsCode:
+                    console.print("Found event mandated by server ✅")
+                    supportElement = picsItem.find('support')
+                    supportElement.text = "true"
+                    continue
 
-            if condition in featurePicsList:
-                console.print("Found event mandated by feature ✅")
-                supportElement = picsItem.find('support')
-                supportElement.text = "true"
-                continue
+                if condition in featurePicsList:
+                    console.print("Found event mandated by feature ✅")
+                    supportElement = picsItem.find('support')
+                    supportElement.text = "true"
+                    continue
 
-            if condition == "":
-                console.print("Event is mandated without a condition ✅")
-                continue
+                if condition == "":
+                    console.print("Event is mandated without a condition ✅")
+                    continue
 
     # Grabbing the header from the XML templates
     inputFile = open(f"{xmlPath}{fileName}", "r")
