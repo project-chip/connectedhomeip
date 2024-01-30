@@ -21,10 +21,10 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#define JAVA_JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
+#define JAVA_JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                           \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_##CLASS_NAME##_##METHOD_NAME
 
-#define KOTLIN_JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
+#define KOTLIN_JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                         \
     extern "C" JNIEXPORT RETURN JNICALL Java_matter_controller_##CLASS_NAME##_##METHOD_NAME
 
 using namespace chip::Controller;
@@ -48,7 +48,8 @@ JAVA_JNI_METHOD(jlong, ReportCallbackJni, newCallback)
 (JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
 {
     chip::DeviceLayer::StackLock lock;
-    ReportCallback * reportCallback = chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava);
+    ReportCallback * reportCallback =
+        chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava);
     return reinterpret_cast<jlong>(reportCallback);
 }
 
@@ -64,8 +65,7 @@ JAVA_JNI_METHOD(jlong, WriteAttributesCallbackJni, newCallback)
 (JNIEnv * env, jobject self)
 {
     chip::DeviceLayer::StackLock lock;
-    WriteAttributesCallback * writeAttributesCallback =
-        chip::Platform::New<WriteAttributesCallback>(self);
+    WriteAttributesCallback * writeAttributesCallback = chip::Platform::New<WriteAttributesCallback>(self);
     return reinterpret_cast<jlong>(writeAttributesCallback);
 }
 
@@ -112,7 +112,8 @@ KOTLIN_JNI_METHOD(jlong, ReportCallbackJni, newCallback)
 (JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject resubscriptionAttemptCallbackJava)
 {
     chip::DeviceLayer::StackLock lock;
-    ReportCallback * reportCallback = chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava);
+    ReportCallback * reportCallback =
+        chip::Platform::New<ReportCallback>(self, subscriptionEstablishedCallbackJava, resubscriptionAttemptCallbackJava);
     return reinterpret_cast<jlong>(reportCallback);
 }
 
@@ -128,8 +129,7 @@ KOTLIN_JNI_METHOD(jlong, WriteAttributesCallbackJni, newCallback)
 (JNIEnv * env, jobject self)
 {
     chip::DeviceLayer::StackLock lock;
-    WriteAttributesCallback * writeAttributesCallback =
-        chip::Platform::New<WriteAttributesCallback>(self);
+    WriteAttributesCallback * writeAttributesCallback = chip::Platform::New<WriteAttributesCallback>(self);
     return reinterpret_cast<jlong>(writeAttributesCallback);
 }
 

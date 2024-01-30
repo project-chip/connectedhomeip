@@ -22,10 +22,10 @@
  *
  */
 #include "AndroidCallbacks.h"
-#include "AndroidInteractionClient.h"
 #include "AndroidCommissioningWindowOpener.h"
 #include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
+#include "AndroidInteractionClient.h"
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -2218,7 +2218,8 @@ JNI_METHOD(void, subscribe)
  jint imTimeoutMs, jobject eventMin)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList, minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin));
+    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList,
+                                  minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin));
     return;
 exit:
     ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.AsString());
@@ -2229,7 +2230,8 @@ JNI_METHOD(void, read)
  jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList, isFabricFiltered, imTimeoutMs, eventMin));
+    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList,
+                             isFabricFiltered, imTimeoutMs, eventMin));
     return;
 exit:
     ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());

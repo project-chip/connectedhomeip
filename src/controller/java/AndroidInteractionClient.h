@@ -20,7 +20,12 @@
 
 #include <lib/support/JniReferences.h>
 
-CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
-CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
-CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs, jint imTimeoutMs);
-CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs, jint imTimeoutMs);
+CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList,
+                     jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval,
+                     jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
+CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+                jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin);
+CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList,
+                 jint timedRequestTimeoutMs, jint imTimeoutMs);
+CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement,
+                  jint timedRequestTimeoutMs, jint imTimeoutMs);

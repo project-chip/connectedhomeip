@@ -43,7 +43,9 @@ CHIP_ERROR ParseDataVersionFilter(jobject dataVersionFilter, EndpointId & outEnd
 static CHIP_ERROR ParseDataVersionFilterList(jobject dataVersionFilterList,
                                              std::vector<app::DataVersionFilter> & outDataVersionFilterList);
 
-CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList,
+                     jobject eventPathList, jobject dataVersionFilterList, jint minInterval, jint maxInterval,
+                     jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
@@ -183,12 +185,13 @@ exit:
     return err;
 }
 
-CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList, jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+                jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err               = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    auto callback                = reinterpret_cast<ReportCallback *>(callbackHandle);
+    auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
     std::vector<app::AttributePathParams> attributePathParamsList;
     std::vector<app::EventPathParams> eventPathParamsList;
     std::vector<app::DataVersionFilter> versionList;
@@ -284,7 +287,8 @@ CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::Conc
     return writeClient.PutPreencodedAttribute(path, reader);
 }
 
-CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs, jint imTimeoutMs)
+CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList,
+                 jint timedRequestTimeoutMs, jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                          = CHIP_NO_ERROR;
@@ -315,9 +319,9 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
         jmethodID getDataVersionMethod    = nullptr;
         jmethodID getTlvByteArrayMethod   = nullptr;
         jmethodID getJsonStringMethod     = nullptr;
-        jlong endpointIdObj             = 0;
-        jlong clusterIdObj              = 0;
-        jlong attributeIdObj            = 0;
+        jlong endpointIdObj               = 0;
+        jlong clusterIdObj                = 0;
+        jlong attributeIdObj              = 0;
         jbyteArray tlvBytesObj            = nullptr;
         bool hasDataVersion               = false;
         Optional<DataVersion> dataVersion = Optional<DataVersion>();
@@ -325,9 +329,12 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
         bool isGroupSession = false;
 
         SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
-        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getEndpointId", "(J)J", &getEndpointIdMethod));
-        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getClusterId", "(J)J", &getClusterIdMethod));
-        SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getAttributeId","(J)J", &getAttributeIdMethod));
+        SuccessOrExit(
+            err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getEndpointId", "(J)J", &getEndpointIdMethod));
+        SuccessOrExit(err =
+                          JniReferences::GetInstance().FindMethod(env, attributeItem, "getClusterId", "(J)J", &getClusterIdMethod));
+        SuccessOrExit(
+            err = JniReferences::GetInstance().FindMethod(env, attributeItem, "getAttributeId", "(J)J", &getAttributeIdMethod));
         SuccessOrExit(
             err = JniReferences::GetInstance().FindMethod(env, attributeItem, "hasDataVersion", "()Z", &hasDataVersionMethod));
         SuccessOrExit(
@@ -435,7 +442,8 @@ CHIP_ERROR PutPreencodedInvokeRequest(app::CommandSender & commandSender, app::C
     return writer->CopyContainer(TLV::ContextTag(app::CommandDataIB::Tag::kFields), reader);
 }
 
-CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs, jint imTimeoutMs)
+CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement,
+                  jint timedRequestTimeoutMs, jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                          = CHIP_NO_ERROR;
@@ -452,9 +460,9 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
     jmethodID getJsonStringMethod           = nullptr;
     jmethodID isEndpointIdValidMethod       = nullptr;
     jmethodID isGroupIdValidMethod          = nullptr;
-    jlong endpointIdObj                   = 0;
-    jlong clusterIdObj                    = 0;
-    jlong commandIdObj                    = 0;
+    jlong endpointIdObj                     = 0;
+    jlong clusterIdObj                      = 0;
+    jlong commandIdObj                      = 0;
     jobject groupIdObj                      = nullptr;
     jbyteArray tlvBytesObj                  = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
@@ -608,12 +616,14 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
     jmethodID getEndpointIdMethod  = nullptr;
     jmethodID getClusterIdMethod   = nullptr;
     jmethodID getAttributeIdMethod = nullptr;
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, attributePath, "getEndpointId", "(J)J", &getEndpointIdMethod));
+    ReturnErrorOnFailure(
+        JniReferences::GetInstance().FindMethod(env, attributePath, "getEndpointId", "(J)J", &getEndpointIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, attributePath, "getClusterId", "(J)J", &getClusterIdMethod));
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, attributePath, "getAttributeId", "(J)J", &getAttributeIdMethod));
+    ReturnErrorOnFailure(
+        JniReferences::GetInstance().FindMethod(env, attributePath, "getAttributeId", "(J)J", &getAttributeIdMethod));
 
-    jlong endpointIdObj = env->CallLongMethod(attributePath, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
-    jlong clusterIdObj = env->CallLongMethod(attributePath, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+    jlong endpointIdObj  = env->CallLongMethod(attributePath, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
+    jlong clusterIdObj   = env->CallLongMethod(attributePath, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
     jlong attributeIdObj = env->CallLongMethod(attributePath, getAttributeIdMethod, static_cast<jlong>(kInvalidAttributeId));
 
     outEndpointId  = static_cast<EndpointId>(endpointIdObj);
@@ -669,9 +679,9 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "isUrgent", "()Z", &isUrgentMethod));
 
     jlong endpointIdObj = env->CallLongMethod(eventPath, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
-    jlong clusterIdObj = env->CallLongMethod(eventPath, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
-    jlong eventIdObj = env->CallLongMethod(eventPath, getEventIdMethod, static_cast<jlong>(kInvalidEventId));
-    jboolean isUrgent = env->CallBooleanMethod(eventPath, isUrgentMethod);
+    jlong clusterIdObj  = env->CallLongMethod(eventPath, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+    jlong eventIdObj    = env->CallLongMethod(eventPath, getEventIdMethod, static_cast<jlong>(kInvalidEventId));
+    jboolean isUrgent   = env->CallBooleanMethod(eventPath, isUrgentMethod);
 
     outEndpointId = static_cast<EndpointId>(endpointIdObj);
     outClusterId  = static_cast<ClusterId>(clusterIdObj);
@@ -719,15 +729,16 @@ CHIP_ERROR ParseDataVersionFilter(jobject versionFilter, EndpointId & outEndpoin
     jmethodID getClusterIdMethod   = nullptr;
     jmethodID getDataVersionMethod = nullptr;
 
-    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, versionFilter, "getEndpointId", "(J)J", &getEndpointIdMethod));
+    ReturnErrorOnFailure(
+        JniReferences::GetInstance().FindMethod(env, versionFilter, "getEndpointId", "(J)J", &getEndpointIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, versionFilter, "getClusterId", "(J)J", &getClusterIdMethod));
     ReturnErrorOnFailure(
         JniReferences::GetInstance().FindMethod(env, versionFilter, "getDataVersion", "()J", &getDataVersionMethod));
 
     jlong endpointIdObj = env->CallLongMethod(versionFilter, getEndpointIdMethod, static_cast<jlong>(kInvalidEndpointId));
-    outEndpointId        = static_cast<EndpointId>(endpointIdObj);
-    jlong clusterIdObj = env->CallLongMethod(versionFilter, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
-    outClusterId = static_cast<ClusterId>(clusterIdObj);
+    outEndpointId       = static_cast<EndpointId>(endpointIdObj);
+    jlong clusterIdObj  = env->CallLongMethod(versionFilter, getClusterIdMethod, static_cast<jlong>(kInvalidClusterId));
+    outClusterId        = static_cast<ClusterId>(clusterIdObj);
 
     outDataVersion = static_cast<DataVersion>(env->CallLongMethod(versionFilter, getDataVersionMethod));
     return CHIP_NO_ERROR;

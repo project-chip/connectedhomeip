@@ -35,7 +35,9 @@ CHIP_ERROR CreateChipAttributePath(JNIEnv * env, const app::ConcreteDataAttribut
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
 {
-    GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback, const char * callbackClassSignature = "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback");
+    GetConnectedDeviceCallback(
+        jobject wrapperCallback, jobject javaCallback,
+        const char * callbackClassSignature = "chip/devicecontroller/GetConnectedDeviceCallbackJni$GetConnectedDeviceCallback");
     ~GetConnectedDeviceCallback();
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
@@ -76,8 +78,10 @@ struct ReportCallback : public app::ClusterStateCache::Callback
 
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR err);
-    void ReportError(const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, Protocols::InteractionModel::Status status);
-    void ReportError(const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, const char * message, ChipError::StorageType errorCode);
+    void ReportError(const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath,
+                     Protocols::InteractionModel::Status status);
+    void ReportError(const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath,
+                     const char * message, ChipError::StorageType errorCode);
 
     void UpdateClusterDataVersion();
 
@@ -123,7 +127,8 @@ struct InvokeCallback : public app::CommandSender::Callback
 
     void OnDone(app::CommandSender * apCommandSender) override;
 
-    // CHIP_ERROR CreateInvokeElement(JNIEnv * env, const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj);
+    // CHIP_ERROR CreateInvokeElement(JNIEnv * env, const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject &
+    // outObj);
     void ReportError(CHIP_ERROR err);
     void ReportError(Protocols::InteractionModel::Status status);
     void ReportError(const char * message, ChipError::StorageType errorCode);

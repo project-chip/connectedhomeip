@@ -22,11 +22,11 @@
 
 JNI_METHOD(void, subscribe)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
- jint imTimeoutMs)
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, nullptr, minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, nullptr));
+    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, nullptr, minInterval,
+                                  maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, nullptr));
     return;
 exit:
     ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.AsString());
@@ -37,7 +37,8 @@ JNI_METHOD(void, read)
  jboolean isFabricFiltered, jint imTimeoutMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, nullptr, isFabricFiltered, imTimeoutMs, nullptr));
+    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, nullptr, isFabricFiltered,
+                             imTimeoutMs, nullptr));
     return;
 exit:
     ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
