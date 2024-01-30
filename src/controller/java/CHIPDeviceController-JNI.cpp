@@ -2176,6 +2176,8 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
                         ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
 
     auto iter = wrapper->getICDClientStorage()->IterateICDClientInfo();
+    VerifyOrReturnValue(iter != nullptr, nullptr, ChipLogError(Controller, "IterateICDClientInfo failed!"));
+    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
 
     jmethodID constructor;
     jclass infoClass;
@@ -2218,8 +2220,6 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
     }
-
-    iter->Release();
 
     return jInfo;
 }

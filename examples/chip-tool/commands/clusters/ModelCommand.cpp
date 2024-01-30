@@ -19,6 +19,7 @@
 #include "ModelCommand.h"
 
 #include <app/InteractionModelEngine.h>
+#include <app/icd/client/DefaultICDClientStorage.h>
 #include <inttypes.h>
 
 using namespace ::chip;
@@ -86,11 +87,11 @@ void ModelCommand::CheckPeerICDType()
     app::ICDClientInfo info;
     auto destinationPeerId = chip::ScopedNodeId(mDestinationId, CurrentCommissioner().GetFabricIndex());
     auto iter              = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
-
     if (iter == nullptr)
     {
         return;
     }
+    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
 
     while (iter->Next(info))
     {
