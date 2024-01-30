@@ -92,7 +92,7 @@ private:
     // ICD related information is managed by the ICDManager but stored in the ICDConfigurationData to enable consummers to access it
     // without creating a circular dependency. To avoid allowing consummers changing the state of the ICD mode without going through
     // the ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a
-    // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/ICDStateObserver.h
+    // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/server/ICDStateObserver.h
     friend class chip::app::ICDManager;
     friend class chip::app::TestICDManager;
 
