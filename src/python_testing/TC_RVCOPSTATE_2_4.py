@@ -94,7 +94,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
         ret = await self.send_go_home_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
                              "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                             error_enum_to_text(expected_error)))
+                                                                error_enum_to_text(expected_error)))
 
     # Prints the step number, reads the operational state attribute and checks if it matches with expected_state
     async def read_operational_state_with_check(self, step_number, expected_state):

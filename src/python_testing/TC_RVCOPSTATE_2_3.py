@@ -112,7 +112,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         ret = await self.send_pause_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
                              "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                             error_enum_to_text(expected_error)))
+                                                                error_enum_to_text(expected_error)))
 
     # Sends the Resume command and checks that the returned error matches the expected_error
     async def send_resume_cmd_with_check(self, step_number, expected_error):
@@ -120,7 +120,7 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         ret = await self.send_resume_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
                              "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                             error_enum_to_text(expected_error)))
+                                                                error_enum_to_text(expected_error)))
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):

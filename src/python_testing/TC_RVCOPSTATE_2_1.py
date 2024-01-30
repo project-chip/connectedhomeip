@@ -28,7 +28,6 @@ class TC_RVCOPSTATE_2_1(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
 
-
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
