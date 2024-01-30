@@ -100,8 +100,8 @@ bool DeviceInfoProviderImpl::FixedLabelIteratorImpl::Next(FixedLabelType & outpu
         VerifyOrReturnError(std::strlen(labelPtr) <= kMaxLabelNameLength, false);
         VerifyOrReturnError(std::strlen(valuePtr) <= kMaxLabelValueLength, false);
 
-        Platform::CopyString(mFixedLabelNameBuf, kMaxLabelNameLength + 1, labelPtr);
-        Platform::CopyString(mFixedLabelValueBuf, kMaxLabelValueLength + 1, valuePtr);
+        Platform::CopyString(mFixedLabelNameBuf, labelPtr);
+        Platform::CopyString(mFixedLabelValueBuf, valuePtr);
 
         output.label = CharSpan::fromCharString(mFixedLabelNameBuf);
         output.value = CharSpan::fromCharString(mFixedLabelValueBuf);

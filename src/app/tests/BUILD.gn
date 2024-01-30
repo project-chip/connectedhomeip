@@ -153,6 +153,7 @@ chip_test_suite_using_nltest("tests") {
     "TestReportingEngine.cpp",
     "TestStatusIB.cpp",
     "TestStatusResponseMessage.cpp",
+    "TestTestEventTriggerDelegate.cpp",
     "TestTimeSyncDataProvider.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",

@@ -1051,8 +1051,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::InvalidValue);
     }
 
-    auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                                                         attributeData, attributeMetadata->attributeType));
+    auto status = ToInteractionModelStatus(emAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                                                                      attributeData, attributeMetadata->attributeType));
     return apWriteHandler->AddStatus(aPath, status);
 }
 
