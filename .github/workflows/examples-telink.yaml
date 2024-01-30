@@ -54,8 +54,8 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            # - name: Update Zephyr to specific revision (for developers purpose)
-             run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a1011c672e2c9df742ec68c03b0d0b00fcee514f"
+            - name: Update Zephyr to specific revision (for developers purpose)
+              run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py a1011c672e2c9df742ec68c03b0d0b00fcee514f"
 
             - name: Build example Telink (B93) Lighting App with 2Mb flash
               run: |
