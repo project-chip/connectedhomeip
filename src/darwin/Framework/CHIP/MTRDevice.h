@@ -348,7 +348,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_NEWLY_AVAILABLE;
 @end
 
-MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
+MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate <NSObject>
 @required
