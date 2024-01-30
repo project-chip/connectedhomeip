@@ -43,6 +43,13 @@ pw_proto_library("attributes_service") {
   prefix = "attributes_service"
 }
 
+pw_proto_library("boolean_state_service") {
+  sources = [ "protos/boolean_state_service.proto" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "boolean_state_service"
+}
+
 pw_proto_library("device_service") {
   sources = [ "protos/device_service.proto" ]
   inputs = [ "protos/device_service.options" ]
@@ -115,7 +122,7 @@ pw_source_set("system_rpc_server") {
   ]
 
   public_deps = [
-    "$dir_pw_hdlc:pw_rpc",
+    "$dir_pw_hdlc:default_addresses",
     "$dir_pw_hdlc:rpc_channel_output",
     "$dir_pw_stream:sys_io_stream",
   ]

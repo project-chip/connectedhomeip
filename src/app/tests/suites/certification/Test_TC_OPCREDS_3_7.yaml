@@ -66,7 +66,8 @@ tests:
 
     - label:
           "Step 3.2: TH1 does a non-fabric-filtered read of the Fabrics
-          attribute from the Node Operational Credentials cluster."
+          attribute from the Node Operational Credentials cluster. Save the
+          FabricIndex for TH1 as TH1_Fabric_Index for future use."
       PICS: OPCREDS.S.A0001
       identity: "alpha"
       command: "readAttribute"

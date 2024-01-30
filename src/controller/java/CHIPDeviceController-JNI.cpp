@@ -53,6 +53,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <pthread.h>
 #include <system/SystemClock.h>
 #include <vector>
@@ -174,34 +175,34 @@ JNI_METHOD(jint, onNOCChainGeneration)
 
     jmethodID getRootCertificate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRootCertificate", "()[B", &getRootCertificate);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
 
     jmethodID getIntermediateCertificate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIntermediateCertificate", "()[B",
                                                         &getIntermediateCertificate);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
 
     jmethodID getOperationalCertificate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getOperationalCertificate", "()[B",
                                                         &getOperationalCertificate);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
 
     jmethodID getIpk;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getIpk", "()[B", &getIpk);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
 
     jmethodID getAdminSubject;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getAdminSubject", "()J", &getAdminSubject);
-    VerifyOrReturnValue(err == CHIP_NO_ERROR, err.AsInteger());
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, static_cast<jint>(err.AsInteger()));
 
     jbyteArray rootCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getRootCertificate);
-    VerifyOrReturnValue(rootCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+    VerifyOrReturnValue(rootCertificate != nullptr, static_cast<jint>(CHIP_ERROR_BAD_REQUEST.AsInteger()));
 
     jbyteArray intermediateCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getIntermediateCertificate);
-    VerifyOrReturnValue(intermediateCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+    VerifyOrReturnValue(intermediateCertificate != nullptr, static_cast<jint>(CHIP_ERROR_BAD_REQUEST.AsInteger()));
 
     jbyteArray operationalCertificate = (jbyteArray) env->CallObjectMethod(controllerParams, getOperationalCertificate);
-    VerifyOrReturnValue(operationalCertificate != nullptr, CHIP_ERROR_BAD_REQUEST.AsInteger());
+    VerifyOrReturnValue(operationalCertificate != nullptr, static_cast<jint>(CHIP_ERROR_BAD_REQUEST.AsInteger()));
 
     // use ipk and adminSubject from CommissioningParameters if not set in ControllerParams
     CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
@@ -215,7 +216,12 @@ JNI_METHOD(jint, onNOCChainGeneration)
     {
         JniByteArray jByteArrayIpk(env, ipk);
 
-        VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+        if (jByteArrayIpk.byteSpan().size() != sizeof(ipkValue))
+        {
+            ChipLogError(Controller, "Invalid IPK size %u and expect %u", static_cast<unsigned>(jByteArrayIpk.byteSpan().size()),
+                         static_cast<unsigned>(sizeof(ipkValue)));
+            return CHIP_ERROR_INVALID_IPK.AsInteger();
+        }
         memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
 
         ipkOptional.SetValue(ipkTempSpan);
@@ -227,7 +233,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
     }
 
     Optional<NodeId> adminSubjectOptional;
-    uint64_t adminSubject = env->CallLongMethod(controllerParams, getAdminSubject);
+    uint64_t adminSubject = static_cast<uint64_t>(env->CallLongMethod(controllerParams, getAdminSubject));
     if (adminSubject == kUndefinedNodeId)
     {
         // if no value pass in ControllerParams, use value from CommissioningParameters
@@ -255,7 +261,7 @@ JNI_METHOD(jint, onNOCChainGeneration)
         ChipLogError(Controller, "Failed to SetNocChain for the device: %" CHIP_ERROR_FORMAT, err.Format());
     }
 #endif // JAVA_MATTER_CONTROLLER_TEST
-    return err.AsInteger();
+    return static_cast<jint>(err.AsInteger());
 }
 
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject controllerParams)
@@ -603,7 +609,7 @@ JNI_METHOD(void, commissionDevice)
         JniByteArray jniCsrNonce(env, csrNonce);
         commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
-    err = wrapper->Controller()->Commission(deviceId, commissioningParams);
+    err = wrapper->Controller()->Commission(static_cast<chip::NodeId>(deviceId), commissioningParams);
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -645,16 +651,13 @@ JNI_METHOD(void, pairDevice)
     }
 
     commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    if (icdRegistrationInfo != nullptr)
-    {
-        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-    }
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
+    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -695,16 +698,13 @@ JNI_METHOD(void, pairDeviceWithAddress)
     }
 
     commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    if (icdRegistrationInfo != nullptr)
-    {
-        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-    }
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
+    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -750,16 +750,14 @@ JNI_METHOD(void, pairDeviceWithCode)
     }
 
     commissioningParams.SetICDRegistrationStrategy(ICDRegistrationStrategy::kBeforeComplete);
-    if (icdRegistrationInfo != nullptr)
-    {
-        wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
-    }
+    wrapper->ApplyICDRegistrationInfo(commissioningParams, icdRegistrationInfo);
 
     if (wrapper->GetDeviceAttestationDelegateBridge() != nullptr)
     {
         commissioningParams.SetDeviceAttestationDelegate(wrapper->GetDeviceAttestationDelegateBridge());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, setUpCodeJniString.c_str(), commissioningParams, discoveryType);
+    err = wrapper->Controller()->PairDevice(static_cast<chip::NodeId>(deviceId), setUpCodeJniString.c_str(), commissioningParams,
+                                            discoveryType);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -787,7 +785,7 @@ JNI_METHOD(void, establishPaseConnection)(JNIEnv * env, jobject self, jlong hand
 #endif
                                                 .SetPeerAddress(Transport::PeerAddress::BLE());
 
-    err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
+    err = wrapper->Controller()->EstablishPASEConnection(static_cast<chip::NodeId>(deviceId), rendezvousParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -816,7 +814,7 @@ JNI_METHOD(void, establishPaseConnectionByAddress)
             .SetSetupPINCode(static_cast<uint32_t>(pinCode))
             .SetPeerAddress(Transport::PeerAddress::UDP(const_cast<char *>(addrJniString.c_str()), static_cast<uint16_t>(port)));
 
-    err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
+    err = wrapper->Controller()->EstablishPASEConnection(static_cast<chip::NodeId>(deviceId), rendezvousParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1192,7 +1190,7 @@ JNI_METHOD(jbyteArray, publicKeyFromCSR)
         return nullptr;
     }
 
-    err = JniReferences::GetInstance().N2J_ByteArray(env, publicKey.Bytes(), static_cast<uint32_t>(publicKey.Length()), outJbytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, publicKey.Bytes(), static_cast<jsize>(publicKey.Length()), outJbytes);
     SuccessOrExit(err);
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1226,7 +1224,7 @@ JNI_METHOD(jbyteArray, convertX509CertToMatterCert)
 
         VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
 
-        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<uint32_t>(outBytes.size()), outJbytes);
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
         SuccessOrExit(err);
     }
 
@@ -1258,7 +1256,7 @@ JNI_METHOD(jbyteArray, extractSkidFromPaaCert)
 
         VerifyOrExit(chip::CanCastTo<uint32_t>(outBytes.size()), err = CHIP_ERROR_INTERNAL);
 
-        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<uint32_t>(outBytes.size()), outJbytes);
+        err = JniReferences::GetInstance().N2J_ByteArray(env, outBytes.data(), static_cast<jsize>(outBytes.size()), outJbytes);
         SuccessOrExit(err);
     }
 
@@ -1280,7 +1278,7 @@ JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong d
 
     ChipLogProgress(Controller, "unpairDevice() called with device ID");
 
-    err = wrapper->Controller()->UnpairDevice(deviceId);
+    err = wrapper->Controller()->UnpairDevice(static_cast<chip::NodeId>(deviceId));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1314,7 +1312,7 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
 
     ChipLogProgress(Controller, "stopDevicePairing() called with device ID");
 
-    err = wrapper->Controller()->StopPairing(deviceId);
+    err = wrapper->Controller()->StopPairing(static_cast<chip::NodeId>(deviceId));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1355,10 +1353,18 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
-    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
-    err = wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess,
+    VerifyOrExit(connectedDeviceCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    err = wrapper->Controller()->GetConnectedDevice(static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess,
                                                     &connectedDeviceCallback->mOnFailure);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking GetConnectedDevice"));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "GetConnectedDevice failed: %" CHIP_ERROR_FORMAT, err.Format());
+        OperationalSessionSetup::ConnnectionFailureInfo failureInfo(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(nodeId), wrapper->Controller()->GetFabricIndex()), err,
+            SessionEstablishmentStage::kUnknown);
+        connectedDeviceCallback->mOnFailure.mCall(&connectedDeviceCallback->mOnFailure.mContext, failureInfo);
+    }
 }
 
 JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jlong devicePtr)
@@ -1776,7 +1782,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     uint16_t port;
     char addrStr[50];
 
-    CHIP_ERROR err = wrapper->Controller()->GetPeerAddressAndPort(deviceId, addr, port);
+    CHIP_ERROR err = wrapper->Controller()->GetPeerAddressAndPort(static_cast<chip::NodeId>(deviceId), addr, port);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1848,7 +1854,7 @@ JNI_METHOD(jlong, getCompressedFabricId)(JNIEnv * env, jobject self, jlong handl
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    return wrapper->Controller()->GetCompressedFabricId();
+    return static_cast<jlong>(wrapper->Controller()->GetCompressedFabricId());
 }
 
 JNI_METHOD(jlong, getControllerNodeId)(JNIEnv * env, jobject self, jlong handle)
@@ -1857,7 +1863,7 @@ JNI_METHOD(jlong, getControllerNodeId)(JNIEnv * env, jobject self, jlong handle)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    return wrapper->Controller()->GetNodeId();
+    return static_cast<jlong>(wrapper->Controller()->GetNodeId());
 }
 
 JNI_METHOD(void, discoverCommissionableNodes)(JNIEnv * env, jobject self, jlong handle)
@@ -2072,8 +2078,8 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     SuccessOrExit(err);
     VerifyOrExit(attestationChallenge.size() == 16, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = JniReferences::GetInstance().N2J_ByteArray(
-        env, attestationChallenge.data(), static_cast<uint32_t>(attestationChallenge.size()), attestationChallengeJbytes);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, attestationChallenge.data(),
+                                                     static_cast<jsize>(attestationChallenge.size()), attestationChallengeJbytes);
     SuccessOrExit(err);
 
 exit:
@@ -2136,6 +2142,73 @@ exit:
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
     }
     return nullptr;
+}
+
+JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, jint jFabricIndex)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    jobject jInfo = nullptr;
+    chip::app::ICDClientInfo info;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(jFabricIndex);
+
+    ChipLogProgress(Controller, "getICDClientInfo(%u) called", fabricIndex);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    VerifyOrReturnValue(wrapper != nullptr, nullptr, ChipLogError(Controller, "wrapper is null"));
+
+    err = JniReferences::GetInstance().CreateArrayList(jInfo);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    auto iter = wrapper->getICDClientStorage()->IterateICDClientInfo();
+
+    jmethodID constructor;
+    jclass infoClass;
+    JniLocalReferenceManager manager(env);
+
+    err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ICDClientInfo", infoClass);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                        ChipLogError(Controller, "Find ICDClientInfo class: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    env->ExceptionClear();
+    constructor = env->GetMethodID(infoClass, "<init>", "(JJJJ[B[B)V");
+    VerifyOrReturnValue(constructor != nullptr, nullptr, ChipLogError(Controller, "Find GetMethodID error!"));
+
+    while (iter->Next(info))
+    {
+        jbyteArray jIcdAesKey  = nullptr;
+        jbyteArray jIcdHmacKey = nullptr;
+        jobject jICDClientInfo = nullptr;
+
+        if (info.peer_node.GetFabricIndex() != fabricIndex)
+        {
+            continue;
+        }
+
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                                                               chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdAesKey);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "ICD AES KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        err = chip::JniReferences::GetInstance().N2J_ByteArray(env, info.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                                                               chip::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, jIcdHmacKey);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "ICD HMAC KEY N2J_ByteArray error!: %" CHIP_ERROR_FORMAT, err.Format()));
+
+        jICDClientInfo = (jobject) env->NewObject(infoClass, constructor, static_cast<jlong>(info.peer_node.GetNodeId()),
+                                                  static_cast<jlong>(info.start_icd_counter), static_cast<jlong>(info.offset),
+                                                  static_cast<jlong>(info.monitored_subject), jIcdAesKey, jIcdHmacKey);
+
+        err = JniReferences::GetInstance().AddToList(jInfo, jICDClientInfo);
+        VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
+                            ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
+    }
+
+    iter->Release();
+
+    return jInfo;
 }
 
 void * IOThreadMain(void * arg)

@@ -21,10 +21,10 @@ import builtins
 import inspect
 import json
 import logging
-import math
 import os
 import pathlib
 import queue
+import random
 import re
 import sys
 import typing
@@ -43,6 +43,7 @@ from chip.tlv import float32, uint
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
+from chip.ChipDeviceCtrl import CommissioningParameters
 
 # isort: on
 import chip.clusters as Clusters
@@ -151,7 +152,7 @@ def parse_pics(lines=typing.List[str]) -> dict[str, bool]:
         if val not in ["1", "0"]:
             raise ValueError('PICS {} must have a value of 0 or 1'.format(key))
 
-        pics[key.strip().upper()] = (val == "1")
+        pics[key.strip()] = (val == "1")
     return pics
 
 
@@ -183,8 +184,10 @@ def type_matches(received_value, desired_type):
     else:
         return isinstance(received_value, desired_type)
 
+# TODO(#31177): Need to add unit tests for all time conversion methods.
 
-def utc_time_in_matter_epoch(desired_datetime: datetime = None):
+
+def utc_time_in_matter_epoch(desired_datetime: Optional[datetime] = None):
     """ Returns the time in matter epoch in us.
 
         If desired_datetime is None, it will return the current time.
@@ -199,19 +202,36 @@ def utc_time_in_matter_epoch(desired_datetime: datetime = None):
     return utc_th_us
 
 
+matter_epoch_us_from_utc_datetime = utc_time_in_matter_epoch
+
+
+def utc_datetime_from_matter_epoch_us(matter_epoch_us: int) -> datetime:
+    """Returns the given Matter epoch time as a usable Python datetime in UTC."""
+    delta_from_epoch = timedelta(microseconds=matter_epoch_us)
+    matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+
+    return matter_epoch + delta_from_epoch
+
+
+def utc_datetime_from_posix_time_ms(posix_time_ms: int) -> datetime:
+    millis = posix_time_ms % 1000
+    seconds = posix_time_ms // 1000
+    return datetime.fromtimestamp(seconds, timezone.utc) + timedelta(milliseconds=millis)
+
+
 def compare_time(received: int, offset: timedelta = timedelta(), utc: int = None, tolerance: timedelta = timedelta(seconds=5)) -> None:
     if utc is None:
         utc = utc_time_in_matter_epoch()
 
     # total seconds includes fractional for microseconds
-    expected = utc + offset.total_seconds()*1000000
+    expected = utc + offset.total_seconds() * 1000000
     delta_us = abs(expected - received)
     delta = timedelta(microseconds=delta_us)
     asserts.assert_less_equal(delta, tolerance, "Received time is out of tolerance")
 
 
 def get_wait_seconds_from_set_time(set_time_matter_us: int, wait_seconds: int):
-    seconds_passed = math.floor((utc_time_in_matter_epoch() - set_time_matter_us)/1000000)
+    seconds_passed = (utc_time_in_matter_epoch() - set_time_matter_us) // 1000000
     return wait_seconds - seconds_passed
 
 
@@ -355,7 +375,16 @@ def cluster_id_str(id):
         s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
     else:
         s = "Unknown cluster"
-    return f'{id_str(id)} {s}'
+    try:
+        return f'{id_str(id)} {s}'
+    except TypeError:
+        return 'HERE IS THE PROBLEM'
+
+
+@dataclass
+class CustomCommissioningParameters:
+    commissioningParameters: CommissioningParameters
+    randomDiscriminator: int
 
 
 @dataclass
@@ -704,8 +733,19 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def check_pics(self, pics_key: str) -> bool:
         picsd = self.matter_test_config.pics
-        pics_key = pics_key.strip().upper()
+        pics_key = pics_key.strip()
         return pics_key in picsd and picsd[pics_key]
+
+    def openCommissioningWindow(self, dev_ctrl: ChipDeviceCtrl, node_id: int) -> CustomCommissioningParameters:
+        rnd_discriminator = random.randint(0, 4095)
+        try:
+            commissioning_params = dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=900, iteration=1000,
+                                                                    discriminator=rnd_discriminator, option=1)
+            params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
+            return params
+
+        except InteractionModelError as e:
+            asserts.fail(e.status, 'Failed to open commissioning window')
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
@@ -715,7 +755,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute_check_success(
             self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -723,19 +763,31 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
-        err_msg = "Error reading {}:{}".format(str(cluster), str(attribute))
-        asserts.assert_true(attr_ret is not None, err_msg)
-        asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
+        read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
-        asserts.assert_true(type_matches(attr_ret, desired_type),
-                            'Returned attribute {} is wrong type expected {}, got {}'.format(attribute, desired_type, type(attr_ret)))
+        type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
+        read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
+        type_ok = type_matches(attr_ret, desired_type)
+        if assert_on_error:
+            asserts.assert_true(read_ok, read_err_msg)
+            asserts.assert_true(type_ok, type_err_msg)
+        else:
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+                                             attribute_id=attribute.attribute_id)
+            if not read_ok:
+                self.record_error(test_name=test_name, location=location, problem=read_err_msg)
+                return None
+            elif not type_ok:
+                self.record_error(test_name=test_name, location=location, problem=type_err_msg)
+                return None
         return attr_ret
 
     async def read_single_attribute_expect_error(
             self, cluster: object, attribute: object,
-            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None) -> object:
+            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = None,
+            fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -743,13 +795,20 @@ class MatterBaseTest(base_test.BaseTestClass):
         if endpoint is None:
             endpoint = self.matter_test_config.endpoint
 
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)])
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
-        asserts.assert_true(attr_ret is not None, err_msg)
-        asserts.assert_true(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
-        asserts.assert_true(isinstance(attr_ret.Reason, InteractionModelError), err_msg)
-        asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        error_type_ok = attr_ret is not None and isinstance(
+            attr_ret, Clusters.Attribute.ValueDecodeFailure) and isinstance(attr_ret.Reason, InteractionModelError)
+        if assert_on_error:
+            asserts.assert_true(error_type_ok, err_msg)
+            asserts.assert_equal(attr_ret.Reason.status, error, err_msg)
+        elif not error_type_ok or attr_ret.Reason.status != error:
+            location = AttributePathLocation(endpoint_id=endpoint, cluster_id=cluster.id,
+                                             attribute_id=attribute.attribute_id)
+            self.record_error(test_name=test_name, location=location, problem=err_msg)
+            return None
+
         return attr_ret
 
     async def send_single_cmd(
@@ -822,23 +881,43 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def pics_guard(self, pics_condition: bool):
         if not pics_condition:
-            try:
-                steps = self.get_test_steps()
-                num = steps[self.current_step_index].test_plan_number
-            except KeyError:
-                num = self.current_step_index
+            self.mark_current_step_skipped()
 
-            if self.runner_hook:
-                # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
-                # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
-                #       as a string? Does it get used by the TH?
-                self.runner_hook.step_skipped(name=str(num), expression="")
-            else:
-                logging.info(f'**** Skipping: {num}')
-            self.step_skipped = True
+    def mark_current_step_skipped(self):
+        try:
+            steps = self.get_test_steps(self.current_test_info.name)
+            if self.current_step_index == 0:
+                asserts.fail("Script error: mark_current_step_skipped cannot be called before step()")
+            num = steps[self.current_step_index-1].test_plan_number
+        except KeyError:
+            num = self.current_step_index
+
+        if self.runner_hook:
+            # TODO: what does name represent here? The wordy test name? The test plan number? The number and name?
+            # TODO: I very much do not want to have people passing in strings here. Do we really need the expression
+            #       as a string? Does it get used by the TH?
+            self.runner_hook.step_skipped(name=str(num), expression="")
+        else:
+            logging.info(f'**** Skipping: {num}')
+        self.step_skipped = True
+
+    def skip_step(self, step):
+        self.step(step)
+        self.mark_current_step_skipped()
+
+    def skip_all_remaining_steps(self, starting_step):
+        ''' Skips all remaining test steps starting with provided starting step
+
+            starting_step must be provided, and is not derived intentionally. By providing argument
+                test is more deliberately identifying where test skips are starting from, making
+                it easier to validate against the test plan for correctness.
+        '''
+        last_step = len(self.get_test_steps(self.current_test_info.name)) + 1
+        for index in range(starting_step, last_step):
+            self.skip_step(index)
 
     def step(self, step: typing.Union[int, str]):
-        test_name = sys._getframe().f_back.f_code.co_name
+        test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
         # TODO: this might be annoying during dev. Remove? Flag?

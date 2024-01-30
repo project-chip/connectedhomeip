@@ -55,6 +55,9 @@ constexpr uint8_t kFabricSensitiveCharLength = 128;
 // The maximum length of the fabric sensitive integer list within the TestFabricScoped struct.
 constexpr uint8_t kFabricSensitiveIntListLength = 8;
 
+// The maximum buffer size allowed in TestBatchHelperResponse
+constexpr uint16_t kTestBatchHelperResponseBufferMax = 800;
+
 namespace {
 
 class OctetStringData
@@ -103,6 +106,14 @@ private:
     CHIP_ERROR WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
 };
 
+struct AsyncBatchCommandsWorkData
+{
+    CommandHandler::Handle asyncCommandHandle;
+    ConcreteCommandPath commandPath = ConcreteCommandPath(0, 0, 0);
+    uint16_t sizeOfResponseBuffer;
+    uint8_t fillCharacter;
+};
+
 TestAttrAccess gAttrAccess;
 uint8_t gListUint8Data[kAttributeListLength];
 size_t gListUint8DataLen = kAttributeListLength;
@@ -136,6 +147,36 @@ const char sLongOctetStringBuf[513] = "0123456789abcdef0123456789abcdef012345678
 SimpleEnum gSimpleEnums[kAttributeListLength];
 size_t gSimpleEnumCount = 0;
 Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
+
+void AsyncBatchCommandWork(AsyncBatchCommandsWorkData * asyncWorkData)
+{
+    auto commandHandleRef = std::move(asyncWorkData->asyncCommandHandle);
+    auto commandHandle    = commandHandleRef.Get();
+    if (commandHandle == nullptr)
+    {
+        // Very weird that we are even in here, what set this to nullptr?
+        Platform::Delete(asyncWorkData);
+        return;
+    }
+
+    uint8_t buffer[kTestBatchHelperResponseBufferMax];
+    memset(buffer, asyncWorkData->fillCharacter, asyncWorkData->sizeOfResponseBuffer);
+    Commands::TestBatchHelperResponse::Type response;
+    response.buffer = ByteSpan(buffer, asyncWorkData->sizeOfResponseBuffer);
+    commandHandle->AddResponse(asyncWorkData->commandPath, response);
+    Platform::Delete(asyncWorkData);
+}
+
+static void timerCallback(System::Layer *, void * callbackContext)
+{
+    AsyncBatchCommandWork(reinterpret_cast<AsyncBatchCommandsWorkData *>(callbackContext));
+}
+
+static void scheduleTimerCallbackMs(AsyncBatchCommandsWorkData * asyncWorkData, uint32_t delayMs)
+{
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                          reinterpret_cast<void *>(asyncWorkData));
+}
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -679,7 +720,7 @@ bool emberAfUnitTestingClusterTestCallback(app::CommandHandler * commandObj, con
                                            const Clusters::UnitTesting::Commands::Test::DecodableType & commandData)
 {
     // Setup the test variables
-    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    emberAfInitializeAttributes(commandPath.mEndpointId);
     for (int i = 0; i < kAttributeListLength; ++i)
     {
         gListUint8Data[i] = 0;
@@ -739,6 +780,27 @@ static bool SendBooleanResponse(CommandHandler * commandObj, const ConcreteComma
     return true;
 }
 
+bool emberAfUnitTestingClusterTestDifferentVendorMeiRequestCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::TestDifferentVendorMeiRequest::DecodableType & commandData)
+{
+    Commands::TestDifferentVendorMeiResponse::Type response;
+
+    {
+        Events::TestDifferentVendorMeiEvent::Type event{ commandData.arg1 };
+
+        if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, response.eventNumber))
+        {
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return true;
+        }
+    }
+
+    response.arg1 = commandData.arg1;
+    commandObj->AddResponse(commandPath, response);
+    return true;
+}
+
 bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::TestStructArgumentRequest::DecodableType & commandData)
@@ -792,6 +854,7 @@ bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
+
     commandObj->AddResponse(commandPath, responseData);
     return true;
 }
@@ -992,6 +1055,52 @@ bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
                                                                              : Protocols::InteractionModel::Status::InvalidValue;
     commandObj->AddStatus(commandPath, status);
     return true;
+}
+
+// TestBatchHelperRequest and TestSecondBatchHelperRequest do the same thing.
+// The reason there are two identical commands is because batch command requires
+// command paths in the same batch to be unique. These command allow for
+// client to control order of the response and control size of CommandDataIB
+// being sent back to help test some corner cases.
+bool TestBatchHelperCommon(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, const uint16_t sleepTimeMs,
+                           const uint16_t sizeOfResponseBuffer, const uint8_t fillCharacter)
+{
+    if (sizeOfResponseBuffer > kTestBatchHelperResponseBufferMax)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::ConstraintError);
+        return true;
+    }
+
+    AsyncBatchCommandsWorkData * asyncWorkData = Platform::New<AsyncBatchCommandsWorkData>();
+    if (asyncWorkData == nullptr)
+    {
+        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Busy);
+        return true;
+    }
+
+    asyncWorkData->asyncCommandHandle   = commandObj;
+    asyncWorkData->commandPath          = commandPath;
+    asyncWorkData->sizeOfResponseBuffer = sizeOfResponseBuffer;
+    asyncWorkData->fillCharacter        = fillCharacter;
+
+    scheduleTimerCallbackMs(asyncWorkData, sleepTimeMs);
+
+    return true;
+}
+
+bool emberAfUnitTestingClusterTestBatchHelperRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                             const Commands::TestBatchHelperRequest::DecodableType & commandData)
+{
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
+}
+
+bool emberAfUnitTestingClusterTestSecondBatchHelperRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestSecondBatchHelperRequest::DecodableType & commandData)
+{
+    return TestBatchHelperCommon(commandObj, commandPath, commandData.sleepBeforeResponseTimeMs, commandData.sizeOfResponseBuffer,
+                                 commandData.fillCharacter);
 }
 
 // -----------------------------------------------------------------------------

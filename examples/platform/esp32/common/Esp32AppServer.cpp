@@ -19,8 +19,9 @@
 #include "Esp32AppServer.h"
 #include "CHIPDeviceManager.h"
 #include <app/InteractionModelEngine.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
-#include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
+#include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
@@ -141,7 +142,8 @@ void Esp32AppServer::DeInitBLEIfCommissioned(void)
 
 #if CONFIG_IDF_TARGET_ESP32
         err |= esp_bt_mem_release(ESP_BT_MODE_BTDM);
-#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2
+#elif CONFIG_IDF_TARGET_ESP32C2 || CONFIG_IDF_TARGET_ESP32C3 || CONFIG_IDF_TARGET_ESP32S3 || CONFIG_IDF_TARGET_ESP32H2 ||          \
+    CONFIG_IDF_TARGET_ESP32C6
         err |= esp_bt_mem_release(ESP_BT_MODE_BLE);
 #endif
 
@@ -168,8 +170,11 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
         ESP_LOGE(TAG, "Failed to convert the EnableKey string to octstr type value");
         memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
     }
-    static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sOtaTestEventTriggerHandler) == CHIP_NO_ERROR);
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     if (sAppDelegate != nullptr)

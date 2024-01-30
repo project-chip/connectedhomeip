@@ -195,9 +195,9 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err               = CHIP_NO_ERROR;
     app::ReadClient * readClient = nullptr;
-    jint numAttributePaths       = 0;
-    jint numEventPaths           = 0;
-    jint numDataVersionFilters   = 0;
+    size_t numAttributePaths     = 0;
+    size_t numEventPaths         = 0;
+    size_t numDataVersionFilters = 0;
     auto callback                = reinterpret_cast<ReportCallback *>(callbackHandle);
     DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
@@ -217,7 +217,9 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
 
     if (attributePathList != nullptr)
     {
-        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributePathList, numAttributePaths));
+        jint jNumAttributePaths = 0;
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributePathList, jNumAttributePaths));
+        numAttributePaths = static_cast<size_t>(jNumAttributePaths);
     }
 
     if (numAttributePaths > 0)
@@ -241,7 +243,9 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
 
     if (dataVersionFilterList != nullptr)
     {
-        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(dataVersionFilterList, numDataVersionFilters));
+        jint jNumDataVersionFilters = 0;
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(dataVersionFilterList, jNumDataVersionFilters));
+        numDataVersionFilters = static_cast<size_t>(jNumDataVersionFilters);
     }
 
     if (numDataVersionFilters > 0)
@@ -270,7 +274,9 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
 
     if (eventPathList != nullptr)
     {
-        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(eventPathList, numEventPaths));
+        jint jNumEventPaths = 0;
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(eventPathList, jNumEventPaths));
+        numEventPaths = static_cast<size_t>(jNumEventPaths);
     }
 
     if (numEventPaths > 0)
@@ -290,7 +296,7 @@ CHIP_ERROR subscribe(JNIEnv * env, jlong handle, jlong callbackHandle, jlong dev
         }
 
         params.mpEventPathParamsList    = eventPaths.get();
-        params.mEventPathParamsListSize = numEventPaths;
+        params.mEventPathParamsListSize = static_cast<size_t>(numEventPaths);
         eventPaths.release();
     }
 
@@ -340,7 +346,6 @@ CHIP_ERROR read(JNIEnv * env, jlong handle, jlong callbackHandle, jlong devicePt
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-
     app::ReadPrepareParams params(device->GetSecureSession().Value());
 
     SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
@@ -521,14 +526,14 @@ CHIP_ERROR write(JNIEnv * env, jlong handle, jlong callbackHandle, jlong deviceP
             VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
             VerifyOrExit(jsonJniString != nullptr, err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
             JniUtfString jsonUtfJniString(env, jsonJniString);
-            std::string jsonString = std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size());
+            std::string jsonString = std::string(jsonUtfJniString.c_str(), static_cast<size_t>(jsonUtfJniString.size()));
 
             // Context: Chunk write is supported in sdk, oversized list could be chunked in multiple message. When transforming
             // JSON to TLV, we need know the actual size for tlv blob when handling JsonToTlv
             // TODO: Implement memory auto-grow to get the actual size needed for tlv blob when transforming tlv to json.
             // Workaround: Allocate memory using json string's size, which is large enough to hold the corresponding tlv blob
             Platform::ScopedMemoryBufferWithSize<uint8_t> tlvBytes;
-            size_t length = jsonUtfJniString.size();
+            size_t length = static_cast<size_t>(jsonUtfJniString.size());
             VerifyOrExit(tlvBytes.Calloc(length), err = CHIP_ERROR_NO_MEMORY);
             MutableByteSpan data(tlvBytes.Get(), tlvBytes.AllocatedSize());
             SuccessOrExit(err = ConvertJsonToTlvWithoutStruct(jsonString, data));
@@ -672,7 +677,8 @@ CHIP_ERROR invoke(JNIEnv * env, jlong handle, jlong callbackHandle, jlong device
             // The invoke does not support chunk, kMaxSecureSduLengthBytes should be enough for command json blob
             uint8_t tlvBytes[chip::app::kMaxSecureSduLengthBytes] = { 0 };
             MutableByteSpan tlvEncodingLocal{ tlvBytes };
-            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), jsonUtfJniString.size()), tlvEncodingLocal));
+            SuccessOrExit(err = JsonToTlv(std::string(jsonUtfJniString.c_str(), static_cast<size_t>(jsonUtfJniString.size())),
+                                          tlvEncodingLocal));
             SuccessOrExit(err = PutPreencodedInvokeRequest(*commandSender, path, tlvEncodingLocal));
         }
     }

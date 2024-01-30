@@ -51,7 +51,7 @@ qpg_executable("lock_app") {
   output_name = "chip-${qpg_target_ic}-lock-example.out"
 
   sources = [
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.cpp",
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
     "src/AppTask.cpp",
@@ -102,6 +102,7 @@ qpg_executable("lock_app") {
     ]
 
     deps += [
+      "$dir_pw_hdlc:default_addresses",
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
       "${chip_root}/config/qpg/lib/pw_rpc:pw_rpc",

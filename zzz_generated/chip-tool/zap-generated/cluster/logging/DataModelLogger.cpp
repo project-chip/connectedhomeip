@@ -188,113 +188,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("AttributeID", indent + 1, value.attributeID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AttributeValue", indent + 1, value.attributeValue);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeValue'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("ClusterID", indent + 1, value.clusterID);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClusterID'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("AttributeValueList", indent + 1, value.attributeValueList);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeValueList'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::Scenes::Structs::SceneInfoStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("SceneCount", indent + 1, value.sceneCount);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SceneCount'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CurrentScene", indent + 1, value.currentScene);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentScene'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CurrentGroup", indent + 1, value.currentGroup);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentGroup'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("SceneValid", indent + 1, value.sceneValid);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SceneValid'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("RemainingCapacity", indent + 1, value.remainingCapacity);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RemainingCapacity'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -1935,6 +1828,114 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ScenesManagement::Structs::AttributeValuePair::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("AttributeID", indent + 1, value.attributeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AttributeValue", indent + 1, value.attributeValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeValue'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ScenesManagement::Structs::ExtensionFieldSet::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ClusterID", indent + 1, value.clusterID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ClusterID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AttributeValueList", indent + 1, value.attributeValueList);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AttributeValueList'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("SceneCount", indent + 1, value.sceneCount);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SceneCount'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CurrentScene", indent + 1, value.currentScene);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentScene'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CurrentGroup", indent + 1, value.currentGroup);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CurrentGroup'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SceneValid", indent + 1, value.sceneValid);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SceneValid'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("RemainingCapacity", indent + 1, value.remainingCapacity);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'RemainingCapacity'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FabricIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -2463,6 +2464,97 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MessageResponseID", indent + 1, value.messageResponseID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MessageResponseID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Label'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Messages::Structs::MessageStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("MessageID", indent + 1, value.messageID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MessageID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Priority", indent + 1, value.priority);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Priority'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MessageControl", indent + 1, value.messageControl);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MessageControl'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("StartTime", indent + 1, value.startTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'StartTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Duration", indent + 1, value.duration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Duration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MessageText", indent + 1, value.messageText);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MessageText'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Responses", indent + 1, value.responses);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Responses'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::DeviceEnergyManagement::Structs::CostStruct::DecodableType & value)
 {
@@ -2726,6 +2818,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("ForecastUpdateReason", indent + 1, value.forecastUpdateReason);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ForecastUpdateReason'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -2890,6 +2990,32 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DayOfWeekForSequence", indent + 1, value.dayOfWeekForSequence);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayOfWeekForSequence'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChargingTargets", indent + 1, value.chargingTargets);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChargingTargets'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::DecodableType & value)
 {
@@ -2932,6 +3058,269 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CredentialIndex'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Thermostat::Structs::ScheduleTransitionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("DayOfWeek", indent + 1, value.dayOfWeek);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DayOfWeek'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TransitionTime", indent + 1, value.transitionTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransitionTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SystemMode", indent + 1, value.systemMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SystemMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CoolingSetpoint", indent + 1, value.coolingSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CoolingSetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HeatingSetpoint", indent + 1, value.heatingSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HeatingSetpoint'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("ScheduleHandle", indent + 1, value.scheduleHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ScheduleHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SystemMode", indent + 1, value.systemMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SystemMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Name'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Transitions", indent + 1, value.transitions);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Transitions'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BuiltIn", indent + 1, value.builtIn);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BuiltIn'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PresetScenario", indent + 1, value.presetScenario);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetScenario'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Name'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("CoolingSetpoint", indent + 1, value.coolingSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CoolingSetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("HeatingSetpoint", indent + 1, value.heatingSetpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'HeatingSetpoint'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("BuiltIn", indent + 1, value.builtIn);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'BuiltIn'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PresetScenario", indent + 1, value.presetScenario);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetScenario'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NumberOfPresets", indent + 1, value.numberOfPresets);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NumberOfPresets'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PresetTypeFeatures", indent + 1, value.presetTypeFeatures);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetTypeFeatures'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TransitionTimestamp", indent + 1, value.transitionTimestamp);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TransitionTimestamp'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("SystemMode", indent + 1, value.systemMode);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SystemMode'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NumberOfSchedules", indent + 1, value.numberOfSchedules);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'NumberOfSchedules'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ScheduleTypeFeatures", indent + 1, value.scheduleTypeFeatures);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ScheduleTypeFeatures'");
             return err;
         }
     }
@@ -5722,6 +6111,78 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Messages::Events::MessageQueued::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("MessageID", indent + 1, value.messageID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MessageID'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Messages::Events::MessagePresented::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("MessageID", indent + 1, value.messageID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MessageID'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Messages::Events::MessageComplete::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("MessageID", indent + 1, value.messageID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'MessageID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("ResponseID", indent + 1, value.responseID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'ResponseID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Reply", indent + 1, value.reply);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Reply'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("FutureMessagesPreference", indent + 1, value.futureMessagesPreference);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'FutureMessagesPreference'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DeviceEnergyManagement::Events::PowerAdjustStart::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5773,6 +6234,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const DeviceEnergyManagement::Events::Resumed::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Cause", indent + 1, value.cause);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Cause'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -6527,6 +6996,22 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Events::TestDifferentVendorMeiEvent::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = DataModelLogger::LogValue("Arg1", indent + 1, value.arg1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Event truncated due to invalid value for 'Arg1'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SampleMei::Events::PingCountEvent::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -6585,102 +7070,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
     ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::AddSceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::ViewSceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("transitionTime", indent + 1, value.transitionTime));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneName", indent + 1, value.sceneName));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("extensionFieldSets", indent + 1, value.extensionFieldSets));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::RemoveSceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::RemoveAllScenesResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::StoreSceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::GetSceneMembershipResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("capacity", indent + 1, value.capacity));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneList", indent + 1, value.sceneList));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::EnhancedAddSceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::EnhancedViewSceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("transitionTime", indent + 1, value.transitionTime));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneName", indent + 1, value.sceneName));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("extensionFieldSets", indent + 1, value.extensionFieldSets));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const Scenes::Commands::CopySceneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("groupIdentifierFrom", indent + 1, value.groupIdentifierFrom));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneIdentifierFrom", indent + 1, value.sceneIdentifierFrom));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -6953,11 +7342,101 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::AddSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::ViewSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("transitionTime", indent + 1, value.transitionTime));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneName", indent + 1, value.sceneName));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("extensionFieldSets", indent + 1, value.extensionFieldSets));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::RemoveSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::StoreSceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneID", indent + 1, value.sceneID));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("capacity", indent + 1, value.capacity));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupID", indent + 1, value.groupID));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneList", indent + 1, value.sceneList));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ScenesManagement::Commands::CopySceneResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("groupIdentifierFrom", indent + 1, value.groupIdentifierFrom));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("sceneIdentifierFrom", indent + 1, value.sceneIdentifierFrom));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const EnergyEvse::Commands::GetTargetsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("dayOfWeekforSequence", indent + 1, value.dayOfWeekforSequence));
-    ReturnErrorOnFailure(DataModelLogger::LogValue("chargingTargets", indent + 1, value.chargingTargets));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("chargingTargetSchedules", indent + 1, value.chargingTargetSchedules));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("status", indent + 1, value.status));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("statusText", indent + 1, value.statusText));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -7303,6 +7782,23 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Commands::TestBatchHelperResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("buffer", indent + 1, value.buffer));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("arg1", indent + 1, value.arg1));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("eventNumber", indent + 1, value.eventNumber));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const SampleMei::Commands::AddArgumentsResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -7399,82 +7895,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case Groups::Attributes::ClusterRevision::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ClusterRevision", 1, value);
-        }
-        }
-        break;
-    }
-    case Scenes::Id: {
-        switch (path.mAttributeId)
-        {
-        case Scenes::Attributes::SceneCount::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SceneCount", 1, value);
-        }
-        case Scenes::Attributes::CurrentScene::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentScene", 1, value);
-        }
-        case Scenes::Attributes::CurrentGroup::Id: {
-            chip::GroupId value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CurrentGroup", 1, value);
-        }
-        case Scenes::Attributes::SceneValid::Id: {
-            bool value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SceneValid", 1, value);
-        }
-        case Scenes::Attributes::NameSupport::Id: {
-            chip::BitMask<chip::app::Clusters::Scenes::NameSupportBitmap> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NameSupport", 1, value);
-        }
-        case Scenes::Attributes::LastConfiguredBy::Id: {
-            chip::app::DataModel::Nullable<chip::NodeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("LastConfiguredBy", 1, value);
-        }
-        case Scenes::Attributes::SceneTableSize::Id: {
-            uint16_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SceneTableSize", 1, value);
-        }
-        case Scenes::Attributes::FabricSceneInfo::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::SceneInfoStruct::DecodableType> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FabricSceneInfo", 1, value);
-        }
-        case Scenes::Attributes::GeneratedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
-        }
-        case Scenes::Attributes::AcceptedCommandList::Id: {
-            chip::app::DataModel::DecodableList<chip::CommandId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
-        }
-        case Scenes::Attributes::EventList::Id: {
-            chip::app::DataModel::DecodableList<chip::EventId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EventList", 1, value);
-        }
-        case Scenes::Attributes::AttributeList::Id: {
-            chip::app::DataModel::DecodableList<chip::AttributeId> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AttributeList", 1, value);
-        }
-        case Scenes::Attributes::FeatureMap::Id: {
-            uint32_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("FeatureMap", 1, value);
-        }
-        case Scenes::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -10246,6 +10666,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UserActiveModeTriggerInstruction", 1, value);
         }
+        case IcdManagement::Attributes::OperatingMode::Id: {
+            chip::app::Clusters::IcdManagement::OperatingModeEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OperatingMode", 1, value);
+        }
         case IcdManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -10750,11 +11175,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RvcRunMode::Attributes::OnMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
-        }
         case RvcRunMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -10800,11 +11220,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
-        }
-        case RvcCleanMode::Attributes::OnMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OnMode", 1, value);
         }
         case RvcCleanMode::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -10909,17 +11324,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case RefrigeratorAlarm::Attributes::Mask::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
         case RefrigeratorAlarm::Attributes::State::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
         }
         case RefrigeratorAlarm::Attributes::Supported::Id: {
-            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Supported", 1, value);
         }
@@ -11159,22 +11574,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case DishwasherAlarm::Attributes::Mask::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Mask", 1, value);
         }
         case DishwasherAlarm::Attributes::Latch::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Latch", 1, value);
         }
         case DishwasherAlarm::Attributes::State::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("State", 1, value);
         }
         case DishwasherAlarm::Attributes::Supported::Id: {
-            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value;
+            chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Supported", 1, value);
         }
@@ -11266,6 +11681,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CookTime", 1, value);
         }
+        case MicrowaveOvenControl::Attributes::MaxCookTime::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxCookTime", 1, value);
+        }
         case MicrowaveOvenControl::Attributes::PowerSetting::Id: {
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -11285,6 +11705,21 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PowerStep", 1, value);
+        }
+        case MicrowaveOvenControl::Attributes::SupportedWatts::Id: {
+            chip::app::DataModel::DecodableList<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedWatts", 1, value);
+        }
+        case MicrowaveOvenControl::Attributes::SelectedWattIndex::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SelectedWattIndex", 1, value);
+        }
+        case MicrowaveOvenControl::Attributes::WattRating::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("WattRating", 1, value);
         }
         case MicrowaveOvenControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -11448,6 +11883,58 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case RvcOperationalState::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case ScenesManagement::Id: {
+        switch (path.mAttributeId)
+        {
+        case ScenesManagement::Attributes::LastConfiguredBy::Id: {
+            chip::app::DataModel::Nullable<chip::NodeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LastConfiguredBy", 1, value);
+        }
+        case ScenesManagement::Attributes::SceneTableSize::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SceneTableSize", 1, value);
+        }
+        case ScenesManagement::Attributes::FabricSceneInfo::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::ScenesManagement::Structs::SceneInfoStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FabricSceneInfo", 1, value);
+        }
+        case ScenesManagement::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ScenesManagement::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ScenesManagement::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ScenesManagement::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ScenesManagement::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ScenesManagement::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -11720,6 +12207,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ValveFault", 1, value);
         }
+        case ValveConfigurationAndControl::Attributes::LevelStep::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LevelStep", 1, value);
+        }
         case ValveConfigurationAndControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -11904,6 +12396,52 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case Messages::Id: {
+        switch (path.mAttributeId)
+        {
+        case Messages::Attributes::Messages::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Messages", 1, value);
+        }
+        case Messages::Attributes::ActiveMessageIDs::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveMessageIDs", 1, value);
+        }
+        case Messages::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case Messages::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case Messages::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case Messages::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case Messages::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case Messages::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     case DeviceEnergyManagement::Id: {
         switch (path.mAttributeId)
         {
@@ -11944,6 +12482,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
                 value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Forecast", 1, value);
+        }
+        case DeviceEnergyManagement::Attributes::OptOutState::Id: {
+            chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OptOutState", 1, value);
         }
         case DeviceEnergyManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -12035,16 +12578,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RandomizationDelayWindow", 1, value);
-        }
-        case EnergyEvse::Attributes::NumberOfWeeklyTargets::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfWeeklyTargets", 1, value);
-        }
-        case EnergyEvse::Attributes::NumberOfDailyTargets::Id: {
-            uint8_t value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("NumberOfDailyTargets", 1, value);
         }
         case EnergyEvse::Attributes::NextChargeStartTime::Id: {
             chip::app::DataModel::Nullable<uint32_t> value;
@@ -12193,6 +12726,121 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("FeatureMap", 1, value);
         }
         case EnergyPreference::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case EnergyEvseMode::Id: {
+        switch (path.mAttributeId)
+        {
+        case EnergyEvseMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::EnergyEvseMode::Structs::ModeOptionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
+        case EnergyEvseMode::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case EnergyEvseMode::Attributes::StartUpMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case EnergyEvseMode::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case EnergyEvseMode::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case EnergyEvseMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case EnergyEvseMode::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
+    case DeviceEnergyManagementMode::Id: {
+        switch (path.mAttributeId)
+        {
+        case DeviceEnergyManagementMode::Attributes::SupportedModes::Id: {
+            chip::app::DataModel::DecodableList<
+                chip::app::Clusters::DeviceEnergyManagementMode::Structs::ModeOptionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedModes", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::CurrentMode::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentMode", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::StartUpMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StartUpMode", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::OnMode::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("OnMode", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case DeviceEnergyManagementMode::Attributes::ClusterRevision::Id: {
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
@@ -12382,6 +13030,51 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ExpiringUserTimeout", 1, value);
+        }
+        case DoorLock::Attributes::AliroReaderVerificationKey::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroReaderVerificationKey", 1, value);
+        }
+        case DoorLock::Attributes::AliroReaderGroupIdentifier::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroReaderGroupIdentifier", 1, value);
+        }
+        case DoorLock::Attributes::AliroReaderGroupSubIdentifier::Id: {
+            chip::ByteSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroReaderGroupSubIdentifier", 1, value);
+        }
+        case DoorLock::Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroExpeditedTransactionSupportedProtocolVersions", 1, value);
+        }
+        case DoorLock::Attributes::AliroGroupResolvingKey::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroGroupResolvingKey", 1, value);
+        }
+        case DoorLock::Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
+            chip::app::DataModel::DecodableList<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroSupportedBLEUWBProtocolVersions", 1, value);
+        }
+        case DoorLock::Attributes::AliroBLEAdvertisingVersion::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AliroBLEAdvertisingVersion", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfAliroCredentialIssuerKeysSupported", 1, value);
+        }
+        case DoorLock::Attributes::NumberOfAliroEndpointKeysSupported::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfAliroEndpointKeysSupported", 1, value);
         }
         case DoorLock::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -13046,6 +13739,76 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::Thermostat::ACCapacityFormatEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ACCapacityformat", 1, value);
+        }
+        case Thermostat::Attributes::PresetTypes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PresetTypes", 1, value);
+        }
+        case Thermostat::Attributes::ScheduleTypes::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleTypeStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ScheduleTypes", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfPresets::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfPresets", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfSchedules::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfSchedules", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfScheduleTransitions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfScheduleTransitions", 1, value);
+        }
+        case Thermostat::Attributes::NumberOfScheduleTransitionPerDay::Id: {
+            chip::app::DataModel::Nullable<uint8_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("NumberOfScheduleTransitionPerDay", 1, value);
+        }
+        case Thermostat::Attributes::ActivePresetHandle::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActivePresetHandle", 1, value);
+        }
+        case Thermostat::Attributes::ActiveScheduleHandle::Id: {
+            chip::app::DataModel::Nullable<chip::ByteSpan> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ActiveScheduleHandle", 1, value);
+        }
+        case Thermostat::Attributes::Presets::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Presets", 1, value);
+        }
+        case Thermostat::Attributes::Schedules::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ScheduleStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("Schedules", 1, value);
+        }
+        case Thermostat::Attributes::PresetsSchedulesEditable::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("PresetsSchedulesEditable", 1, value);
+        }
+        case Thermostat::Attributes::TemperatureSetpointHoldPolicy::Id: {
+            chip::BitMask<chip::app::Clusters::Thermostat::TemperatureSetpointHoldPolicyBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TemperatureSetpointHoldPolicy", 1, value);
+        }
+        case Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id: {
+            chip::app::DataModel::Nullable<uint32_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SetpointHoldExpiryTimestamp", 1, value);
+        }
+        case Thermostat::Attributes::QueuedPreset::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::QueuedPresetStruct::DecodableType> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("QueuedPreset", 1, value);
         }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -16790,6 +17553,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClusterRevision", 1, value);
         }
+        case UnitTesting::Attributes::MeiInt8u::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("mei_int8u", 1, value);
+        }
         }
         break;
     }
@@ -16906,57 +17674,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Groups::Commands::RemoveGroupResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RemoveGroupResponse", 1, value);
-        }
-        }
-        break;
-    }
-    case Scenes::Id: {
-        switch (path.mCommandId)
-        {
-        case Scenes::Commands::AddSceneResponse::Id: {
-            Scenes::Commands::AddSceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("AddSceneResponse", 1, value);
-        }
-        case Scenes::Commands::ViewSceneResponse::Id: {
-            Scenes::Commands::ViewSceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ViewSceneResponse", 1, value);
-        }
-        case Scenes::Commands::RemoveSceneResponse::Id: {
-            Scenes::Commands::RemoveSceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RemoveSceneResponse", 1, value);
-        }
-        case Scenes::Commands::RemoveAllScenesResponse::Id: {
-            Scenes::Commands::RemoveAllScenesResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RemoveAllScenesResponse", 1, value);
-        }
-        case Scenes::Commands::StoreSceneResponse::Id: {
-            Scenes::Commands::StoreSceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StoreSceneResponse", 1, value);
-        }
-        case Scenes::Commands::GetSceneMembershipResponse::Id: {
-            Scenes::Commands::GetSceneMembershipResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetSceneMembershipResponse", 1, value);
-        }
-        case Scenes::Commands::EnhancedAddSceneResponse::Id: {
-            Scenes::Commands::EnhancedAddSceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EnhancedAddSceneResponse", 1, value);
-        }
-        case Scenes::Commands::EnhancedViewSceneResponse::Id: {
-            Scenes::Commands::EnhancedViewSceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("EnhancedViewSceneResponse", 1, value);
-        }
-        case Scenes::Commands::CopySceneResponse::Id: {
-            Scenes::Commands::CopySceneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("CopySceneResponse", 1, value);
         }
         }
         break;
@@ -17214,6 +17931,47 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
         }
         break;
     }
+    case ScenesManagement::Id: {
+        switch (path.mCommandId)
+        {
+        case ScenesManagement::Commands::AddSceneResponse::Id: {
+            ScenesManagement::Commands::AddSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AddSceneResponse", 1, value);
+        }
+        case ScenesManagement::Commands::ViewSceneResponse::Id: {
+            ScenesManagement::Commands::ViewSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ViewSceneResponse", 1, value);
+        }
+        case ScenesManagement::Commands::RemoveSceneResponse::Id: {
+            ScenesManagement::Commands::RemoveSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RemoveSceneResponse", 1, value);
+        }
+        case ScenesManagement::Commands::RemoveAllScenesResponse::Id: {
+            ScenesManagement::Commands::RemoveAllScenesResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("RemoveAllScenesResponse", 1, value);
+        }
+        case ScenesManagement::Commands::StoreSceneResponse::Id: {
+            ScenesManagement::Commands::StoreSceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("StoreSceneResponse", 1, value);
+        }
+        case ScenesManagement::Commands::GetSceneMembershipResponse::Id: {
+            ScenesManagement::Commands::GetSceneMembershipResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GetSceneMembershipResponse", 1, value);
+        }
+        case ScenesManagement::Commands::CopySceneResponse::Id: {
+            ScenesManagement::Commands::CopySceneResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CopySceneResponse", 1, value);
+        }
+        }
+        break;
+    }
     case EnergyEvse::Id: {
         switch (path.mCommandId)
         {
@@ -17221,6 +17979,28 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             EnergyEvse::Commands::GetTargetsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetTargetsResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case EnergyEvseMode::Id: {
+        switch (path.mCommandId)
+        {
+        case EnergyEvseMode::Commands::ChangeToModeResponse::Id: {
+            EnergyEvseMode::Commands::ChangeToModeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case DeviceEnergyManagementMode::Id: {
+        switch (path.mCommandId)
+        {
+        case DeviceEnergyManagementMode::Commands::ChangeToModeResponse::Id: {
+            DeviceEnergyManagementMode::Commands::ChangeToModeResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ChangeToModeResponse", 1, value);
         }
         }
         break;
@@ -17454,6 +18234,16 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestFabricScopedEventResponse", 1, value);
+        }
+        case UnitTesting::Commands::TestBatchHelperResponse::Id: {
+            UnitTesting::Commands::TestBatchHelperResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestBatchHelperResponse", 1, value);
+        }
+        case UnitTesting::Commands::TestDifferentVendorMeiResponse::Id: {
+            UnitTesting::Commands::TestDifferentVendorMeiResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestDifferentVendorMeiResponse", 1, value);
         }
         }
         break;
@@ -17977,6 +18767,27 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
         }
         break;
     }
+    case Messages::Id: {
+        switch (header.mPath.mEventId)
+        {
+        case Messages::Events::MessageQueued::Id: {
+            chip::app::Clusters::Messages::Events::MessageQueued::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MessageQueued", 1, value);
+        }
+        case Messages::Events::MessagePresented::Id: {
+            chip::app::Clusters::Messages::Events::MessagePresented::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MessagePresented", 1, value);
+        }
+        case Messages::Events::MessageComplete::Id: {
+            chip::app::Clusters::Messages::Events::MessageComplete::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MessageComplete", 1, value);
+        }
+        }
+        break;
+    }
     case DeviceEnergyManagement::Id: {
         switch (header.mPath.mEventId)
         {
@@ -18217,6 +19028,11 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
             chip::app::Clusters::UnitTesting::Events::TestFabricScopedEvent::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestFabricScopedEvent", 1, value);
+        }
+        case UnitTesting::Events::TestDifferentVendorMeiEvent::Id: {
+            chip::app::Clusters::UnitTesting::Events::TestDifferentVendorMeiEvent::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestDifferentVendorMeiEvent", 1, value);
         }
         }
         break;

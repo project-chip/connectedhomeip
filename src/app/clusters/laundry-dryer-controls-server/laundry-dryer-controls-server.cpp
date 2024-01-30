@@ -163,6 +163,10 @@ Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const 
     {
     case Attributes::SelectedDrynessLevel::Id: {
         uint8_t drynessLevelIdx = 0;
+        if (NumericAttributeTraits<uint8_t>::IsNullValue(*value))
+        {
+            return Status::Success;
+        }
         while (true)
         {
             DrynessLevelEnum supportedDryness;
@@ -171,7 +175,7 @@ Status MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback(const 
             {
                 // Can't find the attribute to be written in the supported list (CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
                 // Or can't get the correct supported list
-                return Status::InvalidInState;
+                return Status::ConstraintError;
             }
             static_assert(sizeof(DrynessLevelEnum) == sizeof(*value), "Enum size doesn't match parameter size");
             if (supportedDryness == static_cast<DrynessLevelEnum>(*value))

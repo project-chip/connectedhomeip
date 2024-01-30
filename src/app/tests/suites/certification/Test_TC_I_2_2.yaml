@@ -23,7 +23,9 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1a: Wait for the commissioned device to be retrieved"
+    - label:
+          "Step 1a: Commission DUT to TH (can be skipped if done in a preceding
+          test)."
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -41,24 +43,6 @@ tests:
               type: enum8
               minValue: 0
               maxValue: 5
-
-    - label:
-          "Verify that the device enters its identification state using the
-          IdentifyType from Step 1b, in order to indicate to an observer which
-          of several nodes and/or endpoints it is."
-      verification: |
-          Verify that the device enters its identification state using the IdentifyType from step1b,
-          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
-          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && I.S.A0001
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
 
     - label:
           "Step 2a: TH sends Identify command to DUT, with the IdentifyTime
@@ -115,8 +99,8 @@ tests:
     #             value: "y"
 
     - label:
-          "Step 4a: TH sends Identify command to DUT, with the IdentifyTime
-          field set to 0x0000 (stop identifying)."
+          "Step 4a: Before 60 seconds expire, TH sends Identify command to DUT,
+          with the identify time field set to 0x0000 (stop identifying)."
       PICS: I.S.C00.Rsp
       command: "Identify"
       arguments:
@@ -144,6 +128,24 @@ tests:
     #            value: "Please enter 'y' for success"
     #          - name: "expectedValue"
     #            value: "y"
+
+    - label:
+          "Step 6a: Verify that the device enters its identification state using
+          the IdentifyType from Step 1b, in order to indicate to an observer
+          which of several nodes and/or endpoints it is."
+      verification: |
+          Verify that the device enters its identification state using the IdentifyType from step1b,
+          Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.
+          This IdentifyType can vary to device ref: 1.2.5.1 in spec for the IdentifyTypeEnum of the particular DUT
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && I.S.A0001
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' for success"
+              - name: "expectedValue"
+                value: "y"
 
     - label:
           "Step 6a: TH writes a value of 0x000f (15s) to IdentifyTime attribute
@@ -174,9 +176,7 @@ tests:
               maxValue: 5
 
     - label:
-          "Verify that the device enters its identification state using the
-          IdentifyType from Step 1b, in order to indicate to an observer which
-          of several nodes and/or endpoints it is."
+          "Step 6b: Verify that the device terminates its identification state"
       verification: |
           Verify that the identification state is terminated in the DUT.
           Here the Identifytype is 2(VisibleIndicator) which can be a small led that indicates the device is in identification state.

@@ -32,6 +32,10 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 #include "pigweed/rpc_services/Attributes.h"
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+#include "pigweed/rpc_services/BooleanState.h"
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
@@ -139,6 +143,10 @@ struct k_thread rpc_thread_data;
 Attributes attributes_service;
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+BooleanState boolean_state_service;
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 NrfButton button_service;
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
@@ -176,6 +184,10 @@ void RegisterServices(pw::rpc::Server & server)
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
     server.RegisterService(attributes_service);
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
+
+#if defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
+    server.RegisterService(boolean_state_service);
+#endif // defined(PW_RPC_BOOLEAN_STATE_SERVICE) && PW_RPC_BOOLEAN_STATE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
     server.RegisterService(button_service);

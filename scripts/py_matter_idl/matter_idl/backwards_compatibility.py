@@ -17,7 +17,7 @@ import enum
 import logging
 from typing import Callable, Dict, List, Optional, Protocol, TypeVar
 
-from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
+from matter_idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
 
 
 class Compatibility(enum.Enum):
@@ -50,6 +50,13 @@ def group_list_by_name(items: List[NAMED]) -> Dict[str, NAMED]:
 def attribute_name(attribute: Attribute) -> str:
     """Get the name of an attribute."""
     return attribute.definition.name
+
+
+def not_stable(maturity: ApiMaturity):
+    """Determine if the given api maturity allows binary/api changes or not."""
+    # TODO: internal and deprecated not currently widely used,
+    #       so we enforce stability on them for now.
+    return maturity == ApiMaturity.PROVISIONAL
 
 
 class CompatibilityChecker:
@@ -271,6 +278,13 @@ class CompatibilityChecker:
 
         for original_cluster in original:
             updated_cluster = updated_clusters.get(original_cluster.name)
+
+            if not_stable(original_cluster.api_maturity):
+                continue
+
+            if updated_cluster and not_stable(updated_cluster.api_maturity):
+                continue
+
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
     def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):

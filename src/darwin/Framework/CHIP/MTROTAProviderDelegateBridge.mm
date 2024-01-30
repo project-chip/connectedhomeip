@@ -198,17 +198,6 @@ private:
         return err;
     }
 
-    bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err)
-    {
-        if (err == CHIP_ERROR_INCORRECT_STATE) {
-            return bdx::StatusCode::kUnexpectedMessage;
-        }
-        if (err == CHIP_ERROR_INVALID_ARGUMENT) {
-            return bdx::StatusCode::kBadMessageContents;
-        }
-        return bdx::StatusCode::kUnknown;
-    }
-
     CHIP_ERROR OnTransferSessionBegin(TransferSession::OutputEvent & event)
     {
         assertChipStackLockedByCurrentThread();

@@ -119,6 +119,10 @@ class UnitTestingCluster(private val controller: MatterController, private val e
 
   class TestEmitTestFabricScopedEventResponse(val value: ULong)
 
+  class TestBatchHelperResponse(val buffer: ByteArray)
+
+  class TestDifferentVendorMeiResponse(val arg1: UByte, val eventNumber: ULong)
+
   class ListInt8uAttribute(val value: List<UByte>)
 
   sealed class ListInt8uAttributeSubscriptionState {
@@ -2215,6 +2219,180 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     tlvReader.exitContainer()
 
     return TestEmitTestFabricScopedEventResponse(value_decoded)
+  }
+
+  suspend fun testBatchHelperRequest(
+    sleepBeforeResponseTimeMs: UShort,
+    sizeOfResponseBuffer: UShort,
+    fillCharacter: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestBatchHelperResponse {
+    val commandId: UInt = 22u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
+    tlvWriter.put(
+      ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
+      sleepBeforeResponseTimeMs
+    )
+
+    val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SIZE_OF_RESPONSE_BUFFER_REQ), sizeOfResponseBuffer)
+
+    val TAG_FILL_CHARACTER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_FILL_CHARACTER_REQ), fillCharacter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_BUFFER: Int = 0
+    var buffer_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_BUFFER)) {
+        buffer_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (buffer_decoded == null) {
+      throw IllegalStateException("buffer not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestBatchHelperResponse(buffer_decoded)
+  }
+
+  suspend fun testSecondBatchHelperRequest(
+    sleepBeforeResponseTimeMs: UShort,
+    sizeOfResponseBuffer: UShort,
+    fillCharacter: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestBatchHelperResponse {
+    val commandId: UInt = 23u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ: Int = 0
+    tlvWriter.put(
+      ContextSpecificTag(TAG_SLEEP_BEFORE_RESPONSE_TIME_MS_REQ),
+      sleepBeforeResponseTimeMs
+    )
+
+    val TAG_SIZE_OF_RESPONSE_BUFFER_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_SIZE_OF_RESPONSE_BUFFER_REQ), sizeOfResponseBuffer)
+
+    val TAG_FILL_CHARACTER_REQ: Int = 2
+    tlvWriter.put(ContextSpecificTag(TAG_FILL_CHARACTER_REQ), fillCharacter)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_BUFFER: Int = 0
+    var buffer_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_BUFFER)) {
+        buffer_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (buffer_decoded == null) {
+      throw IllegalStateException("buffer not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestBatchHelperResponse(buffer_decoded)
+  }
+
+  suspend fun testDifferentVendorMeiRequest(
+    arg1: UByte,
+    timedInvokeTimeout: Duration? = null
+  ): TestDifferentVendorMeiResponse {
+    val commandId: UInt = 4294049962u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_ARG1_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_ARG1_REQ), arg1)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_ARG1: Int = 0
+    var arg1_decoded: UByte? = null
+
+    val TAG_EVENT_NUMBER: Int = 1
+    var eventNumber_decoded: ULong? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_ARG1)) {
+        arg1_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_EVENT_NUMBER)) {
+        eventNumber_decoded = tlvReader.getULong(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (arg1_decoded == null) {
+      throw IllegalStateException("arg1 not found in TLV")
+    }
+
+    if (eventNumber_decoded == null) {
+      throw IllegalStateException("eventNumber not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return TestDifferentVendorMeiResponse(arg1_decoded, eventNumber_decoded)
   }
 
   suspend fun readBooleanAttribute(): Boolean {
@@ -12816,6 +12994,127 @@ class UnitTestingCluster(private val controller: MatterController, private val e
             }
 
           decodedValue?.let { emit(UByteSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UByteSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readMeiInt8uAttribute(): UByte {
+    val ATTRIBUTE_ID: UInt = 4294070017u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Meiint8u attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+    return decodedValue
+  }
+
+  suspend fun writeMeiInt8uAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 4294070017u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timedWriteTimeout
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeMeiInt8uAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Flow<UByteSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 4294070017u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong())
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UByteSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Meiint8u attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+          emit(UByteSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(UByteSubscriptionState.SubscriptionEstablished)

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 12.1.1. [TC-TSUIC-1.1] Global attributes with server as DUT
+name: 12.1.1. [TC-TSUIC-1.1] Global attributes with DUT as Server
 
 PICS:
     - TSUIC.S
@@ -23,7 +23,7 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Step 1: Wait for the commissioned device to be retrieved"
+    - label: "Step 1: Commission DUT to TH"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -76,7 +76,16 @@ tests:
               type: list
               contains: [2]
 
-    - label: "Step 5: TH reads from the DUT the AcceptedCommandList attribute."
+    - label: "Step 5: TH reads from the DUT the EventList attribute."
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          value: []
+          constraints:
+              type: list
+
+    - label: "Step 6: TH reads from the DUT the AcceptedCommandList attribute."
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
@@ -84,18 +93,9 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6: TH reads from the DUT the GeneratedCommandList attribute."
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
-      response:
-          value: []
-          constraints:
-              type: list
-
-    - label: "Step 7: TH reads from the DUT the EventList attribute."
-      PICS: PICS_EVENT_LIST_ENABLED
-      command: "readAttribute"
-      attribute: "EventList"
       response:
           value: []
           constraints:

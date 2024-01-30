@@ -127,8 +127,8 @@ def main():
     if classpath:
         kotlin_args += ["-classpath", classpath]
 
-    kotlin_args += ["-J-Xms256m", "-J-Xmx4096m", "-J-XX:MaxPermSize=350m",
-                    "-J-XX:ReservedCodeCacheSize=225m", "-J-XX:+UseCompressedOops"]
+    kotlin_args += ["-J-Xms256m", "-J-Xmx4096m", "-J-XX:ReservedCodeCacheSize=225m",
+                    "-J-XX:+UseCompressedOops"]
 
     retcode = subprocess.check_call(kotlin_args + args.rest)
     if retcode != EXIT_SUCCESS:

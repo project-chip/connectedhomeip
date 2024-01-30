@@ -65,6 +65,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000074, DeviceTypeClass::Simple, "Matter Robotic Vacuum Cleaner" },
     { 0x00000075, DeviceTypeClass::Simple, "Matter Dishwasher" },
     { 0x00000076, DeviceTypeClass::Simple, "Matter Smoke CO Alarm" },
+    { 0x00000077, DeviceTypeClass::Simple, "Matter Cook Surface" },
     { 0x00000078, DeviceTypeClass::Simple, "Matter Cooktop" },
     { 0x00000079, DeviceTypeClass::Simple, "Matter Microwave Oven" },
     { 0x0000007A, DeviceTypeClass::Simple, "Matter Extractor Hood" },

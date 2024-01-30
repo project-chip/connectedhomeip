@@ -25,10 +25,12 @@ import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.DataVersionFilter;
 import chip.devicecontroller.model.InvokeElement;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import javax.annotation.Nullable;
 
 /** Controller to interact with the CHIP device. */
@@ -611,9 +613,9 @@ public class ChipDeviceController {
     }
   }
 
-  public void onICDRegistrationComplete(long icdNodeId, long icdCounter) {
+  public void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo) {
     if (completionListener != null) {
-      completionListener.onICDRegistrationComplete(icdNodeId, icdCounter);
+      completionListener.onICDRegistrationComplete(errorCode, icdDeviceInfo);
     }
   }
 
@@ -715,6 +717,19 @@ public class ChipDeviceController {
 
   public int getFabricIndex() {
     return getFabricIndex(deviceControllerPtr);
+  }
+
+  public List<ICDClientInfo> getICDClientInfo() {
+    return getICDClientInfo(deviceControllerPtr, getFabricIndex(deviceControllerPtr));
+  }
+
+  /**
+   * Returns the ICD Client Information
+   *
+   * @param fabricIndex the fabric index to check
+   */
+  public List<ICDClientInfo> getICDClientInfo(int fabricIndex) {
+    return getICDClientInfo(deviceControllerPtr, fabricIndex);
   }
 
   /* Shuts down all active subscriptions. */
@@ -1185,8 +1200,8 @@ public class ChipDeviceController {
   public static byte[] createRootCertificate(
       KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
     // current time
-    Calendar start = Calendar.getInstance();
-    Calendar end = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
     end.add(Calendar.YEAR, 10);
     return createRootCertificate(keypair, issuerId, fabricId, start, end);
@@ -1207,9 +1222,9 @@ public class ChipDeviceController {
       long issuerId,
       @Nullable Long fabricId) {
     // current time
-    Calendar start = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
-    Calendar end = Calendar.getInstance();
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     end.add(Calendar.YEAR, 10);
     return createIntermediateCertificate(
         rootKeypair, rootCertificate, intermediatePublicKey, issuerId, fabricId, start, end);
@@ -1243,9 +1258,9 @@ public class ChipDeviceController {
       long nodeId,
       List<Integer> caseAuthenticatedTags) {
     // current time
-    Calendar start = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
-    Calendar end = Calendar.getInstance();
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     end.add(Calendar.YEAR, 10);
     return createOperationalCertificate(
         signingKeypair,
@@ -1491,6 +1506,8 @@ public class ChipDeviceController {
   private native void updateCommissioningICDRegistrationInfo(
       long deviceControllerPtr, ICDRegistrationInfo icdRegistrationInfo);
 
+  private native List<ICDClientInfo> getICDClientInfo(long deviceControllerPtr, long fabricIndex);
+
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
   private native int getFabricIndex(long deviceControllerPtr);
@@ -1610,6 +1627,6 @@ public class ChipDeviceController {
     void onICDRegistrationInfoRequired();
 
     /** Notifies when the registration flow for the ICD completes. */
-    void onICDRegistrationComplete(long icdNodeId, long icdCounter);
+    void onICDRegistrationComplete(int errorCode, ICDDeviceInfo icdDeviceInfo);
   }
 }

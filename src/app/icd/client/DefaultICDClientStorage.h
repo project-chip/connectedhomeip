@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "ICDClientStorage.h"
+#include <app/icd/client/ICDClientStorage.h>
 #include <lib/core/CHIPCore.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -95,7 +95,7 @@ public:
      */
     CHIP_ERROR DeleteAllEntries(FabricIndex fabricIndex);
 
-    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo) override;
+    CHIP_ERROR ProcessCheckInPayload(const ByteSpan & payload, ICDClientInfo & clientInfo, CounterType & counter) override;
 
 protected:
     enum class ClientInfoTag : uint8_t

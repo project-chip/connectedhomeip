@@ -465,83 +465,6 @@ void TestStructGenericOperationalErrorFuncSet(nlTestSuite * inSuite, void * inCo
                           kOperationalErrorDetailsMaxSize) == 0);
 }
 
-void TestStructGenericOperationalPhaseConstructor(nlTestSuite * inSuite, void * inContext)
-{
-    using namespace chip::app;
-    using namespace chip::app::Clusters::OperationalState;
-
-    GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-    NL_TEST_ASSERT(inSuite, phase.IsMissing() == true);
-
-    char phaseBuffer[kOperationalPhaseNameMaxSize] = "start";
-    GenericOperationalPhase phase2(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(phaseBuffer)));
-    NL_TEST_ASSERT(inSuite, phase2.IsMissing() == false);
-    NL_TEST_ASSERT(inSuite, phase2.mPhaseName.Value().size() == strlen(phaseBuffer));
-    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(phase2.mPhaseName.Value().data()), phaseBuffer, strlen(phaseBuffer)) == 0);
-}
-
-void TestStructGenericOperationalPhaseCopyConstructor(nlTestSuite * inSuite, void * inContext)
-{
-    using namespace chip::app;
-    using namespace chip::app::Clusters::OperationalState;
-
-    char phaseBuffer[kOperationalPhaseNameMaxSize] = "start";
-    GenericOperationalPhase phase(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(phaseBuffer)));
-
-    GenericOperationalPhase phase2(phase);
-
-    NL_TEST_ASSERT(inSuite, phase2.IsMissing() == false);
-    NL_TEST_ASSERT(inSuite, phase2.mPhaseName.Value().size() == phase.mPhaseName.Value().size());
-    NL_TEST_ASSERT(inSuite,
-                   memcmp(const_cast<char *>(phase2.mPhaseName.Value().data()), const_cast<char *>(phase.mPhaseName.Value().data()),
-                          phase.mPhaseName.Value().size()) == 0);
-}
-
-void TestStructGenericOperationalPhaseCopyAssignment(nlTestSuite * inSuite, void * inContext)
-{
-    using namespace chip::app;
-    using namespace chip::app::Clusters::OperationalState;
-
-    // copy assignment with null-name
-    GenericOperationalPhase phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>());
-    NL_TEST_ASSERT(inSuite, phase.IsMissing() == true);
-
-    // copy assignment with name
-    char phaseBuffer[kOperationalPhaseNameMaxSize] = "start";
-    GenericOperationalPhase phase2(DataModel::Nullable<CharSpan>(CharSpan::fromCharString(phaseBuffer)));
-    phase = phase2;
-
-    NL_TEST_ASSERT(inSuite, phase.IsMissing() == false);
-    NL_TEST_ASSERT(inSuite, phase.mPhaseName.Value().size() == phase2.mPhaseName.Value().size());
-    NL_TEST_ASSERT(inSuite,
-                   memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), const_cast<char *>(phase2.mPhaseName.Value().data()),
-                          phase.mPhaseName.Value().size()) == 0);
-
-    // copy assignment with name, name's len = kOperationalPhaseNameMaxSize
-    for (size_t i = 0; i < sizeof(phaseBuffer); i++)
-    {
-        phaseBuffer[i] = 1;
-    }
-    phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan(phaseBuffer, sizeof(phaseBuffer))));
-
-    NL_TEST_ASSERT(inSuite, phase.IsMissing() == false);
-    NL_TEST_ASSERT(inSuite, phase.mPhaseName.Value().size() == sizeof(phaseBuffer));
-    NL_TEST_ASSERT(inSuite, memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), phaseBuffer, sizeof(phaseBuffer)) == 0);
-
-    // copy assignment with name, name's len = kOperationalPhaseNameMaxSize + 1
-    char phaseBuffer2[kOperationalPhaseNameMaxSize + 1];
-    for (size_t i = 0; i < sizeof(phaseBuffer2); i++)
-    {
-        phaseBuffer2[i] = 2;
-    }
-    phase = GenericOperationalPhase(DataModel::Nullable<CharSpan>(CharSpan(phaseBuffer2, sizeof(phaseBuffer2))));
-
-    NL_TEST_ASSERT(inSuite, phase.IsMissing() == false);
-    NL_TEST_ASSERT(inSuite, phase.mPhaseName.Value().size() == kOperationalPhaseNameMaxSize);
-    NL_TEST_ASSERT(inSuite,
-                   memcmp(const_cast<char *>(phase.mPhaseName.Value().data()), phaseBuffer2, kOperationalPhaseNameMaxSize) == 0);
-}
-
 const nlTest sTests[] = {
     NL_TEST_DEF("Test struct GenericOperationalState: constructor with only StateID",
                 TestStructGenericOperationalStateConstructorWithOnlyStateID),
@@ -559,9 +482,6 @@ const nlTest sTests[] = {
     NL_TEST_DEF("Test struct GenericOperationalError: copy constructor", TestStructGenericOperationalErrorCopyConstructor),
     NL_TEST_DEF("Test struct GenericOperationalError: copy assignment", TestStructGenericOperationalErrorCopyAssignment),
     NL_TEST_DEF("Test struct GenericOperationalError: member function 'Set'", TestStructGenericOperationalErrorFuncSet),
-    NL_TEST_DEF("Test struct GenericOperationalPhase: constructor", TestStructGenericOperationalPhaseConstructor),
-    NL_TEST_DEF("Test struct GenericOperationalPhase: copy constructor", TestStructGenericOperationalPhaseCopyConstructor),
-    NL_TEST_DEF("Test struct GenericOperationalPhase: copy assignment", TestStructGenericOperationalPhaseCopyAssignment),
     NL_TEST_SENTINEL()
 };
 
