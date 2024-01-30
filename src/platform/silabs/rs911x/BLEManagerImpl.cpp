@@ -480,7 +480,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     data->Start());
     
     // start timer for light indication confirmation. Long delay for spake2 indication
-    DeviceLayer::SystemLayer().StartTimer(Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS), OnSendIndicationTimeout, this);
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(BLE_SEND_INDICATION_TIMER_PERIOD_MS), OnSendIndicationTimeout, this);
 
     if (status != RSI_SUCCESS)
     {
@@ -935,18 +935,18 @@ void BLEManagerImpl::HandleTxConfirmationEvent(BLE_CONNECTION_OBJECT conId)
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kCHIPoBLEIndicateConfirm;
     event.CHIPoBLEIndicateConfirm.ConId = conId;
-    DeviceLayer::SystemLayer().CancelTimer(BLEManagerImpl, this);
+    DeviceLayer::SystemLayer().CancelTimer(OnSendIndicationTimeout, this);
     PlatformMgr().PostEventOrDie(&event);
 }
 
 
 void BLEManagerImpl::HandleSoftTimerEvent(void)
 {
+    uint8_t connHandle = 1;
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::HandleSoftTimerEvent CHIPOBLE_PROTOCOL_ABORT");
     ChipDeviceEvent event;
     event.Type                                                   = DeviceEventType::kCHIPoBLEConnectionError;
-    event.CHIPoBLEConnectionError.ConId                          = mIndConfId[evt->data.evt_system_soft_timer.handle];
-    sInstance.mIndConfId[evt->data.evt_system_soft_timer.handle] = kUnusedIndex;
+    event.CHIPoBLEConnectionError.ConId                          = connHandle;
     event.CHIPoBLEConnectionError.Reason                         = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
     PlatformMgr().PostEventOrDie(&event);
 }
