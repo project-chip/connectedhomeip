@@ -16,17 +16,13 @@
 #
 
 
+import json
 import asyncio
-import re
-import time
 from typing import Dict, List, Optional
 
-import zeroconf
-
-from mdns_discovery.exceptions import DiscoveryNotPerformedError
-from zeroconf import DNSQuestionType, IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
-from dataclasses import dataclass
+from zeroconf import IPVersion, ServiceStateChange, Zeroconf
+from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
+from dataclasses import asdict, dataclass
 from enum import Enum
 
 
@@ -74,23 +70,6 @@ class MdnsServiceType(Enum):
     OPERATIONAL = "_matter._tcp.local."
     BORDER_ROUTER = "_meshcop._udp.local."
 
-class EmptyServiceListener(ServiceListener):
-    '''
-    A service listener for the TXT record data to get populated
-    '''
-
-    def add_service(self, zc: Zeroconf, type: str, name: str) -> None:
-        # time.sleep(1)
-        pass
-
-    def remove_service(self, zc: Zeroconf, type: str, name: str) -> None:
-        # time.sleep(1)
-        pass
-
-    def update_service(self, zc: Zeroconf, type: str, name: str) -> None:
-        # time.sleep(1)
-        pass
-
 class MdnsDiscovery:
 
     DEFAULT_DISCOVERY_DURATION_SEC = 3
@@ -99,77 +78,63 @@ class MdnsDiscovery:
         """
         Initializes the MdnsDiscovery instance with necessary configurations.
 
-        Main methods, return a list of MdnsServiceInfo objects
+        Main methods:
             - get_commissioner_service_info()
             - get_commissionable_service_info()
             - get_operational_service_info()
             - get_border_router_service_info()
+            - discover()
         """
         # An instance of Zeroconf to manage mDNS operations.
         # This is used for handling the low-level details of mDNS.
-        self._zc = None
-
-        # An instance of the AsyncServiceBrowser browser to discover services.
-        # This browser is responsible for actively looking for services on the network.
-        self._aiobrowser = None
-
-        # A list of mDNS service types to discover.
-        # This list defines the types of services that we are interested in discovering.
-        self._service_types = [mdns_type.value for mdns_type in MdnsServiceType]
+        self._zc = Zeroconf()
 
         # A dictionary to store discovered services.
         # As services are discovered, they are added to this dictionary.
         self._discovered_services = {}
 
-        # Flag to indicate if discovery has been performed.
-        # This helps in managing the state of service discovery.
-        self._discovery_performed = False
-
-    async def discover(self, discovery_duration_sec: float = DEFAULT_DISCOVERY_DURATION_SEC) -> dict:
+    async def discover(self,
+                       discovery_duration_sec: float = DEFAULT_DISCOVERY_DURATION_SEC,
+                       log_output: bool = True) -> dict:
         """
-        Asynchronously discovers network services of specified types using mDNS.
+        Asynchronously discovers network services of specified types using mDNS and returns the discovered services.
 
-        This method initiates a multicast DNS (mDNS) service discovery process to find
-        network services matching the specified types in the `MdnsServiceType` enum. It uses
-        an asynchronous service browser to listen for service announcements and updates.
-
-        The discovery process is given a configurable period to operate, during which the method
-        asynchronously waits to allow network responses to be received and processed.
+        This method initiates a multicast DNS (mDNS) service discovery process to find network services. The
+        discovery process runs for a configurable duration, allowing network responses to be received and
+        processed.
 
         Args:
-            discovery_duration_sec (float): The duration in seconds for which the discovery
-                                        process should wait to allow for service announcements.
-                                        If not provided, defaults to 3 seconds.
+            discovery_duration_sec (float): The duration in seconds for which the discovery process should wait
+                                            to allow for service announcements. If not provided, defaults to a
+                                            predetermined duration (e.g., 3 seconds).
+            log_output (bool): Logs discovered services in JSON format, defaults to True.
 
         Note:
-            The discovery duration may need adjustment based on network conditions and the
-            expected response time for service announcements.
+            The discovery duration may need adjustment based on network conditions and the expected response
+            time for service announcements.
 
         Returns:
-            None: This method does not return any value. The results of the service discovery
-                  are handled by the callback function.
+            dict: A dictionary containing the discovered services, organized by service type. Each key in the
+                dictionary represents a service type, and each value is a list of MdnsServiceInfo objects, each containing
+                details of a discovered service.
         """
-        
         service_types = list(await AsyncZeroconfServiceTypes.async_find())
-        
-        service_types = [service for service in service_types if service.startswith('_I')]
-
-        
-        # self._service_types.extend(service_types)
-        self._service_types = service_types
-        print(f"self._service_types: {self._service_types}")
-        
         self._zc = Zeroconf(ip_version=IPVersion.V6Only)
-        self._discovered_services = {mdns_type.name: [] for mdns_type in MdnsServiceType}
-        self._aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
-                                               type_=self._service_types,
-                                               handlers=[self._on_service_state_change]
-                                               )
+        aiobrowser = AsyncServiceBrowser(zeroconf=self._zc,
+                                         type_=service_types,
+                                         handlers=[self._on_service_state_change]
+                                         )
         # Wait for discovery
         await asyncio.sleep(discovery_duration_sec)
-        self._discovery_performed = True
-        await self._async_close()
-        
+        if aiobrowser is not None:
+            await aiobrowser.async_cancel()
+
+        if log_output:
+            # Log discovered services in JSON format
+            converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
+            json_str = json.dumps(converted_services, indent=4)
+            print(json_str)
+
         return self._discovered_services
 
     def _on_service_state_change(
@@ -217,25 +182,19 @@ class MdnsDiscovery:
         # Get service info
         service_info = AsyncServiceInfo(service_type, name)
         is_service_discovered = await service_info.async_request(zeroconf, 3000)
-
-        # print(f"servic@)(%*$(@UT$U#@FT)#$U)e_info: {service_info}")
-        # print(f"servic@)(%*$(@UT$U#@FT)#$U)service_type: {service_type}")
-        # print(f"servic@)(%*$(@UT$U#@FT)#$U)name: {name}")
+        service_info.async_clear_cache()
 
         if is_service_discovered:
-            # Add service info to discovered services
-            for mdns_type in MdnsServiceType:
-                if service_type == mdns_type.value:
-                    service_info_dict = self._service_info_to_class(service_info)
-                    self._discovered_services[mdns_type.name].append(service_info_dict)
-                    break
-                
-                
-        service_info_dict = self._service_info_to_class(service_info)
-        self._discovered_services[mdns_type.name].append(service_info_dict)                
-        print(f":::#:#::# self._discovered_services: {self._discovered_services}")
+            mdns_service_info = self._to_mdns_service_class(service_info)
 
-    def _service_info_to_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
+            if service_type not in self._discovered_services:
+                self._discovered_services[service_type] = [mdns_service_info]
+            else:
+                self._discovered_services[service_type].append(mdns_service_info)
+    
+        print(f"\n"*10)
+
+    def _to_mdns_service_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
         Converts an AsyncServiceInfo object to a dictionary for easier access and manipulation.
 
@@ -264,25 +223,6 @@ class MdnsDiscovery:
         )
 
         return mdns_service_info
-
-    def _get_service_info(self, mdns_type: MdnsServiceType) -> List[Dict[str, any]]:
-        """
-        This method returns the discovered service information for a specified mDNS type.
-        It raises an exception if the discovery process has not been performed before calling this method.
-
-        Args:
-            mdns_type (MdnsServiceType): The mDNS type for which to retrieve the service info.
-
-        Returns:
-            list: A list of discovered services of the specified mDNS type.
-
-        Raises:
-            DiscoveryNotPerformedError: If discovery has not been performed before calling this method.
-        """
-        if not self._discovery_performed:
-            raise DiscoveryNotPerformedError()
-
-        return self._discovered_services[mdns_type.name]
 
     def get_commissioner_service_info(self) -> List[Dict[str, any]]:
         """
@@ -320,12 +260,11 @@ class MdnsDiscovery:
         if service_name is None or type is None:
             raise ValueError("Neither 'service_name' nor 'type' can be None.")
 
-        zc = Zeroconf()
+        # Get service info
         service_info = AsyncServiceInfo(type, service_name)
-        is_discovered = await service_info.async_request(zc, 3000)
-        zc.close()
+        is_discovered = await service_info.async_request(self._zc, 3000)
 
-        return self._service_info_to_class(service_info) if is_discovered else None
+        return self._to_mdns_service_class(service_info) if is_discovered else None
 
     def get_border_router_service_info(self) -> List[Dict[str, any]]:
         """
@@ -335,9 +274,3 @@ class MdnsDiscovery:
             list: A list of discovered Border Router services.
         """
         return self._get_service_info(MdnsServiceType.BORDER_ROUTER)
-
-    async def _async_close(self) -> None:
-        if self._aiobrowser is not None:
-            await self._aiobrowser.async_cancel()
-        self._zc = None
-        self._aiobrowser = None
