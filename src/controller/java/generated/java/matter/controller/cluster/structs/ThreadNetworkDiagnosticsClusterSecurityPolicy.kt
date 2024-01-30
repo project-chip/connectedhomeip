@@ -16,18 +16,13 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ThreadNetworkDiagnosticsClusterSecurityPolicy(
-  val rotationTime: UShort,
-  val flags: UShort
-) {
+class ThreadNetworkDiagnosticsClusterSecurityPolicy(val rotationTime: UShort, val flags: UShort) {
   override fun toString(): String = buildString {
     append("ThreadNetworkDiagnosticsClusterSecurityPolicy {\n")
     append("\trotationTime : $rotationTime\n")
@@ -52,7 +47,7 @@ class ThreadNetworkDiagnosticsClusterSecurityPolicy(
       tlvReader.enterStructure(tlvTag)
       val rotationTime = tlvReader.getUShort(ContextSpecificTag(TAG_ROTATION_TIME))
       val flags = tlvReader.getUShort(ContextSpecificTag(TAG_FLAGS))
-      
+
       tlvReader.exitContainer()
 
       return ThreadNetworkDiagnosticsClusterSecurityPolicy(rotationTime, flags)

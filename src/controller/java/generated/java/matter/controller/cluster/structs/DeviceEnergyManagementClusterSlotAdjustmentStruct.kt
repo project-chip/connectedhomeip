@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -52,12 +50,15 @@ class DeviceEnergyManagementClusterSlotAdjustmentStruct(
     private const val TAG_NOMINAL_POWER = 1
     private const val TAG_DURATION = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementClusterSlotAdjustmentStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): DeviceEnergyManagementClusterSlotAdjustmentStruct {
       tlvReader.enterStructure(tlvTag)
       val slotIndex = tlvReader.getUByte(ContextSpecificTag(TAG_SLOT_INDEX))
       val nominalPower = tlvReader.getLong(ContextSpecificTag(TAG_NOMINAL_POWER))
       val duration = tlvReader.getUInt(ContextSpecificTag(TAG_DURATION))
-      
+
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementClusterSlotAdjustmentStruct(slotIndex, nominalPower, duration)

@@ -17,19 +17,14 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class DeviceEnergyManagementModeClusterModeTagStruct (
-    val mfgCode: Optional<UInt>,
-    val value: UInt) {
-  override fun toString(): String  = buildString {
+class DeviceEnergyManagementModeClusterModeTagStruct(val mfgCode: Optional<UInt>, val value: UInt) {
+  override fun toString(): String = buildString {
     append("DeviceEnergyManagementModeClusterModeTagStruct {\n")
     append("\tmfgCode : $mfgCode\n")
     append("\tvalue : $value\n")
@@ -40,9 +35,9 @@ class DeviceEnergyManagementModeClusterModeTagStruct (
     tlvWriter.apply {
       startStructure(tlvTag)
       if (mfgCode.isPresent) {
-      val optmfgCode = mfgCode.get()
-      put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
-    }
+        val optmfgCode = mfgCode.get()
+        put(ContextSpecificTag(TAG_MFG_CODE), optmfgCode)
+      }
       put(ContextSpecificTag(TAG_VALUE), value)
       endStructure()
     }
@@ -52,15 +47,16 @@ class DeviceEnergyManagementModeClusterModeTagStruct (
     private const val TAG_MFG_CODE = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : DeviceEnergyManagementModeClusterModeTagStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DeviceEnergyManagementModeClusterModeTagStruct {
       tlvReader.enterStructure(tlvTag)
-      val mfgCode = if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
-      Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE)))
-    } else {
-      Optional.empty()
-    }
+      val mfgCode =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_MFG_CODE))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_MFG_CODE)))
+        } else {
+          Optional.empty()
+        }
       val value = tlvReader.getUInt(ContextSpecificTag(TAG_VALUE))
-      
+
       tlvReader.exitContainer()
 
       return DeviceEnergyManagementModeClusterModeTagStruct(mfgCode, value)

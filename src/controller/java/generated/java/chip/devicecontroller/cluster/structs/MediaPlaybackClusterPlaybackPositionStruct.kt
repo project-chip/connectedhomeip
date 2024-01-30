@@ -17,19 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
-import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-import java.util.Optional
-
-class MediaPlaybackClusterPlaybackPositionStruct (
-    val updatedAt: ULong,
-    val position: ULong?) {
-  override fun toString(): String  = buildString {
+class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: ULong, val position: ULong?) {
+  override fun toString(): String = buildString {
     append("MediaPlaybackClusterPlaybackPositionStruct {\n")
     append("\tupdatedAt : $updatedAt\n")
     append("\tposition : $position\n")
@@ -41,10 +35,10 @@ class MediaPlaybackClusterPlaybackPositionStruct (
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_UPDATED_AT), updatedAt)
       if (position != null) {
-      put(ContextSpecificTag(TAG_POSITION), position)
-    } else {
-      putNull(ContextSpecificTag(TAG_POSITION))
-    }
+        put(ContextSpecificTag(TAG_POSITION), position)
+      } else {
+        putNull(ContextSpecificTag(TAG_POSITION))
+      }
       endStructure()
     }
   }
@@ -53,16 +47,17 @@ class MediaPlaybackClusterPlaybackPositionStruct (
     private const val TAG_UPDATED_AT = 0
     private const val TAG_POSITION = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : MediaPlaybackClusterPlaybackPositionStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterPlaybackPositionStruct {
       tlvReader.enterStructure(tlvTag)
       val updatedAt = tlvReader.getULong(ContextSpecificTag(TAG_UPDATED_AT))
-      val position = if (!tlvReader.isNull()) {
-      tlvReader.getULong(ContextSpecificTag(TAG_POSITION))
-    } else {
-      tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
-      null
-    }
-      
+      val position =
+        if (!tlvReader.isNull()) {
+          tlvReader.getULong(ContextSpecificTag(TAG_POSITION))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
+          null
+        }
+
       tlvReader.exitContainer()
 
       return MediaPlaybackClusterPlaybackPositionStruct(updatedAt, position)

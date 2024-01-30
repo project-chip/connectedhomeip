@@ -18,7 +18,6 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -60,21 +59,28 @@ class EnergyEvseClusterChargingTargetStruct(
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterChargingTargetStruct {
       tlvReader.enterStructure(tlvTag)
-      val targetTimeMinutesPastMidnight = tlvReader.getUShort(ContextSpecificTag(TAG_TARGET_TIME_MINUTES_PAST_MIDNIGHT))
-      val targetSoC = if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_SO_C))) {
-      Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TARGET_SO_C)))
-    } else {
-      Optional.empty()
-    }
-      val addedEnergy = if (tlvReader.isNextTag(ContextSpecificTag(TAG_ADDED_ENERGY))) {
-      Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ADDED_ENERGY)))
-    } else {
-      Optional.empty()
-    }
-      
+      val targetTimeMinutesPastMidnight =
+        tlvReader.getUShort(ContextSpecificTag(TAG_TARGET_TIME_MINUTES_PAST_MIDNIGHT))
+      val targetSoC =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_TARGET_SO_C))) {
+          Optional.of(tlvReader.getUByte(ContextSpecificTag(TAG_TARGET_SO_C)))
+        } else {
+          Optional.empty()
+        }
+      val addedEnergy =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ADDED_ENERGY))) {
+          Optional.of(tlvReader.getLong(ContextSpecificTag(TAG_ADDED_ENERGY)))
+        } else {
+          Optional.empty()
+        }
+
       tlvReader.exitContainer()
 
-      return EnergyEvseClusterChargingTargetStruct(targetTimeMinutesPastMidnight, targetSoC, addedEnergy)
+      return EnergyEvseClusterChargingTargetStruct(
+        targetTimeMinutesPastMidnight,
+        targetSoC,
+        addedEnergy
+      )
     }
   }
 }

@@ -16,9 +16,7 @@
  */
 package matter.controller.cluster.structs
 
-import java.util.Optional
 import matter.controller.cluster.*
-import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -52,15 +50,22 @@ class IcdManagementClusterMonitoringRegistrationStruct(
     private const val TAG_MONITORED_SUBJECT = 2
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): IcdManagementClusterMonitoringRegistrationStruct {
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): IcdManagementClusterMonitoringRegistrationStruct {
       tlvReader.enterStructure(tlvTag)
       val checkInNodeID = tlvReader.getULong(ContextSpecificTag(TAG_CHECK_IN_NODE_I_D))
       val monitoredSubject = tlvReader.getULong(ContextSpecificTag(TAG_MONITORED_SUBJECT))
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
-      return IcdManagementClusterMonitoringRegistrationStruct(checkInNodeID, monitoredSubject, fabricIndex)
+      return IcdManagementClusterMonitoringRegistrationStruct(
+        checkInNodeID,
+        monitoredSubject,
+        fabricIndex
+      )
     }
   }
 }
