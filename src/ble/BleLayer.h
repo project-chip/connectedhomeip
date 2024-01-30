@@ -233,6 +233,9 @@ public:
     void * mAppState                 = nullptr;
     BleLayerDelegate * mBleTransport = nullptr;
 
+    // Set in Non-concurrent mode when the ConnectNetworkResponse has been requested
+    bool mTerminateOnPacketTxComplete  = false;
+
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
 
@@ -319,12 +322,6 @@ public:
      *   the BLE connection close will not generate an upcall to CHIP, HandleConnectionError must be called with
      *   err = BLE_ERROR_APP_CLOSED_CONNECTION to prevent the leak of this chipConnection and its end point object. */
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
-
-    /// Call when waiting for BLE transmission confirmation.
-    void SetBleTerminating(bool value);
-
-    ///  Call to determine if BLE transmission waiting for confirmation
-    bool GetBleTerminating();
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
     BLEEndPoint * mTestBleEndPoint;

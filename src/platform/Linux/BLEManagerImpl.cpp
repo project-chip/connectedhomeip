@@ -220,13 +220,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        // If BLE has been stopped ignore any write messages as they cannot go anywhere
-        if (GetBleTerminating())
+        // If BLE is being stopped, ignore any write messages
+        if (mTerminateOnPacketTxComplete)
         {
             ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE stopped, BLE write write ignored");
         }
         else
-#endif
+#endif 
         {
             HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
                                 PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
@@ -235,13 +235,6 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
-#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-        if (GetBleTerminating())
-        {
-            ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE packet acknowledged. Sending CloseAllBLEConnections");
-            DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
-        }
-#endif
         break;
 
     case DeviceEventType::kCHIPoBLEConnectionError:
@@ -282,8 +275,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformLinuxBLEWriteComplete:
-        HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
-        break;
+                HandleWriteConfirmation(apEvent->Platform.BLEWriteComplete.mConnection, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX);
+                break;
     case DeviceEventType::kPlatformLinuxBLESubscribeOpComplete:
         if (apEvent->Platform.BLESubscribeOpComplete.mIsSubscribed)
             HandleSubscribeComplete(apEvent->Platform.BLESubscribeOpComplete.mConnection, &CHIP_BLE_SVC_ID,
@@ -657,13 +650,23 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    if (GetBleTerminating())
+    if (mTerminateOnPacketTxComplete)
     {
         // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
         DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
     }
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+void BLEManagerImpl::CheckNonConcurrentBleClosing()
+{
+    if (mTerminateOnPacketTxComplete)
+    {
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+    }
+}
+#endif
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {

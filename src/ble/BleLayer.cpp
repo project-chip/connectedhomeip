@@ -286,7 +286,7 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
     memset(&sBLEEndPointPool, 0, sizeof(sBLEEndPointPool));
 
     mState = kState_Initialized;
-    SetBleTerminating(false);
+    mTerminateOnPacketTxComplete = false;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
     mTestBleEndPoint = NULL;
@@ -788,18 +788,6 @@ void BleLayer::OnConnectionError(void * appState, CHIP_ERROR err)
 {
     BleLayer * layer = reinterpret_cast<BleLayer *>(appState);
     layer->mBleTransport->OnBleConnectionError(err);
-}
-
-// BLE Flag to wait for packet transmission confirmation
-static bool BleTerminating = false;
-void BleLayer::SetBleTerminating(bool value)
-{
-    BleTerminating = value;
-}
-
-bool BleLayer::GetBleTerminating()
-{
-    return BleTerminating;
 }
 
 } /* namespace Ble */

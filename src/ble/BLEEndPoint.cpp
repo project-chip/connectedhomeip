@@ -1020,7 +1020,7 @@ CHIP_ERROR BLEEndPoint::DriveSending()
     }
     else if (mBtpEngine.TxState() == BtpEngine::kState_Complete)
     {
-        // Clear fragmenter's pointer to sent message buffer and reset its Tx state.
+                // Clear fragmenter's pointer to sent message buffer and reset its Tx state.
         // Buffer will be freed at scope exit.
         PacketBufferHandle sentBuf = mBtpEngine.TakeTxPacket();
 #if CHIP_ENABLE_CHIPOBLE_TEST
@@ -1029,17 +1029,20 @@ CHIP_ERROR BLEEndPoint::DriveSending()
 
         if (!mSendQueue.IsNull())
         {
-            // Transmit first fragment of next whole message in send queue.
+                        // Transmit first fragment of next whole message in send queue.
             ReturnErrorOnFailure(SendNextMessage());
         }
         else if (mState == kState_Closing && !mBtpEngine.ExpectingAck()) // and mSendQueue is NULL, per above...
         {
             // If end point closing, got last ack, and got out-of-order confirmation for last send, finalize close.
             FinalizeClose(mState, kBleCloseFlag_SuppressCallback, CHIP_NO_ERROR);
-        }
+                    }
         else
         {
             // Nothing to send!
+#if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+            mBle->mApplicationDelegate->CheckNonConcurrentBleClosing();
+#endif
         }
     }
 
