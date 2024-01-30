@@ -164,7 +164,7 @@ void ReportCallback::OnReportBegin()
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(wrapperCallback, onReportBeginMethod);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());        
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void ReportCallback::OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams)
@@ -710,7 +710,7 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
         size_t bufferLen = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
         std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
         uint32_t size = 0;
-        
+
         TLV::TLVWriter writer;
         writer.Init(buffer.get(), bufferLen);
         err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
@@ -749,7 +749,7 @@ void InvokeCallback::OnDone(app::CommandSender * apCommandSender)
     JniLocalReferenceManager manager(env);
     jmethodID onDoneMethod;
     VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s", __func__));
-    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();    
+    jobject wrapperCallback = mWrapperCallbackRef.ObjectRef();
     JniGlobalReference globalRef(std::move(mWrapperCallbackRef));
 
     err                  = JniReferences::GetInstance().FindMethod(env, wrapperCallback, "onDone", "()V", &onDoneMethod);
