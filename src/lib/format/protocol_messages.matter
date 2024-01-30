@@ -24,17 +24,23 @@
 ///
 client cluster SecureChannelProtocol = 0xFFFF0000 {
 
-  struct ICDParameterStruct {
-    int32u sleepy_idle_interval = 1;
-    int32u sleepy_active_interval = 2;
+  struct SessionParameterStruct {
+    optional int32u session_idle_interval = 1;
+    optional int32u session_active_interval = 2;
+    optional int16u session_active_threshold = 3;
+    int16u data_model_revision = 4;
+    int16u interaction_model_revision = 5;
+    int32u specification_version = 6;
+    int16u max_paths_per_invoke = 7;
   }
+
 
   struct PBKDFParamRequest {
     octet_string<32> initiator_random = 1;
     int16u initiator_session_id = 2;
     int16u passcode_id = 3;
     boolean has_pbkdf_parameters = 4;
-    optional ICDParameterStruct initiator_icd_params = 5;
+    optional SessionParameterStruct initiator_session_params = 5;
   }
 
   struct CryptoPBKDFParameterSet {
@@ -47,7 +53,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
     octet_string<32> responder_random = 2;
     int16u responder_session_id = 3;
     CryptoPBKDFParameterSet pbkdf_parameters = 4;
-    optional IDCParameterStruct responder_icd_params = 5;
+    optional SessionParameterStruct responder_icd_params = 5;
   }
 
   struct PasePake1 {
@@ -68,7 +74,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
     int16u initiator_session_id = 2;
     octet_string<32> destination_id = 3;
     octet_string<65> initiator_eph_pub_key = 4;
-    optional ICDParameterStruct initiator_icd_params = 5;
+    optional SessionParameterStruct initiator_session_params = 5;
     optional octet_string<16> resumption_id = 6;
     optional octet_string initiator_resume_mic = 7;
   }
@@ -78,7 +84,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
     int16u responder_sessoion_id = 2;
     octet_string<65> responder_eph_pub_key = 3;
     octet_string encrypted2 = 4;
-    optional ICDParameterStruct responder_icd_params = 5;
+    optional SessionParameterStruct responder_session_params = 5;
   }
 
   struct CaseSigma3 {
@@ -89,7 +95,7 @@ client cluster SecureChannelProtocol = 0xFFFF0000 {
     octet_string<16> resumption_id = 1;
     octet_string<16> sigma2_resume_mic = 2;
     int16u responder_sessoion_id = 3;
-    optional ICDParameterStruct responder_icd_params = 4;
+    optional SessionParameterStruct responder_session_params = 4;
   }
 
   // IDs here are based on Protocol opcodes
@@ -166,6 +172,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     optional EventFilterIB event_filters[] = 2;
     optional boolean fabric_filtered = 3;
     optional DataVersionFilterIB data_version_filters[] = 4;
+    optional boolean include_attribution_data = 5;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;
@@ -237,6 +244,24 @@ client cluster IMProtocol = 0xFFFF0001 {
     StatusIB status = 1;
   }
 
+  struct AttributionData {
+    // NOTE: 0 is missing
+    int8u context_information = 1;
+    int32u source_context = 2;
+
+    // at-most-one-of {
+    optional int64u node_id = 3;
+    optional int16u group_id = 4;
+    // }
+
+    // at-most-one-of {
+    optional int64u epoch_timestamp = 5;
+    optional int64u system_timestamp = 6;
+    // }
+
+    int8u fabric_index = 0xFE;
+  }
+
   struct AttributeData {
     optional int32u data_version = 0;
     AttributePathIB path = 1;
@@ -266,6 +291,8 @@ client cluster IMProtocol = 0xFFFF0001 {
     //  }
 
     cluster_event_payload data = 7;
+
+    AttributionData attribution_data = 8;
   }
 
   struct EventReportIB {
@@ -288,6 +315,7 @@ client cluster IMProtocol = 0xFFFF0001 {
     int32u data_version = 0;
     AttributePathIB path = 1;
     cluster_attribute_payload data = 2;
+    AttributionData attribution_data = 3;
   }
 
   struct WriteRequestMessage {
@@ -320,7 +348,26 @@ client cluster IMProtocol = 0xFFFF0001 {
 
   struct CommandDataIB {
     CommandPathIB path = 0;
-    cluster_command_payload data = 1;
+    optional cluster_command_payload data = 1;
+    optional int16u command_ref = 2;
+
+    // at-most-one-of {
+    optional SuppliedAttribution supplied_attribution_data = 3;
+    optional int16u supplied_attribution_data_repeat = 4;
+    // }
+  }
+
+  enum SuppliedAttributionContextInformation : enum8 {
+     kDefaultClientAction = 0;
+     kUserInteraction = 1;
+     kClientAutomationRule = 2;
+     kClientSchedule = 3;
+     kClientTimer = 4;
+  }
+
+  struct  SuppliedAttribution {
+     SuppliedAttributeContextInformation context_information = 0;
+     int32u source_context = 1;
   }
 
   struct InvokeRequestMessage {
@@ -345,6 +392,7 @@ client cluster IMProtocol = 0xFFFF0001 {
   struct InvokeResponseMessage {
     boolean suppress_response = 0;
     InvokeResponseIB invoke_responses[] = 1;
+    optional boolean more_chunked_messages = 2;
 
     // 10.2.2.2. Context Tag Encoded Action Information
     int8u interaction_model_revison = 0xFF;

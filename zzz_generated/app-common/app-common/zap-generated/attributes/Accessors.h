@@ -329,14 +329,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace PulseWidthModulation
 
 namespace Descriptor {
-namespace Attributes {
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
-} // namespace Attributes
+namespace Attributes {} // namespace Attributes
 } // namespace Descriptor
 
 namespace Binding {
@@ -1999,6 +1992,22 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace DemandResponseLoadControl
+
+namespace Messages {
+namespace Attributes {
+
+namespace FeatureMap {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace Messages
 
 namespace DeviceEnergyManagement {
 namespace Attributes {
@@ -5497,6 +5506,11 @@ namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
+
+namespace MeiInt8u {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace MeiInt8u
 
 } // namespace Attributes
 } // namespace UnitTesting

@@ -16,6 +16,7 @@
 import logging
 import os
 import shutil
+import subprocess
 import tempfile
 import threading
 import time
@@ -63,10 +64,7 @@ class App:
             with self.cv_stopped:
                 self.stopped = True
                 self.cv_stopped.notify()
-            self.process.kill()
-            self.process.wait(10)
-            self.process = None
-            self.outpipe = None
+            self.__terminateProcess()
             return True
         return False
 
@@ -90,8 +88,7 @@ class App:
         return True
 
     def kill(self):
-        if self.process:
-            self.process.kill()
+        self.__terminateProcess()
         self.killed = True
 
     def wait(self, timeout=None):
@@ -157,6 +154,18 @@ class App:
         if not qrLine:
             raise Exception("Unable to find QR code")
         self.setupCode = qrLine.group(1)
+
+    def __terminateProcess(self):
+        if self.process:
+            self.process.terminate()  # sends SIGTERM
+            try:
+                self.process.wait(10)
+            except subprocess.TimeoutExpired:
+                logging.debug('Subprocess did not terminate on SIGTERM, killing it now')
+                self.process.kill()
+                self.process.wait(10)
+            self.process = None
+            self.outpipe = None
 
 
 class TestTarget(Enum):

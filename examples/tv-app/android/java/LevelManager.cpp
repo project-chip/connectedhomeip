@@ -92,6 +92,7 @@ CHIP_ERROR LevelManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnLogError(env != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JniLocalReferenceManager manager(env);
 
     mLevelManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturnLogError(mLevelManagerObject != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -115,7 +116,9 @@ void LevelManager::HandleLevelChanged(uint8_t value)
     ChipLogProgress(Zcl, "LevelManager::HandleLevelChanged");
 
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != NULL, ChipLogProgress(Zcl, "env null"));
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
+
     VerifyOrReturn(mLevelManagerObject != nullptr, ChipLogProgress(Zcl, "mLevelManagerObject null"));
     VerifyOrReturn(mHandleLevelChangedMethod != nullptr, ChipLogProgress(Zcl, "mHandleLevelChangedMethod null"));
 

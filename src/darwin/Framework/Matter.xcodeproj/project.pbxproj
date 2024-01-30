@@ -299,10 +299,16 @@
 		B45373FF2A9FEC4F00807602 /* unix-misc.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F82A9FEC4F00807602 /* unix-misc.c */; };
 		B45374002A9FEC4F00807602 /* unix-init.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373F92A9FEC4F00807602 /* unix-init.c */; };
 		B45374012A9FEC4F00807602 /* unix-sockets.c in Sources */ = {isa = PBXBuildFile; fileRef = B45373FA2A9FEC4F00807602 /* unix-sockets.c */; };
+		B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */; };
 		B4E262162AA0CF1C00DBA5BC /* RemoteDataModelLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */; };
 		B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */; };
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
 		B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */; };
+		B4FCD56A2B5EDBD300832859 /* MTRDiagnosticLogsType.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD5692B5EDBD300832859 /* MTRDiagnosticLogsType.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B4FCD5732B611EB300832859 /* MTRDiagnosticLogsDownloader.h in Headers */ = {isa = PBXBuildFile; fileRef = B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */; };
+		B4FCD5702B603A6300832859 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD56D2B603A6300832859 /* Commands.h */; };
+		B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B4FCD56E2B603A6300832859 /* DownloadLogCommand.h */; };
+		B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
@@ -669,10 +675,16 @@
 		B45373F82A9FEC4F00807602 /* unix-misc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-misc.c"; path = "repo/lib/plat/unix/unix-misc.c"; sourceTree = "<group>"; };
 		B45373F92A9FEC4F00807602 /* unix-init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-init.c"; path = "repo/lib/plat/unix/unix-init.c"; sourceTree = "<group>"; };
 		B45373FA2A9FEC4F00807602 /* unix-sockets.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "unix-sockets.c"; path = "repo/lib/plat/unix/unix-sockets.c"; sourceTree = "<group>"; };
+		B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDiagnosticLogsDownloader.h; sourceTree = "<group>"; };
+		B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDiagnosticLogsDownloader.mm; sourceTree = "<group>"; };
 		B4E262122AA0C7A300DBA5BC /* RemoteDataModelLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RemoteDataModelLogger.mm; sourceTree = "<group>"; };
 		B4E262132AA0C7A300DBA5BC /* RemoteDataModelLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteDataModelLogger.h; sourceTree = "<group>"; };
 		B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SleepCommand.mm; sourceTree = "<group>"; };
 		B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WaitForCommissioneeCommand.mm; sourceTree = "<group>"; };
+		B4FCD5692B5EDBD300832859 /* MTRDiagnosticLogsType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDiagnosticLogsType.h; sourceTree = "<group>"; };
+		B4FCD56D2B603A6300832859 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		B4FCD56E2B603A6300832859 /* DownloadLogCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownloadLogCommand.h; sourceTree = "<group>"; };
+		B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DownloadLogCommand.mm; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
 		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
@@ -741,6 +753,7 @@
 		037C3D7B2991BD4F00B7EEE2 /* commands */ = {
 			isa = PBXGroup;
 			children = (
+				B4FCD56C2B603A6300832859 /* bdx */,
 				B4E262182AA0CFFE00DBA5BC /* delay */,
 				03FB93DA2A46200A0048CB35 /* discover */,
 				037C3D7C2991BD4F00B7EEE2 /* pairing */,
@@ -1105,6 +1118,9 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				B4FCD5692B5EDBD300832859 /* MTRDiagnosticLogsType.h */,
+				B4C8E6B32B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.h */,
+				B4C8E6B42B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm */,
 				1E4D655129C30A8700BC3478 /* MTRCommissionableBrowser.mm */,
 				1E4D654C29C208DD00BC3478 /* MTRCommissionableBrowser.h */,
 				1E4D654D29C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h */,
@@ -1339,6 +1355,16 @@
 			path = delay;
 			sourceTree = "<group>";
 		};
+		B4FCD56C2B603A6300832859 /* bdx */ = {
+			isa = PBXGroup;
+			children = (
+				B4FCD56D2B603A6300832859 /* Commands.h */,
+				B4FCD56E2B603A6300832859 /* DownloadLogCommand.h */,
+				B4FCD56F2B603A6300832859 /* DownloadLogCommand.mm */,
+			);
+			path = bdx;
+			sourceTree = "<group>";
+		};
 		BA09EB3E2474762900605257 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1368,6 +1394,7 @@
 				037C3DCE2991BD5100B7EEE2 /* CHIPCommandBridge.h in Headers */,
 				037C3DD22991BD5200B7EEE2 /* InteractiveCommands.h in Headers */,
 				037C3DAF2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h in Headers */,
+				B4FCD5712B603A6300832859 /* DownloadLogCommand.h in Headers */,
 				037C3DC32991BD5100B7EEE2 /* Commands.h in Headers */,
 				037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */,
 				037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */,
@@ -1380,6 +1407,7 @@
 				037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */,
 				037C3DBE2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.h in Headers */,
 				037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */,
+				B4FCD5702B603A6300832859 /* Commands.h in Headers */,
 				037C3DB02991BD4F00B7EEE2 /* Commands.h in Headers */,
 				037C3DC02991BD5100B7EEE2 /* Commands.h in Headers */,
 				B4E262172AA0CF2000DBA5BC /* RemoteDataModelLogger.h in Headers */,
@@ -1411,6 +1439,7 @@
 				5178E6812AE098520069DF72 /* MTRCommandTimedCheck.h in Headers */,
 				7596A84B287636C1004DAE0E /* MTRDevice_Internal.h in Headers */,
 				5A6FEC9927B5C88900F25F42 /* MTRDeviceOverXPC.h in Headers */,
+				B4FCD5732B611EB300832859 /* MTRDiagnosticLogsDownloader.h in Headers */,
 				51B22C222740CB1D008D5055 /* MTRCommandPayloadsObjc.h in Headers */,
 				51B22C1E2740CB0A008D5055 /* MTRStructsObjc.h in Headers */,
 				2CB7163B252E8A7B0026E2BB /* MTRDeviceControllerDelegateBridge.h in Headers */,
@@ -1460,6 +1489,7 @@
 				998F286D26D55E10001846C6 /* MTRKeypair.h in Headers */,
 				1ED276E426C5832500547A89 /* MTRCluster.h in Headers */,
 				3D843711294977000070D20A /* NSStringSpanConversion.h in Headers */,
+				B4FCD56A2B5EDBD300832859 /* MTRDiagnosticLogsType.h in Headers */,
 				5A6FEC9A27B5C89300F25F42 /* MTRDeviceControllerXPCConnection.h in Headers */,
 				5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */,
 				2C8C8FC1253E0C2100797F05 /* MTRStorage.h in Headers */,
@@ -1643,6 +1673,7 @@
 				B45373C12A9FEA9100807602 /* close.c in Sources */,
 				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
 				B45373E72A9FEBA400807602 /* parsers.c in Sources */,
+				B4FCD5722B603A6300832859 /* DownloadLogCommand.mm in Sources */,
 				B45373BF2A9FEA9100807602 /* adopt.c in Sources */,
 				B45373F32A9FEC1A00807602 /* server-ws.c in Sources */,
 				03F430AA2994113500166449 /* sysunix.c in Sources */,
@@ -1736,6 +1767,7 @@
 				AF5F90FF2878D351005503FA /* MTROTAProviderDelegateBridge.mm in Sources */,
 				51E95DFC2A78443C00A434F0 /* MTRSessionResumptionStorageBridge.mm in Sources */,
 				7534F12828BFF20300390851 /* MTRDeviceAttestationDelegate.mm in Sources */,
+				B4C8E6B72B3453AD00FCD54D /* MTRDiagnosticLogsDownloader.mm in Sources */,
 				2C5EEEF7268A85C400CAE3D3 /* MTRDeviceConnectionBridge.mm in Sources */,
 				51B22C262740CB32008D5055 /* MTRStructsObjc.mm in Sources */,
 				2C222AD1255C620600E446B9 /* MTRBaseDevice.mm in Sources */,
@@ -1848,11 +1880,13 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"CONFIG_USE_INTERACTIVE_MODE=1",
+					"MTR_NO_AVAILABILITY=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples/darwin-framework-tool",
@@ -1924,11 +1958,13 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
 					CHIP_HAVE_CONFIG_H,
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"CONFIG_USE_INTERACTIVE_MODE=1",
+					"MTR_NO_AVAILABILITY=1",
 				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(CHIP_ROOT)/examples//darwin-framework-tool",
@@ -2032,6 +2068,7 @@
 					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
 					"$(inherited)",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -2039,14 +2076,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
+				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
-				SUPPORTS_TEXT_BASED_API = NO;
+				SUPPORTS_TEXT_BASED_API = YES;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				TAPI_ENABLE_PROJECT_HEADERS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -2075,20 +2112,6 @@
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"MTR_ENABLE_PROVISIONAL=1",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/src/include",
-					"$(CHIP_ROOT)/src/lib",
-					"$(CHIP_ROOT)/src/app",
-					"$(CHIP_ROOT)/config/ios",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/src/app/util",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-					"$(TEMP_DIR)/out/gen/include",
-					"$(CHIP_ROOT)/zzz_generated/",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -2131,6 +2154,20 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.csa.matter;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(TEMP_DIR)/out/gen/include",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/src/app/util",
+					"$(CHIP_ROOT)/zzz_generated/",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+				);
 				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
@@ -2142,6 +2179,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"MTR_NO_AVAILABILITY=1",
+				);
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2197,6 +2238,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -2204,10 +2246,9 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
+				OTHER_TAPI_FLAGS = "-x objective-c++ -std=gnu++17 -fvisibility=hidden -fobjc-arc";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "macosx iphonesimulator iphoneos appletvos appletvsimulator watchos watchsimulator";
 				SUPPORTS_TEXT_BASED_API = YES;
@@ -2241,20 +2282,6 @@
 					"$(inherited)",
 					"CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
 					"MTR_ENABLE_PROVISIONAL=1",
-				);
-				HEADER_SEARCH_PATHS = (
-					"$(CHIP_ROOT)/src",
-					"$(CHIP_ROOT)/src/include",
-					"$(CHIP_ROOT)/src/lib",
-					"$(CHIP_ROOT)/src/app",
-					"$(CHIP_ROOT)/config/ios",
-					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
-					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
-					"$(CHIP_ROOT)/src/app/util",
-					"$(CHIP_ROOT)/third_party/nlio/repo/include",
-					"$(TEMP_DIR)/out/gen/include",
-					"$(CHIP_ROOT)/zzz_generated/",
-					"$(CHIP_ROOT)/zzz_generated/app-common",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
@@ -2298,6 +2325,20 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SDKROOT = iphoneos;
 				STRIP_STYLE = "non-global";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(TEMP_DIR)/out/gen/include",
+					"$(CHIP_ROOT)/src/darwin/Framework/CHIP/",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/src/include",
+					"$(CHIP_ROOT)/src/lib",
+					"$(CHIP_ROOT)/src/app",
+					"$(CHIP_ROOT)/src/app/util",
+					"$(CHIP_ROOT)/zzz_generated/",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+				);
 				TAPI_VERIFY_MODE = Pedantic;
 				TARGETED_DEVICE_FAMILY = "1,2,3,4";
 				VERSION_INFO_EXPORT_DECL = "__attribute__((visibility(\"hidden\")))";
@@ -2310,6 +2351,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"MTR_NO_AVAILABILITY=1",
+				);
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../../src";
 				INFOPLIST_FILE = CHIPTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
