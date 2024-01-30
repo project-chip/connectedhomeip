@@ -2602,16 +2602,19 @@ void ColorControlServer::updateTempCommand(EndpointId endpoint)
 
     isColorTempTransitionDone = computeNewColor16uValue(colorTempTransitionState);
 
-    if (!isColorTempTransitionDone) {
+    if (!isColorTempTransitionDone)
+    {
         // Check whether our color temperature has actually changed.  If not, do
         // nothing, and wait for it to change.
         uint16_t currentColorTemp;
-        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != EMBER_ZCL_STATUS_SUCCESS) {
+        if (Attributes::ColorTemperatureMireds::Get(endpoint, &currentColorTemp) != EMBER_ZCL_STATUS_SUCCESS)
+        {
             // Why can't we read our attribute?
             return;
         }
 
-        if (currentColorTemp == colorTempTransitionState->currentValue) {
+        if (currentColorTemp == colorTempTransitionState->currentValue)
+        {
             scheduleTimerCallbackMs(configureTempEventControl(endpoint), TRANSITION_UPDATE_TIME_MS.count());
             return;
         }
