@@ -19,12 +19,44 @@
 
 #include <app/util/af.h>
 
-// Remote devices writing attributes of local device
-EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                            uint8_t * dataPtr, EmberAfAttributeType dataType);
+/**
+ * Write an attribute for a request arriving from external sources.
+ *
+ * This will check attribute writeability and that
+ * the provided data type matches the expected data type.
+ */
+EmberAfStatus emAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
+                                         uint8_t * dataPtr, EmberAfAttributeType dataType);
 
+/**
+ * @brief write an attribute, performing all the checks.
+ *
+ * This function will attempt to write the attribute value from
+ * the provided pointer. This function will only check that the
+ * attribute exists. If it does it will write the value into
+ * the attribute table for the given attribute.
+ *
+ * This function will not check to see if the attribute is
+ * writable since the read only / writable characteristic
+ * of an attribute only pertains to external devices writing
+ * over the air. Because this function is being called locally
+ * it assumes that the device knows what it is doing and has permission
+ * to perform the given operation.
+ *
+ * if true is passed in for overrideReadOnlyAndDataType then the data type is
+ * not checked and the read-only flag is ignored. This mode is meant for
+ * testing or setting the initial value of the attribute on the device.
+ *
+ * this returns:
+ * - EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: if endpoint isn't supported by the device.
+ * - EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER: if cluster isn't supported on the endpoint.
+ * - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isn't supported in the cluster.
+ * - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
+ *           stored in the attribute table
+ * - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
+ * - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
+ *           the attribute
+ * - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
+ */
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * data,
-                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest);
-
-EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType);

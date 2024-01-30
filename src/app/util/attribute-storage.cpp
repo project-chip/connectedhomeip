@@ -938,10 +938,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         emAfEndpoints[index].bitmask.Set(EmberAfEndpointOptions::isEnabled);
     }
 
-#if defined(EZSP_HOST)
-    ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
-#endif
-
     if (currentlyEnabled != enable)
     {
         if (enable)

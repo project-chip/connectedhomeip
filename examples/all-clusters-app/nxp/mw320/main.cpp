@@ -1152,12 +1152,10 @@ void task_test_main(void * param)
             PRINTF("--> update CurrentPosition [%d] \r\n", value);
             Clusters::Switch::Attributes::CurrentPosition::Set(1, value);
 #ifdef SUPPORT_MANUAL_CTRL
-#error                                                                                                                             \
-    "This code thinks it's setting the OnOff attribute, but it's actually setting the NumberOfPositions attribute!  And passing the wrong size for either case.  Figure out what it's trying to do."
-            // sync-up the Light attribute (for test event, OO.M.ManuallyControlled)
-            PRINTF("--> update [Clusters::Switch::Id]: OnOff::Id [%d] \r\n", value);
-            emAfWriteAttribute(1, Clusters::Switch::Id, Clusters::OnOff::Attributes::OnOff::Id, (uint8_t *) &value, sizeof(value),
-                               true, false);
+#error "Not implemented"
+            // TODO: previous code was trying to write a OnOff cluster attribute id to a switch attribute, generally
+            //       not working. Determine if this should maybe be
+            //       OnOff::Attributes::OnOff::Set(1, is_on) or similar
 #endif // SUPPORT_MANUAL_CTRL
 
             need2sync_sw_attr = false;
