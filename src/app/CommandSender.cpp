@@ -224,6 +224,9 @@ CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExcha
     {
         err = ProcessInvokeResponse(std::move(aPayload), moreChunkedMessages);
         SuccessOrExit(err);
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+        mInvokeResponseMessageCount++;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
         if (moreChunkedMessages)
         {
             StatusResponse::Send(Status::Success, apExchangeContext, /*aExpectResponse = */ true);

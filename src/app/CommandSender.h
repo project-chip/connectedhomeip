@@ -347,6 +347,7 @@ public:
     CHIP_ERROR TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
                                                                       Optional<System::Clock::Timeout> timeout = NullOptional);
 
+    size_t GetInvokeResponseMessageCount() { return mInvokeResponseMessageCount; }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
@@ -509,6 +510,10 @@ private:
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     uint16_t mFinishedCommandCount    = 0;
     uint16_t mRemoteMaxPathsPerInvoke = 1;
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    size_t mInvokeResponseMessageCount = 0;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
     State mState                = State::Idle;
     bool mSuppressResponse      = false;

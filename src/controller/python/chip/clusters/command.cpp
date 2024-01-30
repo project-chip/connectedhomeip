@@ -62,7 +62,7 @@ using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::Endp
 using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
                                               std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                               chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
+using OnCommandSenderDoneCallback     = void (*)(PyObject appContext, python::TestOnlyPyOnDoneInfo testOnlyDoneInfo);
 
 OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
 OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
@@ -148,7 +148,10 @@ public:
 
     void OnDone(CommandSender * apCommandSender) override
     {
-        gOnCommandSenderDoneCallback(mAppContext);
+
+        python::TestOnlyPyOnDoneInfo testOnlyOnDoneInfo;
+        testOnlyOnDoneInfo.responseMessageCount = apCommandSender->GetInvokeResponseMessageCount();
+        gOnCommandSenderDoneCallback(mAppContext, testOnlyOnDoneInfo);
         delete apCommandSender;
         delete this;
     };
