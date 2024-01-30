@@ -46,18 +46,18 @@ namespace ThreadNetworkDiagnostics {
  * @param aEncoder Encoder to encode the attribute value.
  *
  * @return CHIP_NO_ERROR = Succes.
- *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute to yet available to send as reply
+ *         CHIP_ERROR_NOT_IMPLEMENTED = Runtime value for this attribute not yet available to send as reply
  *                                      Use standard read.
  *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE = Is not a Runtime readable attribute. Use standard read
  *         All other errors should be treated as a read error and reported as such.
  *
- * @note This function implementation can compile in 3 different outcome
+ * @note This function implementation can compile in 3 different outcomes
  *       (1) CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
  *           - Generic implementation fetching the valid thread network data from the thread stack and encoding it respectively to
  *             the attributeID received.
  *       (2) CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK:
  *           - Encode a NULL value for nullable attributes or 0 for the others.
- *           - Devices using the ot-br-posix dbus stack have not yet provided the API the fetch the needed thread informations.
+ *           - Devices using the ot-br-posix dbus stack have not yet provided the API to fetch the needed thread informations.
  *       (3) None of the conditions above
  *           - returns CHIP_ERROR_NOT_IMPLEMENTED.
  */
@@ -70,7 +70,7 @@ CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, a
     if (!otDatasetIsCommissioned(otInst))
     {
         // For the following nullable attributes of the cluster, encodeNull since
-        // thread instance cannot provide the related data when it is not currently configured.
+        // thread instance cannot provide the relevant data when it is not currently configured.
         //
         // Note that RoutingRole is nullable but not listed here as thread provides
         // valid data even when disabled or detached
