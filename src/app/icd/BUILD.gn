@@ -70,7 +70,7 @@ source_set("manager") {
     ":notifier",
     ":observer",
     ":sender",
-    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app:subscription-manager",
     "${chip_root}/src/credentials:credentials",
   ]
 }
@@ -114,5 +114,6 @@ source_set("configuration-data") {
   deps = [
     ":icd_config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }

@@ -330,7 +330,7 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
-bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subjectID)
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
@@ -365,6 +365,12 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFab
     });
 
     return isActive;
+}
+
+bool InteractionModelEngine::SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject)
+{
+    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
+    return false;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
