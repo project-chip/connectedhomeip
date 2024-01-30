@@ -43,6 +43,8 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     # Map clusters to common XML template if needed
     accessControlCluster = "AccessControl"
     groupKeyManagementCluster = "GroupKeyManagement"
+    laundryDryerControls = "Laundry Dryer Controls"
+    laundryWasherControls = "Laundry Washer Controls"
     lowPowerCluster = "Low Power"
     onOffCluster = "On/Off"
     operationalCredentialsCluster = "Operational Credentials"
@@ -71,6 +73,12 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
     elif thermostatCluster == clusterName:
         clusterName = "Thermostat Cluster"
+
+    elif laundryDryerControls == clusterName:
+        clusterName = "Dryer Controls"
+
+    elif laundryWasherControls == clusterName:
+        clusterName = "Washer Controls"
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
