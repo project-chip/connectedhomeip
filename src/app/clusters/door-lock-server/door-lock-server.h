@@ -80,9 +80,9 @@ static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
 
 enum class AttributeNullabilityType : uint8_t
 {
-    kNullable  = 0,
+    kNullable = 0,
     /**< Used to indicate if an attribute can be nullable */
-    kNotNullable  = 1,
+    kNotNullable = 1,
     /**< Used to indicate if an attribute is not nullable */
 };
 

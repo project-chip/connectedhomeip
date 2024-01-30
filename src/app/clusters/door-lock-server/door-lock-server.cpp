@@ -4174,7 +4174,8 @@ CHIP_ERROR DoorLockServer::ReadAliroSupportedBLEUWBProtocolVersions(const Concre
 }
 
 CHIP_ERROR DoorLockServer::ReadAliroByteSpanAttribute(CHIP_ERROR (Delegate::*func)(MutableByteSpan &), MutableByteSpan & data,
-                                                      Delegate * delegate, AttributeValueEncoder & aEncoder, AttributeNullabilityType nullabilityType)
+                                                      Delegate * delegate, AttributeValueEncoder & aEncoder,
+                                                      AttributeNullabilityType nullabilityType)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -4227,7 +4228,8 @@ CHIP_ERROR DoorLockServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     case AliroGroupResolvingKey::Id: {
         uint8_t buffer[kAliroGroupResolvingKeySize];
         MutableByteSpan groupResolvingKey(buffer);
-        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, groupResolvingKey, delegate, aEncoder, AttributeNullabilityType::kNullable);
+        return ReadAliroByteSpanAttribute(&Delegate::GetAliroGroupResolvingKey, groupResolvingKey, delegate, aEncoder,
+                                          AttributeNullabilityType::kNullable);
     }
     case AliroSupportedBLEUWBProtocolVersions::Id: {
         return ReadAliroSupportedBLEUWBProtocolVersions(aPath, aEncoder, delegate);
