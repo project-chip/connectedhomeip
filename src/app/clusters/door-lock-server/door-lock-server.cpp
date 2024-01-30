@@ -71,7 +71,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
     uint16_t ep = emberAfGetClusterServerEndpointIndex(endpoint, DoorLock::Id, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT);
     // if endpoint is found
-    if (ep < kDoorLockDelegateTableSize)
+    if (ep < ArraySize(gDelegateTable))
     {
         gDelegateTable[ep] = delegate;
     }
@@ -3922,7 +3922,7 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     {
         ChipLogProgress(Zcl,
                         "[SetAliroReaderConfig] One or more parameters in the command do not meet the size constraint as per spec");
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
         return;
     }
 
@@ -3934,7 +3934,7 @@ void DoorLockServer::setAliroReaderConfigCommandHandler(CommandHandler * command
     // If Aliro reader verification key attribute was not read successfuly, return INVALID_IN_STATE. Or if the verification key was
     // read and is not null (i.e not empty), we can't set a new reader config without clearing the previous one, return
     // INVALID_IN_STATE.
-    if (err != CHIP_NO_ERROR || (err == CHIP_NO_ERROR && !readerVerificationKey.empty()))
+    if (err != CHIP_NO_ERROR || !readerVerificationKey.empty())
     {
         ChipLogProgress(
             Zcl, "[SetAliroReaderConfig] Aliro reader verification key was not read or is not null. Return INVALID_IN_STATE");
