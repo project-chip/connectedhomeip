@@ -101,6 +101,8 @@ def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
 
 def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
 
+    numberOfRowsInEndpoint = 2
+
     partsListFromWildcardRead = wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.PartsList]
 
     listOfDeviceTypes = []
@@ -138,6 +140,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         elif clusterColumnCount == 3:
             nodeRef = nextNodeRef
             clusterColumnCount = 0
+            numberOfRowsInEndpoint += 1
 
     for clusterId in wildcardResponse[endpoint][Clusters.Objects.Descriptor][Clusters.Objects.Descriptor.Attributes.ClientList]:
         clusterColumnCount += 1
@@ -154,11 +157,12 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
         elif clusterColumnCount == 3:
             nodeRef = nextNodeRef
             clusterColumnCount = 0
+            numberOfRowsInEndpoint += 1
 
     if endpoint != 0:
         # Create link to endpoints in the parts list
         for part in partsListFromWildcardRead:
-            graph.edge(f"ep{endpoint}", f"ep{part}", ltail=f"cluster_{endpoint}")
+            graph.edge(f"ep{endpoint}", f"ep{part}", ltail=f"cluster_{endpoint}", minlen=f"{numberOfRowsInEndpoint}")
 
 
 class TC_MatterDeviceGraph(MatterBaseTest):
