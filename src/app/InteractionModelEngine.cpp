@@ -369,7 +369,7 @@ bool InteractionModelEngine::SubjectHasActiveSubcription(const FabricIndex & aFa
 
 bool InteractionModelEngine::SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject)
 {
-    // TODO : Implement persisted sub verification
+    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
     return false;
 }
 
