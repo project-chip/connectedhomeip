@@ -174,7 +174,6 @@ private:
     static void DriveBLEState(intptr_t arg);
 
     void InitiateScan(BleScanState scanType);
-    static void InitiateScan(intptr_t arg);
 
     void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
     static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,

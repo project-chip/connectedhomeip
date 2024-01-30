@@ -1398,8 +1398,8 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
         ChipLogProgress(DeviceLayer, "NewConnection: long discriminator value [%u]", connDiscriminator.GetLongValue());
     }
 
-    // Initiate Scan.
-    PlatformMgr().ScheduleWork(InitiateScan, static_cast<intptr_t>(BleScanState::kScanForDiscriminator));
+    // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
+    ServiceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
@@ -1448,11 +1448,6 @@ exit:
     ChipLogError(DeviceLayer, "BLE scan initiation failed: %" CHIP_ERROR_FORMAT, err.Format());
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
-}
-
-void BLEManagerImpl::InitiateScan(intptr_t arg)
-{
-    sInstance.InitiateScan(static_cast<BleScanState>(arg));
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
