@@ -106,58 +106,53 @@ static void __BLEConnectionFree(BLEConnection * conn)
     g_free(conn);
 }
 
-static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
+void BLEManagerImpl::AdapterStateChangedCb(int result, bt_adapter_state_e adapterState)
 {
     ChipLogProgress(DeviceLayer, "Adapter State Changed: %s", adapterState == BT_ADAPTER_ENABLED ? "Enabled" : "Disabled");
 }
 
-void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData)
+void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress)
 {
     switch (result)
     {
     case BT_ERROR_NONE:
     case BT_ERROR_ALREADY_DONE:
         ChipLogProgress(DeviceLayer, "GATT %s", connected ? "connected" : "disconnected");
-        sInstance.HandleConnectionEvent(connected, remoteAddress);
+        HandleConnectionEvent(connected, remoteAddress);
         break;
     default:
         ChipLogError(DeviceLayer, "GATT %s failed: %s", connected ? "connection" : "disconnection", get_error_message(result));
         if (connected)
-            sInstance.NotifyHandleConnectFailed(TizenToChipError(result));
+            NotifyHandleConnectFailed(TizenToChipError(result));
     }
 }
 
-CHIP_ERROR BLEManagerImpl::_BleInitialize(void * userData)
+CHIP_ERROR BLEManagerImpl::_InitImpl()
 {
     int ret;
-
-    if (sInstance.mFlags.Has(Flags::kTizenBLELayerInitialized))
-    {
-        ChipLogProgress(DeviceLayer, "BLE Already Initialized");
-        return CHIP_NO_ERROR;
-    }
 
     ret = bt_initialize();
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_initialize() failed: %s", get_error_message(ret)));
 
-    ret = bt_adapter_set_state_changed_cb(__AdapterStateChangedCb, nullptr);
+    ret = bt_adapter_set_state_changed_cb(
+        +[](int result, bt_adapter_state_e adapterState, void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->AdapterStateChangedCb(result, adapterState);
+        },
+        this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
 
     ret = bt_gatt_server_initialize();
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_server_initialize() failed: %s", get_error_message(ret)));
 
-    ret = bt_gatt_set_connection_state_changed_cb(GattConnectionStateChangedCb, nullptr);
+    ret = bt_gatt_set_connection_state_changed_cb(
+        +[](int result, bool connected, const char * remoteAddress, void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->GattConnectionStateChangedCb(result, connected, remoteAddress);
+        },
+        this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_set_state_changed_cb() failed: %s", get_error_message(ret)));
 
-    // The hash table key is stored in the BLEConnection structure
-    // and is freed by the __BLEConnectionFree() function.
-    sInstance.mConnectionMap =
-        g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, reinterpret_cast<GDestroyNotify>(__BLEConnectionFree));
-
-    sInstance.mFlags.Set(Flags::kTizenBLELayerInitialized);
-    ChipLogProgress(DeviceLayer, "BLE Initialized");
     return CHIP_NO_ERROR;
 
 exit:
@@ -997,11 +992,19 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
-    ChipLogProgress(DeviceLayer, "Initialize BLE");
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(_BleInitialize, static_cast<void *>(nullptr));
+    ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
+
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
     SuccessOrExit(err);
 
-    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    // The hash table key is stored in the BLEConnection structure
+    // and is freed by the __BLEConnectionFree() function.
+    mConnectionMap = g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, reinterpret_cast<GDestroyNotify>(__BLEConnectionFree));
+
+    mFlags.Set(Flags::kTizenBLELayerInitialized);
+
+    err = DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 
 exit:
     return err;

@@ -168,13 +168,15 @@ private:
     // Minimum and maximum advertising intervals in units of 0.625ms.
     using AdvertisingIntervals = std::pair<uint16_t, uint16_t>;
 
-    static CHIP_ERROR _BleInitialize(void * userData);
+    CHIP_ERROR _InitImpl();
+
     void DriveBLEState();
     static void DriveBLEState(intptr_t arg);
 
     void InitiateScan(BleScanState scanType);
     static void InitiateScan(intptr_t arg);
 
+    void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
     static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
                                           void * appState);
     static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
@@ -184,9 +186,7 @@ private:
                                       bool responseNeeded, int offset, const char * value, int len, void * userData);
     static void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
                                          bool completed, void * userData);
-    static void IndicationConfirmationCb(bt_gatt_h characteristic, bt_gatt_server_notification_sent_cb callback,
-                                         const char * device_address, void * userData);
-    static void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData);
+    void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
