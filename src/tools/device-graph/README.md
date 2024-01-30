@@ -63,6 +63,9 @@ so:
 python3 '/Users/renejosefsen/Developer/GitData/connectedhomeip/src/tools/device-graph/matter-device-graph.py'
 ```
 
+The tool currently outputs the dot file in this folder and the output file is
+named "matter-device-graph.dot".
+
 # How to view graph
 
 In order to view the graph, any tool that renders dot/graphviz files can be
