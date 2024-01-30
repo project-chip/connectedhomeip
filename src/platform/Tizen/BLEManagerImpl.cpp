@@ -96,6 +96,8 @@ const char chip_ble_service_uuid_short[] = "FFF6";
 
 static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(20);
 static constexpr System::Clock::Timeout kConnectTimeout           = System::Clock::Seconds16(20);
+static constexpr System::Clock::Timeout kFastAdvertiseTimeout =
+    System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_INTERVAL_CHANGE_TIME);
 
 static void __BLEConnectionFree(BLEConnection * conn)
 {
@@ -182,6 +184,15 @@ static constexpr const char * __ConvertAttTypeToStr(bt_gatt_type_e type)
     default:
         return "(unknown)";
     }
+}
+
+void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appState)
+{
+    auto * self = static_cast<BLEManagerImpl *>(appState);
+    VerifyOrReturn(self->mFlags.Has(Flags::kFastAdvertisingEnabled));
+
+    ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
+    self->_SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
 }
 
 BLEManagerImpl::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() const
@@ -309,7 +320,7 @@ void BLEManagerImpl::IndicationConfirmationCb(int result, const char * remoteAdd
 }
 
 void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
-                                               void * userData)
+                                               void * appState)
 {
     ChipLogProgress(DeviceLayer, "Advertising %s", advState == BT_ADAPTER_LE_ADVERTISING_STARTED ? "Started" : "Stopped");
 
@@ -317,11 +328,17 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
     {
         sInstance.mFlags.Set(Flags::kAdvertising);
         sInstance.NotifyBLEPeripheralAdvStartComplete(true, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda([appState] {
+            // Start a timer to make sure that the fast advertising is stopped after specified timeout.
+            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, appState);
+        });
     }
     else
     {
         sInstance.mFlags.Clear(Flags::kAdvertising);
         sInstance.NotifyBLEPeripheralAdvStopComplete(true, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda(
+            [appState] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, appState); });
     }
 
     if (sInstance.mFlags.Has(Flags::kAdvertisingRefreshNeeded))
@@ -703,7 +720,7 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 
     BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
 
-    ret = bt_adapter_le_start_advertising_new(mAdvertiser, AdvertisingStateChangedCb, nullptr);
+    ret = bt_adapter_le_start_advertising_new(mAdvertiser, AdvertisingStateChangedCb, this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_start_advertising_new() failed: %s", get_error_message(ret)));
 
@@ -978,6 +995,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     SuccessOrExit(err);
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+    mFlags.Set(Flags::kFastAdvertisingEnabled, true);
 
     ChipLogProgress(DeviceLayer, "Initialize BLE");
     err = PlatformMgrImpl().GLibMatterContextInvokeSync(_BleInitialize, static_cast<void *>(nullptr));

@@ -176,7 +176,7 @@ private:
     static void InitiateScan(intptr_t arg);
 
     static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
-                                          void * userData);
+                                          void * appState);
     static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
     static void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
                                      int offset, void * userData);
@@ -208,6 +208,7 @@ private:
     void NotifyBLESubscribed(bool indicationsEnabled, BLE_CONNECTION_OBJECT conId);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
+    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
     AdvertisingIntervals GetAdvertisingIntervals() const;
 
     // ==== Connection.
