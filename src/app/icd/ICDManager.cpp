@@ -577,7 +577,7 @@ bool ICDManager::CheckInMessagesWouldBeSent()
             }
 
             // At least one registration would require a Check-In message
-            VerifyOrReturnValue(mSubManager->SubjectHasActiveSubcription(entry.fabricIndex, entry.monitoredSubject), true);
+            VerifyOrReturnValue(mSubManager->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject), true);
         }
     }
 

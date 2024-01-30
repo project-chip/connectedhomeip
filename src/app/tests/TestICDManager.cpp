@@ -79,7 +79,7 @@ public:
 
     void SetReturnValue(bool value) { mReturnValue = value; };
 
-    bool SubjectHasActiveSubcription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
+    bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
     bool SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) { return mReturnValue; };
 
 private:
@@ -192,7 +192,7 @@ public:
         // Set FeatureMap - Configures CIP, UAT and LITS to 1
         ctx->mICDManager.SetTestFeatureMapValue(0x07);
 
-        // Set that there are not matching subscriptions
+        // Set that there are no matching subscriptions
         ctx->mSubManager.SetReturnValue(false);
 
         // Set New durations for test case

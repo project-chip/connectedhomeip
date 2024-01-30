@@ -324,7 +324,7 @@ public:
 
     CHIP_ERROR ResumeSubscriptions();
 
-    bool SubjectHasActiveSubcription(const FabricIndex & aFabricIndex, const NodeId & subject) override;
+    bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) override;
 
     bool SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) override;
 

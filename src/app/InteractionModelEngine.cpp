@@ -330,7 +330,7 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
-bool InteractionModelEngine::SubjectHasActiveSubcription(const FabricIndex & aFabricIndex, const NodeId & subjectID)
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subjectID)
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {

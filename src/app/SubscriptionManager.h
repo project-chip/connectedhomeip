@@ -46,7 +46,7 @@ public:
      * @return true subject has at least one active subscription with the device
      *         false subject doesn't have any acitve subscription with the device
      */
-    virtual bool SubjectHasActiveSubcription(const FabricIndex & aFabricIndex, const NodeId & subject) = 0;
+    virtual bool SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subject) = 0;
 
     /**
      * @brief Check if a given subject (CAT or operational NodeId) has at least 1 persisted subscription.
