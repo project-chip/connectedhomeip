@@ -52,8 +52,8 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     auto rvcOpStateInstance = RvcOperationalState::GetRvcOperationalStateInstance();
     if (NewMode == RvcRunMode::ModeIdle) {
         rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-    } 
-    else 
+    }
+    else
     {
         rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
