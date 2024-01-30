@@ -28,6 +28,7 @@ sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main  # noqa: E402
 
 console = None
+maxClusterNameLength = 30
 
 
 # Given there is currently no tranlation from DeviceTypeID to the device type name,
@@ -87,7 +88,13 @@ deviceTypeDict = {
 
 
 def AddServerOrClientNode(graphSection, endpoint, clusterName, color, nodeRef):
-    graphSection.node(f"ep{endpoint}_{clusterName}", label=f"{clusterName}", style="filled,rounded",
+
+    if (len(clusterName) > maxClusterNameLength):
+        clusterNameAdjustedLength = clusterName[:maxClusterNameLength] + '...'
+    else:
+        clusterNameAdjustedLength = clusterName
+
+    graphSection.node(f"ep{endpoint}_{clusterName}", label=f"{clusterNameAdjustedLength}", style="filled,rounded",
                       color=color, shape="box", fixedsize="true", width="3", height="0.5")
     graphSection.edge(nodeRef, f"ep{endpoint}_{clusterName}", style="invis")
 
@@ -151,7 +158,7 @@ def CreateEndpointGraph(graph, graphSection, endpoint, wildcardResponse):
     if endpoint != 0:
         # Create link to endpoints in the parts list
         for part in partsListFromWildcardRead:
-            graph.edge(f"ep{endpoint}", f"ep{part}", ltail="cluster_rootnode")
+            graph.edge(f"ep{endpoint}", f"ep{part}", ltail=f"cluster_{endpoint}")
 
 
 class TC_MatterDeviceGraph(MatterBaseTest):
