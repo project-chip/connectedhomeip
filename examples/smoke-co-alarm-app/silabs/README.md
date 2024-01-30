@@ -18,6 +18,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
         -   [Debug build / release build](#debug-build--release-build)
         -   [Disabling LCD](#disabling-lcd)
         -   [KVS maximum entry count](#kvs-maximum-entry-count)
+        -   [Enabling test event trigger](#enabling-test-event-trigger)
 
 <hr>
 
@@ -54,8 +55,9 @@ Silicon Labs platform.
     (For Mac OS X, `commander` is located inside
     `Commander.app/Contents/MacOS/`.)
 
--   Download and install a suitable ARM gcc tool chain:
-    [GNU Arm Embedded Toolchain 9-2019-q4-major](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+-   Download and install a suitable ARM gcc tool chain (For most Host, the
+    bootstrap already installs the toolchain):
+    [GNU Arm Embedded Toolchain 12.2 Rel1](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 -   Install some additional tools(likely already present for CHIP developers):
 

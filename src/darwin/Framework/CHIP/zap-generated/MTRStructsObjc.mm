@@ -4813,6 +4813,171 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRMessagesClusterMessageResponseOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageResponseID = nil;
+
+        _label = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageResponseOptionStruct alloc] init];
+
+    other.messageResponseID = self.messageResponseID;
+    other.label = self.label;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageResponseID:%@; label:%@; >", NSStringFromClass([self class]), _messageResponseID, _label];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _priority = @(0);
+
+        _messageControl = @(0);
+
+        _startTime = nil;
+
+        _duration = nil;
+
+        _messageText = @"";
+
+        _responses = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageStruct alloc] init];
+
+    other.messageID = self.messageID;
+    other.priority = self.priority;
+    other.messageControl = self.messageControl;
+    other.startTime = self.startTime;
+    other.duration = self.duration;
+    other.messageText = self.messageText;
+    other.responses = self.responses;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; priority:%@; messageControl:%@; startTime:%@; duration:%@; messageText:%@; responses:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _priority, _messageControl, _startTime, _duration, _messageText, _responses];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageQueuedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageQueuedEvent alloc] init];
+
+    other.messageID = self.messageID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessagePresentedEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessagePresentedEvent alloc] init];
+
+    other.messageID = self.messageID;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRMessagesClusterMessageCompleteEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _messageID = [NSData data];
+
+        _responseID = nil;
+
+        _reply = nil;
+
+        _futureMessagesPreference = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRMessagesClusterMessageCompleteEvent alloc] init];
+
+    other.messageID = self.messageID;
+    other.responseID = self.responseID;
+    other.reply = self.reply;
+    other.futureMessagesPreference = self.futureMessagesPreference;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: messageID:%@; responseID:%@; reply:%@; futureMessagesPreference:%@; >", NSStringFromClass([self class]), [_messageID base64EncodedStringWithOptions:0], _responseID, _reply, _futureMessagesPreference];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDeviceEnergyManagementClusterCostStruct
 - (instancetype)init
 {

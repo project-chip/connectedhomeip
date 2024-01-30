@@ -5130,6 +5130,182 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::Messages::Id: {
+        using namespace app::Clusters::Messages;
+        switch (aPath.mEventId)
+        {
+        case Events::MessageQueued::Id: {
+            Events::MessageQueued::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jclass messageQueuedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageQueuedEvent", messageQueuedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessageQueuedEvent");
+                return nullptr;
+            }
+
+            jmethodID messageQueuedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, messageQueuedStructClass, "<init>", "([B)V",
+                                                                &messageQueuedStructCtor);
+            if (err != CHIP_NO_ERROR || messageQueuedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessageQueuedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messageQueuedStructClass, messageQueuedStructCtor, value_messageID);
+
+            return value;
+        }
+        case Events::MessagePresented::Id: {
+            Events::MessagePresented::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jclass messagePresentedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessagePresentedEvent", messagePresentedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessagePresentedEvent");
+                return nullptr;
+            }
+
+            jmethodID messagePresentedStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, messagePresentedStructClass, "<init>", "([B)V",
+                                                                &messagePresentedStructCtor);
+            if (err != CHIP_NO_ERROR || messagePresentedStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessagePresentedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messagePresentedStructClass, messagePresentedStructCtor, value_messageID);
+
+            return value;
+        }
+        case Events::MessageComplete::Id: {
+            Events::MessageComplete::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_messageID;
+            jbyteArray value_messageIDByteArray = env->NewByteArray(static_cast<jsize>(cppValue.messageID.size()));
+            env->SetByteArrayRegion(value_messageIDByteArray, 0, static_cast<jsize>(cppValue.messageID.size()),
+                                    reinterpret_cast<const jbyte *>(cppValue.messageID.data()));
+            value_messageID = value_messageIDByteArray;
+
+            jobject value_responseID;
+            if (!cppValue.responseID.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_responseID);
+            }
+            else
+            {
+                jobject value_responseIDInsideOptional;
+                if (cppValue.responseID.Value().IsNull())
+                {
+                    value_responseIDInsideOptional = nullptr;
+                }
+                else
+                {
+                    std::string value_responseIDInsideOptionalClassName     = "java/lang/Long";
+                    std::string value_responseIDInsideOptionalCtorSignature = "(J)V";
+                    jlong jnivalue_responseIDInsideOptional = static_cast<jlong>(cppValue.responseID.Value().Value());
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                        value_responseIDInsideOptionalClassName.c_str(), value_responseIDInsideOptionalCtorSignature.c_str(),
+                        jnivalue_responseIDInsideOptional, value_responseIDInsideOptional);
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_responseIDInsideOptional, value_responseID);
+            }
+
+            jobject value_reply;
+            if (!cppValue.reply.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_reply);
+            }
+            else
+            {
+                jobject value_replyInsideOptional;
+                if (cppValue.reply.Value().IsNull())
+                {
+                    value_replyInsideOptional = nullptr;
+                }
+                else
+                {
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.reply.Value().Value(),
+                                                                                         value_replyInsideOptional));
+                }
+                chip::JniReferences::GetInstance().CreateOptional(value_replyInsideOptional, value_reply);
+            }
+
+            jobject value_futureMessagesPreference;
+            if (cppValue.futureMessagesPreference.IsNull())
+            {
+                value_futureMessagesPreference = nullptr;
+            }
+            else
+            {
+                std::string value_futureMessagesPreferenceClassName     = "java/lang/Integer";
+                std::string value_futureMessagesPreferenceCtorSignature = "(I)V";
+                jint jnivalue_futureMessagesPreference = static_cast<jint>(cppValue.futureMessagesPreference.Value());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_futureMessagesPreferenceClassName.c_str(), value_futureMessagesPreferenceCtorSignature.c_str(),
+                    jnivalue_futureMessagesPreference, value_futureMessagesPreference);
+            }
+
+            jclass messageCompleteStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$MessagesClusterMessageCompleteEvent", messageCompleteStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$MessagesClusterMessageCompleteEvent");
+                return nullptr;
+            }
+
+            jmethodID messageCompleteStructCtor;
+            err = chip::JniReferences::GetInstance().FindMethod(env, messageCompleteStructClass, "<init>",
+                                                                "([BLjava/util/Optional;Ljava/util/Optional;Ljava/lang/Integer;)V",
+                                                                &messageCompleteStructCtor);
+            if (err != CHIP_NO_ERROR || messageCompleteStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$MessagesClusterMessageCompleteEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(messageCompleteStructClass, messageCompleteStructCtor, value_messageID, value_responseID,
+                                           value_reply, value_futureMessagesPreference);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DeviceEnergyManagement::Id: {
         using namespace app::Clusters::DeviceEnergyManagement;
         switch (aPath.mEventId)

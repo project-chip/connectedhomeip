@@ -33,35 +33,8 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Attributes;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
 
-struct MeasurementData
-{
-    MeasurementAccuracyStruct::Type measurementAccuracy;
-    Optional<EnergyMeasurementStruct::Type> cumulativeImported;
-    Optional<EnergyMeasurementStruct::Type> cumulativeExported;
-    Optional<EnergyMeasurementStruct::Type> periodicImported;
-    Optional<EnergyMeasurementStruct::Type> periodicExported;
-};
-
 MeasurementData
     gMeasurements[EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
-
-MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
-{
-    auto index = emberAfGetClusterServerEndpointIndex(endpointId, app::Clusters::ElectricalEnergyMeasurement::Id,
-                                                      EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT);
-
-    if (index == kEmberInvalidEndpointIndex)
-    {
-        return nullptr;
-    }
-
-    if (index >= EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT)
-    {
-        ChipLogError(NotSpecified, "Internal error: invalid/unexpected energy measurement index.");
-        return nullptr;
-    }
-    return &gMeasurements[index];
-}
 
 class ElectricalEnergyMeasurementAttrAccess : public app::AttributeAccessInterface
 {
@@ -125,6 +98,24 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ElectricalEnergyMeasurement {
+
+MeasurementData * MeasurementDataForEndpoint(EndpointId endpointId)
+{
+    auto index = emberAfGetClusterServerEndpointIndex(endpointId, app::Clusters::ElectricalEnergyMeasurement::Id,
+                                                      EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT);
+
+    if (index == kEmberInvalidEndpointIndex)
+    {
+        return nullptr;
+    }
+
+    if (index >= EMBER_AF_ELECTRICAL_ENERGY_MEASUREMENT_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        ChipLogError(NotSpecified, "Internal error: invalid/unexpected energy measurement index.");
+        return nullptr;
+    }
+    return &gMeasurements[index];
+}
 
 CHIP_ERROR SetMeasurementAccuracy(EndpointId endpointId, const MeasurementAccuracyStruct::Type & accuracy)
 {

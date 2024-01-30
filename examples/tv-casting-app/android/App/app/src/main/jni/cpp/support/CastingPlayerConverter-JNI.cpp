@@ -83,7 +83,11 @@ jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer
     {
         ChipLogError(AppServer,
                      "CastingPlayerConverter-JNI.createJCastingPlayer() Warning: Could not create MatterCastingPlayer Java object");
+        return jMatterCastingPlayer;
     }
+    // Set the value of the _cppCastingPlayer field in the Java object to the C++ CastingPlayer pointer.
+    jfieldID longFieldId = env->GetFieldID(matterCastingPlayerJavaClass, "_cppCastingPlayer", "J");
+    env->SetLongField(jMatterCastingPlayer, longFieldId, reinterpret_cast<jlong>(player.get()));
     return jMatterCastingPlayer;
 }
 

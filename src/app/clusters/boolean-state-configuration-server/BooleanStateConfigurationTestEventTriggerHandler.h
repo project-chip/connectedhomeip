@@ -28,21 +28,10 @@ enum class BooleanStateConfigurationTrigger : uint64_t
     kSensorUntrigger = 0x0080000000000001,
 };
 
-class BooleanStateConfigurationTestEventTriggerDelegate : public TestEventTriggerDelegate
+class BooleanStateConfigurationTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
-    explicit BooleanStateConfigurationTestEventTriggerDelegate(const ByteSpan & enableKey,
-                                                               TestEventTriggerDelegate * otherDelegate) :
-        mEnableKey(enableKey),
-        mOtherDelegate(otherDelegate)
-    {}
-
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-
-private:
-    ByteSpan mEnableKey;
-    TestEventTriggerDelegate * mOtherDelegate;
 };
 
 } // namespace chip
