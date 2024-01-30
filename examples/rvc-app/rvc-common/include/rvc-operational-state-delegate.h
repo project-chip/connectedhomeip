@@ -99,22 +99,6 @@ public:
      */
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
-    /**
-     * Handle Command Callback in application: Start
-     * @param[out] get operational error after callback.
-     */
-    void HandleStartStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
-
-    /**
-     * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
-     */
-    void HandleStopStateCallback(Clusters::OperationalState::GenericOperationalError & err) override{
-        // This command in not supported.
-    };
-
     void SetPauseCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
     {
         mPauseCallback          = aCallback;
