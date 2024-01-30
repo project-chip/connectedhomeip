@@ -33,8 +33,7 @@ public class ChipEventPath {
     this.isUrgent = isUrgent;
   }
 
-  ChipEventPath(
-      int endpointId, long clusterId, long eventId, boolean isUrgent) {
+  ChipEventPath(int endpointId, long clusterId, long eventId, boolean isUrgent) {
     this.endpointId = ChipPathId.forId(endpointId);
     this.clusterId = ChipPathId.forId(clusterId);
     this.eventId = ChipPathId.forId(eventId);

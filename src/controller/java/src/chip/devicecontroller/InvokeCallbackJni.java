@@ -41,8 +41,15 @@ public final class InvokeCallbackJni {
     wrappedInvokeCallback.onError(e);
   }
 
-  private void onResponse(int endpointId, long clusterId, long commandId, byte[] tlv, String jsonString, long successCode) {
-    wrappedInvokeCallback.onResponse(InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, jsonString), successCode);
+  private void onResponse(
+      int endpointId,
+      long clusterId,
+      long commandId,
+      byte[] tlv,
+      String jsonString,
+      long successCode) {
+    wrappedInvokeCallback.onResponse(
+        InvokeElement.newInstance(endpointId, clusterId, commandId, tlv, jsonString), successCode);
   }
 
   private void onDone() {

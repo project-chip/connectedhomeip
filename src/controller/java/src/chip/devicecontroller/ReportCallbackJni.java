@@ -17,13 +17,12 @@
  */
 package chip.devicecontroller;
 
-import javax.annotation.Nullable;
-
 import chip.devicecontroller.model.AttributeState;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.EventState;
 import chip.devicecontroller.model.NodeState;
+import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportCallbackJni {
@@ -72,23 +71,62 @@ public class ReportCallbackJni {
     }
   }
 
-  private void addAttribute(int endpointId, long clusterId, long attributeId, Object valueObject, byte[] tlv, String jsonString) {
+  private void addAttribute(
+      int endpointId,
+      long clusterId,
+      long attributeId,
+      Object valueObject,
+      byte[] tlv,
+      String jsonString) {
     if (nodeState != null) {
-      nodeState.addAttribute(endpointId, clusterId, attributeId, new AttributeState(valueObject, tlv, jsonString));
+      nodeState.addAttribute(
+          endpointId, clusterId, attributeId, new AttributeState(valueObject, tlv, jsonString));
     }
   }
 
-  private void addEvent(int endpointId, long clusterId, long eventId, long eventNumber, int priorityLevel, int timestampType, long timestampValue, Object valueObject, byte[] tlv, String jsonString) {
+  private void addEvent(
+      int endpointId,
+      long clusterId,
+      long eventId,
+      long eventNumber,
+      int priorityLevel,
+      int timestampType,
+      long timestampValue,
+      Object valueObject,
+      byte[] tlv,
+      String jsonString) {
     if (nodeState != null) {
-      nodeState.addEvent(endpointId, clusterId, eventId, new EventState(eventNumber, priorityLevel, timestampType, timestampValue, valueObject, tlv, jsonString));
+      nodeState.addEvent(
+          endpointId,
+          clusterId,
+          eventId,
+          new EventState(
+              eventNumber,
+              priorityLevel,
+              timestampType,
+              timestampValue,
+              valueObject,
+              tlv,
+              jsonString));
     }
   }
 
   private void onError(
-      boolean isAttributePath, int attributeEndpointId, long attributeClusterId, long attributeId,
-      boolean isEventPath, int eventEndpointId, long eventClusterId, long eventId,
+      boolean isAttributePath,
+      int attributeEndpointId,
+      long attributeClusterId,
+      long attributeId,
+      boolean isEventPath,
+      int eventEndpointId,
+      long eventClusterId,
+      long eventId,
       Exception e) {
-    wrappedReportCallback.onError(isAttributePath ? ChipAttributePath.newInstance(attributeEndpointId, attributeClusterId, attributeId) : null, isEventPath ? ChipEventPath.newInstance(eventEndpointId, eventClusterId, eventId) : null, e);
+    wrappedReportCallback.onError(
+        isAttributePath
+            ? ChipAttributePath.newInstance(attributeEndpointId, attributeClusterId, attributeId)
+            : null,
+        isEventPath ? ChipEventPath.newInstance(eventEndpointId, eventClusterId, eventId) : null,
+        e);
   }
 
   private void onDone() {

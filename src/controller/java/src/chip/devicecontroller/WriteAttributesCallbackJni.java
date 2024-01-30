@@ -38,12 +38,16 @@ public final class WriteAttributesCallbackJni {
   private native void deleteCallback(long callbackHandle);
 
   // Called from native code only, which ignores access modifiers.
-  private void onError(boolean isAttributePath, int endpointId, long clusterId, long attributeId, Exception e) {
-    wrappedWriteAttributesCallback.onError(isAttributePath ? ChipAttributePath.newInstance(endpointId, clusterId, attributeId) : null, e);
+  private void onError(
+      boolean isAttributePath, int endpointId, long clusterId, long attributeId, Exception e) {
+    wrappedWriteAttributesCallback.onError(
+        isAttributePath ? ChipAttributePath.newInstance(endpointId, clusterId, attributeId) : null,
+        e);
   }
 
   private void onResponse(int endpointId, long clusterId, long attributeId) {
-    wrappedWriteAttributesCallback.onResponse(ChipAttributePath.newInstance(endpointId, clusterId, attributeId));
+    wrappedWriteAttributesCallback.onResponse(
+        ChipAttributePath.newInstance(endpointId, clusterId, attributeId));
   }
 
   private void onDone() {
