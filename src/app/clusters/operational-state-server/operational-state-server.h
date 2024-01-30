@@ -351,7 +351,7 @@ public:
     };
 
     /**
-     * The start command is not supported by the RvcOpeartionalState cluster hence this method shold never de called.
+     * The start command is not supported by the RvcOperationalState cluster hence this method should never be called.
      * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
      */
     void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override
@@ -360,7 +360,7 @@ public:
     };
 
     /**
-     * The stop command is not supported by the RvcOpeartionalState cluster hence this method shold never de called.
+     * The stop command is not supported by the RvcOperationalState cluster hence this method should never be called.
      * This is a dummy implementation of the handler method so the consumer of this class does not need to define it.
      */
     void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override
