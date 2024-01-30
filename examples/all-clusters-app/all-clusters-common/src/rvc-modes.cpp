@@ -45,7 +45,7 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
     if (NewMode != RvcRunMode::ModeIdle && currentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change a running mode is only allowed from idle"));
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Change to a running mode is only allowed from idle"));
         return;
     }
 
