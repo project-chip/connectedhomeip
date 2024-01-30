@@ -144,7 +144,7 @@ void ICDManager::SendCheckInMsgs()
                 continue;
             }
 
-            bool active = mSubManager->SubjectHasActiveSubcription(entry.fabricIndex, entry.monitoredSubject);
+            bool active = mSubManager->SubjectHasActiveSubscription(entry.fabricIndex, entry.monitoredSubject);
             if (active)
             {
                 continue;
