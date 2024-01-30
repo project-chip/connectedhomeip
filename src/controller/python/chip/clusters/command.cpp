@@ -55,24 +55,26 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 namespace chip {
 namespace python {
 
-using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                 chip::CommandId commandId, size_t index,
-                                                 std::underlying_type_t<Protocols::InteractionModel::Status> status,
-                                                 chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
-                                              std::underlying_type_t<Protocols::InteractionModel::Status> status,
-                                              chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback     = void (*)(PyObject appContext, python::TestOnlyPyOnDoneInfo testOnlyDoneInfo);
+using OnCommandSenderResponseCallback     = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+                                                     chip::CommandId commandId, size_t index,
+                                                     std::underlying_type_t<Protocols::InteractionModel::Status> status,
+                                                     chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
+using OnCommandSenderErrorCallback        = void (*)(PyObject appContext,
+                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
+                                                  chip::ClusterStatus clusterStatus, PyChipError chiperror);
+using OnCommandSenderDoneCallback         = void (*)(PyObject appContext);
+using TestOnlyOnCommandSenderDoneCallback = void (*)(PyObject appContext, python::TestOnlyPyOnDoneInfo testOnlyDoneInfo);
 
-OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
-OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
-OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
+OnCommandSenderResponseCallback gOnCommandSenderResponseCallback         = nullptr;
+OnCommandSenderErrorCallback gOnCommandSenderErrorCallback               = nullptr;
+OnCommandSenderDoneCallback gOnCommandSenderDoneCallback                 = nullptr;
+TestOnlyOnCommandSenderDoneCallback gTestOnlyOnCommandSenderDoneCallback = nullptr;
 
 class CommandSenderCallback : public CommandSender::ExtendableCallback
 {
 public:
-    CommandSenderCallback(PyObject appContext, bool isBatchedCommands) :
-        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands)
+    CommandSenderCallback(PyObject appContext, bool isBatchedCommands, bool callTestOnlyOnDone) :
+        mAppContext(appContext), mIsBatchedCommands(isBatchedCommands), mCallTestOnlyOnDone(callTestOnlyOnDone)
     {}
 
     void OnResponse(CommandSender * apCommandSender, const CommandSender::ResponseData & aResponseData) override
@@ -148,10 +150,17 @@ public:
 
     void OnDone(CommandSender * apCommandSender) override
     {
+        if (mCallTestOnlyOnDone)
+        {
+            python::TestOnlyPyOnDoneInfo testOnlyOnDoneInfo;
+            testOnlyOnDoneInfo.responseMessageCount = apCommandSender->GetInvokeResponseMessageCount();
+            gTestOnlyOnCommandSenderDoneCallback(mAppContext, testOnlyOnDoneInfo);
+        }
+        else
+        {
+            gOnCommandSenderDoneCallback(mAppContext);
+        }
 
-        python::TestOnlyPyOnDoneInfo testOnlyOnDoneInfo;
-        testOnlyOnDoneInfo.responseMessageCount = apCommandSender->GetInvokeResponseMessageCount();
-        gOnCommandSenderDoneCallback(mAppContext, testOnlyOnDoneInfo);
         delete apCommandSender;
         delete this;
     };
@@ -182,6 +191,7 @@ private:
     PyObject mAppContext = nullptr;
     std::unordered_map<uint16_t, size_t> commandRefToIndex;
     bool mIsBatchedCommands;
+    bool mCallTestOnlyOnDone;
 };
 
 PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
@@ -223,8 +233,10 @@ PyChipError SendBatchCommandsInternal(void * appContext, DeviceProxy * device, u
         config.SetRemoteMaxPathsPerInvoke(remoteSessionParameters.GetMaxPathsPerInvoke());
     }
 
+    bool isBatchedCommands = true;
+    bool callTestOnlyOnDone = testOnlyOverrides != nullptr;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/true);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
 
     bool isTimedRequest = timedRequestTimeoutMs != 0 || testOnlySuppressTimedRequestMessage;
     std::unique_ptr<CommandSender> sender =
@@ -318,11 +330,13 @@ using namespace chip::python;
 extern "C" {
 void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
                                         OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback,
+                                        TestOnlyOnCommandSenderDoneCallback testOnlyOnCommandSenderDoneCallback)
 {
-    gOnCommandSenderResponseCallback = onCommandSenderResponseCallback;
-    gOnCommandSenderErrorCallback    = onCommandSenderErrorCallback;
-    gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
+    gOnCommandSenderResponseCallback     = onCommandSenderResponseCallback;
+    gOnCommandSenderErrorCallback        = onCommandSenderErrorCallback;
+    gOnCommandSenderDoneCallback         = onCommandSenderDoneCallback;
+    gTestOnlyOnCommandSenderDoneCallback = testOnlyOnCommandSenderDoneCallback;
 }
 
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
@@ -334,8 +348,10 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+    bool isBatchedCommands = false;
+    bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender =
         std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                         /* is timed request */ timedRequestTimeoutMs != 0, suppressResponse);
@@ -409,8 +425,10 @@ PyChipError pychip_CommandSender_TestOnlySendCommandTimedRequestNoTimedInvoke(
 
     VerifyOrReturnError(device->GetSecureSession().HasValue(), ToPyChipError(CHIP_ERROR_MISSING_SECURE_SESSION));
 
+    bool isBatchedCommands = false;
+    bool callTestOnlyOnDone = false;
     std::unique_ptr<CommandSenderCallback> callback =
-        std::make_unique<CommandSenderCallback>(appContext, /* isBatchedCommands =*/false);
+        std::make_unique<CommandSenderCallback>(appContext, isBatchedCommands, callTestOnlyOnDone);
     std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
                                                                             /* is timed request */ true, suppressResponse);
 

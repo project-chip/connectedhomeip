@@ -241,6 +241,8 @@ _OnCommandSenderResponseCallbackFunct = CFUNCTYPE(
 _OnCommandSenderErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint8, PyChipError)
 _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
+    None, py_object)
+_TestOnlyOnCommandSenderDoneCallbackFunct = CFUNCTYPE(
     None, py_object, TestOnlyPyOnDoneInfo)
 
 
@@ -258,10 +260,13 @@ def _OnCommandSenderErrorCallback(closure, imStatus: int, clusterStatus: int, ch
 
 
 @_OnCommandSenderDoneCallbackFunct
-def _OnCommandSenderDoneCallback(closure, testOnlyDoneInfo: TestOnlyPyOnDoneInfo):
-    testOnlyDoneInfoFunction = getattr(closure, "testOnlyDoneInfo", None)
-    if testOnlyDoneInfoFunction:
-        closure.testOnlyDoneInfo(testOnlyDoneInfo)
+def _OnCommandSenderDoneCallback(closure):
+    closure.handleDone()
+
+
+@_TestOnlyOnCommandSenderDoneCallbackFunct
+def _TestOnlyOnCommandSenderDoneCallback(closure, testOnlyDoneInfo: TestOnlyPyOnDoneInfo):
+    closure.testOnlyDoneInfo(testOnlyDoneInfo)
     closure.handleDone()
 
 
@@ -472,7 +477,7 @@ def Init():
         setter.Set('pychip_CommandSender_SendGroupCommand',
                    PyChipError, [c_uint16, c_void_p, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [
-                   _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct])
+                   _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct, _TestOnlyOnCommandSenderDoneCallbackFunct])
 
     handle.pychip_CommandSender_InitCallbacks(
-        _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback)
+        _OnCommandSenderResponseCallback, _OnCommandSenderErrorCallback, _OnCommandSenderDoneCallback, _TestOnlyOnCommandSenderDoneCallback)
