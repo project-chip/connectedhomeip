@@ -67,8 +67,7 @@ public:
 
     /**
      * @brief Reads the value of the Attribute that belongs to the associated Endpoint and corresponding Cluster
-     *
-     * @param context
+     * @param context current context passed back in successCb/FailureCb
      * @param successCb Called when the Attribute is read successfully, with the value of the attribute after reading, as well as
      * before (if the Attribute had been previously read)
      * @param failureCb Called when there is a failure in reading the Attribute
@@ -159,7 +158,7 @@ public:
      * @brief Writes the value of the Attribute to an associated Endpoint and corresponding Cluster
      *
      * @param requestData value of the Attribute to be written
-     * @param context
+     * @param context current context passed back in successCb/FailureCb
      * @param successCb Called when the Attribute is written successfully
      * @param failureCb Called when there is a failure in writing the Attribute
      * @param aTimedWriteTimeoutMs write timeout
@@ -239,12 +238,12 @@ public:
     /**
      * @brief Subscribes to the value of the Attribute that belongs to the associated Endpoint and corresponding Cluster
      *
-     * @param context
+     * @param context current context passed back in successCb/FailureCb
      * @param successCb Called when the Attribute is read successfully, with the value of the attribute after reading, as well as
      * before (if the Attribute had been previously read)
      * @param failureCb Called when there is a failure in reading the Attribute
-     * @param minIntervalFloorSeconds
-     * @param maxIntervalCeilingSeconds
+     * @param minIntervalFloorSeconds the requested minimum interval boundary floor in seconds for attribute udpates
+     * @param maxIntervalCeilingSeconds the requested maximum interval boundary ceiling in seconds for attribute udpates
      */
     void Subscribe(void * context, ReadResponseSuccessCallbackFn<typename TypeInfo::DecodableType> successCb,
                    ReadResponseFailureCallbackFn failureCb, uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds)

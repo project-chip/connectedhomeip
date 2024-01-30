@@ -352,6 +352,13 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/BDXDiagnosticLogsProvider.h",
           "${_app_root}/clusters/${cluster}/DiagnosticLogsProviderDelegate.h",
         ]
+      } else if (cluster == "electrical-energy-measurement-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/EnergyReportingTestEventTriggerDelegate.cpp",
+          "${_app_root}/clusters/${cluster}/EnergyReportingTestEventTriggerDelegate.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
