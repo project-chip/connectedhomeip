@@ -184,6 +184,7 @@ style:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     UseCheckOrError:
         excludes:
@@ -314,12 +315,16 @@ complexity:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
             - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
+            - "**/src/controller/java/src/matter/controller/InvokeCallbackJni.kt"
+            - "**/src/controller/java/src/matter/controller/ReportCallbackJni.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     LongMethod:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
             - "**/src/controller/java/generated/java/**/*"
+            - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
             - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
