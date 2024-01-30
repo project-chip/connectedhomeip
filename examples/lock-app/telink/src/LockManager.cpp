@@ -471,7 +471,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     chip::Platform::CopyString(mCurrentUserNames, userNames);
     userInDb.userName = chip::CharSpan(mCurrentUserNames, userInDb.userName.size());
-    
+
 #else
     const auto & userInDb = mLockUsers[userIndex];
     const auto & credentialsInStorage = mCredentials[userIndex];
@@ -676,7 +676,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
                     to_underlying(credentialType), credentialIndex);
         break;
     }
-                               
+
     memcpy(mCurrentCredentialData, lockCredentialsData, credentialInStorage.credentialData.size());
     credentialInStorage.credentialData = chip::ByteSpan{ mCurrentCredentialData, credentialInStorage.credentialData.size() };
 #else

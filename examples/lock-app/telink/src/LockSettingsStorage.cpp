@@ -71,19 +71,19 @@ const char * LockSettingsStorage::kConfigKey_HolidaySchedules[APP_MAX_HOLYDAY_SC
                 { LISTIFY(APP_MAX_HOLYDAY_SCHEDULE_PER_USER, CONFIG_KEY_HOLYDAY_SCH, (,)) };
 
 
-const char * LockSettingsStorage::kConfigKey_CredentialPin[APP_MAX_CREDENTIAL] = 
+const char * LockSettingsStorage::kConfigKey_CredentialPin[APP_MAX_CREDENTIAL] =
     { LISTIFY(APP_MAX_CREDENTIAL, CONFIG_KEY_CREDENTIALS_PIN, (,)) };
 
-const char * LockSettingsStorage::kConfigKey_CredentialFace[APP_MAX_CREDENTIAL] = 
+const char * LockSettingsStorage::kConfigKey_CredentialFace[APP_MAX_CREDENTIAL] =
     { LISTIFY(APP_MAX_CREDENTIAL, CONFIG_KEY_CREDENTIALS_FACE, (,)) };
-    
-const char * LockSettingsStorage::kConfigKey_CredentialFingerprint[APP_MAX_CREDENTIAL] = 
+
+const char * LockSettingsStorage::kConfigKey_CredentialFingerprint[APP_MAX_CREDENTIAL] =
     { LISTIFY(APP_MAX_CREDENTIAL, CONFIG_KEY_CREDENTIALS_FINGERPTRINT, (,)) };
 
-const char * LockSettingsStorage::kConfigKey_CredentialFingervein[APP_MAX_CREDENTIAL] = 
+const char * LockSettingsStorage::kConfigKey_CredentialFingervein[APP_MAX_CREDENTIAL] =
     { LISTIFY(APP_MAX_CREDENTIAL, CONFIG_KEY_CREDENTIALS_FINGERVEIN, (,)) };
 
-const char * LockSettingsStorage::kConfigKey_CredentialRfid[APP_MAX_CREDENTIAL] = 
+const char * LockSettingsStorage::kConfigKey_CredentialRfid[APP_MAX_CREDENTIAL] =
     { LISTIFY(APP_MAX_CREDENTIAL, CONFIG_KEY_CREDENTIALS_RFID, (,)) };
 
 const char * LockSettingsStorage::kConfigKey_CredentialDataPin[APP_MAX_CREDENTIAL] =

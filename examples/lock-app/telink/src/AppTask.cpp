@@ -249,7 +249,7 @@ void AppTask::LockStateActionHandler(AppEvent * aEvent)
     {
         mDoorState = DoorStateEnum::kDoorClosed;
     }
-    else 
+    else
     {
         mDoorState = DoorStateEnum::kDoorOpen;
     }

@@ -35,7 +35,7 @@ class AppTask : public AppTaskCommon
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
-    
+
     CHIP_ERROR Init(void);
 
     static void LockActionEventHandler(AppEvent * event);
