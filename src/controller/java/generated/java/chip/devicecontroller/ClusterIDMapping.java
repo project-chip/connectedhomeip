@@ -229,6 +229,9 @@ public class ClusterIDMapping {
         if (clusterId == DemandResponseLoadControl.ID) {
             return new DemandResponseLoadControl();
         }
+        if (clusterId == Messages.ID) {
+            return new Messages();
+        }
         if (clusterId == DeviceEnergyManagement.ID) {
             return new DeviceEnergyManagement();
         }
@@ -6859,7 +6862,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -6980,7 +6982,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -8230,8 +8231,6 @@ public class ClusterIDMapping {
 
         public enum Command {
             Pause(0L),
-            Stop(1L),
-            Start(2L),
             Resume(3L),
             GoHome(128L),;
             private final long id;
@@ -9273,6 +9272,147 @@ public class ClusterIDMapping {
                     }
                     public static RemoveLoadControlEventRequestCommandField value(int id) throws NoSuchFieldError {
                         for (RemoveLoadControlEventRequestCommandField field : RemoveLoadControlEventRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class Messages implements BaseCluster {
+        public static final long ID = 151L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            Messages(0L),
+            ActiveMessageIDs(1L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            EventList(65530L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            MessageQueued(0L),
+            MessagePresented(1L),
+            MessageComplete(2L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            PresentMessagesRequest(0L),
+            CancelMessagesRequest(1L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum PresentMessagesRequestCommandField {Messages(0),;
+                    private final int id;
+                    PresentMessagesRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PresentMessagesRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (PresentMessagesRequestCommandField field : PresentMessagesRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum CancelMessagesRequestCommandField {MessageIDs(0),;
+                    private final int id;
+                    CancelMessagesRequestCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static CancelMessagesRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (CancelMessagesRequestCommandField field : CancelMessagesRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

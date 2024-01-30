@@ -90,8 +90,8 @@ This is because zap does not currently support generating code for clusters that
 <!--    <cluster code="0x..."/>-->
     <cluster code="0x0051"/> <!-- Laundry Washer Mode -->
     <cluster code="0x0052"/> <!-- Refrigerator and temperature controlled cabinet Mode -->
-    <cluster code="0x0054"/> <!-- RVC Run Mode -->
-    <cluster code="0x0055"/> <!-- RVC Clean Mode -->
+    <!-- <cluster code="0x0054"/> RVC Run Mode. This feature map is implemented in rvc-run-mode-cluster.xml -->
+    <!-- <cluster code="0x0055"/> RVC Clean Mode. This feature map is implemented in rvc-clean-mode-cluster.xml -->
     <cluster code="0x0059"/> <!-- Dishwasher Mode -->
     <cluster code="0x005E"/> <!-- Microwave Oven Mode -->
     <cluster code="0x0049"/> <!-- Oven Mode -->

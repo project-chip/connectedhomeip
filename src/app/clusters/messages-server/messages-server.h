@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2023 Project CHIP Authors
  *
@@ -15,28 +15,15 @@
  *    limitations under the License.
  */
 
-#include "SmokeCOTestEventTriggerDelegate.h"
+#pragma once
 
-using namespace chip::app::Clusters::SmokeCoAlarm;
+#include <app-common/zap-generated/cluster-enums.h>
+#include <app/util/basic-types.h>
 
 namespace chip {
-
-bool SmokeCOTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
-{
-    return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-}
-
-CHIP_ERROR SmokeCOTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
-{
-    if (HandleSmokeCOTestEventTrigger(eventTrigger))
-    {
-        return CHIP_NO_ERROR;
-    }
-    if (mOtherDelegate != nullptr)
-    {
-        return mOtherDelegate->HandleEventTrigger(eventTrigger);
-    }
-    return CHIP_ERROR_INVALID_ARGUMENT;
-}
-
+namespace app {
+namespace Clusters {
+namespace Messaging {} // namespace Messaging
+} // namespace Clusters
+} // namespace app
 } // namespace chip

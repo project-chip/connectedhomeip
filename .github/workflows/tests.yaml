@@ -143,6 +143,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/messages-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/mode-base-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml \
