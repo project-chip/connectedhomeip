@@ -4720,7 +4720,7 @@ cluster PumpConfigurationAndControl = 512 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 6;
+  revision 7;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -4838,8 +4838,7 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
-    kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
+    kQueuedPresetsSupported = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -4919,7 +4918,7 @@ cluster Thermostat = 513 {
     optional char_string<64> name = 2;
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
-    optional nullable boolean builtIn = 5;
+    nullable boolean builtIn = 5;
   }
 
   struct PresetStruct {
@@ -5091,7 +5090,7 @@ cluster Thermostat = 513 {
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
 cluster Thermostat = 513 {
-  revision 6;
+  revision 7;
 
   enum ACCapacityFormatEnum : enum8 {
     kBTUh = 0;
@@ -5209,8 +5208,7 @@ cluster Thermostat = 513 {
     kLocalTemperatureNotExposed = 0x40;
     kMatterScheduleConfiguration = 0x80;
     kPresets = 0x100;
-    kSetpoints = 0x200;
-    kQueuedPresetsSupported = 0x400;
+    kQueuedPresetsSupported = 0x200;
   }
 
   bitmap HVACSystemTypeBitmap : bitmap8 {
@@ -5290,7 +5288,7 @@ cluster Thermostat = 513 {
     optional char_string<64> name = 2;
     optional octet_string<16> presetHandle = 3;
     ScheduleTransitionStruct transitions[] = 4;
-    optional nullable boolean builtIn = 5;
+    nullable boolean builtIn = 5;
   }
 
   struct PresetStruct {
