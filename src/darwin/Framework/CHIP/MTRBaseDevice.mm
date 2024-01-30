@@ -87,7 +87,6 @@ NSString * const MTREventTimeTypeKey = @"eventTimeType";
 NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
 NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
 NSString * const MTREventIsHistoricalKey = @"eventIsHistorical";
-NSString * const MTRPreviousDataKey = @"previousData";
 
 class MTRDataValueDictionaryCallbackBridge;
 
@@ -332,7 +331,7 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionScheduledHandler,
         MTRSubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
         : MTRBaseSubscriptionCallback(attributeReportCallback, eventReportCallback, errorCallback, resubscriptionScheduledHandler,
-            subscriptionEstablishedHandler, onDoneHandler)
+              subscriptionEstablishedHandler, onDoneHandler)
     {
     }
 
