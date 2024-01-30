@@ -34,7 +34,7 @@
  *
  * @warning *** DO NOT USE FOR STANDARD CLUSTER EVENT TRIGGERS ***
  *
- * TODO(#31723): Rename `emberAfHandleEventTrigger` to `AmebaHandleGlobalTestEventTrigger`
+ * TODO(#31723): Rename `emberAfHandleEventTrigger` to `SilabsHandleGlobalTestEventTrigger`
  *
  * @retval true on success
  * @retval false if error happened
