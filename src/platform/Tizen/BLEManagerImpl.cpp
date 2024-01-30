@@ -198,7 +198,7 @@ BLEManagerImpl::AdvertisingIntervals BLEManagerImpl::GetAdvertisingIntervals() c
 }
 
 void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                          int offset, void * userData)
+                                          int offset)
 {
     int ret, len = 0;
     bt_gatt_type_e type;
@@ -220,14 +220,14 @@ void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int reques
 }
 
 void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                           bool responseNeeded, int offset, const char * value, int len, void * userData)
+                                           bool responseNeeded, int offset, const char * value, int len)
 {
     int ret;
     GAutoPtr<char> uuid;
-    BLEConnection * conn = nullptr;
+    BLEConnection * conn;
     bt_gatt_type_e type;
 
-    conn = static_cast<BLEConnection *>(g_hash_table_lookup(sInstance.mConnectionMap, remoteAddress));
+    conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddress));
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &MakeUniquePointerReceiver(uuid).Get(), &type) == BT_ERROR_NONE,
@@ -243,10 +243,10 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     VerifyOrReturn(ret == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "bt_gatt_server_send_response() failed: %s", get_error_message(ret)));
 
-    sInstance.HandleC1CharWriteEvent(conn, Uint8::from_const_char(value), len);
+    HandleC1CharWriteEvent(conn, Uint8::from_const_char(value), len);
 }
 
-void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h charHandle, void * userData)
+void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h charHandle)
 {
     GAutoPtr<char> uuid;
     BLEConnection * conn = nullptr;
@@ -254,11 +254,11 @@ void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h se
     GHashTableIter iter;
     gpointer key, value;
 
-    g_hash_table_iter_init(&iter, sInstance.mConnectionMap);
+    g_hash_table_iter_init(&iter, mConnectionMap);
     while (g_hash_table_iter_next(&iter, &key, &value))
     {
         /* NOTE: Currently Tizen Platform API does not return remote device address, which enables/disables
-         * notification/Indication. Therefore, returning first Connection */
+         * notification/indication. Therefore, returning first connection. */
         conn = static_cast<BLEConnection *>(value);
         break;
     }
@@ -271,7 +271,7 @@ void BLEManagerImpl::NotificationStateChangedCb(bool notify, bt_gatt_server_h se
 
     ChipLogProgress(DeviceLayer, "Notification State Changed %d on %s: %s", notify, __ConvertAttTypeToStr(type),
                     StringOrNullMarker(uuid.get()));
-    sInstance.NotifyBLESubscribed(notify ? true : false, conn);
+    NotifyBLESubscribed(notify ? true : false, conn);
 }
 
 void BLEManagerImpl::WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData)
@@ -299,50 +299,47 @@ void BLEManagerImpl::CharacteristicNotificationCb(bt_gatt_h characteristic, char
 }
 
 void BLEManagerImpl::IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server,
-                                              bt_gatt_h characteristic, bool completed, void * userData)
+                                              bt_gatt_h characteristic, bool completed)
 {
     BLEConnection * conn = nullptr;
     VerifyOrReturn(result == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to Get Indication Confirmation"));
 
-    conn = static_cast<BLEConnection *>(g_hash_table_lookup(sInstance.mConnectionMap, remoteAddress));
+    conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddress));
 
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Could not find connection for [%s]", StringOrNullMarker(remoteAddress)));
-    VerifyOrReturn(sInstance.mGattCharC2Handle == characteristic,
-                   ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
+    VerifyOrReturn(mGattCharC2Handle == characteristic, ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
 
-    sInstance.NotifyBLEIndicationConfirmation(conn);
+    NotifyBLEIndicationConfirmation(conn);
 }
 
-void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
-                                               void * appState)
+void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState)
 {
     ChipLogProgress(DeviceLayer, "Advertising %s", advState == BT_ADAPTER_LE_ADVERTISING_STARTED ? "Started" : "Stopped");
 
     if (advState == BT_ADAPTER_LE_ADVERTISING_STARTED)
     {
-        sInstance.mFlags.Set(Flags::kAdvertising);
-        sInstance.NotifyBLEPeripheralAdvStartComplete(true, nullptr);
-        DeviceLayer::SystemLayer().ScheduleLambda([appState] {
+        mFlags.Set(Flags::kAdvertising);
+        NotifyBLEPeripheralAdvStartComplete(true, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] {
             // Start a timer to make sure that the fast advertising is stopped after specified timeout.
-            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, appState);
+            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this);
         });
     }
     else
     {
-        sInstance.mFlags.Clear(Flags::kAdvertising);
-        sInstance.NotifyBLEPeripheralAdvStopComplete(true, nullptr);
-        DeviceLayer::SystemLayer().ScheduleLambda(
-            [appState] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, appState); });
+        mFlags.Clear(Flags::kAdvertising);
+        NotifyBLEPeripheralAdvStopComplete(true, nullptr);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this); });
     }
 
-    if (sInstance.mFlags.Has(Flags::kAdvertisingRefreshNeeded))
+    if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))
     {
-        sInstance.mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        mFlags.Clear(Flags::kAdvertisingRefreshNeeded);
+        DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
     }
 
-    sInstance.mAdvReqInProgress = false;
+    mAdvReqInProgress = false;
 }
 
 // ====== Private Functions.
@@ -592,7 +589,14 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed: %s", get_error_message(ret)));
 
-    ret = bt_gatt_server_set_write_value_requested_cb(char1, WriteValueRequestedCb, nullptr);
+    ret = bt_gatt_server_set_write_value_requested_cb(
+        char1,
+        +[](const char * remoteAddress, int requestId, bt_gatt_server_h gattServer, bt_gatt_h gattHandle, bool responseNeeded,
+            int offset, const char * value, int len, void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->WriteValueRequestedCb(remoteAddress, requestId, gattServer, gattHandle,
+                                                                                   responseNeeded, offset, value, len);
+        },
+        this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_write_value_requested_cb() failed: %s", get_error_message(ret)));
 
@@ -607,10 +611,21 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed: %s", get_error_message(ret)));
 
-    ret = bt_gatt_server_set_read_value_requested_cb(char2, ReadValueRequestedCb, nullptr);
+    ret = bt_gatt_server_set_read_value_requested_cb(
+        char2,
+        +[](const char * remoteAddress, int requestId, bt_gatt_server_h gattServer, bt_gatt_h gattHandle, int offset, void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->ReadValueRequestedCb(remoteAddress, requestId, gattServer, gattHandle,
+                                                                                  offset);
+        },
+        this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_read_value_requested_cb() failed: %s", get_error_message(ret)));
-    ret = bt_gatt_server_set_characteristic_notification_state_change_cb(char2, NotificationStateChangedCb, nullptr);
+    ret = bt_gatt_server_set_characteristic_notification_state_change_cb(
+        char2,
+        +[](bool notify, bt_gatt_server_h gattServer, bt_gatt_h charHandle, void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->NotificationStateChangedCb(notify, gattServer, charHandle);
+        },
+        this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_characteristic_notification_state_change_cb() failed: %s",
                               get_error_message(ret)));
@@ -715,7 +730,12 @@ CHIP_ERROR BLEManagerImpl::StartBLEAdvertising()
 
     BLEManagerImpl::NotifyBLEPeripheralAdvConfiguredComplete(true, nullptr);
 
-    ret = bt_adapter_le_start_advertising_new(mAdvertiser, AdvertisingStateChangedCb, this);
+    ret = bt_adapter_le_start_advertising_new(
+        mAdvertiser,
+        +[](int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState, void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->AdvertisingStateChangedCb(result, advertiser, advState);
+        },
+        this);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_adapter_le_start_advertising_new() failed: %s", get_error_message(ret)));
 
@@ -977,11 +997,6 @@ exit:
     }
 }
 
-void BLEManagerImpl::DriveBLEState(intptr_t arg)
-{
-    sInstance.DriveBLEState();
-}
-
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
@@ -1019,7 +1034,7 @@ void BLEManagerImpl::_Shutdown()
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     mFlags.Set(Flags::kAdvertisingEnabled, val);
-    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
@@ -1036,7 +1051,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
-    return PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveBLEState(); });
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
@@ -1327,7 +1342,14 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::Chip
     ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conn->peerAddr,
                     pBuf->DataLength());
 
-    ret = bt_gatt_server_notify_characteristic_changed_value(mGattCharC2Handle, IndicationConfirmationCb, conn->peerAddr, nullptr);
+    ret = bt_gatt_server_notify_characteristic_changed_value(
+        mGattCharC2Handle,
+        +[](int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic, bool completed,
+            void * self) {
+            return reinterpret_cast<BLEManagerImpl *>(self)->IndicationConfirmationCb(result, remoteAddress, server, characteristic,
+                                                                                      completed);
+        },
+        conn->peerAddr, this);
     VerifyOrExit(
         ret == BT_ERROR_NONE,
         ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed: %s", get_error_message(ret)));
@@ -1399,7 +1421,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     }
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    ServiceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
+    DeviceLayer::SystemLayer().ScheduleLambda([this] { InitiateScan(BleScanState::kScanForDiscriminator); });
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)

@@ -171,20 +171,17 @@ private:
     CHIP_ERROR _InitImpl();
 
     void DriveBLEState();
-    static void DriveBLEState(intptr_t arg);
 
     void InitiateScan(BleScanState scanType);
 
     void AdapterStateChangedCb(int result, bt_adapter_state_e adapterState);
-    static void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState,
-                                          void * appState);
-    static void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle, void * userData);
-    static void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                     int offset, void * userData);
-    static void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                      bool responseNeeded, int offset, const char * value, int len, void * userData);
-    static void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
-                                         bool completed, void * userData);
+    void AdvertisingStateChangedCb(int result, bt_advertiser_h advertiser, bt_adapter_le_advertising_state_e advState);
+    void NotificationStateChangedCb(bool notify, bt_gatt_server_h server, bt_gatt_h gattHandle);
+    void ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle, int offset);
+    void WriteValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                               bool responseNeeded, int offset, const char * value, int len);
+    void IndicationConfirmationCb(int result, const char * remoteAddress, bt_gatt_server_h server, bt_gatt_h characteristic,
+                                  bool completed);
     void GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress);
     static void WriteCompletedCb(int result, bt_gatt_h gattHandle, void * userData);
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
