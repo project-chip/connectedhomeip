@@ -140,8 +140,10 @@ static void InitServer(intptr_t context)
     static chip::CommonCaseDeviceServerInitParams initParams;
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-    static AmebaTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
-    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+    // TODO(#31723): Show to customers that they can do `Server::GetInstance().GetTestEventTriggerDelegate().AddHandler(xxx)`
+    // to add custom handlers during their app init, after InitServer.
+    static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
     initParams.InitializeStaticResourcesBeforeServerInit();

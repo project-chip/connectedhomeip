@@ -29,13 +29,13 @@ config:
         defaultValue: "hex:00112233445566778899aabbccddeeff"
     TEST_EVENT_TRIGGER_WARNING_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff00000090"
+        defaultValue: "0x005c000000000090"
     TEST_EVENT_TRIGGER_CRITICAL_SMOKE_ALARM:
         type: int64u
-        defaultValue: "0xffffffff0000009c"
+        defaultValue: "0x005c00000000009c"
     TEST_EVENT_TRIGGER_SMOKE_ALARM_CLEAR:
         type: int64u
-        defaultValue: "0xffffffff000000a0"
+        defaultValue: "0x005c0000000000a0"
 
 tests:
     - label: "Step 1: Commission DUT to TH"

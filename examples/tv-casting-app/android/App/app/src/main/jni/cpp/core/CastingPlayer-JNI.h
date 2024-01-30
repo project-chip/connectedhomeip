@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +18,24 @@
 
 #pragma once
 
-#include <app/TestEventTriggerDelegate.h>
+#include <jni.h>
 
-namespace chip {
+namespace matter {
+namespace casting {
+namespace core {
 
-class OTATestEventTriggerDelegate : public TestEventTriggerDelegate
+class CastingPlayerJNI
 {
 public:
-    static constexpr uint64_t kOtaQueryTrigger         = 0x0100'0000'0000'0100;
-    static constexpr uint64_t kOtaQueryFabricIndexMask = 0xff;
-
-    explicit OTATestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
-
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
-    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-
 private:
-    ByteSpan mEnableKey;
+    friend CastingPlayerJNI & CastingAppJNIMgr();
+    static CastingPlayerJNI sInstance;
 };
 
-} // namespace chip
+inline class CastingPlayerJNI & CastingAppJNIMgr()
+{
+    return CastingPlayerJNI::sInstance;
+}
+}; // namespace core
+}; // namespace casting
+}; // namespace matter
