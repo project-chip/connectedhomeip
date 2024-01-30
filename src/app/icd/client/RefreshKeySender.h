@@ -34,6 +34,7 @@ namespace chip {
 namespace app {
 
 class CheckInDelegate;
+
 /**
  * @brief RefreshKeySender contains all the data and methods needed for key refresh and re-registration of an ICD client.
  */
@@ -41,65 +42,15 @@ class RefreshKeySender
 {
 public:
     typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
-    /**
-     * @brief This class comprises command sender callbacks for the registration command.
-     */
-    class Callback : public CommandSender::Callback
-    {
-    public:
-        // CommandSender callbacks
-        void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const StatusIB & aStatus,
-                        chip::TLV::TLVReader * aData) override;
-        void OnError(const CommandSender * apCommandSender, CHIP_ERROR aError) override;
-        void OnDone(CommandSender * apCommandSender) override;
 
-        void SetRefreshKeySender(RefreshKeySender * apRefreshKeySender) { mpRefreshKeySender = apRefreshKeySender; }
-
-        virtual ~Callback() {}
-
-    private:
-        CHIP_ERROR mError                     = CHIP_NO_ERROR;
-        RefreshKeySender * mpRefreshKeySender = nullptr;
-    };
-
-    RefreshKeySender(CheckInDelegate * apCheckInDelegate, ICDClientInfo & aICDClientInfo, ICDClientStorage * aICDClientStorage);
-
-    /**
-     * @brief Used to send a re-registration command to the peer using a new key.
-     *
-     * @param[in] clientInfo    - ICDClientInfo object representing the state associated with the node that sent the check-in
-     *                            message. The callee can use the clientInfo to determine the type of key to generate.
-     * @param[in] keyData       - New key to re-register the client with the server
-     * @param[in] exchangeMgr   - exchange manager to use for the re-registration
-     * @param[in] sessionHandle - session handle to use for the re-registration
-     */
-    CHIP_ERROR RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+    RefreshKeySender(CheckInDelegate * apCheckInDelegate, const ICDClientInfo & aICDClientInfo,
+                     ICDClientStorage * aICDClientStorage, const RefreshKeyBuffer & aRefreshKeyBuffer);
 
     /**
      * @brief Sets up a CASE session to the peer for re-registering a client with the peer when a key refresh is required to avoid
      * ICD counter rollover. Returns error if we did not even manage to kick off a CASE attempt.
      */
     CHIP_ERROR EstablishSessionToPeer();
-
-    /**
-     * @brief Getter for ICDClientInfo
-     */
-    ICDClientInfo & GetICDClientInfo(void) { return mICDClientInfo; }
-
-    /**
-     * @brief Getter for ICDClientStorage pointer
-     */
-    ICDClientStorage * GetICDClientStorage(void) { return mpICDClientStorage; }
-
-    /**
-     * @brief Getter for CheckInDelegate pointer
-     */
-    CheckInDelegate * GetCheckInDelegate(void) { return mpCheckInDelegate; }
-
-    /**
-     * @brief Getter for refresh key buffer
-     */
-    RefreshKeyBuffer & GetRefreshKeyBuffer(void) { return mNewKey; }
 
 private:
     // CASE session callbacks
@@ -123,15 +74,23 @@ private:
      */
     static void HandleDeviceConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR err);
 
+    /**
+     * @brief Used to send a re-registration command to the peer using a new key.
+     *
+     * @param[in] clientInfo    - ICDClientInfo object representing the state associated with the node that sent the check-in
+     *                            message. The callee can use the clientInfo to determine the type of key to generate.
+     * @param[in] keyData       - New key to re-register the client with the server
+     * @param[in] exchangeMgr   - exchange manager to use for the re-registration
+     * @param[in] sessionHandle - session handle to use for the re-registration
+     */
+    CHIP_ERROR RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
+
     ICDClientInfo mICDClientInfo;
     ICDClientStorage * mpICDClientStorage = nullptr;
     CheckInDelegate * mpCheckInDelegate   = nullptr;
     RefreshKeyBuffer mNewKey;
-    chip::Optional<CommandSender> mRegisterCommandSender;
-    Callback mCommandSenderDelegate;
     chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
-    CHIP_ERROR mError = CHIP_NO_ERROR;
 };
 } // namespace app
 } // namespace chip

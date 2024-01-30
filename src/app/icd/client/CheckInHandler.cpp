@@ -114,7 +114,6 @@ CHIP_ERROR CheckInHandler::OnMessageReceived(Messaging::ExchangeContext * ec, co
         {
             ChipLogError(ICD, "Key Refresh failed for node ID:" ChipLogFormatScopedNodeId,
                          ChipLogValueScopedNodeId(clientInfo.peer_node));
-            mpCheckInDelegate->OnKeyRefreshDone(refreshKeySender, CHIP_ERROR_NO_MEMORY);
             return CHIP_NO_ERROR;
         }
         err = refreshKeySender->EstablishSessionToPeer();

@@ -39,7 +39,7 @@ public:
      * @brief Callback used to let the application know that a check-in message was received and validated.
      *
      * @param[in] clientInfo - ICDClientInfo object representing the state associated with the
-     *                         node that sent the check-in message.
+                               node that sent the check-in message.
      */
     virtual void OnCheckInComplete(const ICDClientInfo & clientInfo) = 0;
 
@@ -47,9 +47,12 @@ public:
      * @brief Callback used to let the application know that a key refresh is
      * needed to avoid counter rollover problems.
      *
-     * The implementer of this function should create a new RefreshKeySender object. They should also generate a new key and store
-     * it in the RefreshKeySender object. This object will be tied to the specific key refresh process and will not be used by the
-     * caller after that particular key refresh process has ended, regardless of success or failure.
+     * The implementer of this function should create a new RefreshKeySender object. This object will be tied to the specific key
+     * refresh process and will not be used by the caller after that particular key refresh process has ended, regardless of success
+     * or failure.
+     *
+     * The caller guarantees that if a non-null RefreshKeySender pointer is returned, it will call OnKeyRefreshDone
+     * at some point, and pass it the returned pointer.
      *
      * If the callee is unable to provide the RefreshKeySender object, that indicates key
      * refresh is not possible until the callee is able to provide the required resources.
@@ -68,7 +71,7 @@ public:
      * both success and failure cases. On failure, the callee should take appropriate corrective action based on the error.
      *
      * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller
-     *                               will NOT use this pointer anymore.
+     *                               will NOT use this pointer any more.
      * @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
      *                     Other errors indicate the failure reason.
      */

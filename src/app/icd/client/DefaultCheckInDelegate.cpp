@@ -47,18 +47,18 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    auto refreshKeySender = chip::Platform::New<RefreshKeySender>(this, clientInfo, clientStorage);
-    if (refreshKeySender == nullptr)
-    {
-        return nullptr;
-    }
+    RefreshKeySender::RefreshKeyBuffer newKey;
 
-    err = chip::Crypto::DRBG_get_bytes(refreshKeySender->GetRefreshKeyBuffer().Bytes(),
-                                       refreshKeySender->GetRefreshKeyBuffer().Capacity());
+    err = Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ICD, "Generation of new key failed: %" CHIP_ERROR_FORMAT, err.Format());
-        Platform::Delete(refreshKeySender);
+        return nullptr;
+    }
+
+    auto refreshKeySender = Platform::New<RefreshKeySender>(this, clientInfo, clientStorage, newKey);
+    if (refreshKeySender == nullptr)
+    {
         return nullptr;
     }
     return refreshKeySender;
