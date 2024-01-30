@@ -62,7 +62,8 @@ shared_library("jni") {
     "CHIPDeviceController-JNI.cpp",
     "DeviceAttestationDelegateBridge.cpp",
     "DeviceAttestationDelegateBridge.h",
-    "MatterInteractionClient-JNI.cpp",
+    "AndroidInteractionClient.cpp",
+    "MatterController-JNI.cpp"
   ]
 
   deps = [

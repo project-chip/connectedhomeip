@@ -22,6 +22,7 @@
  *
  */
 #include "AndroidCallbacks.h"
+#include "AndroidInteractionClient.h"
 #include "AndroidCommissioningWindowOpener.h"
 #include "AndroidCurrentFabricRemover.h"
 #include "AndroidDeviceControllerWrapper.h"
@@ -2209,6 +2210,51 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
     iter->Release();
 
     return jInfo;
+}
+
+JNI_METHOD(void, subscribe)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jobject dataVersionFilterList, jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered,
+ jint imTimeoutMs, jobject eventMin)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = subscribe(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList, minInterval, maxInterval, keepSubscriptions, isFabricFiltered, imTimeoutMs, eventMin));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Subscribe Error: %" CHIP_ERROR_FORMAT, err.AsString());
+}
+
+JNI_METHOD(void, read)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
+ jobject dataVersionFilterList, jboolean isFabricFiltered, jint imTimeoutMs, jobject eventMin)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = read(env, handle, callbackHandle, devicePtr, attributePathList, eventPathList, dataVersionFilterList, isFabricFiltered, imTimeoutMs, eventMin));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Read Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+JNI_METHOD(void, write)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = write(env, handle, callbackHandle, devicePtr, attributeList, timedRequestTimeoutMs, imTimeoutMs));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Write Error: %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+JNI_METHOD(void, invoke)
+(JNIEnv * env, jclass clz, jlong handle, jlong callbackHandle, jlong devicePtr, jobject invokeElement, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err = invoke(env, handle, callbackHandle, devicePtr, invokeElement, timedRequestTimeoutMs, imTimeoutMs));
+    return;
+exit:
+    ChipLogError(Controller, "JNI IM Invoke Error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 void * IOThreadMain(void * arg)
