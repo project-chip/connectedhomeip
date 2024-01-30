@@ -53,7 +53,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 2a: Commissioner reads General Commissioning cluster attribute SupportsConcurrentConnection"
+          "Step 2a: Commissioner reads General Commissioning cluster attribute
+          SupportsConcurrentConnection"
       verification: |
           Verify in TH(CHIP-TOOL)
           CHIP:DMG:         AttributeReportIB =
@@ -389,8 +390,7 @@ tests:
           Cannot be verified in TH(CHIP-TOOL)
       disabled: true
 
-    - label:
-          "Step 11: Commissionee starts the operational channel."
+    - label: "Step 11: Commissionee starts the operational channel."
       verification: |
           Verify in TH(CHIP-TOOL)
 
