@@ -193,7 +193,7 @@ private:
     void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
-    static void HandleConnectionTimeout(System::Layer * layer, void * data);
+    static void HandleConnectionTimeout(System::Layer * layer, void * appState);
     bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
