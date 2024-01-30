@@ -194,7 +194,7 @@ private:
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
     static void HandleConnectionTimeout(System::Layer * layer, void * data);
-    static bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
+    bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
     void NotifyBLEPeripheralGATTServerRegisterComplete(bool aIsSuccess, void * apAppstate);
@@ -208,7 +208,7 @@ private:
     AdvertisingIntervals GetAdvertisingIntervals() const;
 
     // ==== Connection.
-    static CHIP_ERROR ConnectChipThing(const char * userData);
+    CHIP_ERROR ConnectChipThing(const char * address);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);

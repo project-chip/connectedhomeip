@@ -481,7 +481,7 @@ CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", StringOrNullMarker(address));
 
-    ret = bt_gatt_client_create(address, &sInstance.mGattClient);
+    ret = bt_gatt_client_create(address, &mGattClient);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client: %s", get_error_message(ret));
                  err = TizenToChipError(ret));
 
@@ -494,7 +494,7 @@ CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 
 exit:
     if (err != CHIP_NO_ERROR)
-        sInstance.NotifyHandleConnectFailed(err);
+        NotifyHandleConnectFailed(err);
     return err;
 }
 
@@ -535,7 +535,12 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
-    PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectChipThing, const_cast<const char *>(deviceInfo->remote_address));
+    auto params = std::make_pair(this, deviceInfo->remote_address);
+    PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](typeof(params) * aParams) {
+            return reinterpret_cast<BLEManagerImpl *>(aParams->first)->ConnectChipThing(aParams->second);
+        },
+        &params);
 }
 
 void BLEManagerImpl::OnScanComplete()
@@ -819,7 +824,7 @@ exit:
 bool BLEManagerImpl::IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId)
 {
     int ret;
-    if ((ret = bt_gatt_client_foreach_services(sInstance.mGattClient, __GattClientForeachServiceCb, conId)) != BT_ERROR_NONE)
+    if ((ret = bt_gatt_client_foreach_services(mGattClient, __GattClientForeachServiceCb, conId)) != BT_ERROR_NONE)
         ChipLogError(DeviceLayer, "Failed to browse GATT services: %s", get_error_message(ret));
     return (conId->isChipDevice ? true : false);
 }
