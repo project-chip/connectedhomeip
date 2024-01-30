@@ -47,7 +47,6 @@ public:
     static const char * kConfigKey_CredentialDataFingerprint[APP_MAX_CREDENTIAL];
     static const char * kConfigKey_CredentialDataFingerVein[APP_MAX_CREDENTIAL];
     static const char * kConfigKey_CredentialDataRfid[APP_MAX_CREDENTIAL];
-
 };
 } // namespace Internal
 } // namespace DeviceLayer

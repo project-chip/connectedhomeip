@@ -632,15 +632,15 @@ enum class DlAssetSource : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status = DlCredentialStatus::kAvailable;  /**< Indicates if credential slot is occupied or not. */
-    CredentialTypeEnum credentialType;                           /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;                               /**< Credential data bytes. */
+    DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
+    CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;                              /**< Credential data bytes. */
 
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy;                                 /**< Index of the fabric that created the user. */
+    chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
 
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy;                            /**< ID of the fabric that modified the user. */
+    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 };
 
 /**

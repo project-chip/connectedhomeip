@@ -49,8 +49,8 @@ struct HolidayScheduleInfo
 namespace TelinkDoorLock {
 namespace ResourceRanges {
 // Used to size arrays
-static constexpr uint8_t kMaxCredentialSize          = 20;
-static constexpr uint8_t kNumCredentialTypes         = 6;
+static constexpr uint8_t kMaxCredentialSize  = 20;
+static constexpr uint8_t kNumCredentialTypes = 6;
 
 } // namespace ResourceRanges
 

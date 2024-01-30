@@ -17,8 +17,8 @@
  */
 
 #include "AppTask.h"
-#include <LockManager.h>
 #include "ButtonManager.h"
+#include <LockManager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
 #include <app/server/Server.h>
@@ -242,8 +242,8 @@ void AppTask::LockStateActionHandler(AppEvent * aEvent)
 {
     LOG_INF("Sending a lock state event");
 
-    //This code was written for testing purpose only
-    //For real door status the level detection may be used instead of pulse
+    // This code was written for testing purpose only
+    // For real door status the level detection may be used instead of pulse
     static DoorStateEnum mDoorState = DoorStateEnum::kDoorOpen;
     if (mDoorState == DoorStateEnum::kDoorOpen)
     {
