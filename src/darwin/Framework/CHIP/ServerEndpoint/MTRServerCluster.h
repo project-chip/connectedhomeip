@@ -17,7 +17,6 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRDeviceType.h>
 #import <Matter/MTRServerAttribute.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -26,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  * A representation of a server cluster implemented by an MTRDeviceController.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRServerCluster : NSObject <NSCopying>
+@interface MTRServerCluster : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -47,14 +46,16 @@ MTR_NEWLY_AVAILABLE
 - (nullable instancetype)initWithClusterID:(NSNumber *)clusterID clusterRevision:(NSNumber *)clusterRevision;
 
 /**
- * Add an access grant to the cluster.
+ * Add an access grant to the cluster.  If the same access grant is added
+ * multiple times, it will be treated as if it were added once (and removing
+ * it once will remove it).
  */
-- (BOOL)addAccessGrant:(MTRAccessGrant *)accessGrant;
+- (void)addAccessGrant:(MTRAccessGrant *)accessGrant;
 
 /**
  * Remove an access grant from the cluster.
  */
-- (BOOL)removeAccessGrant:(MTRAccessGrant *)accessGrant;
+- (void)removeAccessGrant:(MTRAccessGrant *)accessGrant;
 
 /**
  * Add an attribute to the cluster.  This can only be done before the endpoint
@@ -93,12 +94,12 @@ MTR_NEWLY_AVAILABLE
 @property (nonatomic, copy, readonly) NSNumber * clusterRevision;
 
 /**
- * The set of entities that are allowed to access this cluster instance.  This
- * set is in addition to any endpoint-wide access grants that exist.
+ * The list of entities that are allowed to access this cluster instance.  This
+ * list is in addition to any endpoint-wide access grants that exist.
  *
- * Defaults to empty set, which means no additional access grants.
+ * Defaults to empty list, which means no additional access grants.
  */
-@property (nonatomic, copy, readonly) NSSet<MTRAccessGrant *> * accessGrants;
+@property (nonatomic, copy, readonly) NSArray<MTRAccessGrant *> * accessGrants;
 
 /**
  * The list of attributes supported by the cluster.

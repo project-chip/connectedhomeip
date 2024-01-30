@@ -32,7 +32,6 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerAttribute {
-    MTRServerEndpointState _state;
     MTRDeviceController * __weak _deviceController;
 }
 
@@ -67,7 +66,6 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    _state = MTRServerEndpointStateInitializing;
     _attributeID = attributeID;
     _requiredReadPrivilege = requiredReadPrivilege;
     _writable = writable;
@@ -81,35 +79,8 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-/**
- * Ensures we are in a valid state to manipulate our Matter-side state.
- */
-- (BOOL)ensureState:(NSString *)action
-{
-    if (_state == MTRServerEndpointStateInitializing) {
-        return YES;
-    }
-
-    MTRDeviceController * deviceController = _deviceController;
-    if (deviceController == nil || !deviceController.running) {
-        // Controller went away.  Make sure we are invalidated.
-        [self invalidate];
-    }
-
-    if (_state == MTRServerEndpointStateDefunct) {
-        MTR_LOG_ERROR("Cannot %@ on attribute %llx on no-longer-active endpoint", action, _attributeID.unsignedLongLongValue);
-        return NO;
-    }
-
-    return YES;
-}
-
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value
 {
-    if (![self ensureState:@"change value"]) {
-        return NO;
-    }
-
     id serializedValue;
     id dataType = value[MTRTypeKey];
     if ([MTRArrayValueType isEqual:dataType]) {
@@ -143,11 +114,11 @@ MTR_DIRECT_MEMBERS
     // We serialized properly, so should be good to go on the value.
     _value = [value copy];
 
-    if (_state == MTRServerEndpointStateInitializing) {
+    MTRDeviceController * deviceController = _deviceController;
+    if (deviceController == nil) {
+        // We're not bound to a controller, so safe to directly update _serializedValue.
         _serializedValue = serializedValue;
     } else {
-        // Must be non-nil if ensureState already happened.
-        MTRDeviceController * deviceController = _deviceController;
         [deviceController asyncDispatchToMatterQueue:^{
             auto changed = ![self->_serializedValue isEqual:serializedValue];
             self->_serializedValue = serializedValue;
@@ -163,12 +134,17 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)associateWithController:(MTRDeviceController *)controller
 {
-    if (_state != MTRServerEndpointStateInitializing) {
-        MTR_LOG_ERROR("Cannot associate MTRServerAttribute in state %lu with controller", static_cast<unsigned long>(_state));
+    MTRDeviceController * existingController = _deviceController;
+    if (existingController != nil) {
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+        MTR_LOG_ERROR("Cannot associate MTRServerAttribute with controller %@; already associated with controller %@",
+            controller.uniqueIdentifier, existingController.uniqueIdentifier);
+#else
+        MTR_LOG_ERROR("Cannot associate MTRServerAttribute with controller; already associated with a different controller");
+#endif
         return NO;
     }
 
-    _state = MTRServerEndpointStateActive;
     _deviceController = controller;
 
     return YES;
@@ -176,35 +152,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
-    _state = MTRServerEndpointStateDefunct;
     _deviceController = nil;
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    // It's important to not copy _serializedValue here, because it could be out
-    // of data compared to _value if there is an async task queued to update
-    // it.  That said, if we are here, we know our _value is serializable
-    // properly, so initWithAttributeID: won't return nil.
-    return [[MTRServerAttribute alloc] initWithAttributeID:[_attributeID copy] value:[_value copy] requiredReadPrivilege:_requiredReadPrivilege writable:_writable];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    if ([object class] != [self class]) {
-        return NO;
-    }
-
-    MTRServerAttribute * other = object;
-
-    // We ignore _serializedValue here, since it's the same information as
-    // _value, but might be set with a lag.
-    return [_attributeID isEqual:other.attributeID] && _requiredReadPrivilege == other.requiredReadPrivilege && _writable == other.writable && [_value isEqual:other.value];
-}
-
-- (NSUInteger)hash
-{
-    return _attributeID.unsignedLongValue ^ [_value hash] ^ _requiredReadPrivilege ^ static_cast<NSUInteger>(_writable);
 }
 
 @end

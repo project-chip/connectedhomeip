@@ -32,7 +32,6 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerCluster {
-    MTRServerEndpointState _state;
     /**
      * The access grants our API consumer can manipulate directly.  Never
      * touched on the Matter queue.
@@ -81,7 +80,6 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    _state = MTRServerEndpointStateInitializing;
     _clusterID = [clusterID copy];
     _clusterRevision = [clusterRevision copy];
     _accessGrants = [[NSMutableSet alloc] init];
@@ -104,76 +102,39 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-/**
- * Ensures we are in a valid state to manipulate our Matter-side state.
- */
-- (BOOL)ensureState:(NSString *)action
-{
-    if (_state == MTRServerEndpointStateInitializing) {
-        return YES;
-    }
-
-    MTRDeviceController * deviceController = _deviceController;
-    if (deviceController == nil || !deviceController.running) {
-        // Controller went away.  Make sure we are invalidated.
-        [self invalidate];
-    }
-
-    if (_state == MTRServerEndpointStateDefunct) {
-        MTR_LOG_ERROR("Cannot %@ on cluster %llx on no-longer-active endpoint", action, _clusterID.unsignedLongLongValue);
-        return NO;
-    }
-
-    return YES;
-}
-
 - (void)updateMatterAccessGrants
 {
-    // Must have had ensureState called first.
-
-    if (_state == MTRServerEndpointStateInitializing) {
-        // _matterAccessGrants will be updated when we move to the
-        // MTRServerEndpointStateActive state.
-    } else {
-        // Must be non-nil if ensureState already happened.
-        MTRDeviceController * deviceController = _deviceController;
-        NSSet * grants = [_accessGrants copy];
-        [deviceController asyncDispatchToMatterQueue:^{
-            self->_matterAccessGrants = grants;
-        }
-                                        errorHandler:nil];
+    MTRDeviceController * deviceController = _deviceController;
+    if (deviceController == nil) {
+        // _matterAccessGrants will be updated when we get bound to a controller.
+        return;
     }
+
+    NSSet * grants = [_accessGrants copy];
+    [deviceController asyncDispatchToMatterQueue:^{
+        self->_matterAccessGrants = grants;
+    }
+                                    errorHandler:nil];
 }
 
-- (BOOL)addAccessGrant:(MTRAccessGrant *)accessGrant
+- (void)addAccessGrant:(MTRAccessGrant *)accessGrant
 {
-    if (![self ensureState:@"add access grants"]) {
-        return NO;
-    }
-
     [_accessGrants addObject:accessGrant];
 
     [self updateMatterAccessGrants];
-
-    return YES;
 }
 
-- (BOOL)removeAccessGrant:(MTRAccessGrant *)accessGrant;
+- (void)removeAccessGrant:(MTRAccessGrant *)accessGrant;
 {
-    if (![self ensureState:@"remove access grants"]) {
-        return NO;
-    }
-
     [_accessGrants removeObject:accessGrant];
 
     [self updateMatterAccessGrants];
-
-    return YES;
 }
 
 - (BOOL)addAttribute:(MTRServerAttribute *)attribute
 {
-    if (_state != MTRServerEndpointStateInitializing) {
+    MTRDeviceController * deviceController = _deviceController;
+    if (deviceController != nil) {
         MTR_LOG_ERROR("Cannot add attribute on cluster %llx which is already in use", _clusterID.unsignedLongLongValue);
         return NO;
     }
@@ -210,8 +171,14 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)associateWithController:(MTRDeviceController *)controller
 {
-    if (_state != MTRServerEndpointStateInitializing) {
-        MTR_LOG_ERROR("Cannot associate MTRServerCluster in state %lu with controller", static_cast<unsigned long>(_state));
+    MTRDeviceController * existingController = _deviceController;
+    if (existingController != nil) {
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+        MTR_LOG_ERROR("Cannot associate MTRServerCluster with controller %@; already associated with controller %@",
+            controller.uniqueIdentifier, existingController.uniqueIdentifier);
+#else
+        MTR_LOG_ERROR("Cannot associate MTRServerCluster with controller; already associated with a different controller");
+#endif
         return NO;
     }
 
@@ -224,7 +191,6 @@ MTR_DIRECT_MEMBERS
     // Snapshot _matterAccessGrants now; after this point it will only be
     // updated on the Matter queue.
     _matterAccessGrants = [_accessGrants copy];
-    _state = MTRServerEndpointStateActive;
     _deviceController = controller;
 
     return YES;
@@ -232,8 +198,6 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
-    _state = MTRServerEndpointStateDefunct;
-
     for (MTRServerAttribute * attr in _attributes) {
         [attr invalidate];
     }
@@ -241,9 +205,9 @@ MTR_DIRECT_MEMBERS
     _deviceController = nil;
 }
 
-- (NSSet<MTRAccessGrant *> *)accessGrants
+- (NSArray<MTRAccessGrant *> *)accessGrants
 {
-    return [_accessGrants copy];
+    return [_accessGrants allObjects];
 }
 
 - (NSArray<MTRServerAttribute *> *)attributes
@@ -259,29 +223,6 @@ MTR_DIRECT_MEMBERS
     for (MTRServerAttribute * attr in _attributes) {
         attr.parentCluster = app::ConcreteClusterPath(endpoint, static_cast<ClusterId>(_clusterID.unsignedLongLongValue));
     }
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    return [[MTRServerCluster alloc] initInternalWithClusterID:_clusterID clusterRevision:_clusterRevision accessGrants:_accessGrants attributes:_attributes];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    if ([object class] != [self class]) {
-        return NO;
-    }
-
-    MTRServerCluster * other = object;
-
-    // Note: ignoring _matterAccessGrants, which is just a possibly-delayed
-    // snapshot of _accessGrants.
-    return [_clusterID isEqual:other.clusterID] && [_clusterRevision isEqual:other.clusterRevision] && [_accessGrants isEqualToSet:other.accessGrants] && [_attributes isEqualToArray:other.attributes];
-}
-
-- (NSUInteger)hash
-{
-    return _clusterID.unsignedLongValue ^ _clusterRevision.unsignedShortValue ^ [_accessGrants hash] ^ [_attributes hash];
 }
 
 @end

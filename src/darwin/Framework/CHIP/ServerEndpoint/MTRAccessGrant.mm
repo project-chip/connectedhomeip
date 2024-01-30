@@ -28,7 +28,7 @@ using namespace chip;
 MTR_DIRECT_MEMBERS
 @implementation MTRAccessGrant
 
-- (nullable instancetype)initWithNodeID:(NSNumber *)nodeID privilege:(MTRAccessControlEntryPrivilege)privilege
++ (nullable MTRAccessGrant *)accessGrantForNodeID:(NSNumber *)nodeID privilege:(MTRAccessControlEntryPrivilege)privilege
 {
     NodeId id = nodeID.unsignedLongLongValue;
     if (!IsOperationalNodeId(id)) {
@@ -36,10 +36,10 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self initWithSubject:[nodeID copy] privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
+    return [[MTRAccessGrant alloc] initWithSubject:[nodeID copy] privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
 }
 
-- (nullable instancetype)initWithCASEAuthenticatedTag:(NSNumber *)caseAuthenticatedTag privilege:(MTRAccessControlEntryPrivilege)privilege
++ (nullable MTRAccessGrant *)accessGrantForCASEAuthenticatedTag:(NSNumber *)caseAuthenticatedTag privilege:(MTRAccessControlEntryPrivilege)privilege
 {
     auto value = caseAuthenticatedTag.unsignedLongLongValue;
     if (!CanCastTo<CASEAuthTag>(value)) {
@@ -53,10 +53,10 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self initWithSubject:@(NodeIdFromCASEAuthTag(tag)) privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
+    return [[MTRAccessGrant alloc] initWithSubject:@(NodeIdFromCASEAuthTag(tag)) privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
 }
 
-- (nullable instancetype)initWithGroupID:(NSNumber *)groupID privilege:(MTRAccessControlEntryPrivilege)privilege
++ (nullable MTRAccessGrant *)accessGrantForGroupID:(NSNumber *)groupID privilege:(MTRAccessControlEntryPrivilege)privilege
 {
     auto value = groupID.unsignedLongLongValue;
     if (!CanCastTo<GroupId>(value)) {
@@ -70,12 +70,12 @@ MTR_DIRECT_MEMBERS
         return nil;
     }
 
-    return [self initWithSubject:@(NodeIdFromGroupId(id)) privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeGroup];
+    return [[MTRAccessGrant alloc] initWithSubject:@(NodeIdFromGroupId(id)) privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeGroup];
 }
 
-- (instancetype)initForAllNodesWithPrivilege:(MTRAccessControlEntryPrivilege)privilege
++ (MTRAccessGrant *)accessGrantForAllNodesWithPrivilege:(MTRAccessControlEntryPrivilege)privilege
 {
-    return [self initWithSubject:nil privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
+    return [[MTRAccessGrant alloc] initWithSubject:nil privilege:privilege authenticationMode:MTRAccessControlEntryAuthModeCASE];
 }
 
 // initWithSubject assumes that the subject has already been validated and, if

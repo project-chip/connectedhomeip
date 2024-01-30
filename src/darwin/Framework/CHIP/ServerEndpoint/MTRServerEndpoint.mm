@@ -29,7 +29,6 @@ using namespace chip;
 
 MTR_DIRECT_MEMBERS
 @implementation MTRServerEndpoint {
-    MTRServerEndpointState _state;
     /**
      * The access grants our API consumer can manipulate directly.  Never
      * touched on the Matter queue.
@@ -39,7 +38,7 @@ MTR_DIRECT_MEMBERS
     MTRDeviceController * __weak _deviceController;
 }
 
-- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceType *> *)deviceTypes
+- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceTypeRevision *> *)deviceTypes
 {
     auto endpointIDValue = endpointID.unsignedLongLongValue;
     if (!CanCastTo<EndpointId>(endpointIDValue)) {
@@ -68,13 +67,12 @@ MTR_DIRECT_MEMBERS
     return [self initInternalWithEndpointID:endpointID deviceTypes:deviceTypes accessGrants:[NSSet set] clusters:@[]];
 }
 
-- (instancetype)initInternalWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceType *> *)deviceTypes accessGrants:(NSSet *)accessGrants clusters:(NSArray *)clusters
+- (instancetype)initInternalWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceTypeRevision *> *)deviceTypes accessGrants:(NSSet *)accessGrants clusters:(NSArray *)clusters
 {
     if (!(self = [super init])) {
         return nil;
     }
 
-    _state = MTRServerEndpointStateInitializing;
     _endpointID = [endpointID copy];
     _deviceTypes = [deviceTypes copy];
     _accessGrants = [[NSMutableSet alloc] init];
@@ -96,76 +94,39 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-/**
- * Ensures we are in a valid state to manipulate our Matter-side state.
- */
-- (BOOL)ensureState:(NSString *)action
-{
-    if (_state == MTRServerEndpointStateInitializing) {
-        return YES;
-    }
-
-    MTRDeviceController * deviceController = _deviceController;
-    if (deviceController == nil || !deviceController.running) {
-        // Controller went away.  Make sure we are invalidated.
-        [self invalidate];
-    }
-
-    if (_state == MTRServerEndpointStateDefunct) {
-        MTR_LOG_ERROR("Cannot %@ on no-longer-active endpoint %llu", action, _endpointID.unsignedLongLongValue);
-        return NO;
-    }
-
-    return YES;
-}
-
 - (void)updateMatterAccessGrants
 {
-    // Must have had ensureState called first.
-
-    if (_state == MTRServerEndpointStateInitializing) {
-        // _matterAccessGrants will be updated when we move to the
-        // MTRServerEndpointStateActive state.
-    } else {
-        // Must be non-nil if ensureState already happened.
-        MTRDeviceController * deviceController = _deviceController;
-        NSSet * grants = [_accessGrants copy];
-        [deviceController asyncDispatchToMatterQueue:^{
-            self->_matterAccessGrants = grants;
-        }
-                                        errorHandler:nil];
+    MTRDeviceController * deviceController = _deviceController;
+    if (deviceController == nil) {
+        // _matterAccessGrants will be updated when we get bound to a controller.
+        return;
     }
+
+    NSSet * grants = [_accessGrants copy];
+    [deviceController asyncDispatchToMatterQueue:^{
+        self->_matterAccessGrants = grants;
+    }
+                                    errorHandler:nil];
 }
 
-- (BOOL)addAccessGrant:(MTRAccessGrant *)accessGrant
+- (void)addAccessGrant:(MTRAccessGrant *)accessGrant
 {
-    if (![self ensureState:@"add access grants"]) {
-        return NO;
-    }
-
     [_accessGrants addObject:accessGrant];
 
     [self updateMatterAccessGrants];
-
-    return YES;
 }
 
-- (BOOL)removeAccessGrant:(MTRAccessGrant *)accessGrant;
+- (void)removeAccessGrant:(MTRAccessGrant *)accessGrant;
 {
-    if (![self ensureState:@"remove access grants"]) {
-        return NO;
-    }
-
     [_accessGrants removeObject:accessGrant];
 
     [self updateMatterAccessGrants];
-
-    return YES;
 }
 
 - (BOOL)addServerCluster:(MTRServerCluster *)serverCluster
 {
-    if (_state != MTRServerEndpointStateInitializing) {
+    MTRDeviceController * deviceController = _deviceController;
+    if (deviceController != nil) {
         MTR_LOG_ERROR("Cannot add cluster on endpoint %llu which is already in use", _endpointID.unsignedLongLongValue);
         return NO;
     }
@@ -189,8 +150,14 @@ MTR_DIRECT_MEMBERS
 
 - (BOOL)associateWithController:(MTRDeviceController *)controller
 {
-    if (_state != MTRServerEndpointStateInitializing) {
-        MTR_LOG_ERROR("Cannot associate MTRServerEndpoint in state %lu with controller", static_cast<unsigned long>(_state));
+    MTRDeviceController * existingController = _deviceController;
+    if (existingController != nil) {
+#if MTR_PER_CONTROLLER_STORAGE_ENABLED
+        MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller %@; already associated with controller %@",
+            controller.uniqueIdentifier, existingController.uniqueIdentifier);
+#else
+        MTR_LOG_ERROR("Cannot associate MTRServerEndpoint with controller; already associated with a different controller");
+#endif
         return NO;
     }
 
@@ -203,7 +170,6 @@ MTR_DIRECT_MEMBERS
     // Snapshot _matterAccessGrants now; after this point it will only be
     // updated on the Matter queue.
     _matterAccessGrants = [_accessGrants copy];
-    _state = MTRServerEndpointStateActive;
     _deviceController = controller;
 
     return YES;
@@ -211,8 +177,6 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
-    _state = MTRServerEndpointStateDefunct;
-
     for (MTRServerCluster * cluster in _serverClusters) {
         [cluster invalidate];
     }
@@ -220,37 +184,14 @@ MTR_DIRECT_MEMBERS
     _deviceController = nil;
 }
 
-- (NSSet<MTRAccessGrant *> *)accessGrants
+- (NSArray<MTRAccessGrant *> *)accessGrants
 {
-    return [_accessGrants copy];
+    return [_accessGrants allObjects];
 }
 
 - (NSArray<MTRServerCluster *> *)serverClusters
 {
     return [_serverClusters copy];
-}
-
-- (id)copyWithZone:(NSZone *)zone
-{
-    return [[MTRServerEndpoint alloc] initInternalWithEndpointID:_endpointID deviceTypes:_deviceTypes accessGrants:_accessGrants clusters:_serverClusters];
-}
-
-- (BOOL)isEqual:(id)object
-{
-    if ([object class] != [self class]) {
-        return NO;
-    }
-
-    MTRServerEndpoint * other = object;
-
-    // Note: ignoring _matterAccessGrants, which is just a possibly-delayed
-    // snapshot of _accessGrants.
-    return [_endpointID isEqual:other.endpointID] && [_deviceTypes isEqual:other.deviceTypes] && [_accessGrants isEqualToSet:other.accessGrants] && [_serverClusters isEqualToArray:other.serverClusters];
-}
-
-- (NSUInteger)hash
-{
-    return _endpointID.unsignedShortValue ^ [_deviceTypes hash] ^ [_accessGrants hash] ^ [_serverClusters hash];
 }
 
 @end

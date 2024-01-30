@@ -46,7 +46,7 @@
 #import <Matter/MTRDeviceControllerParameters.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
-#import <Matter/MTRDeviceType.h>
+#import <Matter/MTRDeviceTypeRevision.h>
 #import <Matter/MTRDiagnosticLogsType.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRFabricInfo.h>

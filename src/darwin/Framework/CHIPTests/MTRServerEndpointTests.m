@@ -27,32 +27,32 @@
 {
     // Try to create an access grant with an invalid node ID
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithNodeID:@(0) privilege:MTRAccessControlEntryPrivilegeView];
+        __auto_type * grant = [MTRAccessGrant accessGrantForNodeID:@(0) privilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNil(grant);
     }
 
     // Try to create an access grant with a group-range node ID
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithNodeID:@(0xFFFFFFFFFFFF0001) privilege:MTRAccessControlEntryPrivilegeView];
+        __auto_type * grant = [MTRAccessGrant accessGrantForNodeID:@(0xFFFFFFFFFFFF0001) privilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNil(grant);
     }
 
     // Try to create an access grant with a local node ID
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithNodeID:@(0xFFFFFFFE00020002) privilege:MTRAccessControlEntryPrivilegeView];
+        __auto_type * grant = [MTRAccessGrant accessGrantForNodeID:@(0xFFFFFFFE00020002) privilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNil(grant);
     }
 
     // Try to create an access grant with a CAT-range node ID
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithNodeID:@(0xFFFFFFFD00020002) privilege:MTRAccessControlEntryPrivilegeView];
+        __auto_type * grant = [MTRAccessGrant accessGrantForNodeID:@(0xFFFFFFFD00020002) privilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNil(grant);
     }
 
     // Try to create an access grant with an operational node ID
     {
         NSNumber * nodeID = @(2);
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithNodeID:nodeID privilege:MTRAccessControlEntryPrivilegeView];
+        __auto_type * grant = [MTRAccessGrant accessGrantForNodeID:nodeID privilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNotNil(grant);
         XCTAssertEqualObjects(grant.subjectID, nodeID);
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeView);
@@ -62,7 +62,7 @@
     // Try different privileges
     {
         NSNumber * nodeID = @(2);
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithNodeID:nodeID privilege:MTRAccessControlEntryPrivilegeAdminister];
+        __auto_type * grant = [MTRAccessGrant accessGrantForNodeID:nodeID privilege:MTRAccessControlEntryPrivilegeAdminister];
         XCTAssertNotNil(grant);
         XCTAssertEqualObjects(grant.subjectID, nodeID);
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeAdminister);
@@ -71,7 +71,7 @@
 
     // Try a CAT
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithCASEAuthenticatedTag:@(0x00020003) privilege:MTRAccessControlEntryPrivilegeManage];
+        __auto_type * grant = [MTRAccessGrant accessGrantForCASEAuthenticatedTag:@(0x00020003) privilege:MTRAccessControlEntryPrivilegeManage];
         XCTAssertNotNil(grant);
         XCTAssertEqualObjects(grant.subjectID, @(0xFFFFFFFD00020003));
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeManage);
@@ -80,18 +80,18 @@
 
     // Try some invalid CATs
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithCASEAuthenticatedTag:@(0x100000000) privilege:MTRAccessControlEntryPrivilegeManage];
+        __auto_type * grant = [MTRAccessGrant accessGrantForCASEAuthenticatedTag:@(0x100000000) privilege:MTRAccessControlEntryPrivilegeManage];
         XCTAssertNil(grant);
     }
 
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithCASEAuthenticatedTag:@(0x00020000) privilege:MTRAccessControlEntryPrivilegeManage];
+        __auto_type * grant = [MTRAccessGrant accessGrantForCASEAuthenticatedTag:@(0x00020000) privilege:MTRAccessControlEntryPrivilegeManage];
         XCTAssertNil(grant);
     }
 
     // Try a group ID
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithGroupID:@(0x0005) privilege:MTRAccessControlEntryPrivilegeOperate];
+        __auto_type * grant = [MTRAccessGrant accessGrantForGroupID:@(0x0005) privilege:MTRAccessControlEntryPrivilegeOperate];
         XCTAssertNotNil(grant);
         XCTAssertEqualObjects(grant.subjectID, @(0xFFFFFFFFFFFF0005));
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeOperate);
@@ -100,13 +100,13 @@
 
     // Try an invalid group ID
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initWithGroupID:@(0) privilege:MTRAccessControlEntryPrivilegeOperate];
+        __auto_type * grant = [MTRAccessGrant accessGrantForGroupID:@(0) privilege:MTRAccessControlEntryPrivilegeOperate];
         XCTAssertNil(grant);
     }
 
     // Try a wildcard subject.
     {
-        __auto_type * grant = [[MTRAccessGrant alloc] initForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeView];
+        __auto_type * grant = [MTRAccessGrant accessGrantForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeView];
         XCTAssertNotNil(grant);
         XCTAssertNil(grant.subjectID);
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeView);
@@ -189,31 +189,31 @@
 {
     // Invalid device type ID
     {
-        __auto_type * deviceType = [[MTRDeviceType alloc] initWithDeviceTypeID:@(0xC000) revision:@(1)];
+        __auto_type * deviceType = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(0xC000) revision:@(1)];
         XCTAssertNil(deviceType);
     }
 
     // Another invalid device type ID
     {
-        __auto_type * deviceType = [[MTRDeviceType alloc] initWithDeviceTypeID:@(0xFFFF1234) revision:@(1)];
+        __auto_type * deviceType = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(0xFFFF1234) revision:@(1)];
         XCTAssertNil(deviceType);
     }
 
     // Another invalid device type ID
     {
-        __auto_type * deviceType = [[MTRDeviceType alloc] initWithDeviceTypeID:@(0x100000000) revision:@(1)];
+        __auto_type * deviceType = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(0x100000000) revision:@(1)];
         XCTAssertNil(deviceType);
     }
 
     // Invalid device type revision
     {
-        __auto_type * deviceType = [[MTRDeviceType alloc] initWithDeviceTypeID:@(0x1234) revision:@(0)];
+        __auto_type * deviceType = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(0x1234) revision:@(0)];
         XCTAssertNil(deviceType);
     }
 
     // Another invalid device type revision
     {
-        __auto_type * deviceType = [[MTRDeviceType alloc] initWithDeviceTypeID:@(0x1234) revision:@(0x10000)];
+        __auto_type * deviceType = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(0x1234) revision:@(0x10000)];
         XCTAssertNil(deviceType);
     }
 
@@ -221,7 +221,7 @@
     {
         NSNumber * deviceTypeID = @(0x1234);
         NSNumber * deviceTypeRevision = @(1);
-        __auto_type * deviceType = [[MTRDeviceType alloc] initWithDeviceTypeID:deviceTypeID revision:deviceTypeRevision];
+        __auto_type * deviceType = [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:deviceTypeID revision:deviceTypeRevision];
         XCTAssertNotNil(deviceType);
         XCTAssertEqualObjects(deviceType.deviceTypeID, deviceTypeID);
         XCTAssertEqualObjects(deviceType.deviceTypeRevision, deviceTypeRevision);
@@ -238,7 +238,7 @@
         XCTAssertNotNil(cluster);
         XCTAssertEqualObjects(cluster.clusterID, clusterID);
         XCTAssertEqualObjects(cluster.clusterRevision, clusterRevision);
-        XCTAssertEqualObjects(cluster.accessGrants, [NSSet set]);
+        XCTAssertEqualObjects(cluster.accessGrants, @[]);
         XCTAssertEqualObjects(cluster.attributes, @[]);
     }
 
@@ -250,7 +250,7 @@
         XCTAssertNotNil(cluster);
         XCTAssertEqualObjects(cluster.clusterID, clusterID);
         XCTAssertEqualObjects(cluster.clusterRevision, clusterRevision);
-        XCTAssertEqualObjects(cluster.accessGrants, [NSSet set]);
+        XCTAssertEqualObjects(cluster.accessGrants, @[]);
         XCTAssertEqualObjects(cluster.attributes, @[]);
     }
 
@@ -320,7 +320,7 @@
         XCTAssertEqualObjects(cluster.clusterID, clusterID);
         // Don't hardcode the cluster revision here; we want it to be able to
         // change without updating this test.
-        XCTAssertEqualObjects(cluster.accessGrants, [NSSet set]);
+        XCTAssertEqualObjects(cluster.accessGrants, @[]);
         XCTAssertEqualObjects(cluster.attributes, @[]);
 
         // Adding descriptor's list attributes should fail.
@@ -360,15 +360,15 @@
         NSNumber * clusterRevision = @(1);
         __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
         XCTAssertNotNil(cluster);
-        XCTAssertEqualObjects(cluster.accessGrants, [NSSet set]);
+        XCTAssertEqualObjects(cluster.accessGrants, @[]);
         XCTAssertEqualObjects(cluster.attributes, @[]);
 
-        __auto_type * grants = [NSSet setWithArray:@[
-            [[MTRAccessGrant alloc] initForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeManage],
-            [[MTRAccessGrant alloc] initWithNodeID:@(1) privilege:MTRAccessControlEntryPrivilegeView],
-        ]];
+        __auto_type * grants = @[
+            [MTRAccessGrant accessGrantForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeManage],
+            [MTRAccessGrant accessGrantForNodeID:@(1) privilege:MTRAccessControlEntryPrivilegeView],
+        ];
         for (MTRAccessGrant * grant in grants) {
-            XCTAssertTrue([cluster addAccessGrant:grant]);
+            [cluster addAccessGrant:grant];
         }
         XCTAssertEqualObjects(cluster.accessGrants, grants);
 
@@ -389,12 +389,12 @@
         // Adding an already-added attribute should fail.
         XCTAssertFalse([otherCluster addAttribute:attributes[0]]);
 
-        MTRServerAttribute * otherAttribute = [attributes[0] copy];
+        MTRServerAttribute * otherAttribute = [[MTRServerAttribute alloc] initReadonlyAttributeWithID:@(0) initialValue:signedIntValue requiredPrivilege:MTRAccessControlEntryPrivilegeView];
 
         // Adding same-id attribute should fail.
         XCTAssertFalse([cluster addAttribute:otherAttribute]);
 
-        // Adding the copied attribute to a different cluster should work.
+        // Adding the same-id attribute to a different cluster should work.
         XCTAssertTrue([otherCluster addAttribute:otherAttribute]);
 
         // Adding global attributes should fail.
@@ -414,9 +414,9 @@
 
 - (void)testEndpointDescription
 {
-    NSArray<MTRDeviceType *> * deviceTypes;
+    NSArray<MTRDeviceTypeRevision *> * deviceTypes;
     {
-        deviceTypes = @[ [[MTRDeviceType alloc] initWithDeviceTypeID:@(0xFFF11234) revision:@(2)] ];
+        deviceTypes = @[ [[MTRDeviceTypeRevision alloc] initWithDeviceTypeID:@(0xFFF11234) revision:@(2)] ];
         XCTAssertNotNil(deviceTypes);
     }
 
@@ -449,15 +449,15 @@
 
         XCTAssertEqualObjects(endpoint.endpointID, endpointID);
         XCTAssertEqualObjects(endpoint.deviceTypes, deviceTypes);
-        XCTAssertEqualObjects(endpoint.accessGrants, [NSSet set]);
+        XCTAssertEqualObjects(endpoint.accessGrants, @[]);
         XCTAssertEqualObjects(endpoint.serverClusters, @[]);
 
-        __auto_type * grants = [NSSet setWithArray:@[
-            [[MTRAccessGrant alloc] initForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeManage],
-            [[MTRAccessGrant alloc] initWithGroupID:@(1) privilege:MTRAccessControlEntryPrivilegeAdminister],
-        ]];
+        __auto_type * grants = @[
+            [MTRAccessGrant accessGrantForAllNodesWithPrivilege:MTRAccessControlEntryPrivilegeManage],
+            [MTRAccessGrant accessGrantForGroupID:@(1) privilege:MTRAccessControlEntryPrivilegeAdminister],
+        ];
         for (MTRAccessGrant * grant in grants) {
-            XCTAssertTrue([endpoint addAccessGrant:grant]);
+            [endpoint addAccessGrant:grant];
         }
         XCTAssertEqualObjects(endpoint.accessGrants, grants);
 
@@ -474,12 +474,12 @@
         // Adding an already-added cluster should fail.
         XCTAssertFalse([otherEndpoint addServerCluster:clusters[0]]);
 
-        MTRServerCluster * otherCluster = [clusters[0] copy];
+        MTRServerCluster * otherCluster = [[MTRServerCluster alloc] initWithClusterID:@(6) clusterRevision:@(1)];
 
         // Adding same-id cluster should fail.
         XCTAssertFalse([endpoint addServerCluster:otherCluster]);
 
-        // Adding the copied cluster to a different endpoint should work.
+        // Adding the same-id cluster to a different endpoint should work.
         XCTAssertTrue([otherEndpoint addServerCluster:otherCluster]);
     }
 }

@@ -16,7 +16,7 @@
 
 #import "MTRDefines_Internal.h"
 #import "MTRLogging_Internal.h"
-#import <Matter/MTRDeviceType.h>
+#import <Matter/MTRDeviceTypeRevision.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -25,25 +25,25 @@
 using namespace chip;
 
 MTR_DIRECT_MEMBERS
-@implementation MTRDeviceType
+@implementation MTRDeviceTypeRevision
 
 - (nullable instancetype)initWithDeviceTypeID:(NSNumber *)deviceTypeID revision:(NSNumber *)revision
 {
     auto deviceTypeIDValue = deviceTypeID.unsignedLongLongValue;
     if (!CanCastTo<DeviceTypeId>(deviceTypeIDValue)) {
-        MTR_LOG_ERROR("MTRDeviceType provided too-large device type ID: 0x%llx", deviceTypeIDValue);
+        MTR_LOG_ERROR("MTRDeviceTypeRevision provided too-large device type ID: 0x%llx", deviceTypeIDValue);
         return nil;
     }
 
     auto id = static_cast<DeviceTypeId>(deviceTypeIDValue);
     if (!IsValidDeviceTypeId(id)) {
-        MTR_LOG_ERROR("MTRDeviceType provided invalid device type ID: 0x%" PRIx32, id);
+        MTR_LOG_ERROR("MTRDeviceTypeRevision provided invalid device type ID: 0x%" PRIx32, id);
         return nil;
     }
 
     auto revisionValue = revision.unsignedLongLongValue;
     if (!CanCastTo<uint16_t>(revisionValue) || revisionValue < 1) {
-        MTR_LOG_ERROR("MTRDeviceType provided invalid device type revision: 0x%llx", revisionValue);
+        MTR_LOG_ERROR("MTRDeviceTypeRevision provided invalid device type revision: 0x%llx", revisionValue);
         return nil;
     }
 
@@ -75,7 +75,7 @@ MTR_DIRECT_MEMBERS
         return NO;
     }
 
-    MTRDeviceType * other = object;
+    MTRDeviceTypeRevision * other = object;
 
     return [_deviceTypeID isEqual:other.deviceTypeID] && [_deviceTypeRevision isEqual:other.deviceTypeRevision];
 }

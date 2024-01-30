@@ -20,11 +20,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * A representation of a "device type" in the sense used in the Matter
+ * A representation of a "device type revision" in the sense used in the Matter
  * specification.  This has an identifier and a version number.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRDeviceType : NSObject <NSCopying>
+@interface MTRDeviceTypeRevision : NSObject <NSCopying>
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

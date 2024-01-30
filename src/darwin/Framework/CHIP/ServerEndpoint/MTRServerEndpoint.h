@@ -17,7 +17,7 @@
 #import <Foundation/Foundation.h>
 #import <Matter/MTRAccessGrant.h>
 #import <Matter/MTRDefines.h>
-#import <Matter/MTRDeviceType.h>
+#import <Matter/MTRDeviceTypeRevision.h>
 #import <Matter/MTRServerCluster.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * A representation of an endpoint implemented by an MTRDeviceController.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRServerEndpoint : NSObject <NSCopying>
+@interface MTRServerEndpoint : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -36,17 +36,19 @@ MTR_NEWLY_AVAILABLE
  * types provided must be nonempty (but may include vendor-specific device
  * types).
  */
-- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceType *> *)deviceTypes;
+- (nullable instancetype)initWithEndpointID:(NSNumber *)endpointID deviceTypes:(NSArray<MTRDeviceTypeRevision *> *)deviceTypes;
 
 /**
- * Add an access grant to the endpoint.
+ * Add an access grant to the endpoint.  If the same access grant is added
+ * multiple times, it will be treated as if it were added once (and removing
+ * it once will remove it).
  */
-- (BOOL)addAccessGrant:(MTRAccessGrant *)accessGrant;
+- (void)addAccessGrant:(MTRAccessGrant *)accessGrant;
 
 /**
  * Remove an access grant from the endpoint.
  */
-- (BOOL)removeAccessGrant:(MTRAccessGrant *)accessGrant;
+- (void)removeAccessGrant:(MTRAccessGrant *)accessGrant;
 
 /**
  * Add a server cluster to the endpoint.  This can only be done before the
@@ -61,16 +63,16 @@ MTR_NEWLY_AVAILABLE
 
 @property (nonatomic, copy, readonly) NSNumber * endpointID;
 
-@property (nonatomic, copy, readonly) NSArray<MTRDeviceType *> * deviceTypes;
+@property (nonatomic, copy, readonly) NSArray<MTRDeviceTypeRevision *> * deviceTypes;
 
 /**
- * The set of entities that are allowed to access all clusters on this endpoint.
- * If more fine-grained access control is desired, access grants should be
- * defined on individual clusters.
+ * The list of entities that are allowed to access all clusters on this
+ * endpoint.  If more fine-grained access control is desired, access grants
+ * should be defined on individual clusters.
  *
- * Defaults to empty set, which means no access granted.
+ * Defaults to empty list, which means no access granted.
  */
-@property (nonatomic, copy, readonly) NSSet<MTRAccessGrant *> * accessGrants;
+@property (nonatomic, copy, readonly) NSArray<MTRAccessGrant *> * accessGrants;
 
 /**
  * A list of server clusters supported on this endpoint.  The Descriptor cluster

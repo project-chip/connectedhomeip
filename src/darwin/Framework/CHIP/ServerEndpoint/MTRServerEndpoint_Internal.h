@@ -18,31 +18,6 @@
 #import <Matter/MTRDeviceController.h>
 #import <Matter/MTRServerEndpoint.h>
 
-typedef NS_ENUM(NSUInteger, MTRServerEndpointState) {
-    /**
-     * The Initializing state indicates an endpoint or object that hangs off an
-     * endpoint (cluster, attribute, etc) that is still being set up by the API
-     * consumer and has not been added to a controller yet.
-     */
-    MTRServerEndpointStateInitializing,
-    /**
-     * The Active state indicates an endpoint or object that hangs off an
-     * endpoint (cluster, attribute, etc) that is now attached to a controller.
-     * This state is entered from the Initializing state on the consumer's
-     * thread/queue.  In this state, any mutations to Matter-observable state
-     * must happen on the Matter queue.  While in this state, the object holds a
-     * non-nil weak reference to the controller.
-     */
-    MTRServerEndpointStateActive,
-    /**
-     * The Defunct state indicates an endpoint or object that hangs off an
-     * endpoint (cluster, attribute, etc) that used to be attached to a
-     * controller but isn't any longer. This could be because the controller
-     * shut down, or because the endpoint was removed from the controller.
-     */
-    MTRServerEndpointStateDefunct,
-};
-
 @interface MTRServerEndpoint ()
 
 /**

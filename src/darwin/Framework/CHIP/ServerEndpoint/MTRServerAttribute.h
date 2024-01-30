@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  * may not be writable.
  */
 MTR_NEWLY_AVAILABLE
-@interface MTRServerAttribute : NSObject <NSCopying>
+@interface MTRServerAttribute : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -46,9 +46,7 @@ MTR_NEWLY_AVAILABLE
  * Change the value of the attribute to a new value.  The value is a data-value as documented
  * in MTRBaseDevice.h.
  *
- * Will fail if the attribute is not a valid data-value or if the attribute is
- * on an endpoint that used to be defined on a controller and isn't any longer,
- * whether because it was removed or because the controller was shut down.
+ * Will fail if the attribute is not a valid data-value.
  */
 - (BOOL)setValue:(NSDictionary<NSString *, id> *)value;
 
