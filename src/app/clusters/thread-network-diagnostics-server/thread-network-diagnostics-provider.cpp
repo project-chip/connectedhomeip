@@ -21,12 +21,15 @@
 #include <app/data-model/Encode.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
+
+#if (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
 #if CHIP_DEVICE_CONFIG_THREAD_FTD
 #include <openthread/thread_ftd.h>
-#endif
+#endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+#endif // (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK)
 
 using namespace chip::DeviceLayer;
 
