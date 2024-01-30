@@ -91,18 +91,6 @@ public:
     void HandleResumeStateCallback(OperationalState::GenericOperationalError & err) override;
 
     /**
-     * Handle Command Callback in application: Start
-     * @param[out] get operational error after callback.
-     */
-    void HandleStartStateCallback(OperationalState::GenericOperationalError & err) override;
-
-    /**
-     * Handle Command Callback in application: Stop
-     * @param[out] get operational error after callback.
-     */
-    void HandleStopStateCallback(OperationalState::GenericOperationalError & err) override;
-
-    /**
      * Handle the GoHome command.
      * @param err
      */

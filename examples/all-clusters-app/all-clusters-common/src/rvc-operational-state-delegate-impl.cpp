@@ -70,34 +70,6 @@ void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::Ge
     }
 }
 
-void RvcOperationalStateDelegate::HandleStartStateCallback(OperationalState::GenericOperationalError & err)
-{
-    // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
-}
-
-void RvcOperationalStateDelegate::HandleStopStateCallback(OperationalState::GenericOperationalError & err)
-{
-    // placeholder implementation
-    auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
-    if (error == CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kNoError));
-    }
-    else
-    {
-        err.Set(to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
-    }
-}
-
 void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
