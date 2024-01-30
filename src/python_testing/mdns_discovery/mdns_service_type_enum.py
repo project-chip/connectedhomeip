@@ -24,4 +24,3 @@ class MdnsServiceType(Enum):
     COMMISSIONABLE = "_matterc._udp.local."
     OPERATIONAL = "_matter._tcp.local."
     BORDER_ROUTER = "_meshcop._udp.local."
-    
