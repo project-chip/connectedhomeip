@@ -16,14 +16,14 @@
 #
 
 
-import json
 import asyncio
+import json
+from dataclasses import asdict, dataclass
+from enum import Enum
 from typing import Dict, List, Optional
 
 from zeroconf import IPVersion, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
-from dataclasses import asdict, dataclass
-from enum import Enum
 
 
 @dataclass
@@ -64,11 +64,13 @@ class MdnsServiceInfo:
     # The time-to-live value for other records associated with the service.
     other_ttl: int
 
+
 class MdnsServiceType(Enum):
     COMMISSIONER = "_matterd._udp.local."
     COMMISSIONABLE = "_matterc._udp.local."
     OPERATIONAL = "_matter._tcp.local."
     BORDER_ROUTER = "_meshcop._udp.local."
+
 
 class MdnsDiscovery:
 
@@ -191,8 +193,6 @@ class MdnsDiscovery:
                 self._discovered_services[service_type] = [mdns_service_info]
             else:
                 self._discovered_services[service_type].append(mdns_service_info)
-    
-        print(f"\n"*10)
 
     def _to_mdns_service_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
