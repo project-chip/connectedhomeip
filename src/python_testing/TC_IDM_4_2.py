@@ -389,7 +389,7 @@ class TC_IDM_4_2(MatterBaseTest):
 
         sub_cr1_provided_dvf.Shutdown()
 
-        # *** Step 8 ***
+        # *** Step 8 ****
         self.print_step(8, "CR1 sends a subscription request action for an attribute and sets the MinIntervalFloor value to be same as MaxIntervalCeiling. Activate the Subscription between CR1 and DUT. Modify the attribute which has been subscribed to on the DUT.")
 
         # Subscribe to attribute
