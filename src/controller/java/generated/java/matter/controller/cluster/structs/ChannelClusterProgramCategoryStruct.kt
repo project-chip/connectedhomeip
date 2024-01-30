@@ -18,12 +18,16 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ChannelClusterProgramCategoryStruct(val category: String, val subCategory: Optional<String>) {
+class ChannelClusterProgramCategoryStruct(
+  val category: String,
+  val subCategory: Optional<String>
+) {
   override fun toString(): String = buildString {
     append("ChannelClusterProgramCategoryStruct {\n")
     append("\tcategory : $category\n")
@@ -50,13 +54,12 @@ class ChannelClusterProgramCategoryStruct(val category: String, val subCategory:
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterProgramCategoryStruct {
       tlvReader.enterStructure(tlvTag)
       val category = tlvReader.getString(ContextSpecificTag(TAG_CATEGORY))
-      val subCategory =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUB_CATEGORY))) {
-          Optional.of(tlvReader.getString(ContextSpecificTag(TAG_SUB_CATEGORY)))
-        } else {
-          Optional.empty()
-        }
-
+      val subCategory = if (tlvReader.isNextTag(ContextSpecificTag(TAG_SUB_CATEGORY))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_SUB_CATEGORY)))
+    } else {
+      Optional.empty()
+    }
+      
       tlvReader.exitContainer()
 
       return ChannelClusterProgramCategoryStruct(category, subCategory)

@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.eventstructs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
@@ -55,24 +56,18 @@ class TargetNavigatorClusterTargetUpdatedEvent(
     private const val TAG_CURRENT_TARGET = 1
     private const val TAG_DATA = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TargetNavigatorClusterTargetUpdatedEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : TargetNavigatorClusterTargetUpdatedEvent {
       tlvReader.enterStructure(tlvTag)
-      val targetList =
-        buildList<matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_TARGET_LIST))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(
-              matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
-            )
-          }
-          tlvReader.exitContainer()
+      val targetList = buildList <matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct> {
+        tlvReader.enterArray(ContextSpecificTag(TAG_TARGET_LIST))
+        while(!tlvReader.isEndOfContainer()) {
+          this.add(matter.controller.cluster.structs.TargetNavigatorClusterTargetInfoStruct.fromTlv(AnonymousTag, tlvReader))
         }
+        tlvReader.exitContainer()
+      }
       val currentTarget = tlvReader.getUByte(ContextSpecificTag(TAG_CURRENT_TARGET))
       val data = tlvReader.getByteArray(ContextSpecificTag(TAG_DATA))
-
+      
       tlvReader.exitContainer()
 
       return TargetNavigatorClusterTargetUpdatedEvent(targetList, currentTarget, data)

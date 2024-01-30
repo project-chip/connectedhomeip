@@ -20,11 +20,15 @@ import chip.devicecontroller.cluster.*
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class UnitTestingClusterDoubleNestedStructList(val a: List<UnitTestingClusterNestedStructList>) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class UnitTestingClusterDoubleNestedStructList (
+    val a: List<UnitTestingClusterNestedStructList>) {
+  override fun toString(): String  = buildString {
     append("UnitTestingClusterDoubleNestedStructList {\n")
     append("\ta : $a\n")
     append("}\n")
@@ -45,17 +49,16 @@ class UnitTestingClusterDoubleNestedStructList(val a: List<UnitTestingClusterNes
   companion object {
     private const val TAG_A = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterDoubleNestedStructList {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : UnitTestingClusterDoubleNestedStructList {
       tlvReader.enterStructure(tlvTag)
-      val a =
-        buildList<UnitTestingClusterNestedStructList> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_A))
-          while (!tlvReader.isEndOfContainer()) {
-            add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
-          }
-          tlvReader.exitContainer()
-        }
-
+      val a = buildList<UnitTestingClusterNestedStructList> {
+      tlvReader.enterArray(ContextSpecificTag(TAG_A))
+      while(!tlvReader.isEndOfContainer()) {
+        add(UnitTestingClusterNestedStructList.fromTlv(AnonymousTag, tlvReader))
+      }
+      tlvReader.exitContainer()
+    }
+      
       tlvReader.exitContainer()
 
       return UnitTestingClusterDoubleNestedStructList(a)

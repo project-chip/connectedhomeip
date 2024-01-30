@@ -16,13 +16,17 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterPowerSavingsControlStruct(val powerSavings: UByte) {
+class DemandResponseLoadControlClusterPowerSavingsControlStruct(
+  val powerSavings: UByte
+) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterPowerSavingsControlStruct {\n")
     append("\tpowerSavings : $powerSavings\n")
@@ -40,13 +44,10 @@ class DemandResponseLoadControlClusterPowerSavingsControlStruct(val powerSavings
   companion object {
     private const val TAG_POWER_SAVINGS = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): DemandResponseLoadControlClusterPowerSavingsControlStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DemandResponseLoadControlClusterPowerSavingsControlStruct {
       tlvReader.enterStructure(tlvTag)
       val powerSavings = tlvReader.getUByte(ContextSpecificTag(TAG_POWER_SAVINGS))
-
+      
       tlvReader.exitContainer()
 
       return DemandResponseLoadControlClusterPowerSavingsControlStruct(powerSavings)

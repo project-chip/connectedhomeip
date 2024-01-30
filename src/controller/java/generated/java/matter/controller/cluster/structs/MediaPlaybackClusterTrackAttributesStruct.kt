@@ -18,6 +18,7 @@ package matter.controller.cluster.structs
 
 import java.util.Optional
 import matter.controller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -40,9 +41,9 @@ class MediaPlaybackClusterTrackAttributesStruct(
       put(ContextSpecificTag(TAG_LANGUAGE_CODE), languageCode)
       if (displayName != null) {
         if (displayName.isPresent) {
-          val optdisplayName = displayName.get()
-          put(ContextSpecificTag(TAG_DISPLAY_NAME), optdisplayName)
-        }
+        val optdisplayName = displayName.get()
+        put(ContextSpecificTag(TAG_DISPLAY_NAME), optdisplayName)
+      }
       } else {
         putNull(ContextSpecificTag(TAG_DISPLAY_NAME))
       }
@@ -57,18 +58,17 @@ class MediaPlaybackClusterTrackAttributesStruct(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterTrackAttributesStruct {
       tlvReader.enterStructure(tlvTag)
       val languageCode = tlvReader.getString(ContextSpecificTag(TAG_LANGUAGE_CODE))
-      val displayName =
-        if (!tlvReader.isNull()) {
-          if (tlvReader.isNextTag(ContextSpecificTag(TAG_DISPLAY_NAME))) {
-            Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DISPLAY_NAME)))
-          } else {
-            Optional.empty()
-          }
-        } else {
-          tlvReader.getNull(ContextSpecificTag(TAG_DISPLAY_NAME))
-          null
-        }
-
+      val displayName = if (!tlvReader.isNull()) {
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DISPLAY_NAME))) {
+      Optional.of(tlvReader.getString(ContextSpecificTag(TAG_DISPLAY_NAME)))
+    } else {
+      Optional.empty()
+    }
+    } else {
+      tlvReader.getNull(ContextSpecificTag(TAG_DISPLAY_NAME))
+      null
+    }
+      
       tlvReader.exitContainer()
 
       return MediaPlaybackClusterTrackAttributesStruct(languageCode, displayName)
