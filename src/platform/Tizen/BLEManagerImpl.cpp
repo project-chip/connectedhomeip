@@ -181,7 +181,7 @@ static constexpr const char * __ConvertAttTypeToStr(bt_gatt_type_e type)
     }
 }
 
-void BLEManagerImpl::HandleAdvertisingTimer(chip::System::Layer *, void * appState)
+void BLEManagerImpl::HandleAdvertisingTimeout(chip::System::Layer *, void * appState)
 {
     auto * self = static_cast<BLEManagerImpl *>(appState);
     VerifyOrReturn(self->mFlags.Has(Flags::kFastAdvertisingEnabled));
@@ -323,14 +323,15 @@ void BLEManagerImpl::AdvertisingStateChangedCb(int result, bt_advertiser_h adver
         NotifyBLEPeripheralAdvStartComplete(true, nullptr);
         DeviceLayer::SystemLayer().ScheduleLambda([this] {
             // Start a timer to make sure that the fast advertising is stopped after specified timeout.
-            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimer, this);
+            DeviceLayer::SystemLayer().StartTimer(kFastAdvertiseTimeout, HandleAdvertisingTimeout, this);
         });
     }
     else
     {
         mFlags.Clear(Flags::kAdvertising);
         NotifyBLEPeripheralAdvStopComplete(true, nullptr);
-        DeviceLayer::SystemLayer().ScheduleLambda([this] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this); });
+        DeviceLayer::SystemLayer().ScheduleLambda(
+            [this] { DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimeout, this); });
     }
 
     if (mFlags.Has(Flags::kAdvertisingRefreshNeeded))

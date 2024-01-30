@@ -204,7 +204,7 @@ private:
     void NotifyBLESubscribed(bool indicationsEnabled, BLE_CONNECTION_OBJECT conId);
     void NotifyBLEIndicationConfirmation(BLE_CONNECTION_OBJECT conId);
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
-    static void HandleAdvertisingTimer(chip::System::Layer *, void * appState);
+    static void HandleAdvertisingTimeout(chip::System::Layer *, void * appState);
     AdvertisingIntervals GetAdvertisingIntervals() const;
 
     // ==== Connection.
