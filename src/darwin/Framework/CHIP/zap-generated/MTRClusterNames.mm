@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRClusterNames.h"
+#import <Matter/MTRClusterNames.h>
 
 // @implementation MTRClusterAttributeIDType
 
@@ -218,6 +218,9 @@ NSString * MTRClusterNameForID(MTRClusterIDType clusterID)
         break;
     case MTRClusterIDTypeDemandResponseLoadControlID:
         result = @"DemandResponseLoadControl";
+        break;
+    case MTRClusterIDTypeMessagesID:
+        result = @"Messages";
         break;
     case MTRClusterIDTypeDeviceEnergyManagementID:
         result = @"DeviceEnergyManagement";
@@ -3188,10 +3191,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentMode";
             break;
 
-        case MTRAttributeIDTypeClusterRVCRunModeAttributeOnModeID:
-            result = @"OnMode";
-            break;
-
         case MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -3232,10 +3231,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID:
             result = @"CurrentMode";
-            break;
-
-        case MTRAttributeIDTypeClusterRVCCleanModeAttributeOnModeID:
-            result = @"OnMode";
             break;
 
         case MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID:
@@ -4241,6 +4236,48 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             break;
 
         case MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID:
+            result = @"ClusterRevision";
+            break;
+
+        default:
+            result = [NSString stringWithFormat:@"<Unknown attributeID %d>", attributeID];
+            break;
+        }
+
+    case MTRClusterIDTypeMessagesID:
+
+        switch (attributeID) {
+
+            // Cluster Messages attributes
+        case MTRAttributeIDTypeClusterMessagesAttributeMessagesID:
+            result = @"Messages";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeActiveMessageIDsID:
+            result = @"ActiveMessageIDs";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeGeneratedCommandListID:
+            result = @"GeneratedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeAcceptedCommandListID:
+            result = @"AcceptedCommandList";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeEventListID:
+            result = @"EventList";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeAttributeListID:
+            result = @"AttributeList";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeFeatureMapID:
+            result = @"FeatureMap";
+            break;
+
+        case MTRAttributeIDTypeClusterMessagesAttributeClusterRevisionID:
             result = @"ClusterRevision";
             break;
 
