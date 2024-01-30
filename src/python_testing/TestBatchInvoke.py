@@ -92,7 +92,8 @@ class TestBatchInvoke(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("DUT failed to successfully responded to a InvokeRequest action with two valid commands")
 
-        asserts.assert_greater(testOnlyResponse.ResponseMessageCount, 1, "Unexpected, DUT sent response back in single InvokeResponseMessage")
+        asserts.assert_greater(testOnlyResponse.ResponseMessageCount, 1,
+                               "Unexpected, DUT sent response back in single InvokeResponseMessage")
         result = testOnlyResponse.Responses
         asserts.assert_true(type_matches(result, list), "Unexpected return from SendBatchCommands")
         asserts.assert_equal(len(result), 2, "Unexpected number of InvokeResponses sent back from DUT")

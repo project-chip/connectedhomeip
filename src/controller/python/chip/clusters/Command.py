@@ -55,6 +55,7 @@ class Status:
     IMStatus: int
     ClusterStatus: int
 
+
 @dataclass
 class TestOnlyBatchCommandResponse:
     Responses: object
@@ -230,7 +231,7 @@ class TestOnlyAsyncBatchCommandsTransaction(AsyncBatchCommandsTransaction):
         if not self._future.done():
             self._future.set_result(TestOnlyBatchCommandResponse(self._responses, self._responseMessageCount))
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
-    
+
     def testOnlyDoneInfo(self, testOnlyDoneInfo: TestOnlyPyOnDoneInfo):
         self._responseMessageCount = testOnlyDoneInfo.responseMessageCount
 
