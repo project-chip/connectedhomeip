@@ -83,8 +83,8 @@ tests:
           CHIP:DMG:             Cluster = 0x30,
           CHIP:DMG:             Attribute = 0x0000_0004,
           CHIP:DMG:         }
-          CHIP:DMG:         
-          CHIP:DMG:     isFabricFiltered = false, 
+          CHIP:DMG:
+          CHIP:DMG:     isFabricFiltered = false,
           CHIP:DMG:     InteractionModelRevision = 11
           CHIP:DMG: },
       disabled: true
