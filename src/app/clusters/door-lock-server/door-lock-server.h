@@ -78,14 +78,6 @@ static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of 
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
     DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
 
-enum class AttributeNullabilityType : uint8_t
-{
-    kNullable = 0,
-    /**< Used to indicate if an attribute can be nullable */
-    kNotNullable = 1,
-    /**< Used to indicate if an attribute is not nullable */
-};
-
 struct EmberAfPluginDoorLockCredentialInfo;
 struct EmberAfPluginDoorLockUserInfo;
 
@@ -586,6 +578,15 @@ private:
     CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
                                                         chip::app::AttributeValueEncoder & aEncoder,
                                                         chip::app::Clusters::DoorLock::Delegate * delegate);
+
+    /**
+     * @brief Indicates whether an attribute can be nullable or not.
+     */
+    enum class AttributeNullabilityType : uint8_t
+    {
+        kNullable    = 0, /**< Indicates if an attribute is nullable */
+        kNotNullable = 1, /**< Indicates if an attribute is not nullable */
+    };
 
     /**
      * @brief Utility to read aliro attributes of type ByteSpan
