@@ -54,12 +54,13 @@ CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncode
     jobject javaMac;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
     chip::CharSpan macValue;
 
     ChipLogProgress(Zcl, "Received WakeOnLanManager::HandleGetMacAddress");
     VerifyOrExit(mWakeOnLanManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetMacMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     javaMac = env->CallObjectMethod(mWakeOnLanManagerObject, mGetMacMethod);
@@ -85,7 +86,8 @@ exit:
 void WakeOnLanManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for WakeOnLanManager"));
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     mWakeOnLanManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturn(mWakeOnLanManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef WakeOnLanManager"));

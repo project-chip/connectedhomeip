@@ -1,6 +1,5 @@
 /*
- *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,23 +17,19 @@
 
 #pragma once
 
-#include <app/TestEventTriggerDelegate.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/MessageDef/AttributeDataIB.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace ThreadNetworkDiagnostics {
 
-class GenericFaultTestEventTriggerDelegate : public TestEventTriggerDelegate
-{
-public:
-    static constexpr uint64_t kGenericFaultQueryTrigger         = 0xFFFF'FFFF'10D0'0001;
-    static constexpr uint64_t kGenericFaultQueryFabricIndexMask = 0xff;
+CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-    explicit GenericFaultTestEventTriggerDelegate(const ByteSpan & enableKey) : mEnableKey(enableKey) {}
-
-    bool DoesEnableKeyMatch(const ByteSpan & enableKey) const override;
-    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
-
-private:
-    ByteSpan mEnableKey;
-};
-
+} // namespace ThreadNetworkDiagnostics
+} // namespace Clusters
+} // namespace app
 } // namespace chip
