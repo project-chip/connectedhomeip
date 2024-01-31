@@ -96,7 +96,8 @@ source_set("paths") {
 source_set("global-attributes") {
   sources = [ "GlobalAttributes.h" ]
 
-  # This also depends on zap-generated code which is currently impossible to split outs
+  # This also depends on zap-generated code which is currently impossible to split out
+  # as a dependency
   public_deps = [
     ":app_config",
     "${chip_root}/src/lib/support",
