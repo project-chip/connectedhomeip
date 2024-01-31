@@ -38,7 +38,7 @@ CHIP_ERROR Engine::Init(InteractionModelEngine * apImEngine)
 {
     ChipLogDetail(DataManagement, "Engine::Init");
     VerifyOrReturnError(apImEngine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mpImEngine = apImEngine;
+    mpImEngine          = apImEngine;
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     return CHIP_NO_ERROR;
@@ -638,7 +638,8 @@ void Engine::Run()
     size_t initialAllocated = mpImEngine->mReadHandlers.Allocated();
     while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < initialAllocated))
     {
-        ReadHandler * readHandler = mpImEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) mpImEngine->mReadHandlers.Allocated());
+        ReadHandler * readHandler =
+            mpImEngine->ActiveHandlerAt(mCurReadHandlerIdx % (uint32_t) mpImEngine->mReadHandlers.Allocated());
         VerifyOrDie(readHandler != nullptr);
 
         if (readHandler->ShouldReportUnscheduled() || mpImEngine->GetReportScheduler()->IsReportableNow(readHandler))
@@ -829,26 +830,25 @@ CHIP_ERROR Engine::SetDirty(AttributePathParams & aAttributePath)
     BumpDirtySetGeneration();
 
     bool intersectsInterestPath = false;
-    mpImEngine->mReadHandlers.ForEachActiveObject(
-        [&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
-            // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
-            // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
-            // waiting for a response to the last message chunk for read interactions.
-            if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
+    mpImEngine->mReadHandlers.ForEachActiveObject([&aAttributePath, &intersectsInterestPath](ReadHandler * handler) {
+        // We call AttributePathIsDirty for both read interactions and subscribe interactions, since we may send inconsistent
+        // attribute data between two chunks. AttributePathIsDirty will not schedule a new run for read handlers which are
+        // waiting for a response to the last message chunk for read interactions.
+        if (handler->CanStartReporting() || handler->IsAwaitingReportResponse())
+        {
+            for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
             {
-                for (auto object = handler->GetAttributePathList(); object != nullptr; object = object->mpNext)
+                if (object->mValue.Intersects(aAttributePath))
                 {
-                    if (object->mValue.Intersects(aAttributePath))
-                    {
-                        handler->AttributePathIsDirty(aAttributePath);
-                        intersectsInterestPath = true;
-                        break;
-                    }
+                    handler->AttributePathIsDirty(aAttributePath);
+                    intersectsInterestPath = true;
+                    break;
                 }
             }
+        }
 
-            return Loop::Continue;
-        });
+        return Loop::Continue;
+    });
 
     if (!intersectsInterestPath)
     {

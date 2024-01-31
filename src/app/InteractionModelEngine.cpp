@@ -57,7 +57,8 @@ using Protocols::InteractionModel::Status;
 
 Global<InteractionModelEngine> sInteractionModelEngine;
 
-InteractionModelEngine::InteractionModelEngine() {
+InteractionModelEngine::InteractionModelEngine()
+{
     mReportingEngine.Init(this);
 }
 

@@ -102,7 +102,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths.AllocatedSize(); i++)
     {
         AttributePathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mAttributePaths[i].GetParams();
-        CHIP_ERROR err             = mManagementCallback.GetInteractionModelEngine()->PushFrontAttributePathList(mpAttributePathList, params);
+        CHIP_ERROR err = mManagementCallback.GetInteractionModelEngine()->PushFrontAttributePathList(mpAttributePathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -112,7 +112,7 @@ void ReadHandler::OnSubscriptionResumed(const SessionHandle & sessionHandle,
     for (size_t i = 0; i < resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths.AllocatedSize(); i++)
     {
         EventPathParams params = resumptionSessionEstablisher.mSubscriptionInfo.mEventPaths[i].GetParams();
-        CHIP_ERROR err         = mManagementCallback.GetInteractionModelEngine()->PushFrontEventPathParamsList(mpEventPathList, params);
+        CHIP_ERROR err = mManagementCallback.GetInteractionModelEngine()->PushFrontEventPathParamsList(mpEventPathList, params);
         if (err != CHIP_NO_ERROR)
         {
             Close();
@@ -285,7 +285,8 @@ CHIP_ERROR ReadHandler::SendStatusReport(Protocols::InteractionModel::Status aSt
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
 #else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange =
+            mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
@@ -310,7 +311,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 #if CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         auto exchange = mExchangeMgr->NewContext(mSessionHandle.Get().Value(), this);
 #else  // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
-        auto exchange = mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
+        auto exchange =
+            mManagementCallback.GetInteractionModelEngine()->GetExchangeManager()->NewContext(mSessionHandle.Get().Value(), this);
 #endif // CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE
         VerifyOrReturnLogError(exchange != nullptr, CHIP_ERROR_INCORRECT_STATE);
         mExchangeCtx.Grab(exchange);
@@ -320,7 +322,8 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
 
     if (!IsReporting())
     {
-        mCurrentReportsBeginGeneration = mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
+        mCurrentReportsBeginGeneration =
+            mManagementCallback.GetInteractionModelEngine()->GetReportingEngine().GetDirtySetGeneration();
     }
     SetStateFlag(ReadHandlerFlags::ChunkedReport, aMoreChunks);
     bool responseExpected = IsType(InteractionType::Subscribe) || aMoreChunks;
@@ -489,7 +492,8 @@ CHIP_ERROR ReadHandler::ProcessAttributePaths(AttributePathIBs::Parser & aAttrib
         AttributePathIB::Parser path;
         ReturnErrorOnFailure(path.Init(reader));
         ReturnErrorOnFailure(path.ParsePath(attribute));
-        ReturnErrorOnFailure(mManagementCallback.GetInteractionModelEngine()->PushFrontAttributePathList(mpAttributePathList, attribute));
+        ReturnErrorOnFailure(
+            mManagementCallback.GetInteractionModelEngine()->PushFrontAttributePathList(mpAttributePathList, attribute));
     }
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
@@ -521,8 +525,8 @@ CHIP_ERROR ReadHandler::ProcessDataVersionFilterList(DataVersionFilterIBs::Parse
         ReturnErrorOnFailure(path.GetEndpoint(&(versionFilter.mEndpointId)));
         ReturnErrorOnFailure(path.GetCluster(&(versionFilter.mClusterId)));
         VerifyOrReturnError(versionFilter.IsValidDataVersionFilter(), CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB);
-        ReturnErrorOnFailure(
-            mManagementCallback.GetInteractionModelEngine()->PushFrontDataVersionFilterList(mpDataVersionFilterList, versionFilter));
+        ReturnErrorOnFailure(mManagementCallback.GetInteractionModelEngine()->PushFrontDataVersionFilterList(
+            mpDataVersionFilterList, versionFilter));
     }
 
     if (CHIP_END_OF_TLV == err)
