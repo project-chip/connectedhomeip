@@ -69,7 +69,11 @@
     "GeneralCommissioning": ["Test_TC_CGEN_1_1", "Test_TC_CGEN_2_1"],
     "GeneralDiagnostics": ["Test_TC_DGGEN_1_1"],
     "GroupKeyManagement": ["Test_TC_GRPKEY_1_1", "Test_TC_GRPKEY_2_2"],
-    "IcdManagement": ["TestIcdManagementCluster", "Test_TC_ICDM_1_1"],
+    "IcdManagement": [
+        "TestIcdManagementCluster",
+        "Test_TC_ICDM_1_1",
+        "Test_TC_ICDM_3_4"
+    ],
     "Identify": [
         "Test_TC_I_1_1",
         "Test_TC_I_2_1",
@@ -166,7 +170,9 @@
         "Test_TC_ALOGIN_12_1",
         "Test_TC_CONTENTLAUNCHER_10_3",
         "Test_TC_CONTENTLAUNCHER_10_5",
-        "Test_TC_CONTENTLAUNCHER_10_7"
+        "Test_TC_CONTENTLAUNCHER_10_7",
+        "Test_TC_MEDIAPLAYBACK_6_8",
+        "Test_TC_MEDIAPLAYBACK_6_9"
     ],
     "ModeSelect": ["Test_TC_MOD_1_1"],
     "MultipleFabrics": [],

@@ -4632,6 +4632,21 @@ PICS:
       id: MEDIAPLAYBACK.S.C0b.Rsp
 
     - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateAudioTrack command?"
+      id: MEDIAPLAYBACK.S.C0c.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          ActivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0d.Rsp
+
+    - label:
+          "Does the DUT support the Media Playback server cluster,
+          DeactivateTextTrack command?"
+      id: MEDIAPLAYBACK.S.C0e.Rsp
+
+    - label:
           "Does the DUT support the Audio Output server cluster, SelectOutput
           command?"
       id: AUDIOOUTPUT.S.C00.Rsp
