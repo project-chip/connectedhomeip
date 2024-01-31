@@ -3070,7 +3070,7 @@ int TestCHIPCryptoPAL_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestCHIPCryptoPAL(void)
+int TestChipCryptoPal()
 {
     // clang-format off
     nlTestSuite theSuite =
@@ -3088,4 +3088,4 @@ int TestCHIPCryptoPAL(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCHIPCryptoPAL)
+CHIP_REGISTER_TEST_SUITE(TestChipCryptoPal)
