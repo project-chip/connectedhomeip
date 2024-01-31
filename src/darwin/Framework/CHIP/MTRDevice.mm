@@ -45,6 +45,8 @@
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
+NSString * const MTRPreviousDataKey = @"previousData";
+
 // Consider moving utility classes to their own file
 #pragma mark - Utility Classes
 // This class is for storing weak references in a container
@@ -1413,7 +1415,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         NSDictionary * cachedAttributeDataValue = _readCache[attributePath];
         if (cachedAttributeDataValue
             && ![self _attributeDataValue:attributeDataValue isEqualToDataValue:cachedAttributeDataValue]) {
-            [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : cachedAttributeDataValue }];
+            [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : cachedAttributeDataValue, MTRPreviousDataKey : attributeDataValue }];
             [attributePathsToReport addObject:attributePath];
         }
 
@@ -1505,6 +1507,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
         NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
         NSError * attributeError = attributeReponseValue[MTRErrorKey];
+        NSDictionary * previousValue;
 
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
@@ -1526,6 +1529,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             MTR_LOG_INFO("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
                 _expectedValueCache[attributePath], _readCache[attributePath]);
             _expectedValueCache[attributePath] = nil;
+            previousValue = _readCache[attributePath];
             _readCache[attributePath] = nil;
         } else {
             // if expected values exists, purge and update read cache
@@ -1534,11 +1538,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 if (![self _attributeDataValue:attributeDataValue
                             isEqualToDataValue:expectedValue[MTRDeviceExpectedValueFieldValueIndex]]) {
                     shouldReportAttribute = YES;
+                    previousValue = expectedValue[MTRDeviceExpectedValueFieldValueIndex];
                 }
                 _expectedValueCache[attributePath] = nil;
                 _readCache[attributePath] = attributeDataValue;
             } else if (![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]]) {
                 // otherwise compare and update read cache
+                previousValue = _readCache[attributePath];
                 _readCache[attributePath] = attributeDataValue;
                 shouldReportAttribute = YES;
             }
@@ -1573,7 +1579,13 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
 
         if (shouldReportAttribute) {
-            [attributesToReport addObject:attributeReponseValue];
+            if (previousValue) {
+                NSMutableDictionary * mutableAttributeReponseValue = attributeReponseValue.mutableCopy;
+                mutableAttributeReponseValue[MTRPreviousDataKey] = previousValue;
+                [attributesToReport addObject:mutableAttributeReponseValue];
+            } else {
+                [attributesToReport addObject:attributeReponseValue];
+            }
             [attributePathsToReport addObject:attributePath];
         }
     }
@@ -1585,12 +1597,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 // If value is non-nil, associate with expectedValueID
 // If value is nil, remove only if expectedValueID matches
+// previousValue is an out parameter
 - (void)_setExpectedValue:(NSDictionary<NSString *, id> *)expectedAttributeValue
              attributePath:(MTRAttributePath *)attributePath
             expirationTime:(NSDate *)expirationTime
          shouldReportValue:(BOOL *)shouldReportValue
     attributeValueToReport:(NSDictionary<NSString *, id> **)attributeValueToReport
            expectedValueID:(uint64_t)expectedValueID
+             previousValue:(NSDictionary **)previousValue
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1604,6 +1618,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Case where new expected value overrides previous expected value - report new expected value
             *shouldReportValue = YES;
             *attributeValueToReport = expectedAttributeValue;
+            *previousValue = previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex];
         } else if (!expectedAttributeValue) {
             // Remove previous expected value only if it's from the same setExpectedValues operation
             NSNumber * previousExpectedValueID = previousExpectedValue[MTRDeviceExpectedValueFieldIDIndex];
@@ -1613,6 +1628,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                     // Case of removing expected value that is different than read cache - report read cache value
                     *shouldReportValue = YES;
                     *attributeValueToReport = _readCache[attributePath];
+                    *previousValue = previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex];
                     _expectedValueCache[attributePath] = nil;
                 }
             }
@@ -1623,6 +1639,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Case where new expected value is different than read cache - report new expected value
             *shouldReportValue = YES;
             *attributeValueToReport = expectedAttributeValue;
+            *previousValue = _readCache[attributePath];
+        } else {
+            *previousValue = nil;
         }
 
         // No need to report if new and previous expected value are both nil
@@ -1649,15 +1668,21 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         BOOL shouldReportValue = NO;
         NSDictionary<NSString *, id> * attributeValueToReport;
+        NSDictionary<NSString *, id> * previousValue;
         [self _setExpectedValue:attributeDataValue
                      attributePath:attributePath
                     expirationTime:expirationTime
                  shouldReportValue:&shouldReportValue
             attributeValueToReport:&attributeValueToReport
-                   expectedValueID:expectedValueIDToReturn];
+                   expectedValueID:expectedValueIDToReturn
+                     previousValue:&previousValue];
 
         if (shouldReportValue) {
-            [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport }];
+            if (previousValue) {
+                [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport, MTRPreviousDataKey : previousValue }];
+            } else {
+                [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport }];
+            }
             [attributePathsToReport addObject:attributePath];
         }
     }
@@ -1721,21 +1746,26 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     BOOL shouldReportValue;
     NSDictionary<NSString *, id> * attributeValueToReport;
+    NSDictionary<NSString *, id> * previousValue;
     [self _setExpectedValue:nil
                  attributePath:attributePath
                 expirationTime:nil
              shouldReportValue:&shouldReportValue
         attributeValueToReport:&attributeValueToReport
-               expectedValueID:expectedValueID];
+               expectedValueID:expectedValueID
+                 previousValue:&previousValue];
 
     MTR_LOG_INFO("%@ remove expected value for path %@ should report %@", self, attributePath, shouldReportValue ? @"YES" : @"NO");
 
     if (shouldReportValue) {
+        NSMutableDictionary * attribute = [NSMutableDictionary dictionaryWithObject:attributePath forKey:MTRAttributePathKey];
         if (attributeValueToReport) {
-            [self _reportAttributes:@[ @{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport } ]];
-        } else {
-            [self _reportAttributes:@[ @{ MTRAttributePathKey : attributePath } ]];
+            attribute[MTRDataKey] = attributeValueToReport;
         }
+        if (previousValue) {
+            attribute[MTRPreviousDataKey] = previousValue;
+        }
+        [self _reportAttributes:@[ attribute ]];
     }
 }
 

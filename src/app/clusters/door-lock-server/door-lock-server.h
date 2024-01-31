@@ -24,7 +24,9 @@
 
 #pragma once
 
+#include "door-lock-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
@@ -88,9 +90,10 @@ struct EmberAfDoorLockEndpointContext
 /**
  * @brief Door Lock Server Plugin class.
  */
-class DoorLockServer
+class DoorLockServer : public chip::app::AttributeAccessInterface
 {
 public:
+    DoorLockServer() : AttributeAccessInterface(chip::Optional<chip::EndpointId>::Missing(), chip::app::Clusters::DoorLock::Id) {}
     static DoorLockServer & Instance();
 
     using Feature                       = chip::app::Clusters::DoorLock::Feature;
@@ -202,6 +205,23 @@ public:
     }
 
     inline bool SupportsUnbolt(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kUnbolt); }
+
+    /**
+     * @brief Checks if Aliro Provisioning feature is supported on the given endpoint
+     *
+     * @param endpointId endpointId ID of the endpoint which contains the lock.
+     */
+    inline bool SupportsAliroProvisioning(chip::EndpointId endpointId)
+    {
+        return GetFeatures(endpointId).Has(Feature::kAliroProvisioning);
+    }
+
+    /**
+     * @brief Checks if Aliro BLE UWB feature is supported on the given endpoint
+     *
+     * @param endpointId endpointId ID of the endpoint which contains the lock.
+     */
+    inline bool SupportsAliroBLEUWB(chip::EndpointId endpointId) { return GetFeatures(endpointId).Has(Feature::kAliroBLEUWB); }
 
     /**
      * @brief Allows the application to register a custom callback which will be called after the default DoorLock
@@ -430,6 +450,13 @@ private:
     void clearHolidayScheduleCommandHandler(chip::app::CommandHandler * commandObj,
                                             const chip::app::ConcreteCommandPath & commandPath, uint8_t holidayIndex);
 
+    void setAliroReaderConfigCommandHandler(chip::app::CommandHandler * commandObj,
+                                            const chip::app::ConcreteCommandPath & commandPath, const chip::ByteSpan & signingKey,
+                                            const chip::ByteSpan & verificationKey, const chip::ByteSpan & groupIdentifier,
+                                            const Optional<chip::ByteSpan> & groupResolvingKey);
+    void clearAliroReaderConfigCommandHandler(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath);
+
     bool RemoteOperationEnabled(chip::EndpointId endpointId) const;
 
     EmberAfDoorLockEndpointContext * getContext(chip::EndpointId endpointId);
@@ -521,6 +548,62 @@ private:
     bool SetAttribute(chip::EndpointId endpointId, chip::AttributeId attributeId,
                       EmberAfStatus (*setFn)(chip::EndpointId endpointId, T value), T value);
 
+    // AttributeAccessInterface's Read API
+    CHIP_ERROR Read(const chip::app::ConcreteReadAttributePath & aPath, chip::app::AttributeValueEncoder & aEncoder) override;
+
+    /**
+     * @brief Reads AliroExpeditedTransactionSupportedProtocolVersions attribute for door lock
+     *
+     * @param aPath         attribute path.
+     * @param aEncoder      attribute value encoder.
+     * @param delegate      door lock cluster delegate that will provide the value
+     *
+     * @return CHIP_NO_ERROR  on success
+     * @return CHIP_ERROR     if attribute read failed
+     */
+    CHIP_ERROR ReadAliroExpeditedTransactionSupportedProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
+                                                                      chip::app::AttributeValueEncoder & aEncoder,
+                                                                      chip::app::Clusters::DoorLock::Delegate * delegate);
+
+    /**
+     * @brief Reads AliroSupportedBLEUWBProtocolVersions attribute for door lock
+     *
+     * @param aPath         attribute path.
+     * @param aEncoder      attribute value encoder.
+     * @param delegate      door lock cluster delegate that will provide the value
+     *
+     * @return CHIP_NO_ERROR  on success
+     * @return CHIP_ERROR     if attribute read failed
+     */
+    CHIP_ERROR ReadAliroSupportedBLEUWBProtocolVersions(const chip::app::ConcreteReadAttributePath & aPath,
+                                                        chip::app::AttributeValueEncoder & aEncoder,
+                                                        chip::app::Clusters::DoorLock::Delegate * delegate);
+
+    /**
+     * @brief Indicates whether an attribute can be nullable or not.
+     */
+    enum class AttributeNullabilityType : uint8_t
+    {
+        kNullable    = 0, /**< Indicates if an attribute is nullable */
+        kNotNullable = 1, /**< Indicates if an attribute is not nullable */
+    };
+
+    /**
+     * @brief Utility to read aliro attributes of type ByteSpan
+     *
+     * @param func          getter function for the attribute.
+     * @param data          buffer for the data.
+     * @param delegate      door lock cluster delegate that will provide the value
+     * @param aEncoder      attribute value encoder.
+     * @param nullabilityType enum value indicating whether the attribute is nullable or not.
+     *
+     * @return CHIP_NO_ERROR  on success
+     * @return CHIP_ERROR     if attribute read failed
+     */
+    CHIP_ERROR ReadAliroByteSpanAttribute(CHIP_ERROR (chip::app::Clusters::DoorLock::Delegate::*func)(chip::MutableByteSpan & data),
+                                          chip::MutableByteSpan & data, chip::app::Clusters::DoorLock::Delegate * delegate,
+                                          chip::app::AttributeValueEncoder & aEncoder, AttributeNullabilityType nullabilityType);
+
     friend bool
     emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
                                            const chip::app::ConcreteCommandPath & commandPath,
@@ -600,6 +683,14 @@ private:
     friend bool emberAfDoorLockClusterClearYearDayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterSetAliroReaderConfigCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::SetAliroReaderConfig::DecodableType & commandData);
+
+    friend bool emberAfDoorLockClusterClearAliroReaderConfigCallback(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::ClearAliroReaderConfig::DecodableType & commandData);
 
     static constexpr size_t kDoorLockClusterServerMaxEndpointCount =
         EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -1167,3 +1258,33 @@ bool emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::Endpoin
  * @return false on failure, true on success.
  */
 bool emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to communicate the Aliro reader configuration to the door lock.
+ *
+ * @note This function is used for communicating the Aliro signing key, verification key, group identifier and group resolving key
+ *       to the lock.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param[in] signingKey Signing key component of the Reader's key pair.
+ * @param[in] verificationKey Verification key component of the Reader's key pair.
+ * @param[in] groupIdentifier Reader group identifier for the lock.
+ * @param[in] groupResolvingKey Group resolving key for the lock if Aliro BLE UWB feature is supported
+ *
+ * @retval true, if the Aliro reader config was successfully communicated to the door lock.
+ * @retval false, if error occurred while communicating the Aliro reader config.
+ */
+bool emberAfPluginDoorLockSetAliroReaderConfig(chip::EndpointId endpointId, const chip::ByteSpan & signingKey,
+                                               const chip::ByteSpan & verificationKey, const chip::ByteSpan & groupIdentifier,
+                                               const Optional<chip::ByteSpan> & groupResolvingKey);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to clear an existing Aliro reader configuration from the door lock.
+ *
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ *
+ * @retval true, if the Aliro reader config was successfully cleared from the door lock.
+ * @retval false, if error occurred while clearing the Aliro reader config.
+ */
+bool emberAfPluginDoorLockClearAliroReaderConfig(chip::EndpointId endpointId);

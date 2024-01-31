@@ -14,13 +14,13 @@
 
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
-import("icd.gni")
+import("${chip_root}/src/app/icd/icd.gni")
 
 # ICD Server sources and configurations
 
-buildconfig_header("icd_buildconfig") {
-  header = "ICDBuildConfig.h"
-  header_dir = "app/icd"
+buildconfig_header("icd-server-buildconfig") {
+  header = "ICDServerBuildConfig.h"
+  header_dir = "app/icd/server"
 
   defines = [
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
@@ -29,13 +29,13 @@ buildconfig_header("icd_buildconfig") {
     "ICD_ENFORCE_SIT_SLOW_POLL_LIMIT=${icd_enforce_sit_slow_poll_limit}",
   ]
 
-  visibility = [ ":icd_config" ]
+  visibility = [ ":icd-server-config" ]
 }
 
-source_set("icd_config") {
-  sources = [ "ICDConfig.h" ]
+source_set("icd-server-config") {
+  sources = [ "ICDServerConfig.h" ]
 
-  deps = [ ":icd_buildconfig" ]
+  deps = [ ":icd-server-buildconfig" ]
 }
 
 source_set("observer") {
@@ -49,7 +49,7 @@ source_set("notifier") {
   ]
 
   deps = [
-    ":icd_config",
+    ":icd-server-config",
     "${chip_root}/src/lib/core",
   ]
 }
@@ -62,7 +62,7 @@ source_set("manager") {
     "ICDManager.h",
   ]
 
-  deps = [ ":icd_config" ]
+  deps = [ ":icd-server-config" ]
 
   public_deps = [
     ":configuration-data",
@@ -70,7 +70,7 @@ source_set("manager") {
     ":notifier",
     ":observer",
     ":sender",
-    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app:subscription-manager",
     "${chip_root}/src/credentials:credentials",
   ]
 }
@@ -112,7 +112,8 @@ source_set("configuration-data") {
   ]
 
   deps = [
-    ":icd_config",
+    ":icd-server-config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
   ]
 }

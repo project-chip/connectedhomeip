@@ -16,7 +16,8 @@
  */
 
 #include "ICDConfigurationData.h"
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
@@ -34,6 +35,18 @@ System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
     }
 #endif
     return mSlowPollingInterval;
+}
+
+CHIP_ERROR ICDConfigurationData::SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeInterval_s)
+{
+    VerifyOrReturnError(activeModeDuration_ms <= (idleModeInterval_s * 1000), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(idleModeInterval_s <= kMaxIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(idleModeInterval_s >= kMinIdleModeDuration_s, CHIP_ERROR_INVALID_ARGUMENT);
+
+    mIdleModeDuration_s    = idleModeInterval_s;
+    mActiveModeDuration_ms = activeModeDuration_ms;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

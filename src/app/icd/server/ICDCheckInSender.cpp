@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include <app/icd/ICDCheckInSender.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDNotifier.h>
+#include <app/icd/server/ICDCheckInSender.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDNotifier.h>
 #include <lib/dnssd/Resolver.h>
 #include <protocols/secure_channel/CheckinMessage.h>
 #include <system/SystemPacketBuffer.h>
