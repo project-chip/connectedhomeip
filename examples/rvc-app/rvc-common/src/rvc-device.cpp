@@ -134,6 +134,28 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
                                      : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
 }
 
+void RvcDevice::HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err)
+{
+    switch (mOperationalStateInstance.GetCurrentOperationalState())
+    {
+    case to_underlying(OperationalState::OperationalStateEnum::kStopped): {
+        if (mRunModeInstance.GetCurrentMode() != RvcRunMode::ModeIdle) {
+            err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+            return;
+        }
+
+        auto error = mOperationalStateInstance.SetOperationalState(to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger));
+
+        err.Set((error == CHIP_NO_ERROR) ? to_underlying(OperationalState::ErrorStateEnum::kNoError)
+                                         : to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation));
+    }
+    break;
+    default:
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+}
+
 void RvcDevice::HandleChargedMessage()
 {
     if (mOperationalStateInstance.GetCurrentOperationalState() !=

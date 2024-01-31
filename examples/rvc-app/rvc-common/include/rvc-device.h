@@ -48,6 +48,7 @@ public:
         mCleanModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcCleanChangeToMode, this);
         mOperationalStateDelegate.SetPauseCallback(&RvcDevice::HandleOpStatePauseCallback, this);
         mOperationalStateDelegate.SetResumeCallback(&RvcDevice::HandleOpStateResumeCallback, this);
+        mOperationalStateDelegate.SetGoHomeCallback(&RvcDevice::HandleOpStateGoHomeCallback, this);
     }
 
     /**
@@ -80,6 +81,11 @@ public:
      * Handles the RvcOperationalState resume command.
      */
     void HandleOpStateResumeCallback(Clusters::OperationalState::GenericOperationalError & err);
+
+    /**
+     * Handles the RvcOperationalState GoHome command.
+     */
+    void HandleOpStateGoHomeCallback(Clusters::OperationalState::GenericOperationalError & err);
 
     /**
      * Updates the state machine when the device becomes fully-charged.
