@@ -45,7 +45,7 @@
     return _metricsData[key];
 }
 
-- (void)setValue:(id)value forKey:(NSString *)key
+- (void)setValue:(id _Nullable)value forKey:(NSString *)key
 {
     if (!key) {
         MTR_LOG_ERROR("Cannot set metrics value for nil key");

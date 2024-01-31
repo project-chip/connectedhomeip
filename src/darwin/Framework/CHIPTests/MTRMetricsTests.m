@@ -108,4 +108,24 @@
     XCTAssertEqualObjects([metrics valueForKey:@"com.matter.metrics.counter3"], [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]);
 }
 
+- (void)test006_TestValueRemoval
+{
+    MTRMetrics * metrics = [MTRMetrics new];
+    [metrics setValue:@"metricsCounter1" forKey:@"com.matter.metrics.counter1"];
+    [metrics setValue:@"metricsCounter2" forKey:@"com.matter.metrics.counter2"];
+
+    NSArray<NSString *> * keys = [metrics allKeys];
+    XCTAssertTrue([keys count] == 2);
+
+    [metrics setValue:nil forKey:@"com.matter.metrics.counter2"];
+    keys = [metrics allKeys];
+    XCTAssertTrue([keys count] == 1);
+    XCTAssertTrue([keys containsObject:@"com.matter.metrics.counter1"]);
+    XCTAssertFalse([keys containsObject:@"com.matter.metrics.counter2"]);
+
+    [metrics setValue:nil forKey:@"com.matter.metrics.counter1"];
+    keys = [metrics allKeys];
+    XCTAssertTrue([keys count] == 0);
+}
+
 @end
