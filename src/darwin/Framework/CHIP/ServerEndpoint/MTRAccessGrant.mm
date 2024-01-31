@@ -80,7 +80,7 @@ MTR_DIRECT_MEMBERS
 
 // initWithSubject assumes that the subject has already been validated and, if
 // needed, copied from the input.
-- (instancetype)initWithSubject:(nullable NSNumber *)subject privilege:(MTRAccessControlEntryPrivilege)privilege authenticationMode:(MTRAccessControlEntryAuthMode)authenticationMode
+- (nullable instancetype)initWithSubject:(nullable NSNumber *)subject privilege:(MTRAccessControlEntryPrivilege)privilege authenticationMode:(MTRAccessControlEntryAuthMode)authenticationMode
 {
     if (!(self = [super init])) {
         return nil;
@@ -113,6 +113,43 @@ MTR_DIRECT_MEMBERS
 - (NSUInteger)hash
 {
     return _subjectID.unsignedLongLongValue ^ _grantedPrivilege ^ _authenticationMode;
+}
+
+- (NSString *)description
+{
+    NSString * privilege = @"Unknown";
+    switch (_grantedPrivilege) {
+    case MTRAccessControlEntryPrivilegeView:
+        privilege = @"View";
+        break;
+    case MTRAccessControlEntryPrivilegeProxyView:
+        privilege = @"ProxyView";
+        break;
+    case MTRAccessControlEntryPrivilegeOperate:
+        privilege = @"Operate";
+        break;
+    case MTRAccessControlEntryPrivilegeManage:
+        privilege = @"Manage";
+        break;
+    case MTRAccessControlEntryPrivilegeAdminister:
+        privilege = @"Administer";
+        break;
+    }
+
+    if (_subjectID == nil) {
+        return [NSString stringWithFormat:@"<%@ all nodes can %@>", self.class, privilege];
+    }
+
+    NodeId nodeId = static_cast<NodeId>(_subjectID.unsignedLongLongValue);
+    if (IsGroupId(nodeId)) {
+        return [NSString stringWithFormat:@"<%@ group 0x%x can %@>", self.class, GroupIdFromNodeId(nodeId), privilege];
+    }
+
+    if (IsCASEAuthTag(nodeId)) {
+        return [NSString stringWithFormat:@"<%@ nodes with CASE Authenticated Tag 0x%08x can %@>", self.class, CASEAuthTagFromNodeId(nodeId), privilege];
+    }
+
+    return [NSString stringWithFormat:@"<%@ node 0x%016llx can %@>", self.class, nodeId, privilege];
 }
 
 @end

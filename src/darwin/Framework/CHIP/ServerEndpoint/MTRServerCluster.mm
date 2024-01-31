@@ -41,7 +41,7 @@ MTR_DIRECT_MEMBERS
     MTRDeviceController * __weak _deviceController;
 }
 
-- (nullable instancetype)initWithClusterID:(NSNumber *)clusterID clusterRevision:(NSNumber *)clusterRevision
+- (nullable instancetype)initWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision
 {
     auto clusterIDValue = clusterID.unsignedLongLongValue;
     if (!CanCastTo<ClusterId>(clusterIDValue)) {
@@ -56,32 +56,32 @@ MTR_DIRECT_MEMBERS
     }
 
     if (id == MTRClusterIDTypeDescriptorID) {
-        MTR_LOG_ERROR("Should be using initDescriptorCluster to initialize an MTRServerCluster for Descriptor");
+        MTR_LOG_ERROR("Should be using newDescriptorCluster to initialize an MTRServerCluster for Descriptor");
         return nil;
     }
 
-    auto revisionValue = clusterRevision.unsignedLongLongValue;
+    auto revisionValue = revision.unsignedLongLongValue;
     if (revisionValue < 1 || revisionValue > 0xFFFF) {
         MTR_LOG_ERROR("MTRServerCluster provided invalid cluster revision: 0x%llx", revisionValue);
         return nil;
     }
 
-    return [self initInternalWithClusterID:clusterID clusterRevision:clusterRevision accessGrants:[NSSet set] attributes:@[]];
+    return [self initInternalWithClusterID:clusterID revision:revision accessGrants:[NSSet set] attributes:@[]];
 }
 
-- (instancetype)initDescriptorCluster
++ (MTRServerCluster *)newDescriptorCluster
 {
-    return [self initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) clusterRevision:@(app::Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
+    return [[MTRServerCluster alloc] initInternalWithClusterID:@(MTRClusterIDTypeDescriptorID) revision:@(app::Clusters::Descriptor::kClusterRevision) accessGrants:[NSSet set] attributes:@[]];
 }
 
-- (instancetype)initInternalWithClusterID:(NSNumber *)clusterID clusterRevision:(NSNumber *)clusterRevision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes
+- (instancetype)initInternalWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision accessGrants:(NSSet *)accessGrants attributes:(NSArray *)attributes
 {
     if (!(self = [super init])) {
         return nil;
     }
 
     _clusterID = [clusterID copy];
-    _clusterRevision = [clusterRevision copy];
+    _clusterRevision = [revision copy];
     _accessGrants = [[NSMutableSet alloc] init];
     _attributes = [[NSMutableArray alloc] init];
     _matterAccessGrants = [NSSet set];
@@ -90,13 +90,13 @@ MTR_DIRECT_MEMBERS
     for (MTRAccessGrant * grant in accessGrants) {
         // Since our state is MTRServerEndpointStateInitializing, we know this
         // will succeed.
-        [self addAccessGrant:[grant copy]];
+        [self addAccessGrant:grant];
     }
 
     for (MTRServerAttribute * attr in attributes) {
         // Since our state is MTRServerEndpointStateInitializing and the initial
         // attribute array was valid, we know this will succeed.
-        [self addAttribute:[attr copy]];
+        [self addAttribute:attr];
     }
 
     return self;

@@ -32,7 +32,7 @@ MTR_NEWLY_AVAILABLE
 
 /**
  * The provided clusterID must not be MTRClusterIDTypeDescriptorID; see
- * initDescriptorCluster.
+ * newDescriptorCluster.
  *
  * Otherwise, it must be a valid cluster identifier.  That means:
  *
@@ -40,10 +40,10 @@ MTR_NEWLY_AVAILABLE
  * * In the range 0xVVVVFC00-0xVVVVFFFE for vendor-specific clusters, where VVVV
  *   is the vendor identifier.
  *
- * The provided clusterRevision must be in the range 1-65535.
+ * The provided revision must be in the range 1-65535.
  *
  */
-- (nullable instancetype)initWithClusterID:(NSNumber *)clusterID clusterRevision:(NSNumber *)clusterRevision;
+- (nullable instancetype)initWithClusterID:(NSNumber *)clusterID revision:(NSNumber *)revision;
 
 /**
  * Add an access grant to the cluster.  If the same access grant is added
@@ -87,7 +87,7 @@ MTR_NEWLY_AVAILABLE
  * Create a cluster description for the descriptor cluster.  This will set
  * clusterRevision to the current version implemented by Matter.framework.
  */
-- (instancetype)initDescriptorCluster;
++ (MTRServerCluster *)newDescriptorCluster;
 
 @property (nonatomic, copy, readonly) NSNumber * clusterID;
 

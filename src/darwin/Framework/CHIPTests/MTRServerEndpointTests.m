@@ -57,6 +57,7 @@
         XCTAssertEqualObjects(grant.subjectID, nodeID);
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeView);
         XCTAssertEqual(grant.authenticationMode, MTRAccessControlEntryAuthModeCASE);
+        XCTAssertEqualObjects([grant description], @"<MTRAccessGrant node 0x0000000000000002 can View>");
     }
 
     // Try different privileges
@@ -67,6 +68,7 @@
         XCTAssertEqualObjects(grant.subjectID, nodeID);
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeAdminister);
         XCTAssertEqual(grant.authenticationMode, MTRAccessControlEntryAuthModeCASE);
+        XCTAssertEqualObjects([grant description], @"<MTRAccessGrant node 0x0000000000000002 can Administer>");
     }
 
     // Try a CAT
@@ -76,6 +78,7 @@
         XCTAssertEqualObjects(grant.subjectID, @(0xFFFFFFFD00020003));
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeManage);
         XCTAssertEqual(grant.authenticationMode, MTRAccessControlEntryAuthModeCASE);
+        XCTAssertEqualObjects([grant description], @"<MTRAccessGrant nodes with CASE Authenticated Tag 0x00020003 can Manage>");
     }
 
     // Try some invalid CATs
@@ -96,6 +99,7 @@
         XCTAssertEqualObjects(grant.subjectID, @(0xFFFFFFFFFFFF0005));
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeOperate);
         XCTAssertEqual(grant.authenticationMode, MTRAccessControlEntryAuthModeGroup);
+        XCTAssertEqualObjects([grant description], @"<MTRAccessGrant group 0x5 can Operate>");
     }
 
     // Try an invalid group ID
@@ -111,6 +115,7 @@
         XCTAssertNil(grant.subjectID);
         XCTAssertEqual(grant.grantedPrivilege, MTRAccessControlEntryPrivilegeView);
         XCTAssertEqual(grant.authenticationMode, MTRAccessControlEntryAuthModeCASE);
+        XCTAssertEqualObjects([grant description], @"<MTRAccessGrant all nodes can View>");
     }
 }
 
@@ -234,7 +239,7 @@
     {
         NSNumber * clusterID = @(6);
         NSNumber * clusterRevision = @(1);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNotNil(cluster);
         XCTAssertEqualObjects(cluster.clusterID, clusterID);
         XCTAssertEqualObjects(cluster.clusterRevision, clusterRevision);
@@ -246,7 +251,7 @@
     {
         NSNumber * clusterID = @(0xFFF1FC01);
         NSNumber * clusterRevision = @(1);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNotNil(cluster);
         XCTAssertEqualObjects(cluster.clusterID, clusterID);
         XCTAssertEqualObjects(cluster.clusterRevision, clusterRevision);
@@ -258,7 +263,7 @@
     {
         NSNumber * clusterID = @(0x8000);
         NSNumber * clusterRevision = @(1);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNil(cluster);
     }
 
@@ -266,7 +271,7 @@
     {
         NSNumber * clusterID = @(0xFFF10002);
         NSNumber * clusterRevision = @(1);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNil(cluster);
     }
 
@@ -274,7 +279,7 @@
     {
         NSNumber * clusterID = @(0x100000000);
         NSNumber * clusterRevision = @(1);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNil(cluster);
     }
 
@@ -282,7 +287,7 @@
     {
         NSNumber * clusterID = @(6);
         NSNumber * clusterRevision = @(0);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNil(cluster);
     }
 
@@ -290,7 +295,7 @@
     {
         NSNumber * clusterID = @(6);
         NSNumber * clusterRevision = @(0x10000);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNil(cluster);
     }
 
@@ -298,7 +303,7 @@
     {
         NSNumber * clusterID = @(0x001D);
         NSNumber * clusterRevision = @(0x10000);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNil(cluster);
     }
 
@@ -315,7 +320,7 @@
     // Descriptor cluster right method
     {
         NSNumber * clusterID = @(0x001D);
-        __auto_type * cluster = [[MTRServerCluster alloc] initDescriptorCluster];
+        __auto_type * cluster = [MTRServerCluster newDescriptorCluster];
         XCTAssertNotNil(cluster);
         XCTAssertEqualObjects(cluster.clusterID, clusterID);
         // Don't hardcode the cluster revision here; we want it to be able to
@@ -358,7 +363,7 @@
     {
         NSNumber * clusterID = @(0xFFF1FC01);
         NSNumber * clusterRevision = @(1);
-        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * cluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
         XCTAssertNotNil(cluster);
         XCTAssertEqualObjects(cluster.accessGrants, @[]);
         XCTAssertEqualObjects(cluster.attributes, @[]);
@@ -384,7 +389,7 @@
         }
         XCTAssertEqualObjects(cluster.attributes, attributes);
 
-        __auto_type * otherCluster = [[MTRServerCluster alloc] initWithClusterID:clusterID clusterRevision:clusterRevision];
+        __auto_type * otherCluster = [[MTRServerCluster alloc] initWithClusterID:clusterID revision:clusterRevision];
 
         // Adding an already-added attribute should fail.
         XCTAssertFalse([otherCluster addAttribute:attributes[0]]);
@@ -462,7 +467,7 @@
         XCTAssertEqualObjects(endpoint.accessGrants, grants);
 
         __auto_type * clusters = @[
-            [[MTRServerCluster alloc] initWithClusterID:@(6) clusterRevision:@(1)],
+            [[MTRServerCluster alloc] initWithClusterID:@(6) revision:@(1)],
         ];
         for (MTRServerCluster * cluster in clusters) {
             XCTAssertTrue([endpoint addServerCluster:cluster]);
@@ -474,7 +479,7 @@
         // Adding an already-added cluster should fail.
         XCTAssertFalse([otherEndpoint addServerCluster:clusters[0]]);
 
-        MTRServerCluster * otherCluster = [[MTRServerCluster alloc] initWithClusterID:@(6) clusterRevision:@(1)];
+        MTRServerCluster * otherCluster = [[MTRServerCluster alloc] initWithClusterID:@(6) revision:@(1)];
 
         // Adding same-id cluster should fail.
         XCTAssertFalse([endpoint addServerCluster:otherCluster]);
