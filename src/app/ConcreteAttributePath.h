@@ -86,6 +86,13 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
     {
         mListIndex.SetValue(aListIndex);
     }
+    
+    bool operator==(const ConcreteReadAttributePath & aOther) const
+    {
+        return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex);
+    }
+
+    bool operator!=(const ConcreteReadAttributePath & aOther) const { return !(*this == aOther); }
 
     Optional<uint16_t> mListIndex;
 };
@@ -137,6 +144,13 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
         ChipLogProgress(DataManagement, "Concrete Attribute Path: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ", mEndpointId,
                         ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
     }
+   
+    bool operator==(const ConcreteDataAttributePath & aOther) const
+    {
+        return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) && (mDataVersion == aOther.mDataVersion);
+    }
+
+    bool operator!=(const ConcreteDataAttributePath & aOther) const { return !(*this == aOther); }
 
     //
     // This index is only valid if `mListOp` is set to a list item operation, i.e
