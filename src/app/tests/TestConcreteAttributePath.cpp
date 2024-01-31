@@ -16,12 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements unit tests for ConcreteAttributePath 
- *
- */
-
 #include <lib/support/UnitTestRegistration.h>
 #include <app/ConcreteAttributePath.h>
 #include <nlunit-test.h>
@@ -88,10 +82,6 @@ void TestConcreteDataAttributePathInequalityDifferentListIndex(nlTestSuite* aSui
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
-} // anonymous namespace
-
-namespace {
-
 const nlTest sTests[] = {
   NL_TEST_DEF("TestConcreteAttributePathEqualityDefaultConstructor", TestConcreteAttributePathEqualityDefaultConstructor),
   NL_TEST_DEF("TestConcreteAttributePathEquality", TestConcreteAttributePathEquality),
@@ -105,7 +95,7 @@ const nlTest sTests[] = {
   NL_TEST_SENTINEL()
 };
 
-}
+} // anonymous namespace
 
 int TestConcreteAttributePath()
 {
