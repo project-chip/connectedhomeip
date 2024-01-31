@@ -14225,6 +14225,57 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 namespace ElectricalEnergyMeasurement {
 namespace Structs {
 
+namespace CumulativeEnergyResetStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kImportedResetTimestamp), importedResetTimestamp);
+    encoder.Encode(to_underlying(Fields::kExportedResetTimestamp), exportedResetTimestamp);
+    encoder.Encode(to_underlying(Fields::kImportedResetSystime), importedResetSystime);
+    encoder.Encode(to_underlying(Fields::kExportedResetSystime), exportedResetSystime);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kImportedResetTimestamp))
+        {
+            err = DataModel::Decode(reader, importedResetTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kExportedResetTimestamp))
+        {
+            err = DataModel::Decode(reader, exportedResetTimestamp);
+        }
+        else if (__context_tag == to_underlying(Fields::kImportedResetSystime))
+        {
+            err = DataModel::Decode(reader, importedResetSystime);
+        }
+        else if (__context_tag == to_underlying(Fields::kExportedResetSystime))
+        {
+            err = DataModel::Decode(reader, exportedResetSystime);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace CumulativeEnergyResetStruct
+
 namespace EnergyMeasurementStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -14299,6 +14350,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, periodicEnergyImported);
     case Attributes::PeriodicEnergyExported::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, periodicEnergyExported);
+    case Attributes::CumulativeEnergyReset::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, cumulativeEnergyReset);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

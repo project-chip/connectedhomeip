@@ -6587,6 +6587,7 @@ private:
 | * CumulativeEnergyExported                                          | 0x0002 |
 | * PeriodicEnergyImported                                            | 0x0003 |
 | * PeriodicEnergyExported                                            | 0x0004 |
+| * CumulativeEnergyReset                                             | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * EventList                                                         | 0xFFFA |
@@ -20220,6 +20221,7 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
                                    credsIssuerConfig),                                                                         //
         make_unique<ReadAttribute>(Id, "periodic-energy-imported", Attributes::PeriodicEnergyImported::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "periodic-energy-exported", Attributes::PeriodicEnergyExported::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "cumulative-energy-reset", Attributes::CumulativeEnergyReset::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                            //
@@ -20246,6 +20248,10 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
             chip::app::Clusters::ElectricalEnergyMeasurement::Structs::EnergyMeasurementStruct::Type>>>(
             Id, "periodic-energy-exported", Attributes::PeriodicEnergyExported::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<
+            WriteAttributeAsComplex<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type>>(
+            Id, "cumulative-energy-reset", Attributes::CumulativeEnergyReset::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -20268,13 +20274,14 @@ void registerClusterElectricalEnergyMeasurement(Commands & commands, CredentialI
         make_unique<SubscribeAttribute>(Id, "periodic-energy-imported", Attributes::PeriodicEnergyImported::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "periodic-energy-exported", Attributes::PeriodicEnergyExported::Id,
-                                        credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "cumulative-energy-reset", Attributes::CumulativeEnergyReset::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         //
         // Events
         //

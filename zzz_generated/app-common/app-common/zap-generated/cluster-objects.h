@@ -20542,6 +20542,33 @@ namespace ElectricalEnergyMeasurement {
 namespace Structs {
 namespace MeasurementAccuracyRangeStruct = Clusters::detail::Structs::MeasurementAccuracyRangeStruct;
 namespace MeasurementAccuracyStruct      = Clusters::detail::Structs::MeasurementAccuracyStruct;
+namespace CumulativeEnergyResetStruct {
+enum class Fields : uint8_t
+{
+    kImportedResetTimestamp = 0,
+    kExportedResetTimestamp = 1,
+    kImportedResetSystime   = 2,
+    kExportedResetSystime   = 3,
+};
+
+struct Type
+{
+public:
+    Optional<DataModel::Nullable<uint32_t>> importedResetTimestamp;
+    Optional<DataModel::Nullable<uint32_t>> exportedResetTimestamp;
+    Optional<DataModel::Nullable<uint64_t>> importedResetSystime;
+    Optional<DataModel::Nullable<uint64_t>> exportedResetSystime;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CumulativeEnergyResetStruct
 namespace EnergyMeasurementStruct {
 enum class Fields : uint8_t
 {
@@ -20648,6 +20675,19 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PeriodicEnergyExported
+namespace CumulativeEnergyReset {
+struct TypeInfo
+{
+    using Type          = chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type;
+    using DecodableType = chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::DecodableType;
+    using DecodableArgType =
+        const chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ElectricalEnergyMeasurement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CumulativeEnergyReset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CumulativeEnergyReset
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -20698,6 +20738,7 @@ struct TypeInfo
         Attributes::CumulativeEnergyExported::TypeInfo::DecodableType cumulativeEnergyExported;
         Attributes::PeriodicEnergyImported::TypeInfo::DecodableType periodicEnergyImported;
         Attributes::PeriodicEnergyExported::TypeInfo::DecodableType periodicEnergyExported;
+        Attributes::CumulativeEnergyReset::TypeInfo::DecodableType cumulativeEnergyReset;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

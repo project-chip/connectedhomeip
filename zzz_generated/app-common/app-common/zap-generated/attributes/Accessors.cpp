@@ -9958,6 +9958,42 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace ElectricalEnergyMeasurement {
 namespace Attributes {
 
+#error Attribute "CumulativeEnergyReset" in cluster "Electrical Energy Measurement" is struct-typed and must be added to the attributeAccessInterfaceAttributes object in src/app/zap-templates/zcl/zcl.json and src/app/zap-templates/zcl/zcl-with-test-extensions.json
+namespace CumulativeEnergyReset {
+
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type * value)
+{
+    using Traits =
+        NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type value)
+{
+    using Traits =
+        NumericAttributeTraits<chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteAttribute(endpoint, Clusters::ElectricalEnergyMeasurement::Id, Id, writable, ZCL__ATTRIBUTE_TYPE);
+}
+
+} // namespace CumulativeEnergyReset
+
 namespace ClusterRevision {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
