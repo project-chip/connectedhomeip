@@ -39,21 +39,6 @@ public:
      */
     CHIP_ERROR CreateChipClusterException(JNIEnv * env, uint32_t errorCode, jthrowable & outEx);
 
-    /**
-     * Creates a Java IllegalStateException in outEx.
-     */
-    CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], ChipError errorCode, jthrowable & outEx);
-
-    CHIP_ERROR CreateIllegalStateException(JNIEnv * env, const char message[], ChipError::StorageType errorCode,
-                                           jthrowable & outEx);
-
-    /**
-     * Creates an IllegalStateException and passes it to the Java onError() function of the provided callback object.
-     */
-    void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], ChipError errorCode);
-
-    void ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[], ChipError::StorageType errorCode);
-
 private:
     AndroidClusterExceptions() {}
 };

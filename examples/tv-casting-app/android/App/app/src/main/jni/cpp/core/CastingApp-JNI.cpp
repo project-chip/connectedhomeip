@@ -112,7 +112,7 @@ jobject extractJAppParameter(jobject jAppParameters, const char * methodName, co
 
     jclass jAppParametersClass;
     CHIP_ERROR err =
-        chip::JniReferences::GetInstance().GetClassRef(env, "com/matter/casting/support/AppParameters", jAppParametersClass);
+        chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/matter/casting/support/AppParameters", jAppParametersClass);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
 
     // get the RotatingDeviceIdUniqueIdProvider

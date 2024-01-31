@@ -124,7 +124,8 @@ JNI_METHOD(jboolean, openBasicCommissioningWindow)
 
     CommissioningCallbacks commissioningCallbacks;
     jclass jCommissioningCallbacksClass;
-    chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/CommissioningCallbacks", jCommissioningCallbacksClass);
+    chip::JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/CommissioningCallbacks",
+                                                        jCommissioningCallbacksClass);
 
     jfieldID jCommissioningCompleteField =
         env->GetFieldID(jCommissioningCallbacksClass, "commissioningComplete", "Ljava/lang/Object;");
@@ -458,8 +459,8 @@ CHIP_ERROR CreateContentSearch(JNIEnv * env, jobject jSearch,
                                ListFreer & listFreer)
 {
     jclass jContentSearchClass;
-    ReturnErrorOnFailure(
-        JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/ContentLauncherTypes$ContentSearch", jContentSearchClass));
+    ReturnErrorOnFailure(JniReferences::GetInstance().GetLocalClassRef(env, "com/chip/casting/ContentLauncherTypes$ContentSearch",
+                                                                       jContentSearchClass));
 
     jfieldID jParameterListField = env->GetFieldID(jContentSearchClass, "parameterList", "Ljava/util/ArrayList;");
     jobject jParameterList       = env->GetObjectField(jSearch, jParameterListField);

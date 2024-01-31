@@ -727,8 +727,10 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     jmethodID javaMethod;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
@@ -798,8 +800,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniRssi, newElement_rssi);
 
             jclass wiFiInterfaceScanResultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/WiFiScanResult",
-                                                                 wiFiInterfaceScanResultStructClass);
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/WiFiScanResult",
+                                                                      wiFiInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "Could not find class WiFiScanResult");
@@ -863,8 +865,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             chip::JniReferences::GetInstance().CreateBoxedObject<jint>("java/lang/Integer", "(I)V", jniLqi, newElement_lqi);
 
             jclass threadInterfaceScanResultStructClass;
-            err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ThreadScanResult",
-                                                                 threadInterfaceScanResultStructClass);
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ThreadScanResult",
+                                                                      threadInterfaceScanResultStructClass);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "Could not find class ThreadScanResult");
