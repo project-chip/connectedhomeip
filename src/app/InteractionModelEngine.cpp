@@ -390,6 +390,11 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
 
     mReadHandlers.ReleaseObject(&apReadObj);
 
+    TryToResumeSubscriptions();
+}
+
+void InteractionModelEngine::TryToResumeSubscriptions()
+{
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     if (!mSubscriptionResumptionScheduled && HasSubscriptionsToResume())
     {
@@ -399,7 +404,7 @@ void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
             System::Clock::Seconds32(timeTillNextSubscriptionResumptionSecs), ResumeSubscriptionsTimerCallback, this);
         mNumSubscriptionResumptionRetries++;
     }
-#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
 }
 
 Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,

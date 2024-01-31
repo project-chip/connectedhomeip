@@ -392,6 +392,8 @@ private:
     void OnDone(CommandHandler & apCommandObj) override;
     void OnDone(ReadHandler & apReadObj) override;
 
+    void TryToResumeSubscriptions();
+
     ReadHandler::ApplicationCallback * GetAppCallback() override { return mpReadHandlerApplicationCallback; }
 
     InteractionModelEngine * GetInteractionModelEngine() override { return this; }
