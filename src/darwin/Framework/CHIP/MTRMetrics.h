@@ -30,6 +30,5 @@ MTR_NEWLY_AVAILABLE
 
 - (nullable id)valueForKey:(NSString *)key;
 
-
 @end
 NS_ASSUME_NONNULL_END

@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import "MTRMetrics_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRMetrics_Internal.h"
 #import <Matter/MTRDefines.h>
 
 @implementation MTRMetrics {
@@ -30,7 +30,7 @@
     return self;
 }
 
-- (NSArray<NSString *> *) allKeys
+- (NSArray<NSString *> *)allKeys
 {
     return [_metricsData allKeys];
 }

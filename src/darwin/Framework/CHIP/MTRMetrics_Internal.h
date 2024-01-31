@@ -18,7 +18,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#define MTRMetricCommissioningStatusKey  @"com.matter.metric.commissioningStatus"
+#define MTRMetricCommissioningStatusKey @"com.matter.metric.commissioningStatus"
 
 @interface MTRMetrics ()
 
