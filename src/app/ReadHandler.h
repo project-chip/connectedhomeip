@@ -157,7 +157,7 @@ public:
         /*
          * Retrieve the InteractionalModelEngine that holds this ReadHandler.
          */
-        virtual InteractionModelEngine * GetReadHandlerImEngine();
+        virtual InteractionModelEngine * GetInteractionModelEngine() = 0;
     };
 
     // TODO (#27675) : Merge existing callback and observer into one class and have an observer pool in the Readhandler to notify

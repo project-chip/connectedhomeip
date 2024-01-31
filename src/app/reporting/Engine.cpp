@@ -36,6 +36,7 @@ namespace app {
 namespace reporting {
 CHIP_ERROR Engine::Init(InteractionModelEngine * apImEngine)
 {
+    ChipLogDetail(DataManagement, "Engine::Init");
     VerifyOrReturnError(apImEngine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mpImEngine = apImEngine;
     mNumReportsInFlight = 0;

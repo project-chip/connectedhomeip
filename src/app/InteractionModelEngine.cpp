@@ -57,7 +57,9 @@ using Protocols::InteractionModel::Status;
 
 Global<InteractionModelEngine> sInteractionModelEngine;
 
-InteractionModelEngine::InteractionModelEngine() {}
+InteractionModelEngine::InteractionModelEngine() {
+    mReportingEngine.Init(this);
+}
 
 InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
@@ -81,7 +83,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
     ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
-    mReportingEngine.Init(this);
     mMagic++;
 
     StatusIB::RegisterErrorFormatter();
