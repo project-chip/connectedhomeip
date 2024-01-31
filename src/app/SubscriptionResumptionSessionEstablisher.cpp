@@ -115,6 +115,7 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnected(void * cont
     SubscriptionResumptionSessionEstablishRecord * record = FindRecordOrFirstEmptyEntry(subscriptionInfo.mSubscriptionId);
     if (record && record->mSubscriptionId == subscriptionInfo.mSubscriptionId)
     {
+        // Remove the record if establishing the session.
         record->mSessionEstablishRetries = UINT16_MAX;
     }
     InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
@@ -155,6 +156,8 @@ void SubscriptionResumptionSessionEstablisher::HandleDeviceConnectionFailure(voi
             subscriptionResumptionStorage->Delete(subscriptionInfo.mNodeId, subscriptionInfo.mFabricIndex,
                                                   subscriptionInfo.mSubscriptionId);
         }
+        // Remove the record when deleting the entry.
+        record->mSessionEstablishRetries = UINT16_MAX;
     }
 }
 
