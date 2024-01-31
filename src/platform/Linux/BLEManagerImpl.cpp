@@ -226,7 +226,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
             ChipLogProgress(DeviceLayer, "Non-concurrent mode BLE stopped, BLE write write ignored");
         }
         else
-#endif 
+#endif
         {
             HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
                                 PacketBufferHandle::Adopt(event->CHIPoBLEWriteReceived.Data));
