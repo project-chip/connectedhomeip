@@ -207,8 +207,8 @@ chip_test_suite_using_nltest("tests") {
     ":time-sync-data-provider-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
-    "${chip_root}/src/app/icd:manager",
     "${chip_root}/src/app/icd/client:manager",
+    "${chip_root}/src/app/icd/server:manager",
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
@@ -231,7 +231,7 @@ chip_test_suite_using_nltest("tests") {
   # Do not run TestCommissionManager when running ICD specific unit tests.
   # ICDManager has a dependency on the Accessors.h file which causes a link error
   # when building the TestCommissionManager
-  if (!chip_enable_icd_server && chip_config_network_layer_ble &&
+  if (chip_config_network_layer_ble &&
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
     public_deps += [ "${chip_root}/src/app/server" ]
