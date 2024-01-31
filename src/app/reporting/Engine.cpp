@@ -38,11 +38,11 @@ using namespace chip::Access;
 namespace chip {
 namespace app {
 namespace reporting {
-CHIP_ERROR Engine::Init(InteractionModelEngine * apImEngine)
+
+Engine::Engine(InteractionModelEngine * apImEngine) : mpImEngine(apImEngine) {}
+
+CHIP_ERROR Engine::Init()
 {
-    ChipLogDetail(DataManagement, "Engine::Init");
-    VerifyOrReturnError(apImEngine != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mpImEngine          = apImEngine;
     mNumReportsInFlight = 0;
     mCurReadHandlerIdx  = 0;
     return CHIP_NO_ERROR;

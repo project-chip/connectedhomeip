@@ -58,14 +58,17 @@ class Engine
 {
 public:
     /**
+     *  Constructor Engine with a valid InteractionModelEngine pointer.
+     */
+    Engine(InteractionModelEngine * apImEngine);
+
+    /**
      * Initializes the reporting engine. Should only be called once.
-     *
-     * @param[in]    apImEngine       A valid pointer to the IM engine.
      *
      * @retval #CHIP_NO_ERROR On success.
      * @retval other           Was unable to retrieve data and write it into the writer.
      */
-    CHIP_ERROR Init(InteractionModelEngine * apImEngine);
+    CHIP_ERROR Init();
 
     void Shutdown();
 
