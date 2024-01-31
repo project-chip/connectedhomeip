@@ -234,7 +234,7 @@ public:
     BleLayerDelegate * mBleTransport = nullptr;
 
     // Set in Non-concurrent mode when the ConnectNetworkResponse has been requested
-    bool mTerminateOnPacketTxComplete  = false;
+    bool mTerminateOnPacketTxComplete = false;
 
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
