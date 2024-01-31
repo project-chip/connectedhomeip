@@ -97,7 +97,10 @@ source_set("global-attributes") {
   sources = [ "GlobalAttributes.h" ]
 
   # This also depends on zap-generated code which is currently impossible to split outs
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  public_deps = [
+    ":app_config",
+    "${chip_root}/src/lib/support",
+  ]
 }
 
 source_set("pre-encoded-value") {
