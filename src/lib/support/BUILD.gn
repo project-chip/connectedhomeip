@@ -158,6 +158,17 @@ source_set("chip_version_header") {
   deps = [ ":gen_chip_version" ]
 }
 
+source_set("testing") {
+  sources = [
+    "TestGroupData.h",
+    "TestPersistentStorageDelegate.h",
+  ]
+}
+
+source_set("type-traits") {
+  sources = [ "TypeTraits.h" ]
+}
+
 static_library("support") {
   output_name = "libSupportLayer"
 
@@ -176,7 +187,10 @@ static_library("support") {
     "BytesToHex.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.h",
+    "CHIPListUtils.h",
     "CHIPMemString.h",
+    "CommonIterator.h",
+    "CommonPersistentData.h",
     "DLLUtil.h",
     "DefaultStorageKeyAllocator.h",
     "Defer.h",
@@ -184,21 +198,31 @@ static_library("support") {
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "Fold.h",
+    "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",
+    "IntrusiveList.h",
     "Iterators.h",
+    "LambdaBridge.h",
     "LifetimePersistedCounter.h",
     "ObjectLifeCycle.h",
+    "OwnerOf.h",
     "PersistedCounter.h",
+    "PersistentData.h",
     "PersistentStorageAudit.cpp",
     "PersistentStorageAudit.h",
     "PersistentStorageMacros.h",
     "Pool.cpp",
     "Pool.h",
+    "PoolWrapper.h",
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
+    "SafePointerCast.h",
+    "SafeString.h",
     "Scoped.h",
+    "ScopedBuffer.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
     "SetupDiscriminator.h",
@@ -211,6 +235,7 @@ static_library("support") {
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
     "TimeUtils.h",
+    "UnitTestContext.h",
     "Variant.h",
     "ZclString.cpp",
     "ZclString.h",
@@ -250,6 +275,7 @@ static_library("support") {
     ":safeint",
     ":span",
     ":text_only_logging",
+    ":type-traits",
     ":verifymacros",
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
