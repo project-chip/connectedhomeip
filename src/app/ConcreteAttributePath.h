@@ -86,7 +86,7 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
     {
         mListIndex.SetValue(aListIndex);
     }
-    
+
     bool operator==(const ConcreteReadAttributePath & aOther) const
     {
         return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex);
@@ -144,7 +144,7 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
         ChipLogProgress(DataManagement, "Concrete Attribute Path: (%d, " ChipLogFormatMEI ", " ChipLogFormatMEI ") ", mEndpointId,
                         ChipLogValueMEI(mClusterId), ChipLogValueMEI(mAttributeId));
     }
-   
+
     bool operator==(const ConcreteDataAttributePath & aOther) const
     {
         return ConcreteAttributePath::operator==(aOther) && (mListIndex == aOther.mListIndex) && (mListOp == aOther.mListOp) && (mDataVersion == aOther.mDataVersion);
