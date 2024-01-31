@@ -254,8 +254,8 @@ static_library("interaction-model") {
     ":message-def",
     ":paths",
     ":subscription-manager",
-    "${chip_root}/src/app/icd:icd_config",
-    "${chip_root}/src/app/icd:observer",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
@@ -333,7 +333,7 @@ static_library("app") {
     ":interaction-model",
     ":pre-encoded-value",
     ":revision_info",
-    "${chip_root}/src/app/icd:icd_config",
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -353,8 +353,8 @@ static_library("app") {
 
   if (chip_enable_icd_server) {
     public_deps += [
-      "${chip_root}/src/app/icd:manager",
-      "${chip_root}/src/app/icd:notifier",
+      "${chip_root}/src/app/icd/server:manager",
+      "${chip_root}/src/app/icd/server:notifier",
     ]
   }
 

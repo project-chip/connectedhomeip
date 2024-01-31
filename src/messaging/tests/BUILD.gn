@@ -83,6 +83,6 @@ chip_test_suite_using_nltest("tests") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:configuration-data" ]
+    public_deps += [ "${chip_root}/src/app/icd/server:configuration-data" ]
   }
 }

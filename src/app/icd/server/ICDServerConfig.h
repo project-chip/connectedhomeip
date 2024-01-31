@@ -18,5 +18,5 @@
 #pragma once
 
 #if CHIP_HAVE_CONFIG_H
-#include <app/icd/ICDBuildConfig.h>
+#include <app/icd/server/ICDServerBuildConfig.h>
 #endif

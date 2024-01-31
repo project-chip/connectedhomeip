@@ -17,10 +17,10 @@
  */
 #include <app/EventManagement.h>
 #include <app/SubscriptionManager.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDManager.h>
-#include <app/icd/ICDNotifier.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDManager.h>
+#include <app/icd/server/ICDNotifier.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
