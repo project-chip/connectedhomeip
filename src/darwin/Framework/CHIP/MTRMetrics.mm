@@ -52,7 +52,7 @@
         return;
     }
 
-    [_metricsData setObject:value forKey:key];
+    [_metricsData setValue:value forKey:key];
 }
 
 - (void)removeValueForKey:(NSString *)key
