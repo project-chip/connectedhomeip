@@ -693,12 +693,17 @@ class ElectricalEnergyMeasurementCluster(
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
     val decodedValue: ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct? =
-      if (tlvReader.isNextTag(AnonymousTag)) {
-        ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.fromTlv(
-          AnonymousTag,
-          tlvReader
-        )
+      if (!tlvReader.isNull()) {
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.fromTlv(
+            AnonymousTag,
+            tlvReader
+          )
+        } else {
+          null
+        }
       } else {
+        tlvReader.getNull(AnonymousTag)
         null
       }
 
@@ -747,12 +752,17 @@ class ElectricalEnergyMeasurementCluster(
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
           val decodedValue: ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct? =
-            if (tlvReader.isNextTag(AnonymousTag)) {
-              ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.fromTlv(
-                AnonymousTag,
-                tlvReader
-              )
+            if (!tlvReader.isNull()) {
+              if (tlvReader.isNextTag(AnonymousTag)) {
+                ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct.fromTlv(
+                  AnonymousTag,
+                  tlvReader
+                )
+              } else {
+                null
+              }
             } else {
+              tlvReader.getNull(AnonymousTag)
               null
             }
 

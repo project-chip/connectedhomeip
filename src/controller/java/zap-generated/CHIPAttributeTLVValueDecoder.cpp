@@ -21308,6 +21308,156 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
+        case Attributes::CumulativeEnergyReset::Id: {
+            using TypeInfo = Attributes::CumulativeEnergyReset::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value;
+            if (cppValue.IsNull())
+            {
+                value = nullptr;
+            }
+            else
+            {
+                jobject value_importedResetTimestamp;
+                if (!cppValue.Value().importedResetTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_importedResetTimestamp);
+                }
+                else
+                {
+                    jobject value_importedResetTimestampInsideOptional;
+                    if (cppValue.Value().importedResetTimestamp.Value().IsNull())
+                    {
+                        value_importedResetTimestampInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_importedResetTimestampInsideOptionalClassName     = "java/lang/Long";
+                        std::string value_importedResetTimestampInsideOptionalCtorSignature = "(J)V";
+                        jlong jnivalue_importedResetTimestampInsideOptional =
+                            static_cast<jlong>(cppValue.Value().importedResetTimestamp.Value().Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                            value_importedResetTimestampInsideOptionalClassName.c_str(),
+                            value_importedResetTimestampInsideOptionalCtorSignature.c_str(),
+                            jnivalue_importedResetTimestampInsideOptional, value_importedResetTimestampInsideOptional);
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(value_importedResetTimestampInsideOptional,
+                                                                      value_importedResetTimestamp);
+                }
+                jobject value_exportedResetTimestamp;
+                if (!cppValue.Value().exportedResetTimestamp.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_exportedResetTimestamp);
+                }
+                else
+                {
+                    jobject value_exportedResetTimestampInsideOptional;
+                    if (cppValue.Value().exportedResetTimestamp.Value().IsNull())
+                    {
+                        value_exportedResetTimestampInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_exportedResetTimestampInsideOptionalClassName     = "java/lang/Long";
+                        std::string value_exportedResetTimestampInsideOptionalCtorSignature = "(J)V";
+                        jlong jnivalue_exportedResetTimestampInsideOptional =
+                            static_cast<jlong>(cppValue.Value().exportedResetTimestamp.Value().Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                            value_exportedResetTimestampInsideOptionalClassName.c_str(),
+                            value_exportedResetTimestampInsideOptionalCtorSignature.c_str(),
+                            jnivalue_exportedResetTimestampInsideOptional, value_exportedResetTimestampInsideOptional);
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(value_exportedResetTimestampInsideOptional,
+                                                                      value_exportedResetTimestamp);
+                }
+                jobject value_importedResetSystime;
+                if (!cppValue.Value().importedResetSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_importedResetSystime);
+                }
+                else
+                {
+                    jobject value_importedResetSystimeInsideOptional;
+                    if (cppValue.Value().importedResetSystime.Value().IsNull())
+                    {
+                        value_importedResetSystimeInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_importedResetSystimeInsideOptionalClassName     = "java/lang/Long";
+                        std::string value_importedResetSystimeInsideOptionalCtorSignature = "(J)V";
+                        jlong jnivalue_importedResetSystimeInsideOptional =
+                            static_cast<jlong>(cppValue.Value().importedResetSystime.Value().Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                            value_importedResetSystimeInsideOptionalClassName.c_str(),
+                            value_importedResetSystimeInsideOptionalCtorSignature.c_str(),
+                            jnivalue_importedResetSystimeInsideOptional, value_importedResetSystimeInsideOptional);
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(value_importedResetSystimeInsideOptional,
+                                                                      value_importedResetSystime);
+                }
+                jobject value_exportedResetSystime;
+                if (!cppValue.Value().exportedResetSystime.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, value_exportedResetSystime);
+                }
+                else
+                {
+                    jobject value_exportedResetSystimeInsideOptional;
+                    if (cppValue.Value().exportedResetSystime.Value().IsNull())
+                    {
+                        value_exportedResetSystimeInsideOptional = nullptr;
+                    }
+                    else
+                    {
+                        std::string value_exportedResetSystimeInsideOptionalClassName     = "java/lang/Long";
+                        std::string value_exportedResetSystimeInsideOptionalCtorSignature = "(J)V";
+                        jlong jnivalue_exportedResetSystimeInsideOptional =
+                            static_cast<jlong>(cppValue.Value().exportedResetSystime.Value().Value());
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
+                            value_exportedResetSystimeInsideOptionalClassName.c_str(),
+                            value_exportedResetSystimeInsideOptionalCtorSignature.c_str(),
+                            jnivalue_exportedResetSystimeInsideOptional, value_exportedResetSystimeInsideOptional);
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(value_exportedResetSystimeInsideOptional,
+                                                                      value_exportedResetSystime);
+                }
+
+                jclass cumulativeEnergyResetStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct",
+                    cumulativeEnergyResetStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl,
+                                 "Could not find class ChipStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct");
+                    return nullptr;
+                }
+
+                jmethodID cumulativeEnergyResetStructStructCtor_1;
+                err = chip::JniReferences::GetInstance().FindMethod(
+                    env, cumulativeEnergyResetStructStructClass_1, "<init>",
+                    "(Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;Ljava/util/Optional;)V",
+                    &cumulativeEnergyResetStructStructCtor_1);
+                if (err != CHIP_NO_ERROR || cumulativeEnergyResetStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(
+                        Zcl,
+                        "Could not find ChipStructs$ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct constructor");
+                    return nullptr;
+                }
+
+                value = env->NewObject(cumulativeEnergyResetStructStructClass_1, cumulativeEnergyResetStructStructCtor_1,
+                                       value_importedResetTimestamp, value_exportedResetTimestamp, value_importedResetSystime,
+                                       value_exportedResetSystime);
+            }
+            return value;
+        }
         case Attributes::GeneratedCommandList::Id: {
             using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

@@ -600,6 +600,7 @@
             "CumulativeEnergyExported",
             "PeriodicEnergyImported",
             "PeriodicEnergyExported",
+            "CumulativeEnergyReset",
             "FeatureMap"
         ],
         "Electrical Power Measurement": [

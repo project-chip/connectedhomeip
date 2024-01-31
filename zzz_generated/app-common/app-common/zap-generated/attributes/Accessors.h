@@ -1950,14 +1950,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ElectricalEnergyMeasurement {
 namespace Attributes {
 
-namespace CumulativeEnergyReset {
-EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type *
-                      value); // CumulativeEnergyResetStruct
-EmberAfStatus Set(chip::EndpointId endpoint,
-                  chip::app::Clusters::ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type value);
-} // namespace CumulativeEnergyReset
-
 namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);

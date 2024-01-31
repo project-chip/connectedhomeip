@@ -6199,6 +6199,97 @@ public static class ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct 
     return output.toString();
   }
 }
+public static class ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct {
+  public @Nullable Optional<Long> importedResetTimestamp;
+  public @Nullable Optional<Long> exportedResetTimestamp;
+  public @Nullable Optional<Long> importedResetSystime;
+  public @Nullable Optional<Long> exportedResetSystime;
+  private static final long IMPORTED_RESET_TIMESTAMP_ID = 0L;
+  private static final long EXPORTED_RESET_TIMESTAMP_ID = 1L;
+  private static final long IMPORTED_RESET_SYSTIME_ID = 2L;
+  private static final long EXPORTED_RESET_SYSTIME_ID = 3L;
+
+  public ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
+    @Nullable Optional<Long> importedResetTimestamp,
+    @Nullable Optional<Long> exportedResetTimestamp,
+    @Nullable Optional<Long> importedResetSystime,
+    @Nullable Optional<Long> exportedResetSystime
+  ) {
+    this.importedResetTimestamp = importedResetTimestamp;
+    this.exportedResetTimestamp = exportedResetTimestamp;
+    this.importedResetSystime = importedResetSystime;
+    this.exportedResetSystime = exportedResetSystime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(IMPORTED_RESET_TIMESTAMP_ID, importedResetTimestamp != null ? importedResetTimestamp.<BaseTLVType>map((nonOptionalimportedResetTimestamp) -> new UIntType(nonOptionalimportedResetTimestamp)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EXPORTED_RESET_TIMESTAMP_ID, exportedResetTimestamp != null ? exportedResetTimestamp.<BaseTLVType>map((nonOptionalexportedResetTimestamp) -> new UIntType(nonOptionalexportedResetTimestamp)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(IMPORTED_RESET_SYSTIME_ID, importedResetSystime != null ? importedResetSystime.<BaseTLVType>map((nonOptionalimportedResetSystime) -> new UIntType(nonOptionalimportedResetSystime)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(EXPORTED_RESET_SYSTIME_ID, exportedResetSystime != null ? exportedResetSystime.<BaseTLVType>map((nonOptionalexportedResetSystime) -> new UIntType(nonOptionalexportedResetSystime)).orElse(new EmptyType()) : new NullType()));
+
+    return new StructType(values);
+  }
+
+  public static ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    @Nullable Optional<Long> importedResetTimestamp = null;
+    @Nullable Optional<Long> exportedResetTimestamp = null;
+    @Nullable Optional<Long> importedResetSystime = null;
+    @Nullable Optional<Long> exportedResetSystime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == IMPORTED_RESET_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          importedResetTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == EXPORTED_RESET_TIMESTAMP_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          exportedResetTimestamp = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == IMPORTED_RESET_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          importedResetSystime = Optional.of(castingValue.value(Long.class));
+        }
+      } else if (element.contextTagNum() == EXPORTED_RESET_SYSTIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          exportedResetSystime = Optional.of(castingValue.value(Long.class));
+        }
+      }
+    }
+    return new ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct(
+      importedResetTimestamp,
+      exportedResetTimestamp,
+      importedResetSystime,
+      exportedResetSystime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ElectricalEnergyMeasurementClusterCumulativeEnergyResetStruct {\n");
+    output.append("\timportedResetTimestamp: ");
+    output.append(importedResetTimestamp);
+    output.append("\n");
+    output.append("\texportedResetTimestamp: ");
+    output.append(exportedResetTimestamp);
+    output.append("\n");
+    output.append("\timportedResetSystime: ");
+    output.append(importedResetSystime);
+    output.append("\n");
+    output.append("\texportedResetSystime: ");
+    output.append(exportedResetSystime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ElectricalEnergyMeasurementClusterEnergyMeasurementStruct {
   public Long energy;
   public Optional<Long> startTimestamp;
