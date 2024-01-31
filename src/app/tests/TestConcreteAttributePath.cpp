@@ -22,6 +22,7 @@
  *
  */
 
+#include <lib/support/UnitTestRegistration.h>
 #include <app/ConcreteAttributePath.h>
 #include <nlunit-test.h>
 
@@ -58,8 +59,8 @@ void TestConcreteReadAttributePathEqualityDefaultConstructor(nlTestSuite* aSuite
 }
 
 void TestConcreteReadAttributePathInequalityDifferentListIndex(nlTestSuite* aSuite, void * aContext) {
-    ConcreteAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/4);
-    ConcreteAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/5);
+    ConcreteReadAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/4);
+    ConcreteReadAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/5);
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
@@ -92,12 +93,12 @@ void TestConcreteDataAttributePathInequalityDifferentListIndex(nlTestSuite* aSui
 namespace {
 
 const nlTest sTests[] = {
-  NL_TEST_DEF("TestConcreteAttributePathEqualityDefaultConstructor", TestConcreteAttributePathDefaultConstructorEquality),
+  NL_TEST_DEF("TestConcreteAttributePathEqualityDefaultConstructor", TestConcreteAttributePathEqualityDefaultConstructor),
   NL_TEST_DEF("TestConcreteAttributePathEquality", TestConcreteAttributePathEquality),
   NL_TEST_DEF("TestConcreteAttributePathInequalityDifferentAttributeId", TestConcreteAttributePathInequalityDifferentAttributeId),
-  NL_TEST_DEF("TestConcreteReadAttributePathEqualityDefaultConstructor", TestConcreteReadAttributePathDefaultConstructorEquality),
+  NL_TEST_DEF("TestConcreteReadAttributePathEqualityDefaultConstructor", TestConcreteReadAttributePathEqualityDefaultConstructor),
   NL_TEST_DEF("TestConcreteReadAttributePathInequalityDifferentListIndex", TestConcreteReadAttributePathInequalityDifferentListIndex),
-  NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathDefaultConstructorEquality),
+  NL_TEST_DEF("TestConcreteDataAttributePathEqualityDefaultConstructor", TestConcreteDataAttributePathEqualityDefaultConstructor),
   NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentDataVersion", TestConcreteDataAttributePathInequalityDifferentDataVersion),
   NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListOp", TestConcreteDataAttributePathInequalityDifferentListOp),
   NL_TEST_DEF("TestConcreteDataAttributePathInequalityDifferentListIndex", TestConcreteDataAttributePathInequalityDifferentListIndex),
