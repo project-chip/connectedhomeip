@@ -90,6 +90,7 @@ source_set("paths") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/core:types",
   ]
 }
 
