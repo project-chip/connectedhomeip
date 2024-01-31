@@ -155,9 +155,9 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
     if (argc == 0)
     {
         /* Retrieve previously added SSID */
-        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = { 0 };
+        char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1] = { 0 };
 
-        ConnectivityMgr().GetNetworkSSID((char *) &ssid);
+        ConnectivityMgr().GetNetworkSSID(&ssid[0]);
         ssidSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
 
         if (IsSpanUsable(ssidSpan))
@@ -227,10 +227,10 @@ static CHIP_ERROR WiFiRemoveNwkHandler(int argc, char ** argv)
     chip::DeviceLayer::NetworkCommissioning::Status status;
     uint8_t networkIndex;
     chip::ByteSpan ssidSpan;
-    char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = { 0 };
+    char ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength + 1] = { 0 };
     chip::MutableCharSpan debugText;
 
-    ConnectivityMgr().GetNetworkSSID((char *) &ssid);
+    ConnectivityMgr().GetNetworkSSID(&ssid[0]);
     ssidSpan = chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), strlen(ssid));
 
     status = ConnectivityMgr().GetDriver()->RemoveNetwork(ssidSpan, debugText, networkIndex);
