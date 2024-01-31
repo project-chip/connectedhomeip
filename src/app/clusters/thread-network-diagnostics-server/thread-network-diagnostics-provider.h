@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2024 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,19 @@
 
 #pragma once
 
-#if CHIP_HAVE_CONFIG_H
-#include <app/icd/ICDBuildConfig.h>
-#endif
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/MessageDef/AttributeDataIB.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ThreadNetworkDiagnostics {
+
+CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
+
+} // namespace ThreadNetworkDiagnostics
+} // namespace Clusters
+} // namespace app
+} // namespace chip

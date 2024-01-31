@@ -19,7 +19,7 @@
 
 #include <inttypes.h>
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPSafeCasts.h>

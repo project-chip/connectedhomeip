@@ -22,17 +22,6 @@
 #endif
 #include CONFIGURATION_HEADER
 
-#ifdef EZSP_HOST
-// Includes needed for ember related functions for the EZSP host
-#include "app/util/ezsp/ezsp-protocol.h"
-#include "app/util/ezsp/ezsp-utils.h"
-#include "app/util/ezsp/ezsp.h"
-#include "app/util/ezsp/serial-interface.h"
-#include "stack/include/ember-random-api.h"
-#include "stack/include/ember-types.h"
-#include "stack/include/error.h"
-#endif // EZSP_HOST
-
 #include <app/util/af-types.h>
 
 #include <app/util/endpoint-config-api.h>
@@ -101,6 +90,10 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * over the air. Because this function is being called locally
  * it assumes that the device knows what it is doing and has permission
  * to perform the given operation.
+ *
+ * This function also does NOT check that the input dataType matches the expected
+ * data type (as Accessors.h/cpp have this correct by default).
+ * TODO: this not checking seems off - what if this is run without Accessors.h ?
  */
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);

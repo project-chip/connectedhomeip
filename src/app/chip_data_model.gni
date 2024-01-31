@@ -300,10 +300,10 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
         deps += [
-          "${chip_root}/src/app/icd:configuration-data",
-          "${chip_root}/src/app/icd:icd_config",
-          "${chip_root}/src/app/icd:monitoring-table",
-          "${chip_root}/src/app/icd:notifier",
+          "${chip_root}/src/app/icd/server:configuration-data",
+          "${chip_root}/src/app/icd/server:icd-server-config",
+          "${chip_root}/src/app/icd/server:monitoring-table",
+          "${chip_root}/src/app/icd/server:notifier",
         ]
       } else if (cluster == "resource-monitoring-server") {
         sources += [
@@ -355,6 +355,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
           "${_app_root}/clusters/${cluster}/EnergyReportingTestEventTriggerHandler.h",
+        ]
+      } else if (cluster == "thread-network-diagnostics-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.cpp",
+          "${_app_root}/clusters/${cluster}/thread-network-diagnostics-provider.h",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

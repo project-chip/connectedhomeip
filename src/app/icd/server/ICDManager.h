@@ -17,11 +17,12 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/icd/ICDCheckInSender.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDMonitoringTable.h>
-#include <app/icd/ICDNotifier.h>
-#include <app/icd/ICDStateObserver.h>
+#include <app/SubscriptionManager.h>
+#include <app/icd/server/ICDCheckInSender.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDMonitoringTable.h>
+#include <app/icd/server/ICDNotifier.h>
+#include <app/icd/server/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -66,7 +67,7 @@ public:
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, Crypto::SymmetricKeystore * symmetricKeyStore,
-              Messaging::ExchangeManager * exchangeManager);
+              Messaging::ExchangeManager * exchangeManager, SubscriptionManager * manager);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
@@ -100,7 +101,7 @@ public:
 #endif
 
     // Implementation of ICDListener functions.
-    // Callers must origin from the chip task context or be holding the ChipStack lock.
+    // Callers must origin from the chip task context or hold the ChipStack lock.
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;
     void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
@@ -129,15 +130,28 @@ protected:
     uint8_t mCheckInRequestCount      = 0;
 
 private:
+    /**
+     * @brief Function checks if at least one client registration would require a Check-In message
+     *
+     * @return true At least one registration would require an Check-In message if we were entering ActiveMode.
+     * @return false None of the registration would require a Check-In message either because there are no registration or because
+     *               they all have associated subscriptions.
+     */
+    bool CheckInMessagesWouldBeSent();
+
     KeepActiveFlags mKeepActiveFlags{ 0 };
 
     // Initialize mOperationalState to ActiveMode so the init sequence at bootup triggers the IdleMode behaviour first.
-    OperationalState mOperationalState             = OperationalState::ActiveMode;
+    OperationalState mOperationalState = OperationalState::ActiveMode;
+
     PersistentStorageDelegate * mStorage           = nullptr;
     FabricTable * mFabricTable                     = nullptr;
     Messaging::ExchangeManager * mExchangeManager  = nullptr;
-    bool mTransitionToIdleCalled                   = false;
     Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
+    SubscriptionManager * mSubManager              = nullptr;
+
+    bool mTransitionToIdleCalled = false;
+
     ObjectPool<ObserverPointer, CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE> mStateObserverPool;
     ObjectPool<ICDCheckInSender, (CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS)> mICDSenderPool;
 

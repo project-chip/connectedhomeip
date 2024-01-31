@@ -20,8 +20,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/icd/ICDConfigurationData.h>
-#include <app/icd/ICDMonitoringTable.h>
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDMonitoringTable.h>
 #include <app/util/basic-types.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
