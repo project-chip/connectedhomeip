@@ -78,8 +78,8 @@ void TestConcreteReadAttributePathEqualityDefaultConstructor(nlTestSuite * aSuit
 
 void TestConcreteReadAttributePathInequalityDifferentListIndex(nlTestSuite * aSuite, void * aContext)
 {
-    ConcreteAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/4);
-    ConcreteAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/5);
+    ConcreteReadAttributePath path_one(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/4);
+    ConcreteReadAttributePath path_two(/*aEndpointId=*/1, /*aClusterId=*/2, /*aAttributeId=*/3, /*aListIndex=*/5);
     NL_TEST_ASSERT(aSuite, path_one != path_two);
 }
 
