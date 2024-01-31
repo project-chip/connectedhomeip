@@ -1632,7 +1632,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_revision, newElement_0_revision);
 
                 jclass deviceTypeStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DescriptorClusterDeviceTypeStruct", deviceTypeStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -1796,7 +1796,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass semanticTagStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DescriptorClusterSemanticTagStruct", semanticTagStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -2054,7 +2054,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass targetStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$BindingClusterTargetStruct", targetStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -2332,7 +2332,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         }
 
                         jclass accessControlTargetStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlTargetStruct",
                             accessControlTargetStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
@@ -2366,7 +2366,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass accessControlEntryStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlEntryStruct",
                     accessControlEntryStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -2423,7 +2423,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass accessControlExtensionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$AccessControlClusterAccessControlExtensionStruct",
                     accessControlExtensionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -2693,7 +2693,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_state, newElement_0_state);
 
                 jclass actionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ActionsClusterActionStruct", actionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -2769,7 +2769,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass endpointListStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ActionsClusterEndpointListStruct", endpointListStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -3230,7 +3230,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jnivalue_subscriptionsPerFabric, value_subscriptionsPerFabric);
 
             jclass capabilityMinimaStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$BasicInformationClusterCapabilityMinimaStruct",
                 capabilityMinimaStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -3284,7 +3284,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             jclass productAppearanceStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$BasicInformationClusterProductAppearanceStruct",
                 productAppearanceStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -3662,7 +3662,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass providerLocationStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$OtaSoftwareUpdateRequestorClusterProviderLocation",
                     providerLocationStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -5354,7 +5354,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 jnivalue_maxCumulativeFailsafeSeconds, value_maxCumulativeFailsafeSeconds);
 
             jclass basicCommissioningInfoStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$GeneralCommissioningClusterBasicCommissioningInfo",
                 basicCommissioningInfoStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -5661,7 +5661,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass networkInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$NetworkCommissioningClusterNetworkInfoStruct",
                     networkInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -6245,7 +6245,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_type, newElement_0_type);
 
                 jclass networkInterfaceStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$GeneralDiagnosticsClusterNetworkInterface",
                     networkInterfaceStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -6660,7 +6660,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass threadMetricsStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$SoftwareDiagnosticsClusterThreadMetricsStruct",
                     threadMetricsStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -7156,7 +7156,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_0_isChild, newElement_0_isChild);
 
                 jclass neighborTableStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterNeighborTableStruct",
                     neighborTableStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -7275,7 +7275,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jninewElement_0_linkEstablished, newElement_0_linkEstablished);
 
                 jclass routeTableStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterRouteTableStruct",
                     routeTableStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -8190,7 +8190,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     value_flagsClassName.c_str(), value_flagsCtorSignature.c_str(), jnivalue_flags, value_flags);
 
                 jclass securityPolicyStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterSecurityPolicy",
                     securityPolicyStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -8336,7 +8336,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jnivalue_channelMaskPresent, value_channelMaskPresent);
 
                 jclass operationalDatasetComponentsStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThreadNetworkDiagnosticsClusterOperationalDatasetComponents",
                     operationalDatasetComponentsStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -9373,7 +9373,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     value_endpointClassName.c_str(), value_endpointCtorSignature.c_str(), jnivalue_endpoint, value_endpoint);
 
                 jclass trustedTimeSourceStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$TimeSynchronizationClusterTrustedTimeSourceStruct",
                     trustedTimeSourceStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -9460,7 +9460,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass timeZoneStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$TimeSynchronizationClusterTimeZoneStruct", timeZoneStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -9530,7 +9530,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass DSTOffsetStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$TimeSynchronizationClusterDSTOffsetStruct",
                     DSTOffsetStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -10027,7 +10027,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             jclass productAppearanceStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$BridgedDeviceBasicInformationClusterProductAppearanceStruct",
                 productAppearanceStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -10629,7 +10629,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass NOCStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterNOCStruct", NOCStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -10706,7 +10706,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass fabricDescriptorStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$OperationalCredentialsClusterFabricDescriptorStruct",
                     fabricDescriptorStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -10986,7 +10986,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass groupKeyMapStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeyMapStruct",
                     groupKeyMapStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -11070,7 +11070,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass groupInfoMapStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupInfoMapStruct",
                     groupInfoMapStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -11292,7 +11292,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.value, newElement_0_value));
 
                 jclass labelStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$FixedLabelClusterLabelStruct", labelStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -11479,7 +11479,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.value, newElement_0_value));
 
                 jclass labelStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UserLabelClusterLabelStruct", labelStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -12315,7 +12315,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass monitoringRegistrationStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$IcdManagementClusterMonitoringRegistrationStruct",
                     monitoringRegistrationStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -12860,7 +12860,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass operationalStateStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterOperationalStateStruct",
                     operationalStateStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -12944,7 +12944,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             jclass errorStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$OvenCavityOperationalStateClusterErrorStateStruct",
                 errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -13168,7 +13168,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$OvenModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -13192,7 +13192,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$OvenModeClusterModeOptionStruct", modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -13694,7 +13694,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass semanticTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$ModeSelectClusterSemanticTagStruct",
                         semanticTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -13719,7 +13719,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ModeSelectClusterModeOptionStruct", modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -14006,7 +14006,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$LaundryWasherModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -14030,7 +14030,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$LaundryWasherModeClusterModeOptionStruct",
                     modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -14318,7 +14318,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env,
                         "chip/devicecontroller/ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct",
                         modeTagStructStructClass_3);
@@ -14348,7 +14348,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct",
                     modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -14867,7 +14867,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$RvcRunModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -14891,7 +14891,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$RvcRunModeClusterModeOptionStruct", modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -15132,7 +15132,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$RvcCleanModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -15156,7 +15156,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$RvcCleanModeClusterModeOptionStruct", modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -15830,7 +15830,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DishwasherModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -15854,7 +15854,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DishwasherModeClusterModeOptionStruct", modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -16855,7 +16855,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$MicrowaveOvenModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -16879,7 +16879,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$MicrowaveOvenModeClusterModeOptionStruct",
                     modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -17469,7 +17469,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass operationalStateStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$OperationalStateClusterOperationalStateStruct",
                     operationalStateStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -17552,7 +17552,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             jclass errorStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$OperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -17828,7 +17828,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass operationalStateStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterOperationalStateStruct",
                     operationalStateStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -17911,7 +17911,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             jclass errorStateStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$RvcOperationalStateClusterErrorStateStruct", errorStateStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -18174,7 +18174,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass sceneInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ScenesManagementClusterSceneInfoStruct", sceneInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -18458,7 +18458,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                      newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$HepaFilterMonitoringClusterReplacementProductStruct",
                     replacementProductStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -18740,7 +18740,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                      newElement_0_productIdentifierValue));
 
                 jclass replacementProductStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ActivatedCarbonFilterMonitoringClusterReplacementProductStruct",
                     replacementProductStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -19720,7 +19720,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass measurementAccuracyRangeStructStructClass_2;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterMeasurementAccuracyRangeStruct",
                     measurementAccuracyRangeStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
@@ -19752,7 +19752,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
 
             jclass measurementAccuracyStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterMeasurementAccuracyStruct",
                 measurementAccuracyStructStructClass_0);
             if (err != CHIP_NO_ERROR)
@@ -19866,7 +19866,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -19980,7 +19980,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -20094,7 +20094,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -20208,7 +20208,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass energyMeasurementStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ElectricalEnergyMeasurementClusterEnergyMeasurementStruct",
                     energyMeasurementStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -20444,7 +20444,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass loadControlProgramStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlProgramStruct",
                     loadControlProgramStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -20745,7 +20745,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         }
 
                         jclass temperatureControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct",
                             temperatureControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -20797,7 +20797,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_averageLoadControlInsideOptional_loadAdjustment);
 
                         jclass averageLoadControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct",
                             averageLoadControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -20845,7 +20845,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_dutyCycleControlInsideOptional_dutyCycle);
 
                         jclass dutyCycleControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct",
                             dutyCycleControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -20893,7 +20893,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_powerSavingsControlInsideOptional_powerSavings);
 
                         jclass powerSavingsControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct",
                             powerSavingsControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -20941,7 +20941,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_heatingSourceControlInsideOptional_heatingSource);
 
                         jclass heatingSourceControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct",
                             heatingSourceControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -20971,7 +20971,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass loadControlEventTransitionStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct",
                         loadControlEventTransitionStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -21005,7 +21005,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass loadControlEventStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct",
                     loadControlEventStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -21292,7 +21292,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         }
 
                         jclass temperatureControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterTemperatureControlStruct",
                             temperatureControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -21344,7 +21344,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_averageLoadControlInsideOptional_loadAdjustment);
 
                         jclass averageLoadControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterAverageLoadControlStruct",
                             averageLoadControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -21392,7 +21392,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_dutyCycleControlInsideOptional_dutyCycle);
 
                         jclass dutyCycleControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterDutyCycleControlStruct",
                             dutyCycleControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -21440,7 +21440,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_powerSavingsControlInsideOptional_powerSavings);
 
                         jclass powerSavingsControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterPowerSavingsControlStruct",
                             powerSavingsControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -21488,7 +21488,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_2_heatingSourceControlInsideOptional_heatingSource);
 
                         jclass heatingSourceControlStructStructClass_5;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterHeatingSourceControlStruct",
                             heatingSourceControlStructStructClass_5);
                         if (err != CHIP_NO_ERROR)
@@ -21518,7 +21518,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass loadControlEventTransitionStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventTransitionStruct",
                         loadControlEventTransitionStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -21552,7 +21552,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass loadControlEventStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DemandResponseLoadControlClusterLoadControlEventStruct",
                     loadControlEventStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -21902,7 +21902,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         }
 
                         jclass messageResponseOptionStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$MessagesClusterMessageResponseOptionStruct",
                             messageResponseOptionStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
@@ -21930,7 +21930,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass messageStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$MessagesClusterMessageStruct", messageStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -22255,7 +22255,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jninewElement_1_maxDuration, newElement_1_maxDuration);
 
                     jclass powerAdjustStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterPowerAdjustStruct",
                         powerAdjustStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
@@ -22624,7 +22624,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             }
 
                             jclass costStructStructClass_6;
-                            err = chip::JniReferences::GetInstance().GetClassRef(
+                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                                 env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterCostStruct",
                                 costStructStructClass_6);
                             if (err != CHIP_NO_ERROR)
@@ -22728,7 +22728,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass slotStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterSlotStruct", slotStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -22768,7 +22768,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jnivalue_forecastUpdateReason, value_forecastUpdateReason);
 
                 jclass forecastStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementClusterForecastStruct",
                     forecastStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -23601,7 +23601,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass balanceStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$EnergyPreferenceClusterBalanceStruct", balanceStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -23703,7 +23703,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass balanceStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$EnergyPreferenceClusterBalanceStruct", balanceStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -23944,7 +23944,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$EnergyEvseModeClusterModeTagStruct", modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -23968,7 +23968,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$EnergyEvseModeClusterModeOptionStruct", modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -24255,7 +24255,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                jninewElement_2_value, newElement_2_value);
 
                     jclass modeTagStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementModeClusterModeTagStruct",
                         modeTagStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -24280,7 +24280,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass modeOptionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$DeviceEnergyManagementModeClusterModeOptionStruct",
                     modeOptionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -27802,7 +27802,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jninewElement_0_presetTypeFeatures, newElement_0_presetTypeFeatures);
 
                 jclass presetTypeStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThermostatClusterPresetTypeStruct", presetTypeStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -27866,7 +27866,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jninewElement_0_scheduleTypeFeatures, newElement_0_scheduleTypeFeatures);
 
                 jclass scheduleTypeStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThermostatClusterScheduleTypeStruct", scheduleTypeStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -28114,7 +28114,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass presetStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThermostatClusterPresetStruct", presetStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -28301,7 +28301,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass scheduleTransitionStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$ThermostatClusterScheduleTransitionStruct",
                         scheduleTransitionStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -28354,7 +28354,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass scheduleStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThermostatClusterScheduleStruct", scheduleStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -28480,7 +28480,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass queuedPresetStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ThermostatClusterQueuedPresetStruct", queuedPresetStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -36012,7 +36012,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass channelInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfoStruct", channelInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -36091,7 +36091,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jnivalue_lineupInfoType, value_lineupInfoType);
 
                 jclass lineupInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ChannelClusterLineupInfoStruct", lineupInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -36211,7 +36211,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass channelInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfoStruct", channelInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -36406,7 +36406,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
 
                 jclass targetInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$TargetNavigatorClusterTargetInfoStruct", targetInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -36686,7 +36686,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass playbackPositionStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterPlaybackPositionStruct",
                     playbackPositionStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -36822,7 +36822,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass trackAttributesStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
                         trackAttributesStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -36846,7 +36846,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass trackStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackStruct", trackStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -36926,7 +36926,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         }
 
                         jclass trackAttributesStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
                             trackAttributesStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
@@ -36951,7 +36951,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass trackStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackStruct", trackStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -37027,7 +37027,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass trackAttributesStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
                         trackAttributesStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
@@ -37051,7 +37051,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass trackStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackStruct", trackStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -37131,7 +37131,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         }
 
                         jclass trackAttributesStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackAttributesStruct",
                             trackAttributesStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
@@ -37156,7 +37156,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
 
                     jclass trackStructStructClass_2;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$MediaPlaybackClusterTrackStruct", trackStructStructClass_2);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -37361,7 +37361,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     chip::JniReferences::GetInstance().CharToStringUTF(entry_0.description, newElement_0_description));
 
                 jclass inputInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$MediaInputClusterInputInfoStruct", inputInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -38040,7 +38040,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.name, newElement_0_name));
 
                 jclass outputInfoStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$AudioOutputClusterOutputInfoStruct", outputInfoStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -38275,7 +38275,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                      value_application_applicationID));
 
                 jclass applicationStructStructClass_2;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplicationStruct",
                     applicationStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
@@ -38314,7 +38314,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass applicationEPStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ApplicationLauncherClusterApplicationEPStruct",
                     applicationEPStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -38557,7 +38557,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.applicationID, value_applicationID));
 
             jclass applicationStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$ApplicationBasicClusterApplicationStruct", applicationStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -38965,7 +38965,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass ratingNameStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ContentControlClusterRatingNameStruct", ratingNameStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -39034,7 +39034,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass ratingNameStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$ContentControlClusterRatingNameStruct", ratingNameStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -42086,7 +42086,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 newElement_0_member2 = newElement_0_member2ByteArray;
 
                 jclass testListStructOctetStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UnitTestingClusterTestListStructOctet",
                     testListStructOctetStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -42375,7 +42375,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jninewElement_0_nullableStruct_h, newElement_0_nullableStruct_h);
 
                     jclass simpleStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -42470,7 +42470,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         jninewElement_0_optionalStructInsideOptional_h, newElement_0_optionalStructInsideOptional_h);
 
                     jclass simpleStructStructClass_3;
-                    err = chip::JniReferences::GetInstance().GetClassRef(
+                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
                         env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_3);
                     if (err != CHIP_NO_ERROR)
                     {
@@ -42587,7 +42587,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                             newElement_0_nullableOptionalStructInsideOptional_h);
 
                         jclass simpleStructStructClass_4;
-                        err = chip::JniReferences::GetInstance().GetClassRef(
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
                             env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_4);
                         if (err != CHIP_NO_ERROR)
                         {
@@ -42704,7 +42704,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jclass nullablesAndOptionalsStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UnitTestingClusterNullablesAndOptionalsStruct",
                     nullablesAndOptionalsStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
@@ -42806,7 +42806,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                           jnivalue_h, value_h);
 
             jclass simpleStructStructClass_0;
-            err = chip::JniReferences::GetInstance().GetClassRef(
+            err = chip::JniReferences::GetInstance().GetLocalClassRef(
                 env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_0);
             if (err != CHIP_NO_ERROR)
             {
@@ -43069,7 +43069,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_fabricSensitiveStruct_h);
 
                 jclass simpleStructStructClass_2;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_2);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -43119,7 +43119,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            jninewElement_0_fabricIndex, newElement_0_fabricIndex);
 
                 jclass testFabricScopedStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UnitTestingClusterTestFabricScoped", testFabricScopedStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
@@ -43911,7 +43911,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                               value_hCtorSignature.c_str(), jnivalue_h, value_h);
 
                 jclass simpleStructStructClass_1;
-                err = chip::JniReferences::GetInstance().GetClassRef(
+                err = chip::JniReferences::GetInstance().GetLocalClassRef(
                     env, "chip/devicecontroller/ChipStructs$UnitTestingClusterSimpleStruct", simpleStructStructClass_1);
                 if (err != CHIP_NO_ERROR)
                 {
