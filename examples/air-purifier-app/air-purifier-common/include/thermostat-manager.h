@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <functional>
 
 namespace chip {
 namespace app {
