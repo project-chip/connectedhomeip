@@ -658,15 +658,15 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 void BLEManagerImpl::CheckNonConcurrentBleClosing()
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (mTerminateOnPacketTxComplete)
     {
         DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
     }
-}
 #endif
+}
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
 {
