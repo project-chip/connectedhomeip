@@ -348,6 +348,7 @@ public:
      */
     CHIP_ERROR TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
                                                                       Optional<System::Clock::Timeout> timeout = NullOptional);
+
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
