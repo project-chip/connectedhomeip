@@ -114,6 +114,12 @@ source_set("pre-encoded-value") {
   ]
 }
 
+source_set("subscription-manager") {
+  sources = [ "SubscriptionManager.h" ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
+}
+
 source_set("message-def") {
   sources = [
     "MessageDef/ArrayBuilder.cpp",
@@ -247,8 +253,9 @@ static_library("interaction-model") {
     ":app_config",
     ":message-def",
     ":paths",
-    "${chip_root}/src/app/icd:icd_config",
-    "${chip_root}/src/app/icd:observer",
+    ":subscription-manager",
+    "${chip_root}/src/app/icd/server:icd-server-config",
+    "${chip_root}/src/app/icd/server:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
@@ -326,7 +333,7 @@ static_library("app") {
     ":interaction-model",
     ":pre-encoded-value",
     ":revision_info",
-    "${chip_root}/src/app/icd:icd_config",
+    "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -346,8 +353,8 @@ static_library("app") {
 
   if (chip_enable_icd_server) {
     public_deps += [
-      "${chip_root}/src/app/icd:manager",
-      "${chip_root}/src/app/icd:notifier",
+      "${chip_root}/src/app/icd/server:manager",
+      "${chip_root}/src/app/icd/server:notifier",
     ]
   }
 

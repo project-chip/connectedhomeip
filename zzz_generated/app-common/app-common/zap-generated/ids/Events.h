@@ -431,6 +431,24 @@ static constexpr EventId Id = 0x00000000;
 } // namespace Events
 } // namespace DemandResponseLoadControl
 
+namespace Messages {
+namespace Events {
+
+namespace MessageQueued {
+static constexpr EventId Id = 0x00000000;
+} // namespace MessageQueued
+
+namespace MessagePresented {
+static constexpr EventId Id = 0x00000001;
+} // namespace MessagePresented
+
+namespace MessageComplete {
+static constexpr EventId Id = 0x00000002;
+} // namespace MessageComplete
+
+} // namespace Events
+} // namespace Messages
+
 namespace DeviceEnergyManagement {
 namespace Events {
 

@@ -1575,6 +1575,38 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // nonexistent attribute
     [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
 
+    // Test if previous value is reported on a write
+    uint16_t testOnTimeValue = 10;
+    XCTestExpectation * onTimeWriteSuccess = [self expectationWithDescription:@"OnTime write success"];
+    XCTestExpectation * onTimePreviousValue = [self expectationWithDescription:@"OnTime previous value"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        for (NSDictionary<NSString *, id> * attributeReponseValue in data) {
+            MTRAttributePath * path = attributeReponseValue[MTRAttributePathKey];
+            if (path.cluster.unsignedIntValue == MTRClusterIDTypeOnOffID && path.attribute.unsignedLongValue == MTRAttributeIDTypeClusterOnOffAttributeOnTimeID) {
+                NSDictionary * dataValue = attributeReponseValue[MTRDataKey];
+                NSNumber * onTimeValue = dataValue[MTRValueKey];
+                if (onTimeValue && (onTimeValue.unsignedIntValue == testOnTimeValue)) {
+                    [onTimeWriteSuccess fulfill];
+                }
+
+                NSDictionary * previousDataValue = attributeReponseValue[MTRPreviousDataKey];
+                NSNumber * previousOnTimeValue = previousDataValue[MTRValueKey];
+                if (previousOnTimeValue) {
+                    [onTimePreviousValue fulfill];
+                }
+            }
+        }
+    };
+    NSDictionary * writeOnTimeValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(testOnTimeValue) };
+    [device writeAttributeWithEndpointID:@(1)
+                               clusterID:@(MTRClusterIDTypeOnOffID)
+                             attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID)
+                                   value:writeOnTimeValue
+                   expectedValueInterval:@(10000)
+                       timedWriteTimeout:nil];
+
+    [self waitForExpectations:@[ onTimeWriteSuccess, onTimePreviousValue ] timeout:10];
+
     // Test if errors are properly received
     XCTestExpectation * attributeReportErrorExpectation = [self expectationWithDescription:@"Attribute read error"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {

@@ -47,6 +47,7 @@ from pw_hdlc import rpc
 # Protos
 # isort: off
 from attributes_service import attributes_service_pb2
+from boolean_state_service import boolean_state_service_pb2
 from button_service import button_service_pb2
 from descriptor_service import descriptor_service_pb2
 from device_service import device_service_pb2
@@ -128,6 +129,7 @@ def show_console(device: str, baudrate: int,
         use_ipython=True,
         compiled_protos=[
                 attributes_service_pb2,
+                boolean_state_service_pb2,
                 button_service_pb2,
                 descriptor_service_pb2,
                 device_service_pb2,

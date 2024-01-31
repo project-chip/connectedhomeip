@@ -133,6 +133,17 @@ pw_proto_library(attributes_service
     pw_protobuf.common_proto
 )
 
+pw_proto_library(boolean_state_service
+  SOURCES
+    ${CHIP_ROOT}/examples/common/pigweed/protos/boolean_state_service.proto
+  PREFIX
+    boolean_state_service
+  STRIP_PREFIX
+    ${CHIP_ROOT}/examples/common/pigweed/protos
+  DEPS
+    pw_protobuf.common_proto
+)
+
 pw_proto_library(descriptor_service
   SOURCES
     ${CHIP_ROOT}/examples/common/pigweed/protos/descriptor_service.proto
@@ -202,6 +213,7 @@ target_include_directories(app PRIVATE
 
 target_compile_options(app PRIVATE
                        "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BOOLEAN_STATE_SERVICE=1"
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
@@ -209,6 +221,7 @@ target_compile_options(app PRIVATE
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
+  boolean_state_service.nanopb_rpc
   descriptor_service.nanopb_rpc
   device_service.nanopb_rpc
   thread_service.nanopb_rpc

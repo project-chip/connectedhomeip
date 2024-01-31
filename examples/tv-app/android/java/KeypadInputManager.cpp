@@ -23,6 +23,7 @@
 #include <app/util/config.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
@@ -48,11 +49,12 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNIEnv for current thread"));
+    JniLocalReferenceManager manager(env);
 
     ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %c", to_underlying(keyCode));
     VerifyOrExit(mKeypadInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSendKeyMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
     ret = env->CallIntMethod(mKeypadInputManagerObject, mSendKeyMethod, static_cast<jint>(keyCode));
@@ -74,6 +76,7 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for KeypadInputManager"));
+    JniLocalReferenceManager manager(env);
 
     mKeypadInputManagerObject = env->NewGlobalRef(managerObject);
     VerifyOrReturn(mKeypadInputManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef KeypadInputManager"));
