@@ -21,12 +21,11 @@ source_set("data-model") {
     "Encode.h",
     "FabricScoped.h",
     "List.h",
-    "Nullable.h",
     "NullObject.h",
+    "Nullable.h",
     "TagBoundEncoder.h",
     "WrappedStructEncoder.h",
   ]
-
 
   deps = [
     # TODO: dependencies NOT declared because they are not part of
@@ -36,10 +35,10 @@ source_set("data-model") {
     #  - app/util/attribute-storage-null-handling.h
     #  - app/ConcreteAttributePath.h
     #
+    "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/protocols/interaction_model",
-    "${chip_root}/src/app/common:enums",
   ]
 }
 
