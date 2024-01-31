@@ -43,6 +43,7 @@ chip_test_suite_using_nltest("tests") {
     "TestMessageHeader.cpp",
     "TestPeerAddress.cpp",
     "TestTCP.cpp",
+    "TestUDP.cpp",
   ]
 
   public_deps = [
