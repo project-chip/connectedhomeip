@@ -543,7 +543,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate)
+CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate,
+                                                                             jobject cdTrustKeys)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -565,6 +566,29 @@ CHIP_ERROR AndroidDeviceControllerWrapper::UpdateAttestationTrustStoreBridge(job
         delete mDeviceAttestationVerifier;
     }
     mDeviceAttestationVerifier = deviceAttestationVerifier;
+
+    if (cdTrustKeys != nullptr)
+    {
+        WellKnownKeysTrustStore * cdTrustStore = mDeviceAttestationVerifier->GetCertificationDeclarationTrustStore();
+        VerifyOrExit(cdTrustStore != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+        jint size;
+        err = JniReferences::GetInstance().GetListSize(cdTrustKeys, size);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        for (jint i = 0; i < size; i++)
+        {
+            jobject jTrustKey = nullptr;
+            err               = JniReferences::GetInstance().GetListItem(cdTrustKeys, i, jTrustKey);
+
+            VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+            JniByteArray jniTrustKey(env, static_cast<jbyteArray>(jTrustKey));
+            err = cdTrustStore->AddTrustedKey(jniTrustKey.byteSpan());
+            VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+        }
+    }
 
     mController->SetDeviceAttestationVerifier(mDeviceAttestationVerifier);
 
