@@ -318,6 +318,8 @@ public:
         return FinishCommand(aTimedInvokeTimeoutMs, optionalArgs);
     }
 
+    size_t GetInvokeResponseMessageCount();
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
@@ -346,8 +348,6 @@ public:
      */
     CHIP_ERROR TestOnlyCommandSenderTimedRequestFlagWithNoTimedInvoke(const SessionHandle & session,
                                                                       Optional<System::Clock::Timeout> timeout = NullOptional);
-
-    size_t GetInvokeResponseMessageCount() { return mInvokeResponseMessageCount; }
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 private:
@@ -508,12 +508,10 @@ private:
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
 
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
-    uint16_t mFinishedCommandCount    = 0;
-    uint16_t mRemoteMaxPathsPerInvoke = 1;
 
-#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
-    size_t mInvokeResponseMessageCount = 0;
-#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    uint16_t mInvokeResponseMessageCount = 0;
+    uint16_t mFinishedCommandCount       = 0;
+    uint16_t mRemoteMaxPathsPerInvoke    = 1;
 
     State mState                = State::Idle;
     bool mSuppressResponse      = false;
