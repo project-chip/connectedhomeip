@@ -44,11 +44,10 @@ chip_test_suite_using_nltest("tests") {
     "TestCryptoLayer.h",
   ]
 
-
   test_sources = [
+    "TestChipCryptoPAL.cpp",
     "TestGroupOperationalCredentials.cpp",
     "TestSessionKeystore.cpp",
-    "TestChipCryptoPAL.cpp",
   ]
 
   if (chip_crypto == "psa") {
