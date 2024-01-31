@@ -63,7 +63,7 @@ tests:
           Please send the 'unregister client' command using the check-in nodeID received from the previous read
           ./chip-tool icdmanagement unregister-client 112233 1 0
 
-          [1704888949.629057][71657:71659] CHIP:DMG:         
+          [1704888949.629057][71657:71659] CHIP:DMG:
           [1704888949.629066][71657:71659] CHIP:DMG:         InteractionModelRevision = 11
           [1704888949.629074][71657:71659] CHIP:DMG: },
           [1704888949.629125][71657:71659] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_0046 Command=0x0000_0002 Status=0x0
