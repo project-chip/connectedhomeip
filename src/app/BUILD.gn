@@ -115,7 +115,7 @@ source_set("pre-encoded-value") {
 }
 
 source_set("subscription-manager") {
-  sources = [ "SubscriptionManager.h" ]
+  sources = [ "SubscriptionsInfoProvider.h" ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
 }
