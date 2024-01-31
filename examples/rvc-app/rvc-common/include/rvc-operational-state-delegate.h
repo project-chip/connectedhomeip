@@ -53,6 +53,8 @@ private:
     HandleOpStateCommand mPauseCallback;
     RvcDevice * mResumeRvcDeviceInstance;
     HandleOpStateCommand mResumeCallback;
+    RvcDevice * mGoHomeRvcDeviceInstance;
+    HandleOpStateCommand mGoHomeCallback;
 
 public:
     /**
@@ -100,6 +102,12 @@ public:
     void HandleResumeStateCallback(Clusters::OperationalState::GenericOperationalError & err) override;
 
     /**
+     * Handle Command Callback in application: GoHome
+     * @param[out] get operational error after callback.
+     */
+    void HandleGoHomeCommandCallback(Clusters::OperationalState::GenericOperationalError & err) override;
+
+    /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
      */
@@ -125,6 +133,12 @@ public:
     {
         mResumeCallback          = aCallback;
         mResumeRvcDeviceInstance = aInstance;
+    };
+
+    void SetGoHomeCallback(HandleOpStateCommand aCallback, RvcDevice * aInstance)
+    {
+        mGoHomeCallback          = aCallback;
+        mGoHomeRvcDeviceInstance = aInstance;
     };
 };
 

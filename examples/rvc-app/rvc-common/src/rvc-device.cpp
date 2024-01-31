@@ -123,7 +123,7 @@ void RvcDevice::HandleOpStateResumeCallback(Clusters::OperationalState::GenericO
     break;
     default:
         // This method is only called if the device is in a resume-compatible state, i.e. `Charging`, `Docked` or
-        // `Paused`. Therefor, we do not expect to ever enter this branch.
+        // `Paused`. Therefore, we do not expect to ever enter this branch.
         err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
         return;
     }
