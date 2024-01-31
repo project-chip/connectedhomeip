@@ -533,7 +533,7 @@ exit:
 }
 
 JNI_METHOD(void, setAttestationTrustStoreDelegate)
-(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate)
+(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate, jobject cdTrustKeys)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -544,7 +544,7 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
     if (attestationTrustStoreDelegate != nullptr)
     {
         jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        err                                      = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef);
+        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
         SuccessOrExit(err);
     }
 
