@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/icd/ICDNotifier.h>
+#include <app/icd/server/ICDNotifier.h>
 #include <cstdint>
 #include <cstring>
 

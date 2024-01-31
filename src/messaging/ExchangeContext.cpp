@@ -32,9 +32,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDNotifier.h> // nogncheck
+#include <app/icd/server/ICDNotifier.h> // nogncheck
 #endif
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
