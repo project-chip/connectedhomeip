@@ -24130,12 +24130,42 @@ public class ClusterInfoMapping {
 
     Map<String, CommandParameterInfo> messagespresentMessagesRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
+    CommandParameterInfo messagespresentMessagesRequestmessageIDCommandParameterInfo = new CommandParameterInfo("messageID", byte[].class, byte[].class);
+    messagespresentMessagesRequestCommandParams.put("messageID",messagespresentMessagesRequestmessageIDCommandParameterInfo);
+
+    CommandParameterInfo messagespresentMessagesRequestpriorityCommandParameterInfo = new CommandParameterInfo("priority", Integer.class, Integer.class);
+    messagespresentMessagesRequestCommandParams.put("priority",messagespresentMessagesRequestpriorityCommandParameterInfo);
+
+    CommandParameterInfo messagespresentMessagesRequestmessageControlCommandParameterInfo = new CommandParameterInfo("messageControl", Integer.class, Integer.class);
+    messagespresentMessagesRequestCommandParams.put("messageControl",messagespresentMessagesRequestmessageControlCommandParameterInfo);
+
+    CommandParameterInfo messagespresentMessagesRequeststartTimeCommandParameterInfo = new CommandParameterInfo("startTime", Long.class, Long.class);
+    messagespresentMessagesRequestCommandParams.put("startTime",messagespresentMessagesRequeststartTimeCommandParameterInfo);
+
+    CommandParameterInfo messagespresentMessagesRequestdurationCommandParameterInfo = new CommandParameterInfo("duration", Integer.class, Integer.class);
+    messagespresentMessagesRequestCommandParams.put("duration",messagespresentMessagesRequestdurationCommandParameterInfo);
+
+    CommandParameterInfo messagespresentMessagesRequestmessageTextCommandParameterInfo = new CommandParameterInfo("messageText", String.class, String.class);
+    messagespresentMessagesRequestCommandParams.put("messageText",messagespresentMessagesRequestmessageTextCommandParameterInfo);
+
     InteractionInfo messagespresentMessagesRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MessagesCluster) cluster)
         .presentMessagesRequest((DefaultClusterCallback) callback
-        , (ArrayList<ChipStructs.MessagesClusterMessageStruct>)
-        commandArguments.get("messages")
+        , (byte[])
+        commandArguments.get("messageID")
+        , (Integer)
+        commandArguments.get("priority")
+        , (Integer)
+        commandArguments.get("messageControl")
+        , (Long)
+        commandArguments.get("startTime")
+        , (Integer)
+        commandArguments.get("duration")
+        , (String)
+        commandArguments.get("messageText")
+        , (Optional<ArrayList<ChipStructs.MessagesClusterMessageResponseOptionStruct>>)
+        commandArguments.get("responses")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

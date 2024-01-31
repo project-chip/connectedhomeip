@@ -23855,10 +23855,22 @@ class Messages(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="messages", Tag=0, Type=typing.List[Messages.Structs.MessageStruct]),
+                        ClusterObjectFieldDescriptor(Label="messageID", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="priority", Tag=1, Type=Messages.Enums.MessagePriorityEnum),
+                        ClusterObjectFieldDescriptor(Label="messageControl", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="startTime", Tag=3, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="duration", Tag=4, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="messageText", Tag=5, Type=str),
+                        ClusterObjectFieldDescriptor(Label="responses", Tag=6, Type=typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]),
                     ])
 
-            messages: 'typing.List[Messages.Structs.MessageStruct]' = field(default_factory=lambda: [])
+            messageID: 'bytes' = b""
+            priority: 'Messages.Enums.MessagePriorityEnum' = 0
+            messageControl: 'uint' = 0
+            startTime: 'typing.Union[Nullable, uint]' = NullValue
+            duration: 'typing.Union[Nullable, uint]' = NullValue
+            messageText: 'str' = ""
+            responses: 'typing.Optional[typing.List[Messages.Structs.MessageResponseOptionStruct]]' = None
 
         @dataclass
         class CancelMessagesRequest(ClusterCommand):

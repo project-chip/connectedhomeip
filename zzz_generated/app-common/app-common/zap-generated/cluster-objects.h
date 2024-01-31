@@ -21473,7 +21473,13 @@ namespace Commands {
 namespace PresentMessagesRequest {
 enum class Fields : uint8_t
 {
-    kMessages = 0,
+    kMessageID      = 0,
+    kPriority       = 1,
+    kMessageControl = 2,
+    kStartTime      = 3,
+    kDuration       = 4,
+    kMessageText    = 5,
+    kResponses      = 6,
 };
 
 struct Type
@@ -21483,7 +21489,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::List<const Structs::MessageStruct::Type> messages;
+    chip::ByteSpan messageID;
+    MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
+    chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
+    DataModel::Nullable<uint32_t> startTime;
+    DataModel::Nullable<uint16_t> duration;
+    chip::CharSpan messageText;
+    Optional<DataModel::List<const Structs::MessageResponseOptionStruct::Type>> responses;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -21498,7 +21510,13 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
 
-    DataModel::DecodableList<Structs::MessageStruct::DecodableType> messages;
+    chip::ByteSpan messageID;
+    MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
+    chip::BitMask<MessageControlBitmap> messageControl = static_cast<chip::BitMask<MessageControlBitmap>>(0);
+    DataModel::Nullable<uint32_t> startTime;
+    DataModel::Nullable<uint16_t> duration;
+    chip::CharSpan messageText;
+    Optional<DataModel::DecodableList<Structs::MessageResponseOptionStruct::DecodableType>> responses;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PresentMessagesRequest

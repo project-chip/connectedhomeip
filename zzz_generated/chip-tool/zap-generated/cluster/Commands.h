@@ -6789,9 +6789,15 @@ class MessagesPresentMessagesRequest : public ClusterCommand
 {
 public:
     MessagesPresentMessagesRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("present-messages-request", credsIssuerConfig), mComplex_Messages(&mRequest.messages)
+        ClusterCommand("present-messages-request", credsIssuerConfig), mComplex_Responses(&mRequest.responses)
     {
-        AddArgument("Messages", &mComplex_Messages);
+        AddArgument("MessageID", &mRequest.messageID);
+        AddArgument("Priority", 0, UINT8_MAX, &mRequest.priority);
+        AddArgument("MessageControl", 0, UINT8_MAX, &mRequest.messageControl);
+        AddArgument("StartTime", 0, UINT32_MAX, &mRequest.startTime);
+        AddArgument("Duration", 0, UINT16_MAX, &mRequest.duration);
+        AddArgument("MessageText", &mRequest.messageText);
+        AddArgument("Responses", &mComplex_Responses, "", Argument::kOptional);
         ClusterCommand::AddArguments();
     }
 
@@ -6818,8 +6824,9 @@ public:
 
 private:
     chip::app::Clusters::Messages::Commands::PresentMessagesRequest::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageStruct::Type>>
-        mComplex_Messages;
+    TypedComplexArgument<
+        chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>>>
+        mComplex_Responses;
 };
 
 /*

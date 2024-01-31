@@ -9509,7 +9509,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PresentMessagesRequestCommandField {Messages(0),;
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
                     private final int id;
                     PresentMessagesRequestCommandField(int id) {
                         this.id = id;
