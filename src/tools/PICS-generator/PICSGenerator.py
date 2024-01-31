@@ -282,6 +282,10 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
             clusterID = f"0x{server:04x}"
 
+            if server > 0x7FFF:
+                console.print(f"[red]Cluster outside standard range ({clusterID}) not handled! ❌")
+                continue
+
             try:
                 clusterClass = getattr(Clusters, devCtrl.GetClusterHandler().GetClusterInfoById(server)['clusterName'])
             except AttributeError:
