@@ -105,13 +105,9 @@ source_set("error") {
 }
 
 source_set("encoding") {
-  sources = [
-    "CHIPEncoding.h",
-  ]
+  sources = [ "CHIPEncoding.h" ]
 
-  public_deps = [
-    "${nlio_root}:nlio",
-  ]
+  public_deps = [ "${nlio_root}:nlio" ]
 }
 
 static_library("core") {
