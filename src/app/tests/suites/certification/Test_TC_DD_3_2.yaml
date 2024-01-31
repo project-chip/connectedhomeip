@@ -18,6 +18,7 @@ name:
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
+    - MCORE.DD.NON_CONCURRENT_CONNECTION
 
 config:
     nodeId: 0x12344321
@@ -298,7 +299,7 @@ tests:
 
     - label:
           "Step 9: Commissioner instructs Commissionee to connect to operational
-          network if not already connected"
+          network"
       verification: |
           Verify in TH(CHIP-TOOL)
 

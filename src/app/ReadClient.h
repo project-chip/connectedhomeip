@@ -292,6 +292,12 @@ public:
         Subscribe,
     };
 
+    enum class PeerType : uint8_t
+    {
+        kNormal,
+        kLITICD,
+    };
+
     /**
      *
      *  Constructor.
@@ -525,6 +531,15 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
 
     /**
+     *  Updates the type (LIT ICD or not) of the peer.
+     *
+     *  When the subscription is active, this function will just set the flag. When the subscription is an InactiveICDSubscription,
+     * setting the peer type to SIT or normal devices will also trigger a resubscription attempt.
+     *
+     */
+    void OnPeerTypeChange(PeerType aType);
+
+    /**
      *  Check if current read client is being used
      *
      */
@@ -544,6 +559,7 @@ private:
     CHIP_ERROR BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                           const Span<AttributePathParams> & aAttributePaths,
                                           const Span<DataVersionFilter> & aDataVersionFilters, bool & aEncodedDataVersionList);
+    CHIP_ERROR ReadICDOperatingModeFromAttributeDataIB(TLV::TLVReader && aReader, PeerType & aType);
     CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
     CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 

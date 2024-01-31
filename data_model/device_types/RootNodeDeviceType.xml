@@ -139,13 +139,6 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0038" name="Time Synchronization" side="server">
       <quality singleton="true"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <optionalConform/>
-      </otherwiseConform>
-    </cluster>
-    <cluster id="0x0038" name="Time Synchronization" side="server">
-      <quality singleton="true"/>
       <optionalConform/>
     </cluster>
     <cluster id="0x003C" name="Administrator Commissioning" side="server">

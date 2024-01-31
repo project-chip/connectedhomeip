@@ -38,6 +38,7 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 @protocol MTRDevicePairingDelegate;
 @protocol MTRDeviceControllerDelegate;
 
+MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRDeviceController : NSObject
 
 /**

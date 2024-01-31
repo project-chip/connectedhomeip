@@ -38,6 +38,9 @@ class TC_DRLK_2_12(MatterBaseTest, DRLK_COMMON):
         await self.teardown()
         return super().teardown_test()
 
+    def pics_TC_DRLK_2_12(self) -> list[str]:
+        return ["DRLK.S.F0c"]
+
     @async_test_body
     async def test_TC_DRLK_2_12(self):
         await self.run_drlk_test_2_12()

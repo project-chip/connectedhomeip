@@ -15,8 +15,10 @@
 name:
     Window Covering [TC-WNCV-3.5] DownOrClose command Long-Run Verification [DUT
     as Server]
+
 PICS:
     - WNCV.S
+    - WNCV.S.F02 | WNCV.S.F04
 
 config:
     nodeId: 0x12344321

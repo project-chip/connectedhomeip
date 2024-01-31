@@ -266,8 +266,8 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
         {
             if (argc >= 3)
             {
-                uint32_t pincode = (uint32_t) strtol(argv[2], &eptr, 10);
-                GetCommissionerDiscoveryController()->CommissionWithPincode(pincode);
+                uint32_t passcode = (uint32_t) strtol(argv[2], &eptr, 10);
+                GetCommissionerDiscoveryController()->CommissionWithPasscode(passcode);
                 return CHIP_NO_ERROR;
             }
             GetCommissionerDiscoveryController()->Ok();
@@ -280,15 +280,15 @@ static CHIP_ERROR ControllerHandler(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "udc-commission") == 0)
     {
-        // udc-commission pincode index
+        // udc-commission passcode index
         if (argc < 3)
         {
             return PrintAllCommands();
         }
         char * eptr;
-        uint32_t pincode = (uint32_t) strtol(argv[1], &eptr, 10);
-        size_t index     = (size_t) strtol(argv[2], &eptr, 10);
-        return pairUDC(true, pincode, index);
+        uint32_t passcode = (uint32_t) strtol(argv[1], &eptr, 10);
+        size_t index      = (size_t) strtol(argv[2], &eptr, 10);
+        return pairUDC(true, passcode, index);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

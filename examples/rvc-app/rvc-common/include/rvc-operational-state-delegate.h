@@ -34,7 +34,7 @@ typedef void (RvcDevice::*HandleOpStateCommand)(Clusters::OperationalState::Gene
 namespace RvcOperationalState {
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
-class RvcOperationalStateDelegate : public OperationalState::Delegate
+class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 private:
     const Clusters::OperationalState::GenericOperationalState mOperationalStateList[7] = {

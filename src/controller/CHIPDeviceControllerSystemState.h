@@ -36,6 +36,7 @@
 #include <credentials/GroupDataProvider.h>
 #include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
+#include <protocols/bdx/BdxTransferServer.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
@@ -102,6 +103,7 @@ struct DeviceControllerSystemStateParams
     Protocols::SecureChannel::UnsolicitedStatusHandler * unsolicitedStatusHandler = nullptr;
     Messaging::ExchangeManager * exchangeMgr                                      = nullptr;
     secure_channel::MessageCounterManager * messageCounterManager                 = nullptr;
+    bdx::BDXTransferServer * bdxTransferServer                                    = nullptr;
     CASEServer * caseServer                                                       = nullptr;
     CASESessionManager * caseSessionManager                                       = nullptr;
     SessionSetupPool * sessionSetupPool                                           = nullptr;
@@ -136,7 +138,8 @@ public:
         mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
         mUnsolicitedStatusHandler(params.unsolicitedStatusHandler), mExchangeMgr(params.exchangeMgr),
-        mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
+        mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
+        mBDXTransferServer(params.bdxTransferServer), mCASEServer(params.caseServer),
         mCASESessionManager(params.caseSessionManager), mSessionSetupPool(params.sessionSetupPool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider), mTimerDelegate(params.timerDelegate),
         mReportScheduler(params.reportScheduler), mSessionKeystore(params.sessionKeystore),
@@ -190,7 +193,7 @@ public:
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
             mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
             mGroupDataProvider != nullptr && mReportScheduler != nullptr && mTimerDelegate != nullptr &&
-            mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr;
+            mSessionKeystore != nullptr && mSessionResumptionStorage != nullptr && mBDXTransferServer != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
@@ -214,6 +217,7 @@ public:
         mTempFabricTable          = tempFabricTable;
         mEnableServerInteractions = enableServerInteractions;
     }
+    bdx::BDXTransferServer * BDXTransferServer() const { return mBDXTransferServer; }
 
 private:
     DeviceControllerSystemState() {}
@@ -230,6 +234,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr                                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager                 = nullptr;
     FabricTable * mFabrics                                                         = nullptr;
+    bdx::BDXTransferServer * mBDXTransferServer                                    = nullptr;
     CASEServer * mCASEServer                                                       = nullptr;
     CASESessionManager * mCASESessionManager                                       = nullptr;
     SessionSetupPool * mSessionSetupPool                                           = nullptr;

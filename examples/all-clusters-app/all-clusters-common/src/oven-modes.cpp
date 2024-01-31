@@ -101,7 +101,6 @@ void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gOvenModeDelegate == nullptr && gOvenModeInstance == nullptr);
     gOvenModeDelegate = new OvenMode::OvenModeDelegate;
-    gOvenModeInstance =
-        new ModeBase::Instance(gOvenModeDelegate, 0x1, OvenMode::Id, chip::to_underlying(OvenMode::Feature::kOnOff));
+    gOvenModeInstance = new ModeBase::Instance(gOvenModeDelegate, 0x1, OvenMode::Id, 0x0);
     gOvenModeInstance->Init();
 }

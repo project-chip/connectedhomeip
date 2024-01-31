@@ -34,7 +34,6 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
-MTR_HIDDEN
 @interface MTRErrorHolder : NSObject
 @property (nonatomic, readonly) CHIP_ERROR error;
 

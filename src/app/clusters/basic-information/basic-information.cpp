@@ -33,6 +33,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -410,6 +411,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 {
     void OnStartUp(uint32_t softwareVersion) override
     {
+        MATTER_TRACE_INSTANT("OnStartUp", "BasicInfo");
         // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
         ChipLogDetail(Zcl, "Emitting StartUp event");
 
@@ -429,6 +431,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 
     void OnShutDown() override
     {
+        MATTER_TRACE_INSTANT("OnShutDown", "BasicInfo");
         // The ShutDown event SHOULD be emitted on a best-effort basis by a Node prior to any orderly shutdown sequence.
         ChipLogDetail(Zcl, "Emitting ShutDown event");
 

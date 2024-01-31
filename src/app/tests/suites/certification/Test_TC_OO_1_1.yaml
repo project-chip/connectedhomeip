@@ -33,14 +33,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/29786
     - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
+          value: 5
           constraints:
               type: int16u
-              minValue: 5
-              maxValue: 6
 
     - label: "Step 3a: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"

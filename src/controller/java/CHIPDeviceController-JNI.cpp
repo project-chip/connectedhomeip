@@ -53,6 +53,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/Protocols.h>
+#include <protocols/secure_channel/SessionEstablishmentDelegate.h>
 #include <pthread.h>
 #include <system/SystemClock.h>
 #include <vector>
@@ -228,7 +229,12 @@ JNI_METHOD(jint, onNOCChainGeneration)
     {
         JniByteArray jByteArrayIpk(env, ipk);
 
-        VerifyOrReturnValue(jByteArrayIpk.byteSpan().size() == sizeof(ipkValue), CHIP_ERROR_INTERNAL.AsInteger());
+        if (jByteArrayIpk.byteSpan().size() != sizeof(ipkValue))
+        {
+            ChipLogError(Controller, "Invalid IPK size %u and expect %u", static_cast<unsigned>(jByteArrayIpk.byteSpan().size()),
+                         static_cast<unsigned>(sizeof(ipkValue)));
+            return CHIP_ERROR_INVALID_IPK.AsInteger();
+        }
         memcpy(&ipkValue[0], jByteArrayIpk.byteSpan().data(), jByteArrayIpk.byteSpan().size());
 
         ipkOptional.SetValue(ipkTempSpan);
@@ -527,7 +533,7 @@ exit:
 }
 
 JNI_METHOD(void, setAttestationTrustStoreDelegate)
-(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate)
+(JNIEnv * env, jobject self, jlong handle, jobject attestationTrustStoreDelegate, jobject cdTrustKeys)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -538,7 +544,7 @@ JNI_METHOD(void, setAttestationTrustStoreDelegate)
     if (attestationTrustStoreDelegate != nullptr)
     {
         jobject attestationTrustStoreDelegateRef = env->NewGlobalRef(attestationTrustStoreDelegate);
-        err                                      = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef);
+        err = wrapper->UpdateAttestationTrustStoreBridge(attestationTrustStoreDelegateRef, cdTrustKeys);
         SuccessOrExit(err);
     }
 
@@ -1360,10 +1366,18 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
-    VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    VerifyOrExit(connectedDeviceCallback != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     err = wrapper->Controller()->GetConnectedDevice(static_cast<chip::NodeId>(nodeId), &connectedDeviceCallback->mOnSuccess,
                                                     &connectedDeviceCallback->mOnFailure);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error invoking GetConnectedDevice"));
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "GetConnectedDevice failed: %" CHIP_ERROR_FORMAT, err.Format());
+        OperationalSessionSetup::ConnnectionFailureInfo failureInfo(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(nodeId), wrapper->Controller()->GetFabricIndex()), err,
+            SessionEstablishmentStage::kUnknown);
+        connectedDeviceCallback->mOnFailure.mCall(&connectedDeviceCallback->mOnFailure.mContext, failureInfo);
+    }
 }
 
 JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jlong devicePtr)
@@ -2162,6 +2176,8 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
                         ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
 
     auto iter = wrapper->getICDClientStorage()->IterateICDClientInfo();
+    VerifyOrReturnValue(iter != nullptr, nullptr, ChipLogError(Controller, "IterateICDClientInfo failed!"));
+    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
 
     jmethodID constructor;
     jclass infoClass;
@@ -2204,8 +2220,6 @@ JNI_METHOD(jobject, getICDClientInfo)(JNIEnv * env, jobject self, jlong handle, 
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                             ChipLogError(Controller, "AddToList error!: %" CHIP_ERROR_FORMAT, err.Format()));
     }
-
-    iter->Release();
 
     return jInfo;
 }

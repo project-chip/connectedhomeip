@@ -180,6 +180,22 @@ private:
     jclass mClassRef;
 };
 
+// Manages an pre-existing global reference to a jobject.
+class JniGlobalRefWrapper
+{
+public:
+    explicit JniGlobalRefWrapper(jobject mGlobalRef) : mGlobalRef(mGlobalRef) {}
+    ~JniGlobalRefWrapper()
+    {
+        chip::JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mGlobalRef);
+        mGlobalRef = nullptr;
+    }
+    jobject classRef() { return mGlobalRef; }
+
+private:
+    jobject mGlobalRef = nullptr;
+};
+
 class JniLocalReferenceManager
 {
 public:

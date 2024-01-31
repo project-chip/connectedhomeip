@@ -111,38 +111,11 @@ public:
     }
 };
 
+Instance * GetOperationalStateInstance();
+
 void Shutdown();
 
 } // namespace OperationalState
-
-namespace RvcOperationalState {
-
-// This is an application level delegate to handle operational state commands according to the specific business logic.
-class RvcOperationalStateDelegate : public OperationalState::GenericOperationalStateDelegateImpl
-{
-private:
-    const OperationalState::GenericOperationalState rvcOpStateList[7] = {
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-        OperationalState::GenericOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
-    };
-
-public:
-    RvcOperationalStateDelegate()
-    {
-        GenericOperationalStateDelegateImpl::mOperationalStateList =
-            Span<const OperationalState::GenericOperationalState>(rvcOpStateList);
-    }
-};
-
-void Shutdown();
-
-} // namespace RvcOperationalState
 } // namespace Clusters
 } // namespace app
 } // namespace chip

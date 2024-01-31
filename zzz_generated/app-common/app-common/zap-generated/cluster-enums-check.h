@@ -1641,6 +1641,48 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DemandResponseLoadContr
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(Messages::FutureMessagePreferenceEnum val)
+{
+    using EnumType = Messages::FutureMessagePreferenceEnum;
+    switch (val)
+    {
+    case EnumType::kAllowed:
+    case EnumType::kIncreased:
+    case EnumType::kReduced:
+    case EnumType::kDisallowed:
+    case EnumType::kBanned:
+        return val;
+    default:
+        return static_cast<EnumType>(5);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Messages::MessagePriorityEnum val)
+{
+    using EnumType = Messages::MessagePriorityEnum;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+    case EnumType::kCritical:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::AdjustmentCauseEnum val)
+{
+    using EnumType = DeviceEnergyManagement::AdjustmentCauseEnum;
+    switch (val)
+    {
+    case EnumType::kLocalOptimization:
+    case EnumType::kGridOptimization:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CauseEnum val)
 {
     using EnumType = DeviceEnergyManagement::CauseEnum;
@@ -1650,9 +1692,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement:
     case EnumType::kOffline:
     case EnumType::kFault:
     case EnumType::kUserOptOut:
+    case EnumType::kCancelled:
         return val;
     default:
-        return static_cast<EnumType>(4);
+        return static_cast<EnumType>(5);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::CostTypeEnum val)
@@ -1677,12 +1720,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement:
     case EnumType::kOffline:
     case EnumType::kOnline:
     case EnumType::kFault:
-    case EnumType::kUserOptOut:
     case EnumType::kPowerAdjustActive:
     case EnumType::kPaused:
         return val;
     default:
-        return static_cast<EnumType>(6);
+        return static_cast<EnumType>(5);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ESATypeEnum val)
@@ -1708,6 +1750,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement:
         return val;
     default:
         return static_cast<EnumType>(14);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::ForecastUpdateReasonEnum val)
+{
+    using EnumType = DeviceEnergyManagement::ForecastUpdateReasonEnum;
+    switch (val)
+    {
+    case EnumType::kInternalOptimization:
+    case EnumType::kLocalOptimization:
+    case EnumType::kGridOptimization:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement::OptOutStateEnum val)
+{
+    using EnumType = DeviceEnergyManagement::OptOutStateEnum;
+    switch (val)
+    {
+    case EnumType::kNoOptOut:
+    case EnumType::kLocalOptOut:
+    case EnumType::kGridOptOut:
+    case EnumType::kOptOut:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
     }
 }
 
@@ -3130,9 +3199,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelTypeEnu
     case EnumType::kSatellite:
     case EnumType::kCable:
     case EnumType::kTerrestrial:
+    case EnumType::kOtt:
         return val;
     default:
-        return static_cast<EnumType>(3);
+        return static_cast<EnumType>(4);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::LineupInfoTypeEnum val)

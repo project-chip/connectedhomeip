@@ -342,6 +342,16 @@ static CHIP_ERROR Setup(const char * label,
 
 static void Finalize(chip::app::Clusters::DemandResponseLoadControl::Structs::LoadControlProgramStruct::Type & request);
 
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Messages::Structs::MessageStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::Messages::Structs::MessageStruct::Type & request);
+
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DeviceEnergyManagement::Structs::CostStruct::Type & request,
                         Json::Value & value);
 
@@ -377,6 +387,11 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyEvse::Str
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::EnergyPreference::Structs::BalanceStruct::Type & request,
                         Json::Value & value);

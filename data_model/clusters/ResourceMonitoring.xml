@@ -60,6 +60,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial version of the Resource Monitoring cluster"/>
   </revisionHistory>
   <clusterIds>
+    <clusterId id="0x0071" name="HEPA Filter Monitoring"/>
     <clusterId id="0x0072" name="Activated Carbon Filter Monitoring"/>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="REPM" scope="Endpoint"/>

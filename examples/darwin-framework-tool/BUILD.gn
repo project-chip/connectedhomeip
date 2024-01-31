@@ -42,6 +42,9 @@ declare_args() {
   }
 
   enable_provisional_features = config_enable_yaml_tests
+
+  # Disable generating compiler database by default
+  generate_compilation_database = false
 }
 
 sdk = "macosx"
@@ -107,6 +110,12 @@ action("build-darwin-framework") {
     args += [ "--no-clang" ]
   }
 
+  if (generate_compilation_database) {
+    args += [ "--compdb" ]
+  } else {
+    args += [ "--no-compdb" ]
+  }
+
   if (config_enable_yaml_tests) {
     args += [ "--enable-encoding-sentinel-enum-values" ]
   } else {
@@ -163,6 +172,8 @@ executable("darwin-framework-tool") {
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
     "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
+    "commands/bdx/Commands.h",
+    "commands/bdx/DownloadLogCommand.mm",
     "commands/clusters/ClusterCommandBridge.h",
     "commands/clusters/ModelCommandBridge.mm",
     "commands/clusters/ReportCommandBridge.h",

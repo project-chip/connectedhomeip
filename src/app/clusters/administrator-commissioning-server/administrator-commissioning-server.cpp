@@ -35,6 +35,7 @@
 #include <protocols/interaction_model/Constants.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/SystemClock.h>
+#include <tracing/macros.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -82,6 +83,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("OpenCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
     auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
     auto & discriminator      = commandData.discriminator;
@@ -141,6 +143,7 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::OpenBasicCommissioningWindow::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("OpenBasicCommissioningWindow", "AdministratorCommissioning");
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
 
     Optional<StatusCode> status           = Optional<StatusCode>::Missing();
@@ -187,6 +190,7 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::RevokeCommissioning::DecodableType & commandData)
 {
+    MATTER_TRACE_SCOPE("RevokeCommissioning", "AdministratorCommissioning");
     ChipLogProgress(Zcl, "Received command to close commissioning window");
 
     Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();

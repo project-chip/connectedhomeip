@@ -49,7 +49,7 @@ using CostsList = DataModel::List<const Structs::CostStruct::Type>;
  *   6) generate a PowerAdjustEnd event with cause NormalCompletion
  *   7) if necessary, update the forecast with new expected end time
  */
-Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t power, const uint32_t duration)
+Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t power, const uint32_t duration, AdjustmentCauseEnum cause)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
 
@@ -98,7 +98,7 @@ Status DeviceEnergyManagementDelegate::CancelPowerAdjustRequest()
  *      1) update the forecast attribute with the revised start time
  *      2) send a callback notification to the appliance so it can refresh its internal schedule
  */
-Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime)
+Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t requestedStartTime, AdjustmentCauseEnum cause)
 {
     DataModel::Nullable<Structs::ForecastStruct::Type> forecast = GetForecast();
 
@@ -136,7 +136,7 @@ Status DeviceEnergyManagementDelegate::StartTimeAdjustRequest(const uint32_t req
  *   6) generate a Resumed event
  *   7) if necessary, update the forecast with new expected end time
  */
-Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t duration)
+Status DeviceEnergyManagementDelegate::PauseRequest(const uint32_t duration, AdjustmentCauseEnum cause)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
     // TODO: implement the behaviour above
@@ -181,7 +181,8 @@ Status DeviceEnergyManagementDelegate::ResumeRequest()
  *      3) notify the appliance to follow the revised schedule
  */
 Status DeviceEnergyManagementDelegate::ModifyForecastRequest(
-    const uint32_t forecastId, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments)
+    const uint32_t forecastId, const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+    AdjustmentCauseEnum cause)
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
 
@@ -202,7 +203,25 @@ Status DeviceEnergyManagementDelegate::ModifyForecastRequest(
  *      3) notify the appliance to follow the revised schedule
  */
 Status DeviceEnergyManagementDelegate::RequestConstraintBasedForecast(
-    const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints)
+    const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints, AdjustmentCauseEnum cause)
+{
+    Status status = Status::UnsupportedCommand; // Status::Success;
+    // TODO: implement the behaviour above
+    return status;
+}
+
+/**
+ * @brief Delegate handler for CancelRequest
+ *
+ * Note: This is a more complex use-case and requires higher-level work by the delegate.
+ *
+ * It SHALL:
+ *      1) Check if the forecastUpdateReason was already InternalOptimization (and reject the command)
+ *      2) Update its forecast (based on its optimization strategy) ignoring previous requests
+ *      3) Update its Forecast attribute to match its new intended operation, and update the
+ *         ForecastStruct.ForecastUpdateReason to `Internal Optimization`.
+ */
+Status DeviceEnergyManagementDelegate::CancelRequest()
 {
     Status status = Status::UnsupportedCommand; // Status::Success;
     // TODO: implement the behaviour above
@@ -244,6 +263,11 @@ PowerAdjustmentCapability::TypeInfo::Type DeviceEnergyManagementDelegate::GetPow
 DataModel::Nullable<Structs::ForecastStruct::Type> DeviceEnergyManagementDelegate::GetForecast()
 {
     return mForecast;
+}
+
+OptOutStateEnum DeviceEnergyManagementDelegate::GetOptOutState()
+{
+    return mOptOutState;
 }
 
 // ------------------------------------------------------------------

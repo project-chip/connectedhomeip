@@ -30,16 +30,19 @@ RUN case ${TARGETPLATFORM} in \
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
+    && apt-get upgrade -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
     autoconf \
     automake \
     bison \
+    bluez \
     bridge-utils \
     clang \
     clang-format \
     clang-tidy \
     curl \
     flex \
+    gcc \
     g++ \
     git \
     gperf \
@@ -188,6 +191,8 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-lock-ipv6only \
     --target linux-x64-simulated-app1-ipv6only \
     --target linux-x64-lit-icd-ipv6only \
+    --target linux-x64-energy-management-ipv6only \
+    --target linux-x64-microwave-oven-ipv6only \
     build \
     && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -204,6 +209,8 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-x64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-x64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
+    && mv out/linux-x64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     ;; \
     "linux/arm64")\
     set -x \
@@ -224,6 +231,8 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-lock-ipv6only \
     --target linux-arm64-simulated-app1-ipv6only \
     --target linux-arm64-lit-icd-ipv6only \
+    --target linux-arm64-energy-management-ipv6only \
+    --target linux-arm64-microwave-oven-ipv6only \
     build \
     && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
@@ -240,11 +249,13 @@ RUN case ${TARGETPLATFORM} in \
     && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
     && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
     && mv out/linux-arm64-lit-icd-ipv6only/lit-icd-app out/lit-icd-app \
+    && mv out/linux-arm64-energy-management-ipv6only/chip-energy-management-app out/chip-energy-management-app \
+    && mv out/linux-arm64-microwave-oven-ipv6only/chip-microwave-oven-app out/chip-microwave-oven-app \
     ;; \
     *) ;; \
     esac
 
-RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true
+RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i out/python_env
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:22.04
@@ -269,9 +280,12 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-ap
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/lit-icd-app lit-icd-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-energy-management-app chip-energy-management-app
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-microwave-oven-app chip-microwave-oven-app
 
-# Stage 3.1 Setup the Matter Python environment
+# Stage 3.1: Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_env python_env
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/scripts/tests/requirements.txt /tmp/requirements.txt

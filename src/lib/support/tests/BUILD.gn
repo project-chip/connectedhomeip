@@ -44,6 +44,7 @@ chip_test_suite_using_nltest("tests") {
     "TestPrivateHeap.cpp",
     "TestSafeInt.cpp",
     "TestSafeString.cpp",
+    "TestScoped.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",

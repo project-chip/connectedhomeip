@@ -31,7 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Step 2: Read the global attribute: ClusterRevision"
+    - label: "Step 2: TH reads from the DUT the ClusterRevision attribute."
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
@@ -39,7 +39,7 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: Read the global attribute: FeatureMap"
+    - label: "Step 3: TH reads from the DUT the FeatureMap attribute."
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
@@ -47,7 +47,7 @@ tests:
           constraints:
               type: bitmap32
 
-    - label: "Step 4a: Read the global attribute: AttributeList"
+    - label: "Step 4a: TH reads from the DUT the AttributeList attribute."
       PICS: PICS_EVENT_LIST_ENABLED
       command: "readAttribute"
       attribute: "AttributeList"
@@ -76,36 +76,146 @@ tests:
 
     #Issue: https://github.com/project-chip/connectedhomeip/issues/26721
     - label: "Step 5: TH reads EventList attribute from DUT"
-      verification: |
-          ./chip-tool actions read event-list 1 1
-
-          Via the TH (chip-tool), verify:
-          -that EventList attribute contains list of supported events.
-          -that list has 1 entry(0) for this cluster.
-
-          [1676460741.103254][37023:37025] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0025 Attribute 0x0000_FFFA DataVersion: 928273128
-          [1676460741.103303][37023:37025] CHIP:TOO:   EventList: 1 entries
-          [1676460741.103320][37023:37025] CHIP:TOO:     [1]: 0
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && PICS_EVENT_LIST_ENABLED
-      arguments:
-          values:
-              - name: "message"
-                value: "Please enter 'y' for success"
-              - name: "expectedValue"
-                value: "y"
+      PICS: PICS_EVENT_LIST_ENABLED
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1]
 
     # Checking only type check all commands are optional
-    - label: "Step 6: Read the global attribute: AcceptedCommandList"
+    - label:
+          "Step 6a: TH Read the optional command (InstantAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C00.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              maxLength: 11
+              contains: [0x0]
 
-    - label: "Step 7: Read the global attribute: GeneratedCommandList"
+    - label:
+          "Step 6b: TH Read the optional command (InstantActionWithTransition)
+          in AcceptedCommandList"
+      PICS: ACT.S.C01.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x01]
+
+    - label:
+          "Step 6C: TH Read the optional command (StartAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C02.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x02]
+
+    - label:
+          "Step 6d: TH Read the optional command (StartActionWithDuration) in
+          AcceptedCommandList"
+      PICS: ACT.S.C03.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x03]
+
+    - label:
+          "Step 6e: TH Read the optional command (StopAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C04.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x04]
+    - label:
+          "Step 6f: TH Read the optional command (PauseAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C05.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x05]
+
+    - label:
+          "Step 6g: TH Read the optional command (PauseActionWithDuration) in
+          AcceptedCommandList"
+      PICS: ACT.S.C06.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x06]
+
+    - label:
+          "Step 6h: TH Read the optional command (ResumeAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C07.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x07]
+
+    - label:
+          "Step 6i: TH Read the optional command (EnableAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C08.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x08]
+    - label:
+          "Step 6j: TH Read the optional command (EnableActionWithDuration) in
+          AcceptedCommandList"
+      PICS: ACT.S.C09.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x09]
+
+    - label:
+          "Step 6k: TH Read the optional command (DisableAction) in
+          AcceptedCommandList"
+      PICS: ACT.S.C0a.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0a]
+
+    - label:
+          "Step 6l: TH Read the optional command (DisableActionWithDuration) in
+          AcceptedCommandList"
+      PICS: ACT.S.C0b.Rsp
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0x0b]
+
+    - label: "Step 7: TH reads from the DUT the GeneratedCommandList attribute."
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:

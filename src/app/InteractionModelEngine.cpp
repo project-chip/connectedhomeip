@@ -332,7 +332,7 @@ void InteractionModelEngine::ShutdownMatchingSubscriptions(const Optional<Fabric
 }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
-bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFabricIndex, const NodeId & subjectID)
+bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex & aFabricIndex, const NodeId & subjectID)
 {
     bool isActive = false;
     mReadHandlers.ForEachActiveObject([aFabricIndex, subjectID, &isActive](ReadHandler * handler) {
@@ -367,6 +367,12 @@ bool InteractionModelEngine::SubjectHasActiveSubscription(const FabricIndex aFab
     });
 
     return isActive;
+}
+
+bool InteractionModelEngine::SubjectHasPersistedSubscription(const FabricIndex & aFabricIndex, const NodeId & subject)
+{
+    // TODO(#30281) : Implement persisted sub check and verify how persistent subscriptions affects this at ICDManager::Init
+    return false;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -992,6 +998,22 @@ void InteractionModelEngine::OnActiveModeNotification(ScopedNodeId aPeer)
         if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
         {
             pListItem->OnActiveModeNotification();
+        }
+        pListItem = pNextItem;
+    }
+}
+
+void InteractionModelEngine::OnPeerTypeChange(ScopedNodeId aPeer, ReadClient::PeerType aType)
+{
+    // TODO: Follow up to use a iterator function to avoid copy/paste here.
+    for (ReadClient * pListItem = mpActiveReadClientList; pListItem != nullptr;)
+    {
+        // It is possible that pListItem is destroyed by the app in OnPeerTypeChange.
+        // Get the next item before invoking `OnPeerTypeChange`.
+        auto pNextItem = pListItem->GetNextClient();
+        if (ScopedNodeId(pListItem->GetPeerNodeId(), pListItem->GetFabricIndex()) == aPeer)
+        {
+            pListItem->OnPeerTypeChange(aType);
         }
         pListItem = pNextItem;
     }

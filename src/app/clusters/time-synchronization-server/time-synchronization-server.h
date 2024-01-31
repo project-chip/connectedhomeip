@@ -29,7 +29,7 @@
 #include "time-synchronization-delegate.h"
 
 #if TIME_SYNC_ENABLE_TSC_FEATURE
-#include <app/ClusterStateCache.h>
+#include <app/ReadClient.h>
 #endif
 #include <app/server/Server.h>
 #include <app/util/af-types.h>

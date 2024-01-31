@@ -215,9 +215,9 @@ private:
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
     void NotifyBLENotificationReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
-    int RegisterGATTServer();
-    int StartBLEAdvertising();
-    int StopBLEAdvertising();
+    CHIP_ERROR RegisterGATTServer();
+    CHIP_ERROR StartBLEAdvertising();
+    CHIP_ERROR StopBLEAdvertising();
     void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;

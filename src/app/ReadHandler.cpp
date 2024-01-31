@@ -28,7 +28,7 @@
 #include <app/MessageDef/StatusResponseMessage.h>
 #include <app/MessageDef/SubscribeRequestMessage.h>
 #include <app/MessageDef/SubscribeResponseMessage.h>
-#include <app/icd/ICDConfig.h>
+#include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/TLVUtilities.h>
 #include <messaging/ExchangeContext.h>
 
@@ -36,7 +36,7 @@
 #include <app/reporting/Engine.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDConfigurationData.h> //nogncheck
+#include <app/icd/server/ICDConfigurationData.h> //nogncheck
 #endif
 
 namespace chip {

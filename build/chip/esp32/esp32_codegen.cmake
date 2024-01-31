@@ -33,6 +33,7 @@ macro(chip_app_component_codegen IDL_NAME)
       OUTPUTS
             "app/PluginApplicationCallbacks.h"
             "app/callback-stub.cpp"
+            "app/cluster-init-callback.cpp"
       OUTPUT_PATH   APP_GEN_DIR
       OUTPUT_FILES  APP_GEN_FILES
     )

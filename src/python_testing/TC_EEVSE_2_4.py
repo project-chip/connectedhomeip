@@ -35,7 +35,7 @@ class TC_EEVSE_2_4(MatterBaseTest, EEVSEBaseTestHelper):
     def pics_TC_EEVSE_2_4(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         # In this case - there is no feature flags needed to run this test case
-        return None
+        return ["EEVSE.S"]
 
     def steps_TC_EEVSE_2_4(self) -> list[TestStep]:
         steps = [
