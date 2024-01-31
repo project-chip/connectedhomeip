@@ -69,6 +69,7 @@ executable("${sample_name}") {
     defines = [
       "PW_RPC_ENABLED",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BOOLEAN_STATE_SERVICE=1",
       "PW_RPC_BUTTON_SERVICE=1",
       "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
@@ -95,6 +96,7 @@ executable("${sample_name}") {
       "$dir_pw_trace_tokenized:trace_rpc_service",
       "${chip_root}/config/linux/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:boolean_state_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",

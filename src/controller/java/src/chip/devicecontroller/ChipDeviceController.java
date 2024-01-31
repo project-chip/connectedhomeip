@@ -19,16 +19,19 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
+import chip.devicecontroller.ChipDeviceController.CompletionListener;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import chip.devicecontroller.model.DataVersionFilter;
 import chip.devicecontroller.model.InvokeElement;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 import javax.annotation.Nullable;
 
 /** Controller to interact with the CHIP device. */
@@ -115,10 +118,18 @@ public class ChipDeviceController {
    * paa certificates before commissioning.
    *
    * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   * @param cdTrustKeys certification Declaration Trust Keys
    */
   public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate,
+      @Nullable List<byte[]> cdTrustKeys) {
+    setAttestationTrustStoreDelegate(
+        deviceControllerPtr, attestationTrustStoreDelegate, cdTrustKeys);
+  }
+
+  public void setAttestationTrustStoreDelegate(
       AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
-    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate, null);
   }
 
   /**
@@ -1193,8 +1204,8 @@ public class ChipDeviceController {
   public static byte[] createRootCertificate(
       KeypairDelegate keypair, long issuerId, @Nullable Long fabricId) {
     // current time
-    Calendar start = Calendar.getInstance();
-    Calendar end = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
     end.add(Calendar.YEAR, 10);
     return createRootCertificate(keypair, issuerId, fabricId, start, end);
@@ -1215,9 +1226,9 @@ public class ChipDeviceController {
       long issuerId,
       @Nullable Long fabricId) {
     // current time
-    Calendar start = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
-    Calendar end = Calendar.getInstance();
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     end.add(Calendar.YEAR, 10);
     return createIntermediateCertificate(
         rootKeypair, rootCertificate, intermediatePublicKey, issuerId, fabricId, start, end);
@@ -1251,9 +1262,9 @@ public class ChipDeviceController {
       long nodeId,
       List<Integer> caseAuthenticatedTags) {
     // current time
-    Calendar start = Calendar.getInstance();
+    Calendar start = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     // current time + 10 years
-    Calendar end = Calendar.getInstance();
+    Calendar end = Calendar.getInstance(TimeZone.getTimeZone(ZoneOffset.UTC));
     end.add(Calendar.YEAR, 10);
     return createOperationalCertificate(
         signingKeypair,
@@ -1365,7 +1376,9 @@ public class ChipDeviceController {
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
 
   private native void setAttestationTrustStoreDelegate(
-      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
+      long deviceControllerPtr,
+      AttestationTrustStoreDelegate delegate,
+      @Nullable List<byte[]> cdTrustKeys);
 
   private native void startOTAProvider(long deviceControllerPtr, OTAProviderDelegate delegate);
 

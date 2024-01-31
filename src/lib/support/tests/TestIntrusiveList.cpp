@@ -131,6 +131,35 @@ void TestContains(nlTestSuite * inSuite, void * inContext)
     list.Remove(&b);
 }
 
+void TestClear(nlTestSuite * inSuite, void * inContext)
+{
+    ListNode a, b, c;
+    IntrusiveList<ListNode> list;
+
+    NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&c));
+
+    list.PushBack(&a);
+    list.PushFront(&c);
+
+    NL_TEST_ASSERT(inSuite, list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, list.Contains(&c));
+
+    list.PushBack(&b);
+
+    NL_TEST_ASSERT(inSuite, list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, list.Contains(&c));
+
+    list.Clear();
+
+    NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&c));
+}
+
 void TestReplaceNode(nlTestSuite * inSuite, void * inContext)
 {
     ListNode a, b;
@@ -242,6 +271,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF_FN(TestReplaceNode),         //
     NL_TEST_DEF_FN(TestMoveList),            //
     NL_TEST_DEF_FN(TestAutoUnlink),          //
+    NL_TEST_DEF_FN(TestClear),               //
     NL_TEST_SENTINEL(),                      //
 };
 

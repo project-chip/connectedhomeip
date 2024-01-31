@@ -23,6 +23,7 @@ limitations under the License.
     <define>ACCOUNT_LOGIN_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="2"/> <!-- Revision   -->
     <description>This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client.</description>
 
     <command source="client" code="0x00" name="GetSetupPIN" isFabricScoped="true" response="GetSetupPINResponse" mustUseTimedInvoke="true" optional="false">

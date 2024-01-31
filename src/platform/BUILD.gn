@@ -111,11 +111,20 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         chip_enable_wifi && chip_device_platform != "darwin"
     chip_stack_lock_tracking_log = chip_stack_lock_tracking != "none"
     chip_stack_lock_tracking_fatal = chip_stack_lock_tracking == "fatal"
+
+    # This is used to identify which platforms implement their ThreadStackManager
+    # with the otbr posix dbus api.
+    chip_device_uses_otbr_posix_dbus =
+        chip_enable_openthread &&
+        (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
+         chip_device_platform == "webos")
+
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER=${chip_openthread_border_router}",
+      "CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK=${chip_device_uses_otbr_posix_dbus}",
       "CHIP_STACK_LOCK_TRACKING_ENABLED=${chip_stack_lock_tracking_log}",
       "CHIP_STACK_LOCK_TRACKING_ERROR_FATAL=${chip_stack_lock_tracking_fatal}",
       "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=${chip_enable_additional_data_advertising}",
@@ -507,7 +516,7 @@ if (chip_device_platform != "none") {
       ":platform_base",
       "${chip_root}/src/app:app_config",
       "${chip_root}/src/app/common:cluster-objects",
-      "${chip_root}/src/app/icd:icd_config",
+      "${chip_root}/src/app/icd/server:icd-server-config",
       "${chip_root}/src/credentials:build_time_header",
       "${chip_root}/src/crypto",
       "${chip_root}/src/lib/support",
