@@ -17,6 +17,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <rvc-modes.h>
+#include <rvc-operational-state-delegate-impl.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RvcRunMode;
@@ -40,12 +41,22 @@ void RvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands:
 {
     uint8_t currentMode = mInstance->GetCurrentMode();
 
-    // Our business logic states that we can only switch into the mapping state from the idle state.
-    if (NewMode == RvcRunMode::ModeMapping && currentMode != RvcRunMode::ModeIdle)
+    // Our business logic states that we can only switch into a running mode from the idle state.
+    if (NewMode != RvcRunMode::ModeIdle && currentMode != RvcRunMode::ModeIdle)
     {
         response.status = to_underlying(ModeBase::StatusCode::kInvalidInMode);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Change to the mapping mode is only allowed from idle"));
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Change to a running mode is only allowed from idle"));
         return;
+    }
+
+    auto rvcOpStateInstance = RvcOperationalState::GetRvcOperationalStateInstance();
+    if (NewMode == RvcRunMode::ModeIdle)
+    {
+        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped));
+    }
+    else
+    {
+        rvcOpStateInstance->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     }
 
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);

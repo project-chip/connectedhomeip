@@ -21,10 +21,6 @@ import chip.clusters as Clusters
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
-# This test requires several additional command line arguments
-# run with
-# --int-arg PIXIT_ENDPOINT:<endpoint>
-
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
 def state_enum_to_text(state_enum):
@@ -79,14 +75,14 @@ def error_enum_to_text(error_enum):
 
 class TC_RVCOPSTATE_2_4(MatterBaseTest):
     def __init__(self, *args):
-        super().__init__(args)
-        self.endpoint = self.matter_test_config.global_test_params['PIXIT_ENDPOINT']
+        super().__init__(*args)
+        self.endpoint = None
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.GoHome:
+    async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(), endpoint=self.endpoint)
         asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for GoHome")
@@ -95,10 +91,10 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
     # Sends the GoHome command and checks that the returned error matches the expected_error
     async def send_go_home_cmd_with_check(self, step_number, expected_error):
         self.print_step(step_number, "Send GoHome command")
-        ret = self.send_go_home_cmd()
+        ret = await self.send_go_home_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % ret.commandResponseState.errorStateID,
-                             error_enum_to_text(expected_error))
+                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
+                                                                error_enum_to_text(expected_error)))
 
     # Prints the step number, reads the operational state attribute and checks if it matches with expected_state
     async def read_operational_state_with_check(self, step_number, expected_state):
@@ -107,7 +103,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
             endpoint=self.endpoint, attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
         logging.info("OperationalState: %s" % operational_state)
         asserts.assert_equal(operational_state, expected_state,
-                             "OperationalState(%s) should be %s" % operational_state, state_enum_to_text(expected_state))
+                             "OperationalState(%s) should be %s" % (operational_state, state_enum_to_text(expected_state)))
 
     # Prints the instruction and waits for a user input to continue
     def print_instruction(self, step_number, instruction):
@@ -116,13 +112,11 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_4(self):
-
-        asserts.assert_true('PIXIT_ENDPOINT' in self.matter_test_config.global_test_params,
-                            "PIXIT_ENDPOINT must be included on the command line in "
-                            "the --int-arg flag as PIXIT_ENDPOINT:<endpoint>")
+        self.endpoint = self.matter_test_config.endpoint
+        asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
-        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Rsp"), "RVCOPSTATE.S.C04.Rsp must be supported")
+        asserts.assert_true(self.check_pics("RVCOPSTATE.S.C04.Tx"), "RVCOPSTATE.S.C04.Tx must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.C128.Rsp"), "RVCOPSTATE.S.C128.Rsp must be supported")
 
         op_states = Clusters.OperationalState.Enums.OperationalStateEnum

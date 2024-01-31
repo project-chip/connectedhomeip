@@ -4440,7 +4440,13 @@ cluster Messages = 151 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct PresentMessagesRequestRequest {
-    MessageStruct messages[] = 0;
+    octet_string<16> messageID = 0;
+    MessagePriorityEnum priority = 1;
+    MessageControlBitmap messageControl = 2;
+    nullable epoch_s startTime = 3;
+    nullable int16u duration = 4;
+    char_string<256> messageText = 5;
+    optional MessageResponseOptionStruct responses[] = 6;
   }
 
   request struct CancelMessagesRequestRequest {
