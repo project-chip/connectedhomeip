@@ -53,6 +53,7 @@
 #import <Matter/MTRKeypair.h>
 #import <Matter/MTRLogging.h>
 #import <Matter/MTRManualSetupPayloadParser.h>
+#import <Matter/MTRMetrics.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
 #import <Matter/MTROnboardingPayloadParser.h>
@@ -65,6 +66,5 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
-#import <Matter/MTRMetrics.h>
 
 #undef MTR_INCLUDED_FROM_UMBRELLA_HEADER
