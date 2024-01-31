@@ -15,28 +15,8 @@
  *    limitations under the License.
  */
 
-#include "SmokeCOTestEventTriggerDelegate.h"
+#pragma once
 
-using namespace chip::app::Clusters::SmokeCoAlarm;
-
-namespace chip {
-
-bool SmokeCOTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKey) const
-{
-    return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
-}
-
-CHIP_ERROR SmokeCOTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
-{
-    if (HandleSmokeCOTestEventTrigger(eventTrigger))
-    {
-        return CHIP_NO_ERROR;
-    }
-    if (mOtherDelegate != nullptr)
-    {
-        return mOtherDelegate->HandleEventTrigger(eventTrigger);
-    }
-    return CHIP_ERROR_INVALID_ARGUMENT;
-}
-
-} // namespace chip
+#if CHIP_HAVE_CONFIG_H
+#include <app/icd/server/ICDServerBuildConfig.h>
+#endif

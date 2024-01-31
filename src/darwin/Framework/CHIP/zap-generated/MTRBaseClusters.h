@@ -5424,14 +5424,6 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
-- (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeOnModeWithParams:(MTRSubscribeParams *)params
-                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeOnModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -5512,14 +5504,6 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
-
-- (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeOnModeWithParams:(MTRSubscribeParams *)params
-                   subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeOnModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -6520,22 +6504,6 @@ MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 - (void)pauseWithParams:(MTRRVCOperationalStateClusterPauseParams * _Nullable)params completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 - (void)pauseWithCompletion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
-/**
- * Command Stop
- *
- * Upon receipt, the device SHALL stop its operation if it is at a position where it is safe to do so and/or permitted.
- */
-- (void)stopWithParams:(MTRRVCOperationalStateClusterStopParams * _Nullable)params completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)stopWithCompletion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
-/**
- * Command Start
- *
- * Upon receipt, the device SHALL start its operation if it is safe to do so and the device is in an operational state from which it can be started.
- */
-- (void)startWithParams:(MTRRVCOperationalStateClusterStartParams * _Nullable)params completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)startWithCompletion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
-    MTR_PROVISIONALLY_AVAILABLE;
 /**
  * Command Resume
  *
@@ -17251,7 +17219,7 @@ typedef NS_ENUM(uint8_t, MTRRVCRunModeStatusCode) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRRVCRunModeFeature) {
-    MTRRVCRunModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRRVCRunModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_ENUM(uint16_t, MTRRVCCleanModeModeTag) {
@@ -17265,7 +17233,7 @@ typedef NS_ENUM(uint8_t, MTRRVCCleanModeStatusCode) {
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRRVCCleanModeFeature) {
-    MTRRVCCleanModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRRVCCleanModeFeatureNoFeatures MTR_PROVISIONALLY_AVAILABLE = 0x0,
 } MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
 
 typedef NS_OPTIONS(uint32_t, MTRTemperatureControlFeature) {

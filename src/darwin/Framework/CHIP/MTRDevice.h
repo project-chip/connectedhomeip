@@ -348,6 +348,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_NEWLY_AVAILABLE;
 @end
 
+MTR_EXTERN NSString * const MTRPreviousDataKey MTR_NEWLY_AVAILABLE;
+
 @protocol MTRDeviceDelegate <NSObject>
 @required
 /**
@@ -359,6 +361,10 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * Notifies delegate of attribute reports from the MTRDevice
  *
  * @param attributeReport  An array of response-value objects as described in MTRDeviceResponseHandler
+ *
+ *                In addition to MTRDataKey, each response-value dictionary in the array may also have this key:
+ *
+ *                MTRPreviousDataKey : Same data-value dictionary format as the object for MTRDataKey. This is included when the previous value is known for an attribute.
  */
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 

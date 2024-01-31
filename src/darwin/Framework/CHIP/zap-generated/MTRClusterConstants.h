@@ -2352,7 +2352,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster RVCRunMode attributes
     MTRAttributeIDTypeClusterRVCRunModeAttributeSupportedModesID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000000,
     MTRAttributeIDTypeClusterRVCRunModeAttributeCurrentModeID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000001,
-    MTRAttributeIDTypeClusterRVCRunModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterRVCRunModeAttributeGeneratedCommandListID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterRVCRunModeAttributeAcceptedCommandListID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterRVCRunModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -2363,7 +2362,6 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     // Cluster RVCCleanMode attributes
     MTRAttributeIDTypeClusterRVCCleanModeAttributeSupportedModesID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000000,
     MTRAttributeIDTypeClusterRVCCleanModeAttributeCurrentModeID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000001,
-    MTRAttributeIDTypeClusterRVCCleanModeAttributeOnModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRAttributeIDTypeClusterRVCCleanModeAttributeGeneratedCommandListID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterRVCCleanModeAttributeAcceptedCommandListID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterRVCCleanModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
@@ -6198,8 +6196,6 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
 
     // Cluster RVCOperationalState commands
     MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000000,
-    MTRCommandIDTypeClusterRVCOperationalStateCommandStopID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRCommandIDTypeClusterRVCOperationalStateCommandStartID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
     MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000003,
     MTRCommandIDTypeClusterRVCOperationalStateCommandOperationalCommandResponseID MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4)) = 0x00000004,
     MTRCommandIDTypeClusterRVCOperationalStateCommandGoHomeID MTR_PROVISIONALLY_AVAILABLE = 0x00000080,

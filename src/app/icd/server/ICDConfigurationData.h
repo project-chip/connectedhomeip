@@ -25,6 +25,11 @@ namespace chip {
 namespace app {
 // Forward declaration of ICDManager to allow it to be friend with ICDConfigurationData
 class ICDManager;
+
+// Forward declaration of TestICDManager to allow it to be friend with the ICDConfigurationData
+// Used in unit tests
+class TestICDManager;
+
 } // namespace app
 
 /**
@@ -47,9 +52,9 @@ public:
 
     static ICDConfigurationData & GetInstance() { return instance; };
 
-    uint32_t GetIdleModeDurationSec() { return mIdleInterval_s; }
+    uint32_t GetIdleModeDurationSec() { return mIdleModeDuration_s; }
 
-    uint32_t GetActiveModeDurationMs() { return mActiveInterval_ms; }
+    uint32_t GetActiveModeDurationMs() { return mActiveModeDuration_ms; }
 
     uint16_t GetActiveModeThresholdMs() { return mActiveThreshold_ms; }
 
@@ -87,8 +92,9 @@ private:
     // ICD related information is managed by the ICDManager but stored in the ICDConfigurationData to enable consummers to access it
     // without creating a circular dependency. To avoid allowing consummers changing the state of the ICD mode without going through
     // the ICDManager, the ICDManager is a friend that can access the private setters. If a consummer needs to be notified when a
-    // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/ICDStateObserver.h
+    // value is changed, they can leverage the Observer events the ICDManager generates. See src/app/icd/server/ICDStateObserver.h
     friend class chip::app::ICDManager;
+    friend class chip::app::TestICDManager;
 
     void SetICDMode(ICDMode mode) { mICDMode = mode; };
     void SetICDCounter(uint32_t count) { mICDCounter = count; }
@@ -97,15 +103,31 @@ private:
 
     static constexpr uint32_t kMinLitActiveModeThreshold_ms = 5000;
 
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= 64800,
+    /**
+     * @brief Change the ActiveModeDuration and IdleModeDuration value
+     *        To only change one value, pass the old value for the other one
+     *
+     * @param[in] activeModeDuration_ms new ActiveModeDuration value
+     * @param[in] idleModeDuration_s new IdleModeDuration value
+     * @return CHIP_ERROR CHIP_ERROR_INVALID_ARGUMENT is returned if idleModeDuration_s is smaller than activeModeDuration_ms
+     *                                                is returned if idleModeDuration_s is greater than 64800 seconds
+     *                                                is returned if idleModeDuration_s is smaller than 1 seconds
+     *                    CHIP_NO_ERROR is returned if the new intervals were set
+     */
+    CHIP_ERROR SetModeDurations(uint32_t activeModeDuration_ms, uint32_t idleModeDuration_s);
+
+    static constexpr uint32_t kMaxIdleModeDuration_s = 64800;
+    static constexpr uint32_t kMinIdleModeDuration_s = 1;
+
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) <= kMaxIdleModeDuration_s,
                   "Spec requires the IdleModeDuration to be equal or inferior to 64800s.");
-    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= 1,
+    static_assert((CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC) >= kMinIdleModeDuration_s,
                   "Spec requires the IdleModeDuration to be equal or greater to 1s.");
-    uint32_t mIdleInterval_s = CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC;
+    uint32_t mIdleModeDuration_s = CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC;
 
     static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC * kMillisecondsPerSecond),
                   "Spec requires the IdleModeDuration be equal or greater to the ActiveModeDuration.");
-    uint32_t mActiveInterval_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS;
+    uint32_t mActiveModeDuration_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS;
 
     uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
