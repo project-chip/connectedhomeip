@@ -31,11 +31,11 @@ class MdnsServiceInfo:
     # The unique name of the mDNS service.
     service_name: str
 
-    # The human-readable name of the service.
-    name: str
+    # The service type of the service, typically indicating the service protocol and domain.
+    service_type: str
 
-    # The type of the service, typically indicating the service protocol and domain.
-    type: str
+    # The instance name of the service.
+    instance_name: str
 
     # The domain name of the machine hosting the service.
     server: str
@@ -66,6 +66,9 @@ class MdnsServiceInfo:
 
 
 class MdnsServiceType(Enum):
+    """
+    Enum for Matter mDNS service types used in network service discovery.
+    """
     COMMISSIONER = "_matterd._udp.local."
     COMMISSIONABLE = "_matterc._udp.local."
     OPERATIONAL = "_matter._tcp.local."
@@ -78,7 +81,7 @@ class MdnsDiscovery:
 
     def __init__(self):
         """
-        Initializes the MdnsDiscovery instance with necessary configurations.
+        Initializes the MdnsDiscovery instance.
 
         Main methods:
             - get_commissioner_service_info()
@@ -109,7 +112,7 @@ class MdnsDiscovery:
             discovery_duration_sec (float): The duration in seconds for which the discovery process should wait
                                             to allow for service announcements. If not provided, defaults to a
                                             predetermined duration (e.g., 3 seconds).
-            log_output (bool): Logs discovered services in JSON format, defaults to True.
+            log_output (bool): Logs discovered services to the console in JSON format, defaults to True.
 
         Note:
             The discovery duration may need adjustment based on network conditions and the expected response
@@ -117,8 +120,8 @@ class MdnsDiscovery:
 
         Returns:
             dict: A dictionary containing the discovered services, organized by service type. Each key in the
-                dictionary represents a service type, and each value is a list of MdnsServiceInfo objects, each containing
-                details of a discovered service.
+                dictionary represents a service type, and each value is a list of MdnsServiceInfo objects, each
+                containing details of a discovered service.
         """
         service_types = list(await AsyncZeroconfServiceTypes.async_find())
         self._zc = Zeroconf(ip_version=IPVersion.V6Only)
@@ -154,8 +157,8 @@ class MdnsDiscovery:
 
         Args:
             zeroconf (Zeroconf): The Zeroconf instance managing the network operations.
-            service_type (str): The type of the mDNS service that changed state.
-            name (str): The name of the mDNS service.
+            service_type (str): The service type of the mDNS service that changed state.
+            name (str): The service name of the mDNS service.
             state_change (ServiceStateChange): The type of state change that occurred.
 
         Returns:
@@ -168,21 +171,24 @@ class MdnsDiscovery:
                 name)
             )
 
-    async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, name: str) -> None:
+    async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, service_name: str) -> None:
         """
-        This method requests detailed information about an mDNS service, such as its address,
-        port, and other service metadata. The information is requested asynchronously.
+        This method queries for service details such as its address, port, and TXT records
+        containing metadata. 
 
         Args:
-            zeroconf (Zeroconf): The Zeroconf instance managing the network operations.
-            service_type (str): The type of the mDNS service to query.
-            name (str): The name of the mDNS service.
+            zeroconf (Zeroconf): The Zeroconf instance used for managing network operations and service discovery.
+            service_type (str): The type of the mDNS service being queried.
+            service_name (str): The specific service name of the mDNS service to query. This service name uniquely
+            identifies the service instance within the local network.
 
         Returns:
-            None: This method does not return any value. The results of the query are processed internally.
+            None: This method does not return any value. It processes and stores the results of the service query
+                internally in a dictionary which organizes services by their type for easy
+                retrieval.
         """
         # Get service info
-        service_info = AsyncServiceInfo(service_type, name)
+        service_info = AsyncServiceInfo(service_type, service_name)
         is_service_discovered = await service_info.async_request(zeroconf, 3000)
         service_info.async_clear_cache()
 
@@ -196,21 +202,18 @@ class MdnsDiscovery:
 
     def _to_mdns_service_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
-        Converts an AsyncServiceInfo object to a dictionary for easier access and manipulation.
-
-        This method facilitates the handling of service information by converting the AsyncServiceInfo
-        object, which contains details about an mDNS service, into a more accessible dictionary format.
+        Converts an AsyncServiceInfo object into a MdnsServiceInfo data class.
 
         Args:
-            service_info (AsyncServiceInfo): The AsyncServiceInfo object to convert.
+            service_info (AsyncServiceInfo): The service information to convert.
 
         Returns:
-            MdnsServiceInfo: A dataclass representation of the AsyncServiceInfo object.
+            MdnsServiceInfo: The converted service information as a data class.
         """
         mdns_service_info = MdnsServiceInfo(
             service_name=service_info.name,
-            name=service_info.get_name(),
-            type=service_info.type,
+            service_type=service_info.type,
+            instance_name=service_info.get_name(),
             server=service_info.server,
             port=service_info.port,
             addresses=service_info.parsed_addresses(),
@@ -242,23 +245,23 @@ class MdnsDiscovery:
         """
         return self._get_service_info(MdnsServiceType.COMMISSIONABLE)
 
-    async def get_operational_service_info(self, service_name: str, type: str) -> Optional[MdnsServiceInfo]:
+    async def get_operational_service_info(self, service_name: str, service_type: str) -> Optional[MdnsServiceInfo]:
         """
-        Asynchronously retrieves service information for a specified service name and type.
+        Asynchronously retrieves service information for a specified service name and service_type.
 
         Args:
             service_name (str): The name of the service to discover.
-            type (str): The type of the service to discover.
+            service_type (str): The service type of the service to discover.
 
         Returns:
             MdnsServiceInfo | None: The discovered service information if discovered, otherwise None.
 
         Raises:
-            ValueError: If either 'service_name' or 'type' is None.
+            ValueError: If either 'service_name' or 'service_type' is None.
         """
         # Validate arguments to ensure they are not None
-        if service_name is None or type is None:
-            raise ValueError("Neither 'service_name' nor 'type' can be None.")
+        if service_name is None or service_type is None:
+            raise ValueError("Neither 'service_name' nor 'service_type' can be None.")
 
         # Get service info
         service_info = AsyncServiceInfo(type, service_name)
