@@ -67,7 +67,7 @@ Next, you're ready to:
 1. [Read](#read-operations) endpoint attributes like playback state.
 1. [Subscribe](#subscriptions) to playback events.
 
-In order to illustrate more specifically these steps,refer to the below figure
+In order to illustrate these steps, refer to the figure below
 ![workflow of casting video player](./diagram/workflow_of_casting_video_player.png)
 
 ## Build and Setup
