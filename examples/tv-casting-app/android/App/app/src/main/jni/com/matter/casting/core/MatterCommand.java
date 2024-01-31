@@ -16,9 +16,11 @@
  */
 package com.matter.casting.core;
 
-/** Represents the state of the CastingApp */
-enum CastingAppState {
-  UNINITIALIZED, // Before Initialize() success
-  NOT_RUNNING, // After Initialize() success before Start()ing, OR After stop() success
-  RUNNING, // After Start() success
+import java.util.concurrent.CompletableFuture;
+
+public abstract class MatterCommand<Request, Response> implements Command<Request, Response> {
+  protected long _cppCommand;
+
+  @Override
+  public native CompletableFuture<Response> invoke(Request request, Integer timedInvokeTimeoutMs);
 }

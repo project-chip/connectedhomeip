@@ -100,24 +100,26 @@ public class ConnectionExampleFragment extends Fragment {
                   new EndpointFilter(null, 65521, new ArrayList<DeviceTypeStruct>());
               // The desired commissioning window timeout and EndpointFilter are optional.
               CompletableFuture<Void> completableFuture =
-                  targetCastingPlayer.VerifyOrEstablishConnection(
+                  targetCastingPlayer.verifyOrEstablishConnection(
                       MIN_CONNECTION_TIMEOUT_SEC, desiredEndpointFilter);
 
               Log.d(TAG, "onViewCreated() verifyOrEstablishConnection() called");
 
+              Log.d(
+                  TAG,
+                  "onViewCreated() verifyOrEstablishConnection() completableFuture == null? "
+                      + (completableFuture == null));
+
               completableFuture
-                  .thenRun(
-                      () -> {
+                  .thenAccept(
+                      (response) -> {
                         Log.i(
                             TAG,
-                            "CompletableFuture.thenRun(), connected to CastingPlayer with deviceId: "
+                            "CompletableFuture.thenAccept(), connected to CastingPlayer with deviceId: "
                                 + targetCastingPlayer.getDeviceId());
                         getActivity()
                             .runOnUiThread(
                                 () -> {
-                                  connectionFragmentStatusTextView.setText(
-                                      "Connected to Casting Player with device name: "
-                                          + targetCastingPlayer.getDeviceName());
                                   connectionFragmentNextButton.setEnabled(true);
                                 });
                       })

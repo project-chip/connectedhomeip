@@ -16,9 +16,12 @@
  */
 package com.matter.casting.core;
 
-/** Represents the state of the CastingApp */
-enum CastingAppState {
-  UNINITIALIZED, // Before Initialize() success
-  NOT_RUNNING, // After Initialize() success before Start()ing, OR After stop() success
-  RUNNING, // After Start() success
+public abstract class MatterCluster implements Cluster {
+  protected long _cppCluster;
+
+  @Override
+  public native Endpoint getEndpoint();
+
+  @Override
+  public native <T extends Command<?, ?>> T getCommand(Class<T> commandClass);
 }

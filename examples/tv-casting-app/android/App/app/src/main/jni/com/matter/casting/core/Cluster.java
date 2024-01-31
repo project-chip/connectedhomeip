@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2024 Project CHIP Authors
+ *   Copyright (c) 2020-24 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,11 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
 package com.matter.casting.core;
 
-/** Represents the state of the CastingApp */
-enum CastingAppState {
-  UNINITIALIZED, // Before Initialize() success
-  NOT_RUNNING, // After Initialize() success before Start()ing, OR After stop() success
-  RUNNING, // After Start() success
+public interface Cluster {
+  Endpoint getEndpoint();
+
+  <T extends Command<?, ?>> T getCommand(Class<T> commandClass);
 }

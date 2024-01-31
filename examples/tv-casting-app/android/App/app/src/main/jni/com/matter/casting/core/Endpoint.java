@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2024 Project CHIP Authors
+ *   Copyright (c) 2020-24 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,24 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
+
 package com.matter.casting.core;
 
-/** Represents the state of the CastingApp */
-enum CastingAppState {
-  UNINITIALIZED, // Before Initialize() success
-  NOT_RUNNING, // After Initialize() success before Start()ing, OR After stop() success
-  RUNNING, // After Start() success
+import com.matter.casting.support.DeviceTypeStruct;
+import java.util.List;
+
+public interface Endpoint {
+  int getId();
+
+  int getVendorId();
+
+  int getProductId();
+
+  List<DeviceTypeStruct> getDeviceTypeList();
+
+  CastingPlayer getCastingPlayer();
+
+  <T extends Cluster> T getCluster(Class<T> clusterClass);
+
+  boolean hasCluster(Class<? extends Cluster> clusterClass);
 }

@@ -19,8 +19,7 @@
 #include "CastingPlayerDiscovery-JNI.h"
 
 #include "../JNIDACProvider.h"
-#include "../support/CastingPlayerConverter-JNI.h"
-#include "../support/ErrorConverter-JNI.h"
+#include "../support/Converters-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
 #include "core/CastingApp.h"             // from tv-casting-common
 #include "core/CastingPlayerDiscovery.h" // from tv-casting-common
@@ -81,7 +80,7 @@ public:
                                     "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Not set, "
                                     "onAddedCallbackJavaMethodID == nullptr"));
 
-        jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
+        jobject matterCastingPlayerJavaObject = support::convertCastingPlayerFromCppToJava(player);
         VerifyOrReturn(matterCastingPlayerJavaObject != nullptr,
                        ChipLogError(AppServer,
                                     "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnAdded() Warning: Could not create "
@@ -107,7 +106,7 @@ public:
                                     "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Not set, "
                                     "onChangedCallbackJavaMethodID == nullptr"));
 
-        jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
+        jobject matterCastingPlayerJavaObject = support::convertCastingPlayerFromCppToJava(player);
         VerifyOrReturn(matterCastingPlayerJavaObject != nullptr,
                        ChipLogError(AppServer,
                                     "CastingPlayerDiscovery-JNI::DiscoveryDelegateImpl::HandleOnUpdated() Warning: Could not "
@@ -158,10 +157,10 @@ JNI_METHOD(jobject, startDiscovery)(JNIEnv * env, jobject, jobject targetDeviceT
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayerDiscovery-JNI startDiscovery() err: %" CHIP_ERROR_FORMAT, err.Format());
-        return support::createJMatterError(err);
+        return support::convertMatterErrorFromCppToJava(err);
     }
 
-    return support::createJMatterError(CHIP_NO_ERROR);
+    return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
 JNI_METHOD(jobject, stopDiscovery)(JNIEnv * env, jobject)
@@ -174,39 +173,41 @@ JNI_METHOD(jobject, stopDiscovery)(JNIEnv * env, jobject)
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "CastingPlayerDiscovery-JNI::StopDiscovery() err: %" CHIP_ERROR_FORMAT, err.Format());
-        return support::createJMatterError(err);
+        return support::convertMatterErrorFromCppToJava(err);
     }
 
-    return support::createJMatterError(CHIP_NO_ERROR);
+    return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
 JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobject castingPlayerChangeListenerJavaObject)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() called");
-    VerifyOrReturnValue(castingPlayerChangeListenerJavaObject != nullptr, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnValue(castingPlayerChangeListenerJavaObject != nullptr,
+                        support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
 
     if (DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject != nullptr)
     {
         ChipLogError(AppServer,
                      "CastingPlayerDiscovery-JNI::addCastingPlayerChangeListener() Warning: Call removeCastingPlayerChangeListener "
                      "before adding a new one");
-        return support::createJMatterError(CHIP_ERROR_INCORRECT_STATE);
+        return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE);
     }
 
     // Get the class and method IDs for the CastingPlayerChangeListener Java class
     jclass castingPlayerChangeListenerJavaClass = env->GetObjectClass(castingPlayerChangeListenerJavaObject);
-    VerifyOrReturnValue(castingPlayerChangeListenerJavaClass != nullptr, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnValue(castingPlayerChangeListenerJavaClass != nullptr,
+                        support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
 
     jmethodID onAddedJavaMethodID =
         env->GetMethodID(castingPlayerChangeListenerJavaClass, "_onAdded", "(Lcom/matter/casting/core/CastingPlayer;)V");
-    VerifyOrReturnValue(onAddedJavaMethodID != nullptr, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnValue(onAddedJavaMethodID != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
     jmethodID onChangedJavaMethodID =
         env->GetMethodID(castingPlayerChangeListenerJavaClass, "_onChanged", "(Lcom/matter/casting/core/CastingPlayer;)V");
-    VerifyOrReturnValue(onChangedJavaMethodID != nullptr, support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
+    VerifyOrReturnValue(onChangedJavaMethodID != nullptr, support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
     // jmethodID onRemovedJavaMethodID = env->GetMethodID(castingPlayerChangeListenerJavaClass, "_onRemoved",
     // "(Lcom/matter/casting/core/CastingPlayer;)V"); VerifyOrReturnValue(onRemovedJavaMethodID != nullptr,
-    // support::createJMatterError(CHIP_ERROR_INCORRECT_STATE));
+    // support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE));
 
     // Set Java callbacks in the DiscoveryDelegateImpl Singleton
     DiscoveryDelegateImpl::GetInstance()->castingPlayerChangeListenerJavaObject =
@@ -215,7 +216,7 @@ JNI_METHOD(jobject, addCastingPlayerChangeListener)(JNIEnv * env, jobject, jobje
     DiscoveryDelegateImpl::GetInstance()->onChangedCallbackJavaMethodID = onChangedJavaMethodID;
     // DiscoveryDelegateImpl::GetInstance()->onRemovedCallbackJavaMethodID = onRemovedJavaMethodID;
 
-    return support::createJMatterError(CHIP_NO_ERROR);
+    return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
 }
 
 JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jobject castingPlayerChangeListenerJavaObject)
@@ -238,14 +239,14 @@ JNI_METHOD(jobject, removeCastingPlayerChangeListener)(JNIEnv * env, jobject, jo
         DiscoveryDelegateImpl::GetInstance()->onChangedCallbackJavaMethodID = nullptr;
         // DiscoveryDelegateImpl::GetInstance()->onRemovedCallbackJavaMethodID = nullptr;
 
-        return support::createJMatterError(CHIP_NO_ERROR);
+        return support::convertMatterErrorFromCppToJava(CHIP_NO_ERROR);
     }
     else
     {
         ChipLogError(AppServer,
                      "CastingPlayerDiscovery-JNI::removeCastingPlayerChangeListener() Warning: Cannot remove listener. Received a "
                      "different CastingPlayerChangeListener object");
-        return support::createJMatterError(CHIP_ERROR_INCORRECT_STATE);
+        return support::convertMatterErrorFromCppToJava(CHIP_ERROR_INCORRECT_STATE);
     }
 }
 
@@ -264,7 +265,7 @@ JNI_METHOD(jobject, getCastingPlayers)(JNIEnv * env, jobject)
 
     for (const auto & player : castingPlayersList)
     {
-        jobject matterCastingPlayerJavaObject = support::createJCastingPlayer(player);
+        jobject matterCastingPlayerJavaObject = support::convertCastingPlayerFromCppToJava(player);
         if (matterCastingPlayerJavaObject != nullptr)
         {
             jboolean added = env->CallBooleanMethod(arrayList, addMethod, matterCastingPlayerJavaObject);

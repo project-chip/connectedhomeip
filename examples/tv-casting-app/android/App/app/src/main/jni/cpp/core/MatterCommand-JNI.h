@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
+ *    Copyright (c) 2020-24 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,28 +15,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include "core/CastingPlayer.h"
-
-#include <lib/core/CHIPError.h>
+#include "../support/Converters-JNI.h"
 
 #include <jni.h>
 
 namespace matter {
 namespace casting {
-namespace support {
+namespace core {
 
-/**
- * @brief Convertes a native CastingPlayer into a MatterCastingPlayer jobject
- *
- * @param CastingPlayer represents a Matter commissioner that is able to play media to a physical
- * output or to a display screen which is part of the device.
- *
- * @return pointer to the CastingPlayer jobject if created successfully, nullptr otherwise.
- */
-jobject createJCastingPlayer(matter::casting::memory::Strong<core::CastingPlayer> player);
+class MatterCommandJNI
+{
+private:
+    friend MatterCommandJNI & MatterCommandJNIMgr();
+    static MatterCommandJNI sInstance;
+};
 
-}; // namespace support
+inline class MatterCommandJNI & MatterCommandJNIMgr()
+{
+    return MatterCommandJNI::sInstance;
+}
+
+}; // namespace core
 }; // namespace casting
 }; // namespace matter

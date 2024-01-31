@@ -131,6 +131,9 @@ public class MatterCastingPlayer implements CastingPlayer {
   }
 
   @Override
+  public native List<Endpoint> getEndpoints();
+
+  @Override
   public String toString() {
     return this.deviceId;
   }
@@ -167,7 +170,7 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     CastingException will contain the error code and message from the CastingApp.
    */
   @Override
-  public native CompletableFuture<Void> VerifyOrEstablishConnection(
+  public native CompletableFuture<Void> verifyOrEstablishConnection(
       long commissioningWindowTimeoutSec, EndpointFilter desiredEndpointFilter);
 
   /**
@@ -183,7 +186,11 @@ public class MatterCastingPlayer implements CastingPlayer {
    *     CastingException will contain the error code and message from the CastingApp.
    */
   @Override
-  public CompletableFuture<Void> VerifyOrEstablishConnection() {
-    return VerifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC, null);
+  public CompletableFuture<Void> verifyOrEstablishConnection() {
+    return verifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC, null);
   }
+
+  /** Sets the internal connection state of this CastingPlayer to "disconnected" */
+  @Override
+  public native void disconnect();
 }

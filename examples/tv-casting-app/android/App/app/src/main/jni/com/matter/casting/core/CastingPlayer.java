@@ -48,6 +48,8 @@ public interface CastingPlayer {
 
   long getDeviceType();
 
+  List<Endpoint> getEndpoints();
+
   @Override
   String toString();
 
@@ -75,7 +77,7 @@ public interface CastingPlayer {
    *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
    *     CastingException will contain the error code and message from the CastingApp.
    */
-  CompletableFuture<Void> VerifyOrEstablishConnection(
+  CompletableFuture<Void> verifyOrEstablishConnection(
       long commissioningWindowTimeoutSec, EndpointFilter desiredEndpointFilter);
 
   /**
@@ -90,5 +92,7 @@ public interface CastingPlayer {
    *     com.matter.casting.core.CastingException. If the VerifyOrEstablishConnection fails, the
    *     CastingException will contain the error code and message from the CastingApp.
    */
-  CompletableFuture<Void> VerifyOrEstablishConnection();
+  CompletableFuture<Void> verifyOrEstablishConnection();
+
+  void disconnect();
 }

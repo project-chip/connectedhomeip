@@ -14,11 +14,10 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.matter.casting.core;
+package com.matter.casting.clusters;
 
-/** Represents the state of the CastingApp */
-enum CastingAppState {
-  UNINITIALIZED, // Before Initialize() success
-  NOT_RUNNING, // After Initialize() success before Start()ing, OR After stop() success
-  RUNNING, // After Start() success
+import com.matter.casting.core.MatterCluster;
+
+public class MatterClusters {
+  public static class ContentLauncherCluster extends MatterCluster {}
 }

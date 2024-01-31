@@ -18,23 +18,36 @@
 
 #pragma once
 
+#include "core/CastingPlayer.h" // from tv-casting-common
+
 #include <jni.h>
 
 namespace matter {
 namespace casting {
 namespace core {
 
-class CastingPlayerJNI
+class ConnectionContextJNI
 {
 public:
-private:
-    friend CastingPlayerJNI & CastingAppJNIMgr();
-    static CastingPlayerJNI sInstance;
+    CastingPlayer * castingPlayer;
+    ConnectCallback callback;
+    unsigned long long int commissioningWindowTimeoutSec;
+    EndpointFilter desiredEndpointFilter;
 };
 
-inline class CastingPlayerJNI & CastingAppJNIMgr()
+class MatterCastingPlayerJNI
 {
-    return CastingPlayerJNI::sInstance;
+public:
+    static void VerifyOrEstablishConnectionTask(chip::System::Layer * aSystemLayer, void * context);
+
+private:
+    friend MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr();
+    static MatterCastingPlayerJNI sInstance;
+};
+
+inline class MatterCastingPlayerJNI & MatterCastingPlayerJNIMgr()
+{
+    return MatterCastingPlayerJNI::sInstance;
 }
 }; // namespace core
 }; // namespace casting

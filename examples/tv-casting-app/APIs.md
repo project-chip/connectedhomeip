@@ -693,7 +693,8 @@ discover available endpoints supported by a Casting Player.
 ### Connect to a Casting Player
 
 _{Complete Connection examples: [Linux](linux/simple-app-helper.cpp) |
-[iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
+[Android](android/App/app/src/main/java/com/matter/casting/ConnectionExampleFragment.java)
+| [iOS](darwin/TvCasting/TvCasting/MCConnectionExampleViewModel.swift)}_
 
 Each `CastingPlayer` object created during
 [Discovery](#discover-casting-players) contains information such as
@@ -740,6 +741,40 @@ targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler,
 ...
 ```
 
+On Android, the Casting Client may call `verifyOrEstablishConnection` on the
+`CastingPlayer` object it wants to connect to and accept or handle exceptions on
+the returned `CompletableFuture` object.
+
+```java
+private static final long MIN_CONNECTION_TIMEOUT_SEC = 3 * 60;
+...
+...
+
+EndpointFilter desiredEndpointFilter = new EndpointFilter(null, 65521, new ArrayList<DeviceTypeStruct>());
+
+// The desired commissioning window timeout and EndpointFilter are optional.
+CompletableFuture<Void> completableFuture = targetCastingPlayer.verifyOrEstablishConnection(MIN_CONNECTION_TIMEOUT_SEC, desiredEndpointFilter);
+completableFuture
+    .thenAccept(
+        (response) -> {
+            Log.i(TAG, "CompletableFuture.thenAccept(), connected to CastingPlayer with deviceId: " + targetCastingPlayer.getDeviceId());
+
+            getActivity().runOnUiThread(() -> {
+                connectionFragmentNextButton.setEnabled(true);
+            });
+        }
+    ).exceptionally(
+        exc -> {
+            Log.e(TAG, "CompletableFuture.exceptionally(), CastingPLayer connection failed: " + exc.getMessage());
+
+            getActivity().runOnUiThread(() -> {
+                connectionFragmentStatusTextView.setText("Casting Player connection failed due to: " + exc.getMessage());
+            });
+        return null;
+        }
+    );
+```
+
 On iOS, the Casting Client may call `verifyOrEstablishConnection` on the
 `MCCastingPlayer` object it wants to connect to and handle any `NSErrors` that
 may happen in the process.
@@ -774,6 +809,8 @@ func connect(selectedCastingPlayer: MCCastingPlayer?) {
 ### Select an Endpoint on the Casting Player
 
 _{Complete Endpoint selection examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/ContentLauncherLaunchURLExampleFragment.java)
+|
 [iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
 On a successful connection with a `CastingPlayer`, a Casting Client may select
@@ -797,6 +834,29 @@ if (it != endpoints.end())
     // The desired endpoint is endpoints[index]
     unsigned index = (unsigned int) std::distance(endpoints.begin(), it);
     ...
+}
+```
+
+On Android, it can select an `Endpoint` as shown below.
+
+```java
+private static final Integer SAMPLE_ENDPOINT_VID = 65521;
+...
+List<Endpoint> endpoints = selectedCastingPlayer.getEndpoints();
+if (endpoints == null) {
+    Log.e(TAG, "No Endpoints found on CastingPlayer");
+    return;
+}
+
+Endpoint endpoint = endpoints
+    .stream()
+    .filter(e -> SAMPLE_ENDPOINT_VID.equals(e.getVendorId()))
+    .findFirst()
+    .get();
+
+if (endpoint == null) {
+    Log.e(TAG, "No Endpoint with chosen vendorID: " + SAMPLE_ENDPOINT_VID + " found on CastingPlayer");
+    return;
 }
 ```
 
@@ -834,6 +894,8 @@ response types to use with these APIs:
 ### Issuing Commands
 
 _{Complete Command invocation examples: [Linux](linux/simple-app-helper.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/ContentLauncherLaunchURLExampleFragment.java)
+|
 [iOS](darwin/TvCasting/TvCasting/MCContentLauncherLaunchURLExampleViewModel.swift)}_
 
 The Casting Client can get a reference to an `Endpoint` on a `CastingPlayer`,
@@ -878,6 +940,46 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
         },
         chip::MakeOptional(kTimedInvokeCommandTimeoutMs));      // time out after kTimedInvokeCommandTimeoutMs
 }
+```
+
+On Android, given an `Endpoint` endpoint, it can send a `LaunchURL` command
+(part of the Content Launcher cluster) by calling the `invoke` API on a
+`ContentLauncherClusterLaunchURLCommand`
+
+```java
+if (!endpoint.hasCluster(MatterClusters.ContentLauncherCluster.class)) {
+    Log.e(TAG, "Endpoint with chosen vendorID does not support ContentLauncher cluster");
+    return;
+}
+
+MatterClusters.ContentLauncherCluster cluster = endpoint.getCluster(MatterClusters.ContentLauncherCluster.class);
+MatterCommands.ContentLauncherClusterLaunchURLCommand command = cluster.getCommand(MatterCommands.ContentLauncherClusterLaunchURLCommand.class);
+if (command == null) {
+    Log.e(TAG, "ContentLauncher cluster on Endpoint with chosen vendorID does not support LaunchURL command");
+    return;
+}
+
+// create the request object from GUI inputs
+MatterCommands.ContentLauncherClusterLaunchURLRequest request = new MatterCommands.ContentLauncherClusterLaunchURLRequest();
+request.contentURL = ((EditText) getView().findViewById(R.id.contentUrlEditText)).getText().toString();
+request.displayString = ((EditText) getView().findViewById(R.id.contentDisplayStringEditText)).getText().toString();
+CompletableFuture<MatterCommands.ContentLauncherClusterResponse> responseFuture = command.invoke(request, 5000);
+responseFuture
+    .thenAccept(
+        response -> {
+            Log.d(TAG, "Command response " + response);
+            TextView launchUrlStatus = getView().findViewById(R.id.launchUrlStatus);
+            getActivity().runOnUiThread(() ->
+                launchUrlStatus.setText("Success! Response data: " + response.data));
+        }
+    ).exceptionally(
+        exc -> {
+            Log.e(TAG, "Command failure: " + exc.getMessage());
+            TextView launchUrlStatus = getView().findViewById(R.id.launchUrlStatus);
+            getActivity().runOnUiThread(() -> launchUrlStatus.setText("Command failure: " + exc.getMessage()));
+            return null;
+        }
+    );
 ```
 
 On iOS, given an `MCEndpoint` endpoint, it can send a `LaunchURL` command (part
@@ -1042,10 +1144,8 @@ vendorIDAttribute!.read(nil) { context, before, after, err in
 
 ### Subscriptions
 
-_{Complete Attribute subscription examples:
-[Linux](linux/simple-app-helper.cpp)}_
-
-_{Complete Attribute Read examples: [Linux](linux/simple-app-helper.cpp) |
+_{Complete Attribute subscription examples: [Linux](linux/simple-app-helper.cpp)
+|
 [iOS](darwin/TvCasting/TvCasting/MCMediaPlaybackSubscribeToCurrentStateExampleViewModel.swift)}_
 
 A Casting Client may subscribe to an attribute on an `Endpoint` of the

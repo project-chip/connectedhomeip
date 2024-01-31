@@ -11,7 +11,9 @@ import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.TvCastingApp;
 import com.chip.casting.util.GlobalCastingConstants;
 import com.chip.casting.util.PreferencesConfigurationManager;
+import com.matter.casting.ActionSelectorFragment;
 import com.matter.casting.ConnectionExampleFragment;
+import com.matter.casting.ContentLauncherLaunchURLExampleFragment;
 import com.matter.casting.DiscoveryExampleFragment;
 import com.matter.casting.InitializationExample;
 import com.matter.casting.core.CastingPlayer;
@@ -22,7 +24,8 @@ public class MainActivity extends AppCompatActivity
         ConnectionFragment.Callback,
         SelectClusterFragment.Callback,
         DiscoveryExampleFragment.Callback,
-        ConnectionExampleFragment.Callback {
+        ConnectionExampleFragment.Callback,
+        ActionSelectorFragment.Callback {
 
   private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -73,9 +76,12 @@ public class MainActivity extends AppCompatActivity
   @Override
   public void handleConnectionComplete(CastingPlayer castingPlayer) {
     Log.i(TAG, "MainActivity.handleConnectionComplete() called ");
+    showFragment(ActionSelectorFragment.newInstance(castingPlayer));
+  }
 
-    // TODO: Implement in following PRs. Select Cluster Fragment.
-    // showFragment(SelectClusterFragment.newInstance(tvCastingApp));
+  @Override
+  public void handleContentLauncherLaunchURLSelected(CastingPlayer selectedCastingPlayer) {
+    showFragment(ContentLauncherLaunchURLExampleFragment.newInstance(selectedCastingPlayer));
   }
 
   @Override
@@ -95,7 +101,10 @@ public class MainActivity extends AppCompatActivity
 
   @Override
   public void handleDisconnect() {
-    showFragment(CommissionerDiscoveryFragment.newInstance(tvCastingApp));
+    showFragment(
+        GlobalCastingConstants.ChipCastingSimplified
+            ? DiscoveryExampleFragment.newInstance()
+            : CommissionerDiscoveryFragment.newInstance(tvCastingApp));
   }
 
   /**
