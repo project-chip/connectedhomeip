@@ -25,5 +25,13 @@ static_library("log") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/lib/support" ]
+  public_deps = [ 
+    "${chip_root}/src/lib/support",
+    # TODO: this should be a dependency on
+    #
+    #    app-common/zap-generated/tests/simulated-cluster-objects.h
+    #
+    # However that one is NOT in any gn dependency :(
+    "${chip_root}/src/app/common:enums",
+  ]
 }
