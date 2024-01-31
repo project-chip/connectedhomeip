@@ -242,6 +242,7 @@
 		7596A85728788557004DAE0E /* MTRClusters.h in Headers */ = {isa = PBXBuildFile; fileRef = 7596A85428788557004DAE0E /* MTRClusters.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		75B765C12A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h in Headers */ = {isa = PBXBuildFile; fileRef = 75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */; };
 		75B765C32A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm in Sources */ = {isa = PBXBuildFile; fileRef = 75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */; };
+		8874C1322B69C7060084BEFD /* MTRMetricsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8874C1312B69C7060084BEFD /* MTRMetricsTests.m */; };
 		88E6C9462B6334ED001A1FE0 /* MTRMetrics.h in Headers */ = {isa = PBXBuildFile; fileRef = 88E6C9432B6334ED001A1FE0 /* MTRMetrics.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		88E6C9472B6334ED001A1FE0 /* MTRMetrics_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 88E6C9442B6334ED001A1FE0 /* MTRMetrics_Internal.h */; };
 		88E6C9482B6334ED001A1FE0 /* MTRMetrics.mm in Sources */ = {isa = PBXBuildFile; fileRef = 88E6C9452B6334ED001A1FE0 /* MTRMetrics.mm */; };
@@ -632,6 +633,7 @@
 		75B765BF2A1D70F80014719B /* MTRAttributeSpecifiedCheck-src.zapt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MTRAttributeSpecifiedCheck-src.zapt"; sourceTree = "<group>"; };
 		75B765C02A1D71BC0014719B /* MTRAttributeSpecifiedCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRAttributeSpecifiedCheck.h; sourceTree = "<group>"; };
 		75B765C22A1D82D30014719B /* MTRAttributeSpecifiedCheck.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeSpecifiedCheck.mm; sourceTree = "<group>"; };
+		8874C1312B69C7060084BEFD /* MTRMetricsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRMetricsTests.m; sourceTree = "<group>"; };
 		88E6C9432B6334ED001A1FE0 /* MTRMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMetrics.h; sourceTree = "<group>"; };
 		88E6C9442B6334ED001A1FE0 /* MTRMetrics_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRMetrics_Internal.h; sourceTree = "<group>"; };
 		88E6C9452B6334ED001A1FE0 /* MTRMetrics.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRMetrics.mm; sourceTree = "<group>"; };
@@ -1318,6 +1320,7 @@
 		B202529A2459E34F00F97062 /* CHIPTests */ = {
 			isa = PBXGroup;
 			children = (
+				8874C1312B69C7060084BEFD /* MTRMetricsTests.m */,
 				1EE0805C2A448756008A03C2 /* MTRCommissionableBrowserTests.m */,
 				51189FC72A33ACE900184508 /* TestHelpers */,
 				3DFCB3282966684500332B35 /* MTRCertificateInfoTests.m */,
@@ -1903,6 +1906,7 @@
 				51C8E3F82825CDB600D47D00 /* MTRTestKeys.m in Sources */,
 				51C984622A61CE2A00B0AD9A /* MTRFabricInfoChecker.m in Sources */,
 				99C65E10267282F1003402F6 /* MTRControllerTests.m in Sources */,
+				8874C1322B69C7060084BEFD /* MTRMetricsTests.m in Sources */,
 				1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */,
 				5A6FEC9D27B5E48900F25F42 /* MTRXPCProtocolTests.m in Sources */,
 				1EE0805E2A44875E008A03C2 /* MTRCommissionableBrowserTests.m in Sources */,

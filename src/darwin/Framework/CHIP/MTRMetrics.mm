@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#import "MTRMetrics.h"
+#import "MTRMetrics_Internal.h"
 #import "MTRLogging_Internal.h"
 #import <Matter/MTRDefines.h>
 
@@ -28,6 +28,11 @@
         _metricsData = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (NSArray<NSString *> *) allKeys
+{
+    return [_metricsData allKeys];
 }
 
 - (nullable id)valueForKey:(NSString *)key
