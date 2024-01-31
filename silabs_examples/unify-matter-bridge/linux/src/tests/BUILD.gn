@@ -68,7 +68,8 @@ chip_test_suite_using_nltest("tests") {
   public_deps = [
     "//:unify-matter-bridge-lib",
     ":helpers",
-    "${chip_root}/src/lib/support:testing",
+    "${chip_root}/src/lib/support:test_utils",
+    "${chip_root}/src/lib/support:testing_nlunit",
     "${nlunit_test_root}:nlunit-test",
   ]
 }

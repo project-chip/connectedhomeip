@@ -906,6 +906,7 @@ namespace app {
                     { "ClientsSupportedPerFabric", ClientsSupportedPerFabric::Id },
                     { "UserActiveModeTriggerHint", UserActiveModeTriggerHint::Id },
                     { "UserActiveModeTriggerInstruction", UserActiveModeTriggerInstruction::Id },
+                    { "OperatingMode", OperatingMode::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1194,11 +1195,15 @@ namespace app {
         namespace MicrowaveOvenControl {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "CookTime", CookTime::Id },
                     { "MaxCookTime", MaxCookTime::Id },
                     { "PowerSetting", PowerSetting::Id },
                     { "MinPower", MinPower::Id },
                     { "MaxPower", MaxPower::Id },
                     { "PowerStep", PowerStep::Id },
+                    { "SupportedWatts", SupportedWatts::Id },
+                    { "SelectedWattIndex", SelectedWattIndex::Id },
+                    { "WattRating", WattRating::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1246,7 +1251,17 @@ namespace app {
         } // namespace RvcOperationalState
         namespace ScenesManagement {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "LastConfiguredBy", LastConfiguredBy::Id },
+                    { "SceneTableSize", SceneTableSize::Id },
+                    { "FabricSceneInfo", FabricSceneInfo::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace ScenesManagement
         namespace HepaFilterMonitoring {
@@ -1318,6 +1333,7 @@ namespace app {
                     { "TargetLevel", TargetLevel::Id },
                     { "DefaultOpenLevel", DefaultOpenLevel::Id },
                     { "ValveFault", ValveFault::Id },
+                    { "LevelStep", LevelStep::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1374,6 +1390,7 @@ namespace app {
                     { "AbsMaxPower", AbsMaxPower::Id },
                     { "PowerAdjustmentCapability", PowerAdjustmentCapability::Id },
                     { "Forecast", Forecast::Id },
+                    { "OptOutState", OptOutState::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1437,12 +1454,34 @@ namespace app {
         } // namespace EnergyPreference
         namespace EnergyEvseMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace EnergyEvseMode
         namespace DeviceEnergyManagementMode {
             namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::AttributeId> matter_attribute_id_cluster_map {
+                    { "SupportedModes", SupportedModes::Id },
+                    { "CurrentMode", CurrentMode::Id },
+                    { "StartUpMode", StartUpMode::Id },
+                    { "OnMode", OnMode::Id },
+                    { "GeneratedCommandList", GeneratedCommandList::Id },
+                    { "AcceptedCommandList", AcceptedCommandList::Id },
+                    { "EventList", EventList::Id },
+                    { "AttributeList", AttributeList::Id },
+                    { "FeatureMap", FeatureMap::Id },
+                    { "ClusterRevision", ClusterRevision::Id }
+                };
             } // namespace Attributes
         } // namespace DeviceEnergyManagementMode
         namespace DoorLock {
@@ -1484,6 +1523,15 @@ namespace app {
                     { "SendPINOverTheAir", SendPINOverTheAir::Id },
                     { "RequirePINforRemoteOperation", RequirePINforRemoteOperation::Id },
                     { "ExpiringUserTimeout", ExpiringUserTimeout::Id },
+                    { "AliroReaderVerificationKey", AliroReaderVerificationKey::Id },
+                    { "AliroReaderGroupIdentifier", AliroReaderGroupIdentifier::Id },
+                    { "AliroReaderGroupSubIdentifier", AliroReaderGroupSubIdentifier::Id },
+                    { "AliroExpeditedTransactionSupportedProtocolVersions", AliroExpeditedTransactionSupportedProtocolVersions::Id },
+                    { "AliroGroupResolvingKey", AliroGroupResolvingKey::Id },
+                    { "AliroSupportedBLEUWBProtocolVersions", AliroSupportedBLEUWBProtocolVersions::Id },
+                    { "AliroBLEAdvertisingVersion", AliroBLEAdvertisingVersion::Id },
+                    { "NumberOfAliroCredentialIssuerKeysSupported", NumberOfAliroCredentialIssuerKeysSupported::Id },
+                    { "NumberOfAliroEndpointKeysSupported", NumberOfAliroEndpointKeysSupported::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -1636,6 +1684,20 @@ namespace app {
                     { "ACLouverPosition", ACLouverPosition::Id },
                     { "ACCoilTemperature", ACCoilTemperature::Id },
                     { "ACCapacityformat", ACCapacityformat::Id },
+                    { "PresetTypes", PresetTypes::Id },
+                    { "ScheduleTypes", ScheduleTypes::Id },
+                    { "NumberOfPresets", NumberOfPresets::Id },
+                    { "NumberOfSchedules", NumberOfSchedules::Id },
+                    { "NumberOfScheduleTransitions", NumberOfScheduleTransitions::Id },
+                    { "NumberOfScheduleTransitionPerDay", NumberOfScheduleTransitionPerDay::Id },
+                    { "ActivePresetHandle", ActivePresetHandle::Id },
+                    { "ActiveScheduleHandle", ActiveScheduleHandle::Id },
+                    { "Presets", Presets::Id },
+                    { "Schedules", Schedules::Id },
+                    { "PresetsSchedulesEditable", PresetsSchedulesEditable::Id },
+                    { "TemperatureSetpointHoldPolicy", TemperatureSetpointHoldPolicy::Id },
+                    { "SetpointHoldExpiryTimestamp", SetpointHoldExpiryTimestamp::Id },
+                    { "QueuedPreset", QueuedPreset::Id },
                     { "GeneratedCommandList", GeneratedCommandList::Id },
                     { "AcceptedCommandList", AcceptedCommandList::Id },
                     { "EventList", EventList::Id },
@@ -2555,6 +2617,7 @@ namespace app {
                     { "AttributeList", AttributeList::Id },
                     { "FeatureMap", FeatureMap::Id },
                     { "ClusterRevision", ClusterRevision::Id },
+                    { "MeiInt8u", MeiInt8u::Id }
                 };
             } // namespace Attributes
         } // namespace UnitTesting
@@ -3180,12 +3243,29 @@ namespace app {
                     { "Start", Start::Id },
                     { "Resume", Resume::Id },
                     { "OperationalCommandResponse", OperationalCommandResponse::Id },
+                    { "GoHome", GoHome::Id }
                 };
             } // namespace Commands
         } // namespace RvcOperationalState
         namespace ScenesManagement {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "AddScene", AddScene::Id },
+                    { "AddSceneResponse", AddSceneResponse::Id },
+                    { "ViewScene", ViewScene::Id },
+                    { "ViewSceneResponse", ViewSceneResponse::Id },
+                    { "RemoveScene", RemoveScene::Id },
+                    { "RemoveSceneResponse", RemoveSceneResponse::Id },
+                    { "RemoveAllScenes", RemoveAllScenes::Id },
+                    { "RemoveAllScenesResponse", RemoveAllScenesResponse::Id },
+                    { "StoreScene", StoreScene::Id },
+                    { "StoreSceneResponse", StoreSceneResponse::Id },
+                    { "RecallScene", RecallScene::Id },
+                    { "GetSceneMembership", GetSceneMembership::Id },
+                    { "GetSceneMembershipResponse", GetSceneMembershipResponse::Id },
+                    { "CopyScene", CopyScene::Id },
+                    { "CopySceneResponse", CopySceneResponse::Id }
+                };
             } // namespace Commands
         } // namespace ScenesManagement
         namespace HepaFilterMonitoring {
@@ -3244,6 +3324,7 @@ namespace app {
                     { "ResumeRequest", ResumeRequest::Id },
                     { "ModifyForecastRequest", ModifyForecastRequest::Id },
                     { "RequestConstraintBasedForecast", RequestConstraintBasedForecast::Id },
+                    { "CancelRequest", CancelRequest::Id }
                 };
             } // namespace Commands
         } // namespace DeviceEnergyManagement
@@ -3268,12 +3349,18 @@ namespace app {
         } // namespace EnergyPreference
         namespace EnergyEvseMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace EnergyEvseMode
         namespace DeviceEnergyManagementMode {
             namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {};
+                static const std::unordered_map<std::string, chip::CommandId> matter_command_id_cluster_map {
+                    { "ChangeToMode", ChangeToMode::Id },
+                    { "ChangeToModeResponse", ChangeToModeResponse::Id }
+                };
             } // namespace Commands
         } // namespace DeviceEnergyManagementMode
         namespace DoorLock {
@@ -3304,6 +3391,8 @@ namespace app {
                     { "GetCredentialStatusResponse", GetCredentialStatusResponse::Id },
                     { "ClearCredential", ClearCredential::Id },
                     { "UnboltDoor", UnboltDoor::Id },
+                    { "SetAliroReaderConfig", SetAliroReaderConfig::Id },
+                    { "ClearAliroReaderConfig", ClearAliroReaderConfig::Id }
                 };
             } // namespace Commands
         } // namespace DoorLock
@@ -3341,6 +3430,13 @@ namespace app {
                     { "SetWeeklySchedule", SetWeeklySchedule::Id },
                     { "GetWeeklySchedule", GetWeeklySchedule::Id },
                     { "ClearWeeklySchedule", ClearWeeklySchedule::Id },
+                    { "SetActiveScheduleRequest", SetActiveScheduleRequest::Id },
+                    { "SetActivePresetRequest", SetActivePresetRequest::Id },
+                    { "StartPresetsSchedulesEditRequest", StartPresetsSchedulesEditRequest::Id },
+                    { "CancelPresetsSchedulesEditRequest", CancelPresetsSchedulesEditRequest::Id },
+                    { "CommitPresetsSchedulesRequest", CommitPresetsSchedulesRequest::Id },
+                    { "CancelSetActivePresetRequest", CancelSetActivePresetRequest::Id },
+                    { "SetTemperatureSetpointHoldPolicy", SetTemperatureSetpointHoldPolicy::Id }
                 };
             } // namespace Commands
         } // namespace Thermostat
@@ -3654,6 +3750,10 @@ namespace app {
                     { "TestSimpleOptionalArgumentRequest", TestSimpleOptionalArgumentRequest::Id },
                     { "TestEmitTestEventRequest", TestEmitTestEventRequest::Id },
                     { "TestEmitTestFabricScopedEventRequest", TestEmitTestFabricScopedEventRequest::Id },
+                    { "TestBatchHelperRequest", TestBatchHelperRequest::Id },
+                    { "TestSecondBatchHelperRequest", TestSecondBatchHelperRequest::Id },
+                    { "TestDifferentVendorMeiRequest", TestDifferentVendorMeiRequest::Id },
+                    { "TestDifferentVendorMeiResponse", TestDifferentVendorMeiResponse::Id }
                 };
             } // namespace Commands
         } // namespace UnitTesting

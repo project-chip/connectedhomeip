@@ -36,7 +36,6 @@ namespace app {
             { "Basic", BridgedDeviceBasicInformation::Id },
             { "Identify", Identify::Id },
             { "Groups", Groups::Id },
-            { "Scenes", Scenes::Id },
             { "OnOff", OnOff::Id },
             { "Level", LevelControl::Id },
             { "DoorLock", DoorLock::Id },
@@ -91,18 +90,6 @@ namespace app {
                 };
             } // namespace Attributes
         } // namespace Groups
-        namespace Scenes {
-            namespace Attributes {
-                static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
-                    { "SceneCount", SceneCount::Id },
-                    { "CurrentScene", CurrentScene::Id },
-                    { "CurrentGroup", CurrentGroup::Id },
-                    { "SceneValid", SceneValid::Id },
-                    { "NameSupport", NameSupport::Id },
-                    { "LastConfiguredBy", LastConfiguredBy::Id },
-                };
-            } // namespace Attributes
-        } // namespace Scenes
         namespace OnOff {
             namespace Attributes {
                 static const std::unordered_map<std::string, chip::AttributeId> unify_to_matter_attribute_id_cluster_map {
@@ -530,7 +517,6 @@ namespace app {
             { "Basic", BridgedDeviceBasicInformation::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "Identify", Identify::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "Groups", Groups::Attributes::unify_to_matter_attribute_id_cluster_map },
-            { "Scenes", Scenes::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "OnOff", OnOff::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "Level", LevelControl::Attributes::unify_to_matter_attribute_id_cluster_map },
             { "DoorLock", DoorLock::Attributes::unify_to_matter_attribute_id_cluster_map },
@@ -580,31 +566,6 @@ namespace app {
                 };
             } // namespace Commands
         } // namespace Groups
-        namespace Scenes {
-            namespace Commands {
-                static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
-                    { "AddScene", AddSceneResponse::Id },
-                    { "AddSceneResponse", AddSceneResponse::Id },
-                    { "ViewScene", ViewSceneResponse::Id },
-                    { "ViewSceneResponse", ViewSceneResponse::Id },
-                    { "RemoveScene", RemoveSceneResponse::Id },
-                    { "RemoveSceneResponse", RemoveSceneResponse::Id },
-                    { "RemoveAllScenes", RemoveAllScenesResponse::Id },
-                    { "RemoveAllScenesResponse", RemoveAllScenesResponse::Id },
-                    { "StoreScene", StoreSceneResponse::Id },
-                    { "StoreSceneResponse", StoreSceneResponse::Id },
-                    { "RecallScene", RecallScene::Id },
-                    { "GetSceneMembership", GetSceneMembershipResponse::Id },
-                    { "GetSceneMembershipResponse", GetSceneMembershipResponse::Id },
-                    { "EnhancedAddScene", EnhancedAddSceneResponse::Id },
-                    { "EnhancedAddSceneResponse", EnhancedAddSceneResponse::Id },
-                    { "EnhancedViewScene", EnhancedViewSceneResponse::Id },
-                    { "EnhancedViewSceneResponse", EnhancedViewSceneResponse::Id },
-                    { "CopyScene", CopySceneResponse::Id },
-                    { "CopySceneResponse", CopySceneResponse::Id }
-                };
-            } // namespace Commands
-        } // namespace Scenes
         namespace OnOff {
             namespace Commands {
                 static const std::unordered_map<std::string, chip::CommandId> unify_to_matter_command_id_cluster_map {
@@ -763,7 +724,6 @@ namespace app {
             { "Basic", BridgedDeviceBasicInformation::Commands::unify_to_matter_command_id_cluster_map },
             { "Identify", Identify::Commands::unify_to_matter_command_id_cluster_map },
             { "Groups", Groups::Commands::unify_to_matter_command_id_cluster_map },
-            { "Scenes", Scenes::Commands::unify_to_matter_command_id_cluster_map },
             { "OnOff", OnOff::Commands::unify_to_matter_command_id_cluster_map },
             { "Level", LevelControl::Commands::unify_to_matter_command_id_cluster_map },
             { "DoorLock", DoorLock::Commands::unify_to_matter_command_id_cluster_map },
