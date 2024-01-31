@@ -65,5 +65,6 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+#import <Matter/MTRMetrics.h>
 
 #undef MTR_INCLUDED_FROM_UMBRELLA_HEADER
