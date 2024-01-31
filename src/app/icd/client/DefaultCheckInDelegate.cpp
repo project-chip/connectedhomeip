@@ -46,7 +46,6 @@ void DefaultCheckInDelegate::OnCheckInComplete(const ICDClientInfo & clientInfo)
 RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & clientInfo, ICDClientStorage * clientStorage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     RefreshKeySender::RefreshKeyBuffer newKey;
 
     err = Crypto::DRBG_get_bytes(newKey.Bytes(), newKey.Capacity());
@@ -64,20 +63,21 @@ RefreshKeySender * DefaultCheckInDelegate::OnKeyRefreshNeeded(ICDClientInfo & cl
     return refreshKeySender;
 }
 
-void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR aError)
+void DefaultCheckInDelegate::OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error)
 {
-    if (aError == CHIP_NO_ERROR)
+    if (error == CHIP_NO_ERROR)
     {
         ChipLogProgress(ICD, "Re-registration with new key completed successfully");
     }
     else
     {
-        ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, aError.Format());
-        // The application can take corrective action  based on the error received.
+        ChipLogError(ICD, "Re-registration with new key failed with error : %" CHIP_ERROR_FORMAT, error.Format());
+        // The callee can take corrective action  based on the error received.
     }
     if (refreshKeySender != nullptr)
     {
         Platform::Delete(refreshKeySender);
+        refreshKeySender = nullptr;
     }
 }
 } // namespace app

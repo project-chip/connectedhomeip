@@ -27,14 +27,14 @@
 namespace chip {
 namespace app {
 
-RefreshKeySender::RefreshKeySender(CheckInDelegate * apCheckInDelegate, const ICDClientInfo & aICDClientInfo,
-                                   ICDClientStorage * aICDClientStorage, const RefreshKeyBuffer & aRefreshKeyBuffer) :
-    mICDClientInfo(aICDClientInfo),
-    mpICDClientStorage(aICDClientStorage), mpCheckInDelegate(apCheckInDelegate), mOnConnectedCallback(HandleDeviceConnected, this),
+RefreshKeySender::RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDClientInfo & icdClientInfo,
+                                   ICDClientStorage * icdClientStorage, const RefreshKeyBuffer & refreshKeyBuffer) :
+    mICDClientInfo(icdClientInfo),
+    mpICDClientStorage(icdClientStorage), mpCheckInDelegate(checkInDelegate), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 
 {
-    mNewKey = aRefreshKeyBuffer;
+    mNewKey = refreshKeyBuffer;
 }
 
 CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
@@ -48,7 +48,6 @@ CHIP_ERROR RefreshKeySender::RegisterClientWithNewKey(Messaging::ExchangeManager
         mICDClientInfo.offset            = 0;
         mpICDClientStorage->RemoveKey(mICDClientInfo);
         error = mpICDClientStorage->SetKey(mICDClientInfo, mNewKey.Span());
-
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(ICD, "Failed to set the new key after re-registration: %" CHIP_ERROR_FORMAT, error.Format());

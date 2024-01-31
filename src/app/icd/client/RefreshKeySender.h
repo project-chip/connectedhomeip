@@ -43,8 +43,8 @@ class RefreshKeySender
 public:
     typedef Crypto::SensitiveDataBuffer<Crypto::kAES_CCM128_Key_Length> RefreshKeyBuffer;
 
-    RefreshKeySender(CheckInDelegate * apCheckInDelegate, const ICDClientInfo & aICDClientInfo,
-                     ICDClientStorage * aICDClientStorage, const RefreshKeyBuffer & aRefreshKeyBuffer);
+    RefreshKeySender(CheckInDelegate * checkInDelegate, const ICDClientInfo & icdClientInfo, ICDClientStorage * icdClientStorage,
+                     const RefreshKeyBuffer & refreshKeyBuffer);
 
     /**
      * @brief Sets up a CASE session to the peer for re-registering a client with the peer when a key refresh is required to avoid
@@ -77,9 +77,6 @@ private:
     /**
      * @brief Used to send a re-registration command to the peer using a new key.
      *
-     * @param[in] clientInfo    - ICDClientInfo object representing the state associated with the node that sent the check-in
-     *                            message. The callee can use the clientInfo to determine the type of key to generate.
-     * @param[in] keyData       - New key to re-register the client with the server
      * @param[in] exchangeMgr   - exchange manager to use for the re-registration
      * @param[in] sessionHandle - session handle to use for the re-registration
      */

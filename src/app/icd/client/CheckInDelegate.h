@@ -72,10 +72,10 @@ public:
      *
      * @param[in] refreshKeySender - pointer to the RefreshKeySender object that was used for the key refresh process. The caller
      *                               will NOT use this pointer any more.
-     * @param[in] aError - CHIP_NO_ERROR indicates successful re-registration using the new key
+     * @param[in] error - CHIP_NO_ERROR indicates successful re-registration using the new key
      *                     Other errors indicate the failure reason.
      */
-    virtual void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR aError) = 0;
+    virtual void OnKeyRefreshDone(RefreshKeySender * refreshKeySender, CHIP_ERROR error) = 0;
 };
 
 } // namespace app
