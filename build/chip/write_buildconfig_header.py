@@ -99,12 +99,18 @@ def GetOptions():
         key = define[:equals_index]
         value = define[equals_index + 1:]
 
+        ifdef_guard = False
+        if key.startswith('ifndef:'):
+            key = key[len('ifndef:'):]
+            ifdef_guard = True
+
         # Canonicalize and validate the value.
         if value == 'true':
             value = '1'
         elif value == 'false':
             value = '0'
-        defines.append((key, str(value)))
+
+        defines.append((key, str(value), ifdef_guard))
 
     return Options(output=output,
                    rulename=cmdline_options.rulename,
@@ -121,8 +127,12 @@ def WriteHeader(options):
         output_file.write('\n#ifndef %s\n' % options.header_guard)
         output_file.write('#define %s\n\n' % options.header_guard)
 
-        for pair in options.defines:
-            output_file.write('#define %s %s\n' % pair)
+        for name, value, ifdef_guard in options.defines:
+            if ifdef_guard:
+                output_file.write(f'#ifndef {name}\n')
+            output_file.write(f'#define {name} {value}\n')
+            if ifdef_guard:
+                output_file.write('#endif\n')
 
         output_file.write('\n#endif  // %s\n' % options.header_guard)
 

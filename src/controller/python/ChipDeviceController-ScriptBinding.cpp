@@ -89,7 +89,7 @@ using namespace chip::DeviceLayer;
 extern "C" {
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
-typedef void (*DeviceAvailableFunc)(chip::Controller::Python::PyObject * context, DeviceProxy * device, PyChipError err);
+typedef void (*DeviceAvailableFunc)(PyObject * context, DeviceProxy * device, PyChipError err);
 typedef void (*ChipThreadTaskRunnerFunct)(intptr_t context);
 typedef void (*DeviceUnpairingCompleteFunct)(uint64_t nodeId, PyChipError error);
 }
@@ -208,7 +208,7 @@ const char * pychip_Stack_StatusReportToString(uint32_t profileId, uint16_t stat
 void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback);
+                                              PyObject * context, DeviceAvailableFunc callback);
 PyChipError pychip_FreeOperationalDeviceProxy(chip::OperationalDeviceProxy * deviceProxy);
 PyChipError pychip_GetLocalSessionId(chip::OperationalDeviceProxy * deviceProxy, uint16_t * localSessionId);
 PyChipError pychip_GetNumSessionsToPeer(chip::OperationalDeviceProxy * deviceProxy, uint32_t * numSessions);
@@ -224,15 +224,13 @@ PyChipError pychip_InteractionModel_ShutdownSubscription(SubscriptionId subscrip
 //
 // Storage
 //
-void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                               chip::Controller::Python::SyncSetKeyValueCb setCb,
+void * pychip_Storage_InitializeStorageAdapter(PyObject * context, chip::Controller::Python::SyncSetKeyValueCb setCb,
                                                chip::Controller::Python::SetGetKeyValueCb getCb,
                                                chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
 void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * storageAdapter);
 }
 
-void * pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject * context,
-                                               chip::Controller::Python::SyncSetKeyValueCb setCb,
+void * pychip_Storage_InitializeStorageAdapter(PyObject * context, chip::Controller::Python::SyncSetKeyValueCb setCb,
                                                chip::Controller::Python::SetGetKeyValueCb getCb,
                                                chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
 {
@@ -745,7 +743,7 @@ namespace {
 
 struct GetDeviceCallbacks
 {
-    GetDeviceCallbacks(chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback) :
+    GetDeviceCallbacks(PyObject * context, DeviceAvailableFunc callback) :
         mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mContext(context), mCallback(callback)
     {}
 
@@ -766,13 +764,13 @@ struct GetDeviceCallbacks
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-    chip::Controller::Python::PyObject * const mContext;
+    PyObject * const mContext;
     DeviceAvailableFunc mCallback;
 };
 } // anonymous namespace
 
 PyChipError pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
-                                              chip::Controller::Python::PyObject * context, DeviceAvailableFunc callback)
+                                              PyObject * context, DeviceAvailableFunc callback)
 {
     VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     auto * callbacks = new GetDeviceCallbacks(context, callback);

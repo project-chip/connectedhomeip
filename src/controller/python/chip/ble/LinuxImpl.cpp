@@ -16,6 +16,10 @@
  *    limitations under the License.
  */
 
+#include <memory>
+
+#include <Python.h>
+
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/bluez/AdapterIterator.h>
@@ -77,7 +81,6 @@ namespace {
 // To avoid python compatibility issues on inc/dec references,
 // code assumes an abstract type and leaves it up to python to keep track of
 // reference counts
-struct PyObject;
 
 class ScannerDelegateImpl : public ChipDeviceScannerDelegate
 {
