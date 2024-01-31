@@ -611,6 +611,11 @@
             "PeriodicEnergyImported",
             "PeriodicEnergyExported"
         ],
+        "Power Topology": [
+            "FeatureMap",
+            "AvailableEndpoints",
+            "ActiveEndpoints"
+        ],
         "Valve Configuration and Control": ["RemainingDuration"],
         "Boolean State Configuration": ["CurrentSensitivityLevel"]
     },
